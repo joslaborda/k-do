@@ -277,51 +277,51 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
             ) : (
               <>
                 {filteredCategories.map((category) => (
-              <Collapsible
-                key={category.name}
-                open={expandedCategories[category.name]}
-                onOpenChange={() => toggleCategory(category.name)}
-              >
-                <div className="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
-                  <CollapsibleTrigger className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <span className="font-semibold text-slate-900">{category.name}</span>
-                      <span className="text-sm text-slate-400">({category.phrases.length})</span>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent>
-                    <div className="border-t border-slate-100 divide-y divide-slate-50">
-                      {category.phrases.map((phrase, idx) => (
-                        <div key={idx} className="p-4 hover:bg-slate-50 transition-colors">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-slate-900 font-medium">{phrase.spanish}</p>
-                              <p className="text-xl mt-1">{phrase.japanese}</p>
-                              <p className="text-sm text-slate-500 mt-0.5 italic">{phrase.romaji}</p>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => copyToClipboard(phrase.japanese, `${category.name}-${idx}`)}
-                              className="flex-shrink-0"
-                            >
-                              {copiedId === `${category.name}-${idx}` ? (
-                                <Check className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <Copy className="w-4 h-4" />
-                              )}
-                            </Button>
-                          </div>
+                  <Collapsible
+                    key={category.name}
+                    open={expandedCategories[category.name]}
+                    onOpenChange={() => toggleCategory(category.name)}
+                  >
+                    <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-2xl overflow-hidden">
+                      <CollapsibleTrigger className="w-full p-4 flex items-center justify-between text-left hover:bg-stone-700/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{category.icon}</span>
+                          <span className="font-semibold text-stone-100">{category.name}</span>
+                          <span className="text-sm text-stone-400">({category.phrases.length})</span>
                         </div>
-                      ))}
+                        <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
+                      </CollapsibleTrigger>
+                      
+                      <CollapsibleContent>
+                        <div className="border-t border-stone-700 divide-y divide-stone-700">
+                          {category.phrases.map((phrase, idx) => (
+                            <div key={idx} className="p-4 hover:bg-stone-700/50 transition-colors">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-stone-100 font-medium">{phrase.spanish}</p>
+                                  <p className="text-xl mt-1 text-stone-200">{phrase.japanese}</p>
+                                  <p className="text-sm text-stone-400 mt-0.5 italic">{phrase.romaji}</p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => copyToClipboard(phrase.japanese, `${category.name}-${idx}`)}
+                                  className="flex-shrink-0"
+                                >
+                                  {copiedId === `${category.name}-${idx}` ? (
+                                    <Check className="w-4 h-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-4 h-4 text-stone-400" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CollapsibleContent>
                     </div>
-                  </CollapsibleContent>
-                </div>
-              </Collapsible>
-            ))}
+                  </Collapsible>
+                ))}
           </TabsContent>
         </Tabs>
       </div>
