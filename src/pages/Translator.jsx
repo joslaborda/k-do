@@ -260,7 +260,23 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
           </TabsContent>
 
           <TabsContent value="phrases" className="space-y-4">
-            {phraseCategories.map((category) => (
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
+              <Input
+                placeholder="Busca frases..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-500"
+              />
+            </div>
+            {filteredCategories.length === 0 ? (
+              <div className="text-center py-12 text-stone-400">
+                <Search className="w-12 h-12 mx-auto mb-3 text-stone-600" />
+                <p>No se encontraron frases que coincidan con tu búsqueda</p>
+              </div>
+            ) : (
+              <>
+                {filteredCategories.map((category) => (
               <Collapsible
                 key={category.name}
                 open={expandedCategories[category.name]}
