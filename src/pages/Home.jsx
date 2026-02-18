@@ -63,7 +63,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-xs uppercase tracking-wider text-stone-500">Fechas</p>
-                    <p className="font-medium text-stone-900">11 abril — 1 mayo</p>
+                    <p className="font-medium text-stone-900">4 marzo — 19 marzo</p>
                   </div>
                 </div>
                 <div className="h-12 w-px bg-stone-200" />
