@@ -47,32 +47,32 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import Calendar from './pages/Calendar';
 import Cities from './pages/Cities';
 import CityDetail from './pages/CityDetail';
+import Diary from './pages/Diary';
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
+import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
-import Packing from './pages/Packing';
-import Diary from './pages/Diary';
 import Utilities from './pages/Utilities';
-import Calendar from './pages/Calendar';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Calendar": Calendar,
     "Cities": Cities,
     "CityDetail": CityDetail,
+    "Diary": Diary,
     "Expenses": Expenses,
     "Home": Home,
+    "Packing": Packing,
     "Restaurants": Restaurants,
     "Tickets": Tickets,
     "Translator": Translator,
-    "Packing": Packing,
-    "Diary": Diary,
     "Utilities": Utilities,
-    "Calendar": Calendar,
 }
 
 export const pagesConfig = {

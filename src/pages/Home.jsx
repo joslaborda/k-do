@@ -245,52 +245,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Timeline Preview */}
-      {cities.length > 0 && (
-        <div className="max-w-6xl mx-auto px-6 py-12 pb-24">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-sm uppercase tracking-widest text-stone-400 font-medium">Tu itinerario</h2>
-            <Link to={createPageUrl('Cities')}>
-              <Button variant="ghost" size="sm" className="text-stone-600">
-                Ver todo <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-4">
-            {cities.slice(0, 3).map((city, idx) => (
-              <Link
-                key={city.id}
-                to={createPageUrl('CityDetail') + `?id=${city.id}`}
-                className="group bg-white rounded-xl border-2 border-stone-200 overflow-hidden hover:border-red-400 hover:shadow-lg transition-all"
-              >
-                <div className="aspect-video bg-gradient-to-br from-red-100 to-orange-100 relative overflow-hidden">
-                  {city.image_url ? (
-                    <img src={city.image_url} alt={city.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-30">
-                      {['🏯', '⛩️', '🗻'][idx % 3]}
-                    </div>
-                  )}
-                  <div className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-red-600">
-                    {idx + 1}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-stone-900 group-hover:text-red-600 transition-colors">
-                    {city.name}
-                  </h3>
-                  {city.start_date && (
-                    <p className="text-sm text-stone-500 mt-1">
-                      {format(new Date(city.start_date), 'd MMM', { locale: es })}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
