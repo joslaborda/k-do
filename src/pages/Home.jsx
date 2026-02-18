@@ -17,7 +17,9 @@ export default function Home() {
     { name: 'Docs', page: 'Tickets', icon: '✈️' },
     { name: 'Yummy', page: 'Restaurants', icon: '🍜' },
     { name: 'Gastos', page: 'Expenses', icon: '💴' },
-    { name: 'Idioma', page: 'Translator', icon: '🗣️' }
+    { name: 'Diario', page: 'Diary', icon: '📔' },
+    { name: 'Maleta', page: 'Packing', icon: '🧳' },
+    { name: 'Útil', page: 'Utilities', icon: '🔧' }
   ];
 
   const formatDateRange = (city) => {
@@ -99,7 +101,7 @@ export default function Home() {
       {/* Navigation Grid */}
       <div className="max-w-5xl mx-auto px-6 py-12">
         <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-light">Explora</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {sections.map((section) => (
             <Link
               key={section.page}
