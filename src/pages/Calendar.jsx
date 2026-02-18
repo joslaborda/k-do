@@ -199,7 +199,18 @@ export default function Calendar() {
               );
             })}
           </div>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="timeline">
+            <TimelineView
+              cities={cities}
+              expenses={expenses}
+              diaryEntries={diaryEntries}
+              itineraryDays={itineraryDays}
+            />
+          </TabsContent>
+        </Tabs>
 
         {/* Legend */}
         <div className="mt-6 flex flex-wrap gap-4 items-center justify-center">
