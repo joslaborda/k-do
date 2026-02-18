@@ -196,35 +196,71 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="translator" className="space-y-4">
-            <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-3xl p-8">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'es-jp' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
-                  🇪🇸 Español
+          <TabsContent value="translator" className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Input */}
+              <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl p-6 shadow-xl">
+                <div className="mb-4">
+                  <label className="text-sm font-semibold text-stone-300 mb-3 block">Entrada</label>
+                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'es-jp' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
+                    {direction === 'es-jp' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
+                  </div>
                 </div>
-                <button 
-                  onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
-                  className="p-2 rounded-full hover:bg-stone-700 transition-colors"
-                >
-                  <ArrowRightLeft className="w-5 h-5 text-stone-400" />
-                </button>
-                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'jp-es' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
-                  🇯🇵 Japonés
-                </div>
+                
+                <Textarea
+                  placeholder={direction === 'es-jp' ? 'Escribe algo en español...' : '日本語で書いてください...'}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  rows={6}
+                  className="bg-stone-700/50 border border-stone-600 text-stone-100 placeholder:text-stone-400 focus:border-indigo-500 focus:ring-indigo-500/20"
+                />
               </div>
 
-              <Textarea
-                placeholder={direction === 'es-jp' ? 'Escribe en español...' : '日本語で書いてください... (o en romaji)'}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                rows={4}
-                className="mb-4 bg-stone-700/50 border border-stone-600 text-stone-100 placeholder:text-stone-400"
-              />
+              {/* Output */}
+              <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl p-6 shadow-xl">
+                <div className="mb-4">
+                  <label className="text-sm font-semibold text-stone-300 mb-3 block">Traducción</label>
+                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'jp-es' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
+                    {direction === 'jp-es' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
+                  </div>
+                </div>
 
+                <div className="bg-stone-700/50 border border-stone-600 rounded-lg p-4 min-h-40 flex flex-col justify-between">
+                  {translatedText ? (
+                    <>
+                      <div className="flex-1 whitespace-pre-wrap text-stone-100">{translatedText}</div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(translatedText, 'translation')}
+                        className="mt-3 self-end"
+                      >
+                        {copiedId === 'translation' ? (
+                          <>
+                            <Check className="w-4 h-4 mr-2 text-green-500" />
+                            Copiado
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4 mr-2 text-stone-400" />
+                            Copiar
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    <p className="text-stone-400 text-sm">Aquí aparecerá la traducción...</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Button with switcher */}
+            <div className="flex gap-3 items-center justify-center">
               <Button 
                 onClick={handleTranslate}
                 disabled={!inputText.trim() || isTranslating}
-                className="w-full bg-indigo-600 hover:bg-indigo-700"
+                className="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-6 text-base"
               >
                 {isTranslating ? (
                   <>
@@ -238,26 +274,14 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                   </>
                 )}
               </Button>
-
-              {translatedText && (
-                <div className="mt-6 p-4 bg-stone-700/50 border border-stone-600 rounded-xl">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 whitespace-pre-wrap text-stone-100">{translatedText}</div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => copyToClipboard(translatedText, 'translation')}
-                      className="ml-2 flex-shrink-0"
-                    >
-                      {copiedId === 'translation' ? (
-                        <Check className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-stone-400" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              )}
+              
+              <button 
+                onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
+                className="p-3 rounded-full border border-stone-600 bg-stone-800 hover:bg-stone-700 transition-all hover:border-indigo-500"
+                title="Intercambiar idiomas"
+              >
+                <ArrowRightLeft className="w-5 h-5 text-indigo-400" />
+              </button>
             </div>
           </TabsContent>
 
