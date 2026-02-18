@@ -130,70 +130,7 @@ export default function Cities() {
           </div>
         </div>
 
-        {/* Map Section */}
-        {cities.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm uppercase tracking-widest text-stone-400 font-light">Mapa Interactivo</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowRoute(!showRoute)}
-                className="text-stone-600"
-              >
-                <Route className="w-4 h-4 mr-2" />
-                {showRoute ? 'Ocultar' : 'Mostrar'} Ruta
-              </Button>
-            </div>
-            <div className="h-[500px] rounded-lg overflow-hidden border border-stone-200">
-              <MapContainer
-                center={[36.2048, 138.2529]}
-                zoom={6}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                  url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                />
-                
-                {cities.map((city, idx) => (
-                  <Marker key={city.id} position={getCityPosition(city.name)}>
-                    <Popup>
-                      <div className="p-2 min-w-[200px]">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs text-stone-400">{String(idx + 1).padStart(2, '0')}</span>
-                          <h3 className="font-medium text-stone-900">{city.name}</h3>
-                        </div>
-                        {city.start_date && (
-                          <p className="text-xs text-stone-500 mb-2">
-                            {formatDateRange(city)}
-                          </p>
-                        )}
-                        {city.image_url && (
-                          <img 
-                            src={city.image_url} 
-                            alt={city.name}
-                            className="w-full h-24 object-cover rounded mt-2"
-                          />
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
 
-                {showRoute && routePositions.length > 1 && (
-                  <Polyline
-                    positions={routePositions}
-                    color="#dc2626"
-                    weight={2}
-                    opacity={0.6}
-                    dashArray="10, 10"
-                  />
-                )}
-              </MapContainer>
-            </div>
-          </div>
-        )}
 
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
