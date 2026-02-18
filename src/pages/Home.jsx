@@ -8,8 +8,8 @@ import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
   MapPin, Calendar, Plane, UtensilsCrossed, Receipt, 
-  BookOpen, Package, Info, CheckCircle2, Clock, TrendingUp,
-  ArrowRight, Search
+  Package, Info, CheckCircle2, Clock, TrendingUp,
+  ArrowRight, Search, Languages
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,10 +70,10 @@ export default function Home() {
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
     { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
-    { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-amber-500 to-yellow-500', emoji: '📔' },
     { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
     { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
+    { name: 'Translate', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🌐' },
   ];
 
   return (
