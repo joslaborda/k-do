@@ -32,9 +32,8 @@ const cityCoordinates = {
 };
 
 export default function Cities() {
-  const [showRoute, setShowRoute] = useState(false);
-  const queryClient = useQueryClient();
-  const { performDelete } = useUndo();
+   const queryClient = useQueryClient();
+   const { performDelete } = useUndo();
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['cities'] });
