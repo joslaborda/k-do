@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, MapPin, Trash2, Route } from 'lucide-react';
+import { Plus, MapPin, Trash2, Route, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import ShareButton from '@/components/ShareButton';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import {
   Dialog,
   DialogContent,
@@ -46,6 +48,7 @@ export default function Cities() {
   const { data: cities = [], isLoading } = useQuery({
     queryKey: ['cities'],
     queryFn: () => base44.entities.City.list('order'),
+    staleTime: 30000, // Cache por 30 segundos
   });
 
   const { data: itineraryDays = [] } = useQuery({
@@ -69,6 +72,27 @@ export default function Cities() {
     mutationFn: (id) => base44.entities.City.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cities'] }),
   });
+
+  const reorderMutation = useMutation({
+    mutationFn: async (reorderedCities) => {
+      await Promise.all(
+        reorderedCities.map((city, index) => 
+          base44.entities.City.update(city.id, { order: index })
+        )
+      );
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cities'] }),
+  });
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(cities);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    reorderMutation.mutate(items);
+  };
 
   const getDaysCount = (cityId) => {
     return itineraryDays.filter(day => day.city_id === cityId).length;
@@ -106,8 +130,10 @@ export default function Cities() {
             <h1 className="text-3xl font-light text-stone-900">Ruta</h1>
             <p className="text-stone-500 mt-1 font-light">Explora tu itinerario por Japón</p>
           </div>
-          
-          <Dialog open={open} onOpenChange={setOpen}>
+
+          <div className="flex gap-2">
+            <ShareButton title="Mi ruta por Japón" description="Mira mi itinerario de viaje" />
+            <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="bg-stone-900 hover:bg-stone-800">
                 <Plus className="w-4 h-4 mr-2" />
@@ -149,8 +175,9 @@ export default function Cities() {
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
-        </div>
+            </Dialog>
+            </div>
+            </div>
 
         {/* Map Section */}
         {cities.length > 0 && (
@@ -235,16 +262,47 @@ export default function Cities() {
           </div>
         ) : (
           <div>
-            <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-light">Ciudades</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cities.map((city) => (
-                <CityCard 
-                  key={city.id} 
-                  city={city} 
-                  daysCount={getDaysCount(city.id)}
-                />
-              ))}
-            </div>
+            <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-light flex items-center gap-2">
+              Ciudades
+              <span className="text-xs bg-stone-200 text-stone-600 px-2 py-1 rounded-full">Arrastra para reordenar</span>
+            </h2>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="cities">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  >
+                    {cities.map((city, index) => (
+                      <Draggable key={city.id} draggableId={city.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={snapshot.isDragging ? 'opacity-50' : ''}
+                          >
+                            <div className="relative group">
+                              <div
+                                {...provided.dragHandleProps}
+                                className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+                              >
+                                <GripVertical className="w-5 h-5 text-stone-400" />
+                              </div>
+                              <CityCard 
+                                city={city} 
+                                daysCount={getDaysCount(city.id)}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         )}
       </div>

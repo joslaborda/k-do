@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useImperativeHandle, forwardRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function QuickNotes() {
+const QuickNotes = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
   const [noteText, setNoteText] = useState('');
 
@@ -44,6 +44,10 @@ export default function QuickNotes() {
     mutationFn: (id) => base44.entities.UsefulInfo.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['quickNotes'] }),
   });
+
+  useImperativeHandle(ref, () => ({
+    openNotes: () => setOpen(true)
+  }));
 
   return (
     <>
@@ -118,4 +122,8 @@ export default function QuickNotes() {
       </Dialog>
     </>
   );
-}
+});
+
+QuickNotes.displayName = 'QuickNotes';
+
+export default QuickNotes;

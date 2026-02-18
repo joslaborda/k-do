@@ -1,7 +1,9 @@
+import { useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
 import QuickNotes from '@/components/QuickNotes';
+import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
@@ -15,9 +17,12 @@ const navItems = [
 ];
 
 export default function Layout({ children, currentPageName }) {
+  const quickNotesRef = useRef();
+
   return (
     <div className="min-h-screen bg-stone-50">
-      <QuickNotes />
+      <QuickNotes ref={quickNotesRef} />
+      <KeyboardShortcuts onNewNote={() => quickNotesRef.current?.openNotes()} />
       {children}
       
       {/* Bottom Navigation - Mobile */}
@@ -69,6 +74,13 @@ export default function Layout({ children, currentPageName }) {
           })}
         </div>
       </nav>
+
+      {/* Keyboard shortcuts hint */}
+      <div className="hidden md:block fixed bottom-4 left-20 text-xs text-stone-400 bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm border border-stone-200">
+        <kbd className="px-1.5 py-0.5 bg-stone-100 rounded text-stone-600">Alt+N</kbd> Nueva nota
+        {' • '}
+        <kbd className="px-1.5 py-0.5 bg-stone-100 rounded text-stone-600">⌘K</kbd> Buscar
+      </div>
 
       {/* Content padding for desktop nav */}
       <style>{`
