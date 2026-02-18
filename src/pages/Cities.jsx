@@ -122,50 +122,16 @@ export default function Cities() {
              <p className="text-stone-400 font-light">Tu ruta aparecerá aquí</p>
            </div>
          ) : (
-           <div>
-             <h2 className="text-sm uppercase tracking-widest text-stone-500 mb-6 font-light flex items-center gap-2">
-               Ciudades
-               <span className="text-xs bg-stone-700 text-stone-300 px-2 py-1 rounded-full">Arrastra para reordenar</span>
-             </h2>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="cities">
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-                  >
-                    {cities.map((city, index) => (
-                      <Draggable key={city.id} draggableId={city.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className={snapshot.isDragging ? 'opacity-50' : ''}
-                          >
-                            <div className="relative group">
-                              <div
-                                {...provided.dragHandleProps}
-                                className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 p-2 bg-stone-700 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-                              >
-                                <GripVertical className="w-5 h-5 text-stone-400" />
-                              </div>
-                              <CityCard 
-                                city={city} 
-                                daysCount={getDaysCount(city.id)}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </div>
-        )}
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {cities.map((city) => (
+               <CityCard 
+                 key={city.id}
+                 city={city} 
+                 daysCount={getDaysCount(city.id)}
+               />
+             ))}
+           </div>
+         )}
       </div>
     </div>
   );
