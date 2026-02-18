@@ -177,14 +177,16 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
   })).filter(cat => cat.phrases.length > 0);
 
   return (
-    <div className="min-h-screen bg-stone-900">
-      <div className="max-w-4xl mx-auto px-6 py-12 pb-24">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-stone-100">Traductor 🌐</h1>
-          <p className="text-stone-400 mt-1">Traduce y aprende frases útiles para tu viaje</p>
+    <div className="min-h-screen bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900">
+      <div className="max-w-5xl mx-auto px-6 py-12 pb-24">
+        {/* Header */}
+        <div className="mb-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-red-600/20 rounded-2xl blur-2xl -z-10" />
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-stone-100 to-stone-300 bg-clip-text text-transparent">Traductor 🌐</h1>
+          <p className="text-stone-400 mt-2">Traduce y aprende frases útiles para tu viaje</p>
         </div>
 
-        <Tabs defaultValue="phrases" className="space-y-6">
+        <Tabs defaultValue="translator" className="space-y-6">
           <TabsList className="bg-stone-800 border border-stone-700 p-1">
             <TabsTrigger value="phrases" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
               📖 Frases útiles
