@@ -404,7 +404,7 @@ export default function Restaurants() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Map */}
               <div className="lg:col-span-2">
-                <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden shadow-sm h-[600px]">
+                <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden shadow-sm h-[300px]">
                   <MapContainer
                     center={defaultCenter}
                     zoom={6}
