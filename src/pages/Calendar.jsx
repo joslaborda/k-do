@@ -107,7 +107,7 @@ export default function Calendar() {
         <div className="flex justify-end mb-6">
           <Button
             onClick={() => setDialogOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-green-600 hover:bg-green-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Añadir documento
@@ -143,7 +143,7 @@ export default function Calendar() {
                      {categoryTickets.map((ticket) => (
                        <div
                          key={ticket.id}
-                         className="bg-stone-800 border-2 border-stone-700 rounded-2xl p-6 hover:shadow-xl transition-all"
+                         className="bg-stone-800/40 backdrop-blur-xl border-2 border-stone-700/50 rounded-2xl p-6 hover:shadow-xl hover:border-stone-600/50 hover:bg-stone-800/60 transition-all"
                        >
                          <div className="flex items-start justify-between mb-4">
                            <div className="flex-1">
@@ -277,7 +277,7 @@ export default function Calendar() {
                 </Button>
                 <Button
                   onClick={() => createMutation.mutate(formData)}
-                  className="bg-red-600 hover:bg-red-700"
+                  className="bg-green-600 hover:bg-green-700"
                   disabled={!formData.name.trim() || createMutation.isPending}
                 >
                   {createMutation.isPending ? 'Guardando...' : 'Guardar'}
@@ -361,7 +361,7 @@ export default function Calendar() {
                         notes: editingTicket.notes,
                       }
                     })}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-green-600 hover:bg-green-700"
                     disabled={!editingTicket.name?.trim() || updateMutation.isPending}
                   >
                     {updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
