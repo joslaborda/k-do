@@ -5,7 +5,6 @@ import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, In
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
-import DailyReminder from '@/components/DailyReminder';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
@@ -23,7 +22,6 @@ export default function Layout({ children, currentPageName }) {
             <OfflineIndicator />
             <SyncIndicator />
             <KeyboardShortcuts />
-            <DailyReminder />
       {children}
       
       {/* Bottom Navigation - Mobile */}
