@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Receipt, BookOpen, UtensilsCrossed, Package } from 'lucide-react';
+import { Search, MapPin, Receipt, BookOpen, UtensilsCrossed, Package, Plane } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,6 +36,11 @@ export default function GlobalSearch({ open, onOpenChange }) {
     queryFn: () => base44.entities.PackingItem.list()
   });
 
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets'],
+    queryFn: () => base44.entities.Ticket.list('-date')
+  });
+
   const searchResults = query.length > 1 ? {
     cities: cities.filter(c => c.name?.toLowerCase().includes(query.toLowerCase())),
     expenses: expenses.filter(e => e.description?.toLowerCase().includes(query.toLowerCase())),
@@ -44,8 +49,9 @@ export default function GlobalSearch({ open, onOpenChange }) {
       d.content?.toLowerCase().includes(query.toLowerCase())
     ),
     restaurants: restaurants.filter(r => r.name?.toLowerCase().includes(query.toLowerCase())),
-    packing: packingItems.filter(p => p.name?.toLowerCase().includes(query.toLowerCase()))
-  } : { cities: [], expenses: [], diary: [], restaurants: [], packing: [] };
+    packing: packingItems.filter(p => p.name?.toLowerCase().includes(query.toLowerCase())),
+    tickets: tickets.filter(t => t.name?.toLowerCase().includes(query.toLowerCase()))
+  } : { cities: [], expenses: [], diary: [], restaurants: [], packing: [], tickets: [] };
 
   const totalResults = Object.values(searchResults).reduce((sum, arr) => sum + arr.length, 0);
 
@@ -184,6 +190,30 @@ export default function GlobalSearch({ open, onOpenChange }) {
                     >
                       <Package className="w-5 h-5 text-blue-600" />
                       <span className="font-medium">{item.name}</span>
+                    </Link>
+                  )}
+                />
+              )}
+
+              {searchResults.tickets.length > 0 && (
+                <ResultSection
+                  title="Documentos"
+                  icon={Plane}
+                  color="text-slate-600"
+                  results={searchResults.tickets}
+                  renderItem={(ticket) => (
+                    <Link
+                      to={createPageUrl('Calendar')}
+                      onClick={() => onOpenChange(false)}
+                      className="flex items-center justify-between p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Plane className="w-5 h-5 text-slate-600" />
+                        <div>
+                          <div className="font-medium">{ticket.name}</div>
+                          <div className="text-xs text-stone-500">{ticket.category}</div>
+                        </div>
+                      </div>
                     </Link>
                   )}
                 />
