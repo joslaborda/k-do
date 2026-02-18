@@ -172,8 +172,8 @@ export default function Home() {
                  >
                    <div className="text-4xl mb-2">💰</div>
                    <div className="space-y-1 mb-1">
-                     <div className="text-2xl font-bold text-white">¥{totalExpenses.jpy.toLocaleString()}</div>
-                     <div className="text-sm text-white/80">€{totalExpenses.eur.toLocaleString()}</div>
+                     <div className="text-2xl font-bold text-white">€{totalExpenses.eur.toLocaleString()}</div>
+                     <div className="text-sm text-white/80">¥{totalExpenses.jpy.toLocaleString()}</div>
                    </div>
                    <div className="text-sm text-white/80">Gastado</div>
                  </motion.div>
