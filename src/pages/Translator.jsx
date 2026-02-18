@@ -321,11 +321,11 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                       </CollapsibleContent>
                     </div>
                   </Collapsible>
-                ))}
-                </>
-                )}
-                </TabsContent>
-                </Tabs>
+                  ))}
+                  </>
+                  )}
+                  </TabsContent>
+                  </Tabs>
                 </div>
                 </div>
                 );
