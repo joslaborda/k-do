@@ -88,24 +88,172 @@ export default function Calendar() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-        {/* Redirect to Tickets page */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-stone-800 dark:to-stone-800 border-2 border-blue-200 dark:border-stone-700 rounded-3xl p-12 text-center">
-          <Plane className="w-20 h-20 text-blue-600 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-3">
-            Gestiona tus documentos
-          </h2>
-          <p className="text-stone-600 dark:text-stone-400 mb-6 max-w-md mx-auto">
-            Guarda y organiza tus vuelos, reservas de hotel, billetes de tren y más
-          </p>
-          <Link to={createPageUrl('Tickets')}>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Plane className="w-4 h-4 mr-2" />
-              Ir a Documentos
-            </Button>
-          </Link>
+        <div className="flex justify-end mb-6">
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Añadir documento
+          </Button>
         </div>
 
+        {tickets.length === 0 ? (
+          <div className="text-center py-24 bg-white/50 backdrop-blur-sm border-2 border-dashed border-stone-200 rounded-3xl">
+            <FileText className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+            <p className="text-stone-400">No hay documentos todavía</p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {Object.entries(categoryConfig).map(([key, config]) => {
+              const categoryTickets = groupedTickets[key] || [];
+              if (categoryTickets.length === 0) return null;
 
+              const Icon = config.icon;
+
+              return (
+                <div key={key}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${config.color} rounded-xl flex items-center justify-center`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+                      {config.label}
+                    </h2>
+                    <Badge variant="secondary">{categoryTickets.length}</Badge>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {categoryTickets.map((ticket) => (
+                      <div
+                        key={ticket.id}
+                        className={`bg-white/70 backdrop-blur-xl border-2 ${config.border} rounded-2xl p-6 hover:shadow-xl transition-all`}
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <h3 className="font-bold text-stone-900 text-lg mb-1">
+                              {ticket.name}
+                            </h3>
+                            {ticket.date && (
+                              <div className="flex items-center gap-2 text-sm text-stone-500">
+                                <CalendarIcon className="w-4 h-4" />
+                                {format(new Date(ticket.date), "d 'de' MMMM yyyy", { locale: es })}
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteMutation.mutate(ticket.id)}
+                            className="text-stone-400 hover:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+
+                        {ticket.notes && (
+                          <p className="text-sm text-stone-600 mb-4">{ticket.notes}</p>
+                        )}
+
+                        {ticket.file_url && (
+                          <a
+                            href={ticket.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 px-4 py-2 ${config.bg} ${config.text} rounded-lg hover:opacity-80 transition-opacity`}
+                          >
+                            <FileText className="w-4 h-4" />
+                            <span className="text-sm font-medium">Ver documento</span>
+                            <ExternalLink className="w-3 h-3 ml-auto" />
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Add Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Añadir documento</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div>
+                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Nombre</label>
+                <Input
+                  placeholder="ej. Vuelo Madrid - Tokyo"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Categoría</label>
+                <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(categoryConfig).map(([key, config]) => {
+                      const Icon = config.icon;
+                      return (
+                        <SelectItem key={key} value={key}>
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-4 h-4" />
+                            {config.label}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Fecha</label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Archivo</label>
+                <Input
+                  type="file"
+                  onChange={handleFileUpload}
+                  disabled={uploadingFile}
+                />
+                {uploadingFile && <p className="text-xs text-stone-500 mt-1">Subiendo archivo...</p>}
+                {formData.file_url && <p className="text-xs text-green-600 mt-1">✓ Archivo subido</p>}
+              </div>
+              <div>
+                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Notas (opcional)</label>
+                <Textarea
+                  placeholder="Notas adicionales..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => createMutation.mutate(formData)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={!formData.name.trim() || createMutation.isPending}
+                >
+                  {createMutation.isPending ? 'Guardando...' : 'Guardar'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
