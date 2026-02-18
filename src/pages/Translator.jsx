@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2, ChevronDown, Search } from 'lucide-react';
+import { Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2, ChevronDown, Search, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -167,6 +167,13 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
     setExpandedCategories(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
+  const speakJapanese = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ja-JP';
+    utterance.rate = 0.8;
+    speechSynthesis.speak(utterance);
+  };
+
   const filteredCategories = phraseCategories.map(cat => ({
     ...cat,
     phrases: cat.phrases.filter(phrase => 
@@ -331,18 +338,28 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                                   <p className="text-2xl font-bold mt-2 text-white tracking-tight">{phrase.japanese}</p>
                                   <p className="text-xs text-stone-400 mt-2 italic font-mono bg-stone-800/50 inline-block px-2 py-1 rounded">{phrase.romaji}</p>
                                 </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => copyToClipboard(phrase.japanese, `${category.name}-${idx}`)}
-                                  className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  {copiedId === `${category.name}-${idx}` ? (
-                                    <Check className="w-4 h-4 text-green-500" />
-                                  ) : (
-                                    <Copy className="w-4 h-4 text-stone-400" />
-                                  )}
-                                </Button>
+                                <div className="flex-shrink-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => speakJapanese(phrase.japanese)}
+                                    className="text-indigo-400 hover:text-indigo-300"
+                                    title="Escuchar pronunciación"
+                                  >
+                                    <Play className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => copyToClipboard(phrase.japanese, `${category.name}-${idx}`)}
+                                  >
+                                    {copiedId === `${category.name}-${idx}` ? (
+                                      <Check className="w-4 h-4 text-green-500" />
+                                    ) : (
+                                      <Copy className="w-4 h-4 text-stone-400" />
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           ))}
