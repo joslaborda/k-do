@@ -95,37 +95,23 @@ export default function TicketCard({ ticket, onDelete }) {
           </DialogHeader>
           
           <div className="mt-4 bg-stone-900 rounded-lg overflow-hidden h-[70vh]">
-          {isPDF ? (
-          <object
-            data={ticket.file_url}
-            type="application/pdf"
-            className="w-full h-full"
-            title={ticket.name}
-          >
-            <div className="w-full h-full flex items-center justify-center bg-stone-900 text-stone-400">
-              <div className="text-center">
-                <p className="mb-4">El PDF no puede mostrarse aquí</p>
-                <a 
-                  href={ticket.file_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-indigo-400 hover:text-indigo-300 underline"
-                >
-                  Abrir en nueva pestaña
-                </a>
-              </div>
-            </div>
-          </object>
-          ) : (
-          <div className="w-full h-full flex items-center justify-center bg-stone-900">
-            <img 
-              src={ticket.file_url} 
-              alt={ticket.name}
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-          )}
-          </div>
+           {isPDF ? (
+             <iframe
+               src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(ticket.file_url)}`}
+               className="w-full h-full border-0"
+               title={ticket.name}
+               allow="fullscreen"
+             />
+           ) : (
+             <div className="w-full h-full flex items-center justify-center bg-stone-900">
+               <img 
+                 src={ticket.file_url} 
+                 alt={ticket.name}
+                 className="max-w-full max-h-full object-contain"
+               />
+             </div>
+           )}
+           </div>
         </DialogContent>
       </Dialog>
     </>
