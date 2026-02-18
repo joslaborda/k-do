@@ -1,21 +1,13 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, MapPin, Trash2, Route, GripVertical } from 'lucide-react';
+import { MapPin, Route, GripVertical } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
 import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import ShareButton from '@/components/ShareButton';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+
 import CityCard from '@/components/cities/CityCard';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -31,7 +23,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const defaultCities = ['Osaka', 'Hiroshima', 'Hakone', 'Kyoto', 'Tokyo'];
+
 
 // Coordenadas de ciudades japonesas
 const cityCoordinates = {
@@ -43,8 +35,6 @@ const cityCoordinates = {
 };
 
 export default function Cities() {
-  const [open, setOpen] = useState(false);
-  const [newCity, setNewCity] = useState('');
   const [showRoute, setShowRoute] = useState(false);
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
@@ -67,17 +57,7 @@ export default function Cities() {
     queryFn: () => base44.entities.ItineraryDay.list(),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (name) => base44.entities.City.create({ 
-      name, 
-      order: cities.length 
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cities'] });
-      setNewCity('');
-      setOpen(false);
-    },
-  });
+
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.City.delete(id),
@@ -121,12 +101,6 @@ export default function Cities() {
     return itineraryDays.filter(day => day.city_id === cityId).length;
   };
 
-  const handleAddCity = () => {
-    if (newCity.trim()) {
-      createMutation.mutate(newCity.trim());
-    }
-  };
-
   const getCityPosition = (cityName) => {
     return cityCoordinates[cityName] || [35.6762, 139.6503]; // Default a Tokyo
   };
@@ -154,54 +128,7 @@ export default function Cities() {
             <h1 className="text-3xl font-light text-stone-900">Ruta</h1>
             <p className="text-stone-500 mt-1 font-light">Explora tu itinerario por Japón</p>
           </div>
-
-          <div className="flex gap-2">
-            <ShareButton title="Mi ruta por Japón" description="Mira mi itinerario de viaje" />
-            <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-stone-900 hover:bg-stone-800">
-                <Plus className="w-4 h-4 mr-2" />
-                Añadir Ciudad
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Añadir nueva ciudad</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {defaultCities.map((city) => (
-                    <button
-                      key={city}
-                      onClick={() => setNewCity(city)}
-                      className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                        newCity === city 
-                          ? 'bg-stone-900 text-white' 
-                          : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                      }`}
-                    >
-                      {city}
-                    </button>
-                  ))}
-                </div>
-                <Input
-                  placeholder="O escribe el nombre de otra ciudad"
-                  value={newCity}
-                  onChange={(e) => setNewCity(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddCity()}
-                />
-                <Button 
-                  onClick={handleAddCity} 
-                  className="w-full bg-stone-900 hover:bg-stone-800"
-                  disabled={!newCity.trim() || createMutation.isPending}
-                >
-                  {createMutation.isPending ? 'Añadiendo...' : 'Añadir Ciudad'}
-                </Button>
-              </div>
-            </DialogContent>
-            </Dialog>
-            </div>
-            </div>
+        </div>
 
         {/* Map Section */}
         {cities.length > 0 && (
@@ -278,11 +205,7 @@ export default function Cities() {
           <div className="text-center py-20 bg-white rounded-2xl border border-stone-200">
             <MapPin className="w-16 h-16 text-stone-300 mx-auto mb-4" />
             <h3 className="text-xl font-light text-stone-700 mb-2">Sin ciudades todavía</h3>
-            <p className="text-stone-500 mb-6 font-light">Empieza añadiendo las ciudades que visitarás en Japón</p>
-            <Button onClick={() => setOpen(true)} className="bg-stone-900 hover:bg-stone-800">
-              <Plus className="w-4 h-4 mr-2" />
-              Añadir primera ciudad
-            </Button>
+            <p className="text-stone-500 font-light">Tu ruta aparecerá aquí</p>
           </div>
         ) : (
           <div>
