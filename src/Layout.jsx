@@ -4,20 +4,20 @@ import { Home, MapPin, Plane, UtensilsCrossed, Receipt, Languages } from 'lucide
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
-  { name: 'Ciudades', page: 'Cities', icon: MapPin },
+  { name: 'Ruta', page: 'Cities', icon: MapPin },
   { name: 'Docs', page: 'Tickets', icon: Plane },
-  { name: 'Restaurantes', page: 'Restaurants', icon: UtensilsCrossed },
+  { name: 'Comida', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
-  { name: 'Traductor', page: 'Translator', icon: Languages },
+  { name: 'Idioma', page: 'Translator', icon: Languages },
 ];
 
 export default function Layout({ children, currentPageName }) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-50">
       {children}
       
       {/* Bottom Navigation - Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 md:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 md:hidden z-50">
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.map((item) => {
             const isActive = currentPageName === item.page || 
@@ -26,14 +26,14 @@ export default function Layout({ children, currentPageName }) {
               <Link
                 key={item.page}
                 to={createPageUrl(item.page)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-colors ${
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
                   isActive 
-                    ? 'text-slate-900 bg-slate-100' 
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'text-red-600' 
+                    : 'text-stone-500'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                <span className="text-xs font-medium">{item.name}</span>
+                <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                <span className="text-[10px] font-medium">{item.name}</span>
               </Link>
             );
           })}
@@ -41,12 +41,10 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Side Navigation - Desktop */}
-      <nav className="fixed left-0 top-0 bottom-0 w-20 bg-white border-r border-slate-200 hidden md:flex flex-col items-center py-6 z-50">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center mb-8">
-          <span className="text-white font-bold text-lg">🇯🇵</span>
-        </div>
+      <nav className="fixed left-0 top-0 bottom-0 w-16 bg-white border-r border-stone-200 hidden md:flex flex-col items-center py-8 z-50">
+        <div className="text-3xl mb-12">🌸</div>
         
-        <div className="flex-1 flex flex-col items-center gap-2">
+        <div className="flex-1 flex flex-col items-center gap-1">
           {navItems.map((item) => {
             const isActive = currentPageName === item.page || 
               (item.page === 'Cities' && currentPageName === 'CityDetail');
@@ -54,14 +52,14 @@ export default function Layout({ children, currentPageName }) {
               <Link
                 key={item.page}
                 to={createPageUrl(item.page)}
-                className={`group flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                className={`group flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all ${
                   isActive 
-                    ? 'bg-slate-900 text-white' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                    ? 'text-red-600' 
+                    : 'text-stone-500 hover:text-stone-700'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">{item.name}</span>
+                <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                <span className="text-[9px] font-medium">{item.name}</span>
               </Link>
             );
           })}
@@ -72,7 +70,7 @@ export default function Layout({ children, currentPageName }) {
       <style>{`
         @media (min-width: 768px) {
           .min-h-screen {
-            margin-left: 80px;
+            margin-left: 64px;
           }
         }
         @media (max-width: 767px) {
