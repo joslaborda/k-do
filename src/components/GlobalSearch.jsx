@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin, Receipt, BookOpen, UtensilsCrossed, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -56,6 +56,7 @@ export default function GlobalSearch({ open, onOpenChange }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 gap-0 bg-white/95 backdrop-blur-xl">
+        <DialogTitle className="sr-only">Buscar</DialogTitle>
         <div className="p-6 pb-0">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
