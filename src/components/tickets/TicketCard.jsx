@@ -9,12 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const categoryConfig = {
-  flight: { icon: Plane, color: 'bg-sky-50 text-sky-600', label: 'Flight' },
-  train: { icon: Train, color: 'bg-emerald-50 text-emerald-600', label: 'Train' },
+  flight: { icon: Plane, color: 'bg-sky-50 text-sky-600', label: 'Vuelo' },
+  train: { icon: Train, color: 'bg-emerald-50 text-emerald-600', label: 'Tren' },
   hotel: { icon: Hotel, color: 'bg-violet-50 text-violet-600', label: 'Hotel' },
-  insurance: { icon: Shield, color: 'bg-amber-50 text-amber-600', label: 'Insurance' },
-  activity: { icon: Ticket, color: 'bg-rose-50 text-rose-600', label: 'Activity' },
-  other: { icon: FileText, color: 'bg-slate-50 text-slate-600', label: 'Other' }
+  insurance: { icon: Shield, color: 'bg-amber-50 text-amber-600', label: 'Seguro' },
+  activity: { icon: Ticket, color: 'bg-rose-50 text-rose-600', label: 'Actividad' },
+  other: { icon: FileText, color: 'bg-slate-50 text-slate-600', label: 'Otro' }
 };
 
 export default function TicketCard({ ticket, onDelete }) {
@@ -52,13 +52,13 @@ export default function TicketCard({ ticket, onDelete }) {
               <DropdownMenuItem asChild>
                 <a href={ticket.file_url} target="_blank" rel="noopener noreferrer">
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  Descargar
                 </a>
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={() => onDelete(ticket.id)} className="text-red-600">
               <Trash2 className="w-4 h-4 mr-2" />
-              Delete
+              Eliminar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -72,7 +72,7 @@ export default function TicketCard({ ticket, onDelete }) {
           className="mt-3 flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
         >
           <FileText className="w-4 h-4" />
-          View document
+          Ver documento
         </a>
       )}
     </div>

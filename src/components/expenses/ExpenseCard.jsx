@@ -38,7 +38,7 @@ export default function ExpenseCard({ expense, onDelete }) {
         <h3 className="font-medium text-slate-900 truncate">{expense.description}</h3>
         <div className="flex items-center gap-2 mt-0.5">
           <span className={`text-xs px-2 py-0.5 rounded-full ${expense.paid_by === 'You' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>
-            {expense.paid_by}
+            {expense.paid_by === 'You' ? 'Tú' : expense.paid_by}
           </span>
           {expense.date && (
             <span className="text-xs text-slate-400">
@@ -51,7 +51,7 @@ export default function ExpenseCard({ expense, onDelete }) {
       <div className="text-right">
         <p className="font-semibold text-slate-900">{formatAmount(expense.amount, expense.currency)}</p>
         {expense.split_with?.length > 0 && (
-          <p className="text-xs text-slate-400">split</p>
+          <p className="text-xs text-slate-400">dividido</p>
         )}
       </div>
 

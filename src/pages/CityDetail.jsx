@@ -156,10 +156,10 @@ export default function CityDetail() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">Itinerary</h2>
+          <h2 className="text-xl font-semibold text-slate-900">Itinerario</h2>
           <Button onClick={openNewDialog} className="bg-slate-900 hover:bg-slate-800">
             <Plus className="w-4 h-4 mr-2" />
-            Add Day
+            Añadir Día
           </Button>
         </div>
 
@@ -172,11 +172,11 @@ export default function CityDetail() {
         ) : days.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
             <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-700 mb-2">No itinerary yet</h3>
-            <p className="text-slate-500 mb-4">Start planning your days in {city.name}</p>
+            <h3 className="text-lg font-medium text-slate-700 mb-2">Sin itinerario todavía</h3>
+            <p className="text-slate-500 mb-4">Empieza a planificar tus días en {city.name}</p>
             <Button onClick={openNewDialog} className="bg-slate-900 hover:bg-slate-800">
               <Plus className="w-4 h-4 mr-2" />
-              Add first day
+              Añadir primer día
             </Button>
           </div>
         ) : (
@@ -250,19 +250,19 @@ export default function CityDetail() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingDay ? 'Edit Day' : 'Add New Day'}</DialogTitle>
+            <DialogTitle>{editingDay ? 'Editar Día' : 'Añadir Nuevo Día'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Title</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Título</label>
               <Input
-                placeholder="e.g., Arrival + Dotonbori nocturno"
+                placeholder="ej. Llegada + Dotonbori nocturno"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Date</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Fecha</label>
               <Input
                 type="date"
                 value={formData.date}
@@ -271,10 +271,10 @@ export default function CityDetail() {
             </div>
             <div>
               <label className="text-sm font-medium text-slate-700 mb-1.5 block">
-                Details (Markdown supported)
+                Detalles (soporta Markdown)
               </label>
               <Textarea
-                placeholder="Add your itinerary details here..."
+                placeholder="Añade los detalles del itinerario aquí..."
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={12}
@@ -283,7 +283,7 @@ export default function CityDetail() {
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
               <Button 
                 onClick={handleSave}
@@ -291,7 +291,7 @@ export default function CityDetail() {
                 disabled={!formData.title.trim()}
               >
                 <Save className="w-4 h-4 mr-2" />
-                {editingDay ? 'Update' : 'Save'}
+                {editingDay ? 'Actualizar' : 'Guardar'}
               </Button>
             </div>
           </div>

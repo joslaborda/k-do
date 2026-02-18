@@ -38,7 +38,7 @@ export default function CityCard({ city, daysCount }) {
               </h3>
               {daysCount > 0 && (
                 <p className="text-white/70 text-sm mt-1">
-                  {daysCount} {daysCount === 1 ? 'day' : 'days'} planned
+                  {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
                 </p>
               )}
             </div>

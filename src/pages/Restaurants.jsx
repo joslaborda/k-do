@@ -124,14 +124,14 @@ export default function Restaurants() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Restaurants</h1>
-            <p className="text-slate-500 mt-1">Click on the map to pin restaurants you'd like to visit</p>
+            <h1 className="text-3xl font-bold text-slate-900">Restaurantes</h1>
+            <p className="text-slate-500 mt-1">Haz clic en el mapa para marcar restaurantes que quieras visitar</p>
           </div>
           
           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search restaurants..."
+              placeholder="Buscar restaurantes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -211,14 +211,14 @@ export default function Restaurants() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-slate-900">
-                {filteredRestaurants.length} restaurant{filteredRestaurants.length !== 1 ? 's' : ''}
+                {filteredRestaurants.length} restaurante{filteredRestaurants.length !== 1 ? 's' : ''}
               </h2>
               <div className="flex gap-2">
                 <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                  {restaurants.filter(r => !r.visited).length} to visit
+                  {restaurants.filter(r => !r.visited).length} por visitar
                 </Badge>
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  {restaurants.filter(r => r.visited).length} visited
+                  {restaurants.filter(r => r.visited).length} visitados
                 </Badge>
               </div>
             </div>
@@ -227,8 +227,8 @@ export default function Restaurants() {
               {filteredRestaurants.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-200">
                   <UtensilsCrossed className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-500">No restaurants yet</p>
-                  <p className="text-sm text-slate-400 mt-1">Click on the map to add one</p>
+                  <p className="text-slate-500">Sin restaurantes todavía</p>
+                  <p className="text-sm text-slate-400 mt-1">Haz clic en el mapa para añadir uno</p>
                 </div>
               ) : (
                 filteredRestaurants.map((restaurant) => (
@@ -284,37 +284,37 @@ export default function Restaurants() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Restaurant</DialogTitle>
+            <DialogTitle>Añadir Restaurante</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Name</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Nombre</label>
               <Input
-                placeholder="Restaurant name"
+                placeholder="Nombre del restaurante"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">City</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Ciudad</label>
               <Input
-                placeholder="e.g., Osaka"
+                placeholder="ej. Osaka"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Cuisine</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Tipo de cocina</label>
               <Input
-                placeholder="e.g., Ramen, Sushi"
+                placeholder="ej. Ramen, Sushi"
                 value={formData.cuisine}
                 onChange={(e) => setFormData({ ...formData, cuisine: e.target.value })}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Notes</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Notas</label>
               <Textarea
-                placeholder="Any notes about this place..."
+                placeholder="Notas sobre este lugar..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
@@ -322,14 +322,14 @@ export default function Restaurants() {
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
               <Button 
                 onClick={handleSave}
                 className="bg-slate-900 hover:bg-slate-800"
                 disabled={!formData.name.trim() || createMutation.isPending}
               >
-                {createMutation.isPending ? 'Saving...' : 'Save'}
+                {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>

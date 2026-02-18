@@ -62,20 +62,20 @@ export default function Cities() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Cities</h1>
-            <p className="text-slate-500 mt-1">Plan your itinerary for each destination</p>
+            <h1 className="text-3xl font-bold text-slate-900">Ciudades</h1>
+            <p className="text-slate-500 mt-1">Planifica tu itinerario para cada destino</p>
           </div>
           
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="bg-slate-900 hover:bg-slate-800">
                 <Plus className="w-4 h-4 mr-2" />
-                Add City
+                Añadir Ciudad
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add a new city</DialogTitle>
+                <DialogTitle>Añadir nueva ciudad</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -94,7 +94,7 @@ export default function Cities() {
                   ))}
                 </div>
                 <Input
-                  placeholder="Or enter custom city name"
+                  placeholder="O escribe el nombre de otra ciudad"
                   value={newCity}
                   onChange={(e) => setNewCity(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddCity()}
@@ -104,7 +104,7 @@ export default function Cities() {
                   className="w-full bg-slate-900 hover:bg-slate-800"
                   disabled={!newCity.trim() || createMutation.isPending}
                 >
-                  {createMutation.isPending ? 'Adding...' : 'Add City'}
+                  {createMutation.isPending ? 'Añadiendo...' : 'Añadir Ciudad'}
                 </Button>
               </div>
             </DialogContent>
@@ -120,11 +120,11 @@ export default function Cities() {
         ) : cities.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
             <MapPin className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-slate-700 mb-2">No cities added yet</h3>
-            <p className="text-slate-500 mb-6">Start by adding the cities you'll visit in Japan</p>
+            <h3 className="text-xl font-medium text-slate-700 mb-2">Sin ciudades todavía</h3>
+            <p className="text-slate-500 mb-6">Empieza añadiendo las ciudades que visitarás en Japón</p>
             <Button onClick={() => setOpen(true)} className="bg-slate-900 hover:bg-slate-800">
               <Plus className="w-4 h-4 mr-2" />
-              Add your first city
+              Añadir primera ciudad
             </Button>
           </div>
         ) : (

@@ -53,6 +53,7 @@ import CityDetail from './pages/CityDetail';
 import Tickets from './pages/Tickets';
 import Restaurants from './pages/Restaurants';
 import Expenses from './pages/Expenses';
+import Translator from './pages/Translator';
 import __Layout from './Layout.jsx';
 
 
@@ -63,6 +64,7 @@ export const PAGES = {
     "Tickets": Tickets,
     "Restaurants": Restaurants,
     "Expenses": Expenses,
+    "Translator": Translator,
 }
 
 export const pagesConfig = {

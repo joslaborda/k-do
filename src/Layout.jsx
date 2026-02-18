@@ -1,13 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, MapPin, Plane, UtensilsCrossed, Receipt } from 'lucide-react';
+import { Home, MapPin, Plane, UtensilsCrossed, Receipt, Languages } from 'lucide-react';
 
 const navItems = [
-  { name: 'Home', page: 'Home', icon: Home },
-  { name: 'Cities', page: 'Cities', icon: MapPin },
+  { name: 'Inicio', page: 'Home', icon: Home },
+  { name: 'Ciudades', page: 'Cities', icon: MapPin },
   { name: 'Tickets', page: 'Tickets', icon: Plane },
-  { name: 'Restaurants', page: 'Restaurants', icon: UtensilsCrossed },
-  { name: 'Expenses', page: 'Expenses', icon: Receipt },
+  { name: 'Restaurantes', page: 'Restaurants', icon: UtensilsCrossed },
+  { name: 'Gastos', page: 'Expenses', icon: Receipt },
+  { name: 'Traductor', page: 'Translator', icon: Languages },
 ];
 
 export default function Layout({ children, currentPageName }) {

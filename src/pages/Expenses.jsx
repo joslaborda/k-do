@@ -23,12 +23,12 @@ import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalanceSummary from '@/components/expenses/BalanceSummary';
 
 const categories = [
-  { value: 'food', label: 'Food', icon: Utensils },
-  { value: 'transport', label: 'Transport', icon: Train },
-  { value: 'accommodation', label: 'Accommodation', icon: Hotel },
-  { value: 'activities', label: 'Activities', icon: Ticket },
-  { value: 'shopping', label: 'Shopping', icon: ShoppingBag },
-  { value: 'other', label: 'Other', icon: MoreHorizontal },
+  { value: 'food', label: 'Comida', icon: Utensils },
+  { value: 'transport', label: 'Transporte', icon: Train },
+  { value: 'accommodation', label: 'Alojamiento', icon: Hotel },
+  { value: 'activities', label: 'Actividades', icon: Ticket },
+  { value: 'shopping', label: 'Compras', icon: ShoppingBag },
+  { value: 'other', label: 'Otro', icon: MoreHorizontal },
 ];
 
 export default function Expenses() {
@@ -92,12 +92,12 @@ export default function Expenses() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Expenses</h1>
-            <p className="text-slate-500 mt-1">Track and split costs with Carlos</p>
+            <h1 className="text-3xl font-bold text-slate-900">Gastos</h1>
+            <p className="text-slate-500 mt-1">Registra y divide los gastos con Carlos</p>
           </div>
           <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
             <Plus className="w-4 h-4 mr-2" />
-            Add Expense
+            Añadir Gasto
           </Button>
         </div>
 
@@ -112,13 +112,13 @@ export default function Expenses() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
               <TabsList className="bg-white border border-slate-200 p-1">
                 <TabsTrigger value="all" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">
-                  All
+                  Todos
                 </TabsTrigger>
                 <TabsTrigger value="You" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">
-                  You paid
+                  Pagaste tú
                 </TabsTrigger>
                 <TabsTrigger value="Carlos" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">
-                  Carlos paid
+                  Pagó Carlos
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -132,11 +132,11 @@ export default function Expenses() {
             ) : filteredExpenses.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
                 <Receipt className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-700 mb-2">No expenses yet</h3>
-                <p className="text-slate-500 mb-4">Start tracking your trip expenses</p>
+                <h3 className="text-lg font-medium text-slate-700 mb-2">Sin gastos todavía</h3>
+                <p className="text-slate-500 mb-4">Empieza a registrar los gastos del viaje</p>
                 <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add first expense
+                  Añadir primer gasto
                 </Button>
               </div>
             ) : (
@@ -157,13 +157,13 @@ export default function Expenses() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Expense</DialogTitle>
+            <DialogTitle>Añadir Gasto</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Description</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Descripción</label>
               <Input
-                placeholder="e.g., Dinner at Ichiran"
+                placeholder="ej. Cena en Ichiran"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
@@ -171,7 +171,7 @@ export default function Expenses() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Amount</label>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Importe</label>
                 <Input
                   type="number"
                   placeholder="0"
@@ -180,7 +180,7 @@ export default function Expenses() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Currency</label>
+                <label className="text-sm font-medium text-slate-700 mb-1.5 block">Moneda</label>
                 <Select 
                   value={formData.currency}
                   onValueChange={(value) => setFormData({ ...formData, currency: value })}
@@ -197,7 +197,7 @@ export default function Expenses() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Paid by</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Pagado por</label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -205,7 +205,7 @@ export default function Expenses() {
                   onClick={() => setFormData({ ...formData, paid_by: 'You' })}
                   className={formData.paid_by === 'You' ? 'bg-indigo-600 hover:bg-indigo-700' : ''}
                 >
-                  You
+                  Tú
                 </Button>
                 <Button
                   type="button"
@@ -225,12 +225,12 @@ export default function Expenses() {
                 onCheckedChange={handleSplitChange}
               />
               <label htmlFor="split" className="text-sm text-slate-700">
-                Split equally with {formData.paid_by === 'You' ? 'Carlos' : 'You'}
+                Dividir a medias con {formData.paid_by === 'You' ? 'Carlos' : 'ti'}
               </label>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Category</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Categoría</label>
               <Select 
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -252,7 +252,7 @@ export default function Expenses() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Date</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Fecha</label>
               <Input
                 type="date"
                 value={formData.date}
@@ -262,14 +262,14 @@ export default function Expenses() {
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
               <Button 
                 onClick={() => createMutation.mutate(formData)}
                 className="bg-slate-900 hover:bg-slate-800"
                 disabled={!formData.description.trim() || !formData.amount || createMutation.isPending}
               >
-                {createMutation.isPending ? 'Saving...' : 'Save'}
+                {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>

@@ -22,12 +22,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TicketCard from '@/components/tickets/TicketCard';
 
 const categories = [
-  { value: 'flight', label: 'Flight', icon: Plane },
-  { value: 'train', label: 'Train', icon: Train },
+  { value: 'flight', label: 'Vuelo', icon: Plane },
+  { value: 'train', label: 'Tren', icon: Train },
   { value: 'hotel', label: 'Hotel', icon: Hotel },
-  { value: 'insurance', label: 'Insurance', icon: Shield },
-  { value: 'activity', label: 'Activity', icon: Ticket },
-  { value: 'other', label: 'Other', icon: FileText },
+  { value: 'insurance', label: 'Seguro', icon: Shield },
+  { value: 'activity', label: 'Actividad', icon: Ticket },
+  { value: 'other', label: 'Otro', icon: FileText },
 ];
 
 export default function Tickets() {
@@ -86,12 +86,12 @@ export default function Tickets() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Tickets & Documents</h1>
-            <p className="text-slate-500 mt-1">All your travel documents in one place</p>
+            <h1 className="text-3xl font-bold text-slate-900">Tickets y Documentos</h1>
+            <p className="text-slate-500 mt-1">Todos tus documentos de viaje en un solo lugar</p>
           </div>
           <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
             <Plus className="w-4 h-4 mr-2" />
-            Add Document
+            Añadir Documento
           </Button>
         </div>
 
@@ -126,12 +126,12 @@ export default function Tickets() {
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
             <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-medium text-slate-700 mb-2">
-              {activeTab === 'all' ? 'No documents yet' : `No ${activeTab} tickets`}
+              {activeTab === 'all' ? 'Sin documentos todavía' : `Sin tickets de ${activeTab}`}
             </h3>
-            <p className="text-slate-500 mb-6">Upload your travel documents for easy access</p>
+            <p className="text-slate-500 mb-6">Sube tus documentos de viaje para acceder fácilmente</p>
             <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
               <Upload className="w-4 h-4 mr-2" />
-              Upload document
+              Subir documento
             </Button>
           </div>
         ) : (
@@ -150,20 +150,20 @@ export default function Tickets() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Document</DialogTitle>
+            <DialogTitle>Añadir Documento</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Name</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Nombre</label>
               <Input
-                placeholder="e.g., Flight to Tokyo"
+                placeholder="ej. Vuelo a Tokyo"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
             
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Category</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Categoría</label>
               <Select 
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -185,7 +185,7 @@ export default function Tickets() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Date</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Fecha</label>
               <Input
                 type="date"
                 value={formData.date}
@@ -194,7 +194,7 @@ export default function Tickets() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Upload File</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Subir Archivo</label>
               <div className="relative">
                 <input
                   type="file"
@@ -210,17 +210,17 @@ export default function Tickets() {
                   {uploading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                      <span className="text-slate-500">Uploading...</span>
+                      <span className="text-slate-500">Subiendo...</span>
                     </>
                   ) : formData.file_url ? (
                     <>
                       <FileText className="w-5 h-5 text-green-500" />
-                      <span className="text-green-600">File uploaded</span>
+                      <span className="text-green-600">Archivo subido</span>
                     </>
                   ) : (
                     <>
                       <Upload className="w-5 h-5 text-slate-400" />
-                      <span className="text-slate-500">Click to upload PDF or image</span>
+                      <span className="text-slate-500">Haz clic para subir PDF o imagen</span>
                     </>
                   )}
                 </label>
@@ -228,9 +228,9 @@ export default function Tickets() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Notes</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Notas</label>
               <Textarea
-                placeholder="Additional notes..."
+                placeholder="Notas adicionales..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
@@ -239,14 +239,14 @@ export default function Tickets() {
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
               <Button 
                 onClick={() => createMutation.mutate(formData)}
                 className="bg-slate-900 hover:bg-slate-800"
                 disabled={!formData.name.trim() || createMutation.isPending}
               >
-                {createMutation.isPending ? 'Saving...' : 'Save'}
+                {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>

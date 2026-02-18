@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, Plane, UtensilsCrossed, Receipt, ChevronRight, Sparkles } from 'lucide-react';
+import { MapPin, Plane, UtensilsCrossed, Receipt, ChevronRight, Sparkles, Languages } from 'lucide-react';
 import CityCard from '@/components/cities/CityCard';
 
 export default function Home() {
@@ -27,21 +27,28 @@ export default function Home() {
       page: 'Tickets', 
       icon: Plane, 
       color: 'from-sky-500 to-blue-600',
-      description: 'Flights, trains, hotels'
+      description: 'Vuelos, trenes, hoteles'
     },
     { 
-      name: 'Restaurants', 
+      name: 'Restaurantes', 
       page: 'Restaurants', 
       icon: UtensilsCrossed, 
       color: 'from-orange-500 to-red-500',
-      description: 'Places to eat'
+      description: 'Dónde comer'
     },
     { 
-      name: 'Expenses', 
+      name: 'Gastos', 
       page: 'Expenses', 
       icon: Receipt, 
       color: 'from-emerald-500 to-teal-600',
-      description: 'Split costs with Carlos'
+      description: 'Dividir con Carlos'
+    },
+    { 
+      name: 'Traductor', 
+      page: 'Translator', 
+      icon: Languages, 
+      color: 'from-violet-500 to-purple-600',
+      description: 'Frases útiles'
     },
   ];
 
@@ -61,32 +68,32 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
           <div className="flex items-center gap-2 text-white/60 text-sm mb-4">
             <MapPin className="w-4 h-4" />
-            <span>Japan 2025</span>
+            <span>Japón 2025</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            Japan Adventure
+            Aventura en Japón
           </h1>
           <p className="text-xl text-white/70 max-w-xl">
-            Your complete travel companion for exploring the Land of the Rising Sun with Carlos
+            Tu compañero de viaje para explorar el País del Sol Naciente con Carlos
           </p>
           
           <div className="flex items-center gap-3 mt-8">
             <div className="flex -space-x-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 border-2 border-white flex items-center justify-center text-sm font-medium">
-                Y
+                T
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white flex items-center justify-center text-sm font-medium">
                 C
               </div>
             </div>
-            <span className="text-white/60 text-sm">You & Carlos</span>
+            <span className="text-white/60 text-sm">Tú y Carlos</span>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Quick Links */}
-        <div className="grid grid-cols-3 gap-4 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {sections.map((section) => (
             <Link
               key={section.page}
@@ -106,14 +113,14 @@ export default function Home() {
         {/* Cities */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Cities</h2>
-            <p className="text-slate-500 mt-1">Your journey through Japan</p>
+            <h2 className="text-2xl font-bold text-slate-900">Ciudades</h2>
+            <p className="text-slate-500 mt-1">Tu recorrido por Japón</p>
           </div>
           <Link
             to={createPageUrl('Cities')}
             className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
           >
-            View all
+            Ver todo
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -131,14 +138,14 @@ export default function Home() {
         {cities.length === 0 && (
           <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
             <Sparkles className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-700 mb-2">No cities yet</h3>
-            <p className="text-slate-500 mb-4">Start planning your Japan adventure</p>
+            <h3 className="text-lg font-medium text-slate-700 mb-2">Sin ciudades todavía</h3>
+            <p className="text-slate-500 mb-4">Empieza a planificar tu aventura en Japón</p>
             <Link
               to={createPageUrl('Cities')}
               className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
             >
               <MapPin className="w-4 h-4" />
-              Add cities
+              Añadir ciudades
             </Link>
           </div>
         )}
