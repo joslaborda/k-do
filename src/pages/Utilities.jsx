@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Info, Cloud, DollarSign, Trash2, ExternalLink, Phone } from 'lucide-react';
+import WeatherCard from '@/components/WeatherCard';
 import {
   Dialog,
   DialogContent,
@@ -122,9 +123,9 @@ export default function Utilities() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50/20 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 dark:from-stone-900 dark:via-stone-900 dark:to-stone-900 transition-colors">
       {/* Header */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-stone-200 dark:bg-stone-900/80">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold text-stone-900 mb-2">Utilidades 🔧</h1>
           <p className="text-stone-600">Información útil para tu viaje</p>
@@ -220,18 +221,22 @@ export default function Utilities() {
 
           {/* Clima */}
           <TabsContent value="weather" className="space-y-6">
-            <div className="bg-white border-2 border-stone-200 rounded-2xl p-6">
-              <h2 className="text-xl font-bold text-stone-900 mb-6">Clima por ciudad</h2>
-              {cities.length === 0 ? (
-                <p className="text-stone-400 text-center py-8">Añade ciudades primero en la sección Ruta</p>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {cities.map((city) => (
-                    <WeatherCard key={city.id} city={city} />
-                  ))}
-                </div>
-              )}
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-stone-900 mb-2">Clima actual</h2>
+              <p className="text-stone-500">Pronóstico del tiempo en tiempo real</p>
             </div>
+            {cities.length === 0 ? (
+              <div className="text-center py-24 bg-white/50 backdrop-blur-sm border-2 border-dashed border-stone-200 rounded-3xl">
+                <Cloud className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+                <p className="text-stone-400">Añade ciudades primero en la sección Ruta</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {cities.map((city) => (
+                  <WeatherCard key={city.id} city={city} />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* Conversión moneda */}
@@ -367,73 +372,6 @@ export default function Utilities() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-// Componente de clima
-function WeatherCard({ city }) {
-  const [weather, setWeather] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const response = await base44.integrations.Core.InvokeLLM({
-          prompt: `Dame el clima actual y pronóstico para los próximos 3 días en ${city.name}, Japón. Incluye temperatura, condición del clima (soleado, nublado, lluvia, etc).`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              current_temp: { type: 'string' },
-              condition: { type: 'string' },
-              forecast: { type: 'string' }
-            }
-          }
-        });
-        setWeather(response);
-      } catch (error) {
-        console.error('Error fetching weather:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWeather();
-  }, [city.name]);
-
-  if (loading) {
-    return (
-      <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-        <div className="animate-pulse space-y-2">
-          <div className="h-4 bg-stone-200 rounded w-1/2" />
-          <div className="h-6 bg-stone-200 rounded w-3/4" />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5">
-      <h3 className="font-bold text-stone-900 mb-3 flex items-center gap-2">
-        <span className="text-2xl">🌤️</span>
-        {city.name}
-      </h3>
-      {weather && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-stone-600">Temperatura</span>
-            <span className="text-xl font-bold text-stone-900">{weather.current_temp}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-stone-600">Condición</span>
-            <span className="text-sm font-medium text-stone-900">{weather.condition}</span>
-          </div>
-          <div className="pt-2 mt-2 border-t border-blue-200">
-            <p className="text-xs text-stone-600">{weather.forecast}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

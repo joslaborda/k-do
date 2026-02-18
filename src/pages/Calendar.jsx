@@ -85,9 +85,9 @@ export default function Calendar() {
   const tripEnd = new Date('2026-03-19');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20 dark:from-stone-900 dark:via-stone-900 dark:to-stone-900 transition-colors">
       {/* Header */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-stone-200 dark:bg-stone-900/80">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -207,7 +207,12 @@ export default function Calendar() {
           </div>
           </TabsContent>
 
-          <TabsContent value="timeline">
+          <TabsContent value="timeline" className="space-y-6">
+            <div className="bg-gradient-to-br from-purple-50/50 to-pink-50/50 backdrop-blur-xl border border-purple-200/50 rounded-3xl p-6 mb-6">
+              <h3 className="text-lg font-bold text-stone-900 mb-2">📅 Cronología del viaje</h3>
+              <p className="text-stone-600 text-sm">Todos tus eventos ordenados por fecha y hora</p>
+            </div>
+            
             <TimelineView
               cities={cities}
               expenses={expenses}
