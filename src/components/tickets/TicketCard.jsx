@@ -97,7 +97,7 @@ export default function TicketCard({ ticket, onDelete }) {
           <div className="mt-4 bg-stone-900 rounded-lg overflow-hidden h-[70vh]">
            {isPDF ? (
              <iframe
-               src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(ticket.file_url)}`}
+               src={`https://docs.google.com/gview?url=${encodeURIComponent(ticket.file_url)}&embedded=true`}
                className="w-full h-full border-0"
                title={ticket.name}
                allow="fullscreen"
