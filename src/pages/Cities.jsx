@@ -120,36 +120,36 @@ export default function Cities() {
     .filter(pos => pos);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-stone-900 transition-colors">
+    <div className="min-h-screen bg-stone-900">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-light text-stone-900">Ruta</h1>
-            <p className="text-stone-500 mt-1 font-light">Explora tu itinerario por Japón</p>
+            <h1 className="text-3xl font-light text-stone-100">Ruta</h1>
+            <p className="text-stone-400 mt-1 font-light">Explora tu itinerario por Japón</p>
           </div>
         </div>
 
 
 
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="aspect-[16/10] rounded-2xl bg-stone-200 animate-pulse" />
-            ))}
-          </div>
-        ) : cities.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-stone-200">
-            <MapPin className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-            <h3 className="text-xl font-light text-stone-700 mb-2">Sin ciudades todavía</h3>
-            <p className="text-stone-500 font-light">Tu ruta aparecerá aquí</p>
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-light flex items-center gap-2">
-              Ciudades
-              <span className="text-xs bg-stone-200 text-stone-600 px-2 py-1 rounded-full">Arrastra para reordenar</span>
-            </h2>
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {[1, 2, 3].map((i) => (
+               <div key={i} className="aspect-[16/10] rounded-2xl bg-stone-700 animate-pulse" />
+             ))}
+           </div>
+         ) : cities.length === 0 ? (
+           <div className="text-center py-20 bg-stone-800 rounded-2xl border border-stone-700">
+             <MapPin className="w-16 h-16 text-stone-600 mx-auto mb-4" />
+             <h3 className="text-xl font-light text-stone-100 mb-2">Sin ciudades todavía</h3>
+             <p className="text-stone-400 font-light">Tu ruta aparecerá aquí</p>
+           </div>
+         ) : (
+           <div>
+             <h2 className="text-sm uppercase tracking-widest text-stone-500 mb-6 font-light flex items-center gap-2">
+               Ciudades
+               <span className="text-xs bg-stone-700 text-stone-300 px-2 py-1 rounded-full">Arrastra para reordenar</span>
+             </h2>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="cities">
                 {(provided) => (
@@ -169,7 +169,7 @@ export default function Cities() {
                             <div className="relative group">
                               <div
                                 {...provided.dragHandleProps}
-                                className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 p-2 bg-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+                                className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 p-2 bg-stone-700 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
                               >
                                 <GripVertical className="w-5 h-5 text-stone-400" />
                               </div>
