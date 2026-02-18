@@ -114,13 +114,13 @@ export default function Expenses() {
     : expenses.filter(e => e.paid_by === activeTab);
 
   return (
-    <div className="min-h-screen bg-stone-900">
+    <div className="min-h-screen bg-background">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-stone-100">Gastos 💴</h1>
-            <p className="text-stone-400 mt-2">Registra y divide los gastos con Carlos</p>
+            <h1 className="text-4xl font-bold text-foreground">Gastos 💴</h1>
+            <p className="text-muted-foreground mt-2">Registra y divide los gastos con Carlos</p>
           </div>
           <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
             <Plus className="w-4 h-4 mr-2" />
@@ -138,14 +138,14 @@ export default function Expenses() {
           {/* Expenses List */}
           <div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="bg-stone-800 border border-stone-700 p-1">
-                <TabsTrigger value="all" className="text-stone-400 data-[state=active]:bg-stone-700 data-[state=active]:text-stone-100">
+              <TabsList className="glass border border-border p-1">
+                <TabsTrigger value="all" className="text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   Todos
                 </TabsTrigger>
-                <TabsTrigger value="You" className="text-stone-400 data-[state=active]:bg-stone-700 data-[state=active]:text-stone-100">
+                <TabsTrigger value="You" className="text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   Pagaste tú
                 </TabsTrigger>
-                <TabsTrigger value="Carlos" className="text-stone-400 data-[state=active]:bg-stone-700 data-[state=active]:text-stone-100">
+                <TabsTrigger value="Carlos" className="text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   Pagó Carlos
                 </TabsTrigger>
               </TabsList>
@@ -154,14 +154,14 @@ export default function Expenses() {
             {isLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-stone-700 rounded-xl animate-pulse" />
+                  <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse" />
                 ))}
               </div>
             ) : filteredExpenses.length === 0 ? (
-              <div className="text-center py-16 bg-stone-800 rounded-2xl border border-dashed border-stone-700">
-                <Receipt className="w-12 h-12 text-stone-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-stone-100 mb-2">Sin gastos todavía</h3>
-                <p className="text-stone-400 mb-4">Empieza a registrar los gastos del viaje</p>
+              <div className="text-center py-16 glass rounded-2xl border border-dashed border-border">
+                <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Sin gastos todavía</h3>
+                <p className="text-muted-foreground mb-4">Empieza a registrar los gastos del viaje</p>
                 <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
                   <Plus className="w-4 h-4 mr-2" />
                   Añadir primer gasto
@@ -183,34 +183,34 @@ export default function Expenses() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-         <DialogContent className="bg-stone-800 border-stone-700">
+         <DialogContent className="bg-card border-border">
            <DialogHeader>
-             <DialogTitle className="text-stone-100">Añadir Gasto</DialogTitle>
+             <DialogTitle className="text-foreground">Añadir Gasto</DialogTitle>
            </DialogHeader>
            <div className="space-y-4 pt-4">
              <div>
-               <label className="text-sm font-medium text-stone-300 mb-1.5 block">Descripción</label>
-              <Input
+               <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
+               <Input
                 placeholder="ej. Cena en Ichiran"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
               />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Importe</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Importe</label>
                 <Input
                   type="number"
                   placeholder="0"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="bg-stone-700 border-stone-600 text-stone-100"
+                  className="bg-input border-border text-foreground"
                 />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Moneda</label>
+                </div>
+                <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda</label>
                 <Select 
                   value={formData.currency}
                   onValueChange={(value) => setFormData({ ...formData, currency: value })}
@@ -227,13 +227,13 @@ export default function Expenses() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Pagado por</label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant={formData.paid_by === 'You' ? 'default' : 'outline'}
-                  onClick={() => setFormData({ ...formData, paid_by: 'You' })}
-                  className={formData.paid_by === 'You' ? 'bg-green-600 hover:bg-green-700' : 'border-stone-600 text-stone-300 hover:bg-stone-700'}
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Pagado por</label>
+               <div className="flex gap-2">
+                 <Button
+                   type="button"
+                   variant={formData.paid_by === 'You' ? 'default' : 'outline'}
+                   onClick={() => setFormData({ ...formData, paid_by: 'You' })}
+                   className={formData.paid_by === 'You' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}
                 >
                   Tú
                 </Button>
@@ -241,7 +241,7 @@ export default function Expenses() {
                   type="button"
                   variant={formData.paid_by === 'Carlos' ? 'default' : 'outline'}
                   onClick={() => setFormData({ ...formData, paid_by: 'Carlos' })}
-                  className={formData.paid_by === 'Carlos' ? 'bg-blue-600 hover:bg-blue-700' : 'border-stone-600 text-stone-300 hover:bg-stone-700'}
+                  className={formData.paid_by === 'Carlos' ? 'bg-blue-600 hover:bg-blue-700' : 'border-border text-foreground hover:bg-secondary/50'}
                 >
                   Carlos
                 </Button>
@@ -254,13 +254,13 @@ export default function Expenses() {
                 checked={formData.split_with.length > 0}
                 onCheckedChange={handleSplitChange}
               />
-              <label htmlFor="split" className="text-sm text-stone-300">
+              <label htmlFor="split" className="text-sm text-foreground">
                 Dividir a medias con {formData.paid_by === 'You' ? 'Carlos' : 'ti'}
               </label>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Categoría</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
               <Select 
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -282,17 +282,17 @@ export default function Expenses() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
-              <Input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="bg-stone-700 border-stone-600 text-stone-100"
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
+               <Input
+                 type="date"
+                 value={formData.date}
+                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                 className="bg-input border-border text-foreground"
               />
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
                 Cancelar
               </Button>
               <Button 
