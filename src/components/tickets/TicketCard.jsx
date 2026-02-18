@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Plane, Train, Hotel, Shield, Ticket, MoreVertical, Trash2, FileText, Eye, X } from 'lucide-react';
+import { Plane, Train, Hotel, Shield, Ticket, MoreVertical, Trash2, FileText, Eye, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Document, Page, pdfjs } from 'react-pdf';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+
 const categoryConfig = {
   flight: { icon: Plane, color: 'bg-indigo-900/30 text-indigo-400 border border-indigo-700/50', label: 'Vuelo' },
   train: { icon: Train, color: 'bg-emerald-900/30 text-emerald-400 border border-emerald-700/50', label: 'Tren' },
@@ -25,9 +28,17 @@ const categoryConfig = {
 
 export default function TicketCard({ ticket, onDelete }) {
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [numPages, setNumPages] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const config = categoryConfig[ticket.category] || categoryConfig.other;
   const Icon = config.icon;
   const isPDF = ticket.file_url?.toLowerCase().endsWith('.pdf');
+
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setIsLoading(false);
+  };
 
   return (
     <>
@@ -94,14 +105,54 @@ export default function TicketCard({ ticket, onDelete }) {
             </button>
           </DialogHeader>
           
-          <div className="mt-4 bg-stone-900 rounded-lg overflow-hidden h-[70vh]">
+          <div className="mt-4 bg-stone-900 rounded-lg overflow-hidden h-[70vh] flex flex-col">
            {isPDF ? (
-             <iframe
-               src={`https://docs.google.com/gview?url=${encodeURIComponent(ticket.file_url)}&embedded=true`}
-               className="w-full h-full border-0"
-               title={ticket.name}
-               allow="fullscreen"
-             />
+             <>
+               {isLoading && (
+                 <div className="flex-1 flex items-center justify-center">
+                   <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
+                 </div>
+               )}
+               <div className="flex-1 overflow-auto">
+                 <Document 
+                   file={ticket.file_url}
+                   onLoadSuccess={onDocumentLoadSuccess}
+                   onLoadStart={() => setIsLoading(true)}
+                   loading={<div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 text-stone-400 animate-spin" /></div>}
+                 >
+                   <Page 
+                     pageNumber={currentPage}
+                     width={Math.min(window.innerWidth - 80, 800)}
+                     renderTextLayer={false}
+                   />
+                 </Document>
+               </div>
+               {numPages && numPages > 1 && (
+                 <div className="flex items-center justify-between px-4 py-3 bg-stone-800 border-t border-stone-700">
+                   <Button
+                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                     disabled={currentPage === 1}
+                     variant="ghost"
+                     size="sm"
+                     className="text-stone-400 hover:text-stone-200"
+                   >
+                     ← Anterior
+                   </Button>
+                   <span className="text-xs text-stone-400">
+                     Página {currentPage} de {numPages}
+                   </span>
+                   <Button
+                     onClick={() => setCurrentPage(Math.min(numPages, currentPage + 1))}
+                     disabled={currentPage === numPages}
+                     variant="ghost"
+                     size="sm"
+                     className="text-stone-400 hover:text-stone-200"
+                   >
+                     Siguiente →
+                   </Button>
+                 </div>
+               )}
+             </>
            ) : (
              <div className="w-full h-full flex items-center justify-center bg-stone-900">
                <img 
