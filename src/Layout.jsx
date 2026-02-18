@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
+import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, Package, Info, Languages } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
@@ -12,8 +12,8 @@ const navItems = [
   { name: 'Docs', page: 'Calendar', icon: Calendar },
   { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
-  { name: 'Diario', page: 'Diary', icon: BookOpen },
   { name: 'Útil', page: 'Utilities', icon: Info },
+  { name: 'Translate', page: 'Translator', icon: Languages },
 ];
 
 export default function Layout({ children, currentPageName }) {
