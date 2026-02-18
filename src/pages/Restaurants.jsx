@@ -371,7 +371,7 @@ export default function Restaurants() {
     <div className="min-h-screen bg-stone-900">
       <div className="max-w-7xl mx-auto px-6 py-12">
          <div className="mb-8">
-          <h1 className="text-3xl font-light text-stone-100">Yummy</h1>
+          <h1 className="text-3xl font-light text-stone-100">Yummy 🍜</h1>
           <p className="text-stone-400 mt-1 font-light">Descubre la gastronomía japonesa</p>
          </div>
 
