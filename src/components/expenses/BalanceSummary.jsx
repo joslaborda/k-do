@@ -73,71 +73,71 @@ export default function BalanceSummary({ expenses }) {
   const netBalanceEUR = convertToEUR(netBalanceJPY);
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Scale className="w-5 h-5 text-slate-400" />
-          <h3 className="font-medium text-slate-300">Balance del Viaje</h3>
-        </div>
-        <button 
-          onClick={fetchExchangeRate}
-          className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-300 transition-colors"
-          disabled={loadingRate}
-        >
-          {loadingRate ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <RefreshCw className="w-3 h-3" />
-          )}
-          {exchangeRate && <span>1€ = ¥{exchangeRate.toFixed(1)}</span>}
-        </button>
-      </div>
+    <div className="glass rounded-2xl p-6 border border-border">
+       <div className="flex items-center justify-between mb-6">
+         <div className="flex items-center gap-2">
+           <Scale className="w-5 h-5 text-primary" />
+           <h3 className="font-medium text-foreground">Balance del Viaje</h3>
+         </div>
+         <button 
+           onClick={fetchExchangeRate}
+           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+           disabled={loadingRate}
+         >
+           {loadingRate ? (
+             <Loader2 className="w-3 h-3 animate-spin" />
+           ) : (
+             <RefreshCw className="w-3 h-3" />
+           )}
+           {exchangeRate && <span>1€ = ¥{exchangeRate.toFixed(1)}</span>}
+         </button>
+       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white/10 rounded-xl p-4">
-          <p className="text-slate-400 text-sm mb-1">Pagaste tú</p>
-          <p className="text-2xl font-semibold">{formatJPY(youPaidJPY)}</p>
-          {exchangeRate && <p className="text-xs text-slate-500 mt-1">{formatEUR(youPaidJPY / exchangeRate)}</p>}
-        </div>
-        <div className="bg-white/10 rounded-xl p-4">
-          <p className="text-slate-400 text-sm mb-1">Pagó Carlos</p>
-          <p className="text-2xl font-semibold">{formatJPY(carlosPaidJPY)}</p>
-          {exchangeRate && <p className="text-xs text-slate-500 mt-1">{formatEUR(carlosPaidJPY / exchangeRate)}</p>}
-        </div>
-      </div>
+       <div className="grid grid-cols-2 gap-4 mb-6">
+         <div className="bg-secondary rounded-xl p-4">
+           <p className="text-muted-foreground text-sm mb-1">Pagaste tú</p>
+           <p className="text-2xl font-semibold text-foreground">{formatJPY(youPaidJPY)}</p>
+           {exchangeRate && <p className="text-xs text-muted-foreground mt-1">{formatEUR(youPaidJPY / exchangeRate)}</p>}
+         </div>
+         <div className="bg-secondary rounded-xl p-4">
+           <p className="text-muted-foreground text-sm mb-1">Pagó Carlos</p>
+           <p className="text-2xl font-semibold text-foreground">{formatJPY(carlosPaidJPY)}</p>
+           {exchangeRate && <p className="text-xs text-muted-foreground mt-1">{formatEUR(carlosPaidJPY / exchangeRate)}</p>}
+         </div>
+       </div>
 
-      <div className="border-t border-white/10 pt-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-slate-400">Total gastado</span>
-          <div className="text-right">
-            <span className="font-semibold">{formatJPY(totalSpentJPY)}</span>
-            {exchangeRate && <span className="text-xs text-slate-500 ml-2">({formatEUR(totalSpentJPY / exchangeRate)})</span>}
-          </div>
-        </div>
+       <div className="border-t border-border pt-4">
+         <div className="flex items-center justify-between mb-2">
+           <span className="text-muted-foreground">Total gastado</span>
+           <div className="text-right">
+             <span className="font-semibold text-foreground">{formatJPY(totalSpentJPY)}</span>
+             {exchangeRate && <span className="text-xs text-muted-foreground ml-2">({formatEUR(totalSpentJPY / exchangeRate)})</span>}
+           </div>
+         </div>
         
         {netBalanceJPY !== 0 && (
-          <div className={`p-4 rounded-xl mt-3 ${netBalanceJPY > 0 ? 'bg-emerald-500/20' : 'bg-rose-500/20'}`}>
+          <div className={`p-4 rounded-xl mt-3 ${netBalanceJPY > 0 ? 'bg-green-600/10 border border-green-600/30' : 'bg-primary/10 border border-primary/30'}`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 {netBalanceJPY > 0 ? (
                   <>
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300">Carlos te debe</span>
+                    <TrendingUp className="w-4 h-4 text-green-600" />
+                    <span className="text-green-700">Carlos te debe</span>
                   </>
                 ) : (
                   <>
-                    <TrendingDown className="w-4 h-4 text-rose-400" />
-                    <span className="text-rose-300">Debes a Carlos</span>
+                    <TrendingDown className="w-4 h-4 text-primary" />
+                    <span className="text-primary">Debes a Carlos</span>
                   </>
                 )}
               </div>
             </div>
             <div className="text-right">
-              <p className={`text-2xl font-bold ${netBalanceJPY > 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+              <p className={`text-2xl font-bold ${netBalanceJPY > 0 ? 'text-green-600' : 'text-primary'}`}>
                 {formatJPY(netBalanceJPY)}
               </p>
               {netBalanceEUR && (
-                <p className={`text-lg font-semibold mt-1 ${netBalanceJPY > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <p className={`text-lg font-semibold mt-1 ${netBalanceJPY > 0 ? 'text-green-700' : 'text-primary/80'}`}>
                   {formatEUR(netBalanceEUR)}
                 </p>
               )}
@@ -146,9 +146,9 @@ export default function BalanceSummary({ expenses }) {
         )}
 
         {netBalanceJPY === 0 && totalSpentJPY > 0 && (
-          <div className="flex items-center justify-center gap-2 p-3 rounded-xl mt-3 bg-white/10">
-            <Scale className="w-4 h-4 text-slate-400" />
-            <span className="text-slate-300">¡Todo cuadrado!</span>
+          <div className="flex items-center justify-center gap-2 p-3 rounded-xl mt-3 bg-secondary border border-border">
+            <Scale className="w-4 h-4 text-primary" />
+            <span className="text-foreground">¡Todo cuadrado!</span>
           </div>
         )}
       </div>
