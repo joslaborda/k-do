@@ -28,6 +28,7 @@ const moods = ['😊', '😍', '😎', '🤔', '😴', '🤩', '😋'];
 export default function Diary() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     title: '',
@@ -38,6 +39,8 @@ export default function Diary() {
   });
 
   const queryClient = useQueryClient();
+  const recognitionRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const { data: entries = [] } = useQuery({
     queryKey: ['diaryEntries'],
