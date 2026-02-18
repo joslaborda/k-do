@@ -697,7 +697,7 @@ export default function Utilities() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Cantidad</label>
+              <label className="text-sm font-medium text-stone-100 mb-1.5 block">Cantidad</label>
               <Input
                 type="number"
                 min="1"
