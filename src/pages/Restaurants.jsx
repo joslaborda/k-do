@@ -376,11 +376,8 @@ export default function Restaurants() {
           <p className="text-muted-foreground mt-2">Descubre la gastronomía japonesa</p>
          </div>
 
-        <Tabs defaultValue="menu" className="w-full">
+        <Tabs defaultValue="food" className="w-full">
           <TabsList className="mb-8">
-            <TabsTrigger value="menu" className="gap-2">
-              📋 Menú
-            </TabsTrigger>
             <TabsTrigger value="food" className="gap-2">
               <BookOpen className="w-4 h-4" />
               Guía de Comida
@@ -390,10 +387,6 @@ export default function Restaurants() {
               Mapa de Restaurantes
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="menu" className="space-y-6">
-            <MenuViewer foodItems={customFoodItems} />
-          </TabsContent>
 
           <TabsContent value="map" className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
