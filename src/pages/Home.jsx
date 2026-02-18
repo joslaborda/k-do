@@ -77,7 +77,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50/30 to-orange-50/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50/30 to-orange-50/20 dark:bg-gradient-to-br dark:from-stone-900 dark:via-stone-900/95 dark:to-stone-950">
       {/* Hero moderno con imagen */}
       <div className="relative overflow-hidden bg-gradient-to-br from-red-600 via-pink-500 to-orange-500">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1920')] bg-cover bg-center opacity-20" />
@@ -196,21 +196,21 @@ export default function Home() {
 
       {/* Quick Progress Bar */}
       <div className="max-w-6xl mx-auto px-6 mt-6">
-        <div className="bg-white rounded-2xl shadow-2xl p-6 border border-stone-200">
+        <div className="bg-white dark:bg-stone-800 rounded-2xl shadow-2xl p-6 border border-stone-200 dark:border-stone-700">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Package className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-stone-900">Progreso de maleta</span>
+              <span className="font-semibold text-stone-900 dark:text-stone-100">Progreso de maleta</span>
             </div>
-            <span className="text-2xl font-bold text-blue-600">{packedPercentage}%</span>
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{packedPercentage}%</span>
           </div>
-          <div className="h-3 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-3 bg-stone-100 dark:bg-stone-700 rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
               style={{ width: `${packedPercentage}%` }}
             />
           </div>
-          <p className="text-sm text-stone-500 mt-2">
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">
             {packingItems.filter(i => i.packed).length} de {packingItems.length} artículos empacados
           </p>
         </div>
@@ -218,7 +218,7 @@ export default function Home() {
 
       {/* Navigation Cards - Glassmorphism */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-medium">Navega tu viaje</h2>
+        <h2 className="text-sm uppercase tracking-widest text-stone-400 dark:text-stone-300 mb-6 font-medium">Navega tu viaje</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sections.map((section, idx) => (
             <motion.div
@@ -228,26 +228,26 @@ export default function Home() {
               transition={{ delay: idx * 0.05 }}
             >
               <Link
-                to={createPageUrl(section.page)}
-                className="group relative overflow-hidden bg-white rounded-2xl border-2 border-stone-200 hover:border-stone-300 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
-              >
-              <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-              
-              <div className="relative p-6 flex flex-col items-center gap-3">
-                <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
-                  {section.emoji}
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-stone-900 group-hover:text-red-600 transition-colors">
-                    {section.name}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ArrowRight className="w-5 h-5 text-stone-400" />
-              </div>
-              </Link>
+                 to={createPageUrl(section.page)}
+                 className="group relative overflow-hidden bg-white dark:bg-stone-800 rounded-2xl border-2 border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
+               >
+               <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+
+               <div className="relative p-6 flex flex-col items-center gap-3">
+                 <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
+                   {section.emoji}
+                 </div>
+                 <div className="text-center">
+                   <div className="font-semibold text-stone-900 dark:text-stone-100 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                     {section.name}
+                   </div>
+                 </div>
+               </div>
+
+               <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <ArrowRight className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+               </div>
+               </Link>
             </motion.div>
           ))}
         </div>
