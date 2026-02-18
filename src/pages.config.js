@@ -58,6 +58,7 @@ import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
 import Utilities from './pages/Utilities';
+import CalendarView from './pages/CalendarView';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "Tickets": Tickets,
     "Translator": Translator,
     "Utilities": Utilities,
+    "CalendarView": CalendarView,
 }
 
 export const pagesConfig = {

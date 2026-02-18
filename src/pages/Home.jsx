@@ -60,12 +60,12 @@ export default function Home() {
 
   const sections = [
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
-    { name: 'Calendario', page: 'Calendar', icon: Calendar, color: 'from-purple-500 to-indigo-500', emoji: '📅' },
+    { name: 'Calendario', page: 'CalendarView', icon: Calendar, color: 'from-purple-500 to-indigo-500', emoji: '📅' },
     { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
     { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-amber-500 to-yellow-500', emoji: '📔' },
     { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
-    { name: 'Docs', page: 'Tickets', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
+    { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
   ];
 
