@@ -7,6 +7,7 @@ import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import DarkModeToggle from '@/components/DarkModeToggle';
 import PWAInstaller from '@/components/PWAInstaller';
+import SyncIndicator from '@/components/SyncIndicator';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
@@ -26,6 +27,7 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-stone-50 dark:bg-stone-900 transition-colors">
       <OfflineIndicator />
       <PWAInstaller />
+      <SyncIndicator />
       <QuickNotes ref={quickNotesRef} />
       <KeyboardShortcuts onNewNote={() => quickNotesRef.current?.openNotes()} />
       <DarkModeToggle />
