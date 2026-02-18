@@ -6,7 +6,7 @@ const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
   { name: 'Ruta', page: 'Cities', icon: MapPin },
   { name: 'Docs', page: 'Tickets', icon: Plane },
-  { name: 'Comida', page: 'Restaurants', icon: UtensilsCrossed },
+  { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
   { name: 'Idioma', page: 'Translator', icon: Languages },
 ];
