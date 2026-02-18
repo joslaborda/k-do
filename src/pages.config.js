@@ -54,6 +54,9 @@ import Home from './pages/Home';
 import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
+import Packing from './pages/Packing';
+import Diary from './pages/Diary';
+import Utilities from './pages/Utilities';
 import __Layout from './Layout.jsx';
 
 
@@ -65,6 +68,9 @@ export const PAGES = {
     "Restaurants": Restaurants,
     "Tickets": Tickets,
     "Translator": Translator,
+    "Packing": Packing,
+    "Diary": Diary,
+    "Utilities": Utilities,
 }
 
 export const pagesConfig = {
