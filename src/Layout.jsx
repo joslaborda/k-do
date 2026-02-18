@@ -17,7 +17,6 @@ const navItems = [
   { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
   { name: 'Diario', page: 'Diary', icon: BookOpen },
-  { name: 'Maleta', page: 'Packing', icon: Package },
   { name: 'Útil', page: 'Utilities', icon: Info },
 ];
 

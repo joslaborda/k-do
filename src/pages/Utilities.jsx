@@ -183,12 +183,8 @@ export default function Utilities() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
-        <Tabs defaultValue="info" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="info">
-              <Info className="w-4 h-4 mr-2" />
-              Info
-            </TabsTrigger>
+        <Tabs defaultValue="weather" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="weather">
               <Cloud className="w-4 h-4 mr-2" />
               Clima
@@ -202,75 +198,6 @@ export default function Utilities() {
               Maleta
             </TabsTrigger>
           </TabsList>
-
-          {/* Info útil */}
-          <TabsContent value="info" className="space-y-6">
-            <div className="flex justify-end">
-              <Button
-                onClick={() => setDialogOpen(true)}
-                className="bg-stone-900 hover:bg-stone-800"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Añadir Info
-              </Button>
-            </div>
-
-            {infos.length === 0 ? (
-              <div className="text-center py-24 border-2 border-dashed border-stone-200 rounded-2xl">
-                <Info className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-                <p className="text-stone-400">Añade información útil para tu viaje</p>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                {infoCategories.map((cat) => {
-                  const categoryInfos = groupedInfos[cat.value] || [];
-                  if (categoryInfos.length === 0) return null;
-
-                  return (
-                    <div key={cat.value} className="bg-white border-2 border-stone-200 rounded-2xl p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="text-3xl">{cat.icon}</span>
-                        <h2 className="text-xl font-bold text-stone-900">{cat.label}</h2>
-                      </div>
-
-                      <div className="space-y-3">
-                        {categoryInfos.map((info) => (
-                          <div
-                            key={info.id}
-                            className="flex items-start gap-4 p-4 bg-stone-50 rounded-xl border border-stone-200"
-                          >
-                            <span className="text-2xl">{info.icon}</span>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-stone-900 mb-1">{info.title}</h3>
-                              <p className="text-sm text-stone-600 mb-2">{info.content}</p>
-                              {info.link && (
-                                <a
-                                  href={info.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                                >
-                                  Ver más <ExternalLink className="w-3 h-3" />
-                                </a>
-                              )}
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => deleteMutation.mutate(info.id)}
-                              className="text-stone-400 hover:text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </TabsContent>
 
           {/* Clima */}
           <TabsContent value="weather" className="space-y-6">
