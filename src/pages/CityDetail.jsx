@@ -261,6 +261,7 @@ export default function CityDetail() {
                 placeholder="ej. Llegada + Dotonbori nocturno"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div>
