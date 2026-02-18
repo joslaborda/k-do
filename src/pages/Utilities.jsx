@@ -184,7 +184,7 @@ export default function Utilities() {
       {/* Content */}
       <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
         <Tabs defaultValue="weather" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-stone-800 border border-stone-700">
+            <TabsList className="grid w-full grid-cols-4 bg-stone-800 border border-stone-700">
               <TabsTrigger value="weather" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
                 <Cloud className="w-4 h-4 mr-2" />
                 Clima
@@ -196,6 +196,10 @@ export default function Utilities() {
               <TabsTrigger value="packing" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
                 <Package className="w-4 h-4 mr-2" />
                 Maleta
+              </TabsTrigger>
+              <TabsTrigger value="translate" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
+                <Info className="w-4 h-4 mr-2" />
+                Translate
               </TabsTrigger>
             </TabsList>
 
