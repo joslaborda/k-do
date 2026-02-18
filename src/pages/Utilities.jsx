@@ -673,7 +673,7 @@ export default function Utilities() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Artículo</label>
+              <label className="text-sm font-medium text-stone-100 mb-1.5 block">Artículo</label>
               <Input
                 placeholder="ej. Camisetas"
                 value={packingFormData.name}
@@ -682,7 +682,7 @@ export default function Utilities() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Categoría</label>
+              <label className="text-sm font-medium text-stone-100 mb-1.5 block">Categoría</label>
               <Select value={packingFormData.category} onValueChange={(v) => setPackingFormData({ ...packingFormData, category: v })}>
                 <SelectTrigger>
                   <SelectValue />
