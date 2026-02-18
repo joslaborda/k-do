@@ -170,11 +170,11 @@ export default function CityDetail() {
             ))}
           </div>
         ) : days.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
-            <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-700 mb-2">Sin itinerario todavía</h3>
-            <p className="text-slate-500 mb-4">Empieza a planificar tus días en {city.name}</p>
-            <Button onClick={openNewDialog} className="bg-slate-900 hover:bg-slate-800">
+          <div className="text-center py-16 bg-stone-800 rounded-2xl border border-dashed border-stone-700">
+            <Calendar className="w-12 h-12 text-stone-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-stone-100 mb-2">Sin itinerario todavía</h3>
+            <p className="text-stone-400 mb-4">Empieza a planificar tus días en {city.name}</p>
+            <Button onClick={openNewDialog} className="bg-red-600 hover:bg-red-700">
               <Plus className="w-4 h-4 mr-2" />
               Añadir primer día
             </Button>
