@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
-import PWAInstaller from '@/components/PWAInstaller';
 import SyncIndicator from '@/components/SyncIndicator';
 import DailyReminder from '@/components/DailyReminder';
 
@@ -22,7 +21,6 @@ export default function Layout({ children, currentPageName }) {
         return (
           <div className="min-h-screen bg-stone-900 text-stone-100">
             <OfflineIndicator />
-            <PWAInstaller />
             <SyncIndicator />
             <KeyboardShortcuts />
             <DailyReminder />
