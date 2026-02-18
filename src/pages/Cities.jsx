@@ -1,12 +1,9 @@
-import { useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapPin, Route, GripVertical } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
 import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
-import { Button } from '@/components/ui/button';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { base44 } from '@/api/base44Client';
 
 import CityCard from '@/components/cities/CityCard';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
