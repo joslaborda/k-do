@@ -322,9 +322,11 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                     </div>
                   </Collapsible>
                 ))}
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
+                </>
+                )}
+                </TabsContent>
+                </Tabs>
+                </div>
+                </div>
+                );
+                }
