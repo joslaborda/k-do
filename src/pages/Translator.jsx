@@ -167,12 +167,21 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
     setExpandedCategories(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
+  const filteredCategories = phraseCategories.map(cat => ({
+    ...cat,
+    phrases: cat.phrases.filter(phrase => 
+      phrase.spanish.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      phrase.japanese.includes(searchQuery) ||
+      phrase.romaji.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(cat => cat.phrases.length > 0);
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-stone-900">
+      <div className="max-w-4xl mx-auto px-6 py-12 pb-24">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Traductor</h1>
-          <p className="text-slate-500 mt-1">Traduce y aprende frases útiles para tu viaje</p>
+          <h1 className="text-3xl font-bold text-stone-100">Traductor 🌐</h1>
+          <p className="text-stone-400 mt-1">Traduce y aprende frases útiles para tu viaje</p>
         </div>
 
         <Tabs defaultValue="phrases" className="space-y-6">
