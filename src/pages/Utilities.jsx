@@ -466,120 +466,125 @@ export default function Utilities() {
 
           {/* Translate */}
           <TabsContent value="translate" className="space-y-6">
-           <div className="space-y-6">
-             {/* Translator Tool */}
-             <div className="bg-stone-800 rounded-2xl border border-stone-700 p-6">
-               <div className="flex items-center justify-center gap-4 mb-6">
-                 <div className={`px-4 py-2 rounded-full text-sm font-medium ${direction === 'es-jp' ? 'bg-stone-900 text-white' : 'bg-stone-700 text-stone-400'}`}>
-                   🇪🇸 Español
-                 </div>
-                 <button 
-                   onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
-                   className="p-2 rounded-full hover:bg-stone-700 transition-colors"
-                 >
-                   <ArrowRightLeft className="w-5 h-5 text-stone-400" />
-                 </button>
-                 <div className={`px-4 py-2 rounded-full text-sm font-medium ${direction === 'jp-es' ? 'bg-stone-900 text-white' : 'bg-stone-700 text-stone-400'}`}>
-                   🇯🇵 Japonés
-                 </div>
-               </div>
+            <div className="space-y-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-stone-100 mb-2">Traductor 🌐</h2>
+                <p className="text-stone-400">Traduce entre español y japonés</p>
+              </div>
 
-               <Textarea
-                 placeholder={direction === 'es-jp' ? 'Escribe en español...' : '日本語で書いてください...'}
-                 value={inputText}
-                 onChange={(e) => setInputText(e.target.value)}
-                 rows={4}
-                 className="mb-4 bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
-               />
+              {/* Translator Tool */}
+              <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-3xl p-8">
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'es-jp' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
+                    🇪🇸 Español
+                  </div>
+                  <button 
+                    onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
+                    className="p-2 rounded-full hover:bg-stone-700 transition-colors"
+                  >
+                    <ArrowRightLeft className="w-5 h-5 text-stone-400" />
+                  </button>
+                  <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'jp-es' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
+                    🇯🇵 Japonés
+                  </div>
+                </div>
 
-               <Button 
-                 onClick={async () => {
-                   if (!inputText.trim()) return;
-                   setIsTranslating(true);
-                   const prompt = direction === 'es-jp' 
-                     ? `Traduce al japonés: "${inputText}". Proporciona kanji/hiragana y romanización.`
-                     : `Traduce al español: "${inputText}"`;
-                   const result = await base44.integrations.Core.InvokeLLM({ prompt });
-                   setTranslatedText(result);
-                   setIsTranslating(false);
-                 }}
-                 disabled={!inputText.trim() || isTranslating}
-                 className="w-full bg-green-600 hover:bg-green-700"
-               >
-                 {isTranslating ? (
-                   <>
-                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                     Traduciendo...
-                   </>
-                 ) : (
-                   <>
-                     <Languages className="w-4 h-4 mr-2" />
-                     Traducir
-                   </>
-                 )}
-               </Button>
+                <Textarea
+                  placeholder={direction === 'es-jp' ? 'Escribe en español...' : '日本語で書いてください...'}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  rows={4}
+                  className="mb-4 bg-stone-700/50 border border-stone-600 text-stone-100 placeholder:text-stone-400"
+                />
 
-               {translatedText && (
-                 <div className="mt-6 p-4 bg-stone-700 rounded-xl">
-                   <div className="flex items-start justify-between">
-                     <div className="flex-1 text-stone-100">{translatedText}</div>
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       onClick={() => {
-                         navigator.clipboard.writeText(translatedText);
-                         setCopiedId('translation');
-                         setTimeout(() => setCopiedId(null), 2000);
-                       }}
-                       className="ml-2 flex-shrink-0"
-                     >
-                       {copiedId === 'translation' ? (
-                         <Check className="w-4 h-4 text-green-500" />
-                       ) : (
-                         <Copy className="w-4 h-4 text-stone-400" />
-                       )}
-                     </Button>
-                   </div>
-                 </div>
-               )}
-             </div>
+                <Button 
+                  onClick={async () => {
+                    if (!inputText.trim()) return;
+                    setIsTranslating(true);
+                    const prompt = direction === 'es-jp' 
+                      ? `Traduce al japonés: "${inputText}". Proporciona kanji/hiragana y romanización.`
+                      : `Traduce al español: "${inputText}"`;
+                    const result = await base44.integrations.Core.InvokeLLM({ prompt });
+                    setTranslatedText(result);
+                    setIsTranslating(false);
+                  }}
+                  disabled={!inputText.trim() || isTranslating}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {isTranslating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Traduciendo...
+                    </>
+                  ) : (
+                    <>
+                      <Languages className="w-4 h-4 mr-2" />
+                      Traducir
+                    </>
+                  )}
+                </Button>
 
-             {/* Phrases */}
-             <div>
-               <h2 className="text-2xl font-bold text-stone-100 mb-4">Frases útiles</h2>
-               <div className="space-y-3">
-                 {phraseCategories.map((category) => (
-                   <Collapsible
-                     key={category.name}
-                     open={expandedCategories[category.name]}
-                     onOpenChange={() => setExpandedCategories(prev => ({ ...prev, [category.name]: !prev[category.name] }))}
-                   >
-                     <div className="bg-stone-800 rounded-xl border border-stone-700 overflow-hidden">
-                       <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-stone-700 transition-colors">
-                         <div className="flex items-center gap-3">
-                           <span className="text-2xl">{category.icon}</span>
-                           <span className="font-semibold text-stone-100">{category.name}</span>
-                         </div>
-                         <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
-                       </CollapsibleTrigger>
+                {translatedText && (
+                  <div className="mt-6 p-4 bg-stone-700/50 border border-stone-600 rounded-xl">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 text-stone-100">{translatedText}</div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(translatedText);
+                          setCopiedId('translation');
+                          setTimeout(() => setCopiedId(null), 2000);
+                        }}
+                        className="ml-2 flex-shrink-0"
+                      >
+                        {copiedId === 'translation' ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-stone-400" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                       <CollapsibleContent>
-                         <div className="border-t border-stone-700 divide-y divide-stone-700">
-                           {category.phrases.map((phrase, idx) => (
-                             <div key={idx} className="p-4 hover:bg-stone-700/50 transition-colors">
-                               <p className="text-stone-100 font-medium">{phrase.spanish}</p>
-                               <p className="text-lg mt-1">{phrase.japanese}</p>
-                               <p className="text-sm text-stone-400 mt-0.5 italic">{phrase.romaji}</p>
-                             </div>
-                           ))}
-                         </div>
-                       </CollapsibleContent>
-                     </div>
-                   </Collapsible>
-                 ))}
-               </div>
-             </div>
-           </div>
+              {/* Phrases */}
+              <div>
+                <h3 className="text-xl font-bold text-stone-100 mb-4">Frases útiles</h3>
+                <div className="space-y-3">
+                  {phraseCategories.map((category) => (
+                    <Collapsible
+                      key={category.name}
+                      open={expandedCategories[category.name]}
+                      onOpenChange={() => setExpandedCategories(prev => ({ ...prev, [category.name]: !prev[category.name] }))}
+                    >
+                      <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-2xl overflow-hidden">
+                        <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-stone-700/50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{category.icon}</span>
+                            <span className="font-semibold text-stone-100">{category.name}</span>
+                          </div>
+                          <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
+                        </CollapsibleTrigger>
+
+                        <CollapsibleContent>
+                          <div className="border-t border-stone-700 divide-y divide-stone-700">
+                            {category.phrases.map((phrase, idx) => (
+                              <div key={idx} className="p-4 hover:bg-stone-700/50 transition-colors">
+                                <p className="text-stone-100 font-medium">{phrase.spanish}</p>
+                                <p className="text-lg mt-1 text-stone-200">{phrase.japanese}</p>
+                                <p className="text-sm text-stone-400 mt-0.5 italic">{phrase.romaji}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </div>
+                    </Collapsible>
+                  ))}
+                </div>
+              </div>
+            </div>
           </TabsContent>
           </Tabs>
           </div>
