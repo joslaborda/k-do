@@ -1,9 +1,76 @@
-import { Plane } from 'lucide-react';
+import { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+const categoryConfig = {
+  flight: { label: 'Vuelo', icon: Plane, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  train: { label: 'Tren', icon: Train, color: 'from-green-500 to-emerald-500', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' },
+  hotel: { label: 'Hotel', icon: Hotel, color: 'from-purple-500 to-pink-500', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  freetour: { label: 'Free Tour', icon: TicketIcon, color: 'from-orange-500 to-red-500', bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
+  insurance: { label: 'Seguro', icon: Shield, color: 'from-indigo-500 to-blue-500', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+};
 
 export default function Calendar() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    category: 'flight',
+    date: '',
+    notes: '',
+    file_url: '',
+  });
+
+  const queryClient = useQueryClient();
+
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets'],
+    queryFn: () => base44.entities.Ticket.list('-date'),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Ticket.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      setDialogOpen(false);
+      setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '' });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Ticket.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
+  });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, file_url });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const groupedTickets = tickets.reduce((acc, ticket) => {
+    if (!acc[ticket.category]) acc[ticket.category] = [];
+    acc[ticket.category].push(ticket);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/20 dark:from-stone-900 dark:via-stone-900 dark:to-stone-900 transition-colors">
