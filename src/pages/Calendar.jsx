@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, MapPin, Calendar as CalendarIcon, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Calendar as CalendarIcon, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -87,16 +87,33 @@ export default function Calendar() {
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-stone-900 mb-2">Calendario 📅</h1>
-              <p className="text-stone-600">Vista completa de tu viaje a Japón</p>
+              <h1 className="text-3xl font-bold text-stone-900 mb-2">Documentos ✈️</h1>
+              <p className="text-stone-600">Vuelos, trenes, hoteles y más</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Calendar */}
+      {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-        <div>
+        {/* Redirect to Tickets page */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-stone-800 dark:to-stone-800 border-2 border-blue-200 dark:border-stone-700 rounded-3xl p-12 text-center">
+          <Plane className="w-20 h-20 text-blue-600 mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-3">
+            Gestiona tus documentos
+          </h2>
+          <p className="text-stone-600 dark:text-stone-400 mb-6 max-w-md mx-auto">
+            Guarda y organiza tus vuelos, reservas de hotel, billetes de tren y más
+          </p>
+          <Link to={createPageUrl('Tickets')}>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Plane className="w-4 h-4 mr-2" />
+              Ir a Documentos
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-8">
             <div className="bg-white rounded-2xl border-2 border-stone-200 overflow-hidden shadow-lg">
           {/* Month Navigation */}
           <div className="flex items-center justify-between p-6 border-b border-stone-200 bg-gradient-to-r from-purple-50 to-pink-50">
