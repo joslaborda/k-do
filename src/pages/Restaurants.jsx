@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import MenuViewer from '@/components/MenuViewer';
+
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
