@@ -4,6 +4,9 @@ import { createPageUrl } from '@/utils';
 import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
 import QuickNotes from '@/components/QuickNotes';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
+import OfflineIndicator from '@/components/OfflineIndicator';
+import DarkModeToggle from '@/components/DarkModeToggle';
+import PWAInstaller from '@/components/PWAInstaller';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
@@ -20,9 +23,12 @@ export default function Layout({ children, currentPageName }) {
   const quickNotesRef = useRef();
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-900 transition-colors">
+      <OfflineIndicator />
+      <PWAInstaller />
       <QuickNotes ref={quickNotesRef} />
       <KeyboardShortcuts onNewNote={() => quickNotesRef.current?.openNotes()} />
+      <DarkModeToggle />
       {children}
       
       {/* Bottom Navigation - Mobile */}
