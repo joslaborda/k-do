@@ -574,10 +574,10 @@ export default function Restaurants() {
                   <h2 className="text-2xl font-light text-stone-900 border-b border-stone-200 pb-2">
                     {category}
                   </h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid md:grid-cols-3 gap-4">
                     {foods.map((food) => (
-                      <div key={food.name} className="group bg-white border-2 border-stone-200 rounded-2xl overflow-hidden hover:border-red-400 transition-all duration-300 hover:shadow-xl">
-                        <div className="aspect-video overflow-hidden relative">
+                      <div key={food.name} className="group bg-white border-2 border-stone-200 rounded-xl overflow-hidden hover:border-red-400 transition-all duration-300 hover:shadow-xl">
+                        <div className="aspect-square overflow-hidden relative">
                           <img 
                             src={food.image} 
                             alt={food.name}
@@ -593,9 +593,9 @@ export default function Restaurants() {
                             <ImageIcon className="w-4 h-4 text-stone-700" />
                           </button>
                         </div>
-                        <div className="p-5">
-                          <h3 className="text-xl font-bold text-stone-900 mb-2">{food.name}</h3>
-                          <p className="text-sm text-stone-600 leading-relaxed font-light">{food.description}</p>
+                        <div className="p-3">
+                          <h3 className="text-base font-bold text-stone-900 mb-1">{food.name}</h3>
+                          <p className="text-xs text-stone-600 leading-relaxed font-light line-clamp-2">{food.description}</p>
                         </div>
                       </div>
                     ))}
