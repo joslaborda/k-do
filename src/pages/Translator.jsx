@@ -185,11 +185,11 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
         </div>
 
         <Tabs defaultValue="phrases" className="space-y-6">
-          <TabsList className="bg-white border border-slate-200 p-1">
-            <TabsTrigger value="phrases" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+          <TabsList className="bg-stone-800 border border-stone-700 p-1">
+            <TabsTrigger value="phrases" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
               📖 Frases útiles
             </TabsTrigger>
-            <TabsTrigger value="translator" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">
+            <TabsTrigger value="translator" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
               🔄 Traductor
             </TabsTrigger>
           </TabsList>
