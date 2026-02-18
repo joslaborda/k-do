@@ -57,6 +57,7 @@ import Translator from './pages/Translator';
 import Packing from './pages/Packing';
 import Diary from './pages/Diary';
 import Utilities from './pages/Utilities';
+import Calendar from './pages/Calendar';
 import __Layout from './Layout.jsx';
 
 
@@ -71,6 +72,7 @@ export const PAGES = {
     "Packing": Packing,
     "Diary": Diary,
     "Utilities": Utilities,
+    "Calendar": Calendar,
 }
 
 export const pagesConfig = {

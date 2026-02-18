@@ -223,6 +223,11 @@ export default function Restaurants() {
     queryFn: () => base44.entities.FoodItem.list(),
   });
 
+  const { data: favorites = [] } = useQuery({
+    queryKey: ['favoriteRestaurants'],
+    queryFn: () => base44.entities.FavoriteRestaurant.list(),
+  });
+
   // Inicializar FoodItems si no existen
   useEffect(() => {
     const initializeFoodItems = async () => {
@@ -270,6 +275,22 @@ export default function Restaurants() {
       setCustomImageUrl('');
     },
   });
+
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async (restaurantId) => {
+      const existing = favorites.find(f => f.restaurant_id === restaurantId);
+      if (existing) {
+        await base44.entities.FavoriteRestaurant.delete(existing.id);
+      } else {
+        await base44.entities.FavoriteRestaurant.create({ restaurant_id: restaurantId });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['favoriteRestaurants'] }),
+  });
+
+  const isFavorite = (restaurantId) => {
+    return favorites.some(f => f.restaurant_id === restaurantId);
+  };
 
   const handleMapClick = (latlng) => {
     setSelectedLocation(latlng);

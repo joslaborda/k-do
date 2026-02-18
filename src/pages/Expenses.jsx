@@ -21,6 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalanceSummary from '@/components/expenses/BalanceSummary';
+import ExpenseChart from '@/components/expenses/ExpenseChart';
 
 const categories = [
   { value: 'food', label: 'Comida', icon: Utensils },
@@ -101,14 +102,15 @@ export default function Expenses() {
           </Button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
+          {/* Charts */}
+          <ExpenseChart expenses={expenses} />
+
           {/* Balance Summary */}
-          <div className="lg:col-span-1">
-            <BalanceSummary expenses={expenses} />
-          </div>
+          <BalanceSummary expenses={expenses} />
 
           {/* Expenses List */}
-          <div className="lg:col-span-2">
+          <div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
               <TabsList className="bg-white border border-slate-200 p-1">
                 <TabsTrigger value="all" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white">

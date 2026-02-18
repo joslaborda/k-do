@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, MapPin, Plane, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
+import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, BookOpen, Package, Info } from 'lucide-react';
+import QuickNotes from '@/components/QuickNotes';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
   { name: 'Ruta', page: 'Cities', icon: MapPin },
-  { name: 'Docs', page: 'Tickets', icon: Plane },
+  { name: 'Cal', page: 'Calendar', icon: Calendar },
   { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
   { name: 'Diario', page: 'Diary', icon: BookOpen },
@@ -16,6 +17,7 @@ const navItems = [
 export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-stone-50">
+      <QuickNotes />
       {children}
       
       {/* Bottom Navigation - Mobile */}
