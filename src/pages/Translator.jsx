@@ -195,18 +195,18 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
           </TabsList>
 
           <TabsContent value="translator" className="space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+            <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-3xl p-8">
               <div className="flex items-center justify-center gap-4 mb-6">
-                <div className={`px-4 py-2 rounded-full text-sm font-medium ${direction === 'es-jp' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'es-jp' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
                   🇪🇸 Español
                 </div>
                 <button 
                   onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
-                  className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-full hover:bg-stone-700 transition-colors"
                 >
-                  <ArrowRightLeft className="w-5 h-5 text-slate-500" />
+                  <ArrowRightLeft className="w-5 h-5 text-stone-400" />
                 </button>
-                <div className={`px-4 py-2 rounded-full text-sm font-medium ${direction === 'jp-es' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'jp-es' ? 'bg-indigo-600 text-white' : 'bg-stone-700 text-stone-400'}`}>
                   🇯🇵 Japonés
                 </div>
               </div>
@@ -216,13 +216,13 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 rows={4}
-                className="mb-4"
+                className="mb-4 bg-stone-700/50 border border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
 
               <Button 
                 onClick={handleTranslate}
                 disabled={!inputText.trim() || isTranslating}
-                className="w-full bg-slate-900 hover:bg-slate-800"
+                className="w-full bg-indigo-600 hover:bg-indigo-700"
               >
                 {isTranslating ? (
                   <>
@@ -238,9 +238,9 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               </Button>
 
               {translatedText && (
-                <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="mt-6 p-4 bg-stone-700/50 border border-stone-600 rounded-xl">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 whitespace-pre-wrap text-slate-700">{translatedText}</div>
+                    <div className="flex-1 whitespace-pre-wrap text-stone-100">{translatedText}</div>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -250,7 +250,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                       {copiedId === 'translation' ? (
                         <Check className="w-4 h-4 text-green-500" />
                       ) : (
-                        <Copy className="w-4 h-4" />
+                        <Copy className="w-4 h-4 text-stone-400" />
                       )}
                     </Button>
                   </div>
