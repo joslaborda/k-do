@@ -89,14 +89,14 @@ export default function Calendar() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-stone-900">
-      {/* Header */}
-      <div className="bg-stone-800/80 backdrop-blur-xl border-b border-stone-700">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-stone-100 mb-2">Documentos ✈️</h1>
-              <p className="text-stone-400">Vuelos, trenes, hoteles y más</p>
+    <div className="min-h-screen bg-background">
+       {/* Header */}
+       <div className="glass border-b border-border">
+         <div className="max-w-6xl mx-auto px-6 py-8">
+           <div className="flex items-center justify-between">
+             <div>
+               <h1 className="text-3xl font-bold text-foreground mb-2">Documentos ✈️</h1>
+               <p className="text-muted-foreground">Vuelos, trenes, hoteles y más</p>
             </div>
           </div>
         </div>
@@ -115,9 +115,9 @@ export default function Calendar() {
         </div>
 
         {tickets.length === 0 ? (
-          <div className="text-center py-24 bg-stone-800 backdrop-blur-sm border-2 border-dashed border-stone-700 rounded-3xl">
-            <FileText className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-            <p className="text-stone-300">No hay documentos todavía</p>
+          <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-foreground">No hay documentos todavía</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -133,7 +133,7 @@ export default function Calendar() {
                      <div className={`w-10 h-10 bg-gradient-to-br ${config.color} rounded-xl flex items-center justify-center`}>
                        <Icon className="w-5 h-5 text-white" />
                      </div>
-                     <h2 className="text-xl font-bold text-stone-100">
+                     <h2 className="text-xl font-bold text-foreground">
                        {config.label}
                      </h2>
                      <Badge variant="secondary">{categoryTickets.length}</Badge>
@@ -143,15 +143,15 @@ export default function Calendar() {
                      {categoryTickets.map((ticket) => (
                        <div
                          key={ticket.id}
-                         className="bg-stone-800/40 backdrop-blur-xl border-2 border-stone-700/50 rounded-2xl p-6 hover:shadow-xl hover:border-stone-600/50 hover:bg-stone-800/60 transition-all"
+                         className="glass border-2 border-border/50 rounded-2xl p-6 hover:shadow-xl hover:border-primary/50 transition-all"
                        >
                          <div className="flex items-start justify-between mb-4">
                            <div className="flex-1">
-                             <h3 className="font-bold text-stone-100 text-lg mb-1">
+                             <h3 className="font-bold text-foreground text-lg mb-1">
                                {ticket.name}
                              </h3>
                              {ticket.date && (
-                               <div className="flex items-center gap-2 text-sm text-stone-400">
+                               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                  <CalendarIcon className="w-4 h-4" />
                                  {format(new Date(ticket.date), "d 'de' MMMM yyyy", { locale: es })}
                                </div>
@@ -162,7 +162,7 @@ export default function Calendar() {
                                variant="ghost"
                                size="icon"
                                onClick={() => handleEdit(ticket)}
-                               className="text-stone-400 hover:text-blue-400 hover:bg-stone-700"
+                               className="text-muted-foreground hover:text-primary hover:bg-secondary"
                                aria-label="Editar"
                              >
                                <Pencil className="w-4 h-4" />
@@ -171,7 +171,7 @@ export default function Calendar() {
                                variant="ghost"
                                size="icon"
                                onClick={() => deleteMutation.mutate(ticket.id)}
-                               className="text-stone-400 hover:text-red-400 hover:bg-stone-700"
+                               className="text-muted-foreground hover:text-destructive hover:bg-secondary"
                                aria-label="Eliminar"
                              >
                                <Trash2 className="w-4 h-4" />
@@ -180,7 +180,7 @@ export default function Calendar() {
                          </div>
 
                          {ticket.notes && (
-                           <p className="text-sm text-stone-300 mb-4">{ticket.notes}</p>
+                           <p className="text-sm text-muted-foreground mb-4">{ticket.notes}</p>
                          )}
 
                         {ticket.file_url && (
@@ -188,7 +188,7 @@ export default function Calendar() {
                             href={ticket.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 bg-stone-700 text-stone-100 rounded-lg hover:bg-stone-600 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
                           >
                             <FileText className="w-4 h-4" />
                             <span className="text-sm font-medium">Ver documento</span>
@@ -206,22 +206,22 @@ export default function Calendar() {
 
         {/* Add Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="bg-stone-800 border-stone-700">
+          <DialogContent className="bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-stone-100">Añadir documento</DialogTitle>
+              <DialogTitle className="text-foreground">Añadir documento</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Nombre</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre</label>
                 <Input
                   placeholder="ej. Vuelo Madrid - Tokyo"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                 />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Categoría</label>
+                </div>
+                <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
                 <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
                   <SelectTrigger>
                     <SelectValue />
@@ -242,37 +242,37 @@ export default function Calendar() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
                 <Input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-stone-700 border-stone-600 text-stone-100"
+                  className="bg-input border-border text-foreground"
                 />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Archivo</label>
+                </div>
+                <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Archivo</label>
                 <Input
                   type="file"
                   onChange={handleFileUpload}
                   disabled={uploadingFile}
-                  className="bg-stone-700 border-stone-600 text-stone-100"
-                />
-                {uploadingFile && <p className="text-xs text-stone-400 mt-1">Subiendo archivo...</p>}
-                {formData.file_url && <p className="text-xs text-green-400 mt-1">✓ Archivo subido</p>}
-              </div>
-              <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Notas (opcional)</label>
-                <Textarea
+                  className="bg-input border-border text-foreground"
+                  />
+                  {uploadingFile && <p className="text-xs text-muted-foreground mt-1">Subiendo archivo...</p>}
+                  {formData.file_url && <p className="text-xs text-green-400 mt-1">✓ Archivo subido</p>}
+                  </div>
+                  <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Notas (opcional)</label>
+                  <Textarea
                   placeholder="Notas adicionales..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                  className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
+                <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
                   Cancelar
                 </Button>
                 <Button
@@ -289,23 +289,23 @@ export default function Calendar() {
 
         {/* Edit Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="bg-stone-800 border-stone-700">
+          <DialogContent className="bg-card border-border">
             <DialogHeader>
-              <DialogTitle className="text-stone-100">Editar documento</DialogTitle>
+              <DialogTitle className="text-foreground">Editar documento</DialogTitle>
             </DialogHeader>
             {editingTicket && (
               <div className="space-y-4 pt-4">
                 <div>
-                  <label className="text-sm font-medium text-stone-300 mb-1.5 block">Nombre</label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre</label>
                   <Input
                     placeholder="ej. Vuelo Madrid - Tokyo"
                     defaultValue={editingTicket.name}
                     onChange={(e) => setEditingTicket({ ...editingTicket, name: e.target.value })}
-                    className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                   />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-stone-300 mb-1.5 block">Categoría</label>
+                  </div>
+                  <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
                   <Select 
                     value={editingTicket.category} 
                     onValueChange={(v) => setEditingTicket({ ...editingTicket, category: v })}
@@ -329,26 +329,26 @@ export default function Calendar() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
                   <Input
                     type="date"
                     value={editingTicket.date || ''}
                     onChange={(e) => setEditingTicket({ ...editingTicket, date: e.target.value })}
-                    className="bg-stone-700 border-stone-600 text-stone-100"
+                    className="bg-input border-border text-foreground"
                   />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-stone-300 mb-1.5 block">Notas (opcional)</label>
+                  </div>
+                  <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Notas (opcional)</label>
                   <Textarea
                     placeholder="Notas adicionales..."
                     value={editingTicket.notes || ''}
                     onChange={(e) => setEditingTicket({ ...editingTicket, notes: e.target.value })}
                     rows={3}
-                    className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
-                  <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
+                  <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
                     Cancelar
                   </Button>
                   <Button

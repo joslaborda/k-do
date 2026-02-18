@@ -184,21 +184,20 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
   })).filter(cat => cat.phrases.length > 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-6 py-12 pb-24">
         {/* Header */}
-        <div className="mb-12 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-red-600/20 rounded-2xl blur-2xl -z-10" />
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-stone-100 to-stone-300 bg-clip-text text-transparent">Traductor 🌐</h1>
-          <p className="text-stone-400 mt-2">Traduce y aprende frases útiles para tu viaje</p>
+         <div className="mb-12">
+           <h1 className="text-4xl font-bold text-foreground">Traductor 🌐</h1>
+           <p className="text-muted-foreground mt-2">Traduce y aprende frases útiles para tu viaje</p>
         </div>
 
         <Tabs defaultValue="translator" className="space-y-6">
-          <TabsList className="bg-stone-800 border border-stone-700 p-1">
-            <TabsTrigger value="phrases" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
+          <TabsList className="glass border border-border p-1">
+            <TabsTrigger value="phrases" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
               📖 Frases útiles
             </TabsTrigger>
-            <TabsTrigger value="translator" className="text-stone-400 data-[state=active]:text-stone-100 data-[state=active]:bg-stone-700">
+            <TabsTrigger value="translator" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
               🔄 Traductor
             </TabsTrigger>
           </TabsList>
@@ -206,9 +205,9 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
           <TabsContent value="translator" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Input */}
-              <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl p-6 shadow-xl">
+              <div className="glass border border-border rounded-2xl p-6 shadow-xl">
                 <div className="mb-4">
-                  <label className="text-sm font-semibold text-stone-300 mb-3 block">Entrada</label>
+                  <label className="text-sm font-semibold text-foreground mb-3 block">Entrada</label>
                   <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'es-jp' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
                     {direction === 'es-jp' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
                   </div>
@@ -219,23 +218,23 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   rows={6}
-                  className="bg-stone-700/50 border border-stone-600 text-stone-100 placeholder:text-stone-400 focus:border-indigo-500 focus:ring-indigo-500/20"
+                  className="bg-input border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
                 />
               </div>
 
               {/* Output */}
-              <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl p-6 shadow-xl">
+              <div className="glass border border-border rounded-2xl p-6 shadow-xl">
                 <div className="mb-4">
-                  <label className="text-sm font-semibold text-stone-300 mb-3 block">Traducción</label>
+                  <label className="text-sm font-semibold text-foreground mb-3 block">Traducción</label>
                   <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'jp-es' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
                     {direction === 'jp-es' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
                   </div>
                 </div>
 
-                <div className="bg-stone-700/50 border border-stone-600 rounded-lg p-4 min-h-40 flex flex-col justify-between">
+                <div className="bg-input border border-border rounded-lg p-4 min-h-40 flex flex-col justify-between">
                   {translatedText ? (
                     <>
-                      <div className="flex-1 whitespace-pre-wrap text-stone-100">{translatedText}</div>
+                      <div className="flex-1 whitespace-pre-wrap text-foreground">{translatedText}</div>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -256,7 +255,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                       </Button>
                     </>
                   ) : (
-                    <p className="text-stone-400 text-sm">Aquí aparecerá la traducción...</p>
+                    <p className="text-muted-foreground text-sm">Aquí aparecerá la traducción...</p>
                   )}
                 </div>
               </div>
@@ -267,7 +266,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               <Button 
                 onClick={handleTranslate}
                 disabled={!inputText.trim() || isTranslating}
-                className="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white py-6 text-base"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base"
               >
                 {isTranslating ? (
                   <>
@@ -284,28 +283,28 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               
               <button 
                 onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
-                className="p-3 rounded-full border border-stone-600 bg-stone-800 hover:bg-stone-700 transition-all hover:border-indigo-500"
+                className="p-3 rounded-full border border-border glass hover:border-primary/50"
                 title="Intercambiar idiomas"
               >
-                <ArrowRightLeft className="w-5 h-5 text-indigo-400" />
+                <ArrowRightLeft className="w-5 h-5 text-primary" />
               </button>
             </div>
           </TabsContent>
 
           <TabsContent value="phrases" className="space-y-6">
             <div className="relative mb-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 placeholder="Busca por palabra, frase, romaji..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-stone-800/80 border border-stone-700 text-stone-100 placeholder:text-stone-500 focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="pl-12 h-12 glass border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
               />
             </div>
 
             {filteredCategories.length === 0 ? (
-              <div className="text-center py-16 text-stone-400">
-                <Search className="w-16 h-16 mx-auto mb-4 text-stone-600" />
+              <div className="text-center py-16 text-muted-foreground">
+                <Search className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                 <p className="text-lg">No se encontraron frases</p>
               </div>
             ) : (
@@ -316,34 +315,34 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                     open={expandedCategories[category.name]}
                     onOpenChange={() => toggleCategory(category.name)}
                   >
-                    <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl overflow-hidden hover:border-stone-600 transition-colors shadow-lg">
-                      <CollapsibleTrigger className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-stone-700/30 transition-colors">
-                        <div className="flex items-center gap-4">
-                          <span className="text-3xl">{category.icon}</span>
-                          <div>
-                            <span className="font-bold text-stone-100 text-lg">{category.name}</span>
-                            <span className="text-xs text-stone-400 ml-2">({category.phrases.length} frases)</span>
+                    <div className="glass border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-colors shadow-lg">
+                      <CollapsibleTrigger className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-secondary/30 transition-colors">
+                         <div className="flex items-center gap-4">
+                           <span className="text-3xl">{category.icon}</span>
+                           <div>
+                             <span className="font-bold text-foreground text-lg">{category.name}</span>
+                             <span className="text-xs text-muted-foreground ml-2">({category.phrases.length} frases)</span>
                           </div>
                         </div>
-                        <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform duration-300 ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
                       </CollapsibleTrigger>
                       
                       <CollapsibleContent className="animate-in fade-in-50 slide-in-from-top-2 duration-300">
-                        <div className="border-t border-stone-700/50 divide-y divide-stone-700/50 bg-stone-900/20">
+                        <div className="border-t border-border/50 divide-y divide-border/50 bg-secondary/10">
                           {category.phrases.map((phrase, idx) => (
-                            <div key={idx} className="p-5 hover:bg-stone-700/30 transition-colors group">
+                            <div key={idx} className="p-5 hover:bg-secondary/30 transition-colors group">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-stone-100 font-semibold text-sm leading-tight">{phrase.spanish}</p>
-                                  <p className="text-2xl font-bold mt-2 text-white tracking-tight">{phrase.japanese}</p>
-                                  <p className="text-xs text-stone-400 mt-2 italic font-mono bg-stone-800/50 inline-block px-2 py-1 rounded">{phrase.romaji}</p>
+                                  <p className="text-foreground font-semibold text-sm leading-tight">{phrase.spanish}</p>
+                                  <p className="text-2xl font-bold mt-2 text-foreground tracking-tight">{phrase.japanese}</p>
+                                  <p className="text-xs text-muted-foreground mt-2 italic font-mono bg-secondary/50 inline-block px-2 py-1 rounded">{phrase.romaji}</p>
                                 </div>
                                 <div className="flex-shrink-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => speakJapanese(phrase.japanese)}
-                                    className="text-indigo-400 hover:text-indigo-300"
+                                    className="text-primary hover:text-primary/80"
                                     title="Escuchar pronunciación"
                                   >
                                     <Play className="w-4 h-4" />
@@ -356,7 +355,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                                     {copiedId === `${category.name}-${idx}` ? (
                                       <Check className="w-4 h-4 text-green-500" />
                                     ) : (
-                                      <Copy className="w-4 h-4 text-stone-400" />
+                                      <Copy className="w-4 h-4 text-muted-foreground" />
                                     )}
                                   </Button>
                                 </div>

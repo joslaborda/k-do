@@ -97,13 +97,13 @@ export default function Cities() {
     .filter(pos => pos);
 
   return (
-    <div className="min-h-screen bg-stone-900">
-      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-stone-100">Ruta 🗾</h1>
-            <p className="text-stone-400 mt-2">Explora tu itinerario por Japón</p>
+    <div className="min-h-screen bg-background">
+       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
+       <div className="max-w-6xl mx-auto px-6 py-12">
+         <div className="flex items-center justify-between mb-8">
+           <div>
+             <h1 className="text-4xl font-bold text-foreground">Ruta 🗾</h1>
+             <p className="text-muted-foreground mt-2">Explora tu itinerario por Japón</p>
           </div>
         </div>
 
@@ -112,14 +112,14 @@ export default function Cities() {
         {isLoading ? (
            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
              {[1, 2, 3].map((i) => (
-               <div key={i} className="aspect-[16/10] rounded-2xl bg-stone-700 animate-pulse" />
+               <div key={i} className="aspect-[16/10] rounded-2xl bg-secondary animate-pulse" />
              ))}
            </div>
          ) : cities.length === 0 ? (
-           <div className="text-center py-20 bg-stone-800 rounded-2xl border border-stone-700">
-             <MapPin className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-             <h3 className="text-xl font-light text-stone-100 mb-2">Sin ciudades todavía</h3>
-             <p className="text-stone-400 font-light">Tu ruta aparecerá aquí</p>
+           <div className="text-center py-20 glass rounded-2xl border border-border">
+             <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+             <h3 className="text-xl font-light text-foreground mb-2">Sin ciudades todavía</h3>
+             <p className="text-muted-foreground font-light">Tu ruta aparecerá aquí</p>
            </div>
          ) : (
            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
