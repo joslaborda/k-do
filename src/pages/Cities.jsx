@@ -72,26 +72,7 @@ export default function Cities() {
     );
   };
 
-  const reorderMutation = useMutation({
-    mutationFn: async (reorderedCities) => {
-      await Promise.all(
-        reorderedCities.map((city, index) => 
-          base44.entities.City.update(city.id, { order: index })
-        )
-      );
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cities'] }),
-  });
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    
-    const items = Array.from(cities);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    
-    reorderMutation.mutate(items);
-  };
 
   const getDaysCount = (cityId) => {
     return itineraryDays.filter(day => day.city_id === cityId).length;
