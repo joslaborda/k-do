@@ -48,6 +48,7 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import Calendar from './pages/Calendar';
+import CalendarView from './pages/CalendarView';
 import Cities from './pages/Cities';
 import CityDetail from './pages/CityDetail';
 import Diary from './pages/Diary';
@@ -58,12 +59,12 @@ import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
 import Utilities from './pages/Utilities';
-import CalendarView from './pages/CalendarView';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Calendar": Calendar,
+    "CalendarView": CalendarView,
     "Cities": Cities,
     "CityDetail": CityDetail,
     "Diary": Diary,
@@ -74,7 +75,6 @@ export const PAGES = {
     "Tickets": Tickets,
     "Translator": Translator,
     "Utilities": Utilities,
-    "CalendarView": CalendarView,
 }
 
 export const pagesConfig = {
