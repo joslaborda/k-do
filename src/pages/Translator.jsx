@@ -125,12 +125,13 @@ const phraseCategories = [
 ];
 
 export default function Translator() {
-  const [inputText, setInputText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [direction, setDirection] = useState('es-jp'); // es-jp or jp-es
-  const [copiedId, setCopiedId] = useState(null);
-  const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
+   const [inputText, setInputText] = useState('');
+   const [translatedText, setTranslatedText] = useState('');
+   const [isTranslating, setIsTranslating] = useState(false);
+   const [direction, setDirection] = useState('es-jp'); // es-jp or jp-es
+   const [copiedId, setCopiedId] = useState(null);
+   const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
+   const [searchQuery, setSearchQuery] = useState('');
 
   const handleTranslate = async () => {
     if (!inputText.trim()) return;
