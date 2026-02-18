@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import { Plus, MapPin, Trash2, Check, X, UtensilsCrossed, Search, BookOpen } from 'lucide-react';
+import { Plus, MapPin, Trash2, Check, X, UtensilsCrossed, Search, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -201,6 +201,9 @@ export default function Restaurants() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
+  const [editFoodDialogOpen, setEditFoodDialogOpen] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [customImageUrl, setCustomImageUrl] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     city: '',
@@ -214,6 +217,29 @@ export default function Restaurants() {
     queryKey: ['restaurants'],
     queryFn: () => base44.entities.Restaurant.list(),
   });
+
+  const { data: customFoodItems = [] } = useQuery({
+    queryKey: ['foodItems'],
+    queryFn: () => base44.entities.FoodItem.list(),
+  });
+
+  // Inicializar FoodItems si no existen
+  useEffect(() => {
+    const initializeFoodItems = async () => {
+      if (customFoodItems.length === 0) {
+        const itemsToCreate = japaneseFoodTypes.map(food => ({
+          name: food.name,
+          category: food.category,
+          description: food.description,
+          default_image: food.image,
+          image_url: food.image
+        }));
+        await base44.entities.FoodItem.bulkCreate(itemsToCreate);
+        queryClient.invalidateQueries({ queryKey: ['foodItems'] });
+      }
+    };
+    initializeFoodItems();
+  }, [customFoodItems.length, queryClient]);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Restaurant.create(data),
@@ -233,6 +259,16 @@ export default function Restaurants() {
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Restaurant.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['restaurants'] }),
+  });
+
+  const updateFoodImageMutation = useMutation({
+    mutationFn: ({ id, image_url }) => base44.entities.FoodItem.update(id, { image_url }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['foodItems'] });
+      setEditFoodDialogOpen(false);
+      setSelectedFood(null);
+      setCustomImageUrl('');
+    },
   });
 
   const handleMapClick = (latlng) => {
@@ -264,12 +300,25 @@ export default function Restaurants() {
     r.cuisine?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredFoodTypes = japaneseFoodTypes.filter(food =>
-    food.name.toLowerCase().includes(foodSearchQuery.toLowerCase()) ||
-    food.description.toLowerCase().includes(foodSearchQuery.toLowerCase())
-  );
+  // Mezclar datos por defecto con personalizaciones
+  const mergedFoodTypes = japaneseFoodTypes.map(defaultFood => {
+    const customItem = customFoodItems.find(item => item.name === defaultFood.name);
+    return customItem ? {
+      ...defaultFood,
+      image: customItem.image_url || defaultFood.image,
+      id: customItem.id
+    } : defaultFood;
+  });
 
-  const filteredGroupedFoodTypes = Object.entries(groupedFoodTypes).reduce((acc, [category, foods]) => {
+  const mergedGroupedFoodTypes = mergedFoodTypes.reduce((acc, food) => {
+    if (!acc[food.category]) {
+      acc[food.category] = [];
+    }
+    acc[food.category].push(food);
+    return acc;
+  }, {});
+
+  const filteredGroupedFoodTypes = Object.entries(mergedGroupedFoodTypes).reduce((acc, [category, foods]) => {
     const filtered = foods.filter(food =>
       food.name.toLowerCase().includes(foodSearchQuery.toLowerCase()) ||
       food.description.toLowerCase().includes(foodSearchQuery.toLowerCase())
@@ -279,6 +328,21 @@ export default function Restaurants() {
     }
     return acc;
   }, {});
+
+  const handleEditFoodImage = (food) => {
+    setSelectedFood(food);
+    setCustomImageUrl(food.image || '');
+    setEditFoodDialogOpen(true);
+  };
+
+  const handleSaveFoodImage = () => {
+    if (selectedFood && selectedFood.id) {
+      updateFoodImageMutation.mutate({
+        id: selectedFood.id,
+        image_url: customImageUrl
+      });
+    }
+  };
 
   const defaultCenter = [35.6762, 139.6503];
 
@@ -484,12 +548,21 @@ export default function Restaurants() {
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {foods.map((food) => (
                       <div key={food.name} className="group bg-white border-2 border-stone-200 rounded-2xl overflow-hidden hover:border-red-400 transition-all duration-300 hover:shadow-xl">
-                        <div className="aspect-video overflow-hidden">
+                        <div className="aspect-video overflow-hidden relative">
                           <img 
                             src={food.image} 
                             alt={food.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onError={(e) => {
+                              e.target.src = 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400';
+                            }}
                           />
+                          <button
+                            onClick={() => handleEditFoodImage(food)}
+                            className="absolute top-2 right-2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <ImageIcon className="w-4 h-4 text-stone-700" />
+                          </button>
                         </div>
                         <div className="p-5">
                           <h3 className="text-xl font-bold text-stone-900 mb-2">{food.name}</h3>
@@ -554,6 +627,51 @@ export default function Restaurants() {
                 disabled={!formData.name.trim() || createMutation.isPending}
               >
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editFoodDialogOpen} onOpenChange={setEditFoodDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar foto: {selectedFood?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <label className="text-sm font-medium text-stone-700 mb-1.5 block">URL de la imagen</label>
+              <Input
+                placeholder="https://ejemplo.com/imagen.jpg"
+                value={customImageUrl}
+                onChange={(e) => setCustomImageUrl(e.target.value)}
+              />
+              <p className="text-xs text-stone-500 mt-1">
+                Puedes usar una URL de Unsplash, Google Images, etc.
+              </p>
+            </div>
+            {customImageUrl && (
+              <div className="border border-stone-200 rounded-lg overflow-hidden">
+                <img 
+                  src={customImageUrl} 
+                  alt="Preview"
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400';
+                  }}
+                />
+              </div>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="outline" onClick={() => setEditFoodDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleSaveFoodImage}
+                className="bg-stone-900 hover:bg-stone-800"
+                disabled={!customImageUrl.trim() || updateFoodImageMutation.isPending}
+              >
+                {updateFoodImageMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>
