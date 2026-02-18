@@ -60,7 +60,6 @@ export default function Home() {
 
   const sections = [
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
-    { name: 'Calendario', page: 'CalendarView', icon: Calendar, color: 'from-purple-500 to-indigo-500', emoji: '📅' },
     { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
     { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-amber-500 to-yellow-500', emoji: '📔' },
