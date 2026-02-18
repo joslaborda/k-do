@@ -48,15 +48,16 @@ export default function CityCard({ city, daysCount }) {
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <div className="flex items-end justify-between">
             <div>
-              <div className="flex items-center gap-1.5 text-white/80 text-sm mb-1">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>Japan</span>
+              <div className="flex flex-col gap-1 mb-2">
+                <div className="flex items-center gap-1.5 text-white/90 text-sm font-medium">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span>Japan</span>
+                </div>
                 {city.start_date && (
-                  <>
-                    <span className="text-white/40">•</span>
-                    <Calendar className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-1.5 text-white/80 text-sm font-medium">
+                    <Calendar className="w-4 h-4 flex-shrink-0" />
                     <span>{formatDateRange()}</span>
-                  </>
+                  </div>
                 )}
               </div>
               <h3 className="text-2xl font-semibold text-white tracking-tight">

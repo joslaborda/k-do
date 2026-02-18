@@ -195,8 +195,8 @@ export default function Home() {
       </div>
 
       {/* Quick Progress Bar */}
-      <div className="max-w-6xl mx-auto px-6 mt-6">
-        <div className="bg-stone-800 rounded-2xl shadow-2xl p-6 border border-stone-700">
+      <div className="max-w-6xl mx-auto px-6 mt-6 pb-6">
+        <div className="bg-stone-800/40 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-stone-700/50">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Package className="w-5 h-5 text-blue-400" />
@@ -229,29 +229,29 @@ export default function Home() {
             >
               <Link
                  to={createPageUrl(section.page)}
-                 className="group relative overflow-hidden bg-stone-800 rounded-2xl border-2 border-stone-700 hover:border-stone-600 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
+                 className="group relative overflow-hidden bg-stone-800/40 backdrop-blur-lg rounded-2xl border-2 border-stone-700/50 hover:border-stone-600/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
                >
-               <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-15 transition-opacity duration-300`} />
 
-               <div className="relative p-6 flex flex-col items-center gap-3">
-                 <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
-                   {section.emoji}
-                 </div>
-                 <div className="text-center">
-                   <div className="font-semibold text-stone-100 group-hover:text-red-400 transition-colors">
-                     {section.name}
-                   </div>
-                 </div>
-               </div>
+                <div className="relative p-6 flex flex-col items-center gap-3">
+                  <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
+                    {section.emoji}
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-stone-100 group-hover:text-green-400 transition-colors">
+                      {section.name}
+                    </div>
+                  </div>
+                </div>
 
-               <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <ArrowRight className="w-5 h-5 text-stone-500" />
-               </div>
-               </Link>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+                <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowRight className="w-5 h-5 text-stone-500" />
+                </div>
+                </Link>
+             </motion.div>
+           ))}
+         </div>
+       </div>
 
 
     </div>

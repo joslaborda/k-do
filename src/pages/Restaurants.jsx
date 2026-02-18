@@ -613,6 +613,7 @@ export default function Restaurants() {
         <DialogContent className="bg-stone-800 border-stone-700">
           <DialogHeader>
             <DialogTitle className="text-stone-100">Añadir Restaurante</DialogTitle>
+            <div className="sr-only">Formulario para añadir un nuevo restaurante</div>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
@@ -658,7 +659,7 @@ export default function Restaurants() {
               </Button>
               <Button 
                 onClick={handleSave}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-green-600 hover:bg-green-700"
                 disabled={!formData.name.trim() || createMutation.isPending}
               >
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
@@ -672,6 +673,7 @@ export default function Restaurants() {
         <DialogContent className="bg-stone-800 border-stone-700">
           <DialogHeader>
             <DialogTitle className="text-stone-100">Editar foto: {selectedFood?.name}</DialogTitle>
+            <div className="sr-only">Formulario para editar la foto del plato</div>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
@@ -704,7 +706,7 @@ export default function Restaurants() {
               </Button>
               <Button 
                 onClick={handleSaveFoodImage}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-green-600 hover:bg-green-700"
                 disabled={!customImageUrl.trim() || updateFoodImageMutation.isPending}
               >
                 {updateFoodImageMutation.isPending ? 'Guardando...' : 'Guardar'}
