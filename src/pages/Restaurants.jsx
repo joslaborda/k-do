@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import { Plus, MapPin, Trash2, Check, X, UtensilsCrossed, Search, BookOpen, Image as ImageIcon } from 'lucide-react';
+import { Plus, MapPin, Trash2, Check, X, UtensilsCrossed, Search, BookOpen, Image as ImageIcon, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -424,7 +424,15 @@ export default function Restaurants() {
                       >
                         <Popup>
                           <div className="min-w-[200px]">
-                            <h3 className="font-semibold text-stone-900">{restaurant.name}</h3>
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="font-semibold text-stone-900">{restaurant.name}</h3>
+                              <button
+                                onClick={() => toggleFavoriteMutation.mutate(restaurant.id)}
+                                className="p-1 hover:bg-stone-100 rounded transition-colors"
+                              >
+                                <Heart className={`w-4 h-4 ${isFavorite(restaurant.id) ? 'fill-red-500 text-red-500' : 'text-stone-400'}`} />
+                              </button>
+                            </div>
                             {restaurant.cuisine && (
                               <p className="text-sm text-stone-500">{restaurant.cuisine}</p>
                             )}
