@@ -102,8 +102,8 @@ export default function Cities() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-light text-stone-100">Ruta 🗾</h1>
-            <p className="text-stone-400 mt-1 font-light">Explora tu itinerario por Japón</p>
+            <h1 className="text-4xl font-bold text-stone-100">Ruta 🗾</h1>
+            <p className="text-stone-400 mt-2">Explora tu itinerario por Japón</p>
           </div>
         </div>
 

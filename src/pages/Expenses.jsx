@@ -119,8 +119,8 @@ export default function Expenses() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-stone-100">Gastos 💴</h1>
-            <p className="text-stone-400 mt-1">Registra y divide los gastos con Carlos</p>
+            <h1 className="text-4xl font-bold text-stone-100">Gastos 💴</h1>
+            <p className="text-stone-400 mt-2">Registra y divide los gastos con Carlos</p>
           </div>
           <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
             <Plus className="w-4 h-4 mr-2" />

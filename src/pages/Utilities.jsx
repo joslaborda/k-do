@@ -214,7 +214,7 @@ export default function Utilities() {
       {/* Header */}
       <div className="bg-stone-800/80 backdrop-blur-xl border-b border-stone-700">
         <div className="max-w-5xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold text-stone-100 mb-2">Utilidades 🔧</h1>
+          <h1 className="text-4xl font-bold text-stone-100 mb-2">Utilidades 🔧</h1>
           <p className="text-stone-400">Información útil para tu viaje</p>
         </div>
       </div>
