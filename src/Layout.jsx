@@ -18,14 +18,14 @@ const navItems = [
 
 export default function Layout({ children, currentPageName }) {
         return (
-          <div className="min-h-screen bg-stone-900 text-stone-100">
+          <div className="min-h-screen bg-background text-foreground">
             <OfflineIndicator />
             <SyncIndicator />
             <KeyboardShortcuts />
       {children}
       
       {/* Bottom Navigation - Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-stone-800 border-t border-stone-700 md:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border md:hidden z-50">
         <div className="flex items-center justify-around px-1 py-2 overflow-x-auto">
           {navItems.map((item) => {
             const isActive = currentPageName === item.page || 
@@ -36,8 +36,8 @@ export default function Layout({ children, currentPageName }) {
                 to={createPageUrl(item.page)}
                 className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors flex-shrink-0 ${
                   isActive 
-                    ? 'text-red-400' 
-                    : 'text-stone-400'
+                    ? 'text-primary' 
+                    : 'text-muted-foreground'
                 }`}
               >
                 <item.icon className="w-4 h-4" strokeWidth={isActive ? 2.5 : 2} />
@@ -49,7 +49,7 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Side Navigation - Desktop */}
-      <nav className="fixed left-0 top-0 bottom-0 w-16 bg-stone-800 border-r border-stone-700 hidden md:flex flex-col items-center py-8 z-50">
+      <nav className="fixed left-0 top-0 bottom-0 w-16 glass border-r border-border hidden md:flex flex-col items-center py-8 z-50">
         <div className="text-3xl mb-12">🌸</div>
         
         <div className="flex-1 flex flex-col items-center gap-1">
@@ -62,8 +62,8 @@ export default function Layout({ children, currentPageName }) {
                 to={createPageUrl(item.page)}
                 className={`group flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all ${
                   isActive 
-                    ? 'text-red-400' 
-                    : 'text-stone-400 hover:text-stone-200'
+                    ? 'text-primary' 
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
@@ -75,8 +75,8 @@ export default function Layout({ children, currentPageName }) {
       </nav>
 
       {/* Keyboard shortcuts hint */}
-      <div className="hidden md:block fixed bottom-4 left-20 text-xs text-stone-400 bg-stone-800/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm border border-stone-700">
-        <kbd className="px-1.5 py-0.5 bg-stone-700 rounded text-stone-300">⌘K</kbd> Buscar
+      <div className="hidden md:block fixed bottom-4 left-20 text-xs text-muted-foreground glass px-3 py-2 rounded-lg shadow-sm border border-border">
+        <kbd className="px-1.5 py-0.5 bg-secondary rounded text-foreground">⌘K</kbd> Buscar
       </div>
 
       {/* Content padding for desktop nav */}

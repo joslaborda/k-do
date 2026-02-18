@@ -77,9 +77,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-900 via-stone-900/95 to-stone-950">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-background">
       {/* Hero moderno con imagen */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-red-600 via-pink-500 to-orange-500">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-red-600 to-orange-600">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1920')] bg-cover bg-center opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-900/50" />
         
@@ -196,21 +196,21 @@ export default function Home() {
 
       {/* Quick Progress Bar */}
       <div className="max-w-6xl mx-auto px-6 mt-6 pb-6">
-        <div className="bg-stone-800/40 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-stone-700/50">
+        <div className="glass rounded-2xl shadow-xl p-6 border border-border">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Package className="w-5 h-5 text-blue-400" />
-              <span className="font-semibold text-stone-100">Progreso de maleta</span>
+              <Package className="w-5 h-5 text-primary" />
+              <span className="font-semibold text-foreground">Progreso de maleta</span>
             </div>
-            <span className="text-2xl font-bold text-blue-400">{packedPercentage}%</span>
+            <span className="text-2xl font-bold text-primary">{packedPercentage}%</span>
           </div>
-          <div className="h-3 bg-stone-700 rounded-full overflow-hidden">
+          <div className="h-3 bg-secondary rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500"
               style={{ width: `${packedPercentage}%` }}
             />
           </div>
-          <p className="text-sm text-stone-400 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             {packingItems.filter(i => i.packed).length} de {packingItems.length} artículos empacados
           </p>
         </div>
@@ -218,7 +218,7 @@ export default function Home() {
 
       {/* Navigation Cards - Glassmorphism */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <h2 className="text-sm uppercase tracking-widest text-stone-300 mb-6 font-medium">Navega tu viaje</h2>
+        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-6 font-medium">Navega tu viaje</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sections.map((section, idx) => (
             <motion.div
@@ -229,29 +229,29 @@ export default function Home() {
             >
               <Link
                  to={createPageUrl(section.page)}
-                 className="group relative overflow-hidden bg-stone-800/40 backdrop-blur-lg rounded-2xl border-2 border-stone-700/50 hover:border-stone-600/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
+                 className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block"
                >
-                <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-15 transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
 
                 <div className="relative p-6 flex flex-col items-center gap-3">
                   <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
                     {section.emoji}
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold text-stone-100 group-hover:text-green-400 transition-colors">
+                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
                       {section.name}
                     </div>
                   </div>
                 </div>
 
                 <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="w-5 h-5 text-stone-500" />
+                  <ArrowRight className="w-5 h-5 text-primary" />
                 </div>
                 </Link>
              </motion.div>
-           ))}
+            ))}
          </div>
-       </div>
+        </div>
 
 
     </div>
