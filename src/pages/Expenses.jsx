@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Receipt, Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal } from 'lucide-react';
+import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
+import { useUndo } from '@/components/hooks/useUndo';
+import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -47,6 +50,13 @@ export default function Expenses() {
   });
 
   const queryClient = useQueryClient();
+  const { performDelete } = useUndo();
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['expenses'] });
+  };
+
+  const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses'],
@@ -79,6 +89,20 @@ export default function Expenses() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] }),
   });
 
+  const handleDelete = async (expense) => {
+    const expenseData = { ...expense };
+    delete expenseData.id;
+    delete expenseData.created_date;
+    delete expenseData.updated_date;
+    delete expenseData.created_by;
+    
+    await performDelete(
+      () => deleteMutation.mutateAsync(expense.id),
+      () => base44.entities.Expense.create(expenseData),
+      expense.description
+    );
+  };
+
   const handleSplitChange = (checked) => {
     setFormData({
       ...formData,
@@ -91,7 +115,8 @@ export default function Expenses() {
     : expenses.filter(e => e.paid_by === activeTab);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-stone-900 transition-colors">
+      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -152,7 +177,7 @@ export default function Expenses() {
                   <ExpenseCard 
                     key={expense.id} 
                     expense={expense}
-                    onDelete={(id) => deleteMutation.mutate(id)}
+                    onDelete={() => handleDelete(expense)}
                   />
                 ))}
               </div>

@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, MapPin, Trash2, Route, GripVertical } from 'lucide-react';
+import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
+import { useUndo } from '@/components/hooks/useUndo';
+import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ShareButton from '@/components/ShareButton';
@@ -44,6 +47,14 @@ export default function Cities() {
   const [newCity, setNewCity] = useState('');
   const [showRoute, setShowRoute] = useState(false);
   const queryClient = useQueryClient();
+  const { performDelete } = useUndo();
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['cities'] });
+    await queryClient.invalidateQueries({ queryKey: ['itineraryDays'] });
+  };
+
+  const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: cities = [], isLoading } = useQuery({
     queryKey: ['cities'],
@@ -70,8 +81,20 @@ export default function Cities() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.City.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cities'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cities'] });
+      queryClient.invalidateQueries({ queryKey: ['itineraryDays'] });
+    },
   });
+
+  const handleDelete = async (city) => {
+    const cityData = { ...city };
+    await performDelete(
+      () => deleteMutation.mutateAsync(city.id),
+      () => base44.entities.City.create(cityData),
+      city.name
+    );
+  };
 
   const reorderMutation = useMutation({
     mutationFn: async (reorderedCities) => {
@@ -123,7 +146,8 @@ export default function Cities() {
     .filter(pos => pos);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-stone-900 transition-colors">
+      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
