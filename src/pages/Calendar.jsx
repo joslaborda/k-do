@@ -34,6 +34,11 @@ export default function Calendar() {
     queryFn: () => base44.entities.DiaryEntry.list()
   });
 
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets'],
+    queryFn: () => base44.entities.Ticket.list('date')
+  });
+
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -208,6 +213,7 @@ export default function Calendar() {
               expenses={expenses}
               diaryEntries={diaryEntries}
               itineraryDays={itineraryDays}
+              tickets={tickets}
             />
           </TabsContent>
         </Tabs>

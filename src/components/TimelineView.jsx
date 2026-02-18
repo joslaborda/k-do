@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { format, parseISO, isValid } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, MapPin, Receipt, BookOpen, Package } from 'lucide-react';
+import { Calendar, MapPin, Receipt, BookOpen, Package, Plane } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
-export default function TimelineView({ cities, expenses, diaryEntries, itineraryDays }) {
+export default function TimelineView({ cities, expenses, diaryEntries, itineraryDays, tickets }) {
   const timelineEvents = useMemo(() => {
     const events = [];
 
@@ -96,9 +96,35 @@ export default function TimelineView({ cities, expenses, diaryEntries, itinerary
       });
     });
 
+    // Add tickets (flights, trains, hotels, etc.)
+    if (tickets) {
+      tickets.forEach(ticket => {
+        if (ticket.date) {
+          const categoryLabels = {
+            flight: 'Vuelo',
+            train: 'Tren',
+            hotel: 'Hotel',
+            freetour: 'Free Tour',
+            insurance: 'Seguro'
+          };
+
+          events.push({
+            date: new Date(ticket.date),
+            type: 'ticket',
+            icon: Plane,
+            title: ticket.name,
+            subtitle: categoryLabels[ticket.category] || ticket.category,
+            link: createPageUrl('Tickets'),
+            color: 'text-blue-600 bg-blue-50',
+            data: ticket
+          });
+        }
+      });
+    }
+
     // Sort by date
     return events.sort((a, b) => a.date - b.date).filter(e => isValid(e.date));
-  }, [cities, expenses, diaryEntries, itineraryDays]);
+  }, [cities, expenses, diaryEntries, itineraryDays, tickets]);
 
   if (timelineEvents.length === 0) {
     return (
