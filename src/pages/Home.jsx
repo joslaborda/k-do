@@ -195,7 +195,7 @@ export default function Home() {
       </div>
 
       {/* Quick Progress Bar */}
-      <div className="max-w-6xl mx-auto px-6 -mt-8">
+      <div className="max-w-6xl mx-auto px-6 mt-6">
         <div className="bg-white rounded-2xl shadow-2xl p-6 border border-stone-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
