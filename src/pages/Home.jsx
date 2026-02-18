@@ -47,10 +47,18 @@ export default function Home() {
   const tripDuration = differenceInDays(tripEnd, tripStart) + 1;
   
   const totalExpenses = useMemo(() => {
-    return expenses.reduce((sum, exp) => {
-      if (exp.currency === 'JPY') return sum + exp.amount;
-      return sum + (exp.amount * 160);
-    }, 0);
+    let totalJPY = 0;
+    expenses.forEach(exp => {
+      if (exp.currency === 'JPY') {
+        totalJPY += exp.amount;
+      } else {
+        totalJPY += exp.amount * 160;
+      }
+    });
+    return {
+      jpy: totalJPY,
+      eur: Math.round(totalJPY / 160)
+    };
   }, [expenses]);
 
   const packedPercentage = useMemo(() => {
@@ -157,17 +165,18 @@ export default function Home() {
                 </motion.div>
                 
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
-                >
-                  <div className="text-4xl mb-2">💰</div>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    ¥{totalExpenses.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-white/80">Gastado</div>
-                </motion.div>
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: 0.3 }}
+                   className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
+                 >
+                   <div className="text-4xl mb-2">💰</div>
+                   <div className="space-y-1 mb-1">
+                     <div className="text-2xl font-bold text-white">¥{totalExpenses.jpy.toLocaleString()}</div>
+                     <div className="text-sm text-white/80">€{totalExpenses.eur.toLocaleString()}</div>
+                   </div>
+                   <div className="text-sm text-white/80">Gastado</div>
+                 </motion.div>
                 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
