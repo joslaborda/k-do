@@ -368,12 +368,12 @@ export default function Restaurants() {
   const defaultCenter = [35.6762, 139.6503];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-stone-900">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-light text-stone-900">Yummy</h1>
-          <p className="text-stone-500 mt-1 font-light">Descubre la gastronomía japonesa</p>
-        </div>
+         <div className="mb-8">
+          <h1 className="text-3xl font-light text-stone-100">Yummy</h1>
+          <p className="text-stone-400 mt-1 font-light">Descubre la gastronomía japonesa</p>
+         </div>
 
         <Tabs defaultValue="map" className="w-full">
           <TabsList className="mb-8">
@@ -389,14 +389,14 @@ export default function Restaurants() {
 
           <TabsContent value="map" className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <p className="text-stone-600 font-light">Haz clic en el mapa para marcar restaurantes</p>
+              <p className="text-stone-400 font-light">Haz clic en el mapa para marcar restaurantes</p>
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 <Input
                   placeholder="Buscar restaurantes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-400"
                 />
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function Restaurants() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Map */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm h-[600px]">
+                <div className="bg-stone-800 rounded-2xl border border-stone-700 overflow-hidden shadow-sm h-[600px]">
                   <MapContainer
                     center={defaultCenter}
                     zoom={6}
@@ -480,14 +480,14 @@ export default function Restaurants() {
               {/* Restaurant List */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-medium text-stone-900">
+                  <h2 className="font-medium text-stone-100">
                     {filteredRestaurants.length} restaurante{filteredRestaurants.length !== 1 ? 's' : ''}
                   </h2>
                   <div className="flex gap-2">
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs">
+                    <Badge variant="outline" className="bg-red-900/30 text-red-300 border-red-700 text-xs">
                       {restaurants.filter(r => !r.visited).length} pendientes
                     </Badge>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                    <Badge variant="outline" className="bg-green-900/30 text-green-300 border-green-700 text-xs">
                       {restaurants.filter(r => r.visited).length} visitados
                     </Badge>
                   </div>
@@ -495,29 +495,29 @@ export default function Restaurants() {
 
                 <div className="space-y-3 max-h-[540px] overflow-y-auto pr-2">
                   {filteredRestaurants.length === 0 ? (
-                    <div className="text-center py-12 bg-stone-50 rounded-xl border border-stone-200">
-                      <UtensilsCrossed className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-                      <p className="text-stone-500 font-light">Sin restaurantes todavía</p>
-                      <p className="text-sm text-stone-400 mt-1 font-light">Haz clic en el mapa</p>
+                    <div className="text-center py-12 bg-stone-800 rounded-xl border border-stone-700">
+                      <UtensilsCrossed className="w-12 h-12 text-stone-600 mx-auto mb-3" />
+                      <p className="text-stone-400 font-light">Sin restaurantes todavía</p>
+                      <p className="text-sm text-stone-500 mt-1 font-light">Haz clic en el mapa</p>
                     </div>
                   ) : (
                     filteredRestaurants.map((restaurant) => (
                       <div
                         key={restaurant.id}
-                        className={`p-4 bg-white rounded-xl border transition-all ${
+                        className={`p-4 rounded-xl border transition-all ${
                           restaurant.visited 
-                            ? 'border-green-200 bg-green-50/50' 
-                            : 'border-stone-200 hover:border-stone-300'
+                            ? 'border-green-700/50 bg-green-900/20' 
+                            : 'border-stone-700 bg-stone-800 hover:border-stone-600'
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className={`font-medium ${restaurant.visited ? 'text-green-800' : 'text-stone-900'}`}>
+                            <h3 className={`font-medium ${restaurant.visited ? 'text-green-300' : 'text-stone-100'}`}>
                               {restaurant.name}
                             </h3>
                             <div className="flex items-center gap-2 mt-1">
                               {restaurant.city && (
-                                <span className="text-xs text-stone-500 flex items-center gap-1">
+                                <span className="text-xs text-stone-400 flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />
                                   {restaurant.city}
                                 </span>
@@ -533,15 +533,16 @@ export default function Restaurants() {
                             onClick={() => toggleVisited(restaurant)}
                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                               restaurant.visited
-                                ? 'bg-green-500 border-green-500 text-white'
-                                : 'border-stone-300 hover:border-stone-400'
+                                ? 'bg-green-600 border-green-600 text-white'
+                                : 'border-stone-600 hover:border-stone-500'
                             }`}
+                            aria-label={restaurant.visited ? 'Marcar como no visitado' : 'Marcar como visitado'}
                           >
                             {restaurant.visited && <Check className="w-3 h-3" />}
                           </button>
                         </div>
                         {restaurant.notes && (
-                          <p className="text-sm text-stone-500 mt-2">{restaurant.notes}</p>
+                          <p className="text-sm text-stone-400 mt-2">{restaurant.notes}</p>
                         )}
                       </div>
                     ))
@@ -559,24 +560,24 @@ export default function Restaurants() {
                   placeholder="Buscar tipo de comida..."
                   value={foodSearchQuery}
                   onChange={(e) => setFoodSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-400"
                 />
               </div>
             </div>
 
             {Object.entries(filteredGroupedFoodTypes).length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-stone-500 font-light">No se encontraron resultados</p>
+                <p className="text-stone-400 font-light">No se encontraron resultados</p>
               </div>
             ) : (
               Object.entries(filteredGroupedFoodTypes).map(([category, foods]) => (
                 <div key={category} className="space-y-4">
-                  <h2 className="text-2xl font-light text-stone-900 border-b border-stone-200 pb-2">
+                  <h2 className="text-2xl font-light text-stone-100 border-b border-stone-700 pb-2">
                     {category}
                   </h2>
                   <div className="grid md:grid-cols-3 gap-4">
                     {foods.map((food) => (
-                      <div key={food.name} className="group bg-white border-2 border-stone-200 rounded-xl overflow-hidden hover:border-red-400 transition-all duration-300 hover:shadow-xl">
+                      <div key={food.name} className="group bg-stone-800 border-2 border-stone-700 rounded-xl overflow-hidden hover:border-red-500 transition-all duration-300 hover:shadow-xl">
                         <div className="aspect-square overflow-hidden relative">
                           <img 
                             src={food.image} 
@@ -588,14 +589,15 @@ export default function Restaurants() {
                           />
                           <button
                             onClick={() => handleEditFoodImage(food)}
-                            className="absolute top-2 right-2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-2 right-2 bg-stone-900/90 hover:bg-stone-900 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            aria-label="Editar foto"
                           >
-                            <ImageIcon className="w-4 h-4 text-stone-700" />
+                            <ImageIcon className="w-4 h-4 text-stone-300" />
                           </button>
                         </div>
                         <div className="p-3">
-                          <h3 className="text-base font-bold text-stone-900 mb-1">{food.name}</h3>
-                          <p className="text-xs text-stone-600 leading-relaxed font-light line-clamp-2">{food.description}</p>
+                          <h3 className="text-base font-bold text-stone-100 mb-1">{food.name}</h3>
+                          <p className="text-xs text-stone-400 leading-relaxed font-light line-clamp-2">{food.description}</p>
                         </div>
                       </div>
                     ))}
@@ -608,51 +610,55 @@ export default function Restaurants() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-stone-800 border-stone-700">
           <DialogHeader>
-            <DialogTitle>Añadir Restaurante</DialogTitle>
+            <DialogTitle className="text-stone-100">Añadir Restaurante</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Nombre</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Nombre</label>
               <Input
                 placeholder="Nombre del restaurante"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Ciudad</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Ciudad</label>
               <Input
                 placeholder="ej. Osaka"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Tipo de cocina</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Tipo de cocina</label>
               <Input
                 placeholder="ej. Ramen, Sushi"
                 value={formData.cuisine}
                 onChange={(e) => setFormData({ ...formData, cuisine: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Notas</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Notas</label>
               <Textarea
                 placeholder="Notas sobre este lugar..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
                 Cancelar
               </Button>
               <Button 
                 onClick={handleSave}
-                className="bg-stone-900 hover:bg-stone-800"
+                className="bg-red-600 hover:bg-red-700"
                 disabled={!formData.name.trim() || createMutation.isPending}
               >
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
@@ -663,24 +669,25 @@ export default function Restaurants() {
       </Dialog>
 
       <Dialog open={editFoodDialogOpen} onOpenChange={setEditFoodDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-stone-800 border-stone-700">
           <DialogHeader>
-            <DialogTitle>Editar foto: {selectedFood?.name}</DialogTitle>
+            <DialogTitle className="text-stone-100">Editar foto: {selectedFood?.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">URL de la imagen</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">URL de la imagen</label>
               <Input
                 placeholder="https://ejemplo.com/imagen.jpg"
                 value={customImageUrl}
                 onChange={(e) => setCustomImageUrl(e.target.value)}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
-              <p className="text-xs text-stone-500 mt-1">
+              <p className="text-xs text-stone-400 mt-1">
                 Puedes usar una URL de Unsplash, Google Images, etc.
               </p>
             </div>
             {customImageUrl && (
-              <div className="border border-stone-200 rounded-lg overflow-hidden">
+              <div className="border border-stone-700 rounded-lg overflow-hidden">
                 <img 
                   src={customImageUrl} 
                   alt="Preview"
@@ -692,12 +699,12 @@ export default function Restaurants() {
               </div>
             )}
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setEditFoodDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setEditFoodDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
                 Cancelar
               </Button>
               <Button 
                 onClick={handleSaveFoodImage}
-                className="bg-stone-900 hover:bg-stone-800"
+                className="bg-red-600 hover:bg-red-700"
                 disabled={!customImageUrl.trim() || updateFoodImageMutation.isPending}
               >
                 {updateFoodImageMutation.isPending ? 'Guardando...' : 'Guardar'}
