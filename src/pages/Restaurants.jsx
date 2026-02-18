@@ -151,6 +151,7 @@ export default function Restaurants() {
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  language="es"
                 />
                 <MapClickHandler onMapClick={handleMapClick} />
                 
