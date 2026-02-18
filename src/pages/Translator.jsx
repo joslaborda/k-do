@@ -285,54 +285,57 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
             </div>
           </TabsContent>
 
-          <TabsContent value="phrases" className="space-y-4">
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
+          <TabsContent value="phrases" className="space-y-6">
+            <div className="relative mb-8">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
               <Input
-                placeholder="Busca frases..."
+                placeholder="Busca por palabra, frase, romaji..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-500"
+                className="pl-12 h-12 bg-stone-800/80 border border-stone-700 text-stone-100 placeholder:text-stone-500 focus:border-indigo-500 focus:ring-indigo-500/20"
               />
             </div>
+
             {filteredCategories.length === 0 ? (
-              <div className="text-center py-12 text-stone-400">
-                <Search className="w-12 h-12 mx-auto mb-3 text-stone-600" />
-                <p>No se encontraron frases que coincidan con tu búsqueda</p>
+              <div className="text-center py-16 text-stone-400">
+                <Search className="w-16 h-16 mx-auto mb-4 text-stone-600" />
+                <p className="text-lg">No se encontraron frases</p>
               </div>
             ) : (
-              <>
+              <div className="grid gap-4">
                 {filteredCategories.map((category) => (
                   <Collapsible
                     key={category.name}
                     open={expandedCategories[category.name]}
                     onOpenChange={() => toggleCategory(category.name)}
                   >
-                    <div className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-2xl overflow-hidden">
-                      <CollapsibleTrigger className="w-full p-4 flex items-center justify-between text-left hover:bg-stone-700/50 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{category.icon}</span>
-                          <span className="font-semibold text-stone-100">{category.name}</span>
-                          <span className="text-sm text-stone-400">({category.phrases.length})</span>
+                    <div className="bg-gradient-to-br from-stone-800 to-stone-800/50 border border-stone-700 rounded-2xl overflow-hidden hover:border-stone-600 transition-colors shadow-lg">
+                      <CollapsibleTrigger className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-stone-700/30 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <span className="text-3xl">{category.icon}</span>
+                          <div>
+                            <span className="font-bold text-stone-100 text-lg">{category.name}</span>
+                            <span className="text-xs text-stone-400 ml-2">({category.phrases.length} frases)</span>
+                          </div>
                         </div>
-                        <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform duration-300 ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
                       </CollapsibleTrigger>
                       
-                      <CollapsibleContent>
-                        <div className="border-t border-stone-700 divide-y divide-stone-700">
+                      <CollapsibleContent className="animate-in fade-in-50 slide-in-from-top-2 duration-300">
+                        <div className="border-t border-stone-700/50 divide-y divide-stone-700/50 bg-stone-900/20">
                           {category.phrases.map((phrase, idx) => (
-                            <div key={idx} className="p-4 hover:bg-stone-700/50 transition-colors">
+                            <div key={idx} className="p-5 hover:bg-stone-700/30 transition-colors group">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-stone-100 font-medium">{phrase.spanish}</p>
-                                  <p className="text-xl mt-1 text-stone-200">{phrase.japanese}</p>
-                                  <p className="text-sm text-stone-400 mt-0.5 italic">{phrase.romaji}</p>
+                                  <p className="text-stone-100 font-semibold text-sm leading-tight">{phrase.spanish}</p>
+                                  <p className="text-2xl font-bold mt-2 text-white tracking-tight">{phrase.japanese}</p>
+                                  <p className="text-xs text-stone-400 mt-2 italic font-mono bg-stone-800/50 inline-block px-2 py-1 rounded">{phrase.romaji}</p>
                                 </div>
                                 <Button
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => copyToClipboard(phrase.japanese, `${category.name}-${idx}`)}
-                                  className="flex-shrink-0"
+                                  className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                   {copiedId === `${category.name}-${idx}` ? (
                                     <Check className="w-4 h-4 text-green-500" />
@@ -347,10 +350,10 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                       </CollapsibleContent>
                     </div>
                   </Collapsible>
-                  ))}
-                  </>
-                  )}
-                  </TabsContent>
+                ))}
+              </div>
+            )}
+          </TabsContent>
                   </Tabs>
                 </div>
                 </div>
