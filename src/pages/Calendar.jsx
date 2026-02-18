@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, ExternalLink } from 'lucide-react';
+import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, ExternalLink, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +21,9 @@ const categoryConfig = {
 
 export default function Calendar() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [editingTicket, setEditingTicket] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     category: 'flight',
@@ -46,10 +48,24 @@ export default function Calendar() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      setEditDialogOpen(false);
+      setEditingTicket(null);
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
   });
+
+  const handleEdit = (ticket) => {
+    setEditingTicket(ticket);
+    setEditDialogOpen(true);
+  };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -141,14 +157,24 @@ export default function Calendar() {
                               </div>
                             )}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteMutation.mutate(ticket.id)}
-                            className="text-stone-400 hover:text-red-600"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(ticket)}
+                              className="text-stone-400 hover:text-blue-600"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteMutation.mutate(ticket.id)}
+                              className="text-stone-400 hover:text-red-600"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
 
                         {ticket.notes && (
