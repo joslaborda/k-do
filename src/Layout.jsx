@@ -8,6 +8,7 @@ import OfflineIndicator from '@/components/OfflineIndicator';
 import DarkModeToggle from '@/components/DarkModeToggle';
 import PWAInstaller from '@/components/PWAInstaller';
 import SyncIndicator from '@/components/SyncIndicator';
+import DailyReminder from '@/components/DailyReminder';
 
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
@@ -31,6 +32,7 @@ export default function Layout({ children, currentPageName }) {
       <QuickNotes ref={quickNotesRef} />
       <KeyboardShortcuts onNewNote={() => quickNotesRef.current?.openNotes()} />
       <DarkModeToggle />
+      <DailyReminder />
       {children}
       
       {/* Bottom Navigation - Mobile */}
