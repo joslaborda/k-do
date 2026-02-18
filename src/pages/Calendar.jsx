@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import TimelineView from '@/components/TimelineView';
 
 export default function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date('2026-03-01'));
@@ -34,10 +33,7 @@ export default function Calendar() {
     queryFn: () => base44.entities.DiaryEntry.list()
   });
 
-  const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets'],
-    queryFn: () => base44.entities.Ticket.list('date')
-  });
+
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -100,19 +96,7 @@ export default function Calendar() {
 
       {/* Calendar */}
       <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-        <Tabs defaultValue="calendar" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="calendar" className="gap-2">
-              <CalendarIcon className="w-4 h-4" />
-              Vista Calendario
-            </TabsTrigger>
-            <TabsTrigger value="timeline" className="gap-2">
-              <List className="w-4 h-4" />
-              Vista Timeline
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="calendar">
+        <div>
             <div className="bg-white rounded-2xl border-2 border-stone-200 overflow-hidden shadow-lg">
           {/* Month Navigation */}
           <div className="flex items-center justify-between p-6 border-b border-stone-200 bg-gradient-to-r from-purple-50 to-pink-50">
@@ -205,23 +189,7 @@ export default function Calendar() {
             })}
             </div>
           </div>
-          </TabsContent>
-
-          <TabsContent value="timeline" className="space-y-6">
-            <div className="bg-gradient-to-br from-purple-50/50 to-pink-50/50 backdrop-blur-xl border border-purple-200/50 rounded-3xl p-6 mb-6">
-              <h3 className="text-lg font-bold text-stone-900 mb-2">📅 Cronología del viaje</h3>
-              <p className="text-stone-600 text-sm">Todos tus eventos ordenados por fecha y hora</p>
-            </div>
-            
-            <TimelineView
-              cities={cities}
-              expenses={expenses}
-              diaryEntries={diaryEntries}
-              itineraryDays={itineraryDays}
-              tickets={tickets}
-            />
-          </TabsContent>
-        </Tabs>
+        </div>
 
         {/* Legend */}
         <div className="mt-6 flex flex-wrap gap-4 items-center justify-center">

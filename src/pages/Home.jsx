@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
@@ -17,7 +18,6 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],
@@ -79,17 +79,18 @@ export default function Home() {
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
           {/* Search Bar */}
           <div className="mb-8">
-            <div className="relative max-w-md">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="relative w-full max-w-md"
+            >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-              <Input
-                placeholder="Buscar en tu viaje..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setSearchOpen(true)}
-                className="pl-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 backdrop-blur-sm"
-              />
-            </div>
+              <div className="w-full pl-12 pr-4 py-3 bg-white/20 border border-white/30 text-white/60 placeholder:text-white/60 backdrop-blur-sm rounded-lg text-left hover:bg-white/30 transition-colors">
+                Buscar en tu viaje...
+              </div>
+            </button>
           </div>
+
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-white space-y-6">

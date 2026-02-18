@@ -22,10 +22,12 @@ export default function WeatherCard({ city }) {
     const fetchWeather = async () => {
       try {
         const response = await base44.integrations.Core.InvokeLLM({
-          prompt: `Dame el clima actual en ${city.name}, Japón. Devuelve SOLO estos datos:
+          prompt: `Dame el clima actual y pronóstico de HOY en ${city.name}, Japón. Devuelve SOLO estos datos:
 - Temperatura actual en °C (solo el número)
 - Condición: una palabra simple (soleado, nublado, lluvia, etc)
 - Sensación térmica en °C
+- Temperatura máxima de HOY en °C
+- Temperatura mínima de HOY en °C
 - Humedad en %
 - Viento en km/h`,
           add_context_from_internet: true,
@@ -35,6 +37,8 @@ export default function WeatherCard({ city }) {
               temp: { type: 'number' },
               condition: { type: 'string' },
               feels_like: { type: 'number' },
+              temp_max: { type: 'number' },
+              temp_min: { type: 'number' },
               humidity: { type: 'number' },
               wind: { type: 'number' }
             }
@@ -100,7 +104,7 @@ export default function WeatherCard({ city }) {
       </div>
 
       {/* Main temp */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-4">
         <div className="w-20 h-20 bg-white/60 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg">
           <WeatherIcon className="w-12 h-12 text-amber-500" strokeWidth={2} />
         </div>
@@ -111,6 +115,19 @@ export default function WeatherCard({ city }) {
           <div className="text-sm text-stone-500">
             Sensación {Math.round(weather.feels_like)}°
           </div>
+        </div>
+      </div>
+
+      {/* Max/Min */}
+      <div className="flex items-center gap-2 mb-6 px-2">
+        <div className="flex-1 text-center">
+          <div className="text-xs text-stone-500 mb-1">Mínima</div>
+          <div className="text-xl font-bold text-blue-600">{Math.round(weather.temp_min)}°</div>
+        </div>
+        <div className="w-px h-8 bg-stone-200" />
+        <div className="flex-1 text-center">
+          <div className="text-xs text-stone-500 mb-1">Máxima</div>
+          <div className="text-xl font-bold text-red-600">{Math.round(weather.temp_max)}°</div>
         </div>
       </div>
 
