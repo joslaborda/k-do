@@ -92,12 +92,12 @@ export default function WeatherCard({ city }) {
   };
 
   return (
-    <div className={`relative overflow-hidden bg-gradient-to-br ${getWeatherGradient()} backdrop-blur-xl border border-stone-700 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+    <div className={`relative overflow-hidden bg-gradient-to-br ${getWeatherGradient()} backdrop-blur-xl border border-border rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
       {/* City name */}
       <div className="flex items-start justify-between mb-6">
-        <h3 className="text-xl font-bold text-white">{city.name}</h3>
-        <div className="px-3 py-1 bg-stone-700/60 backdrop-blur rounded-full">
-          <span className="text-xs font-medium text-white capitalize">
+        <h3 className="text-xl font-bold text-foreground">{city.name}</h3>
+        <div className="px-3 py-1 bg-secondary/80 backdrop-blur rounded-full border border-border">
+          <span className="text-xs font-medium text-foreground capitalize">
             {weather.condition}
           </span>
         </div>
@@ -105,14 +105,14 @@ export default function WeatherCard({ city }) {
 
       {/* Main temp */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-20 h-20 bg-stone-700/60 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg">
-          <WeatherIcon className="w-12 h-12 text-amber-400" strokeWidth={2} />
+        <div className="w-20 h-20 bg-secondary/80 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg border border-border">
+          <WeatherIcon className="w-12 h-12 text-primary" strokeWidth={2} />
         </div>
         <div>
-          <div className="text-5xl font-bold text-white">
+          <div className="text-5xl font-bold text-foreground">
             {Math.round(weather.temp)}°
           </div>
-          <div className="text-sm text-stone-200">
+          <div className="text-sm text-muted-foreground">
             Sensación {Math.round(weather.feels_like)}°
           </div>
         </div>
@@ -121,31 +121,31 @@ export default function WeatherCard({ city }) {
       {/* Max/Min */}
       <div className="flex items-center gap-2 mb-6 px-2">
         <div className="flex-1 text-center">
-          <div className="text-xs text-stone-300 mb-1">Mínima</div>
-          <div className="text-xl font-bold text-cyan-300">{Math.round(weather.temp_min)}°</div>
+          <div className="text-xs text-muted-foreground mb-1">Mínima</div>
+          <div className="text-xl font-bold text-blue-600">{Math.round(weather.temp_min)}°</div>
         </div>
-        <div className="w-px h-8 bg-stone-700" />
+        <div className="w-px h-8 bg-border" />
         <div className="flex-1 text-center">
-          <div className="text-xs text-stone-300 mb-1">Máxima</div>
-          <div className="text-xl font-bold text-red-300">{Math.round(weather.temp_max)}°</div>
+          <div className="text-xs text-muted-foreground mb-1">Máxima</div>
+          <div className="text-xl font-bold text-primary">{Math.round(weather.temp_max)}°</div>
         </div>
       </div>
 
       {/* Details grid */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-3 bg-stone-700/40 backdrop-blur rounded-xl p-3">
-          <Droplets className="w-5 h-5 text-cyan-300" />
+        <div className="flex items-center gap-3 bg-secondary/60 backdrop-blur rounded-xl p-3 border border-border">
+          <Droplets className="w-5 h-5 text-primary" />
           <div>
-            <div className="text-xs text-stone-300">Humedad</div>
-            <div className="font-semibold text-white">{weather.humidity}%</div>
+            <div className="text-xs text-muted-foreground">Humedad</div>
+            <div className="font-semibold text-foreground">{weather.humidity}%</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 bg-stone-700/40 backdrop-blur rounded-xl p-3">
-          <Wind className="w-5 h-5 text-cyan-300" />
+        <div className="flex items-center gap-3 bg-secondary/60 backdrop-blur rounded-xl p-3 border border-border">
+          <Wind className="w-5 h-5 text-primary" />
           <div>
-            <div className="text-xs text-stone-300">Viento</div>
-            <div className="font-semibold text-white">{weather.wind} km/h</div>
+            <div className="text-xs text-muted-foreground">Viento</div>
+            <div className="font-semibold text-foreground">{weather.wind} km/h</div>
           </div>
         </div>
       </div>
