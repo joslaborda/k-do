@@ -116,14 +116,14 @@ export default function CityDetail() {
 
   if (!city) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-pulse text-slate-400">Loading...</div>
+      <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+        <div className="animate-pulse text-stone-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-900">
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img 
@@ -155,9 +155,9 @@ export default function CityDetail() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">Itinerario</h2>
-          <Button onClick={openNewDialog} className="bg-slate-900 hover:bg-slate-800">
+         <div className="flex items-center justify-between mb-6">
+           <h2 className="text-xl font-semibold text-stone-100">Itinerario</h2>
+           <Button onClick={openNewDialog} className="bg-red-600 hover:bg-red-700">
             <Plus className="w-4 h-4 mr-2" />
             Añadir Día
           </Button>
@@ -187,16 +187,16 @@ export default function CityDetail() {
                 open={expandedDays[day.id]}
                 onOpenChange={() => toggleDay(day.id)}
               >
-                <div className="bg-white rounded-xl border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
-                  <CollapsibleTrigger className="w-full p-5 flex items-center justify-between text-left">
+                <div className="bg-stone-800 rounded-xl border border-stone-700 overflow-hidden hover:shadow-md transition-shadow">
+                  <CollapsibleTrigger className="w-full p-5 flex items-center justify-between text-left hover:bg-stone-700/50 transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-semibold">
+                      <div className="w-10 h-10 rounded-xl bg-stone-700 flex items-center justify-center text-stone-200 font-semibold">
                         {index + 1}
                       </div>
                       <div>
-                        <h3 className="font-medium text-slate-900">{day.title}</h3>
+                        <h3 className="font-medium text-stone-100">{day.title}</h3>
                         {day.date && (
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-stone-400">
                             {format(new Date(day.date), 'EEEE, MMMM d')}
                           </p>
                         )}
@@ -206,36 +206,38 @@ export default function CityDetail() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-8 w-8 text-stone-400 hover:text-stone-200 hover:bg-stone-700"
                         onClick={(e) => {
                           e.stopPropagation();
                           openEditDialog(day);
                         }}
+                        aria-label="Editar día"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-red-500 hover:text-red-600"
+                        className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-stone-700"
                         onClick={(e) => {
                           e.stopPropagation();
                           deleteMutation.mutate(day.id);
                         }}
+                        aria-label="Eliminar día"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                       {expandedDays[day.id] ? (
-                        <ChevronUp className="w-5 h-5 text-slate-400" />
+                        <ChevronUp className="w-5 h-5 text-stone-400" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-slate-400" />
+                        <ChevronDown className="w-5 h-5 text-stone-400" />
                       )}
                     </div>
                   </CollapsibleTrigger>
                   
                   <CollapsibleContent>
-                    <div className="px-5 pb-5 pt-0 border-t border-slate-100">
-                      <div className="prose prose-slate prose-sm max-w-none pt-4">
+                    <div className="px-5 pb-5 pt-0 border-t border-stone-700 bg-stone-800/50">
+                      <div className="prose prose-invert prose-sm max-w-none pt-4 text-stone-300 [&>*]:text-stone-300">
                         <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
                       </div>
                     </div>
@@ -248,13 +250,13 @@ export default function CityDetail() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingDay ? 'Editar Día' : 'Añadir Nuevo Día'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Título</label>
+         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-stone-800 border-stone-700">
+           <DialogHeader>
+             <DialogTitle className="text-stone-100">{editingDay ? 'Editar Día' : 'Añadir Nuevo Día'}</DialogTitle>
+           </DialogHeader>
+           <div className="space-y-4 pt-4">
+             <div>
+               <label className="text-sm font-medium text-stone-300 mb-1.5 block">Título</label>
               <Input
                 placeholder="ej. Llegada + Dotonbori nocturno"
                 value={formData.title}
@@ -262,15 +264,16 @@ export default function CityDetail() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Fecha</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
               <Input
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">
                 Detalles (soporta Markdown)
               </label>
               <Textarea
@@ -278,16 +281,16 @@ export default function CityDetail() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={12}
-                className="font-mono text-sm"
+                className="font-mono text-sm bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
                 Cancelar
               </Button>
               <Button 
                 onClick={handleSave}
-                className="bg-slate-900 hover:bg-slate-800"
+                className="bg-red-600 hover:bg-red-700"
                 disabled={!formData.title.trim()}
               >
                 <Save className="w-4 h-4 mr-2" />
