@@ -180,19 +180,19 @@ export default function Diary() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-stone-900 dark:via-stone-900 dark:to-stone-900 transition-colors">
+    <div className="min-h-screen bg-stone-900">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       {/* Header */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-stone-800 border-b border-stone-700">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-stone-900 mb-2">Diario de Viaje 📔</h1>
-              <p className="text-stone-600">Recuerdos y momentos especiales</p>
+              <h1 className="text-3xl font-bold text-stone-100 mb-2">Diario de Viaje 📔</h1>
+              <p className="text-stone-400">Recuerdos y momentos especiales</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-stone-900 hover:bg-stone-800"
+              className="bg-green-600 hover:bg-green-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Nueva Entrada
@@ -214,20 +214,20 @@ export default function Diary() {
 
           <TabsContent value="list">
             {entries.length === 0 ? (
-          <div className="text-center py-24 border-2 border-dashed border-stone-200 rounded-2xl">
-            <BookOpen className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+          <div className="text-center py-24 border-2 border-dashed border-stone-700 rounded-2xl">
+            <BookOpen className="w-16 h-16 text-stone-600 mx-auto mb-4" />
             <p className="text-stone-400">Empieza a escribir tu diario de viaje</p>
           </div>
-        ) : (
+          ) : (
           <div className="space-y-6">
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="bg-white border-2 border-stone-200 rounded-2xl overflow-hidden hover:border-stone-300 transition-all"
+                className="bg-stone-800 border-2 border-stone-700 rounded-2xl overflow-hidden hover:border-stone-600 transition-all"
               >
                 {/* Photos */}
                 {entry.photos && entry.photos.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-stone-50">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-stone-700">
                     {entry.photos.map((photo, idx) => (
                       <div key={idx} className="aspect-square rounded-lg overflow-hidden">
                         <img
@@ -243,19 +243,19 @@ export default function Diary() {
                 {/* Content */}
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="text-5xl">{entry.mood || '😊'}</div>
-                      <div>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="text-5xl flex-shrink-0">{entry.mood || '😊'}</div>
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Calendar className="w-4 h-4 text-stone-400" />
-                          <span className="text-sm font-medium text-stone-600">
+                          <Calendar className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                          <span className="text-sm font-medium text-stone-300 truncate">
                             {format(new Date(entry.date), 'EEEE, d MMMM yyyy', { locale: es })}
                           </span>
                         </div>
                         {entry.location && (
                           <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-stone-400" />
-                            <span className="text-sm text-stone-500">{entry.location}</span>
+                            <MapPin className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                            <span className="text-sm text-stone-400 truncate">{entry.location}</span>
                           </div>
                         )}
                       </div>
@@ -264,16 +264,17 @@ export default function Diary() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(entry)}
-                      className="text-stone-400 hover:text-red-600"
+                      className="text-stone-500 hover:text-red-400 hover:bg-stone-700 flex-shrink-0 ml-2"
+                      aria-label="Eliminar"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
 
                   {entry.title && (
-                    <h2 className="text-2xl font-bold text-stone-900 mb-3">{entry.title}</h2>
+                    <h2 className="text-2xl font-bold text-stone-100 mb-3">{entry.title}</h2>
                   )}
-                  <p className="text-stone-700 leading-relaxed whitespace-pre-wrap">{entry.content}</p>
+                  <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">{entry.content}</p>
                 </div>
               </div>
             ))}
@@ -289,22 +290,23 @@ export default function Diary() {
 
       {/* Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-stone-800 border-stone-700">
           <DialogHeader>
-            <DialogTitle>Nueva entrada del diario</DialogTitle>
+            <DialogTitle className="text-stone-100">Nueva entrada del diario</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Fecha</label>
+                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
                 <Input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="bg-stone-700 border-stone-600 text-stone-100"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-stone-700 mb-1.5 block">Estado de ánimo</label>
+                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Estado de ánimo</label>
                 <Select value={formData.mood} onValueChange={(v) => setFormData({ ...formData, mood: v })}>
                   <SelectTrigger>
                     <SelectValue />
@@ -321,26 +323,28 @@ export default function Diary() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Título (opcional)</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Título (opcional)</label>
               <Input
                 placeholder="ej. Primer día en Tokio"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Ubicación (opcional)</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Ubicación (opcional)</label>
               <Input
                 placeholder="ej. Shibuya, Tokio"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-stone-700">¿Qué pasó hoy?</label>
+                <label className="text-sm font-medium text-stone-300">¿Qué pasó hoy?</label>
                 <Button
                   type="button"
                   variant={isRecording ? "destructive" : "outline"}
@@ -367,15 +371,15 @@ export default function Diary() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={6}
-                className={isRecording ? 'ring-2 ring-red-500' : ''}
+                className={`bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400 ${isRecording ? 'ring-2 ring-red-500' : ''}`}
               />
               {isRecording && (
-                <p className="text-xs text-red-600 mt-1 animate-pulse">🎤 Escuchando...</p>
+                <p className="text-xs text-red-400 mt-1 animate-pulse">🎤 Escuchando...</p>
               )}
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">Fotos</label>
+              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fotos</label>
               <div className="space-y-3">
                 {formData.photos.length > 0 && (
                   <div className="grid grid-cols-3 gap-2">
@@ -392,7 +396,7 @@ export default function Diary() {
                     ))}
                   </div>
                 )}
-                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-stone-300 rounded-lg hover:border-stone-400 cursor-pointer transition-colors">
+                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-stone-600 rounded-lg hover:border-stone-500 cursor-pointer transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -404,8 +408,8 @@ export default function Diary() {
                     <>Subiendo...</>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4 text-stone-500" />
-                      <span className="text-sm text-stone-600">Subir foto</span>
+                      <Upload className="w-4 h-4 text-stone-400" />
+                      <span className="text-sm text-stone-400">Subir foto</span>
                     </>
                   )}
                 </label>
@@ -413,12 +417,12 @@ export default function Diary() {
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
                 Cancelar
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="bg-stone-900 hover:bg-stone-800"
+                className="bg-green-600 hover:bg-green-700"
                 disabled={!formData.content.trim() || createMutation.isPending}
               >
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}

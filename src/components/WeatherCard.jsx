@@ -92,12 +92,12 @@ export default function WeatherCard({ city }) {
   };
 
   return (
-    <div className={`relative overflow-hidden bg-gradient-to-br ${getWeatherGradient()} backdrop-blur-xl border border-white/30 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}>
+    <div className={`relative overflow-hidden bg-gradient-to-br ${getWeatherGradient()} backdrop-blur-xl border border-white/30 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 dark:border-stone-700`}>
       {/* City name */}
       <div className="flex items-start justify-between mb-6">
-        <h3 className="text-xl font-bold text-stone-900">{city.name}</h3>
-        <div className="px-3 py-1 bg-white/60 backdrop-blur rounded-full">
-          <span className="text-xs font-medium text-stone-600 capitalize">
+        <h3 className="text-xl font-bold text-stone-900 dark:text-stone-100">{city.name}</h3>
+        <div className="px-3 py-1 bg-white/60 backdrop-blur rounded-full dark:bg-stone-700/60">
+          <span className="text-xs font-medium text-stone-600 dark:text-stone-300 capitalize">
             {weather.condition}
           </span>
         </div>
@@ -105,14 +105,14 @@ export default function WeatherCard({ city }) {
 
       {/* Main temp */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-20 h-20 bg-white/60 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg">
+        <div className="w-20 h-20 bg-white/60 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg dark:bg-stone-700/60">
           <WeatherIcon className="w-12 h-12 text-amber-500" strokeWidth={2} />
         </div>
         <div>
-          <div className="text-5xl font-bold text-stone-900">
+          <div className="text-5xl font-bold text-stone-900 dark:text-stone-100">
             {Math.round(weather.temp)}°
           </div>
-          <div className="text-sm text-stone-500">
+          <div className="text-sm text-stone-500 dark:text-stone-400">
             Sensación {Math.round(weather.feels_like)}°
           </div>
         </div>
@@ -121,31 +121,31 @@ export default function WeatherCard({ city }) {
       {/* Max/Min */}
       <div className="flex items-center gap-2 mb-6 px-2">
         <div className="flex-1 text-center">
-          <div className="text-xs text-stone-500 mb-1">Mínima</div>
-          <div className="text-xl font-bold text-blue-600">{Math.round(weather.temp_min)}°</div>
+          <div className="text-xs text-stone-500 dark:text-stone-400 mb-1">Mínima</div>
+          <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{Math.round(weather.temp_min)}°</div>
         </div>
-        <div className="w-px h-8 bg-stone-200" />
+        <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
         <div className="flex-1 text-center">
-          <div className="text-xs text-stone-500 mb-1">Máxima</div>
-          <div className="text-xl font-bold text-red-600">{Math.round(weather.temp_max)}°</div>
+          <div className="text-xs text-stone-500 dark:text-stone-400 mb-1">Máxima</div>
+          <div className="text-xl font-bold text-red-600 dark:text-red-400">{Math.round(weather.temp_max)}°</div>
         </div>
       </div>
 
       {/* Details grid */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-3 bg-white/40 backdrop-blur rounded-xl p-3">
-          <Droplets className="w-5 h-5 text-blue-600" />
+        <div className="flex items-center gap-3 bg-white/40 backdrop-blur rounded-xl p-3 dark:bg-stone-700/40">
+          <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <div>
-            <div className="text-xs text-stone-500">Humedad</div>
-            <div className="font-semibold text-stone-900">{weather.humidity}%</div>
+            <div className="text-xs text-stone-500 dark:text-stone-400">Humedad</div>
+            <div className="font-semibold text-stone-900 dark:text-stone-100">{weather.humidity}%</div>
           </div>
         </div>
         
-        <div className="flex items-center gap-3 bg-white/40 backdrop-blur rounded-xl p-3">
-          <Wind className="w-5 h-5 text-cyan-600" />
+        <div className="flex items-center gap-3 bg-white/40 backdrop-blur rounded-xl p-3 dark:bg-stone-700/40">
+          <Wind className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
           <div>
-            <div className="text-xs text-stone-500">Viento</div>
-            <div className="font-semibold text-stone-900">{weather.wind} km/h</div>
+            <div className="text-xs text-stone-500 dark:text-stone-400">Viento</div>
+            <div className="font-semibold text-stone-900 dark:text-stone-100">{weather.wind} km/h</div>
           </div>
         </div>
       </div>
