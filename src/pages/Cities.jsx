@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, MapPin, Trash2 } from 'lucide-react';
+import { Plus, MapPin, Trash2, Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,12 +12,35 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import CityCard from '@/components/cities/CityCard';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+
+// Fix default marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const defaultCities = ['Osaka', 'Hiroshima', 'Hakone', 'Kyoto', 'Tokyo'];
+
+// Coordenadas de ciudades japonesas
+const cityCoordinates = {
+  'Osaka': [34.6937, 135.5023],
+  'Hiroshima': [34.3853, 132.4553],
+  'Hakone': [35.2323, 139.1070],
+  'Kyoto': [35.0116, 135.7681],
+  'Tokyo': [35.6762, 139.6503]
+};
 
 export default function Cities() {
   const [open, setOpen] = useState(false);
   const [newCity, setNewCity] = useState('');
+  const [showRoute, setShowRoute] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: cities = [], isLoading } = useQuery({
@@ -57,18 +80,36 @@ export default function Cities() {
     }
   };
 
+  const getCityPosition = (cityName) => {
+    return cityCoordinates[cityName] || [35.6762, 139.6503]; // Default a Tokyo
+  };
+
+  const formatDateRange = (city) => {
+    if (!city.start_date) return null;
+    const start = new Date(city.start_date);
+    const end = city.end_date ? new Date(city.end_date) : null;
+    if (end && start.getTime() !== end.getTime()) {
+      return `${format(start, 'd', { locale: es })}—${format(end, 'd MMM', { locale: es })}`;
+    }
+    return format(start, 'd MMM', { locale: es });
+  };
+
+  const routePositions = cities
+    .map(city => getCityPosition(city.name))
+    .filter(pos => pos);
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Ciudades</h1>
-            <p className="text-slate-500 mt-1">Planifica tu itinerario para cada destino</p>
+            <h1 className="text-3xl font-light text-stone-900">Ruta</h1>
+            <p className="text-stone-500 mt-1 font-light">Explora tu itinerario por Japón</p>
           </div>
           
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-slate-900 hover:bg-slate-800">
+              <Button className="bg-stone-900 hover:bg-stone-800">
                 <Plus className="w-4 h-4 mr-2" />
                 Añadir Ciudad
               </Button>
@@ -85,8 +126,8 @@ export default function Cities() {
                       onClick={() => setNewCity(city)}
                       className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                         newCity === city 
-                          ? 'bg-slate-900 text-white' 
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          ? 'bg-stone-900 text-white' 
+                          : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                       }`}
                     >
                       {city}
@@ -101,7 +142,7 @@ export default function Cities() {
                 />
                 <Button 
                   onClick={handleAddCity} 
-                  className="w-full bg-slate-900 hover:bg-slate-800"
+                  className="w-full bg-stone-900 hover:bg-stone-800"
                   disabled={!newCity.trim() || createMutation.isPending}
                 >
                   {createMutation.isPending ? 'Añadiendo...' : 'Añadir Ciudad'}
@@ -111,31 +152,100 @@ export default function Cities() {
           </Dialog>
         </div>
 
+        {/* Map Section */}
+        {cities.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm uppercase tracking-widest text-stone-400 font-light">Mapa Interactivo</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRoute(!showRoute)}
+                className="text-stone-600"
+              >
+                <Route className="w-4 h-4 mr-2" />
+                {showRoute ? 'Ocultar' : 'Mostrar'} Ruta
+              </Button>
+            </div>
+            <div className="h-[500px] rounded-lg overflow-hidden border border-stone-200">
+              <MapContainer
+                center={[36.2048, 138.2529]}
+                zoom={6}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  language="es"
+                />
+                
+                {cities.map((city, idx) => (
+                  <Marker key={city.id} position={getCityPosition(city.name)}>
+                    <Popup>
+                      <div className="p-2 min-w-[200px]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs text-stone-400">{String(idx + 1).padStart(2, '0')}</span>
+                          <h3 className="font-medium text-stone-900">{city.name}</h3>
+                        </div>
+                        {city.start_date && (
+                          <p className="text-xs text-stone-500 mb-2">
+                            {formatDateRange(city)}
+                          </p>
+                        )}
+                        {city.image_url && (
+                          <img 
+                            src={city.image_url} 
+                            alt={city.name}
+                            className="w-full h-24 object-cover rounded mt-2"
+                          />
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+
+                {showRoute && routePositions.length > 1 && (
+                  <Polyline
+                    positions={routePositions}
+                    color="#dc2626"
+                    weight={2}
+                    opacity={0.6}
+                    dashArray="10, 10"
+                  />
+                )}
+              </MapContainer>
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="aspect-[16/10] rounded-2xl bg-slate-200 animate-pulse" />
+              <div key={i} className="aspect-[16/10] rounded-2xl bg-stone-200 animate-pulse" />
             ))}
           </div>
         ) : cities.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
-            <MapPin className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-slate-700 mb-2">Sin ciudades todavía</h3>
-            <p className="text-slate-500 mb-6">Empieza añadiendo las ciudades que visitarás en Japón</p>
-            <Button onClick={() => setOpen(true)} className="bg-slate-900 hover:bg-slate-800">
+          <div className="text-center py-20 bg-white rounded-2xl border border-stone-200">
+            <MapPin className="w-16 h-16 text-stone-300 mx-auto mb-4" />
+            <h3 className="text-xl font-light text-stone-700 mb-2">Sin ciudades todavía</h3>
+            <p className="text-stone-500 mb-6 font-light">Empieza añadiendo las ciudades que visitarás en Japón</p>
+            <Button onClick={() => setOpen(true)} className="bg-stone-900 hover:bg-stone-800">
               <Plus className="w-4 h-4 mr-2" />
               Añadir primera ciudad
             </Button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cities.map((city) => (
-              <CityCard 
-                key={city.id} 
-                city={city} 
-                daysCount={getDaysCount(city.id)}
-              />
-            ))}
+          <div>
+            <h2 className="text-sm uppercase tracking-widest text-stone-400 mb-6 font-light">Ciudades</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cities.map((city) => (
+                <CityCard 
+                  key={city.id} 
+                  city={city} 
+                  daysCount={getDaysCount(city.id)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
