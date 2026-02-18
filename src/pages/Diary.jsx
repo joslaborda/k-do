@@ -92,6 +92,69 @@ export default function Diary() {
     createMutation.mutate(formData);
   };
 
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'es-ES';
+
+      recognitionRef.current.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          setFormData(prev => ({
+            ...prev,
+            content: prev.content + finalTranscript
+          }));
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Error de reconocimiento:', event.error);
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        if (isRecording) {
+          recognitionRef.current.start();
+        }
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [isRecording]);
+
+  const toggleRecording = () => {
+    if (!recognitionRef.current) {
+      alert('Tu navegador no soporta reconocimiento de voz. Prueba con Chrome o Edge.');
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-white">
       {/* Header */}
