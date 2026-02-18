@@ -391,6 +391,10 @@ export default function Restaurants() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="menu" className="space-y-6">
+            <MenuViewer foodItems={customFoodItems} />
+          </TabsContent>
+
           <TabsContent value="map" className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <p className="text-stone-400 font-light">Haz clic en el mapa para marcar restaurantes</p>
