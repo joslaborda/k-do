@@ -337,16 +337,16 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                                   <p className="text-2xl font-bold mt-2 text-foreground tracking-tight">{phrase.japanese}</p>
                                   <p className="text-xs text-muted-foreground mt-2 italic font-mono bg-secondary/50 inline-block px-2 py-1 rounded">{phrase.romaji}</p>
                                 </div>
-                                <div className="flex-shrink-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => speakJapanese(phrase.japanese)}
-                                    className="text-primary hover:text-primary/80"
-                                    title="Escuchar pronunciación"
-                                  >
-                                    <Play className="w-4 h-4" />
-                                  </Button>
+                                <div className="flex-shrink-0 flex gap-2">
+                                   <Button
+                                     variant="ghost"
+                                     size="icon"
+                                     onClick={() => speakJapanese(phrase.japanese)}
+                                     className="text-primary hover:text-primary/80"
+                                     title="Escuchar pronunciación"
+                                   >
+                                     <Volume2 className="w-4 h-4" />
+                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
