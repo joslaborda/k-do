@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin, ChevronRight, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const cityImages = {
   'Osaka': 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800',
@@ -11,6 +13,23 @@ const cityImages = {
 };
 
 export default function CityCard({ city, daysCount }) {
+  const formatDateRange = () => {
+    if (!city.start_date) return null;
+    
+    const start = new Date(city.start_date);
+    const end = city.end_date ? new Date(city.end_date) : null;
+    
+    if (end && start.getTime() === end.getTime()) {
+      return format(start, 'd MMM', { locale: es });
+    }
+    
+    if (end) {
+      return `${format(start, 'd', { locale: es })}-${format(end, 'd MMM', { locale: es })}`;
+    }
+    
+    return format(start, 'd MMM', { locale: es });
+  };
+
   return (
     <Link 
       to={createPageUrl('CityDetail') + `?id=${city.id}`}
@@ -32,6 +51,13 @@ export default function CityCard({ city, daysCount }) {
               <div className="flex items-center gap-1.5 text-white/80 text-sm mb-1">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>Japan</span>
+                {city.start_date && (
+                  <>
+                    <span className="text-white/40">•</span>
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{formatDateRange()}</span>
+                  </>
+                )}
               </div>
               <h3 className="text-2xl font-semibold text-white tracking-tight">
                 {city.name}
