@@ -8,7 +8,7 @@ import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
   { name: 'Ruta', page: 'Cities', icon: MapPin },
-  { name: 'Cal', page: 'Calendar', icon: Calendar },
+  { name: 'Timeline', page: 'Calendar', icon: Calendar },
   { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
   { name: 'Diario', page: 'Diary', icon: BookOpen },
