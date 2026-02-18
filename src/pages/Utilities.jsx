@@ -684,7 +684,7 @@ export default function Utilities() {
             <div>
               <label className="text-sm font-medium text-stone-100 mb-1.5 block">Categoría</label>
               <Select value={packingFormData.category} onValueChange={(v) => setPackingFormData({ ...packingFormData, category: v })}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-stone-700 border-stone-600 text-stone-100">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
