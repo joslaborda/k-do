@@ -280,6 +280,88 @@ export default function Calendar() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar documento</DialogTitle>
+            </DialogHeader>
+            {editingTicket && (
+              <div className="space-y-4 pt-4">
+                <div>
+                  <label className="text-sm font-medium text-stone-700 mb-1.5 block">Nombre</label>
+                  <Input
+                    placeholder="ej. Vuelo Madrid - Tokyo"
+                    defaultValue={editingTicket.name}
+                    onChange={(e) => setEditingTicket({ ...editingTicket, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-stone-700 mb-1.5 block">Categoría</label>
+                  <Select 
+                    value={editingTicket.category} 
+                    onValueChange={(v) => setEditingTicket({ ...editingTicket, category: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(categoryConfig).map(([key, config]) => {
+                        const Icon = config.icon;
+                        return (
+                          <SelectItem key={key} value={key}>
+                            <div className="flex items-center gap-2">
+                              <Icon className="w-4 h-4" />
+                              {config.label}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-stone-700 mb-1.5 block">Fecha</label>
+                  <Input
+                    type="date"
+                    value={editingTicket.date || ''}
+                    onChange={(e) => setEditingTicket({ ...editingTicket, date: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-stone-700 mb-1.5 block">Notas (opcional)</label>
+                  <Textarea
+                    placeholder="Notas adicionales..."
+                    value={editingTicket.notes || ''}
+                    onChange={(e) => setEditingTicket({ ...editingTicket, notes: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={() => updateMutation.mutate({ 
+                      id: editingTicket.id, 
+                      data: {
+                        name: editingTicket.name,
+                        category: editingTicket.category,
+                        date: editingTicket.date,
+                        notes: editingTicket.notes,
+                      }
+                    })}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    disabled={!editingTicket.name?.trim() || updateMutation.isPending}
+                  >
+                    {updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
