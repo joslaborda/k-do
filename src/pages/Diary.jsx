@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
+import { useUndo } from '@/components/hooks/useUndo';
+import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -41,6 +44,13 @@ export default function Diary() {
   const queryClient = useQueryClient();
   const recognitionRef = useRef(null);
   const textareaRef = useRef(null);
+  const { performDelete } = useUndo();
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['diaryEntries'] });
+  };
+
+  const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: entries = [] } = useQuery({
     queryKey: ['diaryEntries'],
@@ -67,6 +77,20 @@ export default function Diary() {
     mutationFn: (id) => base44.entities.DiaryEntry.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['diaryEntries'] }),
   });
+
+  const handleDelete = async (entry) => {
+    const entryData = { ...entry };
+    delete entryData.id;
+    delete entryData.created_date;
+    delete entryData.updated_date;
+    delete entryData.created_by;
+    
+    await performDelete(
+      () => deleteMutation.mutateAsync(entry.id),
+      () => base44.entities.DiaryEntry.create(entryData),
+      entry.title || 'Entrada del diario'
+    );
+  };
 
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -156,7 +180,8 @@ export default function Diary() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-amber-50/30 to-white dark:from-stone-900 dark:via-stone-900 dark:to-stone-900 transition-colors">
+      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       {/* Header */}
       <div className="bg-white border-b border-stone-200">
         <div className="max-w-4xl mx-auto px-6 py-8">
@@ -238,7 +263,7 @@ export default function Diary() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMutation.mutate(entry.id)}
+                      onClick={() => handleDelete(entry)}
                       className="text-stone-400 hover:text-red-600"
                     >
                       <Trash2 className="w-4 h-4" />
