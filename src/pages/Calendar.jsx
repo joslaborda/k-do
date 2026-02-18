@@ -198,8 +198,8 @@ export default function Calendar() {
                 </div>
               );
             })}
-          </div>
             </div>
+          </div>
           </TabsContent>
 
           <TabsContent value="timeline">
