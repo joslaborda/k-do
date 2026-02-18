@@ -63,6 +63,24 @@ export default function Tickets() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] }),
   });
 
+  const createTodoMutation = useMutation({
+    mutationFn: (data) => base44.entities.TodoItem.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+      setNewTodoText('');
+    },
+  });
+
+  const updateTodoMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.TodoItem.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
+  });
+
+  const deleteTodoMutation = useMutation({
+    mutationFn: (id) => base44.entities.TodoItem.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todos'] }),
+  });
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -73,9 +91,25 @@ export default function Tickets() {
     setUploading(false);
   };
 
-  const filteredTickets = activeTab === 'all' 
+  const filteredTickets = activeTab === 'all' || activeTab === 'checklist'
     ? tickets 
     : tickets.filter(t => t.category === activeTab);
+
+  const handleAddTodo = () => {
+    if (!newTodoText.trim()) return;
+    createTodoMutation.mutate({
+      text: newTodoText,
+      completed: false,
+      order: todos.length
+    });
+  };
+
+  const toggleTodo = (todo) => {
+    updateTodoMutation.mutate({
+      id: todo.id,
+      data: { ...todo, completed: !todo.completed }
+    });
+  };
 
   const getCategoryCount = (category) => {
     return tickets.filter(t => t.category === category).length;
@@ -86,13 +120,15 @@ export default function Tickets() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Tickets y Documentos</h1>
-            <p className="text-slate-500 mt-1">Todos tus documentos de viaje en un solo lugar</p>
+            <h1 className="text-3xl font-bold text-slate-900">Documentación</h1>
+            <p className="text-slate-500 mt-1">Documentos de viaje y checklist</p>
           </div>
-          <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
-            <Plus className="w-4 h-4 mr-2" />
-            Añadir Documento
-          </Button>
+          {activeTab !== 'checklist' && (
+            <Button onClick={() => setDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800">
+              <Plus className="w-4 h-4 mr-2" />
+              Añadir Documento
+            </Button>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">

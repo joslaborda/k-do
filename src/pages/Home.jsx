@@ -23,11 +23,11 @@ export default function Home() {
 
   const sections = [
     { 
-      name: 'Tickets', 
+      name: 'Documentación', 
       page: 'Tickets', 
       icon: Plane, 
       color: 'from-sky-500 to-blue-600',
-      description: 'Vuelos, trenes, hoteles'
+      description: 'Documentos y checklist'
     },
     { 
       name: 'Restaurantes', 

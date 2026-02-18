@@ -5,7 +5,7 @@ import { Home, MapPin, Plane, UtensilsCrossed, Receipt, Languages } from 'lucide
 const navItems = [
   { name: 'Inicio', page: 'Home', icon: Home },
   { name: 'Ciudades', page: 'Cities', icon: MapPin },
-  { name: 'Tickets', page: 'Tickets', icon: Plane },
+  { name: 'Docs', page: 'Tickets', icon: Plane },
   { name: 'Restaurantes', page: 'Restaurants', icon: UtensilsCrossed },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
   { name: 'Traductor', page: 'Translator', icon: Languages },

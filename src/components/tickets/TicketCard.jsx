@@ -12,9 +12,8 @@ const categoryConfig = {
   flight: { icon: Plane, color: 'bg-sky-50 text-sky-600', label: 'Vuelo' },
   train: { icon: Train, color: 'bg-emerald-50 text-emerald-600', label: 'Tren' },
   hotel: { icon: Hotel, color: 'bg-violet-50 text-violet-600', label: 'Hotel' },
-  insurance: { icon: Shield, color: 'bg-amber-50 text-amber-600', label: 'Seguro' },
-  activity: { icon: Ticket, color: 'bg-rose-50 text-rose-600', label: 'Actividad' },
-  other: { icon: FileText, color: 'bg-slate-50 text-slate-600', label: 'Otro' }
+  freetour: { icon: FileText, color: 'bg-rose-50 text-rose-600', label: 'Free Tour' },
+  insurance: { icon: Shield, color: 'bg-amber-50 text-amber-600', label: 'Seguro' }
 };
 
 export default function TicketCard({ ticket, onDelete }) {
