@@ -25,7 +25,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalanceSummary from '@/components/expenses/BalanceSummary';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
-import BudgetTracker from '@/components/expenses/BudgetTracker';
 
 const categories = [
   { value: 'food', label: 'Comida', icon: Utensils },
@@ -130,9 +129,6 @@ export default function Expenses() {
         </div>
 
         <div className="space-y-6">
-          {/* Budget Tracker */}
-          <BudgetTracker expenses={expenses} />
-
           {/* Charts */}
           <ExpenseChart expenses={expenses} />
 
