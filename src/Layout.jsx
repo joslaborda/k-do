@@ -25,7 +25,7 @@ export default function Layout({ children, currentPageName }) {
       {children}
       
       {/* Bottom Navigation - Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border md:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border md:hidden z-50">
         <div className="flex items-center justify-around px-1 py-2 overflow-x-auto">
           {navItems.map((item) => {
             const isActive = currentPageName === item.page || 
