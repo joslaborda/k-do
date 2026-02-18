@@ -39,6 +39,37 @@ const packingCategories = [
   { value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' },
 ];
 
+const phraseCategories = [
+  {
+    name: 'Básicas',
+    icon: '👋',
+    phrases: [
+      { spanish: 'Hola', japanese: 'こんにちは', romaji: 'Konnichiwa' },
+      { spanish: 'Gracias', japanese: 'ありがとうございます', romaji: 'Arigatou gozaimasu' },
+      { spanish: 'Por favor', japanese: 'お願いします', romaji: 'Onegaishimasu' },
+      { spanish: 'Disculpe', japanese: 'すみません', romaji: 'Sumimasen' },
+    ]
+  },
+  {
+    name: 'Restaurante',
+    icon: '🍜',
+    phrases: [
+      { spanish: '¿Puedo tener agua?', japanese: 'お水をください', romaji: 'Omizu wo kudasai' },
+      { spanish: 'La cuenta, por favor', japanese: 'お会計お願いします', romaji: 'Okaikei onegaishimasu' },
+      { spanish: 'Esto está delicioso', japanese: 'おいしいです', romaji: 'Oishii desu' },
+    ]
+  },
+  {
+    name: 'Direcciones',
+    icon: '🗺️',
+    phrases: [
+      { spanish: '¿Dónde está el baño?', japanese: 'トイレはどこですか？', romaji: 'Toire wa doko desu ka?' },
+      { spanish: '¿Dónde está la estación?', japanese: '駅はどこですか？', romaji: 'Eki wa doko desu ka?' },
+      { spanish: 'Estoy perdido', japanese: '道に迷いました', romaji: 'Michi ni mayoimashita' },
+    ]
+  },
+];
+
 export default function Utilities() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
@@ -46,6 +77,12 @@ export default function Utilities() {
   const [loadingRate, setLoadingRate] = useState(false);
   const [jpyAmount, setJpyAmount] = useState('');
   const [eurAmount, setEurAmount] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [direction, setDirection] = useState('es-jp');
+  const [copiedId, setCopiedId] = useState(null);
+  const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true });
   const [formData, setFormData] = useState({
     title: '',
     category: 'emergencia',
