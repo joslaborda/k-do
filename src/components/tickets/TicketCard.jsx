@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Plane, Train, Hotel, Shield, Ticket, MoreVertical, Download, Trash2, FileText } from 'lucide-react';
+import { Plane, Train, Hotel, Shield, Ticket, MoreVertical, Download, Trash2, FileText, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -64,15 +64,25 @@ export default function TicketCard({ ticket, onDelete }) {
       </div>
       
       {ticket.file_url && (
-        <a 
-          href={ticket.file_url} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="mt-3 flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
-        >
-          <FileText className="w-4 h-4" />
-          Ver documento
-        </a>
+        <div className="mt-3 flex items-center gap-2">
+          <a 
+            href={ticket.file_url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-2 text-sm text-stone-700 bg-stone-50 hover:bg-stone-100 py-2 rounded-lg transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Ver
+          </a>
+          <a 
+            href={ticket.file_url} 
+            download
+            className="flex-1 flex items-center justify-center gap-2 text-sm text-stone-700 bg-stone-50 hover:bg-stone-100 py-2 rounded-lg transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Descargar
+          </a>
+        </div>
       )}
     </div>
   );
