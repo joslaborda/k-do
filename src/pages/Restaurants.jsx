@@ -376,8 +376,11 @@ export default function Restaurants() {
           <p className="text-stone-400 mt-1 font-light">Descubre la gastronomía japonesa</p>
          </div>
 
-        <Tabs defaultValue="food" className="w-full">
+        <Tabs defaultValue="menu" className="w-full">
           <TabsList className="mb-8">
+            <TabsTrigger value="menu" className="gap-2">
+              📋 Menú
+            </TabsTrigger>
             <TabsTrigger value="food" className="gap-2">
               <BookOpen className="w-4 h-4" />
               Guía de Comida
