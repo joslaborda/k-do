@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, BookOpen, Calendar, MapPin, Image as ImageIcon, Trash2, Upload } from 'lucide-react';
+import { Plus, BookOpen, Calendar, MapPin, Image as ImageIcon, Trash2, Upload, Mic, MicOff } from 'lucide-react';
 import PhotoGallery from '@/components/diary/PhotoGallery';
 import {
   Dialog,
