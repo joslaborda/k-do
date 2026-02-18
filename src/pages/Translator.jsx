@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2, ChevronDown, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Collapsible,
