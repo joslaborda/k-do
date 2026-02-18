@@ -314,13 +314,39 @@ export default function Diary() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700 mb-1.5 block">¿Qué pasó hoy?</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-sm font-medium text-stone-700">¿Qué pasó hoy?</label>
+                <Button
+                  type="button"
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  onClick={toggleRecording}
+                  className="gap-2"
+                >
+                  {isRecording ? (
+                    <>
+                      <MicOff className="w-4 h-4" />
+                      Detener dictado
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-4 h-4" />
+                      Dictar
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
-                placeholder="Escribe sobre tu día..."
+                ref={textareaRef}
+                placeholder="Escribe o dicta sobre tu día..."
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={6}
+                className={isRecording ? 'ring-2 ring-red-500' : ''}
               />
+              {isRecording && (
+                <p className="text-xs text-red-600 mt-1 animate-pulse">🎤 Escuchando...</p>
+              )}
             </div>
 
             <div>
