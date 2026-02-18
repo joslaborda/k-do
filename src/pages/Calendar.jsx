@@ -3,11 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, MapPin, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Calendar as CalendarIcon, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import TimelineView from '@/components/TimelineView';
 
 export default function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date('2026-03-01'));
@@ -93,7 +95,20 @@ export default function Calendar() {
 
       {/* Calendar */}
       <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-        <div className="bg-white rounded-2xl border-2 border-stone-200 overflow-hidden shadow-lg">
+        <Tabs defaultValue="calendar" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="calendar" className="gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              Vista Calendario
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="gap-2">
+              <List className="w-4 h-4" />
+              Vista Timeline
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="calendar">
+            <div className="bg-white rounded-2xl border-2 border-stone-200 overflow-hidden shadow-lg">
           {/* Month Navigation */}
           <div className="flex items-center justify-between p-6 border-b border-stone-200 bg-gradient-to-r from-purple-50 to-pink-50">
             <Button variant="ghost" size="icon" onClick={previousMonth}>

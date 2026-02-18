@@ -4,7 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, BookOpen, Calendar, MapPin, Image as ImageIcon, Trash2, Upload } from 'lucide-react';
+import PhotoGallery from '@/components/diary/PhotoGallery';
 import {
   Dialog,
   DialogContent,
@@ -110,7 +112,17 @@ export default function Diary() {
 
       {/* Entries */}
       <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
-        {entries.length === 0 ? (
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="list">Lista</TabsTrigger>
+            <TabsTrigger value="photos" className="gap-2">
+              <ImageIcon className="w-4 h-4" />
+              Galería de fotos
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list">
+            {entries.length === 0 ? (
           <div className="text-center py-24 border-2 border-dashed border-stone-200 rounded-2xl">
             <BookOpen className="w-16 h-16 text-stone-300 mx-auto mb-4" />
             <p className="text-stone-400">Empieza a escribir tu diario de viaje</p>
@@ -175,7 +187,13 @@ export default function Diary() {
               </div>
             ))}
           </div>
-        )}
+            )}
+          </TabsContent>
+
+          <TabsContent value="photos">
+            <PhotoGallery entries={entries} />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Add Dialog */}
