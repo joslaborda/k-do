@@ -1,219 +1,217 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Receipt, BookOpen, UtensilsCrossed, Package, Plane } from 'lucide-react';
+import { Search, MapPin, Receipt, Calendar, Package, BookOpen, UtensilsCrossed } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 
-export default function GlobalSearch({ open, onOpenChange }) {
+export default function GlobalSearch({ open, onOpenChange, tripId }) {
   const [query, setQuery] = useState('');
-  
+
   const { data: cities = [] } = useQuery({
-    queryKey: ['cities'],
-    queryFn: () => base44.entities.City.list('order')
+    queryKey: ['cities', tripId],
+    queryFn: () => tripId ? base44.entities.City.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: expenses = [] } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list('-date')
+    queryKey: ['expenses', tripId],
+    queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: diaryEntries = [] } = useQuery({
-    queryKey: ['diaryEntries'],
-    queryFn: () => base44.entities.DiaryEntry.list('-date')
+    queryKey: ['diaryEntries', tripId],
+    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: restaurants = [] } = useQuery({
-    queryKey: ['restaurants'],
-    queryFn: () => base44.entities.Restaurant.list()
+    queryKey: ['restaurants', tripId],
+    queryFn: () => tripId ? base44.entities.Restaurant.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: packingItems = [] } = useQuery({
-    queryKey: ['packingItems'],
-    queryFn: () => base44.entities.PackingItem.list()
+    queryKey: ['packingItems', tripId],
+    queryFn: () => tripId ? base44.entities.PackingItem.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets'],
-    queryFn: () => base44.entities.Ticket.list('-date')
+    queryKey: ['tickets', tripId],
+    queryFn: () => tripId ? base44.entities.Ticket.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
-  const searchResults = query.length > 1 ? {
+  const filteredResults = {
     cities: cities.filter(c => c.name?.toLowerCase().includes(query.toLowerCase())),
     expenses: expenses.filter(e => e.description?.toLowerCase().includes(query.toLowerCase())),
-    diary: diaryEntries.filter(d => 
+    diaries: diaryEntries.filter(d => 
       d.title?.toLowerCase().includes(query.toLowerCase()) || 
       d.content?.toLowerCase().includes(query.toLowerCase())
     ),
     restaurants: restaurants.filter(r => r.name?.toLowerCase().includes(query.toLowerCase())),
     packing: packingItems.filter(p => p.name?.toLowerCase().includes(query.toLowerCase())),
-    tickets: tickets.filter(t => t.name?.toLowerCase().includes(query.toLowerCase()))
-  } : { cities: [], expenses: [], diary: [], restaurants: [], packing: [], tickets: [] };
+    tickets: tickets.filter(t => t.name?.toLowerCase().includes(query.toLowerCase())),
+  };
 
-  const totalResults = Object.values(searchResults).reduce((sum, arr) => sum + arr.length, 0);
-
-  useEffect(() => {
-    if (!open) setQuery('');
-  }, [open]);
+  const hasResults = query.length > 0 && (
+    filteredResults.cities.length > 0 ||
+    filteredResults.expenses.length > 0 ||
+    filteredResults.diaries.length > 0 ||
+    filteredResults.restaurants.length > 0 ||
+    filteredResults.packing.length > 0 ||
+    filteredResults.tickets.length > 0
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl p-0 gap-0 bg-white/95 backdrop-blur-xl">
-        <DialogTitle className="sr-only">Buscar</DialogTitle>
-        <div className="p-6 pb-0">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col p-0">
+        <div className="p-4 border-b border-border">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               placeholder="Buscar ciudades, gastos, diario, restaurantes..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-12 text-lg h-14 border-2"
+              className="pl-10"
               autoFocus
             />
           </div>
         </div>
 
-        <div className="max-h-96 overflow-y-auto p-6 pt-4">
-          {query.length <= 1 ? (
-            <p className="text-center text-stone-400 py-8">Escribe al menos 2 caracteres para buscar</p>
-          ) : totalResults === 0 ? (
-            <p className="text-center text-stone-400 py-8">No se encontraron resultados</p>
-          ) : (
+        <div className="overflow-y-auto flex-1 p-4">
+          {!query && (
+            <div className="text-center py-12 text-muted-foreground">
+              <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>Escribe para buscar en tu viaje</p>
+            </div>
+          )}
+
+          {query && !hasResults && (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No se encontraron resultados para "{query}"</p>
+            </div>
+          )}
+
+          {hasResults && (
             <div className="space-y-6">
-              {searchResults.cities.length > 0 && (
+              {filteredResults.cities.length > 0 && (
                 <ResultSection
                   title="Ciudades"
                   icon={MapPin}
-                  color="text-red-600"
-                  results={searchResults.cities}
+                  items={filteredResults.cities.slice(0, 3)}
                   renderItem={(city) => (
                     <Link
-                      to={createPageUrl('CityDetail') + `?id=${city.id}`}
+                      key={city.id}
+                      to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center gap-3 p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <MapPin className="w-5 h-5 text-red-600" />
-                      <span className="font-medium">{city.name}</span>
+                      <div className="font-medium text-foreground">{city.name}</div>
+                      <div className="text-sm text-muted-foreground">{city.country}</div>
                     </Link>
                   )}
                 />
               )}
 
-              {searchResults.expenses.length > 0 && (
+              {filteredResults.expenses.length > 0 && (
                 <ResultSection
                   title="Gastos"
                   icon={Receipt}
-                  color="text-green-600"
-                  results={searchResults.expenses}
+                  items={filteredResults.expenses.slice(0, 3)}
                   renderItem={(expense) => (
                     <Link
-                      to={createPageUrl('Expenses')}
+                      key={expense.id}
+                      to={createPageUrl(`Expenses?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center justify-between p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        <Receipt className="w-5 h-5 text-green-600" />
-                        <span className="font-medium">{expense.description}</span>
+                      <div className="font-medium text-foreground">{expense.description}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {expense.amount} {expense.currency}
                       </div>
-                      <span className="text-sm text-stone-500">
-                        {expense.currency === 'EUR' ? '€' : '¥'}{expense.amount}
-                      </span>
                     </Link>
                   )}
                 />
               )}
 
-              {searchResults.diary.length > 0 && (
+              {filteredResults.diaries.length > 0 && (
                 <ResultSection
                   title="Diario"
                   icon={BookOpen}
-                  color="text-amber-600"
-                  results={searchResults.diary}
+                  items={filteredResults.diaries.slice(0, 3)}
                   renderItem={(entry) => (
                     <Link
-                      to={createPageUrl('Diary')}
+                      key={entry.id}
+                      to={createPageUrl(`Diary?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center gap-3 p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <BookOpen className="w-5 h-5 text-amber-600" />
-                      <div>
-                        <div className="font-medium">{entry.title || 'Entrada del diario'}</div>
-                        {entry.content && (
-                          <div className="text-sm text-stone-500 truncate">
-                            {entry.content.substring(0, 60)}...
-                          </div>
-                        )}
+                      <div className="font-medium text-foreground">{entry.title || 'Sin título'}</div>
+                      <div className="text-sm text-muted-foreground line-clamp-2">
+                        {entry.content}
                       </div>
                     </Link>
                   )}
                 />
               )}
 
-              {searchResults.restaurants.length > 0 && (
+              {filteredResults.restaurants.length > 0 && (
                 <ResultSection
                   title="Restaurantes"
                   icon={UtensilsCrossed}
-                  color="text-orange-600"
-                  results={searchResults.restaurants}
+                  items={filteredResults.restaurants.slice(0, 3)}
                   renderItem={(restaurant) => (
                     <Link
-                      to={createPageUrl('Restaurants')}
+                      key={restaurant.id}
+                      to={createPageUrl(`Restaurants?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center gap-3 p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <UtensilsCrossed className="w-5 h-5 text-orange-600" />
-                      <div>
-                        <div className="font-medium">{restaurant.name}</div>
-                        {restaurant.city && (
-                          <div className="text-sm text-stone-500">{restaurant.city}</div>
-                        )}
-                      </div>
+                      <div className="font-medium text-foreground">{restaurant.name}</div>
+                      <div className="text-sm text-muted-foreground">{restaurant.city}</div>
                     </Link>
                   )}
                 />
               )}
 
-              {searchResults.packing.length > 0 && (
+              {filteredResults.packing.length > 0 && (
                 <ResultSection
                   title="Maleta"
                   icon={Package}
-                  color="text-blue-600"
-                  results={searchResults.packing}
+                  items={filteredResults.packing.slice(0, 3)}
                   renderItem={(item) => (
                     <Link
-                      to={createPageUrl('Packing')}
+                      key={item.id}
+                      to={createPageUrl(`Packing?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center gap-3 p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <Package className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium">{item.name}</span>
+                      <div className="font-medium text-foreground">{item.name}</div>
+                      <div className="text-sm text-muted-foreground">{item.category}</div>
                     </Link>
                   )}
                 />
               )}
 
-              {searchResults.tickets.length > 0 && (
+              {filteredResults.tickets.length > 0 && (
                 <ResultSection
                   title="Documentos"
-                  icon={Plane}
-                  color="text-slate-600"
-                  results={searchResults.tickets}
+                  icon={Calendar}
+                  items={filteredResults.tickets.slice(0, 3)}
                   renderItem={(ticket) => (
                     <Link
-                      to={createPageUrl('Calendar')}
+                      key={ticket.id}
+                      to={createPageUrl(`Calendar?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
-                      className="flex items-center justify-between p-3 hover:bg-stone-100 rounded-lg transition-colors"
+                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        <Plane className="w-5 h-5 text-slate-600" />
-                        <div>
-                          <div className="font-medium">{ticket.name}</div>
-                          <div className="text-xs text-stone-500">{ticket.category}</div>
-                        </div>
-                      </div>
+                      <div className="font-medium text-foreground">{ticket.name}</div>
+                      <div className="text-sm text-muted-foreground">{ticket.category}</div>
                     </Link>
                   )}
                 />
@@ -226,25 +224,16 @@ export default function GlobalSearch({ open, onOpenChange }) {
   );
 }
 
-function ResultSection({ title, icon: Icon, color, results, renderItem }) {
+function ResultSection({ title, icon: Icon, items, renderItem }) {
   return (
     <div>
-      <div className="flex items-center gap-2 mb-2 px-2">
-        <Icon className={`w-4 h-4 ${color}`} />
-        <span className="text-sm font-semibold text-stone-700">{title}</span>
-        <span className="text-xs text-stone-400">({results.length})</span>
+      <div className="flex items-center gap-2 mb-3 text-sm font-medium text-muted-foreground">
+        <Icon className="w-4 h-4" />
+        <span>{title}</span>
+        <span className="ml-auto text-xs">{items.length}</span>
       </div>
       <div className="space-y-1">
-        {results.slice(0, 3).map((item, idx) => (
-          <motion.div
-            key={item.id || idx}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.05 }}
-          >
-            {renderItem(item)}
-          </motion.div>
-        ))}
+        {items.map(renderItem)}
       </div>
     </div>
   );

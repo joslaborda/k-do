@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -20,48 +19,64 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Obtener o crear el viaje a Japón
+  const { data: trip, isLoading: tripLoading } = useQuery({
+    queryKey: ['japanTrip'],
+    queryFn: async () => {
+      const trips = await base44.entities.Trip.list();
+      let japanTrip = trips.find(t => t.destination?.toLowerCase().includes('japón') || t.destination?.toLowerCase().includes('japan'));
+      
+      // Si no existe, crear el viaje a Japón
+      if (!japanTrip) {
+        japanTrip = await base44.entities.Trip.create({
+          name: 'Japón 2026',
+          destination: 'Tokio',
+          country: 'Japón',
+          start_date: '2026-03-04',
+          end_date: '2026-03-19',
+          description: 'Una aventura única de 16 días explorando la cultura, tradición y gastronomía japonesa',
+          currency: 'JPY',
+          members: [(await base44.auth.me()).email]
+        });
+      }
+      return japanTrip;
+    },
+  });
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('trip_id');
-    
-    // Si no hay trip_id válido, redirigir a TripsList
-    if (!id || id === 'null' || id === 'default') {
-      navigate(createPageUrl('TripsList'), { replace: true });
-      return;
+    if (trip?.id) {
+      setTripId(trip.id);
     }
-    
-    setTripId(id);
-  }, [navigate]);
+  }, [trip]);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => tripId ? base44.entities.City.filter({ trip_id: tripId }, 'order') : [],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
     enabled: !!tripId
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery({
     queryKey: ['expenses', tripId],
-    queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }) : [],
+    queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }),
     enabled: !!tripId
   });
 
   const { data: packingItems = [], isLoading: packingLoading } = useQuery({
     queryKey: ['packingItems', tripId],
-    queryFn: () => tripId ? base44.entities.PackingItem.filter({ trip_id: tripId }) : [],
+    queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }),
     enabled: !!tripId
   });
 
   const { data: diaryEntries = [], isLoading: diaryLoading } = useQuery({
     queryKey: ['diaryEntries', tripId],
-    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }) : [],
+    queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }),
     enabled: !!tripId
   });
 
-  // Stats calculadas con memoization
-  const tripStart = new Date('2026-03-04');
-  const tripEnd = new Date('2026-03-19');
+  const tripStart = trip?.start_date ? new Date(trip.start_date) : new Date('2026-03-04');
+  const tripEnd = trip?.end_date ? new Date(trip.end_date) : new Date('2026-03-19');
   const today = new Date();
   const daysUntilTrip = differenceInDays(tripStart, today);
   const tripDuration = differenceInDays(tripEnd, tripStart) + 1;
@@ -96,6 +111,17 @@ export default function Home() {
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
   ];
 
+  if (tripLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🌸</div>
+          <p className="text-muted-foreground">Preparando tu viaje a Japón...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-background">
       {/* Hero moderno con imagen */}
@@ -104,19 +130,11 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-900/50" />
         
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
-          {/* Header con botón a TripsList y Search */}
-          <div className="flex items-center justify-between mb-8">
-            <Link 
-              to={createPageUrl('TripsList')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors text-white"
-            >
-              <ArrowRight className="w-4 h-4 rotate-180" />
-              <span className="text-sm font-medium">Todos mis viajes</span>
-            </Link>
-            
+          {/* Header con Search */}
+          <div className="flex items-center justify-end mb-8">
             <button
               onClick={() => setSearchOpen(true)}
-              className="relative w-full max-w-md ml-4"
+              className="relative w-full max-w-md"
             >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
               <div className="w-full pl-12 pr-4 py-3 bg-white/20 border border-white/30 text-white/60 placeholder:text-white/60 backdrop-blur-sm rounded-lg text-left hover:bg-white/30 transition-colors">
@@ -125,7 +143,7 @@ export default function Home() {
             </button>
           </div>
 
-          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-white space-y-6">
@@ -136,13 +154,13 @@ export default function Home() {
               
               <div>
                 <h1 className="text-6xl md:text-7xl font-bold mb-3">
-                  Japón
+                  {trip?.name || 'Japón 2026'}
                 </h1>
                 <p className="text-3xl font-light opacity-90">日本への旅</p>
               </div>
               
               <p className="text-xl text-white/90 leading-relaxed max-w-lg">
-                Una aventura única de 16 días explorando la cultura, tradición y gastronomía japonesa
+                {trip?.description || 'Una aventura única explorando la cultura, tradición y gastronomía japonesa'}
               </p>
 
               {/* Countdown */}
