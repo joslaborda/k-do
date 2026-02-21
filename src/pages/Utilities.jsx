@@ -225,7 +225,6 @@ export default function Utilities() {
         <Tabs defaultValue="weather" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 bg-white border border-border">
               <TabsTrigger value="weather" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                <Cloud className="w-4 h-4 mr-2" />
                 Clima
               </TabsTrigger>
               <TabsTrigger value="currency" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
@@ -233,11 +232,9 @@ export default function Utilities() {
                 Moneda
               </TabsTrigger>
               <TabsTrigger value="packing" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                <Package className="w-4 h-4 mr-2" />
                 Maleta
               </TabsTrigger>
               <TabsTrigger value="diary" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                <BookOpen className="w-4 h-4 mr-2" />
                 Diario
               </TabsTrigger>
             </TabsList>
