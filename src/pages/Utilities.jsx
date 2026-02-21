@@ -404,7 +404,7 @@ export default function Utilities() {
                       </div>
 
                       {/* Items List */}
-                      <div className="p-4 space-y-2">
+                      <div className="bg-[#ffffff] p-4 space-y-2">
                         {categoryItems.length === 0 ?
                       <p className="text-center text-muted-foreground py-8 text-sm">
                               Sin artículos
@@ -412,12 +412,12 @@ export default function Utilities() {
 
                       categoryItems.map((item) =>
                       <div
-                        key={item.id}
-                        className={`group flex items-center gap-3 p-3 rounded-xl transition-all ${
-                        item.packed ?
-                        'bg-green-600/20' :
-                        'bg-secondary/50 hover:bg-secondary'}`
-                        }>
+                        key={item.id} className="bg-slate-100 p-3 rounded-xl group flex items-center gap-3 transition-all hover:bg-secondary">
+
+
+
+
+
 
                               <Checkbox
                           checked={item.packed}
