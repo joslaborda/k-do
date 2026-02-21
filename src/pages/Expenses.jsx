@@ -140,7 +140,10 @@ export default function Expenses() {
 
   const filteredExpenses = activeTab === 'all' ?
   expenses :
-  expenses.filter((e) => e.paid_by === activeTab);
+  expenses.filter((e) => {
+    if (activeTab === 'José') return e.paid_by === 'You' || e.paid_by === 'José';
+    return e.paid_by === activeTab;
+  });
 
   return (
     <div className="min-h-screen bg-orange-50">
@@ -270,13 +273,13 @@ export default function Expenses() {
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Pagado por</label>
                <div className="flex gap-2">
-                 <Button
+                  <Button
                   type="button"
-                  variant={formData.paid_by === 'You' ? 'default' : 'outline'}
-                  onClick={() => setFormData({ ...formData, paid_by: 'You' })}
-                  className={formData.paid_by === 'You' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}>
+                  variant={formData.paid_by === 'José' ? 'default' : 'outline'}
+                  onClick={() => setFormData({ ...formData, paid_by: 'José' })}
+                  className={formData.paid_by === 'José' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}>
 
-                  Tú
+                  José
                 </Button>
                 <Button
                   type="button"
@@ -286,7 +289,7 @@ export default function Expenses() {
 
                   Carlos
                 </Button>
-              </div>
+               </div>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -296,7 +299,7 @@ export default function Expenses() {
                 onCheckedChange={handleSplitChange} />
 
               <label htmlFor="split" className="text-sm text-foreground">
-                Dividir a medias con {formData.paid_by === 'You' ? 'Carlos' : 'ti'}
+                Dividir a medias con {formData.paid_by === 'José' ? 'Carlos' : 'ti'}
               </label>
             </div>
 
