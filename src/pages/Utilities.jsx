@@ -261,9 +261,6 @@ export default function Utilities() {
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 gap-2 bg-transparent border-0 p-0 h-auto">
-              <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                ⚠️ Información
-              </TabsTrigger>
               <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
                 ☁️ Clima
               </TabsTrigger>
@@ -275,6 +272,9 @@ export default function Utilities() {
               </TabsTrigger>
               <TabsTrigger value="diary" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
                 📔 Diario
+              </TabsTrigger>
+              <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
+                ⚠️ Información
               </TabsTrigger>
             </TabsList>
 
