@@ -135,14 +135,14 @@ export default function CityDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         
         <div className="absolute top-6 left-6">
-          <Link
-            to={createPageUrl('Cities')}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Link>
-        </div>
+           <Link
+             to={createPageUrl(`Cities?trip_id=${tripId}`)}
+             className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-colors"
+           >
+             <ArrowLeft className="w-4 h-4" />
+             Back
+           </Link>
+         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="max-w-4xl mx-auto">
