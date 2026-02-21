@@ -12,8 +12,8 @@ const cityImages = {
   'Tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800'
 };
 
-export default function CityCard({ city, daysCount }) {
-  const formatDateRange = () => {
+export default function CityCard({ city, daysCount, tripId }) {
+   const formatDateRange = () => {
     if (!city.start_date) return null;
     
     const start = new Date(city.start_date);
