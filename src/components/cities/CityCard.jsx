@@ -31,10 +31,10 @@ export default function CityCard({ city, daysCount, tripId }) {
   };
 
   return (
-    <Link 
-      to={createPageUrl('CityDetail') + `?id=${city.id}`}
-      className="group block"
-    >
+     <Link 
+       to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
+       className="group block"
+     >
       <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
         <div className="aspect-[16/10] overflow-hidden">
           <img 
