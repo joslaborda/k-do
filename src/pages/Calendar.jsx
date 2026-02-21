@@ -184,8 +184,8 @@ export default function Calendar() {
                     <a
                       href={ticket.file_url}
                       target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors">
+                      rel="noopener noreferrer" className="bg-orange-100 text-foreground px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-secondary/80 transition-colors">
+
 
                             <FileText className="w-4 h-4" />
                             <span className="text-sm font-medium">Ver documento</span>
