@@ -308,27 +308,7 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Quick Progress Bar */}
-            <div className="pb-8">
-              <div className="bg-orange-50 p-4 rounded-xl backdrop-blur-md shadow-lg border border-white/20">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-primary" />
-                    <span className="font-semibold text-foreground text-sm">Progreso de maleta</span>
-                  </div>
-                  <span className="text-xl font-bold text-primary">{packedPercentage}%</span>
-                </div>
-                <div className="bg-green-100 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500"
-                    style={{ width: `${packedPercentage}%` }} />
 
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {packingItems.filter((i) => i.packed).length} de {packingItems.length} artículos empacados
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
