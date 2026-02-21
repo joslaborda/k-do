@@ -223,65 +223,64 @@ export default function Diary() {
           </div> :
 
             <div className="space-y-6">
-            {entries.map((entry) =>
-              <div
-                key={entry.id}
-                className="glass border-2 border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all">
+              {entries.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="glass border-2 border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all">
 
-                {/* Photos */}
-                {entry.photos && entry.photos.length > 0 &&
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-secondary/30">
-                    {entry.photos.map((photo, idx) =>
-                  <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                        <img
-                      src={photo}
-                      alt={`Foto ${idx + 1}`}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" />
-
-                      </div>
-                  )}
-                  </div>
-                }
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="text-5xl flex-shrink-0">{entry.mood || '😊'}</div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium text-foreground truncate">
-                            {format(new Date(entry.date), 'EEEE, d MMMM yyyy', { locale: es })}
-                          </span>
+                  {/* Photos */}
+                  {entry.photos && entry.photos.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-secondary/30">
+                      {entry.photos.map((photo, idx) => (
+                        <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                          <img
+                            src={photo}
+                            alt={`Foto ${idx + 1}`}
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                          />
                         </div>
-                        {entry.location &&
-                        <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground truncate">{entry.location}</span>
-                          </div>
-                        }
-                      </div>
+                      ))}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(entry)}
-                      className="text-muted-foreground hover:text-destructive hover:bg-secondary flex-shrink-0 ml-2"
-                      aria-label="Eliminar">
+                  )}
 
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="text-5xl flex-shrink-0">{entry.mood || '😊'}</div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium text-foreground truncate">
+                              {format(new Date(entry.date), 'EEEE, d MMMM yyyy', { locale: es })}
+                            </span>
+                          </div>
+                          {entry.location && (
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm text-muted-foreground truncate">{entry.location}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(entry)}
+                        className="text-muted-foreground hover:text-destructive hover:bg-secondary flex-shrink-0 ml-2"
+                        aria-label="Eliminar">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
 
-                  {entry.title &&
-                  <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
-                  }
-                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">{entry.content}</p>
+                    {entry.title && (
+                      <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
+                    )}
+                    <p className="text-foreground leading-relaxed whitespace-pre-wrap">{entry.content}</p>
                   </div>
-                  </div>
-                  ))}
-                  </div>
+                </div>
+              ))}
+            </div>
                   }
                   </TabsContent>
 
