@@ -180,19 +180,19 @@ export default function Diary() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-900">
+    <div className="min-h-screen bg-background">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       {/* Header */}
-      <div className="bg-stone-800 border-b border-stone-700">
+      <div className="glass border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-stone-100 mb-2">Diario de Viaje 📔</h1>
-              <p className="text-stone-400">Recuerdos y momentos especiales</p>
+              <h1 className="text-3xl font-bold text-foreground mb-2">Diario de Viaje 📔</h1>
+              <p className="text-muted-foreground">Recuerdos y momentos especiales</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Nueva Entrada
@@ -214,20 +214,20 @@ export default function Diary() {
 
           <TabsContent value="list">
             {entries.length === 0 ? (
-          <div className="text-center py-24 border-2 border-dashed border-stone-700 rounded-2xl">
-            <BookOpen className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-            <p className="text-stone-400">Empieza a escribir tu diario de viaje</p>
+          <div className="text-center py-24 border-2 border-dashed border-border rounded-2xl glass">
+            <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Empieza a escribir tu diario de viaje</p>
           </div>
           ) : (
           <div className="space-y-6">
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="bg-stone-800 border-2 border-stone-700 rounded-2xl overflow-hidden hover:border-stone-600 transition-all"
+                className="glass border-2 border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all"
               >
                 {/* Photos */}
                 {entry.photos && entry.photos.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-stone-700">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-secondary/30">
                     {entry.photos.map((photo, idx) => (
                       <div key={idx} className="aspect-square rounded-lg overflow-hidden">
                         <img
@@ -247,15 +247,15 @@ export default function Diary() {
                       <div className="text-5xl flex-shrink-0">{entry.mood || '😊'}</div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Calendar className="w-4 h-4 text-stone-400 flex-shrink-0" />
-                          <span className="text-sm font-medium text-stone-300 truncate">
+                          <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium text-foreground truncate">
                             {format(new Date(entry.date), 'EEEE, d MMMM yyyy', { locale: es })}
                           </span>
                         </div>
                         {entry.location && (
                           <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-stone-400 flex-shrink-0" />
-                            <span className="text-sm text-stone-400 truncate">{entry.location}</span>
+                            <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground truncate">{entry.location}</span>
                           </div>
                         )}
                       </div>
@@ -264,7 +264,7 @@ export default function Diary() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(entry)}
-                      className="text-stone-500 hover:text-red-400 hover:bg-stone-700 flex-shrink-0 ml-2"
+                      className="text-muted-foreground hover:text-destructive hover:bg-secondary flex-shrink-0 ml-2"
                       aria-label="Eliminar"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -272,9 +272,9 @@ export default function Diary() {
                   </div>
 
                   {entry.title && (
-                    <h2 className="text-2xl font-bold text-stone-100 mb-3">{entry.title}</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
                   )}
-                  <p className="text-stone-300 leading-relaxed whitespace-pre-wrap">{entry.content}</p>
+                  <p className="text-foreground leading-relaxed whitespace-pre-wrap">{entry.content}</p>
                 </div>
               </div>
             ))}
@@ -290,23 +290,23 @@ export default function Diary() {
 
       {/* Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-stone-800 border-stone-700">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-stone-100">Nueva entrada del diario</DialogTitle>
+            <DialogTitle className="text-foreground">Nueva entrada del diario</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fecha</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
                 <Input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-stone-700 border-stone-600 text-stone-100"
+                  className="bg-input border-border text-foreground"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-stone-300 mb-1.5 block">Estado de ánimo</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Estado de ánimo</label>
                 <Select value={formData.mood} onValueChange={(v) => setFormData({ ...formData, mood: v })}>
                   <SelectTrigger>
                     <SelectValue />
@@ -323,28 +323,28 @@ export default function Diary() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Título (opcional)</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Título (opcional)</label>
               <Input
                 placeholder="ej. Primer día en Tokio"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Ubicación (opcional)</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Ubicación (opcional)</label>
               <Input
                 placeholder="ej. Shibuya, Tokio"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-stone-300">¿Qué pasó hoy?</label>
+                <label className="text-sm font-medium text-foreground">¿Qué pasó hoy?</label>
                 <Button
                   type="button"
                   variant={isRecording ? "destructive" : "outline"}
@@ -371,7 +371,7 @@ export default function Diary() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={6}
-                className={`bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400 ${isRecording ? 'ring-2 ring-red-500' : ''}`}
+                className={`bg-input border-border text-foreground placeholder:text-muted-foreground ${isRecording ? 'ring-2 ring-red-500' : ''}`}
               />
               {isRecording && (
                 <p className="text-xs text-red-400 mt-1 animate-pulse">🎤 Escuchando...</p>
@@ -379,7 +379,7 @@ export default function Diary() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Fotos</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Fotos</label>
               <div className="space-y-3">
                 {formData.photos.length > 0 && (
                   <div className="grid grid-cols-3 gap-2">
@@ -396,7 +396,7 @@ export default function Diary() {
                     ))}
                   </div>
                 )}
-                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-stone-600 rounded-lg hover:border-stone-500 cursor-pointer transition-colors">
+                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg hover:border-primary/50 cursor-pointer transition-colors">
                   <input
                     type="file"
                     accept="image/*"
@@ -408,8 +408,8 @@ export default function Diary() {
                     <>Subiendo...</>
                   ) : (
                     <>
-                      <Upload className="w-4 h-4 text-stone-400" />
-                      <span className="text-sm text-stone-400">Subir foto</span>
+                      <Upload className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Subir foto</span>
                     </>
                   )}
                 </label>
@@ -417,12 +417,12 @@ export default function Diary() {
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary">
                 Cancelar
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-primary hover:bg-primary/90"
                 disabled={!formData.content.trim() || createMutation.isPending}
               >
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
