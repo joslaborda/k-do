@@ -27,6 +27,7 @@ import {
 
 const infoCategories = [
 { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
+{ value: 'embajada', label: 'Embajada/Consulado', icon: '🏛️' },
 { value: 'apps', label: 'Apps útiles', icon: '📱' },
 { value: 'transporte', label: 'Transporte', icon: '🚇' },
 { value: 'contactos', label: 'Contactos', icon: '📞' },
