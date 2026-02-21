@@ -311,11 +311,11 @@ export default function Utilities() {
 
                 return (
                   <div key={category.value} className="bg-white p-4 rounded-2xl border border-border hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-3xl">{category.icon}</span>
-                      <h3 className="text-xl font-bold text-foreground">{category.label}</h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-2xl">{category.icon}</span>
+                      <h3 className="text-lg font-bold text-foreground">{category.label}</h3>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {categoryInfos.map((info) => (
                         <Collapsible key={info.id} className="border border-border rounded-xl">
                           <CollapsibleTrigger className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors rounded-xl">
