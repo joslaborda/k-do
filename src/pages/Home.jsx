@@ -160,188 +160,192 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen relative">
-      {/* Background Image with Overlay */}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section with Background Image */}
       <div 
-        className="fixed inset-0 z-0"
+        className="relative"
         style={{
           backgroundImage: 'url(https://images.travelandleisureasia.com/wp-content/uploads/sites/5/2024/01/11144526/feature-2024-01-11t102331-123.jpeg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/85 to-white/90 backdrop-blur-sm" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="glass border-b border-border backdrop-blur-md bg-white/70">
-          <div className="max-w-6xl mx-auto px-6 py-8">
-            <div className="flex items-center justify-between mb-4">
-              <Link to={createPageUrl('TripsList')}>
-                <Button variant="ghost" size="sm">
-                  <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-                  Volver a viajes
-                </Button>
-              </Link>
-              <Button variant="outline" size="icon" onClick={() => setSettingsOpen(true)}>
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold text-foreground mb-2">{trip?.name || 'Japón 2026'}</h1>
-                <div className="flex flex-wrap gap-4 text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    {trip?.destination}, {trip?.country}
-                  </div>
-                  {trip?.start_date && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
-                      {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-md rounded-lg transition-colors flex items-center gap-2 shadow-md"
-              >
-                <Search className="w-4 h-4" />
-                <span className="text-sm">Buscar</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
 
         {/* Content */}
-        <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-          {/* Stats Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white/90 backdrop-blur-md border-2 border-border rounded-2xl p-6 shadow-lg"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-3 bg-blue-500/20 rounded-xl">
-                  <Calendar className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Duración</p>
-                  <p className="text-2xl font-bold text-foreground">{tripDuration} días</p>
-                </div>
+        <div className="relative z-10">
+          {/* Header */}
+          <div className="border-b border-white/20 backdrop-blur-sm">
+            <div className="max-w-6xl mx-auto px-6 py-6">
+              <div className="flex items-center justify-between mb-4">
+                <Link to={createPageUrl('TripsList')}>
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                    <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                    Volver a viajes
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => setSettingsOpen(true)}
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
               </div>
-            </motion.div>
+              
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">{trip?.name || 'Japón 2026'}</h1>
+                  <div className="flex flex-wrap gap-4 text-white/90">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {trip?.destination}, {trip?.country}
+                    </div>
+                    {trip?.start_date && (
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
+                        {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg transition-colors flex items-center gap-2 shadow-md"
+                >
+                  <Search className="w-4 h-4" />
+                  <span className="text-sm">Buscar</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
-            {daysUntilTrip > 0 && (
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
+
+          {/* Stats Cards - 2 columns */}
+          <div className="max-w-6xl mx-auto px-6 py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/90 backdrop-blur-md border-2 border-primary rounded-2xl p-6 shadow-lg bg-gradient-to-br from-primary/5 to-orange-600/5"
+                transition={{ delay: 0.1 }}
+                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-3 bg-primary/20 rounded-xl">
-                    <Clock className="w-6 h-6 text-primary" />
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-blue-500/20 rounded-lg">
+                    <Calendar className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Comienza en</p>
-                    <p className="text-2xl font-bold text-primary">{daysUntilTrip} días</p>
+                    <p className="text-xs text-muted-foreground">Duración</p>
+                    <p className="text-xl font-bold text-foreground">{tripDuration} días</p>
                   </div>
                 </div>
               </motion.div>
-            )}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/90 backdrop-blur-md border-2 border-border rounded-2xl p-6 shadow-lg"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-3 bg-green-500/20 rounded-xl">
-                  <Receipt className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Gastado</p>
-                  <p className="text-2xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Quick Progress Bar */}
-          <div className="mt-6 pb-6">
-            <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-border">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <Package className="w-5 h-5 text-primary" />
-                  <span className="font-semibold text-foreground">Progreso de maleta</span>
-                </div>
-                <span className="text-2xl font-bold text-primary">{packedPercentage}%</span>
-              </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500"
-                  style={{ width: `${packedPercentage}%` }}
-                />
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                {packingItems.filter(i => i.packed).length} de {packingItems.length} artículos empacados
-              </p>
-            </div>
-          </div>
-
-          {/* Navigation Cards */}
-          <div className="py-12">
-            <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-6 font-medium">Navega tu viaje</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {sections.map((section, idx) => (
+              {daysUntilTrip > 0 && (
                 <motion.div
-                  key={section.page}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white/95 backdrop-blur-md border border-primary/30 rounded-xl p-4 shadow-lg"
                 >
-                  <Link
-                    to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
-                    className="group relative overflow-hidden bg-white/90 backdrop-blur-md rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-
-                    <div className="relative p-6 flex flex-col items-center gap-3">
-                      <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
-                        {section.emoji}
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {section.name}
-                        </div>
-                      </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <Clock className="w-4 h-4 text-primary" />
                     </div>
-
-                    <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Comienza en</p>
+                      <p className="text-xl font-bold text-primary">{daysUntilTrip} días</p>
                     </div>
-                  </Link>
+                  </div>
                 </motion.div>
-              ))}
+              )}
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <Receipt className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Gastado</p>
+                    <p className="text-xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
+                    <p className="text-[10px] text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Quick Progress Bar */}
+            <div className="pb-8">
+              <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-lg p-4 border border-white/20">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-4 h-4 text-primary" />
+                    <span className="font-semibold text-foreground text-sm">Progreso de maleta</span>
+                  </div>
+                  <span className="text-xl font-bold text-primary">{packedPercentage}%</span>
+                </div>
+                <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500"
+                    style={{ width: `${packedPercentage}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {packingItems.filter(i => i.packed).length} de {packingItems.length} artículos empacados
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Navigation Section - Outside of background image */}
+      <div className="max-w-6xl mx-auto px-6 py-12 pb-24">
+        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-6 font-medium">Navega tu viaje</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {sections.map((section, idx) => (
+            <motion.div
+              key={section.page}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+            >
+              <Link
+                to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
+                className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+
+                <div className="relative p-6 flex flex-col items-center gap-3">
+                  <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
+                    {section.emoji}
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {section.name}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowRight className="w-5 h-5 text-primary" />
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
 
