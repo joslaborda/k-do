@@ -186,24 +186,23 @@ export default function Diary() {
       {/* Header con caja naranja */}
       <div className="bg-orange-700 pt-12 pb-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-white text-4xl font-bold">Diario de Viaje 📔</h1>
-              <p className="text-white/90 mt-2">Recuerdos y momentos especiales</p>
-            </div>
-            <Button
-              onClick={() => setDialogOpen(true)}
-              className="bg-white text-orange-700 hover:bg-white/90"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nueva Entrada
-            </Button>
+          <div>
+            <h1 className="text-white text-4xl font-bold">Diario de Viaje 📔</h1>
+            <p className="text-white/90 mt-2">Recuerdos y momentos especiales</p>
           </div>
         </div>
       </div>
 
       {/* Entries */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-4xl -mt-12">
+        <div className="flex justify-end mb-6">
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Nueva Entrada
+          </Button>
+        </div>
         <Tabs defaultValue="list" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="list">Lista</TabsTrigger>
