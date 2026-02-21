@@ -61,6 +61,7 @@ import Translator from './pages/Translator';
 import Utilities from './pages/Utilities';
 import TripsList from './pages/TripsList';
 import TripDetail from './pages/TripDetail';
+import MigrateData from './pages/MigrateData';
 import __Layout from './Layout.jsx';
 
 
@@ -79,6 +80,7 @@ export const PAGES = {
     "Utilities": Utilities,
     "TripsList": TripsList,
     "TripDetail": TripDetail,
+    "MigrateData": MigrateData,
 }
 
 export const pagesConfig = {
