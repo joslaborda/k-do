@@ -235,8 +235,8 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg">
+                transition={{ delay: 0.1 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg">
+
 
                 <div className="flex items-center gap-2 mb-2">
                   <div className="p-2 bg-blue-500/20 rounded-lg">
