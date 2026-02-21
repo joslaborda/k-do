@@ -301,7 +301,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Recuerdos</p>
-                      <p className="text-xl font-bold text-foreground">{diaryEntries.length} entries</p>
+                      <p className="text-xl font-bold text-foreground">{diaryEntries.length}</p>
                     </div>
                   </div>
                 </motion.div>
