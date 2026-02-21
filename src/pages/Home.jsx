@@ -167,7 +167,7 @@ export default function Home() {
         style={{
           backgroundImage: 'url(https://images.travelandleisureasia.com/wp-content/uploads/sites/5/2024/01/11144526/feature-2024-01-11t102331-123.jpeg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center 20%'
         }}>
 
         {/* Overlay for readability */}
