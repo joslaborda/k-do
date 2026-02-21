@@ -53,6 +53,7 @@ import Cities from './pages/Cities';
 import CityDetail from './pages/CityDetail';
 import Diary from './pages/Diary';
 import Expenses from './pages/Expenses';
+import Home from './pages/Home';
 import MigrateData from './pages/MigrateData';
 import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
@@ -61,7 +62,6 @@ import Translator from './pages/Translator';
 import TripDetail from './pages/TripDetail';
 import TripsList from './pages/TripsList';
 import Utilities from './pages/Utilities';
-import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -72,6 +72,7 @@ export const PAGES = {
     "CityDetail": CityDetail,
     "Diary": Diary,
     "Expenses": Expenses,
+    "Home": Home,
     "MigrateData": MigrateData,
     "Packing": Packing,
     "Restaurants": Restaurants,
@@ -80,7 +81,6 @@ export const PAGES = {
     "TripDetail": TripDetail,
     "TripsList": TripsList,
     "Utilities": Utilities,
-    "Home": Home,
 }
 
 export const pagesConfig = {

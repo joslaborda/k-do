@@ -142,6 +142,10 @@ export default function Restaurants() {
     }
   };
 
+  const toggleCategory = (name) => {
+    setExpandedCategories((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
   return (
     <div className="min-h-screen bg-orange-50">
       {/* Header con caja naranja */}
@@ -173,40 +177,60 @@ export default function Restaurants() {
                 <p className="text-muted-foreground font-light">No se encontraron resultados</p>
               </div> :
 
-          Object.entries(filteredGroupedFoodTypes).map(([category, foods]) =>
-          <div key={category} className="space-y-4">
-                  <h2 className="text-2xl font-light text-foreground border-b border-border pb-2">
-                    {category}
-                  </h2>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {foods.map((food) =>
-              <div key={food.name} className="group glass border-2 border-border rounded-xl overflow-hidden hover:border-primary transition-all duration-300 hover:shadow-xl">
-                        <div className="aspect-square overflow-hidden relative">
-                          <img
-                    src={food.image}
-                    alt={food.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400';
-                    }} />
+          <div className="grid gap-4">
+                {Object.entries(filteredGroupedFoodTypes).map(([category, foods]) =>
+              <Collapsible
+                key={category}
+                open={expandedCategories[category]}
+                onOpenChange={() => toggleCategory(category)}>
 
-                          <button
-                    onClick={() => handleEditFoodImage(food)}
-                    className="absolute top-2 right-2 bg-foreground/90 hover:bg-foreground p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Editar foto">
+                    <div className="glass border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-colors shadow-lg">
+                      <CollapsibleTrigger className="bg-orange-200 px-6 py-5 text-left w-full flex items-center justify-between hover:bg-secondary/30 transition-colors">
+                         <div className="flex items-center gap-4">
+                           <span className="text-3xl">{category.split(' ')[0]}</span>
+                           <div>
+                             <span className="text-orange-700 text-lg font-bold">{category}</span>
+                             <span className="text-orange-700 ml-2 text-xs">({foods.length} platos)</span>
+                          </div>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCategories[category] ? 'rotate-180' : ''}`} />
+                      </CollapsibleTrigger>
 
-                            <ImageIcon className="w-4 h-4 text-background" />
-                          </button>
+                      <CollapsibleContent className="animate-in fade-in-50 slide-in-from-top-2 duration-300">
+                        <div className="bg-orange-50 p-4">
+                          <div className="grid md:grid-cols-3 gap-4">
+                            {foods.map((food) =>
+                      <div key={food.name} className="group glass border-2 border-border rounded-xl overflow-hidden hover:border-primary transition-all duration-300 hover:shadow-xl">
+                                <div className="aspect-square overflow-hidden relative">
+                                  <img
+                            src={food.image}
+                            alt={food.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onError={(e) => {
+                              e.target.src = 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400';
+                            }} />
+
+                                  <button
+                            onClick={() => handleEditFoodImage(food)}
+                            className="absolute top-2 right-2 bg-foreground/90 hover:bg-foreground p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            aria-label="Editar foto">
+
+                                    <ImageIcon className="w-4 h-4 text-background" />
+                                  </button>
+                                </div>
+                                <div className="bg-zinc-50 p-3">
+                                  <h3 className="text-base font-bold text-foreground mb-1">{food.name}</h3>
+                                  <p className="text-xs text-muted-foreground leading-relaxed font-light line-clamp-2">{food.description}</p>
+                                </div>
+                              </div>
+                      )}
+                          </div>
                         </div>
-                        <div className="bg-zinc-50 p-3">
-                          <h3 className="text-base font-bold text-foreground mb-1">{food.name}</h3>
-                          <p className="text-xs text-muted-foreground leading-relaxed font-light line-clamp-2">{food.description}</p>
-                        </div>
-                      </div>
+                      </CollapsibleContent>
+                    </div>
+                  </Collapsible>
               )}
-                  </div>
-                </div>
-          )
+              </div>
           }
         </div>
       </div>
