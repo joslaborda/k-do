@@ -13,13 +13,19 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StatsSkeleton, CardSkeleton } from '@/components/LoadingSkeleton';
 import { motion } from 'framer-motion';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,7 +45,46 @@ export default function Home() {
       if (!tripId) return null;
       return base44.entities.Trip.get(tripId);
     },
-    enabled: !!tripId
+    enabled: !!tripId,
+    onSuccess: (data) => {
+      if (data) {
+        setFormData({
+          name: data.name || '',
+          destination: data.destination || '',
+          country: data.country || '',
+          start_date: data.start_date || '',
+          end_date: data.end_date || '',
+          description: data.description || '',
+          cover_image: data.cover_image || '',
+          currency: data.currency || 'EUR',
+          members: data.members || []
+        });
+      }
+    }
+  });
+
+  useEffect(() => {
+    if (trip && !formData.name) {
+      setFormData({
+        name: trip.name || '',
+        destination: trip.destination || '',
+        country: trip.country || '',
+        start_date: trip.start_date || '',
+        end_date: trip.end_date || '',
+        description: trip.description || '',
+        cover_image: trip.cover_image || '',
+        currency: trip.currency || 'EUR',
+        members: trip.members || []
+      });
+    }
+  }, [trip]);
+
+  const updateTripMutation = useMutation({
+    mutationFn: (data) => base44.entities.Trip.update(tripId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
+      setSettingsOpen(false);
+    },
   });
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
@@ -126,7 +171,7 @@ export default function Home() {
                 Volver a viajes
               </Button>
             </Link>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" onClick={() => setSettingsOpen(true)}>
               <Settings className="w-4 h-4" />
             </Button>
           </div>
@@ -167,14 +212,62 @@ export default function Home() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
-        {/* Countdown */}
-        {daysUntilTrip > 0 && (
-          <div className="glass border-2 border-primary rounded-3xl p-8 mb-8 text-center bg-gradient-to-br from-primary/5 to-orange-600/5">
-            <p className="text-sm text-muted-foreground mb-2">Tu aventura comienza en</p>
-            <p className="text-6xl font-bold text-primary mb-2">{daysUntilTrip}</p>
-            <p className="text-lg text-foreground">día{daysUntilTrip !== 1 ? 's' : ''}</p>
-          </div>
-        )}
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass border-2 border-border rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-blue-500/20 rounded-xl">
+                <Calendar className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Duración</p>
+                <p className="text-2xl font-bold text-foreground">{tripDuration} días</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {daysUntilTrip > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="glass border-2 border-primary rounded-2xl p-6 bg-gradient-to-br from-primary/5 to-orange-600/5"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-3 bg-primary/20 rounded-xl">
+                  <Clock className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Comienza en</p>
+                  <p className="text-2xl font-bold text-primary">{daysUntilTrip} días</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass border-2 border-border rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-green-500/20 rounded-xl">
+                <Receipt className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Gastado</p>
+                <p className="text-2xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
       {/* Quick Progress Bar */}
       <div className="max-w-6xl mx-auto px-6 mt-6 pb-6">
@@ -235,6 +328,112 @@ export default function Home() {
             </div>
             </div>
             </div>
+
+            {/* Settings Dialog */}
+            <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle className="text-foreground text-2xl">⚙️ Configuración del Viaje</DialogTitle>
+             </DialogHeader>
+             <div className="space-y-4 pt-4">
+               <div>
+                 <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
+                 <Input
+                   placeholder="ej. Japón 2025"
+                   value={formData.name || ''}
+                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                   className="bg-input border-border text-foreground"
+                 />
+               </div>
+
+               <div className="grid md:grid-cols-2 gap-4">
+                 <div>
+                   <label className="text-sm font-medium text-foreground mb-1.5 block">Destino *</label>
+                   <Input
+                     placeholder="ej. Tokio"
+                     value={formData.destination || ''}
+                     onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                     className="bg-input border-border text-foreground"
+                   />
+                 </div>
+                 <div>
+                   <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
+                   <Input
+                     placeholder="ej. Japón"
+                     value={formData.country || ''}
+                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                     className="bg-input border-border text-foreground"
+                   />
+                 </div>
+               </div>
+
+               <div className="grid md:grid-cols-2 gap-4">
+                 <div>
+                   <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha inicio *</label>
+                   <Input
+                     type="date"
+                     value={formData.start_date || ''}
+                     onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                     className="bg-input border-border text-foreground"
+                   />
+                 </div>
+                 <div>
+                   <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
+                   <Input
+                     type="date"
+                     value={formData.end_date || ''}
+                     onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                     className="bg-input border-border text-foreground"
+                   />
+                 </div>
+               </div>
+
+               <div>
+                 <label className="text-sm font-medium text-foreground mb-1.5 block">Viajeros (emails separados por coma)</label>
+                 <Input
+                   placeholder="email1@example.com, email2@example.com"
+                   value={formData.members?.join(', ') || ''}
+                   onChange={(e) => setFormData({ ...formData, members: e.target.value.split(',').map(m => m.trim()).filter(Boolean) })}
+                   className="bg-input border-border text-foreground"
+                 />
+               </div>
+
+               <div>
+                 <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
+                 <Textarea
+                   placeholder="Describe tu viaje..."
+                   value={formData.description || ''}
+                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                   rows={3}
+                   className="bg-input border-border text-foreground"
+                 />
+               </div>
+
+               <div>
+                 <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
+                 <Input
+                   placeholder="https://..."
+                   value={formData.cover_image || ''}
+                   onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
+                   className="bg-input border-border text-foreground"
+                 />
+               </div>
+
+               <div className="flex justify-end gap-3 pt-4">
+                 <Button variant="outline" onClick={() => setSettingsOpen(false)}>
+                   Cancelar
+                 </Button>
+                 <Button
+                   onClick={() => updateTripMutation.mutate(formData)}
+                   className="bg-primary hover:bg-primary/90"
+                   disabled={!formData.name || !formData.destination || updateTripMutation.isPending}
+                 >
+                   {updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+                 </Button>
+               </div>
+             </div>
+            </DialogContent>
+            </Dialog>
             </div>
             );
             }
