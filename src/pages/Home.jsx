@@ -334,7 +334,7 @@ export default function Home() {
       </div>
 
       {/* Navigation Section - Outside of background image */}
-      <div className="bg-background mx-auto pb-24 px-6 py-12 max-w-6xl">
+      <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl">
         <h2 className="text-slate-800 mb-6 text-lg font-medium uppercase tracking-widest">NAVEGA TU VIAJE</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sections.map((section, idx) =>
