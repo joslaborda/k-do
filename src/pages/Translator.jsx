@@ -196,11 +196,11 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
 
         <Tabs defaultValue="translator" className="space-y-6">
-          <TabsList className="glass border border-border p-1">
-            <TabsTrigger value="phrases" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+          <TabsList className="bg-white border border-border p-1">
+            <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
               📖 Frases útiles
             </TabsTrigger>
-            <TabsTrigger value="translator" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+            <TabsTrigger value="translator" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
               🔄 Traductor
             </TabsTrigger>
           </TabsList>
