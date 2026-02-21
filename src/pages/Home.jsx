@@ -160,7 +160,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-orange-50 min-h-screen">
       {/* Hero Section with Background Image */}
       <div
         className="relative"
