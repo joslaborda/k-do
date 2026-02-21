@@ -18,18 +18,13 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
-  const navigate = useNavigate();
+  const [tripId, setTripId] = useState(null);
 
-  // Si hay un trip_id en la URL, estamos en el viaje de Japón (modo legacy)
-  // Si no, redirigir a TripsList
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const tripId = urlParams.get('trip_id');
-    if (!tripId || tripId === 'null') {
-      // No hay trip_id, redirigir a la lista de viajes
-      navigate(createPageUrl('TripsList'), { replace: true });
-    }
-  }, [navigate]);
+    const id = urlParams.get('trip_id');
+    setTripId(id);
+  }, []);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],
@@ -97,11 +92,19 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-900/50" />
         
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
-          {/* Search Bar */}
-          <div className="mb-8">
+          {/* Header con botón a TripsList y Search */}
+          <div className="flex items-center justify-between mb-8">
+            <Link 
+              to={createPageUrl('TripsList')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors text-white"
+            >
+              <ArrowRight className="w-4 h-4 rotate-180" />
+              <span className="text-sm font-medium">Todos mis viajes</span>
+            </Link>
+            
             <button
               onClick={() => setSearchOpen(true)}
-              className="relative w-full max-w-md"
+              className="relative w-full max-w-md ml-4"
             >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
               <div className="w-full pl-12 pr-4 py-3 bg-white/20 border border-white/30 text-white/60 placeholder:text-white/60 backdrop-blur-sm rounded-lg text-left hover:bg-white/30 transition-colors">
@@ -241,7 +244,7 @@ export default function Home() {
               transition={{ delay: idx * 0.05 }}
             >
               <Link
-                 to={createPageUrl(section.page)}
+                 to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
                  className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block"
                >
                 <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
