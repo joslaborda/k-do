@@ -17,7 +17,7 @@ delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
 });
 
 
@@ -32,8 +32,8 @@ const cityCoordinates = {
 };
 
 export default function Cities() {
-   const queryClient = useQueryClient();
-   const { performDelete } = useUndo();
+  const queryClient = useQueryClient();
+  const { performDelete } = useUndo();
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['cities'] });
@@ -45,12 +45,12 @@ export default function Cities() {
   const { data: cities = [], isLoading } = useQuery({
     queryKey: ['cities'],
     queryFn: () => base44.entities.City.list('order'),
-    staleTime: 30000, // Cache por 30 segundos
+    staleTime: 30000 // Cache por 30 segundos
   });
 
   const { data: itineraryDays = [] } = useQuery({
     queryKey: ['itineraryDays'],
-    queryFn: () => base44.entities.ItineraryDay.list(),
+    queryFn: () => base44.entities.ItineraryDay.list()
   });
 
 
@@ -60,7 +60,7 @@ export default function Cities() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cities'] });
       queryClient.invalidateQueries({ queryKey: ['itineraryDays'] });
-    },
+    }
   });
 
   const handleDelete = async (city) => {
@@ -75,7 +75,7 @@ export default function Cities() {
 
 
   const getDaysCount = (cityId) => {
-    return itineraryDays.filter(day => day.city_id === cityId).length;
+    return itineraryDays.filter((day) => day.city_id === cityId).length;
   };
 
   const getCityPosition = (cityName) => {
@@ -92,47 +92,47 @@ export default function Cities() {
     return format(start, 'd MMM', { locale: es });
   };
 
-  const routePositions = cities
-    .map(city => getCityPosition(city.name))
-    .filter(pos => pos);
+  const routePositions = cities.
+  map((city) => getCityPosition(city.name)).
+  filter((pos) => pos);
 
   return (
     <div className="min-h-screen bg-background">
        <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
-       <div className="max-w-6xl mx-auto px-6 py-12">
+       <div className="bg-orange-50 mx-auto px-6 py-12 max-w-6xl">
          <div className="flex items-center justify-between mb-8">
            <div>
-             <h1 className="text-4xl font-bold text-foreground">Ruta 🗾</h1>
-             <p className="text-muted-foreground mt-2">Explora tu itinerario por Japón</p>
+             <h1 className="text-slate-800 text-4xl font-bold">Ruta 🗾</h1>
+             <p className="text-slate-800 mt-2">Explora tu itinerario por Japón</p>
           </div>
         </div>
 
 
 
-        {isLoading ? (
-           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {[1, 2, 3].map((i) => (
-               <div key={i} className="aspect-[16/10] rounded-2xl bg-secondary animate-pulse" />
-             ))}
-           </div>
-         ) : cities.length === 0 ? (
-           <div className="text-center py-20 glass rounded-2xl border border-border">
+        {isLoading ?
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {[1, 2, 3].map((i) =>
+          <div key={i} className="aspect-[16/10] rounded-2xl bg-secondary animate-pulse" />
+          )}
+           </div> :
+        cities.length === 0 ?
+        <div className="text-center py-20 glass rounded-2xl border border-border">
              <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
              <h3 className="text-xl font-light text-foreground mb-2">Sin ciudades todavía</h3>
              <p className="text-muted-foreground font-light">Tu ruta aparecerá aquí</p>
+           </div> :
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {cities.map((city) =>
+          <CityCard
+            key={city.id}
+            city={city}
+            daysCount={getDaysCount(city.id)} />
+
+          )}
            </div>
-         ) : (
-           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {cities.map((city) => (
-               <CityCard 
-                 key={city.id}
-                 city={city} 
-                 daysCount={getDaysCount(city.id)}
-               />
-             ))}
-           </div>
-         )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
