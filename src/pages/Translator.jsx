@@ -184,7 +184,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
   })).filter(cat => cat.phrases.length > 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-orange-50">
       {/* Header con caja naranja */}
       <div className="bg-orange-700 pt-12 pb-20">
         <div className="max-w-5xl mx-auto px-6">

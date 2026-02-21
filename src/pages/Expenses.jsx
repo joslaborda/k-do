@@ -143,7 +143,7 @@ export default function Expenses() {
     : expenses.filter(e => e.paid_by === activeTab);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-orange-50">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
       
       {/* Header con caja naranja */}

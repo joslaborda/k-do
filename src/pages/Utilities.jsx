@@ -211,7 +211,7 @@ export default function Utilities() {
   const packingProgress = totalPackingItems > 0 ? Math.round(packedCount / totalPackingItems * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-orange-50">
        {/* Header con caja naranja */}
        <div className="bg-orange-700 pt-12 pb-20">
          <div className="max-w-5xl mx-auto px-6">
