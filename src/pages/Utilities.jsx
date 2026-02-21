@@ -253,6 +253,78 @@ export default function Utilities() {
               </TabsTrigger>
             </TabsList>
 
+          {/* Información Útil */}
+          <TabsContent value="info" className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Información de Utilidad</h2>
+                <p className="text-muted-foreground">Teléfonos, embajadas, contactos de emergencia y más</p>
+              </div>
+              <Button
+                onClick={() => setDialogOpen(true)}
+                className="bg-orange-600 hover:bg-orange-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Añadir
+              </Button>
+            </div>
+
+            {infos.length === 0 ?
+            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+                <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Añade información útil como números de emergencia o embajadas</p>
+              </div> :
+
+            <div className="grid md:grid-cols-2 gap-6">
+                {infoCategories.map((category) => {
+                const categoryInfos = groupedInfos[category.value] || [];
+                if (categoryInfos.length === 0) return null;
+
+                return (
+                  <div key={category.value} className="glass border-2 border-border rounded-3xl p-6 hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-3xl">{category.icon}</span>
+                      <h3 className="text-xl font-bold text-foreground">{category.label}</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {categoryInfos.map((info) => (
+                        <Collapsible key={info.id} className="border border-border rounded-xl">
+                          <CollapsibleTrigger className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors rounded-xl">
+                            <div className="flex items-center gap-2 text-left">
+                              <span className="text-xl">{info.icon}</span>
+                              <div className="flex-1">
+                                <p className="font-semibold text-foreground">{info.title}</p>
+                                <p className="text-sm text-muted-foreground truncate">{info.content.split('\n')[0]}</p>
+                              </div>
+                            </div>
+                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="px-3 pb-3 pt-0 space-y-2">
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{info.content}</p>
+                            {info.link && (
+                              <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium">
+                                <ExternalLink className="w-3 h-3" />
+                                Visitar
+                              </a>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteMutation.mutate(info.id)}
+                              className="text-destructive hover:bg-red-50 hover:text-destructive w-full mt-2">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Eliminar
+                            </Button>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              </div>
+            }
+          </TabsContent>
+
           {/* Clima */}
           <TabsContent value="weather" className="space-y-6">
             <div className="mb-4">
