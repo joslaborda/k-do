@@ -182,17 +182,18 @@ export default function Diary() {
   return (
     <div className="min-h-screen bg-background">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
-      {/* Header */}
-      <div className="glass border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+      
+      {/* Header con caja naranja */}
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Diario de Viaje 📔</h1>
-              <p className="text-muted-foreground">Recuerdos y momentos especiales</p>
+              <h1 className="text-white text-4xl font-bold">Diario de Viaje 📔</h1>
+              <p className="text-white/90 mt-2">Recuerdos y momentos especiales</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-white text-orange-700 hover:bg-white/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Nueva Entrada
@@ -202,7 +203,7 @@ export default function Diary() {
       </div>
 
       {/* Entries */}
-      <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-4xl -mt-12">
         <Tabs defaultValue="list" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="list">Lista</TabsTrigger>

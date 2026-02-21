@@ -65,17 +65,17 @@ export default function Packing() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="glass border-b border-border sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Header con caja naranja */}
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Maleta 🧳</h1>
-              <p className="text-muted-foreground">Checklist de equipaje</p>
+              <h1 className="text-white text-4xl font-bold">Maleta 🧳</h1>
+              <p className="text-white/90 mt-2">Checklist de equipaje</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-white text-orange-700 hover:bg-white/90"
             >
               <Plus className="w-4 h-4 mr-2" />
               Añadir
@@ -83,12 +83,12 @@ export default function Packing() {
           </div>
 
           {/* Progress */}
-          <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-primary-foreground">
+          <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white mt-6">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium opacity-90">Progreso total</span>
               <span className="text-4xl font-bold">{progress}%</span>
             </div>
-            <div className="h-4 bg-white/20 rounded-full overflow-hidden backdrop-blur">
+            <div className="h-4 bg-white/20 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-white transition-all duration-500 rounded-full"
                 style={{ width: `${progress}%` }}
@@ -102,7 +102,7 @@ export default function Packing() {
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-5xl -mt-12">
         {totalItems === 0 ? (
             <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
               <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />

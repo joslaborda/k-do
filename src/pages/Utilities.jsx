@@ -212,16 +212,16 @@ export default function Utilities() {
 
   return (
     <div className="min-h-screen bg-background">
-       {/* Header */}
-       <div className="glass border-b border-border">
-         <div className="max-w-5xl mx-auto px-6 py-8">
-           <h1 className="text-4xl font-bold text-foreground mb-2">Utilidades 🔧</h1>
-           <p className="text-muted-foreground">Información útil para tu viaje</p>
+       {/* Header con caja naranja */}
+       <div className="bg-orange-700 pt-12 pb-20">
+         <div className="max-w-5xl mx-auto px-6">
+           <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
+           <p className="text-white/90 mt-2">Información útil para tu viaje</p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-5xl -mt-12">
         <Tabs defaultValue="weather" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 glass border border-border">
               <TabsTrigger value="weather" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
