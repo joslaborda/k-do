@@ -44,9 +44,7 @@ export default function Layout({ children, currentPageName }) {
             {navItems.map((item) => {
               const isActive = currentPageName === item.page || 
                 (item.page === 'Cities' && currentPageName === 'CityDetail');
-              const linkUrl = item.page === 'TripDetail' 
-                ? createPageUrl(`${item.page}?id=${tripId}`)
-                : createPageUrl(`${item.page}?trip_id=${tripId}`);
+              const linkUrl = createPageUrl(`${item.page}?trip_id=${tripId}`);
               return (
                 <Link
                   key={item.page}
@@ -77,9 +75,7 @@ export default function Layout({ children, currentPageName }) {
             {navItems.map((item) => {
               const isActive = currentPageName === item.page || 
                 (item.page === 'Cities' && currentPageName === 'CityDetail');
-              const linkUrl = item.page === 'TripDetail' 
-                ? createPageUrl(`${item.page}?id=${tripId}`)
-                : createPageUrl(`${item.page}?trip_id=${tripId}`);
+              const linkUrl = createPageUrl(`${item.page}?trip_id=${tripId}`);
               return (
                 <Link
                   key={item.page}
