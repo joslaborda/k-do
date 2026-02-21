@@ -14,15 +14,15 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -38,7 +38,7 @@ export default function Diary() {
     content: '',
     location: '',
     mood: '😊',
-    photos: [],
+    photos: []
   });
 
   const queryClient = useQueryClient();
@@ -54,7 +54,7 @@ export default function Diary() {
 
   const { data: entries = [] } = useQuery({
     queryKey: ['diaryEntries'],
-    queryFn: () => base44.entities.DiaryEntry.list('-date'),
+    queryFn: () => base44.entities.DiaryEntry.list('-date')
   });
 
   const createMutation = useMutation({
@@ -68,14 +68,14 @@ export default function Diary() {
         content: '',
         location: '',
         mood: '😊',
-        photos: [],
+        photos: []
       });
-    },
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.DiaryEntry.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['diaryEntries'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['diaryEntries'] })
   });
 
   const handleDelete = async (entry) => {
@@ -84,7 +84,7 @@ export default function Diary() {
     delete entryData.created_date;
     delete entryData.updated_date;
     delete entryData.created_by;
-    
+
     await performDelete(
       () => deleteMutation.mutateAsync(entry.id),
       () => base44.entities.DiaryEntry.create(entryData),
@@ -108,7 +108,7 @@ export default function Diary() {
   const removePhoto = (index) => {
     setFormData({
       ...formData,
-      photos: formData.photos.filter((_, i) => i !== index),
+      photos: formData.photos.filter((_, i) => i !== index)
     });
   };
 
@@ -138,7 +138,7 @@ export default function Diary() {
         }
 
         if (finalTranscript) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             content: prev.content + finalTranscript
           }));
@@ -213,32 +213,32 @@ export default function Diary() {
           </TabsList>
 
           <TabsContent value="list">
-            {entries.length === 0 ? (
-          <div className="text-center py-24 border-2 border-dashed border-border rounded-2xl glass">
+            {entries.length === 0 ?
+            <div className="bg-[#ffffff] py-24 text-center rounded-2xl border-2 border-dashed border-border glass">
             <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">Empieza a escribir tu diario de viaje</p>
-          </div>
-          ) : (
-          <div className="space-y-6">
-            {entries.map((entry) => (
+          </div> :
+
+            <div className="space-y-6">
+            {entries.map((entry) =>
               <div
                 key={entry.id}
-                className="glass border-2 border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all"
-              >
+                className="glass border-2 border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all">
+
                 {/* Photos */}
-                {entry.photos && entry.photos.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-secondary/30">
-                    {entry.photos.map((photo, idx) => (
-                      <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                {entry.photos && entry.photos.length > 0 &&
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4 bg-secondary/30">
+                    {entry.photos.map((photo, idx) =>
+                  <div key={idx} className="aspect-square rounded-lg overflow-hidden">
                         <img
-                          src={photo}
-                          alt={`Foto ${idx + 1}`}
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                        />
+                      src={photo}
+                      alt={`Foto ${idx + 1}`}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" />
+
                       </div>
-                    ))}
+                  )}
                   </div>
-                )}
+                }
 
                 {/* Content */}
                 <div className="p-6">
@@ -252,12 +252,12 @@ export default function Diary() {
                             {format(new Date(entry.date), 'EEEE, d MMMM yyyy', { locale: es })}
                           </span>
                         </div>
-                        {entry.location && (
-                          <div className="flex items-center gap-2">
+                        {entry.location &&
+                        <div className="flex items-center gap-2">
                             <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm text-muted-foreground truncate">{entry.location}</span>
                           </div>
-                        )}
+                        }
                       </div>
                     </div>
                     <Button
@@ -265,21 +265,21 @@ export default function Diary() {
                       size="icon"
                       onClick={() => handleDelete(entry)}
                       className="text-muted-foreground hover:text-destructive hover:bg-secondary flex-shrink-0 ml-2"
-                      aria-label="Eliminar"
-                    >
+                      aria-label="Eliminar">
+
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
 
-                  {entry.title && (
-                    <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
-                  )}
+                  {entry.title &&
+                  <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
+                  }
                   <p className="text-foreground leading-relaxed whitespace-pre-wrap">{entry.content}</p>
                 </div>
               </div>
-            ))}
+              )}
           </div>
-            )}
+            }
           </TabsContent>
 
           <TabsContent value="photos">
@@ -302,8 +302,8 @@ export default function Diary() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Estado de ánimo</label>
@@ -312,11 +312,11 @@ export default function Diary() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {moods.map((mood) => (
-                      <SelectItem key={mood} value={mood}>
+                    {moods.map((mood) =>
+                    <SelectItem key={mood} value={mood}>
                         <span className="text-2xl">{mood}</span>
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -328,8 +328,8 @@ export default function Diary() {
                 placeholder="ej. Primer día en Tokio"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
 
             <div>
@@ -338,8 +338,8 @@ export default function Diary() {
                 placeholder="ej. Shibuya, Tokio"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
 
             <div>
@@ -350,19 +350,19 @@ export default function Diary() {
                   variant={isRecording ? "destructive" : "outline"}
                   size="sm"
                   onClick={toggleRecording}
-                  className="gap-2"
-                >
-                  {isRecording ? (
-                    <>
+                  className="gap-2">
+
+                  {isRecording ?
+                  <>
                       <MicOff className="w-4 h-4" />
                       Detener dictado
-                    </>
-                  ) : (
-                    <>
+                    </> :
+
+                  <>
                       <Mic className="w-4 h-4" />
                       Dictar
                     </>
-                  )}
+                  }
                 </Button>
               </div>
               <Textarea
@@ -371,47 +371,47 @@ export default function Diary() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={6}
-                className={`bg-input border-border text-foreground placeholder:text-muted-foreground ${isRecording ? 'ring-2 ring-red-500' : ''}`}
-              />
-              {isRecording && (
-                <p className="text-xs text-red-400 mt-1 animate-pulse">🎤 Escuchando...</p>
-              )}
+                className={`bg-input border-border text-foreground placeholder:text-muted-foreground ${isRecording ? 'ring-2 ring-red-500' : ''}`} />
+
+              {isRecording &&
+              <p className="text-xs text-red-400 mt-1 animate-pulse">🎤 Escuchando...</p>
+              }
             </div>
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Fotos</label>
               <div className="space-y-3">
-                {formData.photos.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {formData.photos.map((photo, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
+                {formData.photos.length > 0 &&
+                <div className="grid grid-cols-3 gap-2">
+                    {formData.photos.map((photo, idx) =>
+                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
                         <img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                         <button
-                          onClick={() => removePhoto(idx)}
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
+                      onClick={() => removePhoto(idx)}
+                      className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
-                    ))}
+                  )}
                   </div>
-                )}
+                }
                 <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg hover:border-primary/50 cursor-pointer transition-colors">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handlePhotoUpload}
                     className="hidden"
-                    disabled={uploadingPhoto}
-                  />
-                  {uploadingPhoto ? (
-                    <>Subiendo...</>
-                  ) : (
-                    <>
+                    disabled={uploadingPhoto} />
+
+                  {uploadingPhoto ?
+                  <>Subiendo...</> :
+
+                  <>
                       <Upload className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Subir foto</span>
                     </>
-                  )}
+                  }
                 </label>
               </div>
             </div>
@@ -423,14 +423,14 @@ export default function Diary() {
               <Button
                 onClick={handleSubmit}
                 className="bg-primary hover:bg-primary/90"
-                disabled={!formData.content.trim() || createMutation.isPending}
-              >
+                disabled={!formData.content.trim() || createMutation.isPending}>
+
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
