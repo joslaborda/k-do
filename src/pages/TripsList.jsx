@@ -102,13 +102,13 @@ export default function TripsList() {
         <div className="bg-orange-700 mx-auto px-6 py-12 max-w-6xl">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-foreground mb-2 text-4xl font-black">Kōdo</h1>
-              <p className="text-lg text-muted-foreground">Planifica tus aventuras</p>
+              <h1 className="text-slate-50 mb-2 text-4xl font-black">Kōdo</h1>
+              <p className="text-slate-50 text-lg">Planifica tu próxima aventura</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              size="lg"
-              className="bg-primary hover:bg-primary/90">
+              size="lg" className="bg-green-600 text-primary-foreground px-8 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-10 hover:bg-primary/90">
+
 
               <Plus className="w-5 h-5 mr-2" />
               Nuevo Viaje
@@ -158,7 +158,7 @@ export default function TripsList() {
                   </div>
 
                   {/* Info */}
-                  <div className="p-6">
+                  <div className="bg-neutral-50 p-6">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                       <Calendar className="w-4 h-4" />
                       {trip.start_date && format(new Date(trip.start_date), 'dd MMM', { locale: es })}
