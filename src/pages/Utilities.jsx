@@ -317,35 +317,28 @@ export default function Utilities() {
                     </div>
                     <div className="space-y-2">
                       {categoryInfos.map((info) => (
-                        <Collapsible key={info.id} className="border border-border rounded-xl">
-                          <CollapsibleTrigger className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors rounded-xl">
-                            <div className="flex items-center gap-2 text-left">
-                              <span className="text-xl">{info.icon}</span>
-                              <div className="flex-1">
-                                <p className="font-semibold text-foreground">{info.title}</p>
-                                <p className="text-sm text-muted-foreground truncate">{info.content.split('\n')[0]}</p>
-                              </div>
+                        <div key={info.id} className="border border-border rounded-lg p-2 hover:bg-secondary/30 transition-colors">
+                          <div className="flex items-start gap-2">
+                            <span className="text-lg flex-shrink-0 mt-0.5">{info.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm text-foreground">{info.title}</p>
+                              <p className="text-xs text-muted-foreground whitespace-pre-wrap mt-1">{info.content}</p>
+                              {info.link && (
+                                <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 font-medium mt-2">
+                                  <ExternalLink className="w-3 h-3" />
+                                  Enlace
+                                </a>
+                              )}
                             </div>
-                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="px-3 pb-3 pt-0 space-y-2">
-                            <p className="text-sm text-foreground whitespace-pre-wrap">{info.content}</p>
-                            {info.link && (
-                              <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium">
-                                <ExternalLink className="w-3 h-3" />
-                                Visitar
-                              </a>
-                            )}
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
                               onClick={() => deleteMutation.mutate(info.id)}
-                              className="text-destructive hover:bg-red-50 hover:text-destructive w-full mt-2">
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Eliminar
+                              className="text-destructive hover:bg-red-50 hover:text-destructive flex-shrink-0 h-7 w-7">
+                              <Trash2 className="w-3 h-3" />
                             </Button>
-                          </CollapsibleContent>
-                        </Collapsible>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
