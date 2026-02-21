@@ -235,7 +235,7 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg">
+                transition={{ delay: 0.1 }} className="bg-[#ffffff] p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg">
 
 
                 <div className="flex items-center gap-2 mb-2">
@@ -253,7 +253,7 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-primary/30 shadow-lg">
+                transition={{ delay: 0.2 }} className="bg-[#ffffff] p-4 rounded-xl backdrop-blur-md border border-primary/30 shadow-lg">
 
 
                   <div className="flex items-center gap-2 mb-2">
@@ -272,7 +272,7 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+                  transition={{ delay: 0.3 }} className="bg-[#ffffff] p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
 
 
                   <div className="flex items-center gap-2 mb-2">
@@ -292,7 +292,7 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }} className="md:col-span-2 bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+                  transition={{ delay: 0.4 }} className="bg-[#ffffff] p-4 rounded-xl md:col-span-2 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
 
 
                   <div className="flex items-center gap-2 mb-2">
@@ -310,7 +310,7 @@ export default function Home() {
 
             {/* Quick Progress Bar */}
             <div className="pb-8">
-              <div className="bg-orange-50 p-4 rounded-xl backdrop-blur-md shadow-lg border border-white/20">
+              <div className="bg-[#ffffff] p-4 rounded-xl backdrop-blur-md shadow-lg border border-white/20">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-primary" />
