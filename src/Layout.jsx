@@ -20,14 +20,14 @@ const navItems = [
 const pagesWithoutNav = ['TripsList', 'MigrateData'];
 
 export default function Layout({ children, currentPageName }) {
-  const [tripId, setTripId] = useState(null);
+  const [tripId, setTripId] = useState('default');
   const showNav = !pagesWithoutNav.includes(currentPageName);
 
   useEffect(() => {
     // Get trip ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('trip_id') || urlParams.get('id');
-    setTripId(id);
+    setTripId(id || 'default'); // Use 'default' for backwards compatibility
   }, [currentPageName]);
 
   return (
