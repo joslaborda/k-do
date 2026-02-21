@@ -278,12 +278,12 @@ export default function Diary() {
                   <h2 className="text-2xl font-bold text-foreground mb-3">{entry.title}</h2>
                   }
                   <p className="text-foreground leading-relaxed whitespace-pre-wrap">{entry.content}</p>
-                </div>
-              </div>
-              )}
-          </div>
-            }
-          </TabsContent>
+                  </div>
+                  </div>
+                  ))}
+                  </div>
+                  }
+                  </TabsContent>
 
           <TabsContent value="photos">
             <PhotoGallery entries={entries} />
