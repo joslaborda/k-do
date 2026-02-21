@@ -64,9 +64,9 @@ export default function Packing() {
   const progress = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-stone-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-stone-800/80 backdrop-blur-xl border-b border-stone-700 sticky top-0 z-10">
+      <div className="glass border-b border-border sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -83,7 +83,7 @@ export default function Packing() {
           </div>
 
           {/* Progress */}
-          <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-primary-foreground">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium opacity-90">Progreso total</span>
               <span className="text-4xl font-bold">{progress}%</span>
@@ -104,9 +104,9 @@ export default function Packing() {
       {/* Content */}
       <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
         {totalItems === 0 ? (
-            <div className="text-center py-24 bg-stone-800 backdrop-blur-sm border-2 border-dashed border-stone-700 rounded-3xl">
-              <Package className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-              <p className="text-stone-400">Empieza añadiendo artículos a tu maleta</p>
+            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+              <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Empieza añadiendo artículos a tu maleta</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
@@ -120,7 +120,7 @@ export default function Packing() {
                 return (
                   <div 
                     key={cat.value} 
-                    className="bg-stone-800 backdrop-blur-xl border-2 border-stone-700 rounded-3xl overflow-hidden hover:shadow-xl transition-all"
+                    className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all"
                   >
                   {/* Category Header */}
                   <div className={`bg-gradient-to-r ${cat.color} p-6 text-white`}>
@@ -145,7 +145,7 @@ export default function Packing() {
                   {/* Items List */}
                   <div className="p-4 space-y-2">
                     {categoryItems.length === 0 ? (
-                      <p className="text-center text-stone-400 py-8 text-sm">
+                      <p className="text-center text-muted-foreground py-8 text-sm">
                         Sin artículos
                       </p>
                     ) : (
@@ -154,8 +154,8 @@ export default function Packing() {
                           key={item.id}
                           className={`group flex items-center gap-3 p-3 rounded-xl transition-all ${
                             item.packed
-                              ? 'bg-green-900/20'
-                              : 'bg-stone-700/50 hover:bg-stone-700'
+                              ? 'bg-green-600/20'
+                              : 'bg-secondary/50 hover:bg-secondary'
                           }`}
                         >
                           <Checkbox
@@ -168,12 +168,12 @@ export default function Packing() {
                           <div className="flex-1 min-w-0">
                             <p className={`font-medium truncate ${
                               item.packed 
-                                ? 'text-stone-400 line-through' 
-                                : 'text-stone-100'
+                                ? 'text-muted-foreground line-through' 
+                                : 'text-foreground'
                             }`}>
                               {item.name}
                               {item.quantity > 1 && (
-                                <span className="ml-2 text-sm text-stone-400">×{item.quantity}</span>
+                                <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>
                               )}
                             </p>
                           </div>
@@ -181,7 +181,7 @@ export default function Packing() {
                             variant="ghost"
                             size="icon"
                             onClick={() => deleteMutation.mutate(item.id)}
-                            className="opacity-0 group-hover:opacity-100 text-stone-500 hover:text-red-400 hover:bg-stone-700 transition-opacity"
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity"
                             aria-label="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -200,7 +200,7 @@ export default function Packing() {
                         setFormData({ ...formData, category: cat.value });
                         setDialogOpen(true);
                       }}
-                      className="w-full border-dashed border-stone-700 text-stone-300 hover:bg-stone-700"
+                      className="w-full border-dashed border-border text-foreground hover:bg-secondary/50"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Añadir a {cat.label}
@@ -215,22 +215,22 @@ export default function Packing() {
 
       {/* Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-stone-800 border-stone-700">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-stone-100">Añadir artículo</DialogTitle>
+            <DialogTitle className="text-foreground">Añadir artículo</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Artículo</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Artículo</label>
               <Input
                 placeholder="ej. Camisetas"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-stone-700 border-stone-600 text-stone-100 placeholder:text-stone-400"
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Categoría</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
               <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
                 <SelectTrigger>
                   <SelectValue />
@@ -245,17 +245,17 @@ export default function Packing() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-stone-300 mb-1.5 block">Cantidad</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Cantidad</label>
               <Input
                 type="number"
                 min="1"
                 value={formData.quantity}
                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                className="bg-stone-700 border-stone-600 text-stone-100"
+                className="bg-input border-border text-foreground"
               />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-stone-600 text-stone-300 hover:bg-stone-700">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
                 Cancelar
               </Button>
               <Button

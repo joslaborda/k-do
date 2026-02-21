@@ -235,9 +235,9 @@ export default function Utilities() {
                 <Package className="w-4 h-4 mr-2" />
                 Maleta
               </TabsTrigger>
-              <TabsTrigger value="diary" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+              <TabsTrigger value="info" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
                 <Info className="w-4 h-4 mr-2" />
-                Diario
+                Info
               </TabsTrigger>
             </TabsList>
 
@@ -464,19 +464,81 @@ export default function Utilities() {
             }
           </TabsContent>
 
-          {/* Diario */}
-          <TabsContent value="diary" className="space-y-6">
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-              <div className="text-6xl mb-4">📔</div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Diario de Viaje</h2>
-              <p className="text-muted-foreground mb-6">Accede al diario completo desde el menú principal</p>
+          {/* Info útil */}
+          <TabsContent value="info" className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Información útil</h2>
+                <p className="text-muted-foreground">Guarda datos importantes del viaje</p>
+              </div>
               <Button
-                onClick={() => window.location.href = '/Diary'}
-                className="bg-primary hover:bg-primary/90">
+                onClick={() => setDialogOpen(true)}
+                className="bg-green-600 hover:bg-green-700">
 
-                Ir al Diario
+                <Plus className="w-4 h-4 mr-2" />
+                Añadir
               </Button>
             </div>
+
+            {Object.keys(groupedInfos).length === 0 ? (
+              <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+                <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Añade información útil para tu viaje</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {infoCategories.map((cat) => {
+                  const items = groupedInfos[cat.value] || [];
+                  if (items.length === 0) return null;
+
+                  return (
+                    <div key={cat.value} className="glass border-2 border-border rounded-2xl overflow-hidden">
+                      <div className="bg-gradient-to-r from-primary to-orange-600 p-4 text-primary-foreground">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{cat.icon}</span>
+                          <h3 className="text-xl font-bold">{cat.label}</h3>
+                        </div>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        {items.map((info) => (
+                          <div
+                            key={info.id}
+                            className="group flex items-start gap-4 p-4 bg-secondary/30 rounded-xl hover:bg-secondary/50 transition-colors">
+
+                            <div className="text-3xl flex-shrink-0">{info.icon}</div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-foreground mb-1">{info.title}</h4>
+                              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                {info.content}
+                              </p>
+                              {info.link && (
+                                <a
+                                  href={info.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2">
+
+                                  <ExternalLink className="w-3 h-3" />
+                                  Abrir enlace
+                                </a>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteMutation.mutate(info.id)}
+                              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity flex-shrink-0">
+
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
           </Tabs>
           </div>
