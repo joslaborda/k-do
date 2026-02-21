@@ -47,14 +47,14 @@ export default function BalanceSummary({ expenses }) {
       const isSplit = splitWith.length > 0;
       const splitAmount = isSplit ? amountJPY / 2 : 0;
 
-      if (expense.paid_by === 'You') {
+      if (expense.paid_by === 'You' || expense.paid_by === 'José') {
         youPaidJPY += amountJPY;
         if (isSplit && splitWith.includes('Carlos')) {
           carlosOwesJPY += splitAmount;
         }
       } else if (expense.paid_by === 'Carlos') {
         carlosPaidJPY += amountJPY;
-        if (isSplit && splitWith.includes('You')) {
+        if (isSplit && (splitWith.includes('You') || splitWith.includes('José'))) {
           youOwesJPY += splitAmount;
         }
       }
