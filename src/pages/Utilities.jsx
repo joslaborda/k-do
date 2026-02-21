@@ -73,18 +73,18 @@ const phraseCategories = [
 
 
 export default function Utilities() {
-   const navigate = useNavigate();
-   const [dialogOpen, setDialogOpen] = useState(false);
-   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
-   const [activeTab, setActiveTab] = useState('weather');
+  const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [packingDialogOpen, setPackingDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('weather');
 
-   useEffect(() => {
-     if (activeTab === 'diary') {
-       const urlParams = new URLSearchParams(window.location.search);
-       const tripId = urlParams.get('trip_id');
-       navigate(createPageUrl(`Diary?trip_id=${tripId}`));
-     }
-   }, [activeTab, navigate]);
+  useEffect(() => {
+    if (activeTab === 'diary') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tripId = urlParams.get('trip_id');
+      navigate(createPageUrl(`Diary?trip_id=${tripId}`));
+    }
+  }, [activeTab, navigate]);
   const [exchangeRate, setExchangeRate] = useState(null);
   const [loadingRate, setLoadingRate] = useState(false);
   const [jpyAmount, setJpyAmount] = useState('');
@@ -272,7 +272,7 @@ export default function Utilities() {
 
           {/* Conversión moneda */}
           <TabsContent value="currency" className="space-y-6">
-            <div className="glass border-2 border-border rounded-2xl p-8">
+            <div className="bg-[#ffffff] p-8 rounded-2xl glass border-2 border-border">
               <div className="max-w-md mx-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
@@ -321,8 +321,8 @@ export default function Utilities() {
                   </div>
                 </div>
 
-                <div className="bg-gray-100 mt-8 p-4 opacity-100 rounded-xl border border-green-700">
-                  <p className="text-[#276d18] text-sm opacity-100">💡 La tasa de cambio se actualiza automáticamente al cargar esta página
+                <div className="bg-green-50 mt-8 p-4 opacity-100 rounded-xl border border-green-700">
+                  <p className="text-green-600 text-sm opacity-100">💡 La tasa de cambio se actualiza automáticamente al cargar esta página
 
                   </p>
                 </div>
