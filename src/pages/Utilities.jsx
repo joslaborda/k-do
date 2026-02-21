@@ -129,13 +129,17 @@ export default function Utilities() {
   useEffect(() => {
     if (infos.length === 0 && tripId) {
       const sampleData = [
-        { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos', icon: '🚨' },
-        { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
-        { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas', link: 'https://www.jnto.go.jp/', icon: '☎️' },
-        { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público.', link: 'https://maps.google.com', icon: '📱' },
-        { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público. Cómprala en cualquier estación o aeropuerto.', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
-        { title: 'Línea de Urgencias Médicas', category: 'emergencia', content: 'Número: +81-3-5285-8185\nIntérprete disponible 24 horas', icon: '⚕️' }
-      ];
+         { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos\n#9110 - Emergencias no urgentes (Policía)', icon: '🚨' },
+         { title: 'Línea de Urgencias Médicas', category: 'salud', content: 'Centro Médico Internacional de Tokio\nTeléfono: +81-3-5285-8185\nIntérprete disponible 24 horas\n\nKyoto Hospital (Kyoto)\nTeléfono: +81-75-751-3111\n\nOsaka Medical Center (Osaka)\nTeléfono: +81-6-6942-1331', icon: '⚕️' },
+         { title: 'Farmacias 24 horas', category: 'salud', content: 'Tokio: Matsumotokiyoshi\nKyoto: Tsuruha\nOsaka: Daikoku Drug\nDisponen de antídoto para alergias y medicinas básicas', icon: '💊' },
+         { title: 'Información de Seguros', category: 'salud', content: 'Verifica tu póliza de viaje antes de partir. Algunos hospitales requieren pago directo.\nGuarda tus recibos para reembolsos.', icon: '📋' },
+         { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
+         { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas\nAyuda con transporte, hoteles y emergencias', icon: '☎️' },
+         { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público. Descarga mapas offline.', link: 'https://maps.google.com', icon: '📱' },
+         { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público en Tokio, Osaka y Kyoto.\nCómprala en cualquier estación o aeropuerto.\nValor típico: ¥2000-3000', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
+         { title: 'Japan Rail Pass', category: 'transporte', content: 'Para viajes entre ciudades (Tokio → Kyoto → Osaka → Hiroshima).\nValor: ~¥29,650 (7 días)\nRequiere compra previa a llegada a Japón', icon: '🚄' },
+         { title: 'Normas de Seguridad', category: 'salud', content: 'Japón es muy seguro. Algunas normas:\n- Cuida tus pertenencias en estaciones concurridas\n- No comas caminando\n- Respeta los espacios en transporte público\n- Apaga la música en tren/autobús', icon: '🛡️' }
+       ];
       sampleData.forEach(data => {
         base44.entities.UsefulInfo.create({ ...data, trip_id: tripId });
       });
