@@ -217,8 +217,8 @@ export default function Home() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setSearchOpen(true)}
-                  className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg transition-colors flex items-center gap-2 shadow-md">
+                  onClick={() => setSearchOpen(true)} className="bg-zinc-50 ml-4 px-4 py-2 rounded-lg hover:bg-white backdrop-blur-sm transition-colors flex items-center gap-2 shadow-md">
+
 
                   <Search className="w-4 h-4" />
                   <span className="text-sm">Buscar</span>
