@@ -23,7 +23,8 @@ const categoryConfig = {
   train: { icon: Train, color: 'bg-emerald-900/30 text-emerald-400 border border-emerald-700/50', label: 'Tren' },
   hotel: { icon: Hotel, color: 'bg-purple-900/30 text-purple-400 border border-purple-700/50', label: 'Hotel' },
   freetour: { icon: FileText, color: 'bg-orange-900/30 text-orange-400 border border-orange-700/50', label: 'Free Tour' },
-  insurance: { icon: Shield, color: 'bg-yellow-900/30 text-yellow-400 border border-yellow-700/50', label: 'Seguro' }
+  insurance: { icon: Shield, color: 'bg-yellow-900/30 text-yellow-400 border border-yellow-700/50', label: 'Seguro' },
+  personal: { icon: FileText, color: 'bg-blue-900/30 text-blue-400 border border-blue-700/50', label: 'Documentos Personales' }
 };
 
 export default function TicketCard({ ticket, onDelete }) {

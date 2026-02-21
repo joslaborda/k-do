@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import { Plus, MapPin, Trash2, Check, X, UtensilsCrossed, Search, BookOpen, Image as ImageIcon, Heart } from 'lucide-react';
+import { Plus, Search, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,41 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
-// Fix for default marker icon
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-const visitedIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const pendingIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-function MapClickHandler({ onMapClick }) {
-  useMapEvents({
-    click: (e) => onMapClick(e.latlng),
-  });
-  return null;
-}
 
 // Tipos de comida japonesa organizados por categorías
 const japaneseFoodTypes = [
@@ -198,35 +163,16 @@ const groupedFoodTypes = japaneseFoodTypes.reduce((acc, food) => {
 }, {});
 
 export default function Restaurants() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [foodSearchQuery, setFoodSearchQuery] = useState('');
   const [editFoodDialogOpen, setEditFoodDialogOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
   const [customImageUrl, setCustomImageUrl] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    city: '',
-    cuisine: '',
-    notes: '',
-  });
 
   const queryClient = useQueryClient();
-
-  const { data: restaurants = [] } = useQuery({
-    queryKey: ['restaurants'],
-    queryFn: () => base44.entities.Restaurant.list(),
-  });
 
   const { data: customFoodItems = [] } = useQuery({
     queryKey: ['foodItems'],
     queryFn: () => base44.entities.FoodItem.list(),
-  });
-
-  const { data: favorites = [] } = useQuery({
-    queryKey: ['favoriteRestaurants'],
-    queryFn: () => base44.entities.FavoriteRestaurant.list(),
   });
 
   // Inicializar FoodItems si no existen
@@ -247,26 +193,6 @@ export default function Restaurants() {
     initializeFoodItems();
   }, [customFoodItems.length, queryClient]);
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Restaurant.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['restaurants'] });
-      setDialogOpen(false);
-      setSelectedLocation(null);
-      setFormData({ name: '', city: '', cuisine: '', notes: '' });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Restaurant.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['restaurants'] }),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Restaurant.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['restaurants'] }),
-  });
-
   const updateFoodImageMutation = useMutation({
     mutationFn: ({ id, image_url }) => base44.entities.FoodItem.update(id, { image_url }),
     onSuccess: () => {
@@ -276,51 +202,6 @@ export default function Restaurants() {
       setCustomImageUrl('');
     },
   });
-
-  const toggleFavoriteMutation = useMutation({
-    mutationFn: async (restaurantId) => {
-      const existing = favorites.find(f => f.restaurant_id === restaurantId);
-      if (existing) {
-        await base44.entities.FavoriteRestaurant.delete(existing.id);
-      } else {
-        await base44.entities.FavoriteRestaurant.create({ restaurant_id: restaurantId });
-      }
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['favoriteRestaurants'] }),
-  });
-
-  const isFavorite = (restaurantId) => {
-    return favorites.some(f => f.restaurant_id === restaurantId);
-  };
-
-  const handleMapClick = (latlng) => {
-    setSelectedLocation(latlng);
-    setDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    if (selectedLocation) {
-      createMutation.mutate({
-        ...formData,
-        latitude: selectedLocation.lat,
-        longitude: selectedLocation.lng,
-        visited: false,
-      });
-    }
-  };
-
-  const toggleVisited = (restaurant) => {
-    updateMutation.mutate({
-      id: restaurant.id,
-      data: { visited: !restaurant.visited }
-    });
-  };
-
-  const filteredRestaurants = restaurants.filter(r => 
-    r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.cuisine?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   // Mezclar datos por defecto con personalizaciones
   const mergedFoodTypes = japaneseFoodTypes.map(defaultFood => {
@@ -366,8 +247,6 @@ export default function Restaurants() {
     }
   };
 
-  const defaultCenter = [35.6762, 139.6503];
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -376,184 +255,7 @@ export default function Restaurants() {
           <p className="text-muted-foreground mt-2">Descubre la gastronomía japonesa</p>
          </div>
 
-        <Tabs defaultValue="food" className="w-full">
-          <TabsList className="mb-8">
-            <TabsTrigger value="food" className="gap-2">
-              <BookOpen className="w-4 h-4" />
-              Guía de Comida
-            </TabsTrigger>
-            <TabsTrigger value="map" className="gap-2">
-              <MapPin className="w-4 h-4" />
-              Mapa de Restaurantes
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="map" className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <p className="text-muted-foreground font-light">Haz clic en el mapa para marcar restaurantes</p>
-               <div className="relative w-full md:w-72">
-                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                 <Input
-                   placeholder="Buscar restaurantes..."
-                   value={searchQuery}
-                   onChange={(e) => setSearchQuery(e.target.value)}
-                   className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
-                 />
-              </div>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Map */}
-              <div className="lg:col-span-2">
-                <div className="glass rounded-2xl border border-border overflow-hidden shadow-sm h-[300px]">
-                  <MapContainer
-                    center={defaultCenter}
-                    zoom={6}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                      url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                    />
-                    <MapClickHandler onMapClick={handleMapClick} />
-                    
-                    {filteredRestaurants.map((restaurant) => (
-                      <Marker
-                        key={restaurant.id}
-                        position={[restaurant.latitude, restaurant.longitude]}
-                        icon={restaurant.visited ? visitedIcon : pendingIcon}
-                      >
-                        <Popup>
-                          <div className="min-w-[200px]">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="font-semibold text-stone-900">{restaurant.name}</h3>
-                              <button
-                                onClick={() => toggleFavoriteMutation.mutate(restaurant.id)}
-                                className="p-1 hover:bg-stone-100 rounded transition-colors"
-                              >
-                                <Heart className={`w-4 h-4 ${isFavorite(restaurant.id) ? 'fill-red-500 text-red-500' : 'text-stone-400'}`} />
-                              </button>
-                            </div>
-                            {restaurant.cuisine && (
-                              <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
-                            )}
-                            {restaurant.city && (
-                              <p className="text-sm text-muted-foreground">{restaurant.city}</p>
-                            )}
-                            {restaurant.notes && (
-                              <p className="text-sm text-muted-foreground mt-2">{restaurant.notes}</p>
-                            )}
-                            <div className="flex gap-2 mt-3">
-                              <Button
-                                size="sm"
-                                variant={restaurant.visited ? "outline" : "default"}
-                                onClick={() => toggleVisited(restaurant)}
-                                className="flex-1"
-                              >
-                                {restaurant.visited ? (
-                                  <>
-                                    <X className="w-3 h-3 mr-1" />
-                                    Unmark
-                                  </>
-                                ) : (
-                                  <>
-                                    <Check className="w-3 h-3 mr-1" />
-                                    Visited
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => deleteMutation.mutate(restaurant.id)}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
-                  </MapContainer>
-                </div>
-              </div>
-
-              {/* Restaurant List */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-medium text-foreground">
-                    {filteredRestaurants.length} restaurante{filteredRestaurants.length !== 1 ? 's' : ''}
-                  </h2>
-                  <div className="flex gap-2">
-                    <Badge variant="outline" className="bg-red-900/30 text-red-300 border-red-700 text-xs">
-                      {restaurants.filter(r => !r.visited).length} pendientes
-                    </Badge>
-                    <Badge variant="outline" className="bg-green-900/30 text-green-300 border-green-700 text-xs">
-                      {restaurants.filter(r => r.visited).length} visitados
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="space-y-3 max-h-[540px] overflow-y-auto pr-2">
-                  {filteredRestaurants.length === 0 ? (
-                    <div className="text-center py-12 glass rounded-xl border border-border">
-                      <UtensilsCrossed className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-muted-foreground font-light">Sin restaurantes todavía</p>
-                      <p className="text-sm text-muted-foreground mt-1 font-light">Haz clic en el mapa</p>
-                    </div>
-                  ) : (
-                    filteredRestaurants.map((restaurant) => (
-                      <div
-                        key={restaurant.id}
-                        className={`p-4 rounded-xl border transition-all ${
-                           restaurant.visited 
-                             ? 'border-green-600/50 bg-green-600/10' 
-                             : 'border-border glass hover:border-primary/50'
-                         }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className={`font-medium ${restaurant.visited ? 'text-green-600' : 'text-foreground'}`}>
-                              {restaurant.name}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              {restaurant.city && (
-                                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {restaurant.city}
-                                </span>
-                              )}
-                              {restaurant.cuisine && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {restaurant.cuisine}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => toggleVisited(restaurant)}
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                              restaurant.visited
-                                ? 'bg-green-600 border-green-600 text-white'
-                                : 'border-stone-600 hover:border-stone-500'
-                            }`}
-                            aria-label={restaurant.visited ? 'Marcar como no visitado' : 'Marcar como visitado'}
-                          >
-                            {restaurant.visited && <Check className="w-3 h-3" />}
-                          </button>
-                        </div>
-                        {restaurant.notes && (
-                          <p className="text-sm text-muted-foreground mt-2">{restaurant.notes}</p>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="food" className="space-y-8">
+        <div className="space-y-8">
             <div className="mb-6">
               <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -606,69 +308,8 @@ export default function Restaurants() {
                 </div>
               ))
             )}
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">Añadir Restaurante</DialogTitle>
-            <div className="sr-only">Formulario para añadir un nuevo restaurante</div>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre</label>
-               <Input
-                 placeholder="Nombre del restaurante"
-                 value={formData.name}
-                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                 className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Ciudad</label>
-               <Input
-                 placeholder="ej. Osaka"
-                 value={formData.city}
-                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                 className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-               />
-              </div>
-              <div>
-               <label className="text-sm font-medium text-foreground mb-1.5 block">Tipo de cocina</label>
-               <Input
-                 placeholder="ej. Ramen, Sushi"
-                 value={formData.cuisine}
-                 onChange={(e) => setFormData({ ...formData, cuisine: e.target.value })}
-                 className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-               />
-              </div>
-              <div>
-               <label className="text-sm font-medium text-foreground mb-1.5 block">Notas</label>
-               <Textarea
-                 placeholder="Notas sobre este lugar..."
-                 value={formData.notes}
-                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                 rows={3}
-                 className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                Cancelar
-              </Button>
-              <Button 
-                onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.name.trim() || createMutation.isPending}
-              >
-                {createMutation.isPending ? 'Guardando...' : 'Guardar'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={editFoodDialogOpen} onOpenChange={setEditFoodDialogOpen}>
         <DialogContent className="bg-card border-border">

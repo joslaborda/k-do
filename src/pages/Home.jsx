@@ -9,7 +9,7 @@ import { es } from 'date-fns/locale';
 import { 
   MapPin, Calendar, Plane, UtensilsCrossed, Receipt, 
   Package, Info, CheckCircle2, Clock, TrendingUp,
-  ArrowRight, Search, Languages
+  ArrowRight, Search, Languages, BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,6 +72,7 @@ export default function Home() {
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
     { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
     { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
+    { name: 'Diario', page: 'Diary', icon: Calendar, color: 'from-purple-500 to-pink-500', emoji: '📔' },
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
     { name: 'Translate', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🌐' },
   ];

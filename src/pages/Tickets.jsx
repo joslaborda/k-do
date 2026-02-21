@@ -28,6 +28,7 @@ const categories = [
   { value: 'hotel', label: 'Hoteles', icon: Hotel },
   { value: 'freetour', label: 'Free Tours', icon: FileText },
   { value: 'insurance', label: 'Seguro', icon: Shield },
+  { value: 'personal', label: 'Documentos Personales', icon: FileText },
 ];
 
 export default function Tickets() {

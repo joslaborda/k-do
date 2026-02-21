@@ -28,7 +28,10 @@ export default function Packing() {
 
   const { data: items = [] } = useQuery({
     queryKey: ['packingItems'],
-    queryFn: () => base44.entities.PackingItem.list(),
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      return base44.entities.PackingItem.filter({ created_by: user.email });
+    },
   });
 
   const createMutation = useMutation({
