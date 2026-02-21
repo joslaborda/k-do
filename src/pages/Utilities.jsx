@@ -304,13 +304,13 @@ export default function Utilities() {
                 <p className="text-muted-foreground">Añade información útil como números de emergencia o embajadas</p>
               </div> :
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {infoCategories.map((category) => {
                 const categoryInfos = groupedInfos[category.value] || [];
                 if (categoryInfos.length === 0) return null;
 
                 return (
-                  <div key={category.value} className="glass border-2 border-border rounded-3xl p-6 hover:shadow-xl transition-all">
+                  <div key={category.value} className="bg-white p-4 rounded-2xl border border-border hover:shadow-lg transition-all">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-3xl">{category.icon}</span>
                       <h3 className="text-xl font-bold text-foreground">{category.label}</h3>
