@@ -73,9 +73,9 @@ export default function Restaurants() {
   useEffect(() => {
     const initializeFoodItems = async () => {
       if (customFoodItems.length === 0) {
-        const itemsToCreate = japaneseFoodTypes.map((food) => ({
+        const itemsToCreate = sushiFoodTypes.map((food) => ({
           name: food.name,
-          category: food.category,
+          category: '🍣 Sushi y Sashimi',
           description: food.description,
           default_image: food.image,
           image_url: food.image
