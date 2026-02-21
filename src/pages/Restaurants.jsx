@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, BookOpen, Image as ImageIcon } from 'lucide-react';
+import { Plus, Search, BookOpen, Image as ImageIcon, ChevronDown } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger } from
+'@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,6 +66,7 @@ export default function Restaurants() {
   const [editFoodDialogOpen, setEditFoodDialogOpen] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
   const [customImageUrl, setCustomImageUrl] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState({ '🍣 Sushi y Sashimi': true });
 
   const queryClient = useQueryClient();
 

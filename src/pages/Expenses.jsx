@@ -187,10 +187,10 @@ export default function Expenses() {
                   👁️ Todos
                 </TabsTrigger>
                 <TabsTrigger value="José" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  🧑 José
+                  💪🏻 José
                 </TabsTrigger>
                 <TabsTrigger value="Carlos" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  👨 Carlos
+                  🧜🏻‍♀️ Carlos
                 </TabsTrigger>
               </TabsList>
             </Tabs>
