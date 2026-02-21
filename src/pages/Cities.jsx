@@ -32,8 +32,11 @@ const cityCoordinates = {
 };
 
 export default function Cities() {
-  const queryClient = useQueryClient();
-  const { performDelete } = useUndo();
+   const urlParams = new URLSearchParams(window.location.search);
+   const tripId = urlParams.get('trip_id');
+
+   const queryClient = useQueryClient();
+   const { performDelete } = useUndo();
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['cities'] });
