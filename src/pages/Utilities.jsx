@@ -286,10 +286,10 @@ export default function Utilities() {
                 <p className="text-muted-foreground">Teléfonos, embajadas, contactos de emergencia y más</p>
               </div>
               <Button
-                onClick={() => setDialogOpen(true)}
-                className="bg-orange-600 hover:bg-orange-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Añadir
+               onClick={() => setDialogOpen(true)}
+               className="bg-green-600 hover:bg-green-700">
+               <Plus className="w-4 h-4 mr-2" />
+               Añadir
               </Button>
             </div>
 
