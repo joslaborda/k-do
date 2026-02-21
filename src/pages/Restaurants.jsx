@@ -263,11 +263,11 @@ export default function Restaurants() {
               <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar tipo de comida..."
-                  value={foodSearchQuery}
-                  onChange={(e) => setFoodSearchQuery(e.target.value)}
-                  className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
-                />
+                placeholder="Buscar tipo de comida..."
+                value={foodSearchQuery}
+                onChange={(e) => setFoodSearchQuery(e.target.value)} className="bg-zinc-50 text-foreground pl-10 px-3 py-1 text-base rounded-md flex h-9 w-full border shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm border-border placeholder:text-muted-foreground" />
+
+
 
 
               </div>
