@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -19,37 +19,28 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
-  const queryClient = useQueryClient();
-
-  // Obtener o crear el viaje a Japón
-  const { data: trip, isLoading: tripLoading } = useQuery({
-    queryKey: ['japanTrip'],
-    queryFn: async () => {
-      const trips = await base44.entities.Trip.list();
-      let japanTrip = trips.find(t => t.destination?.toLowerCase().includes('japón') || t.destination?.toLowerCase().includes('japan'));
-      
-      // Si no existe, crear el viaje a Japón
-      if (!japanTrip) {
-        japanTrip = await base44.entities.Trip.create({
-          name: 'Japón 2026',
-          destination: 'Tokio',
-          country: 'Japón',
-          start_date: '2026-03-04',
-          end_date: '2026-03-19',
-          description: 'Una aventura única de 16 días explorando la cultura, tradición y gastronomía japonesa',
-          currency: 'JPY',
-          members: [(await base44.auth.me()).email]
-        });
-      }
-      return japanTrip;
-    },
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (trip?.id) {
-      setTripId(trip.id);
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('trip_id');
+    
+    if (!id || id === 'null' || id === 'default') {
+      navigate(createPageUrl('TripsList'), { replace: true });
+      return;
     }
-  }, [trip]);
+    
+    setTripId(id);
+  }, [navigate]);
+
+  const { data: trip, isLoading: tripLoading } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: async () => {
+      if (!tripId) return null;
+      return base44.entities.Trip.get(tripId);
+    },
+    enabled: !!tripId
+  });
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities', tripId],
@@ -75,8 +66,8 @@ export default function Home() {
     enabled: !!tripId
   });
 
-  const tripStart = trip?.start_date ? new Date(trip.start_date) : new Date('2026-03-04');
-  const tripEnd = trip?.end_date ? new Date(trip.end_date) : new Date('2026-03-19');
+  const tripStart = trip?.start_date ? new Date(trip.start_date) : new Date();
+  const tripEnd = trip?.end_date ? new Date(trip.end_date) : new Date();
   const today = new Date();
   const daysUntilTrip = differenceInDays(tripStart, today);
   const tripDuration = differenceInDays(tripEnd, tripStart) + 1;
@@ -108,15 +99,16 @@ export default function Home() {
     { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
     { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
     { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
+    { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
   ];
 
-  if (tripLoading) {
+  if (tripLoading || !tripId) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🌸</div>
-          <p className="text-muted-foreground">Preparando tu viaje a Japón...</p>
+          <p className="text-muted-foreground">Cargando viaje...</p>
         </div>
       </div>
     );
@@ -130,11 +122,19 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-900/50" />
         
         <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
-          {/* Header con Search */}
-          <div className="flex items-center justify-end mb-8">
+          {/* Header con botón a TripsList y Search */}
+          <div className="flex items-center justify-between mb-8">
+            <Link 
+              to={createPageUrl('TripsList')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors text-white"
+            >
+              <ArrowRight className="w-4 h-4 rotate-180" />
+              <span className="text-sm font-medium">Todos mis viajes</span>
+            </Link>
+            
             <button
               onClick={() => setSearchOpen(true)}
-              className="relative w-full max-w-md"
+              className="relative w-full max-w-md ml-4"
             >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
               <div className="w-full pl-12 pr-4 py-3 bg-white/20 border border-white/30 text-white/60 placeholder:text-white/60 backdrop-blur-sm rounded-lg text-left hover:bg-white/30 transition-colors">
@@ -176,7 +176,7 @@ export default function Home() {
             </div>
 
             {/* Stats Cards */}
-            {citiesLoading || expensesLoading || packingLoading || diaryLoading ? (
+            {tripLoading || citiesLoading || expensesLoading || packingLoading || diaryLoading ? (
               <div className="grid grid-cols-2 gap-4">
                 {[1,2,3,4].map(i => (
                   <div key={i} className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30 animate-pulse">
