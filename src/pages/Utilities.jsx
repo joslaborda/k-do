@@ -13,62 +13,62 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 
 const infoCategories = [
-  { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
-  { value: 'apps', label: 'Apps útiles', icon: '📱' },
-  { value: 'transporte', label: 'Transporte', icon: '🚇' },
-  { value: 'contactos', label: 'Contactos', icon: '📞' },
-  { value: 'otros', label: 'Otros', icon: '💡' },
-];
+{ value: 'emergencia', label: 'Emergencia', icon: '🚨' },
+{ value: 'apps', label: 'Apps útiles', icon: '📱' },
+{ value: 'transporte', label: 'Transporte', icon: '🚇' },
+{ value: 'contactos', label: 'Contactos', icon: '📞' },
+{ value: 'otros', label: 'Otros', icon: '💡' }];
+
 
 const packingCategories = [
-  { value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
-  { value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
-  { value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
-  { value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-amber-500 to-orange-500' },
-  { value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' },
-];
+{ value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
+{ value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
+{ value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
+{ value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-amber-500 to-orange-500' },
+{ value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' }];
+
 
 const phraseCategories = [
-  {
-    name: 'Básicas',
-    icon: '👋',
-    phrases: [
-      { spanish: 'Hola', japanese: 'こんにちは', romaji: 'Konnichiwa' },
-      { spanish: 'Gracias', japanese: 'ありがとうございます', romaji: 'Arigatou gozaimasu' },
-      { spanish: 'Por favor', japanese: 'お願いします', romaji: 'Onegaishimasu' },
-      { spanish: 'Disculpe', japanese: 'すみません', romaji: 'Sumimasen' },
-    ]
-  },
-  {
-    name: 'Restaurante',
-    icon: '🍜',
-    phrases: [
-      { spanish: '¿Puedo tener agua?', japanese: 'お水をください', romaji: 'Omizu wo kudasai' },
-      { spanish: 'La cuenta, por favor', japanese: 'お会計お願いします', romaji: 'Okaikei onegaishimasu' },
-      { spanish: 'Esto está delicioso', japanese: 'おいしいです', romaji: 'Oishii desu' },
-    ]
-  },
-  {
-    name: 'Direcciones',
-    icon: '🗺️',
-    phrases: [
-      { spanish: '¿Dónde está el baño?', japanese: 'トイレはどこですか？', romaji: 'Toire wa doko desu ka?' },
-      { spanish: '¿Dónde está la estación?', japanese: '駅はどこですか？', romaji: 'Eki wa doko desu ka?' },
-      { spanish: 'Estoy perdido', japanese: '道に迷いました', romaji: 'Michi ni mayoimashita' },
-    ]
-  },
-];
+{
+  name: 'Básicas',
+  icon: '👋',
+  phrases: [
+  { spanish: 'Hola', japanese: 'こんにちは', romaji: 'Konnichiwa' },
+  { spanish: 'Gracias', japanese: 'ありがとうございます', romaji: 'Arigatou gozaimasu' },
+  { spanish: 'Por favor', japanese: 'お願いします', romaji: 'Onegaishimasu' },
+  { spanish: 'Disculpe', japanese: 'すみません', romaji: 'Sumimasen' }]
+
+},
+{
+  name: 'Restaurante',
+  icon: '🍜',
+  phrases: [
+  { spanish: '¿Puedo tener agua?', japanese: 'お水をください', romaji: 'Omizu wo kudasai' },
+  { spanish: 'La cuenta, por favor', japanese: 'お会計お願いします', romaji: 'Okaikei onegaishimasu' },
+  { spanish: 'Esto está delicioso', japanese: 'おいしいです', romaji: 'Oishii desu' }]
+
+},
+{
+  name: 'Direcciones',
+  icon: '🗺️',
+  phrases: [
+  { spanish: '¿Dónde está el baño?', japanese: 'トイレはどこですか？', romaji: 'Toire wa doko desu ka?' },
+  { spanish: '¿Dónde está la estación?', japanese: '駅はどこですか？', romaji: 'Eki wa doko desu ka?' },
+  { spanish: 'Estoy perdido', japanese: '道に迷いました', romaji: 'Michi ni mayoimashita' }]
+
+}];
+
 
 export default function Utilities() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -88,29 +88,29 @@ export default function Utilities() {
     category: 'emergencia',
     content: '',
     link: '',
-    icon: '📌',
+    icon: '📌'
   });
   const [packingFormData, setPackingFormData] = useState({
     name: '',
     category: 'personal',
-    quantity: 1,
+    quantity: 1
   });
 
   const queryClient = useQueryClient();
 
   const { data: infos = [] } = useQuery({
     queryKey: ['usefulInfo'],
-    queryFn: () => base44.entities.UsefulInfo.list(),
+    queryFn: () => base44.entities.UsefulInfo.list()
   });
 
   const { data: cities = [] } = useQuery({
     queryKey: ['cities'],
-    queryFn: () => base44.entities.City.list('order'),
+    queryFn: () => base44.entities.City.list('order')
   });
 
   const { data: packingItems = [] } = useQuery({
     queryKey: ['packingItems'],
-    queryFn: () => base44.entities.PackingItem.list(),
+    queryFn: () => base44.entities.PackingItem.list()
   });
 
   const createMutation = useMutation({
@@ -119,12 +119,12 @@ export default function Utilities() {
       queryClient.invalidateQueries({ queryKey: ['usefulInfo'] });
       setDialogOpen(false);
       setFormData({ title: '', category: 'emergencia', content: '', link: '', icon: '📌' });
-    },
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.UsefulInfo.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['usefulInfo'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['usefulInfo'] })
   });
 
   const createPackingMutation = useMutation({
@@ -133,17 +133,17 @@ export default function Utilities() {
       queryClient.invalidateQueries({ queryKey: ['packingItems'] });
       setPackingDialogOpen(false);
       setPackingFormData({ name: '', category: 'personal', quantity: 1 });
-    },
+    }
   });
 
   const togglePackedMutation = useMutation({
     mutationFn: ({ id, packed }) => base44.entities.PackingItem.update(id, { packed }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] })
   });
 
   const deletePackingMutation = useMutation({
     mutationFn: (id) => base44.entities.PackingItem.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] })
   });
 
   // Obtener tasa de cambio
@@ -206,8 +206,8 @@ export default function Utilities() {
   }, {});
 
   const totalPackingItems = packingItems.length;
-  const packedCount = packingItems.filter(i => i.packed).length;
-  const packingProgress = totalPackingItems > 0 ? Math.round((packedCount / totalPackingItems) * 100) : 0;
+  const packedCount = packingItems.filter((i) => i.packed).length;
+  const packingProgress = totalPackingItems > 0 ? Math.round(packedCount / totalPackingItems * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -247,18 +247,18 @@ export default function Utilities() {
               <h2 className="text-2xl font-bold text-foreground mb-2">Clima actual</h2>
               <p className="text-muted-foreground">Pronóstico del tiempo en tiempo real</p>
             </div>
-            {cities.length === 0 ? (
-              <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            {cities.length === 0 ?
+            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
                 <Cloud className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Añade ciudades primero en la sección Ruta</p>
+              </div> :
+
+            <div className="grid md:grid-cols-2 gap-6">
+                {cities.map((city) =>
+              <WeatherCard key={city.id} city={city} />
+              )}
               </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {cities.map((city) => (
-                  <WeatherCard key={city.id} city={city} />
-                ))}
-              </div>
-            )}
+            }
           </TabsContent>
 
           {/* Conversión moneda */}
@@ -267,13 +267,13 @@ export default function Utilities() {
               <div className="max-w-md mx-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
-                  {loadingRate ? (
-                    <p className="text-muted-foreground">Cargando tasa de cambio...</p>
-                  ) : (
-                    <p className="text-muted-foreground">
+                  {loadingRate ?
+                  <p className="text-muted-foreground">Cargando tasa de cambio...</p> :
+
+                  <p className="text-muted-foreground">
                       1 EUR = <span className="font-bold text-foreground">{exchangeRate?.toFixed(2)} JPY</span>
                     </p>
-                  )}
+                  }
                 </div>
 
                 <div className="space-y-6">
@@ -286,8 +286,8 @@ export default function Utilities() {
                         placeholder="0"
                         value={jpyAmount}
                         onChange={(e) => handleJpyChange(e.target.value)}
-                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground"
-                      />
+                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
                     </div>
                   </div>
 
@@ -306,15 +306,15 @@ export default function Utilities() {
                         placeholder="0"
                         value={eurAmount}
                         onChange={(e) => handleEurChange(e.target.value)}
-                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground"
-                      />
+                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-8 p-4 bg-green-900/30 border border-green-700 rounded-xl">
-                  <p className="text-sm text-green-300">
-                    💡 La tasa de cambio se actualiza automáticamente al cargar esta página
+                <div className="bg-gray-100 mt-8 p-4 opacity-100 rounded-xl border border-green-700">
+                  <p className="text-[#276d18] text-sm opacity-100">💡 La tasa de cambio se actualiza automáticamente al cargar esta página
+
                   </p>
                 </div>
               </div>
@@ -332,48 +332,48 @@ export default function Utilities() {
               </div>
               <Button
                 onClick={() => setPackingDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700"
-              >
+                className="bg-green-600 hover:bg-green-700">
+
                 <Plus className="w-4 h-4 mr-2" />
                 Añadir
               </Button>
             </div>
 
             {/* Progress Bar */}
-            {totalPackingItems > 0 && (
-              <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-primary-foreground mb-6">
+            {totalPackingItems > 0 &&
+            <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-primary-foreground mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium opacity-90">Progreso total</span>
                   <span className="text-4xl font-bold">{packingProgress}%</span>
                 </div>
                 <div className="h-4 bg-white/20 rounded-full overflow-hidden backdrop-blur">
-                  <div 
-                    className="h-full bg-white transition-all duration-500 rounded-full"
-                    style={{ width: `${packingProgress}%` }}
-                  />
+                  <div
+                  className="h-full bg-white transition-all duration-500 rounded-full"
+                  style={{ width: `${packingProgress}%` }} />
+
                 </div>
               </div>
-            )}
+            }
 
-            {totalPackingItems === 0 ? (
-              <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            {totalPackingItems === 0 ?
+            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
                 <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Empieza añadiendo artículos a tu maleta</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {packingCategories.map((cat) => {
-                  const categoryItems = groupedPackingItems[cat.value] || [];
-                  const packedCategoryCount = categoryItems.filter(i => i.packed).length;
-                  const categoryProgress = categoryItems.length > 0 
-                    ? Math.round((packedCategoryCount / categoryItems.length) * 100) 
-                    : 0;
+              </div> :
 
-                  return (
-                    <div 
-                      key={cat.value} 
-                      className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all"
-                    >
+            <div className="grid md:grid-cols-2 gap-6">
+                {packingCategories.map((cat) => {
+                const categoryItems = groupedPackingItems[cat.value] || [];
+                const packedCategoryCount = categoryItems.filter((i) => i.packed).length;
+                const categoryProgress = categoryItems.length > 0 ?
+                Math.round(packedCategoryCount / categoryItems.length * 100) :
+                0;
+
+                return (
+                  <div
+                    key={cat.value}
+                    className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
+
                       {/* Category Header */}
                       <div className={`bg-gradient-to-r ${cat.color} p-6 text-white`}>
                         <div className="flex items-center gap-3 mb-3">
@@ -387,81 +387,81 @@ export default function Utilities() {
                           <div className="text-3xl font-bold">{categoryProgress}%</div>
                         </div>
                         <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-white transition-all duration-500 rounded-full"
-                            style={{ width: `${categoryProgress}%` }}
-                          />
+                          <div
+                          className="h-full bg-white transition-all duration-500 rounded-full"
+                          style={{ width: `${categoryProgress}%` }} />
+
                         </div>
                       </div>
 
                       {/* Items List */}
                       <div className="p-4 space-y-2">
-                        {categoryItems.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8 text-sm">
+                        {categoryItems.length === 0 ?
+                      <p className="text-center text-muted-foreground py-8 text-sm">
                               Sin artículos
-                            </p>
-                        ) : (
-                          categoryItems.map((item) => (
-                            <div
-                              key={item.id}
-                              className={`group flex items-center gap-3 p-3 rounded-xl transition-all ${
-                                item.packed
-                                  ? 'bg-green-600/20'
-                                  : 'bg-secondary/50 hover:bg-secondary'
-                              }`}
-                            >
+                            </p> :
+
+                      categoryItems.map((item) =>
+                      <div
+                        key={item.id}
+                        className={`group flex items-center gap-3 p-3 rounded-xl transition-all ${
+                        item.packed ?
+                        'bg-green-600/20' :
+                        'bg-secondary/50 hover:bg-secondary'}`
+                        }>
+
                               <Checkbox
-                                checked={item.packed}
-                                onCheckedChange={(checked) =>
-                                  togglePackedMutation.mutate({ id: item.id, packed: checked })
-                                }
-                                className="h-5 w-5"
-                              />
+                          checked={item.packed}
+                          onCheckedChange={(checked) =>
+                          togglePackedMutation.mutate({ id: item.id, packed: checked })
+                          }
+                          className="h-5 w-5" />
+
                               <div className="flex-1 min-w-0">
                                 <p className={`font-medium truncate ${
-                                  item.packed 
-                                    ? 'text-muted-foreground line-through' 
-                                    : 'text-foreground'
-                                }`}>
+                          item.packed ?
+                          'text-muted-foreground line-through' :
+                          'text-foreground'}`
+                          }>
                                   {item.name}
-                                  {item.quantity > 1 && (
-                                    <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>
-                                  )}
+                                  {item.quantity > 1 &&
+                            <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>
+                            }
                                 </p>
                               </div>
                               <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => deletePackingMutation.mutate(item.id)}
-                                className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity"
-                              >
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deletePackingMutation.mutate(item.id)}
+                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity">
+
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
-                          ))
-                        )}
+                      )
+                      }
                       </div>
 
                       {/* Add button in category */}
                       <div className="p-4 pt-0">
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setPackingFormData({ ...packingFormData, category: cat.value });
-                            setPackingDialogOpen(true);
-                          }}
-                          className="w-full border-dashed border-border text-foreground hover:bg-secondary/50"
-                        >
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setPackingFormData({ ...packingFormData, category: cat.value });
+                          setPackingDialogOpen(true);
+                        }}
+                        className="w-full border-dashed border-border text-foreground hover:bg-secondary/50">
+
                           <Plus className="w-4 h-4 mr-2" />
                           Añadir a {cat.label}
                         </Button>
                       </div>
-                    </div>
-                  );
-                })}
+                    </div>);
+
+              })}
               </div>
-            )}
+            }
           </TabsContent>
 
           {/* Diario */}
@@ -470,10 +470,10 @@ export default function Utilities() {
               <div className="text-6xl mb-4">📔</div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Diario de Viaje</h2>
               <p className="text-muted-foreground mb-6">Accede al diario completo desde el menú principal</p>
-              <Button 
+              <Button
                 onClick={() => window.location.href = '/Diary'}
-                className="bg-primary hover:bg-primary/90"
-              >
+                className="bg-primary hover:bg-primary/90">
+
                 Ir al Diario
               </Button>
             </div>
@@ -494,8 +494,8 @@ export default function Utilities() {
                 placeholder="ej. Policía Japón"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
@@ -504,11 +504,11 @@ export default function Utilities() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {infoCategories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
+                  {infoCategories.map((cat) =>
+                  <SelectItem key={cat.value} value={cat.value}>
                       {cat.icon} {cat.label}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -519,8 +519,8 @@ export default function Utilities() {
                 value={formData.icon}
                 onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                 maxLength={2}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Contenido</label>
@@ -529,8 +529,8 @@ export default function Utilities() {
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={3}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Enlace (opcional)</label>
@@ -538,8 +538,8 @@ export default function Utilities() {
                 placeholder="https://..."
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
@@ -548,8 +548,8 @@ export default function Utilities() {
               <Button
                 onClick={handleSubmit}
                 className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}
-              >
+                disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}>
+
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
@@ -570,8 +570,8 @@ export default function Utilities() {
                 placeholder="ej. Camisetas"
                 value={packingFormData.name}
                 onChange={(e) => setPackingFormData({ ...packingFormData, name: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
@@ -580,11 +580,11 @@ export default function Utilities() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {packingCategories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
+                  {packingCategories.map((cat) =>
+                  <SelectItem key={cat.value} value={cat.value}>
                       {cat.icon} {cat.label}
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -595,8 +595,8 @@ export default function Utilities() {
                 min="1"
                 value={packingFormData.quantity}
                 onChange={(e) => setPackingFormData({ ...packingFormData, quantity: parseInt(e.target.value) || 1 })}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setPackingDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
@@ -605,14 +605,14 @@ export default function Utilities() {
               <Button
                 onClick={() => createPackingMutation.mutate(packingFormData)}
                 className="bg-green-600 hover:bg-green-700"
-                disabled={!packingFormData.name.trim() || createPackingMutation.isPending}
-              >
+                disabled={!packingFormData.name.trim() || createPackingMutation.isPending}>
+
                 {createPackingMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
