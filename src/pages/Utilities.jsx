@@ -279,7 +279,7 @@ export default function Utilities() {
                 🧳 Maleta
               </TabsTrigger>
               <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                ⚠️ Información
+                🚨 Emergencias
               </TabsTrigger>
             </TabsList>
 
