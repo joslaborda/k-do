@@ -33,10 +33,11 @@ const cityImages = {
 };
 
 export default function CityDetail() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const cityId = urlParams.get('id');
-  
-  const [dialogOpen, setDialogOpen] = useState(false);
+   const urlParams = new URLSearchParams(window.location.search);
+   const cityId = urlParams.get('id');
+   const tripId = urlParams.get('trip_id');
+
+   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState(null);
   const [expandedDays, setExpandedDays] = useState({});
   const [formData, setFormData] = useState({ title: '', date: '', content: '' });
