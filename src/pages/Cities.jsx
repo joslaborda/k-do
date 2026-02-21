@@ -99,22 +99,16 @@ export default function Cities() {
   return (
     <div className="min-h-screen bg-background">
        <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
-       <div className="bg-orange-50 mx-auto px-6 py-12 max-w-6xl">
-         <div className="flex items-center justify-between mb-8">
-           <div>
-             <h1 className="text-slate-800 text-4xl font-bold">Ruta 🗾</h1>
-             <p className="text-slate-800 mt-2">Explora tu itinerario por Japón</p>
-          </div>
-        </div>
+       
+       {/* Header con caja naranja */}
+       <div className="bg-orange-700 pt-12 pb-20">
+         <div className="max-w-6xl mx-auto px-6">
+           <h1 className="text-white text-4xl font-bold">Ruta 🗾</h1>
+           <p className="text-white/90 mt-2">Explora tu itinerario por Japón</p>
+         </div>
+       </div>
 
-        {/* Header naranja */}
-        <div className="bg-orange-700 text-white rounded-2xl p-6 mb-8 shadow-lg">
-          <h3 className="text-xl font-bold mb-2">🗺️ Tu itinerario por Japón</h3>
-          <p className="text-white/90">
-            Descubre las ciudades increíbles en tu ruta. 
-            Haz clic en cualquier ciudad para ver los detalles de tu itinerario.
-          </p>
-        </div>
+       <div className="bg-orange-50 mx-auto px-6 py-12 max-w-6xl -mt-12">
 
         {isLoading ?
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
