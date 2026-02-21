@@ -287,7 +287,7 @@ export default function Utilities() {
           <TabsContent value="info" className="space-y-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Información de Utilidad</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Emergencias y Contactos</h2>
                 <p className="text-muted-foreground">Teléfonos, embajadas, contactos de emergencia y más</p>
               </div>
               <Button
