@@ -184,13 +184,13 @@ export default function Expenses() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
               <TabsList className="bg-white border border-border p-1">
                 <TabsTrigger value="all" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  Todos
+                  👁️ Todos
                 </TabsTrigger>
                 <TabsTrigger value="José" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  José
+                  🧑 José
                 </TabsTrigger>
                 <TabsTrigger value="Carlos" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  Carlos
+                  👨 Carlos
                 </TabsTrigger>
               </TabsList>
             </Tabs>

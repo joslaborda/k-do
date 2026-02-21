@@ -207,11 +207,10 @@ export default function Diary() {
           <Tabs defaultValue="list" className="mb-6">
             <TabsList className="bg-white border border-border p-1">
               <TabsTrigger value="list" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                Lista
+                📋 Lista
               </TabsTrigger>
               <TabsTrigger value="photos" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white gap-2">
-                <ImageIcon className="w-4 h-4" />
-                Galería de fotos
+                🖼️ Galería
               </TabsTrigger>
             </TabsList>
 
