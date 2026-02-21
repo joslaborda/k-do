@@ -59,6 +59,8 @@ import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
 import Utilities from './pages/Utilities';
+import TripsList from './pages/TripsList';
+import TripDetail from './pages/TripDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +77,8 @@ export const PAGES = {
     "Tickets": Tickets,
     "Translator": Translator,
     "Utilities": Utilities,
+    "TripsList": TripsList,
+    "TripDetail": TripDetail,
 }
 
 export const pagesConfig = {
