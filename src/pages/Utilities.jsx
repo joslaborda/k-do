@@ -235,19 +235,21 @@ export default function Utilities() {
       {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-white border border-border">
+            <TabsList className="grid w-full grid-cols-5 bg-white border border-border">
+              <TabsTrigger value="info" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+                ⚠️ Información
+              </TabsTrigger>
               <TabsTrigger value="weather" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                Clima
+                ☁️ Clima
               </TabsTrigger>
               <TabsTrigger value="currency" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                <DollarSign className="w-4 h-4 mr-2" />
-                Moneda
+                💱 Moneda
               </TabsTrigger>
               <TabsTrigger value="packing" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                Maleta
+                🧳 Maleta
               </TabsTrigger>
               <TabsTrigger value="diary" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                Diario
+                📔 Diario
               </TabsTrigger>
             </TabsList>
 
