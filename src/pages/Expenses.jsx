@@ -182,7 +182,7 @@ export default function Expenses() {
           {/* Expenses List */}
           <div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="glass border border-border p-1">
+              <TabsList className="bg-white border border-border p-1">
                 <TabsTrigger value="all" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                   Todos
                 </TabsTrigger>

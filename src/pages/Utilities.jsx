@@ -223,20 +223,20 @@ export default function Utilities() {
       {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs defaultValue="weather" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 glass border border-border">
-              <TabsTrigger value="weather" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+            <TabsList className="grid w-full grid-cols-4 bg-white border border-border">
+              <TabsTrigger value="weather" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                 <Cloud className="w-4 h-4 mr-2" />
                 Clima
               </TabsTrigger>
-              <TabsTrigger value="currency" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+              <TabsTrigger value="currency" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                 <DollarSign className="w-4 h-4 mr-2" />
                 Moneda
               </TabsTrigger>
-              <TabsTrigger value="packing" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+              <TabsTrigger value="packing" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                 <Package className="w-4 h-4 mr-2" />
                 Maleta
               </TabsTrigger>
-              <TabsTrigger value="diary" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+              <TabsTrigger value="diary" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                 <BookOpen className="w-4 h-4 mr-2" />
                 Diario
               </TabsTrigger>
