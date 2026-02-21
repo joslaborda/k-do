@@ -12,15 +12,15 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DialogTitle } from
+'@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  SelectValue } from
+'@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalanceSummary from '@/components/expenses/BalanceSummary';
@@ -28,13 +28,13 @@ import ExpenseChart from '@/components/expenses/ExpenseChart';
 import TricountBalance from '@/components/expenses/TricountBalance';
 
 const categories = [
-  { value: 'food', label: 'Comida', icon: Utensils },
-  { value: 'transport', label: 'Transporte', icon: Train },
-  { value: 'accommodation', label: 'Alojamiento', icon: Hotel },
-  { value: 'activities', label: 'Actividades', icon: Ticket },
-  { value: 'shopping', label: 'Compras', icon: ShoppingBag },
-  { value: 'other', label: 'Otro', icon: MoreHorizontal },
-];
+{ value: 'food', label: 'Comida', icon: Utensils },
+{ value: 'transport', label: 'Transporte', icon: Train },
+{ value: 'accommodation', label: 'Alojamiento', icon: Hotel },
+{ value: 'activities', label: 'Actividades', icon: Ticket },
+{ value: 'shopping', label: 'Compras', icon: ShoppingBag },
+{ value: 'other', label: 'Otro', icon: MoreHorizontal }];
+
 
 export default function Expenses() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function Expenses() {
     split_with: ['Carlos'],
     category: 'food',
     date: new Date().toISOString().split('T')[0],
-    receipt_photos: [],
+    receipt_photos: []
   });
 
   const queryClient = useQueryClient();
@@ -63,13 +63,13 @@ export default function Expenses() {
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses'],
     queryFn: () => base44.entities.Expense.list('-date'),
-    staleTime: 10000, // Cache por 10 segundos
+    staleTime: 10000 // Cache por 10 segundos
   });
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Expense.create({
       ...data,
-      amount: parseFloat(data.amount) || 0,
+      amount: parseFloat(data.amount) || 0
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
@@ -82,9 +82,9 @@ export default function Expenses() {
         split_with: ['Carlos'],
         category: 'food',
         date: new Date().toISOString().split('T')[0],
-        receipt_photos: [],
+        receipt_photos: []
       });
-    },
+    }
   });
 
   const handlePhotoUpload = async (e) => {
@@ -114,7 +114,7 @@ export default function Expenses() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Expense.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] })
   });
 
   const handleDelete = async (expense) => {
@@ -123,7 +123,7 @@ export default function Expenses() {
     delete expenseData.created_date;
     delete expenseData.updated_date;
     delete expenseData.created_by;
-    
+
     await performDelete(
       () => deleteMutation.mutateAsync(expense.id),
       () => base44.entities.Expense.create(expenseData),
@@ -134,13 +134,13 @@ export default function Expenses() {
   const handleSplitChange = (checked) => {
     setFormData({
       ...formData,
-      split_with: checked ? ['Carlos'] : [],
+      split_with: checked ? ['Carlos'] : []
     });
   };
 
-  const filteredExpenses = activeTab === 'all' 
-    ? expenses 
-    : expenses.filter(e => e.paid_by === activeTab);
+  const filteredExpenses = activeTab === 'all' ?
+  expenses :
+  expenses.filter((e) => e.paid_by === activeTab);
 
   return (
     <div className="min-h-screen bg-orange-50">
@@ -180,7 +180,7 @@ export default function Expenses() {
           <div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
               <TabsList className="glass border border-border p-1">
-                <TabsTrigger value="all" className="text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <TabsTrigger value="all" className="bg-orange-700 text-muted-foreground px-3 py-1 text-sm font-medium rounded-md inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   Todos
                 </TabsTrigger>
                 <TabsTrigger value="You" className="text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
@@ -192,14 +192,14 @@ export default function Expenses() {
               </TabsList>
             </Tabs>
 
-            {isLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : filteredExpenses.length === 0 ? (
-              <div className="text-center py-16 glass rounded-2xl border border-dashed border-border">
+            {isLoading ?
+            <div className="space-y-3">
+                {[1, 2, 3].map((i) =>
+              <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse" />
+              )}
+              </div> :
+            filteredExpenses.length === 0 ?
+            <div className="bg-[#ffffff] py-16 text-center rounded-2xl glass border border-dashed border-border">
                 <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">Sin gastos todavía</h3>
                 <p className="text-muted-foreground mb-4">Empieza a registrar los gastos del viaje</p>
@@ -207,18 +207,18 @@ export default function Expenses() {
                   <Plus className="w-4 h-4 mr-2" />
                   Añadir primer gasto
                 </Button>
+              </div> :
+
+            <div className="space-y-3">
+                {filteredExpenses.map((expense) =>
+              <ExpenseCard
+                key={expense.id}
+                expense={expense}
+                onDelete={() => handleDelete(expense)} />
+
+              )}
               </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredExpenses.map((expense) => (
-                  <ExpenseCard 
-                    key={expense.id} 
-                    expense={expense}
-                    onDelete={() => handleDelete(expense)}
-                  />
-                ))}
-              </div>
-            )}
+            }
           </div>
         </div>
       </div>
@@ -235,8 +235,8 @@ export default function Expenses() {
                 placeholder="ej. Cena en Ichiran"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-              />
+                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -247,15 +247,15 @@ export default function Expenses() {
                   placeholder="0"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
                 </div>
                 <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda</label>
-                <Select 
+                <Select
                   value={formData.currency}
-                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
-                >
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}>
+
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -271,19 +271,19 @@ export default function Expenses() {
               <label className="text-sm font-medium text-foreground mb-1.5 block">Pagado por</label>
                <div className="flex gap-2">
                  <Button
-                   type="button"
-                   variant={formData.paid_by === 'You' ? 'default' : 'outline'}
-                   onClick={() => setFormData({ ...formData, paid_by: 'You' })}
-                   className={formData.paid_by === 'You' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}
-                >
+                  type="button"
+                  variant={formData.paid_by === 'You' ? 'default' : 'outline'}
+                  onClick={() => setFormData({ ...formData, paid_by: 'You' })}
+                  className={formData.paid_by === 'You' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}>
+
                   Tú
                 </Button>
                 <Button
                   type="button"
                   variant={formData.paid_by === 'Carlos' ? 'default' : 'outline'}
                   onClick={() => setFormData({ ...formData, paid_by: 'Carlos' })}
-                  className={formData.paid_by === 'Carlos' ? 'bg-blue-600 hover:bg-blue-700' : 'border-border text-foreground hover:bg-secondary/50'}
-                >
+                  className={formData.paid_by === 'Carlos' ? 'bg-blue-600 hover:bg-blue-700' : 'border-border text-foreground hover:bg-secondary/50'}>
+
                   Carlos
                 </Button>
               </div>
@@ -293,8 +293,8 @@ export default function Expenses() {
               <Checkbox
                 id="split"
                 checked={formData.split_with.length > 0}
-                onCheckedChange={handleSplitChange}
-              />
+                onCheckedChange={handleSplitChange} />
+
               <label htmlFor="split" className="text-sm text-foreground">
                 Dividir a medias con {formData.paid_by === 'You' ? 'Carlos' : 'ti'}
               </label>
@@ -302,22 +302,22 @@ export default function Expenses() {
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
-              <Select 
+              <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
+                onValueChange={(value) => setFormData({ ...formData, category: value })}>
+
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
+                  {categories.map((cat) =>
+                  <SelectItem key={cat.value} value={cat.value}>
                       <div className="flex items-center gap-2">
                         <cat.icon className="w-4 h-4" />
                         {cat.label}
                       </div>
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -325,36 +325,36 @@ export default function Expenses() {
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
                <Input
-                 type="date"
-                 value={formData.date}
-                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                 className="bg-input border-border text-foreground"
-              />
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Fotos del recibo (opcional)</label>
               <div className="space-y-3">
-                {formData.receipt_photos && formData.receipt_photos.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {formData.receipt_photos.map((photo, idx) => (
-                      <div key={idx} className="relative group">
-                        <img 
-                          src={photo} 
-                          alt="Recibo" 
-                          className="w-full h-24 object-cover rounded-lg border border-border"
-                        />
+                {formData.receipt_photos && formData.receipt_photos.length > 0 &&
+                <div className="grid grid-cols-3 gap-2">
+                    {formData.receipt_photos.map((photo, idx) =>
+                  <div key={idx} className="relative group">
+                        <img
+                      src={photo}
+                      alt="Recibo"
+                      className="w-full h-24 object-cover rounded-lg border border-border" />
+
                         <button
-                          type="button"
-                          onClick={() => removePhoto(idx)}
-                          className="absolute top-1 right-1 p-1 bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
+                      type="button"
+                      onClick={() => removePhoto(idx)}
+                      className="absolute top-1 right-1 p-1 bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+
                           <X className="w-3 h-3 text-white" />
                         </button>
                       </div>
-                    ))}
+                  )}
                   </div>
-                )}
+                }
                 <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
                   <input
                     type="file"
@@ -362,19 +362,19 @@ export default function Expenses() {
                     capture="environment"
                     onChange={handlePhotoUpload}
                     className="hidden"
-                    disabled={uploadingPhoto}
-                  />
-                  {uploadingPhoto ? (
-                    <>
+                    disabled={uploadingPhoto} />
+
+                  {uploadingPhoto ?
+                  <>
                       <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                       <span className="text-sm text-muted-foreground">Subiendo...</span>
-                    </>
-                  ) : (
-                    <>
+                    </> :
+
+                  <>
                       <Camera className="w-5 h-5 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Añadir foto</span>
                     </>
-                  )}
+                  }
                 </label>
               </div>
             </div>
@@ -383,17 +383,17 @@ export default function Expenses() {
               <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 onClick={() => createMutation.mutate(formData)}
                 className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.description.trim() || !formData.amount || createMutation.isPending}
-              >
+                disabled={!formData.description.trim() || !formData.amount || createMutation.isPending}>
+
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
