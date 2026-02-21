@@ -10,10 +10,13 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
+import TripTemplates from '@/components/trip/TripTemplates';
+import { toast } from '@/components/ui/use-toast';
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     destination: '',
@@ -38,10 +41,32 @@ export default function TripsList() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Trip.create({ ...data, members: [user?.email] }),
+    mutationFn: async (data) => {
+      const trip = await base44.entities.Trip.create({ ...data, members: [user?.email] });
+      
+      // Si hay plantilla seleccionada, crear packing items
+      if (selectedTemplate && selectedTemplate.packingItems) {
+        const packingPromises = selectedTemplate.packingItems.map(item =>
+          base44.entities.PackingItem.create({
+            ...item,
+            trip_id: trip.id,
+            user_id: user?.id,
+            packed: false
+          })
+        );
+        await Promise.all(packingPromises);
+        toast({
+          title: "¡Viaje creado! 🎉",
+          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
+        });
+      }
+      
+      return trip;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       setDialogOpen(false);
+      setSelectedTemplate(null);
       setFormData({
         name: '',
         destination: '',
@@ -241,6 +266,18 @@ export default function TripsList() {
                 onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
                 className="bg-input border-border text-foreground"
               />
+            </div>
+
+            <div className="pt-4 border-t border-border">
+              <TripTemplates onSelect={setSelectedTemplate} />
+              {selectedTemplate && (
+                <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                  <p className="text-sm text-primary flex items-center gap-2">
+                    <span>{selectedTemplate.emoji}</span>
+                    <span>Plantilla "{selectedTemplate.name}" seleccionada</span>
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

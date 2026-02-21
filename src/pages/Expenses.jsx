@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalanceSummary from '@/components/expenses/BalanceSummary';
 import ExpenseChart from '@/components/expenses/ExpenseChart';
+import TricountBalance from '@/components/expenses/TricountBalance';
 
 const categories = [
   { value: 'food', label: 'Comida', icon: Utensils },
@@ -129,6 +130,9 @@ export default function Expenses() {
         </div>
 
         <div className="space-y-6">
+          {/* Tricount Balance */}
+          <TricountBalance expenses={expenses} />
+
           {/* Charts */}
           <ExpenseChart expenses={expenses} />
 
