@@ -109,9 +109,14 @@ export default function Utilities() {
     quantity: 1
   });
 
-  const [urlParams] = useQuery(['urlParams'], () => new URLSearchParams(window.location.search), { staleTime: Infinity });
-  const tripId = urlParams?.get('trip_id');
+  const [tripId, setTripId] = useState(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('trip_id');
+    setTripId(id);
+  }, []);
 
   const { data: infos = [] } = useQuery({
     queryKey: ['usefulInfo', tripId],
@@ -123,12 +128,12 @@ export default function Utilities() {
   useEffect(() => {
     if (infos.length === 0 && tripId) {
       const sampleData = [
-        { title: '🚨 Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos', icon: '🚨' },
-        { title: '🏛️ Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
-        { title: '☎️ Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas', link: 'https://www.jnto.go.jp/', icon: '☎️' },
-        { title: '📱 Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público.', link: 'https://maps.google.com', icon: '📱' },
-        { title: '🚇 Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público. Cómprala en cualquier estación o aeropuerto.', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
-        { title: '⚕️ Línea de Urgencias Médicas', category: 'emergencia', content: 'Número: +81-3-5285-8185\nIntérprete disponible 24 horas', icon: '⚕️' }
+        { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos', icon: '🚨' },
+        { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
+        { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas', link: 'https://www.jnto.go.jp/', icon: '☎️' },
+        { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público.', link: 'https://maps.google.com', icon: '📱' },
+        { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público. Cómprala en cualquier estación o aeropuerto.', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
+        { title: 'Línea de Urgencias Médicas', category: 'emergencia', content: 'Número: +81-3-5285-8185\nIntérprete disponible 24 horas', icon: '⚕️' }
       ];
       sampleData.forEach(data => {
         base44.entities.UsefulInfo.create({ ...data, trip_id: tripId });
