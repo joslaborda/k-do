@@ -98,7 +98,7 @@ export default function Restaurants() {
   });
 
   // Mezclar datos por defecto con personalizaciones
-  const mergedFoodTypes = japaneseFoodTypes.map((defaultFood) => {
+  const mergedFoodTypes = sushiFoodTypes.map((defaultFood) => {
     const customItem = customFoodItems.find((item) => item.name === defaultFood.name);
     return customItem ? {
       ...defaultFood,
@@ -108,10 +108,11 @@ export default function Restaurants() {
   });
 
   const mergedGroupedFoodTypes = mergedFoodTypes.reduce((acc, food) => {
-    if (!acc[food.category]) {
-      acc[food.category] = [];
+    const category = '🍣 Sushi y Sashimi';
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[food.category].push(food);
+    acc[category].push({ ...food, category });
     return acc;
   }, {});
 
