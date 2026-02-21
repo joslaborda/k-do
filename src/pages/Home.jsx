@@ -239,8 +239,8 @@ export default function Home() {
 
 
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-blue-500/20 rounded-lg">
-                    <Calendar className="w-4 h-4 text-blue-600" />
+                  <div className="bg-orange-700 p-2 rounded-lg">
+                    <Calendar className="text-zinc-50 lucide lucide-calendar w-4 h-4" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Duración</p>
@@ -253,12 +253,12 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/95 backdrop-blur-md border border-primary/30 rounded-xl p-4 shadow-lg">
+                transition={{ delay: 0.2 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-primary/30 shadow-lg">
+
 
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-primary/20 rounded-lg">
-                      <Clock className="w-4 h-4 text-primary" />
+                    <div className="bg-orange-700 p-2 rounded-lg">
+                      <Clock className="text-zinc-50 lucide lucide-clock w-4 h-4" />
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Comienza en</p>
@@ -272,12 +272,12 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+                  transition={{ delay: 0.3 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+
 
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <Receipt className="w-4 h-4 text-green-600" />
+                    <div className="bg-orange-700 text-orange-700 p-2 rounded-lg">
+                      <Receipt className="text-zinc-50 lucide lucide-receipt w-4 h-4" />
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Gastado</p>
@@ -292,12 +292,12 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+                  transition={{ delay: 0.4 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+
 
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                      <BookOpen className="w-4 h-4 text-purple-600" />
+                    <div className="bg-orange-700 p-2 rounded-lg">
+                      <BookOpen className="text-zinc-50 lucide lucide-book-open w-4 h-4" />
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Recuerdos</p>
