@@ -40,7 +40,7 @@ export default function BalanceSummary({ expenses }) {
     let youOwesJPY = 0;
     let carlosOwesJPY = 0;
 
-    expenses.forEach(expense => {
+    expenses.forEach((expense) => {
       const amount = expense.amount || 0;
       const amountJPY = convertToJPY(amount, expense.currency || 'JPY');
       const splitWith = expense.split_with || [];
@@ -73,22 +73,22 @@ export default function BalanceSummary({ expenses }) {
   const netBalanceEUR = convertToEUR(netBalanceJPY);
 
   return (
-    <div className="glass rounded-2xl p-6 border border-border">
+    <div className="bg-[#ffffff] p-6 rounded-2xl glass border border-border">
        <div className="flex items-center justify-between mb-6">
          <div className="flex items-center gap-2">
            <Scale className="w-5 h-5 text-primary" />
            <h3 className="font-medium text-foreground">Balance del Viaje</h3>
          </div>
-         <button 
-           onClick={fetchExchangeRate}
-           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-           disabled={loadingRate}
-         >
-           {loadingRate ? (
-             <Loader2 className="w-3 h-3 animate-spin" />
-           ) : (
-             <RefreshCw className="w-3 h-3" />
-           )}
+         <button
+          onClick={fetchExchangeRate}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          disabled={loadingRate}>
+
+           {loadingRate ?
+          <Loader2 className="w-3 h-3 animate-spin" /> :
+
+          <RefreshCw className="w-3 h-3" />
+          }
            {exchangeRate && <span>1€ = ¥{exchangeRate.toFixed(1)}</span>}
          </button>
        </div>
@@ -115,43 +115,43 @@ export default function BalanceSummary({ expenses }) {
            </div>
          </div>
         
-        {netBalanceJPY !== 0 && (
-          <div className={`p-4 rounded-xl mt-3 ${netBalanceJPY > 0 ? 'bg-green-600/10 border border-green-600/30' : 'bg-primary/10 border border-primary/30'}`}>
+        {netBalanceJPY !== 0 &&
+        <div className={`p-4 rounded-xl mt-3 ${netBalanceJPY > 0 ? 'bg-green-600/10 border border-green-600/30' : 'bg-primary/10 border border-primary/30'}`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                {netBalanceJPY > 0 ? (
-                  <>
+                {netBalanceJPY > 0 ?
+              <>
                     <TrendingUp className="w-4 h-4 text-green-600" />
                     <span className="text-green-700">Carlos te debe</span>
-                  </>
-                ) : (
-                  <>
+                  </> :
+
+              <>
                     <TrendingDown className="w-4 h-4 text-primary" />
                     <span className="text-primary">Debes a Carlos</span>
                   </>
-                )}
+              }
               </div>
             </div>
             <div className="text-right">
               <p className={`text-2xl font-bold ${netBalanceJPY > 0 ? 'text-green-600' : 'text-primary'}`}>
                 {formatJPY(netBalanceJPY)}
               </p>
-              {netBalanceEUR && (
-                <p className={`text-lg font-semibold mt-1 ${netBalanceJPY > 0 ? 'text-green-700' : 'text-primary/80'}`}>
+              {netBalanceEUR &&
+            <p className={`text-lg font-semibold mt-1 ${netBalanceJPY > 0 ? 'text-green-700' : 'text-primary/80'}`}>
                   {formatEUR(netBalanceEUR)}
                 </p>
-              )}
+            }
             </div>
           </div>
-        )}
+        }
 
-        {netBalanceJPY === 0 && totalSpentJPY > 0 && (
-          <div className="flex items-center justify-center gap-2 p-3 rounded-xl mt-3 bg-secondary border border-border">
+        {netBalanceJPY === 0 && totalSpentJPY > 0 &&
+        <div className="flex items-center justify-center gap-2 p-3 rounded-xl mt-3 bg-secondary border border-border">
             <Scale className="w-4 h-4 text-primary" />
             <span className="text-foreground">¡Todo cuadrado!</span>
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
