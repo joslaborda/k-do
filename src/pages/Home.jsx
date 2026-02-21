@@ -268,23 +268,44 @@ export default function Home() {
                 </motion.div>
               )}
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-green-500/20 rounded-lg">
-                    <Receipt className="w-4 h-4 text-green-600" />
+              <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                      <Receipt className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Gastado</p>
+                      <p className="text-xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Gastado</p>
-                    <p className="text-xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
-                    <p className="text-[10px] text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
+                </motion.div>
+              </Link>
+
+              <Link to={createPageUrl(`Diary?trip_id=${tripId}`)}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <BookOpen className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Recuerdos</p>
+                      <p className="text-xl font-bold text-foreground">{diaryEntries.length} entradas</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </Link>
             </div>
 
             {/* Quick Progress Bar */}
