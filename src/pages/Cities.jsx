@@ -107,18 +107,14 @@ export default function Cities() {
           </div>
         </div>
 
-
-
-        {/* Caja informativa */}
-        {!isLoading && cities.length > 0 && (
-          <div className="bg-orange-700 text-white rounded-2xl p-6 mb-8 shadow-lg">
-            <h3 className="text-xl font-bold mb-2">🗺️ Tu itinerario por Japón</h3>
-            <p className="text-white/90">
-              Descubre {cities.length} {cities.length === 1 ? 'ciudad' : 'ciudades'} increíbles en tu ruta. 
-              Haz clic en cualquier ciudad para ver los detalles de tu itinerario.
-            </p>
-          </div>
-        )}
+        {/* Header naranja */}
+        <div className="bg-orange-700 text-white rounded-2xl p-6 mb-8 shadow-lg">
+          <h3 className="text-xl font-bold mb-2">🗺️ Tu itinerario por Japón</h3>
+          <p className="text-white/90">
+            Descubre las ciudades increíbles en tu ruta. 
+            Haz clic en cualquier ciudad para ver los detalles de tu itinerario.
+          </p>
+        </div>
 
         {isLoading ?
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
