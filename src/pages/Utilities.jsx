@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -72,8 +74,18 @@ const phraseCategories = [
 
 
 export default function Utilities() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [packingDialogOpen, setPackingDialogOpen] = useState(false);
+   const navigate = useNavigate();
+   const [dialogOpen, setDialogOpen] = useState(false);
+   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
+   const [activeTab, setActiveTab] = useState('weather');
+
+   useEffect(() => {
+     if (activeTab === 'diary') {
+       const urlParams = new URLSearchParams(window.location.search);
+       const tripId = urlParams.get('trip_id');
+       navigate(createPageUrl(`Diary?trip_id=${tripId}`));
+     }
+   }, [activeTab, navigate]);
   const [exchangeRate, setExchangeRate] = useState(null);
   const [loadingRate, setLoadingRate] = useState(false);
   const [jpyAmount, setJpyAmount] = useState('');
@@ -222,7 +234,7 @@ export default function Utilities() {
 
       {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
-        <Tabs defaultValue="weather" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 bg-white border border-border">
               <TabsTrigger value="weather" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                 Clima
