@@ -17,7 +17,7 @@ const navItems = [
 ];
 
 // Pages that should NOT show navigation (trip list and migration)
-const pagesWithoutNav = ['TripsList', 'MigrateData', 'TripDetail'];
+const pagesWithoutNav = ['TripsList', 'MigrateData'];
 
 export default function Layout({ children, currentPageName }) {
   const [tripId, setTripId] = useState('default');

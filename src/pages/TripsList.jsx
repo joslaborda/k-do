@@ -132,7 +132,7 @@ export default function TripsList() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trips.map((trip) => (
-              <Link key={trip.id} to={createPageUrl(`TripDetail?id=${trip.id}`)}>
+              <Link key={trip.id} to={createPageUrl(`Home?trip_id=${trip.id}`)}>
                 <div className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group">
                   {/* Cover Image */}
                   <div className="h-48 bg-gradient-to-br from-primary to-orange-600 relative overflow-hidden">
