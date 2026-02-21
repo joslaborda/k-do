@@ -25,7 +25,7 @@ export default function TripsList() {
     end_date: '',
     description: '',
     cover_image: '',
-    currency: 'EUR',
+    currency: 'EUR'
   });
 
   const queryClient = useQueryClient();
@@ -37,30 +37,30 @@ export default function TripsList() {
 
   const { data: trips = [], isLoading } = useQuery({
     queryKey: ['trips'],
-    queryFn: () => base44.entities.Trip.list('-created_date'),
+    queryFn: () => base44.entities.Trip.list('-created_date')
   });
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const trip = await base44.entities.Trip.create({ ...data, members: [user?.email] });
-      
+
       // Si hay plantilla seleccionada, crear packing items
       if (selectedTemplate && selectedTemplate.packingItems) {
-        const packingPromises = selectedTemplate.packingItems.map(item =>
-          base44.entities.PackingItem.create({
-            ...item,
-            trip_id: trip.id,
-            user_id: user?.id,
-            packed: false
-          })
+        const packingPromises = selectedTemplate.packingItems.map((item) =>
+        base44.entities.PackingItem.create({
+          ...item,
+          trip_id: trip.id,
+          user_id: user?.id,
+          packed: false
+        })
         );
         await Promise.all(packingPromises);
         toast({
           title: "¡Viaje creado! 🎉",
-          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
+          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`
         });
       }
-      
+
       return trip;
     },
     onSuccess: () => {
@@ -75,9 +75,9 @@ export default function TripsList() {
         end_date: '',
         description: '',
         cover_image: '',
-        currency: 'EUR',
+        currency: 'EUR'
       });
-    },
+    }
   });
 
   const handleSubmit = () => {
@@ -91,25 +91,25 @@ export default function TripsList() {
           <div className="text-6xl mb-4">✈️</div>
           <p className="text-muted-foreground">Cargando viajes...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="glass border-b border-border">
-        <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="bg-orange-700 mx-auto px-6 py-12 max-w-6xl">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-5xl font-bold text-foreground mb-2">🌸 Kōdo</h1>
+              <h1 className="text-foreground mb-2 text-4xl font-black">Kōdo</h1>
               <p className="text-lg text-muted-foreground">Planifica tus aventuras</p>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
               size="lg"
-              className="bg-primary hover:bg-primary/90"
-            >
+              className="bg-primary hover:bg-primary/90">
+
               <Plus className="w-5 h-5 mr-2" />
               Nuevo Viaje
             </Button>
@@ -118,9 +118,9 @@ export default function TripsList() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {trips.length === 0 ? (
-          <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+      <div className="bg-orange-50 mx-auto px-6 py-12 max-w-6xl">
+        {trips.length === 0 ?
+        <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
             <Plane className="w-24 h-24 text-muted-foreground mx-auto mb-6" />
             <h2 className="text-2xl font-bold text-foreground mb-2">¡Empieza tu aventura!</h2>
             <p className="text-muted-foreground mb-8">Crea tu primer viaje y comienza a planificar</p>
@@ -128,25 +128,25 @@ export default function TripsList() {
               <Plus className="w-5 h-5 mr-2" />
               Crear Primer Viaje
             </Button>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trips.map((trip) => (
-              <Link key={trip.id} to={createPageUrl(`Home?trip_id=${trip.id}`)}>
+          </div> :
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {trips.map((trip) =>
+          <Link key={trip.id} to={createPageUrl(`Home?trip_id=${trip.id}`)}>
                 <div className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group">
                   {/* Cover Image */}
                   <div className="h-48 bg-gradient-to-br from-primary to-orange-600 relative overflow-hidden">
-                    {trip.cover_image ? (
-                      <img 
-                        src={trip.cover_image} 
-                        alt={trip.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-6xl">
+                    {trip.cover_image ?
+                <img
+                  src={trip.cover_image}
+                  alt={trip.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> :
+
+
+                <div className="w-full h-full flex items-center justify-center text-6xl">
                         🗺️
                       </div>
-                    )}
+                }
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-4 left-4 right-4">
                       <h3 className="text-2xl font-bold text-white mb-1">{trip.name}</h3>
@@ -165,11 +165,11 @@ export default function TripsList() {
                       {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
                     </div>
                     
-                    {trip.description && (
-                      <p className="text-sm text-foreground line-clamp-2 mb-4">
+                    {trip.description &&
+                <p className="text-sm text-foreground line-clamp-2 mb-4">
                         {trip.description}
                       </p>
-                    )}
+                }
 
                     <div className="flex items-center justify-between pt-4 border-t border-border">
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -183,9 +183,9 @@ export default function TripsList() {
                   </div>
                 </div>
               </Link>
-            ))}
+          )}
           </div>
-        )}
+        }
       </div>
 
       {/* Create Dialog */}
@@ -201,8 +201,8 @@ export default function TripsList() {
                 placeholder="ej. Japón 2025"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
@@ -212,8 +212,8 @@ export default function TripsList() {
                   placeholder="ej. Tokio"
                   value={formData.destination}
                   onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
@@ -221,8 +221,8 @@ export default function TripsList() {
                   placeholder="ej. Japón"
                   value={formData.country}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
             </div>
 
@@ -233,8 +233,8 @@ export default function TripsList() {
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
@@ -242,8 +242,8 @@ export default function TripsList() {
                   type="date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
             </div>
 
@@ -254,8 +254,8 @@ export default function TripsList() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div>
@@ -264,20 +264,20 @@ export default function TripsList() {
                 placeholder="https://..."
                 value={formData.cover_image}
                 onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div className="pt-4 border-t border-border">
               <TripTemplates onSelect={setSelectedTemplate} />
-              {selectedTemplate && (
-                <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+              {selectedTemplate &&
+              <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
                   <p className="text-sm text-primary flex items-center gap-2">
                     <span>{selectedTemplate.emoji}</span>
                     <span>Plantilla "{selectedTemplate.name}" seleccionada</span>
                   </p>
                 </div>
-              )}
+              }
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
@@ -287,14 +287,14 @@ export default function TripsList() {
               <Button
                 onClick={handleSubmit}
                 className="bg-primary hover:bg-primary/90"
-                disabled={!formData.name || !formData.destination || !formData.start_date || createMutation.isPending}
-              >
+                disabled={!formData.name || !formData.destination || !formData.start_date || createMutation.isPending}>
+
                 {createMutation.isPending ? 'Creando...' : 'Crear Viaje'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
