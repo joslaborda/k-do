@@ -288,8 +288,9 @@ export default function Diary() {
           <TabsContent value="photos">
             <PhotoGallery entries={entries} />
           </TabsContent>
-        </Tabs>
-      </div>
+          </Tabs>
+          </div>
+          </div>
 
       {/* Add Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
