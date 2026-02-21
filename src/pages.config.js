@@ -54,14 +54,14 @@ import CityDetail from './pages/CityDetail';
 import Diary from './pages/Diary';
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
+import MigrateData from './pages/MigrateData';
 import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
 import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
-import Utilities from './pages/Utilities';
-import TripsList from './pages/TripsList';
 import TripDetail from './pages/TripDetail';
-import MigrateData from './pages/MigrateData';
+import TripsList from './pages/TripsList';
+import Utilities from './pages/Utilities';
 import __Layout from './Layout.jsx';
 
 
@@ -73,14 +73,14 @@ export const PAGES = {
     "Diary": Diary,
     "Expenses": Expenses,
     "Home": Home,
+    "MigrateData": MigrateData,
     "Packing": Packing,
     "Restaurants": Restaurants,
     "Tickets": Tickets,
     "Translator": Translator,
-    "Utilities": Utilities,
-    "TripsList": TripsList,
     "TripDetail": TripDetail,
-    "MigrateData": MigrateData,
+    "TripsList": TripsList,
+    "Utilities": Utilities,
 }
 
 export const pagesConfig = {

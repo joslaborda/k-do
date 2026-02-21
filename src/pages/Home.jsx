@@ -9,7 +9,7 @@ import { es } from 'date-fns/locale';
 import { 
   MapPin, Calendar, Plane, UtensilsCrossed, Receipt, 
   Package, Info, CheckCircle2, Clock, TrendingUp,
-  ArrowRight, Search, Languages, BookOpen
+  ArrowRight, Search, Languages, BookOpen, Users, Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,130 +115,66 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary to-background">
-      {/* Hero moderno con imagen */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-red-600 to-orange-600">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=1920')] bg-cover bg-center opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-900/50" />
-        
-        <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
-          {/* Header con botón a TripsList y Search */}
-          <div className="flex items-center justify-between mb-8">
-            <Link 
-              to={createPageUrl('TripsList')}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-lg border border-white/30 hover:bg-white/30 transition-colors text-white"
-            >
-              <ArrowRight className="w-4 h-4 rotate-180" />
-              <span className="text-sm font-medium">Todos mis viajes</span>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="glass border-b border-border">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('TripsList')}>
+              <Button variant="ghost" size="sm">
+                <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                Volver a viajes
+              </Button>
             </Link>
-            
+            <Button variant="outline" size="icon">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-foreground mb-2">{trip?.name || 'Japón 2026'}</h1>
+              <div className="flex flex-wrap gap-4 text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  {trip?.destination}, {trip?.country}
+                </div>
+                {trip?.start_date && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
+                    {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
+                </div>
+              </div>
+            </div>
             <button
               onClick={() => setSearchOpen(true)}
-              className="relative w-full max-w-md ml-4"
+              className="ml-4 px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg transition-colors flex items-center gap-2"
             >
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
-              <div className="w-full pl-12 pr-4 py-3 bg-white/20 border border-white/30 text-white/60 placeholder:text-white/60 backdrop-blur-sm rounded-lg text-left hover:bg-white/30 transition-colors">
-                Buscar en tu viaje...
-              </div>
+              <Search className="w-4 h-4" />
+              <span className="text-sm">Buscar</span>
             </button>
-          </div>
-
-          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
-
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-white space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-sm font-medium">Aventura 2026</span>
-              </div>
-              
-              <div>
-                <h1 className="text-6xl md:text-7xl font-bold mb-3">
-                  {trip?.name || 'Japón 2026'}
-                </h1>
-                <p className="text-3xl font-light opacity-90">日本への旅</p>
-              </div>
-              
-              <p className="text-xl text-white/90 leading-relaxed max-w-lg">
-                {trip?.description || 'Una aventura única explorando la cultura, tradición y gastronomía japonesa'}
-              </p>
-
-              {/* Countdown */}
-              {daysUntilTrip > 0 && (
-                <div className="inline-flex items-center gap-3 px-6 py-4 bg-white/20 backdrop-blur-lg rounded-2xl border border-white/30">
-                  <Clock className="w-8 h-8" />
-                  <div>
-                    <div className="text-4xl font-bold">{daysUntilTrip}</div>
-                    <div className="text-sm opacity-90">días para el viaje</div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Stats Cards */}
-            {tripLoading || citiesLoading || expensesLoading || packingLoading || diaryLoading ? (
-              <div className="grid grid-cols-2 gap-4">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30 animate-pulse">
-                    <div className="h-10 w-10 bg-white/20 rounded-lg mb-2" />
-                    <div className="h-8 w-16 bg-white/20 rounded mb-1" />
-                    <div className="h-4 w-20 bg-white/20 rounded" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
-                >
-                  <div className="text-4xl mb-2">🏯</div>
-                  <div className="text-3xl font-bold text-white mb-1">{cities.length}</div>
-                  <div className="text-sm text-white/80">Ciudades</div>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
-                >
-                  <div className="text-4xl mb-2">📅</div>
-                  <div className="text-3xl font-bold text-white mb-1">{tripDuration}</div>
-                  <div className="text-sm text-white/80">Días de viaje</div>
-                </motion.div>
-                
-                <motion.div
-                   initial={{ opacity: 0, y: 20 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   transition={{ delay: 0.3 }}
-                   className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
-                 >
-                   <div className="text-4xl mb-2">💰</div>
-                   <div className="space-y-1 mb-1">
-                     <div className="text-2xl font-bold text-white">€{totalExpenses.eur.toLocaleString()}</div>
-                     <div className="text-sm text-white/80">¥{totalExpenses.jpy.toLocaleString()}</div>
-                   </div>
-                   <div className="text-sm text-white/80">Gastado</div>
-                 </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/30"
-                >
-                  <div className="text-4xl mb-2">📔</div>
-                  <div className="text-3xl font-bold text-white mb-1">{diaryEntries.length}</div>
-                  <div className="text-sm text-white/80">Recuerdos</div>
-                </motion.div>
-              </div>
-            )}
           </div>
         </div>
       </div>
+
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
+
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-6 py-8 pb-24">
+        {/* Countdown */}
+        {daysUntilTrip > 0 && (
+          <div className="glass border-2 border-primary rounded-3xl p-8 mb-8 text-center bg-gradient-to-br from-primary/5 to-orange-600/5">
+            <p className="text-sm text-muted-foreground mb-2">Tu aventura comienza en</p>
+            <p className="text-6xl font-bold text-primary mb-2">{daysUntilTrip}</p>
+            <p className="text-lg text-foreground">día{daysUntilTrip !== 1 ? 's' : ''}</p>
+          </div>
+        )}
 
       {/* Quick Progress Bar */}
       <div className="max-w-6xl mx-auto px-6 mt-6 pb-6">
