@@ -249,12 +249,15 @@ export default function Restaurants() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground">Yummy 🍜</h1>
-          <p className="text-muted-foreground mt-2">Descubre la gastronomía japonesa</p>
-         </div>
+      {/* Header con caja naranja */}
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-white text-4xl font-bold">Yummy 🍜</h1>
+          <p className="text-white/90 mt-2">Descubre la gastronomía japonesa</p>
+        </div>
+      </div>
 
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-7xl -mt-12">
         <div className="space-y-8">
             <div className="mb-6">
               <div className="relative max-w-md">
@@ -309,6 +312,7 @@ export default function Restaurants() {
               ))
             )}
         </div>
+      </div>
       </div>
 
       <Dialog open={editFoodDialogOpen} onOpenChange={setEditFoodDialogOpen}>
