@@ -55,8 +55,8 @@ export default function Layout({ children, currentPageName }) {
                 'text-muted-foreground'}`
                 }>
 
-                  <item.icon className="bg-transparent text-orange-700 lucide lucide-house w-4 h-4" strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-orange-700 text-xs font-medium whitespace-nowrap">{item.name}</span>
+                  <item.icon className={`w-4 h-4 ${isActive ? 'text-orange-700' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={`text-xs font-medium whitespace-nowrap ${isActive ? 'text-orange-700' : 'text-gray-400'}`}>{item.name}</span>
                 </Link>);
 
           })}
