@@ -131,7 +131,8 @@ export default function Cities() {
           <CityCard
             key={city.id}
             city={city}
-            daysCount={getDaysCount(city.id)} />
+            daysCount={getDaysCount(city.id)}
+            tripId={tripId} />
 
           )}
            </div>
