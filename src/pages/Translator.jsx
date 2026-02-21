@@ -300,8 +300,8 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               <Input
                 placeholder="Busca por palabra, frase, romaji..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 glass border border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20" />
+                onChange={(e) => setSearchQuery(e.target.value)} className="bg-[#ffffff] text-foreground pl-12 px-3 py-1 text-base rounded-md flex w-full shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm h-12 glass border border-border placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20" />
+
 
             </div>
 
@@ -319,12 +319,12 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                 onOpenChange={() => toggleCategory(category.name)}>
 
                     <div className="glass border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-colors shadow-lg">
-                      <CollapsibleTrigger className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-secondary/30 transition-colors">
+                      <CollapsibleTrigger className="bg-orange-200 px-6 py-5 text-left w-full flex items-center justify-between hover:bg-secondary/30 transition-colors">
                          <div className="flex items-center gap-4">
                            <span className="text-3xl">{category.icon}</span>
                            <div>
-                             <span className="font-bold text-foreground text-lg">{category.name}</span>
-                             <span className="text-xs text-muted-foreground ml-2">({category.phrases.length} frases)</span>
+                             <span className="text-orange-700 text-lg font-bold">{category.name}</span>
+                             <span className="text-orange-700 ml-2 text-xs">({category.phrases.length} frases)</span>
                           </div>
                         </div>
                         <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
@@ -333,7 +333,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
                       <CollapsibleContent className="animate-in fade-in-50 slide-in-from-top-2 duration-300">
                         <div className="border-t border-border/50 divide-y divide-border/50 bg-secondary/10">
                           {category.phrases.map((phrase, idx) =>
-                      <div key={idx} className="p-5 hover:bg-secondary/30 transition-colors group">
+                      <div key={idx} className="bg-[#ffffff] p-5 hover:bg-secondary/30 transition-colors group">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1 min-w-0">
                                   <p className="text-foreground font-semibold text-sm leading-tight">{phrase.spanish}</p>
