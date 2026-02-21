@@ -24,7 +24,7 @@ export default function ExpenseChart({ expenses }) {
     const byCategory = expenses.reduce((acc, exp) => {
       const category = exp.category || 'other';
       if (!acc[category]) acc[category] = 0;
-      
+
       // Convertir todo a JPY
       const amount = exp.currency === 'EUR' ? exp.amount * 160 : exp.amount;
       acc[category] += amount;
@@ -42,10 +42,10 @@ export default function ExpenseChart({ expenses }) {
 
   if (expenses.length === 0) {
     return (
-      <div className="text-center py-8 text-stone-400">
+      <div className="bg-[#ffffff] text-stone-400 py-8 text-center">
         <p>No hay gastos registrados aún</p>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -62,15 +62,15 @@ export default function ExpenseChart({ expenses }) {
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label={(entry) => `${entry.name}: ¥${entry.value.toLocaleString()}`}
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
+              label={(entry) => `${entry.name}: ¥${entry.value.toLocaleString()}`}>
+
+              {chartData.map((entry, index) =>
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+              )}
             </Pie>
-            <Tooltip 
-              formatter={(value) => `¥${value.toLocaleString()}`}
-            />
+            <Tooltip
+              formatter={(value) => `¥${value.toLocaleString()}`} />
+
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -84,9 +84,9 @@ export default function ExpenseChart({ expenses }) {
             <YAxis />
             <Tooltip formatter={(value) => `¥${value.toLocaleString()}`} />
             <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
+              {chartData.map((entry, index) =>
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+              )}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -98,6 +98,6 @@ export default function ExpenseChart({ expenses }) {
         <p className="text-4xl font-bold">¥{totalAmount.toLocaleString()}</p>
         <p className="text-sm opacity-75 mt-2">≈ €{Math.round(totalAmount / 160).toLocaleString()}</p>
       </div>
-    </div>
-  );
+    </div>);
+
 }
