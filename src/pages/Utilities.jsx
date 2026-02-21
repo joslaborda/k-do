@@ -235,9 +235,9 @@ export default function Utilities() {
                 <Package className="w-4 h-4 mr-2" />
                 Maleta
               </TabsTrigger>
-              <TabsTrigger value="translate" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
+              <TabsTrigger value="diary" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
                 <Info className="w-4 h-4 mr-2" />
-                Translate
+                Diario
               </TabsTrigger>
             </TabsList>
 
@@ -325,8 +325,8 @@ export default function Utilities() {
           <TabsContent value="packing" className="space-y-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-stone-100 mb-2">Checklist de equipaje 🧳</h2>
-                <p className="text-stone-400">
+                <h2 className="text-2xl font-bold text-foreground mb-2">Checklist de equipaje 🧳</h2>
+                <p className="text-muted-foreground">
                   {packedCount} de {totalPackingItems} artículos listos
                 </p>
               </div>
@@ -464,126 +464,18 @@ export default function Utilities() {
             )}
           </TabsContent>
 
-          {/* Translate */}
-          <TabsContent value="translate" className="space-y-6">
-            <div className="space-y-6">
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-foreground mb-2">Traductor 🌐</h2>
-                <p className="text-muted-foreground">Traduce entre español y japonés</p>
-              </div>
-
-              {/* Translator Tool */}
-              <div className="glass border-2 border-border rounded-3xl p-8">
-                <div className="flex items-center justify-center gap-4 mb-6">
-                  <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'es-jp' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                    🇪🇸 Español
-                  </div>
-                  <button 
-                    onClick={() => setDirection(direction === 'es-jp' ? 'jp-es' : 'es-jp')}
-                    className="p-2 rounded-full hover:bg-secondary transition-colors"
-                    >
-                    <ArrowRightLeft className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                  <div className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${direction === 'jp-es' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-                    🇯🇵 Japonés
-                  </div>
-                </div>
-
-                <Textarea
-                  placeholder={direction === 'es-jp' ? 'Escribe en español...' : '日本語で書いてください...'}
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  rows={4}
-                  className="mb-4 bg-input border border-border text-foreground placeholder:text-muted-foreground"
-                />
-
-                <Button 
-                  onClick={async () => {
-                    if (!inputText.trim()) return;
-                    setIsTranslating(true);
-                    const prompt = direction === 'es-jp' 
-                      ? `Traduce al japonés: "${inputText}". Proporciona kanji/hiragana y romanización.`
-                      : `Traduce al español: "${inputText}"`;
-                    const result = await base44.integrations.Core.InvokeLLM({ prompt });
-                    setTranslatedText(result);
-                    setIsTranslating(false);
-                  }}
-                  disabled={!inputText.trim() || isTranslating}
-                  className="w-full bg-primary hover:bg-primary/90"
-                >
-                  {isTranslating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Traduciendo...
-                    </>
-                  ) : (
-                    <>
-                      <Languages className="w-4 h-4 mr-2" />
-                      Traducir
-                    </>
-                  )}
-                </Button>
-
-                {translatedText && (
-                  <div className="mt-6 p-4 glass border border-border rounded-xl">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 text-foreground">{translatedText}</div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          navigator.clipboard.writeText(translatedText);
-                          setCopiedId('translation');
-                          setTimeout(() => setCopiedId(null), 2000);
-                        }}
-                        className="ml-2 flex-shrink-0"
-                      >
-                        {copiedId === 'translation' ? (
-                          <Check className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Phrases */}
-              <div>
-                <h3 className="text-xl font-bold text-foreground mb-4">Frases útiles</h3>
-                <div className="space-y-3">
-                  {phraseCategories.map((category) => (
-                    <Collapsible
-                      key={category.name}
-                      open={expandedCategories[category.name]}
-                      onOpenChange={() => setExpandedCategories(prev => ({ ...prev, [category.name]: !prev[category.name] }))}
-                    >
-                      <div className="glass border-2 border-border rounded-2xl overflow-hidden">
-                        <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{category.icon}</span>
-                            <span className="font-semibold text-foreground">{category.name}</span>
-                          </div>
-                          <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
-                        </CollapsibleTrigger>
-
-                        <CollapsibleContent>
-                          <div className="border-t border-border divide-y divide-border">
-                            {category.phrases.map((phrase, idx) => (
-                              <div key={idx} className="p-4 hover:bg-secondary/30 transition-colors">
-                                <p className="text-foreground font-medium">{phrase.spanish}</p>
-                                <p className="text-lg mt-1 text-foreground">{phrase.japanese}</p>
-                                <p className="text-sm text-muted-foreground mt-0.5 italic">{phrase.romaji}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </CollapsibleContent>
-                      </div>
-                    </Collapsible>
-                  ))}
-                </div>
-              </div>
+          {/* Diario */}
+          <TabsContent value="diary" className="space-y-6">
+            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+              <div className="text-6xl mb-4">📔</div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Diario de Viaje</h2>
+              <p className="text-muted-foreground mb-6">Accede al diario completo desde el menú principal</p>
+              <Button 
+                onClick={() => window.location.href = '/Diary'}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Ir al Diario
+              </Button>
             </div>
           </TabsContent>
           </Tabs>
