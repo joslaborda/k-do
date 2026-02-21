@@ -552,7 +552,7 @@ export default function Utilities() {
                       </div>
 
                       {/* Add button in category */}
-                      <div className="p-4 pt-0">
+                      <div className="bg-[#ffffff] pt-0 p-4">
                         <Button
                         variant="outline"
                         size="sm"
