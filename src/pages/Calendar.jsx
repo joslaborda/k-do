@@ -100,7 +100,7 @@ export default function Calendar() {
        </div>
 
       {/* Content */}
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-6xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-6xl -mt-12">
         <div className="flex justify-end mb-6">
           <Button
             onClick={() => setDialogOpen(true)}

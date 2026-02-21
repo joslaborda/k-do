@@ -112,7 +112,7 @@ export default function Layout({ children, currentPageName }) {
           }
           @media (max-width: 767px) {
             .min-h-screen {
-              padding-bottom: 80px;
+              padding-bottom: 70px;
             }
           }
         `}</style>
