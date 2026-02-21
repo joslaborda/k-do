@@ -108,7 +108,7 @@ export default function Cities() {
          </div>
        </div>
 
-       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 max-w-6xl -mt-12">
+       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-6xl -mt-12">
 
         {isLoading ?
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
