@@ -27,6 +27,7 @@ import {
 
 const infoCategories = [
 { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
+{ value: 'salud', label: 'Salud y Seguridad', icon: '⚕️' },
 { value: 'embajada', label: 'Embajada/Consulado', icon: '🏛️' },
 { value: 'apps', label: 'Apps útiles', icon: '📱' },
 { value: 'transporte', label: 'Transporte', icon: '🚇' },
@@ -128,14 +129,14 @@ export default function Utilities() {
   useEffect(() => {
     if (infos.length === 0 && tripId) {
       const sampleData = [
-      { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos', icon: '🚨' },
-      { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
-      { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas', link: 'https://www.jnto.go.jp/', icon: '☎️' },
-      { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público.', link: 'https://maps.google.com', icon: '📱' },
-      { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público. Cómprala en cualquier estación o aeropuerto.', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
-      { title: 'Línea de Urgencias Médicas', category: 'emergencia', content: 'Número: +81-3-5285-8185\nIntérprete disponible 24 horas', icon: '⚕️' }];
-
-      sampleData.forEach((data) => {
+        { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos', icon: '🚨' },
+        { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
+        { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas', link: 'https://www.jnto.go.jp/', icon: '☎️' },
+        { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público.', link: 'https://maps.google.com', icon: '📱' },
+        { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público. Cómprala en cualquier estación o aeropuerto.', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
+        { title: 'Línea de Urgencias Médicas', category: 'emergencia', content: 'Número: +81-3-5285-8185\nIntérprete disponible 24 horas', icon: '⚕️' }
+      ];
+      sampleData.forEach(data => {
         base44.entities.UsefulInfo.create({ ...data, trip_id: tripId });
       });
     }
@@ -261,17 +262,17 @@ export default function Utilities() {
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 gap-2 bg-transparent border-0 p-0 h-auto">
-              <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                ☁️ Clima
-              </TabsTrigger>
               <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
                 💱 Moneda
               </TabsTrigger>
-              <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                🧳 Maleta
+              <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
+                ☁️ Clima
               </TabsTrigger>
               <TabsTrigger value="diary" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
                 📔 Diario
+              </TabsTrigger>
+              <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
+                🧳 Maleta
               </TabsTrigger>
               <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
                 ⚠️ Información
@@ -286,8 +287,8 @@ export default function Utilities() {
                 <p className="text-muted-foreground">Teléfonos, embajadas, contactos de emergencia y más</p>
               </div>
               <Button
-                onClick={() => setDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700">
+               onClick={() => setDialogOpen(true)}
+               className="bg-green-600 hover:bg-green-700">
                <Plus className="w-4 h-4 mr-2" />
                Añadir
               </Button>
@@ -305,14 +306,14 @@ export default function Utilities() {
                 if (categoryInfos.length === 0) return null;
 
                 return (
-                  <div key={category.value} className="bg-[#ffffff] p-6 rounded-3xl glass border-2 border-border hover:shadow-xl transition-all">
+                  <div key={category.value} className="glass border-2 border-border rounded-3xl p-6 hover:shadow-xl transition-all">
                     <div className="flex items-center gap-3 mb-4">
                       <span className="text-3xl">{category.icon}</span>
                       <h3 className="text-xl font-bold text-foreground">{category.label}</h3>
                     </div>
                     <div className="space-y-3">
-                      {categoryInfos.map((info) =>
-                      <Collapsible key={info.id} className="border border-border rounded-xl">
+                      {categoryInfos.map((info) => (
+                        <Collapsible key={info.id} className="border border-border rounded-xl">
                           <CollapsibleTrigger className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 transition-colors rounded-xl">
                             <div className="flex items-center gap-2 text-left">
                               <span className="text-xl">{info.icon}</span>
@@ -325,26 +326,26 @@ export default function Utilities() {
                           </CollapsibleTrigger>
                           <CollapsibleContent className="px-3 pb-3 pt-0 space-y-2">
                             <p className="text-sm text-foreground whitespace-pre-wrap">{info.content}</p>
-                            {info.link &&
-                          <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium">
+                            {info.link && (
+                              <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium">
                                 <ExternalLink className="w-3 h-3" />
                                 Visitar
                               </a>
-                          }
+                            )}
                             <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteMutation.mutate(info.id)}
-                            className="text-destructive hover:bg-red-50 hover:text-destructive w-full mt-2">
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteMutation.mutate(info.id)}
+                              className="text-destructive hover:bg-red-50 hover:text-destructive w-full mt-2">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Eliminar
                             </Button>
                           </CollapsibleContent>
                         </Collapsible>
-                      )}
+                      ))}
                     </div>
-                  </div>);
-
+                  </div>
+                );
               })}
               </div>
             }
