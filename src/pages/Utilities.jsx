@@ -10,7 +10,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Plus, Info, Cloud, DollarSign, Trash2, ExternalLink, Phone, Package, Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2, ChevronDown, BookOpen } from 'lucide-react';
-import { createPageUrl } from '@/utils';
 import WeatherCard from '@/components/WeatherCard';
 import {
   Dialog,
