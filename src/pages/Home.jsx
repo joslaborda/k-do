@@ -36,23 +36,27 @@ export default function Home() {
   }, [navigate]);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
-    queryKey: ['cities'],
-    queryFn: () => base44.entities.City.list('order')
+    queryKey: ['cities', tripId],
+    queryFn: () => tripId ? base44.entities.City.filter({ trip_id: tripId }, 'order') : [],
+    enabled: !!tripId
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list()
+    queryKey: ['expenses', tripId],
+    queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: packingItems = [], isLoading: packingLoading } = useQuery({
-    queryKey: ['packingItems'],
-    queryFn: () => base44.entities.PackingItem.list()
+    queryKey: ['packingItems', tripId],
+    queryFn: () => tripId ? base44.entities.PackingItem.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   const { data: diaryEntries = [], isLoading: diaryLoading } = useQuery({
-    queryKey: ['diaryEntries'],
-    queryFn: () => base44.entities.DiaryEntry.list()
+    queryKey: ['diaryEntries', tripId],
+    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }) : [],
+    enabled: !!tripId
   });
 
   // Stats calculadas con memoization

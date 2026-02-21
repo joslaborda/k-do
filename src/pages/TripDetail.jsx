@@ -24,8 +24,19 @@ export default function TripDetail() {
   const { data: trip, isLoading } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: async () => {
+      // Si el tripId es "default", no existe trip real, ir a TripsList
+      if (tripId === 'default') {
+        window.location.href = createPageUrl('TripsList');
+        return null;
+      }
       const trips = await base44.entities.Trip.list();
-      return trips.find(t => t.id === tripId) || null;
+      const foundTrip = trips.find(t => t.id === tripId);
+      if (!foundTrip) {
+        // Si no se encuentra el trip, redirigir a TripsList
+        window.location.href = createPageUrl('TripsList');
+        return null;
+      }
+      return foundTrip;
     },
     enabled: !!tripId,
   });
