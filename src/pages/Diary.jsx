@@ -203,14 +203,17 @@ export default function Diary() {
             Nueva Entrada
           </Button>
         </div>
-        <Tabs defaultValue="list" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="list">Lista</TabsTrigger>
-            <TabsTrigger value="photos" className="gap-2">
-              <ImageIcon className="w-4 h-4" />
-              Galería de fotos
-            </TabsTrigger>
-          </TabsList>
+        <div>
+          <Tabs defaultValue="list" className="mb-6">
+            <TabsList className="bg-white border border-border p-1">
+              <TabsTrigger value="list" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+                Lista
+              </TabsTrigger>
+              <TabsTrigger value="photos" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white gap-2">
+                <ImageIcon className="w-4 h-4" />
+                Galería de fotos
+              </TabsTrigger>
+            </TabsList>
 
           <TabsContent value="list">
             {entries.length === 0 ?
