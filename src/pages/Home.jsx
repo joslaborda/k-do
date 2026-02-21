@@ -160,32 +160,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      {/* Header naranja */}
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-6">
-            <Link to={createPageUrl('TripsList')}>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-                Volver a viajes
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setSettingsOpen(true)}
-              className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
-          <div>
-            <h1 className="text-white text-4xl font-bold">{trip?.name || 'Japón 2026'}</h1>
-            <p className="text-white/90 mt-2">Planifica tu viaje</p>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-background">
       {/* Hero Section with Background Image */}
       <div
         className="relative"
@@ -200,6 +175,57 @@ export default function Home() {
 
         {/* Content */}
         <div className="relative z-10">
+          {/* Header */}
+          <div className="border-b border-white/20 backdrop-blur-sm">
+            <div className="max-w-6xl mx-auto px-6 py-6">
+              <div className="flex items-center justify-between mb-4">
+                <Link to={createPageUrl('TripsList')}>
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                    <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
+                    Volver a viajes
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSettingsOpen(true)}
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
+
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">{trip?.name || 'Japón 2026'}</h1>
+                  <div className="flex flex-wrap gap-4 text-white/90">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {trip?.destination}, {trip?.country}
+                    </div>
+                    {trip?.start_date &&
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
+                        {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                      </div>
+                    }
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg transition-colors flex items-center gap-2 shadow-md">
+
+                  <Search className="w-4 h-4" />
+                  <span className="text-sm">Buscar</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
@@ -308,7 +334,7 @@ export default function Home() {
       </div>
 
       {/* Navigation Section - Outside of background image */}
-      <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl">
+      <div className="bg-background mx-auto pb-24 px-6 py-12 max-w-6xl">
         <h2 className="text-slate-800 mb-6 text-lg font-medium uppercase tracking-widest">NAVEGA TU VIAJE</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sections.map((section, idx) =>

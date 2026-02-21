@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Receipt, Calendar, Package, BookOpen, UtensilsCrossed } from 'lucide-react';
+import { Search, MapPin, Receipt, Calendar, Package, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -28,12 +28,6 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
     enabled: !!tripId
   });
 
-  const { data: restaurants = [] } = useQuery({
-    queryKey: ['restaurants', tripId],
-    queryFn: () => tripId ? base44.entities.Restaurant.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
-  });
-
   const { data: packingItems = [] } = useQuery({
     queryKey: ['packingItems', tripId],
     queryFn: () => tripId ? base44.entities.PackingItem.filter({ trip_id: tripId }) : [],
@@ -53,7 +47,6 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
       d.title?.toLowerCase().includes(query.toLowerCase()) || 
       d.content?.toLowerCase().includes(query.toLowerCase())
     ),
-    restaurants: restaurants.filter(r => r.name?.toLowerCase().includes(query.toLowerCase())),
     packing: packingItems.filter(p => p.name?.toLowerCase().includes(query.toLowerCase())),
     tickets: tickets.filter(t => t.name?.toLowerCase().includes(query.toLowerCase())),
   };
@@ -62,7 +55,6 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
     filteredResults.cities.length > 0 ||
     filteredResults.expenses.length > 0 ||
     filteredResults.diaries.length > 0 ||
-    filteredResults.restaurants.length > 0 ||
     filteredResults.packing.length > 0 ||
     filteredResults.tickets.length > 0
   );
@@ -74,12 +66,12 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Buscar ciudades, gastos, diario, restaurantes..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="pl-10"
-              autoFocus
-            />
+               placeholder="Buscar ciudades, gastos, diario..."
+               value={query}
+               onChange={(e) => setQuery(e.target.value)}
+               className="pl-10"
+               autoFocus
+             />
           </div>
         </div>
 
@@ -155,25 +147,6 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
                       <div className="text-sm text-muted-foreground line-clamp-2">
                         {entry.content}
                       </div>
-                    </Link>
-                  )}
-                />
-              )}
-
-              {filteredResults.restaurants.length > 0 && (
-                <ResultSection
-                  title="Restaurantes"
-                  icon={UtensilsCrossed}
-                  items={filteredResults.restaurants.slice(0, 3)}
-                  renderItem={(restaurant) => (
-                    <Link
-                      key={restaurant.id}
-                      to={createPageUrl(`Restaurants?trip_id=${tripId}`)}
-                      onClick={() => onOpenChange(false)}
-                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
-                    >
-                      <div className="font-medium text-foreground">{restaurant.name}</div>
-                      <div className="text-sm text-muted-foreground">{restaurant.city}</div>
                     </Link>
                   )}
                 />
