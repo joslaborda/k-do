@@ -37,6 +37,7 @@ export default function Home() {
     }
 
     setTripId(id);
+    window.scrollTo(0, 0);
   }, [navigate]);
 
   const { data: trip, isLoading: tripLoading } = useQuery({
