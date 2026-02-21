@@ -77,7 +77,7 @@ export default function Utilities() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('weather');
+  const [activeTab, setActiveTab] = useState('info');
 
   useEffect(() => {
     if (activeTab === 'diary') {
