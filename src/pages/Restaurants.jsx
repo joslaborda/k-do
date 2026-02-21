@@ -313,7 +313,6 @@ export default function Restaurants() {
             )}
         </div>
       </div>
-      </div>
 
       <Dialog open={editFoodDialogOpen} onOpenChange={setEditFoodDialogOpen}>
         <DialogContent className="bg-card border-border">
