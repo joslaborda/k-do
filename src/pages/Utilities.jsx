@@ -75,10 +75,14 @@ const phraseCategories = [
 
 
 export default function Utilities() {
-  const navigate = useNavigate();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [packingDialogOpen, setPackingDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('info');
+   const navigate = useNavigate();
+   const [dialogOpen, setDialogOpen] = useState(false);
+   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
+   const [activeTab, setActiveTab] = useState('currency');
+
+   useEffect(() => {
+     window.scrollTo(0, 0);
+   }, []);
 
   useEffect(() => {
     if (activeTab === 'diary') {
