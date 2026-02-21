@@ -219,7 +219,6 @@ export default function Expenses() {
           </div>
         </div>
       </div>
-      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
          <DialogContent className="bg-card border-border">
