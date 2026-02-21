@@ -23,7 +23,10 @@ export default function TripDetail() {
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.list().then(trips => trips.find(t => t.id === tripId)),
+    queryFn: async () => {
+      const trips = await base44.entities.Trip.list();
+      return trips.find(t => t.id === tripId) || null;
+    },
     enabled: !!tripId,
   });
 

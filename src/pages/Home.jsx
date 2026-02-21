@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -19,12 +20,20 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('trip_id');
+    
+    // Si no hay trip_id válido, redirigir a TripsList
+    if (!id || id === 'null' || id === 'default') {
+      navigate(createPageUrl('TripsList'), { replace: true });
+      return;
+    }
+    
     setTripId(id);
-  }, []);
+  }, [navigate]);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],
