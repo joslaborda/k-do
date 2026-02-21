@@ -7,7 +7,7 @@ import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
 
 const navItems = [
-  { name: 'Inicio', page: 'TripDetail', icon: Home },
+  { name: 'Inicio', page: 'Home', icon: Home },
   { name: 'Ruta', page: 'Cities', icon: MapPin },
   { name: 'Docs', page: 'Calendar', icon: Calendar },
   { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
@@ -17,7 +17,7 @@ const navItems = [
 ];
 
 // Pages that should NOT show navigation (trip list and migration)
-const pagesWithoutNav = ['TripsList', 'MigrateData'];
+const pagesWithoutNav = ['TripsList', 'MigrateData', 'TripDetail'];
 
 export default function Layout({ children, currentPageName }) {
   const [tripId, setTripId] = useState('default');
@@ -69,7 +69,9 @@ export default function Layout({ children, currentPageName }) {
       {/* Side Navigation - Desktop */}
       {showNav && tripId && (
         <nav className="fixed left-0 top-0 bottom-0 w-16 glass border-r border-border hidden md:flex flex-col items-center py-8 z-50">
-          <div className="text-3xl mb-12">🌸</div>
+          <Link to={createPageUrl('TripsList')} className="text-3xl mb-12 hover:scale-110 transition-transform cursor-pointer" title="Ver todos los viajes">
+            🌸
+          </Link>
           
           <div className="flex-1 flex flex-col items-center gap-1">
             {navItems.map((item) => {

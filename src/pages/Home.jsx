@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -18,6 +18,18 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Si hay un trip_id en la URL, estamos en el viaje de Japón (modo legacy)
+  // Si no, redirigir a TripsList
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tripId = urlParams.get('trip_id');
+    if (!tripId || tripId === 'null') {
+      // No hay trip_id, redirigir a la lista de viajes
+      navigate(createPageUrl('TripsList'), { replace: true });
+    }
+  }, [navigate]);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],

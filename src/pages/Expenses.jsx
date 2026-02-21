@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Receipt, Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal } from 'lucide-react';
+import { Plus, Receipt, Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal, Camera, X } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
 import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
@@ -39,6 +39,7 @@ const categories = [
 export default function Expenses() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
@@ -47,6 +48,7 @@ export default function Expenses() {
     split_with: ['Carlos'],
     category: 'food',
     date: new Date().toISOString().split('T')[0],
+    receipt_photos: [],
   });
 
   const queryClient = useQueryClient();
@@ -80,9 +82,35 @@ export default function Expenses() {
         split_with: ['Carlos'],
         category: 'food',
         date: new Date().toISOString().split('T')[0],
+        receipt_photos: [],
       });
     },
   });
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPhoto(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({
+        ...formData,
+        receipt_photos: [...(formData.receipt_photos || []), file_url]
+      });
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const removePhoto = (indexToRemove) => {
+    setFormData({
+      ...formData,
+      receipt_photos: formData.receipt_photos.filter((_, idx) => idx !== indexToRemove)
+    });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Expense.delete(id),
@@ -293,6 +321,53 @@ export default function Expenses() {
                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                  className="bg-input border-border text-foreground"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Fotos del recibo (opcional)</label>
+              <div className="space-y-3">
+                {formData.receipt_photos && formData.receipt_photos.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {formData.receipt_photos.map((photo, idx) => (
+                      <div key={idx} className="relative group">
+                        <img 
+                          src={photo} 
+                          alt="Recibo" 
+                          className="w-full h-24 object-cover rounded-lg border border-border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(idx)}
+                          className="absolute top-1 right-1 p-1 bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    disabled={uploadingPhoto}
+                  />
+                  {uploadingPhoto ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm text-muted-foreground">Subiendo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Añadir foto</span>
+                    </>
+                  )}
+                </label>
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
