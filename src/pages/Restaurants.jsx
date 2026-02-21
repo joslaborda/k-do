@@ -47,11 +47,12 @@ const sushiFoodTypes = [
 
 
 // Agrupar por categorías
-const groupedFoodTypes = japaneseFoodTypes.reduce((acc, food) => {
-  if (!acc[food.category]) {
-    acc[food.category] = [];
+const groupedFoodTypes = sushiFoodTypes.reduce((acc, food) => {
+  const category = '🍣 Sushi y Sashimi';
+  if (!acc[category]) {
+    acc[category] = [];
   }
-  acc[food.category].push(food);
+  acc[category].push({ ...food, category });
   return acc;
 }, {});
 
