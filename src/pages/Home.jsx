@@ -6,11 +6,11 @@ import { useQuery } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { 
-  MapPin, Calendar, Plane, UtensilsCrossed, Receipt, 
+import {
+  MapPin, Calendar, Plane, UtensilsCrossed, Receipt,
   Package, Info, CheckCircle2, Clock, TrendingUp,
-  ArrowRight, Search, Languages, BookOpen, Users, Settings
-} from 'lucide-react';
+  ArrowRight, Search, Languages, BookOpen, Users, Settings } from
+'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,12 +30,12 @@ export default function Home() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('trip_id');
-    
+
     if (!id || id === 'null' || id === 'default') {
       navigate(createPageUrl('TripsList'), { replace: true });
       return;
     }
-    
+
     setTripId(id);
   }, [navigate]);
 
@@ -84,7 +84,7 @@ export default function Home() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       setSettingsOpen(false);
-    },
+    }
   });
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
@@ -116,10 +116,10 @@ export default function Home() {
   const today = new Date();
   const daysUntilTrip = differenceInDays(tripStart, today);
   const tripDuration = differenceInDays(tripEnd, tripStart) + 1;
-  
+
   const totalExpenses = useMemo(() => {
     let totalJPY = 0;
-    expenses.forEach(exp => {
+    expenses.forEach((exp) => {
       if (exp.currency === 'JPY') {
         totalJPY += exp.amount;
       } else {
@@ -134,19 +134,19 @@ export default function Home() {
 
   const packedPercentage = useMemo(() => {
     if (packingItems.length === 0) return 0;
-    return Math.round((packingItems.filter(i => i.packed).length / packingItems.length) * 100);
+    return Math.round(packingItems.filter((i) => i.packed).length / packingItems.length * 100);
   }, [packingItems]);
 
   const sections = [
-    { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
-    { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
-    { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
-    { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
-    { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
-    { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
-    { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
-    { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' },
-  ];
+  { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
+  { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
+  { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
+  { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
+  { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
+  { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
+  { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
+  { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' }];
+
 
   if (tripLoading || !tripId) {
     return (
@@ -155,21 +155,21 @@ export default function Home() {
           <div className="text-6xl mb-4">🌸</div>
           <p className="text-muted-foreground">Cargando viaje...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Background Image */}
-      <div 
+      <div
         className="relative"
         style={{
           backgroundImage: 'url(https://images.travelandleisureasia.com/wp-content/uploads/sites/5/2024/01/11144526/feature-2024-01-11t102331-123.jpeg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+          backgroundPosition: 'center'
+        }}>
+
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
 
@@ -185,12 +185,12 @@ export default function Home() {
                     Volver a viajes
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={() => setSettingsOpen(true)}
-                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
-                >
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
+
                   <Settings className="w-4 h-4" />
                 </Button>
               </div>
@@ -203,13 +203,13 @@ export default function Home() {
                       <MapPin className="w-4 h-4" />
                       {trip?.destination}, {trip?.country}
                     </div>
-                    {trip?.start_date && (
-                      <div className="flex items-center gap-2">
+                    {trip?.start_date &&
+                    <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
                         {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
                       </div>
-                    )}
+                    }
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
@@ -218,8 +218,8 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => setSearchOpen(true)}
-                  className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg transition-colors flex items-center gap-2 shadow-md"
-                >
+                  className="ml-4 px-4 py-2 bg-white/90 hover:bg-white backdrop-blur-sm rounded-lg transition-colors flex items-center gap-2 shadow-md">
+
                   <Search className="w-4 h-4" />
                   <span className="text-sm">Buscar</span>
                 </button>
@@ -236,8 +236,8 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg"
-              >
+                className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg">
+
                 <div className="flex items-center gap-2 mb-2">
                   <div className="p-2 bg-blue-500/20 rounded-lg">
                     <Calendar className="w-4 h-4 text-blue-600" />
@@ -249,13 +249,13 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {daysUntilTrip > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white/95 backdrop-blur-md border border-primary/30 rounded-xl p-4 shadow-lg"
-                >
+              {daysUntilTrip > 0 &&
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/95 backdrop-blur-md border border-primary/30 rounded-xl p-4 shadow-lg">
+
                   <div className="flex items-center gap-2 mb-2">
                     <div className="p-2 bg-primary/20 rounded-lg">
                       <Clock className="w-4 h-4 text-primary" />
@@ -266,15 +266,15 @@ export default function Home() {
                     </div>
                   </div>
                 </motion.div>
-              )}
+              }
 
               <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
-                >
+                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+
                   <div className="flex items-center gap-2 mb-2">
                     <div className="p-2 bg-green-500/20 rounded-lg">
                       <Receipt className="w-4 h-4 text-green-600" />
@@ -293,8 +293,8 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
-                >
+                  className="bg-white/95 backdrop-blur-md border border-white/20 rounded-xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
+
                   <div className="flex items-center gap-2 mb-2">
                     <div className="p-2 bg-purple-500/20 rounded-lg">
                       <BookOpen className="w-4 h-4 text-purple-600" />
@@ -319,13 +319,13 @@ export default function Home() {
                   <span className="text-xl font-bold text-primary">{packedPercentage}%</span>
                 </div>
                 <div className="h-2.5 bg-secondary rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-primary to-orange-500 transition-all duration-500"
-                    style={{ width: `${packedPercentage}%` }}
-                  />
+                    style={{ width: `${packedPercentage}%` }} />
+
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  {packingItems.filter(i => i.packed).length} de {packingItems.length} artículos empacados
+                  {packingItems.filter((i) => i.packed).length} de {packingItems.length} artículos empacados
                 </p>
               </div>
             </div>
@@ -334,23 +334,23 @@ export default function Home() {
       </div>
 
       {/* Navigation Section - Outside of background image */}
-      <div className="max-w-6xl mx-auto px-6 py-12 pb-24">
-        <h2 className="text-sm uppercase tracking-widest text-muted-foreground mb-6 font-medium">Navega tu viaje</h2>
+      <div className="bg-[#fffff5] mx-auto pb-24 px-6 py-12 max-w-6xl">
+        <h2 className="text-slate-800 mb-6 text-lg font-medium uppercase tracking-widest">NAVEGA TU VIAJE</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {sections.map((section, idx) => (
-            <motion.div
-              key={section.page}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-            >
+          {sections.map((section, idx) =>
+          <motion.div
+            key={section.page}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.05 }}>
+
               <Link
-                to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
-                className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block"
-              >
+              to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
+              className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
+
                 <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
 
-                <div className="relative p-6 flex flex-col items-center gap-3">
+                <div className="bg-[#ffffff] p-6 relative flex flex-col items-center gap-3">
                   <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
                     {section.emoji}
                   </div>
@@ -366,7 +366,7 @@ export default function Home() {
                 </div>
               </Link>
             </motion.div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -383,8 +383,8 @@ export default function Home() {
                 placeholder="ej. Japón 2025"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -394,8 +394,8 @@ export default function Home() {
                   placeholder="ej. Tokio"
                   value={formData.destination || ''}
                   onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
@@ -403,8 +403,8 @@ export default function Home() {
                   placeholder="ej. Japón"
                   value={formData.country || ''}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
             </div>
 
@@ -415,8 +415,8 @@ export default function Home() {
                   type="date"
                   value={formData.start_date || ''}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
@@ -424,8 +424,8 @@ export default function Home() {
                   type="date"
                   value={formData.end_date || ''}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="bg-input border-border text-foreground"
-                />
+                  className="bg-input border-border text-foreground" />
+
               </div>
             </div>
 
@@ -434,9 +434,9 @@ export default function Home() {
               <Input
                 placeholder="email1@example.com, email2@example.com"
                 value={formData.members?.join(', ') || ''}
-                onChange={(e) => setFormData({ ...formData, members: e.target.value.split(',').map(m => m.trim()).filter(Boolean) })}
-                className="bg-input border-border text-foreground"
-              />
+                onChange={(e) => setFormData({ ...formData, members: e.target.value.split(',').map((m) => m.trim()).filter(Boolean) })}
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div>
@@ -446,8 +446,8 @@ export default function Home() {
                 value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div>
@@ -456,8 +456,8 @@ export default function Home() {
                 placeholder="https://..."
                 value={formData.cover_image || ''}
                 onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
+                className="bg-input border-border text-foreground" />
+
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
@@ -467,14 +467,14 @@ export default function Home() {
               <Button
                 onClick={() => updateTripMutation.mutate(formData)}
                 className="bg-primary hover:bg-primary/90"
-                disabled={!formData.name || !formData.destination || updateTripMutation.isPending}
-              >
+                disabled={!formData.name || !formData.destination || updateTripMutation.isPending}>
+
                 {updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 }
