@@ -208,7 +208,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               <div className="glass border border-border rounded-2xl p-6 shadow-xl">
                 <div className="mb-4">
                   <label className="text-sm font-semibold text-foreground mb-3 block">Entrada</label>
-                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'es-jp' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
+                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'es-jp' ? 'bg-indigo-600/20 text-foreground border border-indigo-500/30' : 'bg-red-600/20 text-foreground border border-red-500/30'}`}>
                     {direction === 'es-jp' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
                   </div>
                 </div>
@@ -226,7 +226,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
               <div className="glass border border-border rounded-2xl p-6 shadow-xl">
                 <div className="mb-4">
                   <label className="text-sm font-semibold text-foreground mb-3 block">Traducción</label>
-                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'jp-es' ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'bg-red-600/20 text-red-300 border border-red-500/30'}`}>
+                  <div className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors inline-block ${direction === 'jp-es' ? 'bg-indigo-600/20 text-foreground border border-indigo-500/30' : 'bg-red-600/20 text-foreground border border-red-500/30'}`}>
                     {direction === 'jp-es' ? '🇪🇸 Español' : '🇯🇵 Japonés'}
                   </div>
                 </div>
