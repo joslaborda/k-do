@@ -193,7 +193,7 @@ Si el texto está en romaji, también tradúcelo. Proporciona una traducción cl
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-5xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-5xl -mt-12">
 
         <Tabs defaultValue="translator" className="space-y-6">
           <TabsList className="glass border border-border p-1">

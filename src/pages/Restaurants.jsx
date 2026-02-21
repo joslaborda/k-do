@@ -257,7 +257,7 @@ export default function Restaurants() {
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-7xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-7xl -mt-12">
         <div className="space-y-8">
             <div className="mb-6">
               <div className="relative max-w-md">

@@ -162,7 +162,7 @@ export default function Expenses() {
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-4xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-4xl -mt-12">
         <div className="space-y-6">
           {/* Tricount Balance */}
           <TricountBalance expenses={expenses} />

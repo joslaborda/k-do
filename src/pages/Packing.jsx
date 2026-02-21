@@ -102,7 +102,7 @@ export default function Packing() {
       </div>
 
       {/* Content */}
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-5xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-5xl -mt-12">
         {totalItems === 0 ? (
             <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
               <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />

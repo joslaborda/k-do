@@ -31,7 +31,7 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-orange-50 text-foreground">
       <OfflineIndicator />
       <SyncIndicator />
       <KeyboardShortcuts />

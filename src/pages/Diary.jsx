@@ -203,7 +203,7 @@ export default function Diary() {
       </div>
 
       {/* Entries */}
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-4xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-4xl -mt-12">
         <Tabs defaultValue="list" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="list">Lista</TabsTrigger>

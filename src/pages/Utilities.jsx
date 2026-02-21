@@ -221,7 +221,7 @@ export default function Utilities() {
       </div>
 
       {/* Content */}
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-24 max-w-5xl -mt-12">
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-5xl -mt-12">
         <Tabs defaultValue="weather" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 glass border border-border">
               <TabsTrigger value="weather" className="text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary">
