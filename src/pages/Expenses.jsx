@@ -149,20 +149,23 @@ export default function Expenses() {
       {/* Header con caja naranja */}
       <div className="bg-orange-700 pt-12 pb-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-white text-4xl font-bold">Gastos 💴</h1>
-              <p className="text-white/90 mt-2">Registra y divide los gastos con Carlos</p>
-            </div>
-            <Button onClick={() => setDialogOpen(true)} className="bg-white text-orange-700 hover:bg-white/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Añadir Gasto
-            </Button>
+          <div>
+            <h1 className="text-white text-4xl font-bold">Gastos 💴</h1>
+            <p className="text-white/90 mt-2">Registra y divide los gastos con Carlos</p>
           </div>
         </div>
       </div>
 
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-4xl -mt-12">
+        <div className="flex justify-end mb-6">
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Añadir Gasto
+          </Button>
+        </div>
+
         <div className="space-y-6">
           {/* Tricount Balance */}
           <TricountBalance expenses={expenses} />
