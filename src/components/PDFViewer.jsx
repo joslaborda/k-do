@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Download, X } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -11,7 +11,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 export default function PDFViewer({ fileUrl, onClose }) {
   const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
 
   function onDocumentLoadSuccess({ numPages }) {
@@ -32,6 +31,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
         <div className="flex items-center justify-between p-4 border-b bg-white">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-foreground">Documento</h3>
+            {numPages && <span className="text-sm text-muted-foreground">({numPages} {numPages === 1 ? 'página' : 'páginas'})</span>}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -50,9 +50,9 @@ export default function PDFViewer({ fileUrl, onClose }) {
           </div>
         </div>
 
-        <div className="overflow-auto bg-gray-100 flex items-center justify-center p-4" style={{ height: 'calc(90vh - 120px)' }}>
+        <div className="overflow-auto bg-gray-100 p-4" style={{ height: 'calc(90vh - 64px)' }}>
           {isPDF ? (
-            <div className="bg-white shadow-lg">
+            <div className="flex flex-col items-center gap-4">
               {loading && (
                 <div className="flex items-center justify-center h-96">
                   <div className="animate-pulse text-muted-foreground">Cargando PDF...</div>
@@ -64,46 +64,26 @@ export default function PDFViewer({ fileUrl, onClose }) {
                 onLoadError={onDocumentLoadError}
                 loading={null}
               >
-                <Page 
-                  pageNumber={pageNumber} 
-                  renderTextLayer={true}
-                  renderAnnotationLayer={true}
-                  width={Math.min(window.innerWidth * 0.8, 800)}
-                />
+                {Array.from(new Array(numPages), (el, index) => (
+                  <Page
+                    key={`page_${index + 1}`}
+                    pageNumber={index + 1}
+                    renderTextLayer={true}
+                    renderAnnotationLayer={true}
+                    width={Math.min(window.innerWidth * 0.8, 800)}
+                    className="mb-4 shadow-lg"
+                  />
+                ))}
               </Document>
             </div>
           ) : (
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <img src={fileUrl} alt="Documento" className="max-w-full max-h-full" />
+            <div className="flex items-center justify-center">
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <img src={fileUrl} alt="Documento" className="max-w-full max-h-full" />
+              </div>
             </div>
           )}
         </div>
-
-        {isPDF && numPages && (
-          <div className="flex items-center justify-between p-4 border-t bg-white">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPageNumber(Math.max(1, pageNumber - 1))}
-              disabled={pageNumber <= 1}
-            >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Anterior
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              Página {pageNumber} de {numPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPageNumber(Math.min(numPages, pageNumber + 1))}
-              disabled={pageNumber >= numPages}
-            >
-              Siguiente
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

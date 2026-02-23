@@ -137,7 +137,14 @@ export default function CityDetail() {
 
   const handleSave = () => {
     if (editingDay) {
-      updateMutation.mutate({ id: editingDay.id, data: formData });
+      updateMutation.mutate({ 
+        id: editingDay.id, 
+        data: {
+          ...formData,
+          trip_id: tripId,
+          city_id: cityId
+        }
+      });
     } else {
       createMutation.mutate(formData);
     }
