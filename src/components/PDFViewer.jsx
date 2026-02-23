@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download, X, ExternalLink } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 
 export default function PDFViewer({ fileUrl, onClose }) {
   if (!fileUrl) return null;
@@ -13,14 +13,6 @@ export default function PDFViewer({ fileUrl, onClose }) {
         <div className="flex items-center justify-between p-4 border-b bg-white">
           <h3 className="font-semibold text-foreground">Documento</h3>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(fileUrl, '_blank')}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Abrir en nueva pestaña
-            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -37,15 +29,21 @@ export default function PDFViewer({ fileUrl, onClose }) {
           </div>
         </div>
 
-        <div className="bg-gray-100" style={{ height: 'calc(95vh - 64px)' }}>
+        <div className="bg-gray-100 overflow-auto" style={{ height: 'calc(95vh - 64px)' }}>
           {isPDF ? (
-            <iframe
-              src={fileUrl}
+            <object
+              data={fileUrl}
+              type="application/pdf"
               className="w-full h-full"
-              title="PDF Viewer"
-            />
+            >
+              <iframe
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`}
+                className="w-full h-full"
+                title="PDF Viewer"
+              />
+            </object>
           ) : (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full p-4">
               <img src={fileUrl} alt="Documento" className="max-w-full max-h-full object-contain" />
             </div>
           )}
