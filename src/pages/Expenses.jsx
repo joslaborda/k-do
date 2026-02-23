@@ -37,6 +37,9 @@ const categories = [
 
 
 export default function Expenses() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
+  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -66,9 +69,6 @@ export default function Expenses() {
     staleTime: 10000, // Cache por 10 segundos
     enabled: !!tripId
   });
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripId = urlParams.get('trip_id');
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Expense.create({
