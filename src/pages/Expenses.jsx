@@ -61,14 +61,19 @@ export default function Expenses() {
   const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: expenses = [], isLoading } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: () => base44.entities.Expense.list('-date'),
-    staleTime: 10000 // Cache por 10 segundos
+    queryKey: ['expenses', tripId],
+    queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }, '-date') : base44.entities.Expense.list('-date'),
+    staleTime: 10000, // Cache por 10 segundos
+    enabled: !!tripId
   });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Expense.create({
       ...data,
+      trip_id: tripId,
       amount: parseFloat(data.amount) || 0
     }),
     onSuccess: () => {
