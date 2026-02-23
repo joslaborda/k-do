@@ -59,10 +59,14 @@ export default function PDFViewer({ fileUrl, onClose }) {
                 </div>
               )}
               <Document
-                file={fileUrl}
+                file={{ url: fileUrl }}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading={null}
+                options={{
+                  cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+                  cMapPacked: true,
+                }}
               >
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page
