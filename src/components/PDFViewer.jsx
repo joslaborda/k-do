@@ -20,7 +20,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
         setError(null);
 
         // Load PDF.js
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        let pdfjsLib = window['pdfjs-dist/build/pdf'];
         
         if (!pdfjsLib) {
           // Dynamically load PDF.js
@@ -33,9 +33,10 @@ export default function PDFViewer({ fileUrl, onClose }) {
             script.onload = resolve;
             script.onerror = reject;
           });
+          
+          pdfjsLib = window['pdfjs-dist/build/pdf'];
         }
 
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         const pdf = await pdfjsLib.getDocument(fileUrl).promise;
