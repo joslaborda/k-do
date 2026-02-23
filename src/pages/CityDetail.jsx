@@ -75,6 +75,7 @@ export default function CityDetail() {
     mutationFn: (data) => base44.entities.ItineraryDay.create({
       ...data,
       city_id: cityId,
+      trip_id: tripId,
       order: days.length
     }),
     onSuccess: () => {
