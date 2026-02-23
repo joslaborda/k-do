@@ -29,6 +29,9 @@ import { es } from 'date-fns/locale';
 const moods = ['😊', '😍', '😎', '🤔', '😴', '🤩', '😋'];
 
 export default function Diary() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
+  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -53,12 +56,16 @@ export default function Diary() {
   const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: entries = [] } = useQuery({
-    queryKey: ['diaryEntries'],
-    queryFn: () => base44.entities.DiaryEntry.list('-date')
+    queryKey: ['diaryEntries', tripId],
+    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }, '-date') : base44.entities.DiaryEntry.list('-date'),
+    enabled: !!tripId
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.DiaryEntry.create(data),
+    mutationFn: (data) => base44.entities.DiaryEntry.create({
+      ...data,
+      trip_id: tripId
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['diaryEntries'] });
       setDialogOpen(false);
