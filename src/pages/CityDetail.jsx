@@ -19,6 +19,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -40,6 +50,8 @@ export default function CityDetail() {
    const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState(null);
   const [expandedDays, setExpandedDays] = useState({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dayToDelete, setDayToDelete] = useState(null);
   const [formData, setFormData] = useState({ title: '', date: '', content: '' });
   
   const queryClient = useQueryClient();
@@ -84,8 +96,23 @@ export default function CityDetail() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.ItineraryDay.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+      setDeleteDialogOpen(false);
+      setDayToDelete(null);
+    }
   });
+
+  const handleDeleteClick = (day) => {
+    setDayToDelete(day);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (dayToDelete) {
+      deleteMutation.mutate(dayToDelete.id);
+    }
+  };
 
   const toggleDay = (dayId) => {
     setExpandedDays(prev => ({ ...prev, [dayId]: !prev[dayId] }));
@@ -222,7 +249,7 @@ export default function CityDetail() {
                           className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-secondary"
                           onClick={(e) => {
                             e.stopPropagation();
-                            deleteMutation.mutate(day.id);
+                            handleDeleteClick(day);
                           }}
                           aria-label="Eliminar día"
                         >
@@ -293,15 +320,35 @@ export default function CityDetail() {
               <Button 
                 onClick={handleSave}
                 className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.title.trim()}
+                disabled={!formData.title.trim() || updateMutation.isPending || createMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-2" />
-                {editingDay ? 'Actualizar' : 'Guardar'}
+                {(updateMutation.isPending || createMutation.isPending) 
+                  ? 'Guardando...' 
+                  : editingDay ? 'Actualizar' : 'Guardar'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar día?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres eliminar "{dayToDelete?.title}"? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

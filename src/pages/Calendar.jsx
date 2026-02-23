@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, ExternalLink, Pencil } from 'lucide-react';
+import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import PDFViewer from '@/components/PDFViewer';
 
 const categoryConfig = {
   flight: { label: 'Vuelo', icon: Plane, color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
@@ -25,6 +27,9 @@ export default function Calendar() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState(null);
+  const [viewingPDF, setViewingPDF] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     category: 'flight',
@@ -60,8 +65,23 @@ export default function Calendar() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tickets'] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      setDeleteDialogOpen(false);
+      setTicketToDelete(null);
+    }
   });
+
+  const handleDeleteClick = (ticket) => {
+    setTicketToDelete(ticket);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (ticketToDelete) {
+      deleteMutation.mutate(ticketToDelete.id);
+    }
+  };
 
   const handleEdit = (ticket) => {
     setEditingTicket(ticket);
@@ -165,11 +185,11 @@ export default function Calendar() {
                                <Pencil className="w-4 h-4" />
                              </Button>
                              <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteMutation.mutate(ticket.id)}
-                          className="text-muted-foreground hover:text-destructive hover:bg-secondary"
-                          aria-label="Eliminar">
+                             variant="ghost"
+                             size="icon"
+                             onClick={() => handleDeleteClick(ticket)}
+                             className="text-muted-foreground hover:text-destructive hover:bg-secondary"
+                             aria-label="Eliminar">
 
                                <Trash2 className="w-4 h-4" />
                              </Button>
@@ -181,17 +201,13 @@ export default function Calendar() {
                     }
 
                         {ticket.file_url &&
-                    <a
-                      href={ticket.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer" className="bg-orange-100 text-foreground px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-secondary/80 transition-colors">
-
-
-                            <FileText className="w-4 h-4" />
+                        <Button
+                        onClick={() => setViewingPDF(ticket.file_url)}
+                        className="w-full bg-orange-100 text-foreground hover:bg-orange-200 border-0">
+                            <Eye className="w-4 h-4 mr-2" />
                             <span className="text-sm font-medium">Ver documento</span>
-                            <ExternalLink className="w-3 h-3 ml-auto" />
-                          </a>
-                    }
+                          </Button>
+                        }
                       </div>
                   )}
                   </div>
@@ -368,6 +384,27 @@ export default function Calendar() {
             }
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
+              <AlertDialogDescription>
+                ¿Estás seguro de que quieres eliminar "{ticketToDelete?.name}"? Esta acción no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* PDF Viewer */}
+        <PDFViewer fileUrl={viewingPDF} onClose={() => setViewingPDF(null)} />
       </div>
     </div>);
 
