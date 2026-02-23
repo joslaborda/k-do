@@ -7,7 +7,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 // Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export default function PDFViewer({ fileUrl, onClose }) {
   const [numPages, setNumPages] = useState(null);
@@ -76,7 +76,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
                     file={fileUrl}
                     onLoadSuccess={onDocumentLoadSuccess}
                     onLoadError={onDocumentLoadError}
-                    loading=""
+                    loading={null}
                     options={{
                       cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
                       cMapPacked: true,
@@ -85,8 +85,8 @@ export default function PDFViewer({ fileUrl, onClose }) {
                   >
                     <Page 
                       pageNumber={pageNumber}
-                      renderTextLayer={false}
-                      renderAnnotationLayer={false}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
                       width={Math.min(window.innerWidth * 0.75, 700)}
                     />
                   </Document>
