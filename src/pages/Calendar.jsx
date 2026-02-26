@@ -30,6 +30,8 @@ export default function Calendar() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [viewingPDF, setViewingPDF] = useState(null);
+  const [tripId, setTripId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     category: 'flight',
@@ -40,15 +42,33 @@ export default function Calendar() {
 
   const queryClient = useQueryClient();
 
+  // Get trip ID from URL
+  useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('trip_id');
+    setTripId(id);
+  });
+
+  // Get current user
+  useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      setUserId(user.id);
+      return user;
+    }
+  });
+
   const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets'],
-    queryFn: () => base44.entities.Ticket.list('-date')
+    queryKey: ['tickets', tripId],
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
+    enabled: !!tripId
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Ticket.create(data),
+    mutationFn: (data) => base44.entities.Ticket.create({ ...data, trip_id: tripId, user_id: userId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setDialogOpen(false);
       setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '' });
     }
@@ -57,7 +77,7 @@ export default function Calendar() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setEditDialogOpen(false);
       setEditingTicket(null);
     }
@@ -66,7 +86,7 @@ export default function Calendar() {
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setDeleteDialogOpen(false);
       setTicketToDelete(null);
     }
@@ -291,7 +311,7 @@ export default function Calendar() {
                 <Button
                   onClick={() => createMutation.mutate(formData)}
                   className="bg-green-600 hover:bg-green-700"
-                  disabled={!formData.name.trim() || createMutation.isPending}>
+                  disabled={!formData.name.trim() || !tripId || !userId || createMutation.isPending}>
 
                   {createMutation.isPending ? 'Guardando...' : 'Guardar'}
                 </Button>
