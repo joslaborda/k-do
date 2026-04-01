@@ -129,7 +129,7 @@ export default function Documents() {
       <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
 
         {/* Toolbar card */}
-         <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 flex items-center gap-1 overflow-x-auto">
+         <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 flex items-center gap-1 overflow-x-auto -translate-y-2.5">
            {/* Category pills */}
            <div className="flex items-center gap-1 flex-1">
             <button
