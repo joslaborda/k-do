@@ -47,8 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Calendar from './pages/Calendar';
-import CalendarView from './pages/CalendarView';
+import Documents from './pages/Documents';
 import Cities from './pages/Cities';
 import CityDetail from './pages/CityDetail';
 import Diary from './pages/Diary';
@@ -57,18 +56,14 @@ import Home from './pages/Home';
 import MigrateData from './pages/MigrateData';
 import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
-import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
-import TripDetail from './pages/TripDetail';
 import TripsList from './pages/TripsList';
-import TripMap from './pages/TripMap';
 import Utilities from './pages/Utilities';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Calendar": Calendar,
-    "CalendarView": CalendarView,
+    "Documents": Documents,
     "Cities": Cities,
     "CityDetail": CityDetail,
     "Diary": Diary,
@@ -77,11 +72,8 @@ export const PAGES = {
     "MigrateData": MigrateData,
     "Packing": Packing,
     "Restaurants": Restaurants,
-    "Tickets": Tickets,
     "Translator": Translator,
-    "TripDetail": TripDetail,
     "TripsList": TripsList,
-    "TripMap": TripMap,
     "Utilities": Utilities,
 }
 
