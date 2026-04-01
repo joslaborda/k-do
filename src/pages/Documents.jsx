@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm';
 import DocumentCard from '@/components/tickets/DocumentCard';
+import BackfillDebugger from '@/components/tickets/BackfillDebugger';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 const VISIBILITY_FILTERS = [
@@ -134,6 +135,9 @@ export default function Documents() {
 
       {/* ── MAIN CONTENT — floats over hero ─────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
+
+        {/* Debug component */}
+        {tripId && <BackfillDebugger tripId={tripId} />}
 
         {/* Toolbar card */}
          <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 flex items-center gap-1 overflow-x-auto -translate-y-2.5">
