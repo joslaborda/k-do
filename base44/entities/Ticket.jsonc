@@ -12,7 +12,7 @@
     },
     "name": {
       "type": "string",
-      "description": "Ticket name"
+      "description": "Nombre del documento"
     },
     "category": {
       "type": "string",
@@ -20,37 +20,77 @@
         "flight",
         "train",
         "hotel",
-        "freetour",
-        "insurance",
-        "personal"
-      ]
+        "event",
+        "personal",
+        "other"
+      ],
+      "description": "Tipo de documento"
     },
     "file_url": {
       "type": "string",
-      "description": "Uploaded file URL"
+      "description": "URL del archivo subido"
     },
     "date": {
       "type": "string",
-      "format": "date"
+      "format": "date",
+      "description": "Fecha principal"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha fin (checkout hotel, etc.)"
     },
     "notes": {
       "type": "string"
     },
     "origin": {
       "type": "string",
-      "description": "Lugar de origen (texto libre)"
+      "description": "Origen (vuelos/trenes)"
     },
     "destination": {
       "type": "string",
-      "description": "Lugar de destino (texto libre)"
+      "description": "Destino (vuelos/trenes)"
+    },
+    "airline": {
+      "type": "string",
+      "description": "Aerol\u00ednea (vuelos)"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad (hotel/evento)"
+    },
+    "doc_type": {
+      "type": "string",
+      "description": "Tipo de documento personal (pasaporte, etc.)"
     },
     "city_id": {
       "type": "string",
-      "description": "Ciudad de origen o ciudad a la que pertenece este documento"
+      "description": "Ciudad asociada del viaje"
+    },
+    "itinerary_day_id": {
+      "type": "string",
+      "description": "D\u00eda de itinerario asociado"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "shared",
+        "selected_users"
+      ],
+      "default": "personal",
+      "description": "Visibilidad del documento"
+    },
+    "shared_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails de usuarios con acceso (para selected_users)"
     },
     "arrival_city_id": {
       "type": "string",
-      "description": "Ciudad de destino (para trenes/vuelos entre ciudades)"
+      "description": "Ciudad destino (trenes/vuelos)"
     }
   },
   "required": [

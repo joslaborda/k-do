@@ -14,6 +14,7 @@ import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlace
 import DayMapButton from '@/components/itinerary/DayMapButton';
 import CitySettingsModal from '@/components/cities/CitySettingsModal';
 import CityTickets from '@/components/cities/CityTickets';
+import DayDocuments from '@/components/tickets/DayDocuments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,6 +53,7 @@ export default function CityDetail() {
    const cityId = urlParams.get('id');
    const tripId = urlParams.get('trip_id');
 
+   const [currentUser, setCurrentUser] = useState(null);
    const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState(null);
   const [expandedDays, setExpandedDays] = useState({});
@@ -63,6 +65,15 @@ export default function CityDetail() {
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const u = await base44.auth.me();
+      setCurrentUser(u);
+      return u;
+    }
+  });
 
   const { data: city } = useQuery({
     queryKey: ['city', cityId],
@@ -325,7 +336,7 @@ export default function CityDetail() {
            </div>
         </div>
 
-        <CityTickets cityId={cityId} tripId={tripId} />
+        <CityTickets cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} userId={currentUser?.id} />
 
         {isLoading ? (
            <div className="space-y-4">
@@ -423,6 +434,7 @@ export default function CityDetail() {
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
                           <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
                         </div>
+                        <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} />
                         <div className="mt-3 pt-3 border-t border-border/50">
                           <DayMapButton day={day} city={city} />
                         </div>
