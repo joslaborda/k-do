@@ -51,12 +51,12 @@ export default function Layout({ children, currentPageName }) {
                 to={linkUrl}
                 className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors flex-shrink-0 ${
                 isActive ?
-                'text-primary' :
+                'bg-orange-700 text-white' :
                 'text-muted-foreground'}`
                 }>
 
-                  <item.icon className={`w-4 h-4 ${isActive ? 'text-orange-700' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className={`text-xs font-medium whitespace-nowrap ${isActive ? 'text-orange-700' : 'text-gray-400'}`}>{item.name}</span>
+                  <item.icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={`text-xs font-medium whitespace-nowrap ${isActive ? 'text-white' : 'text-gray-400'}`}>{item.name}</span>
                 </Link>);
 
           })}
@@ -82,11 +82,11 @@ export default function Layout({ children, currentPageName }) {
                 to={linkUrl}
                 className={`group flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all ${
                 isActive ?
-                'text-primary' :
+                'bg-orange-700 text-white' :
                 'text-muted-foreground hover:text-foreground'}`
                 }>
 
-                  <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
                   <span className="text-[9px] font-medium">{item.name}</span>
                 </Link>);
 
