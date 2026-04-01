@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, X, Save } from 'lucide-react';
+import { Settings, X, Save, ImageIcon } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ export default function CitySettingsModal({ city, tripId }) {
     accommodation: city.accommodation || '',
     start_date: city.start_date || '',
     end_date: city.end_date || '',
+    image_url: city.image_url || '',
   });
   const queryClient = useQueryClient();
 
@@ -30,6 +31,7 @@ export default function CitySettingsModal({ city, tripId }) {
       accommodation: city.accommodation || '',
       start_date: city.start_date || '',
       end_date: city.end_date || '',
+      image_url: city.image_url || '',
     });
     setOpen(true);
   };
@@ -75,6 +77,20 @@ export default function CitySettingsModal({ city, tripId }) {
                 value={form.accommodation}
                 onChange={(e) => setForm({ ...form, accommodation: e.target.value })}
                 placeholder="Ej: APA Hotel Pride Kokkaigijidomae, Tokyo"
+                className="bg-input border-border text-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
+              {form.image_url && (
+                <div className="mb-2 rounded-lg overflow-hidden h-24 bg-muted">
+                  <img src={form.image_url} alt="preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display='none'} />
+                </div>
+              )}
+              <Input
+                value={form.image_url}
+                onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                placeholder="https://images.unsplash.com/..."
                 className="bg-input border-border text-foreground"
               />
             </div>

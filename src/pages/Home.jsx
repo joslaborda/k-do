@@ -466,12 +466,16 @@ export default function Home() {
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
+              {formData.cover_image && (
+                <div className="mb-2 rounded-lg overflow-hidden h-28 bg-muted">
+                  <img src={formData.cover_image} alt="preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display='none'} />
+                </div>
+              )}
               <Input
-                placeholder="https://..."
+                placeholder="https://images.unsplash.com/..."
                 value={formData.cover_image || ''}
                 onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
                 className="bg-input border-border text-foreground" />
-
             </div>
 
             <div className="flex items-center justify-between pt-4">
