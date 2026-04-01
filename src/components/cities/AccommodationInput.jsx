@@ -47,7 +47,7 @@ export default function AccommodationInput({ city, tripId }) {
     <form
       onSubmit={handleSave}
       className="mt-2"
-      onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+      onClick={(e) => { e.stopPropagation(); }}
     >
       <div className="flex items-center gap-1">
         <input
