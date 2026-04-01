@@ -1,0 +1,57 @@
+{
+  "name": "Trip",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del viaje"
+    },
+    "destination": {
+      "type": "string",
+      "description": "Destino principal"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de fin"
+    },
+    "cover_image": {
+      "type": "string",
+      "description": "Imagen de portada del viaje"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del viaje"
+    },
+    "currency": {
+      "type": "string",
+      "default": "EUR",
+      "description": "Moneda del viaje"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails de los miembros del viaje"
+    },
+    "roles": {
+      "type": "object",
+      "description": "Roles de los miembros: { email: 'admin' | 'editor' | 'viewer' }"
+    }
+  },
+  "required": [
+    "name",
+    "destination",
+    "start_date"
+  ]
+}

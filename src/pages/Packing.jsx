@@ -71,7 +71,10 @@ export default function Packing() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-white text-4xl font-bold">Maleta 🧳</h1>
-              <p className="text-white/90 mt-2">Checklist de equipaje</p>
+              <div className="flex items-center gap-2 mt-2">
+                <p className="text-white/90">Checklist de equipaje</p>
+                <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full border border-white/30">🔒 Solo visible para ti</span>
+              </div>
             </div>
             <Button
               onClick={() => setDialogOpen(true)}

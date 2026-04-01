@@ -21,12 +21,9 @@ export default function ExpenseCard({ expense, onDelete }) {
   const config = categoryConfig[expense.category] || categoryConfig.other;
   const Icon = config.icon;
 
-  const formatAmount = (amount, currency) => {
-    if (currency === 'JPY') {
-      return `¥${amount.toLocaleString()}`;
-    }
-    return `€${amount.toFixed(2)}`;
-  };
+  const isJPY = expense.currency === 'JPY';
+  const amountOriginal = isJPY ? `¥${expense.amount?.toLocaleString()}` : `€${expense.amount?.toFixed(2)}`;
+  const amountConverted = isJPY ? `≈ €${(expense.amount / 160).toFixed(2)}` : null;
 
   return (
     <div className="group flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-100 hover:shadow-md transition-all duration-300">
@@ -36,22 +33,28 @@ export default function ExpenseCard({ expense, onDelete }) {
       
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-slate-900 truncate">{expense.description}</h3>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${expense.paid_by === 'You' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'}`}>
-            {expense.paid_by === 'You' ? 'Tú' : expense.paid_by}
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+            💳 {expense.paid_by}
           </span>
           {expense.date && (
             <span className="text-xs text-slate-400">
               {format(new Date(expense.date), 'MMM d')}
             </span>
           )}
+          {expense.split_with?.length > 0 && (
+            <span className="text-xs text-slate-400">· dividido</span>
+          )}
         </div>
       </div>
       
-      <div className="text-right">
-        <p className="font-semibold text-slate-900">{formatAmount(expense.amount, expense.currency)}</p>
-        {expense.split_with?.length > 0 && (
-          <p className="text-xs text-slate-400">dividido</p>
+      <div className="text-right shrink-0">
+        <p className="font-semibold text-slate-900">{amountOriginal}</p>
+        {amountConverted && (
+          <p className="text-xs text-muted-foreground">{amountConverted}</p>
+        )}
+        {isJPY && (
+          <p className="text-[10px] text-muted-foreground/60 leading-tight">al cambio del pago</p>
         )}
       </div>
 
@@ -64,7 +67,7 @@ export default function ExpenseCard({ expense, onDelete }) {
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => onDelete(expense.id)} className="text-red-600">
             <Trash2 className="w-4 h-4 mr-2" />
-            Delete
+            Eliminar
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

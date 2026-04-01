@@ -43,12 +43,21 @@ export default function Expenses() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useState(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  });
+
+  const myEmail = currentUser?.email || '';
+  const myName = currentUser?.full_name || myEmail;
+
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
     currency: 'JPY',
-    paid_by: 'José',
-    split_with: ['Carlos'],
+    paid_by: '',
+    split_with: [],
     category: 'food',
     date: new Date().toISOString().split('T')[0],
     receipt_photos: []
@@ -74,6 +83,7 @@ export default function Expenses() {
     mutationFn: (data) => base44.entities.Expense.create({
       ...data,
       trip_id: tripId,
+      paid_by: data.paid_by || myEmail,
       amount: parseFloat(data.amount) || 0
     }),
     onSuccess: () => {
@@ -83,8 +93,8 @@ export default function Expenses() {
         description: '',
         amount: '',
         currency: 'JPY',
-        paid_by: 'José',
-        split_with: ['Carlos'],
+        paid_by: '',
+        split_with: [],
         category: 'food',
         date: new Date().toISOString().split('T')[0],
         receipt_photos: []
@@ -139,16 +149,13 @@ export default function Expenses() {
   const handleSplitChange = (checked) => {
     setFormData({
       ...formData,
-      split_with: checked ? ['Carlos'] : []
+      split_with: checked ? ['split'] : []
     });
   };
 
-  const filteredExpenses = activeTab === 'all' ?
-  expenses :
-  expenses.filter((e) => {
-    if (activeTab === 'José') return e.paid_by === 'You' || e.paid_by === 'José';
-    return e.paid_by === activeTab;
-  });
+  const filteredExpenses = activeTab === 'all'
+    ? expenses
+    : expenses.filter((e) => e.paid_by === activeTab);
 
   return (
     <div className="min-h-screen bg-orange-50">
@@ -159,7 +166,7 @@ export default function Expenses() {
         <div className="max-w-4xl mx-auto px-6">
           <div>
             <h1 className="text-white text-4xl font-bold">Gastos 💴</h1>
-            <p className="text-white/90 mt-2">Registra y divide los gastos con Carlos</p>
+            <p className="text-white/90 mt-2">Registra y divide los gastos del viaje</p>
           </div>
         </div>
       </div>
@@ -191,12 +198,11 @@ export default function Expenses() {
                 <TabsTrigger value="all" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
                   👁️ Todos
                 </TabsTrigger>
-                <TabsTrigger value="José" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  💪🏻 José
-                </TabsTrigger>
-                <TabsTrigger value="Carlos" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  🧜🏻‍♀️ Carlos
-                </TabsTrigger>
+                {myEmail && (
+                  <TabsTrigger value={myEmail} className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+                    💳 Mis gastos
+                  </TabsTrigger>
+                )}
               </TabsList>
             </Tabs>
 
@@ -277,24 +283,12 @@ export default function Expenses() {
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Pagado por</label>
-               <div className="flex gap-2">
-                  <Button
-                  type="button"
-                  variant={formData.paid_by === 'José' ? 'default' : 'outline'}
-                  onClick={() => setFormData({ ...formData, paid_by: 'José' })}
-                  className={formData.paid_by === 'José' ? 'bg-green-600 hover:bg-green-700' : 'border-border text-foreground hover:bg-secondary/50'}>
-
-                  José
-                </Button>
-                <Button
-                  type="button"
-                  variant={formData.paid_by === 'Carlos' ? 'default' : 'outline'}
-                  onClick={() => setFormData({ ...formData, paid_by: 'Carlos' })}
-                  className={formData.paid_by === 'Carlos' ? 'bg-blue-600 hover:bg-blue-700' : 'border-border text-foreground hover:bg-secondary/50'}>
-
-                  Carlos
-                </Button>
-               </div>
+              <Input
+                placeholder={myName || 'Tu nombre o email'}
+                value={formData.paid_by || myName}
+                onChange={(e) => setFormData({ ...formData, paid_by: e.target.value })}
+                className="bg-input border-border text-foreground"
+              />
             </div>
 
             <div className="flex items-center space-x-2">
@@ -302,9 +296,8 @@ export default function Expenses() {
                 id="split"
                 checked={formData.split_with.length > 0}
                 onCheckedChange={handleSplitChange} />
-
               <label htmlFor="split" className="text-sm text-foreground">
-                Dividir a medias con {formData.paid_by === 'José' ? 'Carlos' : 'ti'}
+                Dividir a medias entre los viajeros
               </label>
             </div>
 

@@ -8,21 +8,26 @@ import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
   MapPin, Calendar, Plane, UtensilsCrossed, Receipt,
-  Package, Info, CheckCircle2, Clock, TrendingUp,
-  ArrowRight, Search, Languages, BookOpen, Users, Settings } from
+  Package, Info, Clock,
+  ArrowRight, Search, Languages, BookOpen, Users, Settings, Trash2 } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { StatsSkeleton, CardSkeleton } from '@/components/LoadingSkeleton';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import MembersPanel from '@/components/trip/MembersPanel';
+import DeleteTripModal from '@/components/trip/DeleteTripModal';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -38,6 +43,7 @@ export default function Home() {
 
     setTripId(id);
     window.scrollTo(0, 0);
+    base44.auth.me().then(setCurrentUser).catch(() => {});
   }, [navigate]);
 
   const { data: trip, isLoading: tripLoading } = useQuery({
@@ -87,6 +93,18 @@ export default function Home() {
       setSettingsOpen(false);
     }
   });
+
+  const deleteTripMutation = useMutation({
+    mutationFn: () => base44.entities.Trip.delete(tripId),
+    onSuccess: () => {
+      setDeleteOpen(false);
+      navigate(createPageUrl('TripsList'), { replace: true });
+    }
+  });
+
+  const currentUserEmail = currentUser?.email;
+  const roles = trip?.roles || {};
+  const isAdmin = !trip || roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail || Object.keys(roles).length === 0;
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities', tripId],
@@ -138,15 +156,19 @@ export default function Home() {
     return Math.round(packingItems.filter((i) => i.packed).length / packingItems.length * 100);
   }, [packingItems]);
 
-  const sections = [
-  { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
-  { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
-  { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
-  { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
-  { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' },
-  { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
-  { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
-  { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' }];
+  const sharedSections = [
+    { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
+    { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
+    { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
+    { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
+    { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
+    { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' }
+  ];
+
+  const personalSections = [
+    { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
+    { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' }
+  ];
 
 
   if (tripLoading || !tripId) {
@@ -315,39 +337,59 @@ export default function Home() {
       </div>
 
       {/* Navigation Section - Outside of background image */}
-      <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl">
-        <h2 className="text-slate-800 mb-6 text-lg font-medium uppercase tracking-widest">NAVEGA TU VIAJE</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {sections.map((section, idx) =>
-          <motion.div
-            key={section.page}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}>
+      <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl space-y-10">
 
-              <Link
-              to={createPageUrl(`${section.page}?trip_id=${tripId}`)}
-              className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
-
-                <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-
-                <div className="bg-[#ffffff] p-6 relative flex flex-col items-center gap-3">
-                  <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">
-                    {section.emoji}
+        {/* Shared sections */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-slate-800 text-lg font-medium uppercase tracking-widest">Compartido</h2>
+            <Badge className="bg-orange-100 text-orange-700 border-orange-200 border text-xs font-medium">👥 Todo el grupo</Badge>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {sharedSections.map((section, idx) =>
+              <motion.div key={section.page} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+                <Link to={createPageUrl(`${section.page}?trip_id=${tripId}`)} className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                  <div className="bg-white p-6 relative flex flex-col items-center gap-3">
+                    <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">{section.emoji}</div>
+                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors text-center">{section.name}</div>
                   </div>
-                  <div className="text-center">
-                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {section.name}
-                    </div>
+                  <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="w-5 h-5 text-primary" />
                   </div>
-                </div>
+                </Link>
+              </motion.div>
+            )}
+          </div>
+        </div>
 
-                <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="w-5 h-5 text-primary" />
-                </div>
-              </Link>
-            </motion.div>
-          )}
+        {/* Personal sections */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-slate-800 text-lg font-medium uppercase tracking-widest">Personal</h2>
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 border text-xs font-medium">🔒 Solo visible para ti</Badge>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {personalSections.map((section, idx) =>
+              <motion.div key={section.page} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+                <Link to={createPageUrl(`${section.page}?trip_id=${tripId}`)} className="group relative overflow-hidden glass rounded-2xl border border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                  <div className="bg-white p-6 relative flex flex-col items-center gap-3">
+                    <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">{section.emoji}</div>
+                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors text-center">{section.name}</div>
+                  </div>
+                  <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="w-5 h-5 text-primary" />
+                  </div>
+                </Link>
+              </motion.div>
+            )}
+          </div>
+        </div>
+
+        {/* Members Panel */}
+        <div className="glass rounded-2xl border border-border p-6">
+          <MembersPanel trip={trip} currentUserEmail={currentUserEmail} isAdmin={isAdmin} />
         </div>
       </div>
 
@@ -411,16 +453,6 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Viajeros (emails separados por coma)</label>
-              <Input
-                placeholder="email1@example.com, email2@example.com"
-                value={formData.members?.join(', ') || ''}
-                onChange={(e) => setFormData({ ...formData, members: e.target.value.split(',').map((m) => m.trim()).filter(Boolean) })}
-                className="bg-input border-border text-foreground" />
-
-            </div>
-
-            <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
               <Textarea
                 placeholder="Describe tu viaje..."
@@ -441,21 +473,41 @@ export default function Home() {
 
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setSettingsOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => updateTripMutation.mutate(formData)}
-                className="bg-primary hover:bg-primary/90"
-                disabled={!formData.name || !formData.destination || updateTripMutation.isPending}>
-
-                {updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
-              </Button>
+            <div className="flex items-center justify-between pt-4">
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setSettingsOpen(false); setDeleteOpen(true); }}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar viaje
+                </Button>
+              )}
+              <div className="flex gap-3 ml-auto">
+                <Button variant="outline" onClick={() => setSettingsOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => updateTripMutation.mutate(formData)}
+                  className="bg-primary hover:bg-primary/90"
+                  disabled={!formData.name || !formData.destination || updateTripMutation.isPending}>
+                  {updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+                </Button>
+              </div>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteTripModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        tripName={trip?.name || ''}
+        onConfirm={() => deleteTripMutation.mutate()}
+        isPending={deleteTripMutation.isPending}
+      />
     </div>);
 
 }
