@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
+import DayMapButton from '@/components/itinerary/DayMapButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -390,10 +391,13 @@ export default function CityDetail() {
                     <CollapsibleContent>
                       <div className="px-5 pb-5 pt-0 border-t border-border bg-white/50">
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
-                        <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
+                          <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-border/50">
+                          <DayMapButton day={day} city={city} />
+                        </div>
                       </div>
-                    </div>
-                  </CollapsibleContent>
+                    </CollapsibleContent>
                 </div>
               </Collapsible>
             ))}
