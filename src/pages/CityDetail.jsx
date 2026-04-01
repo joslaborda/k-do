@@ -324,7 +324,8 @@ export default function CityDetail() {
                 onOpenChange={() => toggleDay(day.id)}
               >
                 <div className="bg-white rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
-                    <CollapsibleTrigger className="w-full p-5 flex items-center justify-between text-left hover:bg-secondary/50 transition-colors">
+                    <CollapsibleTrigger asChild>
+                    <div className="w-full p-5 flex items-center justify-between text-left hover:bg-secondary/50 transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-foreground font-semibold">
                           {index + 1}
@@ -386,6 +387,7 @@ export default function CityDetail() {
                           <ChevronDown className="w-5 h-5 text-muted-foreground" />
                         )}
                       </div>
+                    </div>
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
