@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import DayMapButton from '@/components/itinerary/DayMapButton';
 import CitySettingsModal from '@/components/cities/CitySettingsModal';
+import CityTickets from '@/components/cities/CityTickets';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -257,7 +258,7 @@ export default function CityDetail() {
         <div className="absolute top-6 left-6">
            <Link
              to={createPageUrl(`Cities?trip_id=${tripId}`)}
-             className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full text-white text-sm font-semibold hover:bg-white hover:text-orange-600 transition-all duration-200 border border-orange-600"
+             className="inline-flex items-center gap-2 px-4 py-2 bg-orange-700 rounded-full text-white text-sm font-semibold hover:bg-white hover:text-orange-700 transition-all duration-200 border border-orange-700"
            >
              <ArrowLeft className="w-4 h-4" />
              Ruta
@@ -317,12 +318,14 @@ export default function CityDetail() {
                  }
                </Button>
              )}
-             <Button onClick={openNewDialog} className="bg-green-600 hover:bg-green-700">
+             <Button onClick={openNewDialog} className="bg-orange-700 hover:bg-orange-800">
                <Plus className="w-4 h-4 mr-2" />
                Añadir Día
              </Button>
            </div>
         </div>
+
+        <CityTickets cityId={cityId} tripId={tripId} />
 
         {isLoading ? (
            <div className="space-y-4">
@@ -335,7 +338,7 @@ export default function CityDetail() {
              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
              <h3 className="text-lg font-medium text-foreground mb-2">Sin itinerario todavía</h3>
              <p className="text-muted-foreground mb-4">Empieza a planificar tus días en {city.name}</p>
-             <Button onClick={openNewDialog} className="bg-green-600 hover:bg-green-700">
+             <Button onClick={openNewDialog} className="bg-orange-700 hover:bg-orange-800">
                <Plus className="w-4 h-4 mr-2" />
                Añadir primer día
              </Button>
@@ -474,8 +477,8 @@ export default function CityDetail() {
               </Button>
               <Button 
                 onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.title.trim() || updateMutation.isPending || createMutation.isPending}
+                className="bg-orange-700 hover:bg-orange-800"
+                  disabled={!formData.title.trim() || updateMutation.isPending || createMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-2" />
                 {(updateMutation.isPending || createMutation.isPending) 

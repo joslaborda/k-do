@@ -197,7 +197,7 @@ export default function Cities() {
             <p className="text-muted-foreground font-light mb-6">Tu ruta aparecerá aquí</p>
             <Button
               onClick={() => setAiPanelOpen(true)}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
+              className="bg-orange-700 hover:bg-orange-800 text-white"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Generar itinerario con IA

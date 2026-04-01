@@ -122,7 +122,7 @@ export default function CitySettingsModal({ city, tripId }) {
                 size="sm"
                 onClick={handleSave}
                 disabled={saving || !form.name.trim()}
-                className="bg-orange-600 hover:bg-orange-700 text-white"
+                className="bg-orange-700 hover:bg-orange-800 text-white"
               >
                 <Save className="w-3.5 h-3.5 mr-1.5" />
                 {saving ? 'Guardando...' : 'Guardar'}

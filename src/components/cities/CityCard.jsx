@@ -80,7 +80,7 @@ export default function CityCard({ city, daysCount, tripId }) {
         <Link
           to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
           onClick={(e) => e.stopPropagation()}
-          className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-600 border border-orange-600"
+          className="w-10 h-10 rounded-full bg-orange-700 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-700 border border-orange-700"
         >
           <ChevronRight className="w-5 h-5" />
         </Link>

@@ -496,7 +496,7 @@ export default function Home() {
                 </Button>
                 <Button
                   onClick={() => updateTripMutation.mutate(formData)}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-orange-700 hover:bg-orange-800"
                   disabled={!formData.name || !formData.destination || updateTripMutation.isPending}>
                   {updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>

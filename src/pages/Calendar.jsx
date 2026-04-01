@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, Eye, Pencil } from 'lucide-react';
+import { Plane, Train, Hotel, Ticket as TicketIcon, Shield, Plus, Trash2, Calendar as CalendarIcon, FileText, Eye, Pencil, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -37,7 +37,9 @@ export default function Calendar() {
     category: 'flight',
     date: '',
     notes: '',
-    file_url: ''
+    file_url: '',
+    city_id: '',
+    arrival_city_id: ''
   });
 
   const queryClient = useQueryClient();
@@ -65,12 +67,18 @@ export default function Calendar() {
     enabled: !!tripId
   });
 
+  const { data: cities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    enabled: !!tripId
+  });
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Ticket.create({ ...data, trip_id: tripId, user_id: userId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setDialogOpen(false);
-      setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '' });
+      setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '', city_id: '', arrival_city_id: '' });
     }
   });
 
@@ -147,7 +155,7 @@ export default function Calendar() {
         <div className="flex justify-end mb-6">
           <Button
             onClick={() => setDialogOpen(true)}
-            className="bg-green-600 hover:bg-green-700">
+            className="bg-orange-700 hover:bg-orange-800">
 
             <Plus className="w-4 h-4 mr-2" />
             Añadir documento
@@ -297,23 +305,47 @@ export default function Calendar() {
                   {uploadingFile && <p className="text-xs text-muted-foreground mt-1">Subiendo archivo...</p>}
                   {formData.file_url && <p className="text-xs text-green-400 mt-1">✓ Archivo subido</p>}
                   </div>
+                  {cities.length > 0 && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> Ciudad origen</label>
+                        <Select value={formData.city_id || 'none'} onValueChange={(v) => setFormData({ ...formData, city_id: v === 'none' ? '' : v })}>
+                          <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Sin asignar</SelectItem>
+                            {cities.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> Ciudad destino</label>
+                        <Select value={formData.arrival_city_id || 'none'} onValueChange={(v) => setFormData({ ...formData, arrival_city_id: v === 'none' ? '' : v })}>
+                          <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Sin asignar</SelectItem>
+                            {cities.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
                   <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">Notas (opcional)</label>
-                  <Textarea
-                  placeholder="Notas adicionales..."
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={3}
-                  className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Notas (opcional)</label>
+                    <Textarea
+                    placeholder="Notas adicionales..."
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
 
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={() => createMutation.mutate(formData)}
-                  className="bg-green-600 hover:bg-green-700"
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={() => createMutation.mutate(formData)}
+                  className="bg-orange-700 hover:bg-orange-800"
                   disabled={!formData.name.trim() || !tripId || !userId || createMutation.isPending}>
 
                   {createMutation.isPending ? 'Guardando...' : 'Guardar'}
@@ -397,7 +429,7 @@ export default function Calendar() {
                       notes: editingTicket.notes
                     }
                   })}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-orange-700 hover:bg-orange-800"
                   disabled={!editingTicket.name?.trim() || updateMutation.isPending}>
 
                     {updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}

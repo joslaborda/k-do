@@ -248,7 +248,7 @@ export default function TripsList() {
               </Button>
               <Button
                 onClick={handleSubmit}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-orange-700 hover:bg-orange-800"
                 disabled={!formData.name || !formData.destination || !formData.start_date || createMutation.isPending}>
 
                 {createMutation.isPending ? 'Creando...' : 'Crear Viaje'}

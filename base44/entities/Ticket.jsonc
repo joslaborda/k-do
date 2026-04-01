@@ -1,0 +1,54 @@
+{
+  "name": "Ticket",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario due\u00f1o"
+    },
+    "name": {
+      "type": "string",
+      "description": "Ticket name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "flight",
+        "train",
+        "hotel",
+        "freetour",
+        "insurance",
+        "personal"
+      ]
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Uploaded file URL"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "city_id": {
+      "type": "string",
+      "description": "Ciudad de origen o ciudad a la que pertenece este documento"
+    },
+    "arrival_city_id": {
+      "type": "string",
+      "description": "Ciudad de destino (para trenes/vuelos entre ciudades)"
+    }
+  },
+  "required": [
+    "trip_id",
+    "user_id",
+    "name",
+    "category"
+  ]
+}
