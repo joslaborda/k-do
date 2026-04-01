@@ -7,11 +7,12 @@ import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { 
   ArrowLeft, Plus, Calendar, ChevronDown, ChevronUp, 
-  Edit2, Trash2, Save, X, MapPin, Sparkles, RefreshCw
+  Edit2, Trash2, Save, X, MapPin, Sparkles, RefreshCw, Settings, Hotel
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import DayMapButton from '@/components/itinerary/DayMapButton';
+import CitySettingsModal from '@/components/cities/CitySettingsModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -267,9 +268,33 @@ export default function CityDetail() {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 text-white/70 text-sm mb-2">
               <MapPin className="w-4 h-4" />
-              <span>Japan</span>
+              <span>{city.country || 'Japan'}</span>
+              {city.start_date && (
+                <>
+                  <span className="text-white/40">·</span>
+                  <Calendar className="w-4 h-4" />
+                  <span>
+                    {city.start_date && city.end_date
+                      ? `${format(new Date(city.start_date), 'd MMM')} – ${format(new Date(city.end_date), 'd MMM yyyy')}`
+                      : format(new Date(city.start_date), 'd MMM yyyy')}
+                  </span>
+                </>
+              )}
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white">{city.name}</h1>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white">{city.name}</h1>
+                {city.accommodation && (
+                  <div className="flex items-center gap-1.5 mt-2 text-white/75 text-sm">
+                    <Hotel className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate max-w-xs">{city.accommodation}</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex-shrink-0 mb-1">
+                <CitySettingsModal city={city} tripId={tripId} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

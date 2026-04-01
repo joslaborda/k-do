@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { MapPin, ChevronRight, Calendar } from 'lucide-react';
 import AccommodationInput from './AccommodationInput';
-import CitySettingsModal from './CitySettingsModal';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -76,8 +75,8 @@ export default function CityCard({ city, daysCount, tripId }) {
         </div>
       </Link>
 
-      {/* Action buttons — outside Link to prevent navigation on click */}
-      <div className="absolute bottom-5 right-5 flex flex-col items-center gap-2">
+      {/* Chevron button — outside Link to prevent double navigation */}
+      <div className="absolute bottom-5 right-5">
         <Link
           to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
           onClick={(e) => e.stopPropagation()}
@@ -85,7 +84,6 @@ export default function CityCard({ city, daysCount, tripId }) {
         >
           <ChevronRight className="w-5 h-5" />
         </Link>
-        <CitySettingsModal city={city} tripId={tripId} />
       </div>
     </div>
   );
