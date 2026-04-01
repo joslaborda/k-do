@@ -1,73 +1,117 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, Calendar, Users } from 'lucide-react';
-import { format } from 'date-fns';
+import { Users } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getTripCoverImage } from '@/lib/tripImage';
 
+function getTripStatus(trip) {
+  if (!trip.start_date) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(trip.start_date);
+  const end = trip.end_date ? new Date(trip.end_date) : null;
+
+  if (today < start) {
+    const days = differenceInDays(start, today);
+    return { label: `En ${days} día${days !== 1 ? 's' : ''}`, type: 'upcoming' };
+  }
+  if (end && today > end) {
+    return { label: 'Finalizado', type: 'past' };
+  }
+  return { label: 'En curso', type: 'active' };
+}
+
+function getTripDuration(trip) {
+  if (!trip.start_date || !trip.end_date) return null;
+  const days = differenceInDays(new Date(trip.end_date), new Date(trip.start_date)) + 1;
+  return days;
+}
+
+function formatDateRange(trip) {
+  if (!trip.start_date) return null;
+  const start = format(new Date(trip.start_date), 'd MMM', { locale: es });
+  if (!trip.end_date) return start;
+  const end = format(new Date(trip.end_date), 'd MMM', { locale: es });
+  return `${start} – ${end}`;
+}
+
+function getRouteSubtitle(trip, cities) {
+  if (cities.length > 0) {
+    const sorted = [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    return sorted.map(c => c.name).join(' → ');
+  }
+  return trip.country || trip.destination || '';
+}
+
+const statusStyles = {
+  upcoming: 'bg-orange-100 text-orange-700',
+  active: 'bg-green-100 text-green-700',
+  past: 'bg-gray-100 text-gray-500',
+};
+
 export default function TripCard({ trip, cities = [] }) {
   const coverImage = getTripCoverImage(trip, cities);
+  const status = getTripStatus(trip);
+  const duration = getTripDuration(trip);
+  const dateRange = formatDateRange(trip);
+  const subtitle = getRouteSubtitle(trip, cities);
 
   return (
     <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
-      <div className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+      <div className="bg-white border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
         {/* Cover Image */}
-        <div className="h-48 bg-gradient-to-br from-primary to-orange-600 relative overflow-hidden">
+        <div className="h-44 relative overflow-hidden bg-gradient-to-br from-orange-400 to-orange-700">
           <img
             src={coverImage}
             alt={trip.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-          {/* City pills if route exists */}
-          {cities.length > 0 && (
-            <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[90%]">
-              {cities.slice(0, 3).map(c => (
-                <span key={c.id} className="bg-black/40 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full border border-white/20">
-                  📍 {c.name}
-                </span>
-              ))}
-              {cities.length > 3 && (
-                <span className="bg-black/40 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full border border-white/20">
-                  +{cities.length - 3}
-                </span>
-              )}
+          {/* Status badge */}
+          {status && (
+            <div className="absolute top-3 right-3">
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyles[status.type]}`}>
+                {status.label}
+              </span>
             </div>
           )}
 
+          {/* Title + subtitle over image */}
           <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-2xl font-bold text-white mb-1 drop-shadow">{trip.name}</h3>
-            <p className="text-white/90 text-sm flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" />
-              {trip.destination}{trip.country && trip.country !== trip.destination ? `, ${trip.country}` : ''}
-            </p>
+            <h3 className="text-xl font-bold text-white drop-shadow leading-tight mb-0.5">{trip.name}</h3>
+            {subtitle && (
+              <p className="text-white/80 text-xs font-medium truncate">{subtitle}</p>
+            )}
           </div>
         </div>
 
-        {/* Info */}
-        <div className="bg-neutral-50 p-5">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-            <Calendar className="w-4 h-4" />
-            {trip.start_date && format(new Date(trip.start_date), 'dd MMM', { locale: es })}
-            {trip.end_date && ` – ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+        {/* Info row */}
+        <div className="px-4 py-3 flex items-center justify-between gap-3">
+          {/* Dates + duration */}
+          <div className="min-w-0">
+            {dateRange ? (
+              <p className="text-sm font-medium text-foreground truncate">
+                {dateRange}{duration ? <span className="text-muted-foreground font-normal"> · {duration} días</span> : ''}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Sin fechas</p>
+            )}
           </div>
 
-          {trip.description && (
-            <p className="text-sm text-foreground line-clamp-2 mb-3">{trip.description}</p>
-          )}
-
-          <div className="flex items-center justify-between pt-3 border-t border-border">
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Users className="w-4 h-4" />
-              {trip.members?.length || 1} viajero{(trip.members?.length || 1) > 1 ? 's' : ''}
-            </div>
-            <span className="text-xs px-2 py-1 bg-secondary rounded-full text-foreground">
-              {trip.currency}
+          {/* Travelers + currency */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Users className="w-3.5 h-3.5" />
+              {trip.members?.length || 1}
             </span>
+            {trip.currency && (
+              <span className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-full font-medium">
+                {trip.currency}
+              </span>
+            )}
           </div>
         </div>
       </div>

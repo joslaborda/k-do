@@ -105,47 +105,45 @@ export default function TripsList() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="glass border-b border-border">
-        <div className="bg-orange-700 mx-auto px-6 py-12 max-w-6xl">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-slate-50 mb-2 text-4xl font-black">Kōdo</h1>
-              <p className="text-slate-50 text-lg">Planifica tu próxima aventura</p>
-            </div>
-            <Button
-              onClick={() => setDialogOpen(true)}
-              size="lg" className="bg-green-600 text-primary-foreground px-8 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-10 hover:bg-primary/90">
-
-
-              <Plus className="w-5 h-5 mr-2" />
-              Nuevo Viaje
-            </Button>
+      <div className="bg-orange-700 px-6 py-10">
+        <div className="max-w-6xl mx-auto flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-white text-4xl font-black tracking-tight">Kōdo</h1>
+            <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
+            <p className="text-white/60 text-sm mt-1">Tu próximo viaje empieza aquí</p>
           </div>
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0">
+            <Plus className="w-4 h-4 mr-1.5" />
+            Crear viaje
+          </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="bg-orange-50 mx-auto px-6 py-12 max-w-6xl">
-        {trips.length === 0 ?
-        <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-            <Plane className="w-24 h-24 text-muted-foreground mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">¡Empieza tu aventura!</h2>
-            <p className="text-muted-foreground mb-8">Crea tu primer viaje y comienza a planificar</p>
-            <Button onClick={() => setDialogOpen(true)} size="lg" className="bg-primary hover:bg-primary/90">
-              <Plus className="w-5 h-5 mr-2" />
-              Crear Primer Viaje
+      <div className="bg-orange-50 mx-auto px-6 py-8 max-w-6xl">
+        {trips.length === 0 ? (
+          <div className="text-center py-20 bg-white border border-border rounded-2xl">
+            <div className="text-5xl mb-4">✈️</div>
+            <h2 className="text-xl font-semibold text-foreground mb-1">Aún no tienes viajes</h2>
+            <p className="text-muted-foreground text-sm mb-6">Crea tu primer viaje y empieza a planificar</p>
+            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
+              <Plus className="w-4 h-4 mr-1.5" />
+              Crear tu primer viaje
             </Button>
-          </div> :
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trips.map((trip) => {
-              const tripCities = allCities.filter(c => c.trip_id === trip.id);
-              return (
-                <TripCard key={trip.id} trip={trip} cities={tripCities} />
-              );
-            })}
           </div>
-        }
+        ) : (
+          <>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tus viajes</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {trips.map((trip) => {
+                const tripCities = allCities.filter(c => c.trip_id === trip.id);
+                return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Create Dialog */}
