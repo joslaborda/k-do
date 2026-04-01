@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Sparkles, Zap, Coffee, MapPin, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -19,7 +19,22 @@ export default function AIGeneratorPanel({ open, onOpenChange, onGenerate, isGen
     pace: 'equilibrado',
   });
 
+  // Pre-load saved preferences when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    const saved = trip?.ai_preferences;
+    if (saved && Object.keys(saved).length > 0) {
+      setPreferences(p => ({ ...p, ...saved }));
+    } else {
+      try {
+        const local = JSON.parse(localStorage.getItem(`trip_prefs_${trip?.id}`) || '{}');
+        if (Object.keys(local).length > 0) setPreferences(p => ({ ...p, ...local }));
+      } catch {}
+    }
+  }, [open, trip]);
+
   const hasRoute = cities && cities.length > 0;
+  const hasSavedPrefs = !!(trip?.ai_preferences && Object.keys(trip.ai_preferences).length > 0);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -53,6 +68,14 @@ export default function AIGeneratorPanel({ open, onOpenChange, onGenerate, isGen
               </div>
             )}
           </div>
+
+          {/* Saved prefs notice */}
+          {hasSavedPrefs && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-sm text-blue-700 flex items-center gap-2">
+              <span>🧠</span>
+              <span>Preferencias guardadas cargadas automáticamente. Puedes modificarlas.</span>
+            </div>
+          )}
 
           {/* Pace */}
           <div>

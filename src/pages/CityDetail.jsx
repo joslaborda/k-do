@@ -10,7 +10,7 @@ import {
   Edit2, Trash2, Save, X, MapPin, Sparkles, RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { generateDaysForCity } from '@/lib/itineraryAI';
+import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -146,20 +146,15 @@ export default function CityDetail() {
     setDialogOpen(true);
   };
 
-  const getPreferences = () => {
-    try {
-      return JSON.parse(localStorage.getItem(`trip_prefs_${tripId}`) || '{}');
-    } catch {
-      return {};
-    }
-  };
-
   const handleRegenerateCity = async () => {
     if (!city || !trip) return;
     setRegeneratingCity(true);
 
-    const allDays = await base44.entities.ItineraryDay.filter({ trip_id: tripId });
-    const allCities = await base44.entities.City.filter({ trip_id: tripId }, 'order');
+    const [allDays, allCities] = await Promise.all([
+      base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+      base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    ]);
+    const preferences = await loadPreferences(tripId, trip);
 
     // Delete existing days for this city
     for (const day of days) {
@@ -170,7 +165,7 @@ export default function CityDetail() {
       city,
       trip,
       existingDays: allDays.filter(d => d.city_id !== city.id),
-      preferences: getPreferences(),
+      preferences,
       allCities: allCities.filter(c => c.id !== city.id),
     });
 
@@ -183,7 +178,11 @@ export default function CityDetail() {
       });
     }
 
+    // Update visited_places in the trip
+    await updateVisitedPlaces(trip, newDays);
+
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
     setRegeneratingCity(false);
     toast({ title: `${city.name} regenerado 🎌`, description: 'El itinerario de esta ciudad ha sido actualizado.' });
   };
@@ -192,44 +191,17 @@ export default function CityDetail() {
     if (!city || !trip) return;
     setRegeneratingDayId(day.id);
 
-    const allDays = await base44.entities.ItineraryDay.filter({ trip_id: tripId });
-    const allCities = await base44.entities.City.filter({ trip_id: tripId }, 'order');
+    const [allDays, preferences] = await Promise.all([
+      base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+      loadPreferences(tripId, trip),
+    ]);
 
-    // Generate just this one day
-    const prompt = `
-Eres un experto planificador de viajes a Japón. Regenera SOLO el día ${day.date} en ${city.name}.
-
-VIAJE: ${trip.name} - ${trip.destination}
-CIUDAD: ${city.name} (${city.start_date} → ${city.end_date})
-DÍA A REGENERAR: ${day.date} (título actual: "${day.title}")
-
-DÍAS YA PLANIFICADOS EN ESTA CIUDAD (no repetir lugares):
-${allDays.filter(d => d.city_id === cityId && d.id !== day.id).map(d => `- ${d.title}: ${d.content?.substring(0, 200)}`).join('\n')}
-
-LUGARES YA USADOS EN OTRAS CIUDADES:
-${allDays.filter(d => d.city_id !== cityId).map(d => d.content?.substring(0, 100)).join('\n')}
-
-PREFERENCIAS: Ritmo ${getPreferences().pace || 'equilibrado'}
-${getPreferences().places ? `Lugares: ${getPreferences().places}` : ''}
-${getPreferences().avoid ? `Evitar: ${getPreferences().avoid}` : ''}
-
-Genera un nuevo itinerario para este día con zonas diferentes. Responde SOLO JSON:
-{
-  "title": "Nuevo título descriptivo con zona",
-  "content": "Contenido detallado en Markdown con horarios, lugares y tips"
-}
-`;
-
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt,
-      model: 'claude_sonnet_4_6',
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          title: { type: 'string' },
-          content: { type: 'string' },
-        },
-      },
+    const result = await regenerateDay({
+      day,
+      city,
+      trip,
+      allDays,
+      preferences,
     });
 
     await base44.entities.ItineraryDay.update(day.id, {
@@ -237,7 +209,11 @@ Genera un nuevo itinerario para este día con zonas diferentes. Responde SOLO JS
       content: result.content,
     });
 
+    // Update visited_places
+    await updateVisitedPlaces(trip, [{ title: result.title, content: result.content }]);
+
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
     setRegeneratingDayId(null);
     toast({ title: 'Día regenerado ✨', description: `"${result.title}" listo.` });
   };

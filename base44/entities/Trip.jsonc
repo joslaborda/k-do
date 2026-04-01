@@ -47,6 +47,34 @@
     "roles": {
       "type": "object",
       "description": "Roles de los miembros: { email: 'admin' | 'editor' | 'viewer' }"
+    },
+    "ai_preferences": {
+      "type": "object",
+      "description": "Preferencias de la IA: { pace, places, restaurants, experiences, avoid }",
+      "properties": {
+        "pace": {
+          "type": "string"
+        },
+        "places": {
+          "type": "string"
+        },
+        "restaurants": {
+          "type": "string"
+        },
+        "experiences": {
+          "type": "string"
+        },
+        "avoid": {
+          "type": "string"
+        }
+      }
+    },
+    "visited_places": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de lugares ya incluidos en el itinerario (para evitar repeticiones)"
     }
   },
   "required": [

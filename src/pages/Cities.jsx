@@ -14,7 +14,7 @@ import { es } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import AIGeneratorPanel from '@/components/itinerary/AIGeneratorPanel';
 import AIGeneratingStatus from '@/components/itinerary/AIGeneratingStatus';
-import { generateDaysForCity, suggestCitiesForTrip } from '@/lib/itineraryAI';
+import { generateDaysForCity, suggestCitiesForTrip, savePreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import { AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -108,8 +108,8 @@ export default function Cities() {
     setIsGenerating(true);
     setGeneratingStep(0);
 
-    // Save preferences for future regenerations
-    localStorage.setItem(`trip_prefs_${tripId}`, JSON.stringify(preferences));
+    // Save preferences persistently (Trip entity + localStorage)
+    await savePreferences(tripId, preferences);
 
     let citiesToProcess = cities;
 
@@ -153,6 +153,7 @@ export default function Cities() {
         existingDays: allExistingDays.filter(d => d.city_id !== city.id),
         preferences,
         allCities: citiesToProcess.filter(c => c.id !== city.id),
+        onStatus: (msg) => setGeneratingCity(`${city.name}: ${msg}`),
       });
 
       for (let j = 0; j < newDays.length; j++) {
@@ -163,11 +164,18 @@ export default function Cities() {
           order: j,
         });
       }
+
+      // Update visited_places after each city so next city respects them
+      const latestTrip = await base44.entities.Trip.get(tripId);
+      await updateVisitedPlaces(latestTrip, newDays);
+      // Refresh allExistingDays for the next iteration
+      allExistingDays.push(...newDays.map(d => ({ ...d, city_id: city.id })));
     }
 
     setIsGenerating(false);
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
     queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
+    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
 
     toast({
       title: '¡Itinerario generado! 🎌',
