@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -17,45 +17,41 @@ const categoryConfig = {
   other: { icon: MoreHorizontal, color: 'bg-slate-100 text-slate-600' }
 };
 
-export default function ExpenseCard({ expense, onDelete }) {
+export default function ExpenseCard({ expense, onEdit, onDelete }) {
   const config = categoryConfig[expense.category] || categoryConfig.other;
   const Icon = config.icon;
 
-  const isJPY = expense.currency === 'JPY';
-  const amountOriginal = isJPY ? `¥${expense.amount?.toLocaleString()}` : `€${expense.amount?.toFixed(2)}`;
-  const amountConverted = isJPY ? `≈ €${(expense.amount / 160).toFixed(2)}` : null;
+  const splitInfo = expense.split_type === 'equal' 
+    ? `A partes iguales (${expense.split_with?.length || 1})`
+    : `Personalizado`;
 
   return (
-    <div className="group flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-100 hover:shadow-md transition-all duration-300">
+    <div className="group flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all">
       <div className={`w-11 h-11 rounded-xl ${config.color} flex items-center justify-center flex-shrink-0`}>
         <Icon className="w-5 h-5" />
       </div>
       
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-slate-900 truncate">{expense.description}</h3>
+        <h3 className="font-medium text-gray-900 truncate">{expense.description}</h3>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
-            💳 {expense.paid_by}
+          <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-semibold">
+            💳 {expense.paid_by?.split('@')[0]}
           </span>
           {expense.date && (
-            <span className="text-xs text-slate-400">
-              {format(new Date(expense.date), 'MMM d')}
+            <span className="text-xs text-gray-400">
+              {format(new Date(expense.date), 'd MMM')}
             </span>
           )}
           {expense.split_with?.length > 0 && (
-            <span className="text-xs text-slate-400">· dividido</span>
+            <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+              {splitInfo}
+            </span>
           )}
         </div>
       </div>
       
       <div className="text-right shrink-0">
-        <p className="font-semibold text-slate-900">{amountOriginal}</p>
-        {amountConverted && (
-          <p className="text-xs text-muted-foreground">{amountConverted}</p>
-        )}
-        {isJPY && (
-          <p className="text-[10px] text-muted-foreground/60 leading-tight">al cambio del pago</p>
-        )}
+        <p className="font-bold text-gray-900">{expense.amount?.toFixed(2)}€</p>
       </div>
 
       <DropdownMenu>
@@ -65,7 +61,13 @@ export default function ExpenseCard({ expense, onDelete }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onDelete(expense.id)} className="text-red-600">
+          {onEdit && (
+            <DropdownMenuItem onClick={() => onEdit(expense)}>
+              <Edit2 className="w-4 h-4 mr-2" />
+              Editar
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={() => onDelete()} className="text-red-600">
             <Trash2 className="w-4 h-4 mr-2" />
             Eliminar
           </DropdownMenuItem>

@@ -1,135 +1,87 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Receipt, Utensils, Train, Hotel, Ticket, ShoppingBag, MoreHorizontal, Camera, X } from 'lucide-react';
-import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
-import { useUndo } from '@/components/hooks/useUndo';
-import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
+import { Plus, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle } from
-'@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue } from
-'@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+  DialogTitle,
+} from '@/components/ui/dialog';
+import ExpenseForm from '@/components/expenses/ExpenseForm';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
-import BalanceSummary from '@/components/expenses/BalanceSummary';
-import ExpenseChart from '@/components/expenses/ExpenseChart';
-import TricountBalance from '@/components/expenses/TricountBalance';
-
-const categories = [
-{ value: 'food', label: 'Comida', icon: Utensils },
-{ value: 'transport', label: 'Transporte', icon: Train },
-{ value: 'accommodation', label: 'Alojamiento', icon: Hotel },
-{ value: 'activities', label: 'Actividades', icon: Ticket },
-{ value: 'shopping', label: 'Compras', icon: ShoppingBag },
-{ value: 'other', label: 'Otro', icon: MoreHorizontal }];
-
+import BalancesPanel from '@/components/expenses/BalancesPanel';
+import { useUndo } from '@/components/hooks/useUndo';
 
 export default function Expenses() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
-  
+
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-
-  useState(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
-  });
-
-  const myEmail = currentUser?.email || '';
-  const myName = currentUser?.full_name || myEmail;
-
-  const [formData, setFormData] = useState({
-    description: '',
-    amount: '',
-    currency: 'JPY',
-    paid_by: '',
-    split_with: [],
-    category: 'food',
-    date: new Date().toISOString().split('T')[0],
-    receipt_photos: []
-  });
 
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
 
-  const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['expenses'] });
-  };
+  // Obtener usuario actual
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
 
-  const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
+  // Obtener trip
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: () => base44.entities.Trip.get(tripId),
+    enabled: !!tripId,
+  });
 
+  const members = trip?.members || [];
+
+  // Obtener gastos
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
-    queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }, '-date') : base44.entities.Expense.list('-date'),
-    staleTime: 10000, // Cache por 10 segundos
-    enabled: !!tripId
+    queryFn: () =>
+      tripId
+        ? base44.entities.Expense.filter({ trip_id: tripId }, '-date')
+        : base44.entities.Expense.list('-date'),
+    enabled: !!tripId,
   });
 
+  // Crear gasto
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create({
-      ...data,
-      trip_id: tripId,
-      paid_by: data.paid_by || myEmail,
-      amount: parseFloat(data.amount) || 0
-    }),
+    mutationFn: (formData) =>
+      base44.entities.Expense.create({
+        ...formData,
+        trip_id: tripId,
+        amount: parseFloat(formData.amount),
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setDialogOpen(false);
-      setFormData({
-        description: '',
-        amount: '',
-        currency: 'JPY',
-        paid_by: '',
-        split_with: [],
-        category: 'food',
-        date: new Date().toISOString().split('T')[0],
-        receipt_photos: []
-      });
-    }
+      setEditingExpense(null);
+    },
   });
 
-  const handlePhotoUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingPhoto(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({
+  // Actualizar gasto
+  const updateMutation = useMutation({
+    mutationFn: ({ id, formData }) =>
+      base44.entities.Expense.update(id, {
         ...formData,
-        receipt_photos: [...(formData.receipt_photos || []), file_url]
-      });
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-    } finally {
-      setUploadingPhoto(false);
-    }
-  };
+        amount: parseFloat(formData.amount),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
+      setDialogOpen(false);
+      setEditingExpense(null);
+    },
+  });
 
-  const removePhoto = (indexToRemove) => {
-    setFormData({
-      ...formData,
-      receipt_photos: formData.receipt_photos.filter((_, idx) => idx !== indexToRemove)
-    });
-  };
-
+  // Eliminar gasto
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Expense.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }),
   });
 
   const handleDelete = async (expense) => {
@@ -146,255 +98,121 @@ export default function Expenses() {
     );
   };
 
-  const handleSplitChange = (checked) => {
-    setFormData({
-      ...formData,
-      split_with: checked ? ['split'] : []
-    });
+  const handleSave = (formData) => {
+    if (editingExpense) {
+      updateMutation.mutate({
+        id: editingExpense.id,
+        formData,
+      });
+    } else {
+      createMutation.mutate(formData);
+    }
   };
 
-  const filteredExpenses = activeTab === 'all'
-    ? expenses
-    : expenses.filter((e) => e.paid_by === activeTab);
-
   return (
-    <div className="min-h-screen bg-orange-50">
-      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
-      
-      {/* Header con caja naranja */}
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <div>
-            <h1 className="text-white text-4xl font-bold">Gastos 💴</h1>
-            <p className="text-white/90 mt-2">Registra y divide los gastos del viaje</p>
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-orange-700 to-orange-600 pt-12 pb-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-white text-4xl font-bold">Gastos 💰</h1>
+              <p className="text-white/90 mt-2">Registra y divide los gastos del viaje</p>
+            </div>
+            <Button
+              onClick={() => {
+                setEditingExpense(null);
+                setDialogOpen(true);
+              }}
+              className="bg-white text-orange-700 hover:bg-orange-50 font-bold shadow-lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Añadir
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-4xl -mt-12">
-        <div className="flex justify-end mb-6">
-          <Button
-            onClick={() => setDialogOpen(true)}
-            className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Añadir Gasto
-          </Button>
-        </div>
-
-        <div className="space-y-6">
-          {/* Tricount Balance */}
-          <TricountBalance expenses={expenses} />
-
-          {/* Charts */}
-          <ExpenseChart expenses={expenses} />
-
-          {/* Balance Summary */}
-          <BalanceSummary expenses={expenses} />
-
-          {/* Expenses List */}
-          <div>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="bg-white border border-border p-1">
-                <TabsTrigger value="all" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                  👁️ Todos
-                </TabsTrigger>
-                {myEmail && (
-                  <TabsTrigger value={myEmail} className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-                    💳 Mis gastos
-                  </TabsTrigger>
-                )}
-              </TabsList>
-            </Tabs>
-
-            {isLoading ?
-            <div className="space-y-3">
-                {[1, 2, 3].map((i) =>
-              <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse" />
-              )}
-              </div> :
-            filteredExpenses.length === 0 ?
-            <div className="bg-[#ffffff] py-16 text-center rounded-2xl glass border border-dashed border-border">
-                <Receipt className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">Sin gastos todavía</h3>
-                <p className="text-muted-foreground mb-4">Empieza a registrar los gastos del viaje</p>
-                <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Añadir primer gasto
-                </Button>
-              </div> :
-
-            <div className="space-y-3">
-                {filteredExpenses.map((expense) =>
-              <ExpenseCard
-                key={expense.id}
-                expense={expense}
-                onDelete={() => handleDelete(expense)} />
-
-              )}
-              </div>
-            }
+      <div className="max-w-5xl mx-auto px-6 pt-6 pb-20 -mt-12">
+        {/* Balances Panel */}
+        {!isLoading && (
+          <div className="mb-8">
+            <BalancesPanel
+              expenses={expenses}
+              members={members}
+              currentUserEmail={currentUser?.email}
+            />
           </div>
-        </div>
-      </div>
+        )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-         <DialogContent className="bg-card border-border">
-           <DialogHeader>
-             <DialogTitle className="text-foreground">Añadir Gasto</DialogTitle>
-           </DialogHeader>
-           <div className="space-y-4 pt-4">
-             <div>
-               <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
-               <Input
-                placeholder="ej. Cena en Ichiran"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+        {/* Gastos */}
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <h2 className="text-xl font-bold text-foreground mb-4">Registro de gastos</h2>
 
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Importe</label>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="bg-input border-border text-foreground" />
-
-                </div>
-                <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda</label>
-                <Select
-                  value={formData.currency}
-                  onValueChange={(value) => setFormData({ ...formData, currency: value })}>
-
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="JPY">¥ JPY</SelectItem>
-                    <SelectItem value="EUR">€ EUR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse" />
+              ))}
             </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Pagado por</label>
-              <Input
-                placeholder={myName || 'Tu nombre o email'}
-                value={formData.paid_by || myName}
-                onChange={(e) => setFormData({ ...formData, paid_by: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="split"
-                checked={formData.split_with.length > 0}
-                onCheckedChange={handleSplitChange} />
-              <label htmlFor="split" className="text-sm text-foreground">
-                Dividir a medias entre los viajeros
-              </label>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}>
-
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) =>
-                  <SelectItem key={cat.value} value={cat.value}>
-                      <div className="flex items-center gap-2">
-                        <cat.icon className="w-4 h-4" />
-                        {cat.label}
-                      </div>
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
-               <Input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="bg-input border-border text-foreground" />
-
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Fotos del recibo (opcional)</label>
-              <div className="space-y-3">
-                {formData.receipt_photos && formData.receipt_photos.length > 0 &&
-                <div className="grid grid-cols-3 gap-2">
-                    {formData.receipt_photos.map((photo, idx) =>
-                  <div key={idx} className="relative group">
-                        <img
-                      src={photo}
-                      alt="Recibo"
-                      className="w-full h-24 object-cover rounded-lg border border-border" />
-
-                        <button
-                      type="button"
-                      onClick={() => removePhoto(idx)}
-                      className="absolute top-1 right-1 p-1 bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-
-                          <X className="w-3 h-3 text-white" />
-                        </button>
-                      </div>
-                  )}
-                  </div>
-                }
-                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={uploadingPhoto} />
-
-                  {uploadingPhoto ?
-                  <>
-                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                      <span className="text-sm text-muted-foreground">Subiendo...</span>
-                    </> :
-
-                  <>
-                      <Camera className="w-5 h-5 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Añadir foto</span>
-                    </>
-                  }
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                Cancelar
-              </Button>
+          ) : expenses.length === 0 ? (
+            <div className="text-center py-16">
+              <Receipt className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Sin gastos todavía
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Empieza a registrar los gastos del viaje
+              </p>
               <Button
-                onClick={() => createMutation.mutate(formData)}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.description.trim() || !formData.amount || createMutation.isPending}>
-
-                {createMutation.isPending ? 'Guardando...' : 'Guardar'}
+                onClick={() => {
+                  setEditingExpense(null);
+                  setDialogOpen(true);
+                }}
+                className="bg-orange-700 hover:bg-orange-800"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Añadir primer gasto
               </Button>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              {expenses.map((expense) => (
+                <ExpenseCard
+                  key={expense.id}
+                  expense={expense}
+                  onEdit={(e) => {
+                    setEditingExpense(e);
+                    setDialogOpen(true);
+                  }}
+                  onDelete={() => handleDelete(expense)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="bg-white border-border max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-foreground font-bold">
+              {editingExpense ? 'Editar gasto' : 'Nuevo gasto'}
+            </DialogTitle>
+          </DialogHeader>
+          <ExpenseForm
+            members={members}
+            initialData={editingExpense}
+            onSave={handleSave}
+            onCancel={() => {
+              setDialogOpen(false);
+              setEditingExpense(null);
+            }}
+            saving={createMutation.isPending || updateMutation.isPending}
+          />
         </DialogContent>
       </Dialog>
-    </div>);
-
+    </div>
+  );
 }

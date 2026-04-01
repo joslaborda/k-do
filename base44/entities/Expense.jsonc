@@ -1,0 +1,80 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Cantidad total gastada"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "JPY",
+        "EUR",
+        "USD",
+        "GBP"
+      ],
+      "default": "EUR"
+    },
+    "paid_by": {
+      "type": "string",
+      "description": "Email del usuario que pag\u00f3"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "food",
+        "transport",
+        "accommodation",
+        "activities",
+        "shopping",
+        "other"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "split_type": {
+      "type": "string",
+      "enum": [
+        "equal",
+        "custom"
+      ],
+      "default": "equal",
+      "description": "Tipo de divisi\u00f3n: a partes iguales o personalizado"
+    },
+    "split_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails de usuarios incluidos en la divisi\u00f3n (incluye paid_by)"
+    },
+    "amounts_by_user": {
+      "type": "object",
+      "description": "Cantidades espec\u00edficas por usuario (solo si split_type=custom). Formato: {email: amount}"
+    },
+    "receipt_photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de fotos de recibos"
+    }
+  },
+  "required": [
+    "trip_id",
+    "description",
+    "amount",
+    "paid_by",
+    "split_with"
+  ]
+}
