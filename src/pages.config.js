@@ -61,6 +61,7 @@ import Tickets from './pages/Tickets';
 import Translator from './pages/Translator';
 import TripDetail from './pages/TripDetail';
 import TripsList from './pages/TripsList';
+import TripMap from './pages/TripMap';
 import Utilities from './pages/Utilities';
 import __Layout from './Layout.jsx';
 
@@ -80,6 +81,7 @@ export const PAGES = {
     "Translator": Translator,
     "TripDetail": TripDetail,
     "TripsList": TripsList,
+    "TripMap": TripMap,
     "Utilities": Utilities,
 }
 

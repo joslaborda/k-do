@@ -159,6 +159,7 @@ export default function Home() {
 
   const sharedSections = [
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
+    { name: 'Mapa', page: 'TripMap', icon: MapPin, color: 'from-teal-500 to-cyan-500', emoji: '🗺️' },
     { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
     { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },

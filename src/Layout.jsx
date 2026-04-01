@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, Package, Info, Languages, BookOpen } from 'lucide-react';
+import { Home, MapPin, Calendar, UtensilsCrossed, Receipt, Info, Languages, Map } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
@@ -9,6 +9,7 @@ import SyncIndicator from '@/components/SyncIndicator';
 const navItems = [
 { name: 'Inicio', page: 'Home', icon: Home },
 { name: 'Ruta', page: 'Cities', icon: MapPin },
+{ name: 'Mapa', page: 'TripMap', icon: Map },
 { name: 'Docs', page: 'Calendar', icon: Calendar },
 { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
 { name: 'Gastos', page: 'Expenses', icon: Receipt },
