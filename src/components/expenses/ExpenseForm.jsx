@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X, Camera } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 const CATEGORIES = [
   { value: 'food', label: '🍽️ Comida' },
@@ -46,6 +47,11 @@ export default function ExpenseForm({
     initialData?.amounts_by_user || {}
   );
 
+  const [receipts, setReceipts] = useState(initialData?.receipt_photos || []);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+
   const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
   const toggleMember = (email) => {
@@ -79,12 +85,32 @@ export default function ExpenseForm({
     !amountMismatch &&
     !saving;
 
-  const handleSave = () => {
-    if (form.split_type === 'custom') {
-      onSave({ ...form, amounts_by_user: customAmounts });
-    } else {
-      onSave(form);
+  const handleReceiptUpload = async (file) => {
+    if (!file) return;
+    setUploadingReceipt(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setReceipts(prev => [...prev, file_url]);
+    } catch (error) {
+      console.error('Error uploading receipt:', error);
+    } finally {
+      setUploadingReceipt(false);
     }
+  };
+
+  const removeReceipt = (index) => {
+    setReceipts(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    const dataToSave = {
+      ...form,
+      receipt_photos: receipts,
+    };
+    if (form.split_type === 'custom') {
+      dataToSave.amounts_by_user = customAmounts;
+    }
+    onSave(dataToSave);
   };
 
   return (
@@ -243,6 +269,64 @@ export default function ExpenseForm({
           </div>
         </div>
       )}
+
+      {/* Recibos */}
+      <div>
+        <label className="text-sm font-semibold text-foreground mb-3 block">
+          Recibos (opcional)
+        </label>
+        <div className="flex gap-2 mb-3">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingReceipt}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-secondary/50 text-sm font-medium transition-all disabled:opacity-50"
+          >
+            <Upload className="w-4 h-4" />
+            {uploadingReceipt ? 'Subiendo...' : 'Subir archivo'}
+          </button>
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={uploadingReceipt}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-secondary/50 text-sm font-medium transition-all disabled:opacity-50"
+          >
+            <Camera className="w-4 h-4" />
+            {uploadingReceipt ? 'Procesando...' : 'Sacar foto'}
+          </button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleReceiptUpload(e.target.files[0])}
+        />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleReceiptUpload(e.target.files[0])}
+        />
+        {receipts.length > 0 && (
+          <div className="grid grid-cols-3 gap-2">
+            {receipts.map((url, idx) => (
+              <div key={idx} className="relative rounded-lg overflow-hidden bg-secondary">
+                <img src={url} alt="Recibo" className="w-full h-24 object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeReceipt(idx)}
+                  className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* División personalizada */}
       {form.split_type === 'custom' && (
