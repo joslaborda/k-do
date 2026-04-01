@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { MapPin, ChevronRight, Calendar } from 'lucide-react';
 import AccommodationInput from './AccommodationInput';
+import CitySettingsModal from './CitySettingsModal';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -13,70 +14,79 @@ const cityImages = {
   'Tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800'
 };
 
-export default function CityCard({ city, daysCount, tripId, onUpdate }) {
-   const formatDateRange = () => {
+export default function CityCard({ city, daysCount, tripId }) {
+  const formatDateRange = () => {
     if (!city.start_date) return null;
-    
     const start = new Date(city.start_date);
     const end = city.end_date ? new Date(city.end_date) : null;
-    
     if (end && start.getTime() === end.getTime()) {
       return format(start, 'd MMM', { locale: es });
     }
-    
     if (end) {
       return `${format(start, 'd', { locale: es })}-${format(end, 'd MMM', { locale: es })}`;
     }
-    
     return format(start, 'd MMM', { locale: es });
   };
 
   return (
-     <Link 
-       to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
-       className="group block"
-     >
-      <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
-        <div className="aspect-[16/10] overflow-hidden">
-          <img 
-            src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
-            alt={city.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        </div>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="flex flex-col gap-1.5 mb-2">
-                <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                  <MapPin className="w-4 h-4 flex-shrink-0" />
-                  <span>Japan</span>
-                </div>
-                {city.start_date && (
+    <div className="group relative">
+      <Link
+        to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
+        className="block"
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+          <div className="aspect-[16/10] overflow-hidden">
+            <img
+              src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
+              alt={city.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          </div>
+
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-1.5 mb-2">
                   <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                    <Calendar className="w-4 h-4 flex-shrink-0" />
-                    <span>{formatDateRange()}</span>
+                    <MapPin className="w-4 h-4 flex-shrink-0" />
+                    <span>Japan</span>
                   </div>
+                  {city.start_date && (
+                    <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span>{formatDateRange()}</span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-3xl font-bold text-white tracking-tight">
+                  {city.name}
+                </h3>
+                {daysCount > 0 && (
+                  <p className="text-white text-sm mt-1 font-medium">
+                    {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
+                  </p>
                 )}
+                <AccommodationInput city={city} tripId={tripId} />
               </div>
-              <h3 className="text-3xl font-bold text-white tracking-tight">
-                {city.name}
-              </h3>
-              {daysCount > 0 && (
-                <p className="text-white text-sm mt-1 font-medium">
-                  {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
-                </p>
-              )}
-              <AccommodationInput city={city} tripId={tripId} />
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:text-slate-900 text-white">
-              <ChevronRight className="w-5 h-5" />
+              {/* Spacer so the Link content doesn't overlap the absolute buttons */}
+              <div className="w-10 flex-shrink-0" />
             </div>
           </div>
         </div>
+      </Link>
+
+      {/* Action buttons — outside Link to prevent navigation on click */}
+      <div className="absolute bottom-5 right-5 flex flex-col items-center gap-2">
+        <Link
+          to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
+          onClick={(e) => e.stopPropagation()}
+          className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:text-slate-900 text-white"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </Link>
+        <CitySettingsModal city={city} tripId={tripId} />
       </div>
-    </Link>
+    </div>
   );
 }
