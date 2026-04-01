@@ -6,33 +6,12 @@ import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import CityCard from '@/components/cities/CityCard';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import RouteMap from '@/components/cities/RouteMap';
 import { Button } from '@/components/ui/button';
 import AIGeneratorPanel from '@/components/itinerary/AIGeneratorPanel';
 import AIGeneratingStatus from '@/components/itinerary/AIGeneratingStatus';
 import { generateDaysForCity, suggestCitiesForTrip, savePreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
-import { AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/use-toast';
-
-// Fix default marker icon
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
-});
-
-const cityCoordinates = {
-  'Osaka': [34.6937, 135.5023],
-  'Hiroshima': [34.3853, 132.4553],
-  'Hakone': [35.2323, 139.1070],
-  'Kyoto': [35.0116, 135.7681],
-  'Tokyo': [35.6762, 139.6503]
-};
 
 export default function Cities() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -95,12 +74,6 @@ export default function Cities() {
   const getDaysCount = (cityId) => {
     return itineraryDays.filter((day) => day.city_id === cityId).length;
   };
-
-  const getCityPosition = (cityName) => {
-    return cityCoordinates[cityName] || [35.6762, 139.6503];
-  };
-
-  const routePositions = cities.map((city) => getCityPosition(city.name)).filter((pos) => pos);
 
   const handleGenerateItinerary = async (preferences) => {
     if (!trip) return;
@@ -231,16 +204,19 @@ export default function Cities() {
             </Button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cities.map((city) => (
-              <CityCard
-                key={city.id}
-                city={city}
-                daysCount={getDaysCount(city.id)}
-                tripId={tripId}
-              />
-            ))}
-          </div>
+          <>
+            <RouteMap cities={cities} />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cities.map((city) => (
+                <CityCard
+                  key={city.id}
+                  city={city}
+                  daysCount={getDaysCount(city.id)}
+                  tripId={tripId}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 

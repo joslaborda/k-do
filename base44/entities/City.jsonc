@@ -1,0 +1,44 @@
+{
+  "name": "City",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "name": {
+      "type": "string",
+      "description": "City name"
+    },
+    "country": {
+      "type": "string",
+      "default": "Japan"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Cover image URL"
+    },
+    "order": {
+      "type": "number",
+      "description": "Order in itinerary"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date of stay"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "End date of stay"
+    },
+    "accommodation": {
+      "type": "string",
+      "description": "Nombre del alojamiento (hotel, Airbnb, etc.)"
+    }
+  },
+  "required": [
+    "trip_id",
+    "name"
+  ]
+}

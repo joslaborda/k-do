@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { MapPin, ChevronRight, Calendar } from 'lucide-react';
+import AccommodationInput from './AccommodationInput';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -12,7 +13,7 @@ const cityImages = {
   'Tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800'
 };
 
-export default function CityCard({ city, daysCount, tripId }) {
+export default function CityCard({ city, daysCount, tripId, onUpdate }) {
    const formatDateRange = () => {
     if (!city.start_date) return null;
     
@@ -64,10 +65,11 @@ export default function CityCard({ city, daysCount, tripId }) {
                 {city.name}
               </h3>
               {daysCount > 0 && (
-                <p className="text-white text-sm mt-2 font-medium">
+                <p className="text-white text-sm mt-1 font-medium">
                   {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
                 </p>
               )}
+              <AccommodationInput city={city} tripId={tripId} />
             </div>
             <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:text-slate-900 text-white">
               <ChevronRight className="w-5 h-5" />
