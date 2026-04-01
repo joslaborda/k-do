@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { StatsSkeleton, CardSkeleton } from '@/components/LoadingSkeleton';
+import { getTripCoverImage } from '@/lib/tripImage';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import MembersPanel from '@/components/trip/MembersPanel';
@@ -188,7 +189,7 @@ export default function Home() {
       <div
         className="relative"
         style={{
-          backgroundImage: 'url(https://images.travelandleisureasia.com/wp-content/uploads/sites/5/2024/01/11144526/feature-2024-01-11t102331-123.jpeg)',
+          backgroundImage: `url(${getTripCoverImage(trip, cities)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center 20%'
         }}>
