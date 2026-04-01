@@ -434,7 +434,7 @@ export default function CityDetail() {
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
                           <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
                         </div>
-                        <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} />
+                        <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} dayTitle={day.title} />
                         <div className="mt-3 pt-3 border-t border-border/50">
                           <DayMapButton day={day} city={city} />
                         </div>

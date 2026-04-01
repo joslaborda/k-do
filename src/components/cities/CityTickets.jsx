@@ -33,7 +33,7 @@ export default function CityTickets({ cityId, tripId, currentUserEmail, userId }
       </div>
       <div className="space-y-2">
         {cityDocs.map(ticket => (
-          <DocumentCard key={ticket.id} ticket={ticket} compact />
+          <DocumentCard key={ticket.id} ticket={ticket} compact cityName={city?.name} />
         ))}
       </div>
     </div>

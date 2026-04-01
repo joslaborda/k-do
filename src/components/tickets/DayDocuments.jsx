@@ -7,7 +7,7 @@ import { FileText } from 'lucide-react';
  * Shows documents associated to a specific itinerary day.
  * Shown inside CityDetail, within each day's collapsible.
  */
-export default function DayDocuments({ dayId, tripId, currentUserEmail }) {
+export default function DayDocuments({ dayId, tripId, currentUserEmail, dayTitle = '' }) {
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
@@ -34,7 +34,7 @@ export default function DayDocuments({ dayId, tripId, currentUserEmail }) {
       </div>
       <div className="space-y-2">
         {dayDocs.map(ticket => (
-          <DocumentCard key={ticket.id} ticket={ticket} compact />
+          <DocumentCard key={ticket.id} ticket={ticket} compact dayTitle={dayTitle} />
         ))}
       </div>
     </div>
