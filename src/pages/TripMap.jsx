@@ -33,11 +33,11 @@ export default function TripMap() {
     });
   }, [cities]);
 
-  // Build Google Maps directions URL
+  // Build Google Maps embed URL
   const googleMapsUrl = useMemo(() => {
     if (sortedCities.length === 0) return null;
-    const waypoints = sortedCities.map(c => encodeURIComponent(`${c.name}, ${c.country || 'Japan'}`));
-    return `https://www.google.com/maps/dir/${waypoints.join('/')}`;
+    const query = sortedCities.map(c => c.name).join('+');
+    return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
   }, [sortedCities]);
 
   const getDayCount = (city) => {
