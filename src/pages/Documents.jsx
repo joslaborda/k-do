@@ -139,19 +139,19 @@ export default function Documents() {
               Todos
             </button>
             {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-              const Icon = cfg.icon;
-              const active = catFilter === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => setCatFilter(active ? 'all' : key)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {cfg.label}
-                </button>
-              );
-            })}
+               const Icon = cfg.icon;
+               const active = catFilter === key;
+               return (
+                 <button
+                   key={key}
+                   onClick={() => setCatFilter(active ? 'all' : key)}
+                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
+                 >
+                   <Icon className="w-4 h-4 flex-shrink-0" />
+                   <span>{cfg.label}</span>
+                 </button>
+               );
+             })}
           </div>
 
           {/* Visibility icons */}
