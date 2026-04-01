@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, FileText, Eye, EyeOff, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,8 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm';
 import DocumentCard from '@/components/tickets/DocumentCard';
-import BackfillDebugger from '@/components/tickets/BackfillDebugger';
-import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
+import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
 
 const VISIBILITY_FILTERS = [
   { value: 'all',            label: 'Todos',     icon: Filter },
@@ -71,6 +71,21 @@ export default function Documents() {
   });
 
   const members = trip?.members || [];
+
+  // Backfill automático de documentos sin vinculación
+  useEffect(() => {
+    if (tickets.length > 0 && itineraryDays.length > 0) {
+      const backfillUpdates = createBackfillMutation(tickets, itineraryDays, cities);
+      const ticketsNeedingUpdate = backfillUpdates.filter(u => Object.keys(u.updates).length > 0);
+      
+      if (ticketsNeedingUpdate.length > 0) {
+        ticketsNeedingUpdate.forEach(({ ticketId, updates }) => {
+          base44.entities.Ticket.update(ticketId, updates);
+        });
+        queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      }
+    }
+  }, [tripId, tickets.length, itineraryDays.length]);
 
   const createMutation = useMutation({
     mutationFn: (formData) => {
@@ -135,9 +150,6 @@ export default function Documents() {
 
       {/* ── MAIN CONTENT — floats over hero ─────────────────────────────────── */}
       <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
-
-        {/* Debug component */}
-        {tripId && <BackfillDebugger tripId={tripId} />}
 
         {/* Toolbar card */}
          <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 flex items-center gap-1 overflow-x-auto -translate-y-2.5">
