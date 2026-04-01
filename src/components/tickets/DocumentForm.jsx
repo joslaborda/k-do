@@ -12,7 +12,7 @@ export const CATEGORY_CONFIG = {
   train:    { label: 'Tren',             icon: Train,        color: 'from-green-500 to-emerald-500', bg: 'bg-green-50',  text: 'text-green-700',  border: 'border-green-200' },
   hotel:    { label: 'Hotel',            icon: Hotel,        color: 'from-purple-500 to-pink-500',   bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
   event:    { label: 'Evento',           icon: CalendarDays, color: 'from-orange-500 to-red-500',   bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
-  personal: { label: 'Doc. personal',    icon: FileText,     color: 'from-amber-500 to-yellow-500', bg: 'bg-amber-50',  text: 'text-amber-700',  border: 'border-amber-200' },
+  personal: { label: 'Personal',         icon: FileText,     color: 'from-amber-500 to-yellow-500', bg: 'bg-amber-50',  text: 'text-amber-700',  border: 'border-amber-200' },
   other:    { label: 'Otro',             icon: Package,      color: 'from-slate-500 to-gray-500',   bg: 'bg-slate-50',  text: 'text-slate-700',  border: 'border-slate-200' },
 };
 
