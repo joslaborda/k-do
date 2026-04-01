@@ -46,7 +46,7 @@ export default function AccommodationInput({ city, tripId }) {
       >
         <Hotel className="w-3 h-3 text-white/60 flex-shrink-0" />
         {city.accommodation ? (
-          <span className="text-white/80 text-xs truncate max-w-[160px]">{city.accommodation}</span>
+          <span className="text-white/80 text-xs truncate max-w-[75%]">{city.accommodation}</span>
         ) : (
           <span className="text-white/40 text-xs italic">Añadir alojamiento</span>
         )}

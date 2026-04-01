@@ -68,8 +68,8 @@ export default function CityCard({ city, daysCount, tripId }) {
                 )}
                 <AccommodationInput city={city} tripId={tripId} />
               </div>
-              {/* Spacer so the Link content doesn't overlap the absolute buttons */}
-              <div className="w-10 flex-shrink-0" />
+              {/* Spacer for chevron button */}
+              <div className="w-12 flex-shrink-0" />
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function CityCard({ city, daysCount, tripId }) {
         <Link
           to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
           onClick={(e) => e.stopPropagation()}
-          className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:text-slate-900 text-white"
+          className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-600 border border-orange-600"
         >
           <ChevronRight className="w-5 h-5" />
         </Link>

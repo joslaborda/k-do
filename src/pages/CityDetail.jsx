@@ -257,7 +257,7 @@ export default function CityDetail() {
         <div className="absolute top-6 left-6">
            <Link
              to={createPageUrl(`Cities?trip_id=${tripId}`)}
-             className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-full text-white text-sm font-medium hover:bg-white/30 transition-colors border border-white/20"
+             className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full text-white text-sm font-semibold hover:bg-white hover:text-orange-600 transition-all duration-200 border border-orange-600"
            >
              <ArrowLeft className="w-4 h-4" />
              Ruta
