@@ -9,9 +9,9 @@ import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm
 import DocumentCard from '@/components/tickets/DocumentCard';
 
 const VISIBILITY_FILTERS = [
-  { value: 'all',            label: 'Todos',   icon: Filter },
-  { value: 'personal',       label: 'Solo yo', icon: EyeOff },
-  { value: 'shared',         label: 'Grupo',   icon: Eye },
+  { value: 'all',            label: 'Todos',     icon: Filter },
+  { value: 'personal',       label: 'Solo yo',   icon: EyeOff },
+  { value: 'shared',         label: 'Grupo',     icon: Eye },
   { value: 'selected_users', label: 'Concretos', icon: Users },
 ];
 
@@ -72,18 +72,12 @@ export default function Documents() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Ticket.create({ ...data, trip_id: tripId, user_id: userId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
-      setDialogOpen(false);
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDialogOpen(false); }
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
-      setEditingTicket(null);
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditingTicket(null); }
   });
 
   const deleteMutation = useMutation({
@@ -95,7 +89,6 @@ export default function Documents() {
     }
   });
 
-  // Visibility filter
   const visibleTickets = tickets.filter(t => {
     const vis = t.visibility || 'personal';
     if (vis === 'personal' && t.created_by !== currentUserEmail && t.user_id !== userId) return false;
@@ -105,7 +98,6 @@ export default function Documents() {
     return true;
   });
 
-  // Group by category
   const grouped = visibleTickets.reduce((acc, t) => {
     if (!acc[t.category]) acc[t.category] = [];
     acc[t.category].push(t);
@@ -113,33 +105,47 @@ export default function Documents() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      {/* Header */}
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <h1 className="text-white text-4xl font-bold">Documentos ✈️</h1>
-          <p className="text-white/90 mt-1">Inteligente, contextual y colaborativo</p>
+    <div className="min-h-screen bg-[#fdf6ee]">
+
+      {/* ── HERO HEADER ─────────────────────────────────────────────────────── */}
+      <div className="bg-orange-700 pt-14 pb-24">
+        <div className="max-w-5xl mx-auto px-6 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-orange-200 text-sm font-semibold uppercase tracking-widest mb-2">Tu viaje</p>
+            <h1 className="text-white text-5xl font-extrabold leading-tight">Documentos</h1>
+            <p className="text-orange-100/80 mt-2 text-base">Vuelos, hoteles, trenes y más — todo en un lugar</p>
+          </div>
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-white text-orange-700 hover:bg-orange-50 font-bold shadow-lg flex-shrink-0 px-5 py-2.5 rounded-xl"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Añadir
+          </Button>
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-6xl -mt-12">
-        {/* Toolbar */}
-        <div className="bg-white rounded-2xl border border-border p-4 mb-6 flex flex-wrap items-center gap-3">
-          {/* Category filter */}
+      {/* ── MAIN CONTENT — floats over hero ─────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
+
+        {/* Toolbar card */}
+        <div className="bg-white rounded-2xl shadow-md border border-white/60 p-3 mb-8 flex flex-wrap items-center gap-2">
+          {/* Category pills */}
           <div className="flex items-center gap-1.5 flex-wrap flex-1">
             <button
               onClick={() => setCatFilter('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === 'all' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${catFilter === 'all' ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
             >
               Todos
             </button>
             {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
               const Icon = cfg.icon;
+              const active = catFilter === key;
               return (
                 <button
                   key={key}
-                  onClick={() => setCatFilter(catFilter === key ? 'all' : key)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === key ? `${cfg.bg} ${cfg.text} border ${cfg.border}` : 'text-muted-foreground hover:bg-secondary'}`}
+                  onClick={() => setCatFilter(active ? 'all' : key)}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {cfg.label}
@@ -148,8 +154,8 @@ export default function Documents() {
             })}
           </div>
 
-          {/* Visibility filter */}
-          <div className="flex items-center gap-1 border-l border-border pl-3">
+          {/* Visibility icons */}
+          <div className="flex items-center gap-1 border-l border-gray-100 pl-3">
             {VISIBILITY_FILTERS.map(f => {
               const Icon = f.icon;
               return (
@@ -157,46 +163,47 @@ export default function Documents() {
                   key={f.value}
                   onClick={() => setVisFilter(f.value)}
                   title={f.label}
-                  className={`p-1.5 rounded-lg transition-all ${visFilter === f.value ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+                  className={`p-2 rounded-xl transition-all ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-400 hover:bg-gray-100'}`}
                 >
                   <Icon className="w-4 h-4" />
                 </button>
               );
             })}
           </div>
-
-          <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 flex-shrink-0">
-            <Plus className="w-4 h-4 mr-2" />
-            Añadir
-          </Button>
         </div>
 
         {/* Empty state */}
         {visibleTickets.length === 0 ? (
-          <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <p className="text-foreground font-medium mb-1">Sin documentos todavía</p>
-            <p className="text-sm text-muted-foreground mb-5">Sube un PDF o imagen y la IA lo identificará automáticamente</p>
-            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800">
+          <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200">
+            <div className="w-20 h-20 bg-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-5">
+              <FileText className="w-10 h-10 text-orange-400" />
+            </div>
+            <p className="text-gray-800 font-bold text-lg mb-1">Sin documentos todavía</p>
+            <p className="text-sm text-gray-400 mb-6">Sube un PDF o imagen y la IA lo identificará automáticamente</p>
+            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 rounded-xl px-6 font-bold shadow">
               <Plus className="w-4 h-4 mr-2" />
               Añadir documento
             </Button>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-10">
             {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
               const items = grouped[key];
               if (!items?.length) return null;
               const Icon = cfg.icon;
               return (
-                <div key={key}>
+                <section key={key}>
+                  {/* Section header */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 bg-gradient-to-br ${cfg.color} rounded-xl flex items-center justify-center`}>
-                      <Icon className="w-5 h-5 text-white" />
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${cfg.bg}`}>
+                      <Icon className={`w-4 h-4 ${cfg.text}`} />
                     </div>
-                    <h2 className="text-xl font-bold text-foreground">{cfg.label}</h2>
-                    <span className="text-xs bg-orange-200 text-orange-800 font-semibold px-2 py-0.5 rounded-full">{items.length}</span>
+                    <h2 className="text-lg font-extrabold text-gray-800">{cfg.label}</h2>
+                    <span className="text-xs bg-orange-100 text-orange-700 font-bold px-2.5 py-0.5 rounded-full">
+                      {items.length}
+                    </span>
                   </div>
+                  {/* Cards grid */}
                   <div className="grid md:grid-cols-2 gap-4">
                     {items.map(ticket => (
                       <DocumentCard
@@ -207,53 +214,39 @@ export default function Documents() {
                       />
                     ))}
                   </div>
-                </div>
+                </section>
               );
             })}
           </div>
         )}
       </div>
 
-      {/* Add Dialog */}
+      {/* ── DIALOGS (sin cambios) ────────────────────────────────────────────── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto">
+        <DialogContent className="bg-white max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Añadir documento</DialogTitle>
+            <DialogTitle className="text-gray-900 font-extrabold">Añadir documento</DialogTitle>
           </DialogHeader>
-          <DocumentForm
-            cities={cities}
-            itineraryDays={itineraryDays}
-            members={members}
-            onSave={(data) => createMutation.mutate(data)}
-            onCancel={() => setDialogOpen(false)}
-            saving={createMutation.isPending}
-          />
+          <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members}
+            onSave={(data) => createMutation.mutate(data)} onCancel={() => setDialogOpen(false)} saving={createMutation.isPending} />
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog open={!!editingTicket} onOpenChange={(open) => { if (!open) setEditingTicket(null); }}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto">
+        <DialogContent className="bg-white max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Editar documento</DialogTitle>
+            <DialogTitle className="text-gray-900 font-extrabold">Editar documento</DialogTitle>
           </DialogHeader>
           {editingTicket && (
-            <DocumentForm
-              cities={cities}
-              itineraryDays={itineraryDays}
-              members={members}
-              initialData={editingTicket}
-              onSave={(data) => updateMutation.mutate({ id: editingTicket.id, data })}
-              onCancel={() => setEditingTicket(null)}
-              saving={updateMutation.isPending}
-            />
+            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members}
+              initialData={editingTicket} onSave={(data) => updateMutation.mutate({ id: editingTicket.id, data })}
+              onCancel={() => setEditingTicket(null)} saving={updateMutation.isPending} />
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirm */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -262,7 +255,7 @@ export default function Documents() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate(ticketToDelete.id)} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={() => deleteMutation.mutate(ticketToDelete.id)} className="bg-red-600 hover:bg-red-700">
               Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
