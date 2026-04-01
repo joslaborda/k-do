@@ -154,18 +154,18 @@ export default function Documents() {
              })}
           </div>
 
-          {/* Visibility icons */}
-          <div className="flex items-center gap-1 border-l border-gray-100 pl-3">
+          {/* Visibility filters */}
+          <div className="flex items-center gap-1.5 border-l border-gray-100 pl-3">
             {VISIBILITY_FILTERS.map(f => {
               const Icon = f.icon;
               return (
                 <button
                   key={f.value}
                   onClick={() => setVisFilter(f.value)}
-                  title={f.label}
-                  className={`p-2 rounded-xl transition-all ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-400 hover:bg-gray-100'}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>{f.label}</span>
                 </button>
               );
             })}
