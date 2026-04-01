@@ -7,8 +7,10 @@ import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { 
   ArrowLeft, Plus, Calendar, ChevronDown, ChevronUp, 
-  Edit2, Trash2, Save, X, MapPin 
+  Edit2, Trash2, Save, X, MapPin, Sparkles, RefreshCw
 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { generateDaysForCity } from '@/lib/itineraryAI';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,8 +55,11 @@ export default function CityDetail() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dayToDelete, setDayToDelete] = useState(null);
   const [formData, setFormData] = useState({ title: '', date: '', content: '' });
-  
+  const [regeneratingCity, setRegeneratingCity] = useState(false);
+  const [regeneratingDayId, setRegeneratingDayId] = useState(null);
+
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: city } = useQuery({
     queryKey: ['city', cityId],
@@ -63,6 +68,12 @@ export default function CityDetail() {
       return cities[0];
     },
     enabled: !!cityId,
+  });
+
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: () => base44.entities.Trip.get(tripId),
+    enabled: !!tripId,
   });
 
   const { data: days = [], isLoading } = useQuery({
@@ -135,6 +146,102 @@ export default function CityDetail() {
     setDialogOpen(true);
   };
 
+  const getPreferences = () => {
+    try {
+      return JSON.parse(localStorage.getItem(`trip_prefs_${tripId}`) || '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const handleRegenerateCity = async () => {
+    if (!city || !trip) return;
+    setRegeneratingCity(true);
+
+    const allDays = await base44.entities.ItineraryDay.filter({ trip_id: tripId });
+    const allCities = await base44.entities.City.filter({ trip_id: tripId }, 'order');
+
+    // Delete existing days for this city
+    for (const day of days) {
+      await base44.entities.ItineraryDay.delete(day.id);
+    }
+
+    const newDays = await generateDaysForCity({
+      city,
+      trip,
+      existingDays: allDays.filter(d => d.city_id !== city.id),
+      preferences: getPreferences(),
+      allCities: allCities.filter(c => c.id !== city.id),
+    });
+
+    for (let j = 0; j < newDays.length; j++) {
+      await base44.entities.ItineraryDay.create({
+        ...newDays[j],
+        trip_id: tripId,
+        city_id: cityId,
+        order: j,
+      });
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    setRegeneratingCity(false);
+    toast({ title: `${city.name} regenerado 🎌`, description: 'El itinerario de esta ciudad ha sido actualizado.' });
+  };
+
+  const handleRegenerateDay = async (day) => {
+    if (!city || !trip) return;
+    setRegeneratingDayId(day.id);
+
+    const allDays = await base44.entities.ItineraryDay.filter({ trip_id: tripId });
+    const allCities = await base44.entities.City.filter({ trip_id: tripId }, 'order');
+
+    // Generate just this one day
+    const prompt = `
+Eres un experto planificador de viajes a Japón. Regenera SOLO el día ${day.date} en ${city.name}.
+
+VIAJE: ${trip.name} - ${trip.destination}
+CIUDAD: ${city.name} (${city.start_date} → ${city.end_date})
+DÍA A REGENERAR: ${day.date} (título actual: "${day.title}")
+
+DÍAS YA PLANIFICADOS EN ESTA CIUDAD (no repetir lugares):
+${allDays.filter(d => d.city_id === cityId && d.id !== day.id).map(d => `- ${d.title}: ${d.content?.substring(0, 200)}`).join('\n')}
+
+LUGARES YA USADOS EN OTRAS CIUDADES:
+${allDays.filter(d => d.city_id !== cityId).map(d => d.content?.substring(0, 100)).join('\n')}
+
+PREFERENCIAS: Ritmo ${getPreferences().pace || 'equilibrado'}
+${getPreferences().places ? `Lugares: ${getPreferences().places}` : ''}
+${getPreferences().avoid ? `Evitar: ${getPreferences().avoid}` : ''}
+
+Genera un nuevo itinerario para este día con zonas diferentes. Responde SOLO JSON:
+{
+  "title": "Nuevo título descriptivo con zona",
+  "content": "Contenido detallado en Markdown con horarios, lugares y tips"
+}
+`;
+
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt,
+      model: 'claude_sonnet_4_6',
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          title: { type: 'string' },
+          content: { type: 'string' },
+        },
+      },
+    });
+
+    await base44.entities.ItineraryDay.update(day.id, {
+      title: result.title,
+      content: result.content,
+    });
+
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    setRegeneratingDayId(null);
+    toast({ title: 'Día regenerado ✨', description: `"${result.title}" listo.` });
+  };
+
   const handleSave = () => {
     if (editingDay) {
       updateMutation.mutate({ 
@@ -191,12 +298,28 @@ export default function CityDetail() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 pt-6 pb-12 md:pb-6">
-         <div className="flex items-center justify-between mb-6">
+         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
            <h2 className="text-xl font-semibold text-foreground">Itinerario</h2>
-           <Button onClick={openNewDialog} className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Añadir Día
-          </Button>
+           <div className="flex items-center gap-2 flex-wrap">
+             {city?.start_date && city?.end_date && (
+               <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={handleRegenerateCity}
+                 disabled={regeneratingCity}
+                 className="text-orange-600 border-orange-200 hover:bg-orange-50"
+               >
+                 {regeneratingCity
+                   ? <><div className="w-3.5 h-3.5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mr-1.5" />Regenerando...</>
+                   : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />Regenerar ciudad</>
+                 }
+               </Button>
+             )}
+             <Button onClick={openNewDialog} className="bg-green-600 hover:bg-green-700">
+               <Plus className="w-4 h-4 mr-2" />
+               Añadir Día
+             </Button>
+           </div>
         </div>
 
         {isLoading ? (
@@ -238,7 +361,24 @@ export default function CityDetail() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-orange-500 hover:text-orange-700 hover:bg-orange-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRegenerateDay(day);
+                          }}
+                          disabled={regeneratingDayId === day.id}
+                          aria-label="Regenerar día con IA"
+                          title="Regenerar día con IA"
+                        >
+                          {regeneratingDayId === day.id
+                            ? <div className="w-3.5 h-3.5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                            : <RefreshCw className="w-3.5 h-3.5" />
+                          }
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
