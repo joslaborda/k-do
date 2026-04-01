@@ -1,9 +1,11 @@
-import { calculateBalances, getDebts, emailToName } from '@/lib/expenseBalances';
+import { calculateBalances, getDebts } from '@/lib/expenseBalances';
 import { ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
 
-export default function BalancesPanel({ expenses = [], members = [], currentUserEmail = '' }) {
+export default function BalancesPanel({ expenses = [], members = [], currentUserEmail = '', userMap = {} }) {
   const balances = calculateBalances(expenses, members);
   const debts = getDebts(balances);
+
+  const getName = (email) => userMap[email] || email;
 
   const currentUserBalance = balances[currentUserEmail] || 0;
   const isSettled = Math.abs(currentUserBalance) < 0.01;
@@ -105,7 +107,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                           : 'text-green-700'
                         : 'text-gray-700'
                     }`}>
-                      {emailToName(debt.from)}
+                      {getName(debt.from)}
                     </span>
                     <ArrowRight className={`w-4 h-4 ${
                       isRelevant
@@ -121,7 +123,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                           : 'text-green-700'
                         : 'text-gray-700'
                     }`}>
-                      {emailToName(debt.to)}
+                      {getName(debt.to)}
                     </span>
                   </div>
                   <span className={`font-bold whitespace-nowrap ${

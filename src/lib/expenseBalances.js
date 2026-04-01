@@ -77,12 +77,3 @@ export function getDebts(balances) {
 
   return debts.filter(d => d.amount > 0.01);
 }
-
-/**
- * Extrae nombre del email para mostrar
- */
-export function emailToName(email) {
-  if (!email) return 'Unknown';
-  const name = email.split('@')[0];
-  return name.charAt(0).toUpperCase() + name.slice(1);
-}

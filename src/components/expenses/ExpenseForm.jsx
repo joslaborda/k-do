@@ -26,7 +26,9 @@ export default function ExpenseForm({
   onSave,
   onCancel,
   saving = false,
+  userMap = {},
 }) {
+  const getName = (email) => userMap[email] || email;
   const [form, setForm] = useState(
     initialData || {
       description: '',
@@ -162,7 +164,7 @@ export default function ExpenseForm({
             <SelectContent>
               {members.map((email) => (
                 <SelectItem key={email} value={email}>
-                  {email}
+                  {getName(email)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -219,7 +221,7 @@ export default function ExpenseForm({
                 checked={form.split_with.includes(email)}
                 onCheckedChange={() => toggleMember(email)}
               />
-              <span className="text-sm text-foreground">{email}</span>
+              <span className="text-sm text-foreground">{getName(email)}</span>
             </label>
           ))}
         </div>
@@ -234,7 +236,7 @@ export default function ExpenseForm({
           <div className="space-y-1">
             {form.split_with.map((email) => (
               <div key={email} className="text-xs text-orange-700 flex justify-between">
-                <span>{email}</span>
+                <span>{getName(email)}</span>
                 <span className="font-semibold">{equalSplit()}€</span>
               </div>
             ))}
@@ -251,7 +253,7 @@ export default function ExpenseForm({
           <div className="space-y-2 bg-secondary/30 rounded-lg p-3 max-h-48 overflow-y-auto">
             {form.split_with.map((email) => (
               <div key={email} className="flex items-center gap-2">
-                <span className="text-sm text-foreground flex-1 truncate">{email}</span>
+                <span className="text-sm text-foreground flex-1 truncate">{getName(email)}</span>
                 <Input
                   type="number"
                   placeholder="0.00"

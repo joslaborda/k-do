@@ -17,9 +17,11 @@ const categoryConfig = {
   other: { icon: MoreHorizontal, color: 'bg-slate-100 text-slate-600' }
 };
 
-export default function ExpenseCard({ expense, onEdit, onDelete }) {
+export default function ExpenseCard({ expense, userMap = {}, onEdit, onDelete }) {
   const config = categoryConfig[expense.category] || categoryConfig.other;
   const Icon = config.icon;
+
+  const getName = (email) => userMap[email] || email;
 
   const splitInfo = expense.split_type === 'equal' 
     ? `A partes iguales (${expense.split_with?.length || 1})`
@@ -35,7 +37,7 @@ export default function ExpenseCard({ expense, onEdit, onDelete }) {
         <h3 className="font-medium text-gray-900 truncate">{expense.description}</h3>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
           <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-semibold">
-            💳 {expense.paid_by?.split('@')[0]}
+            💳 {getName(expense.paid_by)}
           </span>
           {expense.date && (
             <span className="text-xs text-gray-400">

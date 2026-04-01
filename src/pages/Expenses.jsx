@@ -39,6 +39,18 @@ export default function Expenses() {
 
   const members = trip?.members || [];
 
+  // Obtener datos de usuarios para crear mapa de nombres
+  const { data: usersData = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => base44.entities.User.list(),
+  });
+
+  // Crear mapa: email -> nombre
+  const userMap = usersData.reduce((map, user) => {
+    map[user.email] = user.full_name || user.email;
+    return map;
+  }, {});
+
   // Obtener gastos
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
@@ -141,6 +153,7 @@ export default function Expenses() {
               expenses={expenses}
               members={members}
               currentUserEmail={currentUser?.email}
+              userMap={userMap}
             />
           </div>
         )}
@@ -181,6 +194,7 @@ export default function Expenses() {
                 <ExpenseCard
                   key={expense.id}
                   expense={expense}
+                  userMap={userMap}
                   onEdit={(e) => {
                     setEditingExpense(e);
                     setDialogOpen(true);
@@ -210,6 +224,7 @@ export default function Expenses() {
               setEditingExpense(null);
             }}
             saving={createMutation.isPending || updateMutation.isPending}
+            userMap={userMap}
           />
         </DialogContent>
       </Dialog>
