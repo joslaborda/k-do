@@ -4,16 +4,20 @@ import DocumentCard from '@/components/tickets/DocumentCard';
 import { FileText } from 'lucide-react';
 
 /**
- * Shows documents associated to a specific city (origin or destination).
- * Shown inside CityDetail above the itinerary days.
+ * Shows documents associated to a specific city.
+ * Filters by:
+ * - city_id (auto-linked via date)
+ * - arrival_city_id (destination for flights/trains)
+ * - visibility permissions
  */
-export default function CityTickets({ cityId, tripId, currentUserEmail, userId }) {
+export default function CityTickets({ cityId, tripId, currentUserEmail, userId, cityName = '' }) {
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
     enabled: !!tripId,
   });
 
+  // Filter by city_id (auto-linked) or arrival_city_id (destination)
   const cityDocs = allTickets.filter(t => {
     if (t.city_id !== cityId && t.arrival_city_id !== cityId) return false;
     const vis = t.visibility || 'personal';
@@ -28,12 +32,12 @@ export default function CityTickets({ cityId, tripId, currentUserEmail, userId }
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
         <FileText className="w-5 h-5 text-orange-600" />
-        <h2 className="text-lg font-semibold text-foreground">Documentos</h2>
+        <h2 className="text-lg font-semibold text-foreground">Documentos de {cityName || 'esta ciudad'}</h2>
         <span className="text-xs bg-orange-200 text-orange-800 font-semibold px-2 py-0.5 rounded-full">{cityDocs.length}</span>
       </div>
       <div className="space-y-2">
         {cityDocs.map(ticket => (
-          <DocumentCard key={ticket.id} ticket={ticket} compact cityName={city?.name} />
+          <DocumentCard key={ticket.id} ticket={ticket} compact cityName={cityName} />
         ))}
       </div>
     </div>

@@ -336,7 +336,7 @@ export default function CityDetail() {
            </div>
         </div>
 
-        <CityTickets cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} userId={currentUser?.id} />
+        <CityTickets cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} userId={currentUser?.id} cityName={city?.name} />
 
         {isLoading ? (
            <div className="space-y-4">
