@@ -38,6 +38,8 @@ export default function Calendar() {
     date: '',
     notes: '',
     file_url: '',
+    origin: '',
+    destination: '',
     city_id: '',
     arrival_city_id: ''
   });
@@ -78,7 +80,7 @@ export default function Calendar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setDialogOpen(false);
-      setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '', city_id: '', arrival_city_id: '' });
+      setFormData({ name: '', category: 'flight', date: '', notes: '', file_url: '', origin: '', destination: '', city_id: '', arrival_city_id: '' });
     }
   });
 
@@ -198,12 +200,17 @@ export default function Calendar() {
                              <h3 className="font-bold text-foreground text-lg mb-1">
                                {ticket.name}
                              </h3>
+                             {ticket.origin && ticket.destination && (
+                               <p className="text-sm font-medium text-orange-700 mb-1">
+                                 {ticket.origin} → {ticket.destination}
+                               </p>
+                             )}
                              {ticket.date &&
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                  <CalendarIcon className="w-4 h-4" />
                                  {format(new Date(ticket.date), "d 'de' MMMM yyyy", { locale: es })}
                                </div>
-                        }
+                             }
                            </div>
                            <div className="flex gap-1">
                              <Button
@@ -264,7 +271,25 @@ export default function Calendar() {
                   className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
 
                 </div>
+                <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Origen</label>
+                  <Input
+                    placeholder="ej. Madrid"
+                    value={formData.origin}
+                    onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">Destino</label>
+                  <Input
+                    placeholder="ej. Tokyo"
+                    value={formData.destination}
+                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                    className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+                </div>
+              </div>
+              <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
                 <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
                   <SelectTrigger>
@@ -373,6 +398,24 @@ export default function Calendar() {
 
                   </div>
                   <div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">Origen</label>
+                      <Input
+                        placeholder="ej. Madrid"
+                        value={editingTicket.origin || ''}
+                        onChange={(e) => setEditingTicket({ ...editingTicket, origin: e.target.value })}
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">Destino</label>
+                      <Input
+                        placeholder="ej. Tokyo"
+                        value={editingTicket.destination || ''}
+                        onChange={(e) => setEditingTicket({ ...editingTicket, destination: e.target.value })}
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
+                    </div>
+                  </div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
                   <Select
                   value={editingTicket.category}
@@ -426,7 +469,9 @@ export default function Calendar() {
                       name: editingTicket.name,
                       category: editingTicket.category,
                       date: editingTicket.date,
-                      notes: editingTicket.notes
+                      notes: editingTicket.notes,
+                      origin: editingTicket.origin,
+                      destination: editingTicket.destination
                     }
                   })}
                   className="bg-orange-700 hover:bg-orange-800"

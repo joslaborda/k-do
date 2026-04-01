@@ -36,6 +36,14 @@
     "notes": {
       "type": "string"
     },
+    "origin": {
+      "type": "string",
+      "description": "Lugar de origen (texto libre)"
+    },
+    "destination": {
+      "type": "string",
+      "description": "Lugar de destino (texto libre)"
+    },
     "city_id": {
       "type": "string",
       "description": "Ciudad de origen o ciudad a la que pertenece este documento"

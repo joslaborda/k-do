@@ -49,6 +49,9 @@ export default function CityTickets({ cityId, tripId }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground text-sm truncate">{ticket.name}</p>
+                {ticket.origin && ticket.destination && (
+                  <p className="text-xs font-medium text-orange-700 mt-0.5">{ticket.origin} → {ticket.destination}</p>
+                )}
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
                   <span className={`${config.text} font-medium`}>{config.label}</span>
                   {isArrival && <span className="text-orange-600">· Llegada</span>}
