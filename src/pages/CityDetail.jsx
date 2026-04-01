@@ -11,10 +11,9 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
-import DayMapButton from '@/components/itinerary/DayMapButton';
 import CitySettingsModal from '@/components/cities/CitySettingsModal';
-import CityTickets from '@/components/cities/CityTickets';
 import DayDocuments from '@/components/tickets/DayDocuments';
+import UnlinkedCityDocuments from '@/components/tickets/UnlinkedCityDocuments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -336,8 +335,6 @@ export default function CityDetail() {
            </div>
         </div>
 
-        <CityTickets cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} userId={currentUser?.id} cityName={city?.name} />
-
         {isLoading ? (
            <div className="space-y-4">
              {[1, 2].map((i) => (
@@ -435,9 +432,6 @@ export default function CityDetail() {
                           <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
                         </div>
                         <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} dayTitle={day.title} />
-                        <div className="mt-3 pt-3 border-t border-border/50">
-                          <DayMapButton day={day} city={city} />
-                        </div>
                       </div>
                     </CollapsibleContent>
                 </div>
@@ -445,9 +439,12 @@ export default function CityDetail() {
             ))}
           </div>
         )}
-      </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        {/* Unlinked documents section */}
+        <UnlinkedCityDocuments cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} />
+        </div>
+
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
            <DialogHeader>
              <DialogTitle className="text-foreground">{editingDay ? 'Editar Día' : 'Añadir Nuevo Día'}</DialogTitle>

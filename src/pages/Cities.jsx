@@ -6,7 +6,7 @@ import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import CityCard from '@/components/cities/CityCard';
-import RouteMap from '@/components/cities/RouteMap';
+
 import { Button } from '@/components/ui/button';
 import AIGeneratorPanel from '@/components/itinerary/AIGeneratorPanel';
 import AIGeneratingStatus from '@/components/itinerary/AIGeneratingStatus';
@@ -204,19 +204,16 @@ export default function Cities() {
             </Button>
           </div>
         ) : (
-          <>
-            <RouteMap cities={cities} />
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cities.map((city) => (
-                <CityCard
-                  key={city.id}
-                  city={city}
-                  daysCount={getDaysCount(city.id)}
-                  tripId={tripId}
-                />
-              ))}
-            </div>
-          </>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cities.map((city) => (
+              <CityCard
+                key={city.id}
+                city={city}
+                daysCount={getDaysCount(city.id)}
+                tripId={tripId}
+              />
+            ))}
+          </div>
         )}
       </div>
 
