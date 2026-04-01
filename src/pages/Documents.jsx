@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm';
 import DocumentCard from '@/components/tickets/DocumentCard';
+import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 const VISIBILITY_FILTERS = [
   { value: 'all',            label: 'Todos',     icon: Filter },
@@ -71,12 +72,18 @@ export default function Documents() {
   const members = trip?.members || [];
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Ticket.create({ ...data, trip_id: tripId, user_id: userId }),
+    mutationFn: (formData) => {
+      const enrichedData = enrichTicketDataWithAutoLinks(formData, itineraryDays, formData.city_id);
+      return base44.entities.Ticket.create({ ...enrichedData, trip_id: tripId, user_id: userId });
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDialogOpen(false); }
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
+    mutationFn: ({ id, formData }) => {
+      const enrichedData = enrichTicketDataWithAutoLinks(formData, itineraryDays, formData.city_id);
+      return base44.entities.Ticket.update(id, enrichedData);
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditingTicket(null); }
   });
 
@@ -239,7 +246,7 @@ export default function Documents() {
           </DialogHeader>
           {editingTicket && (
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members}
-              initialData={editingTicket} onSave={(data) => updateMutation.mutate({ id: editingTicket.id, data })}
+              initialData={editingTicket} onSave={(data) => updateMutation.mutate({ id: editingTicket.id, formData: data })}
               onCancel={() => setEditingTicket(null)} saving={updateMutation.isPending} />
           )}
         </DialogContent>
