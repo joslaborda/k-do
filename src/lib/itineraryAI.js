@@ -1,3 +1,38 @@
+// ============ COUNTRY CONFIG ============
+const COUNTRY_CONFIGS = {
+  'Japón': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', lang: 'Japanese', langNative: '日本語', flag: '🇯🇵' },
+  'Japan': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', lang: 'Japanese', langNative: '日本語', flag: '🇯🇵' },
+  'Tailandia': { currency: 'THB', symbol: '฿', locale: 'th-TH', lang: 'Thai', langNative: 'ภาษาไทย', flag: '🇹🇭' },
+  'Corea del Sur': { currency: 'KRW', symbol: '₩', locale: 'ko-KR', lang: 'Korean', langNative: '한국어', flag: '🇰🇷' },
+  'China': { currency: 'CNY', symbol: '¥', locale: 'zh-CN', lang: 'Chinese', langNative: '中文', flag: '🇨🇳' },
+  'Vietnam': { currency: 'VND', symbol: '₫', locale: 'vi-VN', lang: 'Vietnamese', langNative: 'Tiếng Việt', flag: '🇻🇳' },
+  'India': { currency: 'INR', symbol: '₹', locale: 'hi-IN', lang: 'Hindi', langNative: 'हिन्दी', flag: '🇮🇳' },
+  'Francia': { currency: 'EUR', symbol: '€', locale: 'fr-FR', lang: 'French', langNative: 'Français', flag: '🇫🇷' },
+  'Italia': { currency: 'EUR', symbol: '€', locale: 'it-IT', lang: 'Italian', langNative: 'Italiano', flag: '🇮🇹' },
+  'Alemania': { currency: 'EUR', symbol: '€', locale: 'de-DE', lang: 'German', langNative: 'Deutsch', flag: '🇩🇪' },
+  'Portugal': { currency: 'EUR', symbol: '€', locale: 'pt-PT', lang: 'Portuguese', langNative: 'Português', flag: '🇵🇹' },
+  'Grecia': { currency: 'EUR', symbol: '€', locale: 'el-GR', lang: 'Greek', langNative: 'Ελληνικά', flag: '🇬🇷' },
+  'Reino Unido': { currency: 'GBP', symbol: '£', locale: 'en-GB', lang: 'English', langNative: 'English', flag: '🇬🇧' },
+  'Suiza': { currency: 'CHF', symbol: 'Fr', locale: 'de-CH', lang: 'German', langNative: 'Deutsch', flag: '🇨🇭' },
+  'México': { currency: 'MXN', symbol: '$', locale: 'es-MX', lang: 'Spanish', langNative: 'Español', flag: '🇲🇽' },
+  'Estados Unidos': { currency: 'USD', symbol: '$', locale: 'en-US', lang: 'English', langNative: 'English', flag: '🇺🇸' },
+  'Brasil': { currency: 'BRL', symbol: 'R$', locale: 'pt-BR', lang: 'Portuguese', langNative: 'Português', flag: '🇧🇷' },
+  'Argentina': { currency: 'ARS', symbol: '$', locale: 'es-AR', lang: 'Spanish', langNative: 'Español', flag: '🇦🇷' },
+  'Marruecos': { currency: 'MAD', symbol: 'DH', locale: 'ar-MA', lang: 'Arabic', langNative: 'العربية', flag: '🇲🇦' },
+  'Turquía': { currency: 'TRY', symbol: '₺', locale: 'tr-TR', lang: 'Turkish', langNative: 'Türkçe', flag: '🇹🇷' },
+  'Australia': { currency: 'AUD', symbol: '$', locale: 'en-AU', lang: 'English', langNative: 'English', flag: '🇦🇺' },
+};
+
+export function getCountryConfig(country) {
+  if (!country) return { currency: 'USD', symbol: '$', locale: 'en-US', lang: 'English', langNative: 'English', flag: '🌍' };
+  return (
+    COUNTRY_CONFIGS[country] ||
+    Object.entries(COUNTRY_CONFIGS).find(([k]) => k.toLowerCase() === country.toLowerCase())?.[1] ||
+    { currency: 'USD', symbol: '$', locale: 'en-US', lang: 'English', langNative: 'English', flag: '🌍' }
+  );
+}
+// ============ FIN COUNTRY CONFIG ============
+
 import { base44 } from '@/api/base44Client';
 import { differenceInDays, addDays, format, parseISO } from 'date-fns';
 
