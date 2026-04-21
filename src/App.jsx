@@ -7,9 +7,6 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import VerifyEmail from './pages/VerifyEmail';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
@@ -51,9 +48,10 @@ const AuthenticatedApp = () => {
     }
   }
 
-  // Gate: Email not verified
+  // Gate: Email not verified (VerifyEmail is in pagesConfig, but we intercept here for auth flow)
   if (authUser && authUser.is_verified === false) {
-    return <VerifyEmail />;
+    const VerifyEmailPage = Pages['VerifyEmail'];
+    return VerifyEmailPage ? <VerifyEmailPage /> : null;
   }
 
   return (
@@ -74,8 +72,6 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      <Route path="/Profile" element={<Profile />} />
-      <Route path="/Settings" element={<Settings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

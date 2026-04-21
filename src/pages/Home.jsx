@@ -164,7 +164,7 @@ export default function Home() {
 
   const personalSections = [
     { name: 'Maleta', page: 'Packing', icon: Package, color: 'from-blue-500 to-cyan-500', emoji: '🧳' },
-    { name: 'Docs', page: 'Calendar', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' }
+    { name: 'Docs', page: 'Documents', icon: Plane, color: 'from-slate-500 to-gray-500', emoji: '✈️' }
   ];
 
 
