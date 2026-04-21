@@ -293,10 +293,11 @@ export default function Home() {
                     <div className="bg-orange-700 text-orange-700 p-2 rounded-lg">
                       <Receipt className="text-zinc-50 lucide lucide-receipt w-4 h-4" />
                     </div>
-              <div>
-  <p className="text-xs text-muted-foreground">Gastado</p>
-  <p className="text-xl font-bold text-foreground">{totalExpenses.total.toLocaleString()}</p>
-</div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Gastado</p>
+                      <p className="text-xl font-bold text-foreground">{totalExpenses.total.toLocaleString()}</p>
+                    </div>
+                  </div>
                 </motion.div>
               </Link>
 
