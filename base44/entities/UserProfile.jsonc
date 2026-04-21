@@ -1,0 +1,61 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario (base44 user.id)"
+    },
+    "username": {
+      "type": "string",
+      "description": "Username \u00fanico (min\u00fasculas, a-z0-9_)"
+    },
+    "username_normalized": {
+      "type": "string",
+      "description": "Username normalizado en min\u00fasculas para unicidad"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Nombre visible"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "URL del avatar"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Biograf\u00eda corta"
+    },
+    "home_country": {
+      "type": "string",
+      "default": "Espa\u00f1a",
+      "description": "Pa\u00eds de origen"
+    },
+    "home_currency": {
+      "type": "string",
+      "description": "Moneda preferida"
+    },
+    "default_spot_visibility": {
+      "type": "string",
+      "enum": [
+        "trip_members",
+        "personal"
+      ],
+      "default": "trip_members"
+    },
+    "default_doc_visibility": {
+      "type": "string",
+      "enum": [
+        "trip_members",
+        "personal"
+      ],
+      "default": "trip_members"
+    }
+  },
+  "required": [
+    "user_id",
+    "username",
+    "username_normalized",
+    "display_name"
+  ]
+}
