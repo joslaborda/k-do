@@ -6,133 +6,146 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import TripTemplates from '@/components/trip/TripTemplates';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
 
-function normalizeText(str = '') {
-  return str
-    .toString()
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
-
-function splitWords(str = '') {
-  const s = normalizeText(str);
-  if (!s) return [];
-  return s
-    .replace(/[()]/g, ' ')
-    .replace(/&/g, ' ')
-    .replace(/\+/g, ' ')
-    .replace(/->/g, ' ')
-    .replace(/→/g, ' ')
-    .replace(/\//g, ' ')
-    .replace(/,/g, ' ')
-    .replace(/\./g, ' ')
-    .replace(/-/g, ' ')
-    .replace(/\s+/g, ' ')
-    .split(' ')
-    .filter(Boolean);
-}
-
-function buildNGrams(words) {
-  const grams = new Set();
-  for (let i = 0; i < words.length; i++) {
-    grams.add(words[i]);
-    if (i < words.length - 1) grams.add(`${words[i]} ${words[i + 1]}`);
-    if (i < words.length - 2) grams.add(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
-  }
-  return grams;
-}
+const OTHER_LABEL = 'Other / Otra';
 
 const COUNTRY_PRESETS = [
-  { keys: ['japan', 'japon', 'japón', 'jp'], display: 'Japón', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
-  { keys: ['italy', 'italia', 'it'], display: 'Italia', currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
-  { keys: ['france', 'francia', 'fr'], display: 'Francia', currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
-  { keys: ['spain', 'espana', 'españa', 'es'], display: 'España', currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
-  { keys: ['portugal', 'pt'], display: 'Portugal', currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
-  { keys: ['germany', 'alemania', 'de'], display: 'Alemania', currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
-  { keys: ['united kingdom', 'uk', 'reino unido', 'england', 'britain'], display: 'Reino Unido', currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
-  { keys: ['united states', 'usa', 'estados unidos', 'eeuu'], display: 'Estados Unidos', currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
-  { keys: ['mexico', 'méxico', 'mx'], display: 'México', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
-  { keys: ['argentina', 'ar'], display: 'Argentina', currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
-  { keys: ['brazil', 'brasil', 'br'], display: 'Brasil', currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
-  { keys: ['thailand', 'tailandia', 'th'], display: 'Tailandia', currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
-  { keys: ['south korea', 'korea', 'corea', 'corea del sur', 'kr'], display: 'Corea del Sur', currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
-  { keys: ['china', 'cn'], display: 'China', currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
-  { keys: ['vietnam', 'vn'], display: 'Vietnam', currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
-  { keys: ['singapore', 'singapur', 'sg'], display: 'Singapur', currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
-  { keys: ['indonesia', 'id'], display: 'Indonesia', currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
-  { keys: ['morocco', 'marruecos', 'ma'], display: 'Marruecos', currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
-  { keys: ['turkey', 'turquia', 'turquía', 'tr'], display: 'Turquía', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
-  { keys: ['switzerland', 'suiza', 'ch'], display: 'Suiza', currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
-  { keys: ['greece', 'grecia', 'gr'], display: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
+  { country: 'España', currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
+  { country: 'Italia', currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
+  { country: 'Francia', currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
+  { country: 'Portugal', currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
+  { country: 'Alemania', currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
+  { country: 'Reino Unido', currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
+  { country: 'Estados Unidos', currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
+  { country: 'México', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
+  { country: 'Argentina', currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
+  { country: 'Brasil', currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
+  { country: 'Japón', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
+  { country: 'Tailandia', currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
+  { country: 'Corea del Sur', currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
+  { country: 'China', currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
+  { country: 'Vietnam', currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
+  { country: 'Singapur', currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
+  { country: 'Indonesia', currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
+  { country: 'Marruecos', currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
+  { country: 'Turquía', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
+  { country: 'Suiza', currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
+  { country: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
 ];
 
-function getPresetForCountry(input) {
-  const n = normalizeText(input);
-  if (!n) return null;
-  for (const p of COUNTRY_PRESETS) {
-    for (const k of p.keys) {
-      const kn = normalizeText(k);
-      if (n === kn) return p;
-    }
-  }
-  for (const p of COUNTRY_PRESETS) {
-    for (const k of p.keys) {
-      const kn = normalizeText(k);
-      if (n.includes(kn) || kn.includes(n)) return p;
-    }
-  }
-  return null;
-}
+const TOP_CITIES_BY_COUNTRY = {
+  España: [
+    'Madrid','Barcelona','Valencia','Sevilla','Bilbao','Málaga','Granada','Zaragoza','Alicante','San Sebastián',
+    'Córdoba','Toledo','Salamanca','Santiago de Compostela','Palma de Mallorca','Ibiza','Tenerife','Las Palmas de Gran Canaria','Mallorca','Marbella',
+    'Santander','Oviedo','Gijón','Pamplona','Valladolid','Murcia','Tarragona','Girona','Cádiz','Segovia'
+  ],
+  Italia: [
+    'Roma','Milán','Venecia','Florencia','Nápoles','Turín','Bolonia','Génova','Verona','Pisa',
+    'Siena','Bari','Palermo','Catania','Trieste','Padua','Parma','Modena','Lecce','Trento',
+    'Vicenza','Brescia','Perugia','Ravenna','Cagliari','Ancona','Lucca','Como','Sorrento','Cinque Terre'
+  ],
+  Francia: [
+    'París','Marsella','Lyon','Toulouse','Niza','Nantes','Estrasburgo','Montpellier','Burdeos','Lille',
+    'Rennes','Reims','Le Havre','Saint-Étienne','Toulon','Grenoble','Dijon','Angers','Nîmes','Aix-en-Provence',
+    'Avignon','Cannes','Saint-Malo','Biarritz','Annecy','Tours','Metz','Nancy','Besançon','Perpignan'
+  ],
+  Portugal: [
+    'Lisboa','Oporto','Coímbra','Braga','Faro','Aveiro','Évora','Guimarães','Cascais','Sintra',
+    'Madeira (Funchal)','Azores (Ponta Delgada)','Setúbal','Viseu','Leiria','Portimão','Lagos','Albufeira','Tavira','Tomar',
+    'Óbidos','Nazaré','Ericeira','Peniche','Chaves','Viana do Castelo','Beja','Santarém','Figueira da Foz','Covilhã'
+  ],
+  Alemania: [
+    'Berlín','Múnich','Hamburgo','Colonia','Fráncfort','Stuttgart','Düsseldorf','Dresde','Leipzig','Núremberg',
+    'Heidelberg','Bremen','Hannover','Bonn','Augsburgo','Wiesbaden','Freiburg','Mannheim','Mainz','Essen',
+    'Dortmund','Kiel','Rostock','Regensburg','Weimar','Potsdam','Würzburg','Lübeck','Aachen','Garmisch-Partenkirchen'
+  ],
+  'Reino Unido': [
+    'Londres','Edimburgo','Manchester','Liverpool','Birmingham','Bristol','Glasgow','Cambridge','Oxford','Bath',
+    'Brighton','York','Newcastle','Leeds','Cardiff','Belfast','Inverness','Portsmouth','Southampton','Nottingham',
+    'Sheffield','Canterbury','Stratford-upon-Avon','Stonehenge','Windermere','Aberdeen','Swansea','Leicester','Coventry','Durham'
+  ],
+  'Estados Unidos': [
+    'New York','Los Angeles','San Francisco','Miami','Chicago','Las Vegas','Washington D.C.','Boston','Seattle','San Diego',
+    'Austin','New Orleans','Orlando','Philadelphia','Denver','Portland','Atlanta','Nashville','Houston','Dallas',
+    'Phoenix','Minneapolis','Detroit','Salt Lake City','Honolulu','Tampa','Charlotte','Pittsburgh','Cleveland','San Jose'
+  ],
+  México: [
+    'Ciudad de México','Cancún','Guadalajara','Monterrey','Tulum','Playa del Carmen','Puerto Vallarta','Oaxaca','Mérida','San Miguel de Allende',
+    'Puebla','Guanajuato','Querétaro','Toluca','Chiapas (San Cristóbal)','Veracruz','Acapulco','Cozumel','Los Cabos','La Paz',
+    'Mazatlán','Morelia','Tepotzotlán','Xalapa','Aguascalientes','León','Tijuana','Ensenada','Campeche','Bacalar'
+  ],
+  Argentina: [
+    'Buenos Aires','Bariloche','Mendoza','Córdoba','Rosario','Ushuaia','El Calafate','Salta','Mar del Plata','Iguazú',
+    'La Plata','San Juan','San Luis','Neuquén','Puerto Madryn','Tigre','Tandil','San Martín de los Andes','Villa La Angostura','Jujuy (Purmamarca)',
+    'Bahía Blanca','Santa Fe','Corrientes','Resistencia','Comodoro Rivadavia','Río Gallegos','Trelew','San Rafael','Cafayate','Chaltén'
+  ],
+  Brasil: [
+    'Río de Janeiro','São Paulo','Salvador','Brasília','Fortaleza','Recife','Florianópolis','Curitiba','Porto Alegre','Belo Horizonte',
+    'Manaus','Belém','Natal','João Pessoa','Maceió','Vitória','Campinas','Santos','Foz do Iguaçu','Bonito',
+    'Ilhabela','Búzios','Paraty','Jericoacoara','Lençóis Maranhenses','Ouro Preto','Gramado','Petrópolis','Olinda','Arraial do Cabo'
+  ],
+  Japón: [
+    'Tokyo','Kyoto','Osaka','Hiroshima','Nara','Hakone','Sapporo','Fukuoka','Nikko','Nagoya',
+    'Kobe','Yokohama','Kamakura','Kanazawa','Takayama','Sendai','Kumamoto','Nagasaki','Okinawa (Naha)','Kagoshima',
+    'Matsumoto','Shizuoka','Toyama','Okayama','Himeji','Beppu','Koyasan','Fuji Five Lakes','Kawagoe','Ise'
+  ],
+  Tailandia: [
+    'Bangkok','Chiang Mai','Phuket','Krabi','Pattaya','Ayutthaya','Chiang Rai','Koh Samui','Koh Phi Phi','Hua Hin',
+    'Sukhothai','Pai','Kanchanaburi','Koh Tao','Koh Phangan','Surat Thani','Hat Yai','Trang','Koh Lanta','Udon Thani',
+    'Ubon Ratchathani','Nakhon Ratchasima','Lampang','Nan','Rayong','Koh Chang','Samut Prakan','Mae Hong Son','Chumphon','Phetchabun'
+  ],
+  'Corea del Sur': [
+    'Seoul','Busan','Incheon','Daegu','Daejeon','Gwangju','Suwon','Jeonju','Gyeongju','Jeju',
+    'Gangneung','Pyeongchang','Ulsan','Pohang','Chuncheon','Seogwipo','Sokcho','Andong','Tongyeong','Yeosu',
+    'Gimhae','Changwon','Mokpo','Suncheon','Iksan','Cheonan','Seongnam','Yongin','Ilsan','Anyang'
+  ],
+  China: [
+    'Beijing','Shanghai','Hong Kong','Shenzhen','Guangzhou','Chengdu','Hangzhou','Xi’an','Nanjing','Suzhou',
+    'Wuhan','Chongqing','Tianjin','Xiamen','Harbin','Qingdao','Dalian','Kunming','Sanya','Lhasa',
+    'Zhangjiajie','Guilin','Yangshuo','Foshan','Zhuhai','Ningbo','Changsha','Jinan','Urumqi','Hefei'
+  ],
+  Vietnam: [
+    'Hanoi','Ho Chi Minh City','Da Nang','Hoi An','Hue','Nha Trang','Da Lat','Ha Long','Sapa','Can Tho',
+    'Phu Quoc','Vung Tau','Mui Ne','Hai Phong','Ninh Binh','Quy Nhon','Phong Nha','Dong Hoi','Buon Ma Thuot','Pleiku',
+    'Con Dao','Bac Ninh','Ha Tinh','Thanh Hoa','Vinh','Lao Cai','Cao Bang','Lang Son','My Tho','Ben Tre'
+  ],
+  Singapur: [
+    'Singapore','Marina Bay','Sentosa','Chinatown','Little India','Kampong Glam','Orchard','Clarke Quay','Bugis','Tiong Bahru',
+    'East Coast','Botanic Gardens','Gardens by the Bay','Jurong','Holland Village','Punggol','Joo Chiat','Kallang','Novena','Toa Payoh',
+    'Woodlands','Pasir Ris','Ang Mo Kio','Serangoon','Bukit Timah','Clementi','Queenstown','Raffles Place','HarbourFront','Seletar'
+  ],
+  Indonesia: [
+    'Bali','Jakarta','Yogyakarta','Bandung','Surabaya','Ubud','Lombok','Gili Islands','Seminyak','Uluwatu',
+    'Komodo (Labuan Bajo)','Flores','Makassar','Medan','Padang','Malang','Bogor','Batam','Bintan','Solo',
+    'Manado','Bunaken','Raja Ampat','Jayapura','Denpasar','Canggu','Nusa Penida','Nusa Lembongan','Balikpapan','Samarinda'
+  ],
+  Marruecos: [
+    'Marrakech','Casablanca','Fez','Rabat','Tánger','Chefchaouen','Essaouira','Agadir','Meknes','Ouarzazate',
+    'Merzouga','Ifrane','Tetouan','Asilah','El Jadida','Oujda','Al Hoceima','Safi','Taroudant','Tiznit',
+    'Errachidia','Midelt','Beni Mellal','Khenifra','Nador','Dakhla','Laayoune','Sidi Ifni','Azrou','Aït Benhaddou'
+  ],
+  Turquía: [
+    'Istanbul','Ankara','Izmir','Antalya','Bursa','Cappadocia (Göreme)','Pamukkale','Bodrum','Fethiye','Marmaris',
+    'Konya','Trabzon','Gaziantep','Adana','Mersin','Eskisehir','Samsun','Kusadasi','Alanya','Side',
+    'Canakkale','Edirne','Sanliurfa','Kayseri','Rize','Amasya','Kars','Van','Sivas','Diyarbakir'
+  ],
+  Suiza: [
+    'Zúrich','Ginebra','Lucerna','Berna','Basel','Interlaken','Zermatt','Lausana','Montreux','Lugano',
+    'St. Moritz','Grindelwald','Jungfraujoch','Thun','Friburgo','Sion','Chur','Davos','Appenzell','Schaffhausen',
+    'Brienz','Wengen','Kandersteg','Andermatt','Neuchâtel','St. Gallen','Arosa','Mürren','Bellinzona','Locarno'
+  ],
+  Grecia: [
+    'Atenas','Salónica','Santorini','Mykonos','Creta (Heraklion)','Rodas','Corfú','Naxos','Paros','Milos',
+    'Kos','Delphi','Meteora','Nafplio','Patras','Chania','Rethymno','Kavala','Volos','Ioannina',
+    'Zakynthos','Kefalonia','Samos','Thassos','Skopelos','Hydra','Spetses','Mystras','Olympia','Lefkada'
+  ],
+};
 
-const CITY_TO_COUNTRY = [
-  { aliases: ['tokyo', 'tokio', 'kyoto', 'osaka', 'hiroshima', 'nara', 'hakone', 'sapporo', 'fukuoka', 'nikko'], country: 'Japón' },
-  { aliases: ['rome', 'roma', 'milan', 'milano', 'florence', 'firenze', 'venice', 'venezia', 'naples', 'napoli', 'turin', 'torino', 'bologna', 'pisa'], country: 'Italia' },
-  { aliases: ['paris', 'lyon', 'marseille', 'marsella', 'nice', 'niza'], country: 'Francia' },
-  { aliases: ['madrid', 'barcelona', 'valencia', 'sevilla', 'seville', 'malaga', 'málaga', 'bilbao'], country: 'España' },
-  { aliases: ['london', 'londres', 'manchester', 'edinburgh', 'edimburgo'], country: 'Reino Unido' },
-  { aliases: ['new york', 'nyc', 'los angeles', 'san francisco', 'miami', 'chicago'], country: 'Estados Unidos' },
-  { aliases: ['bangkok', 'phuket', 'chiang mai'], country: 'Tailandia' },
-  { aliases: ['seoul', 'seul', 'seúl', 'busan'], country: 'Corea del Sur' },
-  { aliases: ['beijing', 'pekin', 'pekín', 'shanghai', 'hong kong'], country: 'China' },
-  { aliases: ['hanoi', 'ho chi minh', 'saigon', 'saigón'], country: 'Vietnam' },
-  { aliases: ['singapore', 'singapur'], country: 'Singapur' },
-  { aliases: ['bali', 'jakarta'], country: 'Indonesia' },
-  { aliases: ['marrakech', 'casablanca'], country: 'Marruecos' },
-  { aliases: ['istanbul', 'estambul'], country: 'Turquía' },
-  { aliases: ['zurich', 'zúrich', 'geneva', 'ginebra'], country: 'Suiza' },
-  { aliases: ['athens', 'atenas', 'santorini'], country: 'Grecia' },
-];
-
-function detectCountryFromDestination(destination) {
-  const destNorm = normalizeText(destination);
-  if (!destNorm) return null;
-
-  const words = splitWords(destination);
-  const grams = buildNGrams(words);
-
-  for (const row of CITY_TO_COUNTRY) {
-    for (const alias of row.aliases) {
-      const a = normalizeText(alias);
-      if (grams.has(a)) return row.country;
-    }
-  }
-
-  const presetDirect = getPresetForCountry(destination);
-  if (presetDirect) return presetDirect.display;
-
-  for (const w of words) {
-    const p = getPresetForCountry(w);
-    if (p) return p.display;
-  }
-
-  return null;
-}
+const COUNTRIES = Object.keys(TOP_CITIES_BY_COUNTRY);
 
 const CURRENCY_OPTIONS = [
   { value: 'EUR', label: 'EUR (€)' },
@@ -171,26 +184,63 @@ function currencySymbolFromCode(code) {
   if (code === 'ARS') return '$';
   if (code === 'SGD') return '$';
   return '$';
-}
+}function distributeDates(startDateStr, endDateStr, stopsCount) {
+  if (!startDateStr || !endDateStr || !stopsCount || stopsCount <= 0) return [];
 
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  const totalDays = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
+  if (totalDays <= 0) return [];
+
+  const base = Math.floor(totalDays / stopsCount);
+  const extra = totalDays % stopsCount;
+
+  const allocations = [];
+  let cursor = new Date(start);
+
+  for (let i = 0; i < stopsCount; i++) {
+    const len = Math.max(1, base + (i < extra ? 1 : 0));
+    const s = new Date(cursor);
+    const e = new Date(cursor);
+    e.setDate(e.getDate() + len - 1);
+
+    allocations.push({
+      start_date: s.toISOString().slice(0, 10),
+      end_date: e.toISOString().slice(0, 10),
+    });
+
+    cursor.setDate(cursor.getDate() + len);
+  }
+
+  return allocations;
+}
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [currencyTouched, setCurrencyTouched] = useState(false);
 
+  const [mode, setMode] = useState('multi');
+
+  const [stops, setStops] = useState([
+    { city: '', other: '' },
+    { city: '', other: '' },
+  ]);
+
   const [formData, setFormData] = useState({
     name: '',
-    destination: '',
-    country: '',
+    country: 'España',
     start_date: '',
     end_date: '',
     description: '',
     cover_image: '',
     currency: 'EUR',
     currency_symbol: '€',
-    language: 'English',
-    language_code: 'en-GB',
+    language: 'Spanish',
+    language_code: 'es-ES',
   });
 
   const queryClient = useQueryClient();
@@ -211,16 +261,16 @@ export default function TripsList() {
   });
 
   const tripCards = useMemo(() => {
-    return trips.map(trip => {
-      const tripCities = allCities.filter(c => c.trip_id === trip.id);
+    return trips.map((trip) => {
+      const tripCities = allCities.filter((c) => c.trip_id === trip.id);
       return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
     });
   }, [trips, allCities]);
+  function applyCountry(country) {
+    const preset = COUNTRY_PRESETS.find((p) => p.country === country) || null;
 
-  function setCountry(value) {
-    const preset = getPresetForCountry(value);
-    setFormData(prev => {
-      const next = { ...prev, country: value };
+    setFormData((prev) => {
+      const next = { ...prev, country };
       if (preset && !currencyTouched) {
         next.currency = preset.currency;
         next.currency_symbol = preset.symbol;
@@ -229,59 +279,95 @@ export default function TripsList() {
       }
       return next;
     });
-  }
 
-  function setDestination(value) {
-    const detectedCountry = detectCountryFromDestination(value);
-    const preset = detectedCountry ? getPresetForCountry(detectedCountry) : null;
-
-    setFormData(prev => {
-      const next = { ...prev, destination: value };
-
-      const prevCountryNorm = normalizeText(prev.country);
-      const prevDestNorm = normalizeText(prev.destination);
-      const countryEmpty = !prevCountryNorm;
-      const countryWasSameAsDestination = prevCountryNorm && prevCountryNorm === prevDestNorm;
-
-      if (detectedCountry && (countryEmpty || countryWasSameAsDestination)) {
-        next.country = detectedCountry;
-        if (preset && !currencyTouched) {
-          next.currency = preset.currency;
-          next.currency_symbol = preset.symbol;
-          next.language = preset.language;
-          next.language_code = preset.languageCode;
-        }
-      }
-
-      return next;
-    });
+    setStops((prev) => prev.map((s) => ({ ...s, city: '', other: '' })));
   }
 
   function setCurrency(value) {
     setCurrencyTouched(true);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       currency: value,
       currency_symbol: currencySymbolFromCode(value),
     }));
   }
 
-  const createMutation = useMutation({
+  function setStopCity(index, value) {
+    setStops((prev) =>
+      prev.map((s, i) => {
+        if (i !== index) return s;
+        if (value === OTHER_LABEL) return { ...s, city: OTHER_LABEL, other: '' };
+        return { ...s, city: value, other: '' };
+      })
+    );
+  }
+
+  function setStopOther(index, value) {
+    setStops((prev) => prev.map((s, i) => (i === index ? { ...s, other: value } : s)));
+  }
+
+  function addStop() {
+    setStops((prev) => [...prev, { city: '', other: '' }]);
+  }
+
+  function removeStop(index) {
+    setStops((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function setModeValue(value) {
+    setMode(value);
+    if (value === 'single') {
+      setStops((prev) => [prev[0] || { city: '', other: '' }]);
+    } else {
+      setStops((prev) => (prev.length >= 2 ? prev : [...prev, { city: '', other: '' }]));
+    }
+  }
+
+  function getStopLabel(s) {
+    if (s.city === OTHER_LABEL) return (s.other || '').trim();
+    return (s.city || '').trim();
+  }
+
+  function normalizeStopsForTrip() {
+    const clean = stops.map(getStopLabel).map((v) => v.trim()).filter(Boolean);
+    if (mode === 'single') return clean.slice(0, 1);
+    return clean;
+  }
+``const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
       const userId = user?.id;
 
-      const members = email ? [email] : [];
+      const tripCities = normalizeStopsForTrip();
+      const destinationString = tripCities.length ? tripCities.join(' → ') : '';
+
       const roles = email ? { [email]: 'admin' } : {};
+      const members = email ? [email] : [];
 
       const trip = await base44.entities.Trip.create({
         ...data,
+        destination: destinationString,
         members,
         roles,
       });
 
+      const endForSplit = data.end_date || data.start_date;
+      const allocations = distributeDates(data.start_date, endForSplit, tripCities.length);
+
+      for (let i = 0; i < tripCities.length; i++) {
+        const dates = allocations[i] || { start_date: data.start_date, end_date: endForSplit };
+        await base44.entities.City.create({
+          trip_id: trip.id,
+          name: tripCities[i],
+          country: data.country,
+          order: i,
+          start_date: dates.start_date,
+          end_date: dates.end_date,
+        });
+      }
+
       if (selectedTemplate?.packingItems?.length) {
-        const packingPromises = selectedTemplate.packingItems.map(item =>
+        const packingPromises = selectedTemplate.packingItems.map((item) =>
           base44.entities.PackingItem.create({
             ...item,
             trip_id: trip.id,
@@ -300,30 +386,44 @@ export default function TripsList() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['allCities'] });
+
       setDialogOpen(false);
       setSelectedTemplate(null);
       setCurrencyTouched(false);
+      setMode('multi');
+      setStops([{ city: '', other: '' }, { city: '', other: '' }]);
+
       setFormData({
         name: '',
-        destination: '',
-        country: '',
+        country: 'España',
         start_date: '',
         end_date: '',
         description: '',
         cover_image: '',
         currency: 'EUR',
         currency_symbol: '€',
-        language: 'English',
-        language_code: 'en-GB',
+        language: 'Spanish',
+        language_code: 'es-ES',
       });
     },
   });
 
-  const handleSubmit = () => {
-    createMutation.mutate(formData);
-  };
+  const cityOptions = TOP_CITIES_BY_COUNTRY[formData.country] || [];
 
-  if (isLoading) {
+  const canCreate = (() => {
+    const tripCities = normalizeStopsForTrip();
+    const datesOk = !formData.end_date || formData.end_date >= formData.start_date;
+    return (
+      formData.name.trim() &&
+      formData.country.trim() &&
+      formData.start_date &&
+      datesOk &&
+      tripCities.length > 0 &&
+      !createMutation.isPending
+    );
+  })();
+if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -368,14 +468,11 @@ export default function TripsList() {
         ) : (
           <>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tus viajes</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {tripCards}
-            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">{tripCards}</div>
           </>
         )}
       </div>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl">✈️ Nuevo Viaje</DialogTitle>
@@ -385,36 +482,110 @@ export default function TripsList() {
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
               <Input
-                placeholder="ej. Italia 2027"
+                placeholder="ej. Italia 2026"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                 className="bg-input border-border text-foreground"
               />
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Destino *</label>
-                <Input
-                  placeholder="ej. Roma / Tokyo & Kyoto / Italia"
-                  value={formData.destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className="bg-input border-border text-foreground"
-                />
+                <label className="text-sm font-medium text-foreground mb-1.5 block">País *</label>
+                <Select value={formData.country} onValueChange={applyCountry}>
+                  <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
-                <Input
-                  placeholder="Se auto-detecta (puedes cambiarlo)"
-                  value={formData.country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="bg-input border-border text-foreground"
-                />
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Modo</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant={mode === 'single' ? 'default' : 'outline'}
+                    className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''}
+                    onClick={() => setModeValue('single')}
+                  >
+                    1 parada
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={mode === 'multi' ? 'default' : 'outline'}
+                    className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''}
+                    onClick={() => setModeValue('multi')}
+                  >
+                    Multi-ciudad
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-foreground">Destino{mode === 'multi' ? 's' : ''} *</label>
+                {mode === 'multi' && (
+                  <Button type="button" variant="outline" onClick={addStop}>
+                    + Añadir ciudad
+                  </Button>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                {stops.map((stop, idx) => (
+                  <div key={idx} className="bg-white border border-border rounded-xl p-3">
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1">
+                        <Select value={stop.city} onValueChange={(v) => setStopCity(idx, v)}>
+                          <SelectTrigger className="bg-input border-border text-foreground">
+                            <SelectValue placeholder="Elige una ciudad..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cityOptions.map((city) => (
+                              <SelectItem key={city} value={city}>
+                                {city}
+                              </SelectItem>
+                            ))}
+                            <SelectItem value={OTHER_LABEL}>{OTHER_LABEL}</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {stop.city === OTHER_LABEL && (
+                          <Input
+                            placeholder="Escribe la ciudad"
+                            value={stop.other}
+                            onChange={(e) => setStopOther(idx, e.target.value)}
+                            className="bg-input border-border text-foreground mt-2"
+                          />
+                        )}
+                      </div>
+
+                      {mode === 'multi' && stops.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeStop(idx)}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Eliminar ciudad"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+<div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
                 <Select value={formData.currency} onValueChange={setCurrency}>
@@ -422,8 +593,10 @@ export default function TripsList() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CURRENCY_OPTIONS.map(o => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    {CURRENCY_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -444,7 +617,7 @@ export default function TripsList() {
                 <Input
                   type="date"
                   value={formData.start_date}
-                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  onChange={(e) => setFormData((p) => ({ ...p, start_date: e.target.value }))}
                   className="bg-input border-border text-foreground"
                 />
               </div>
@@ -454,7 +627,7 @@ export default function TripsList() {
                 <Input
                   type="date"
                   value={formData.end_date}
-                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                  onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))}
                   className="bg-input border-border text-foreground"
                 />
               </div>
@@ -465,7 +638,7 @@ export default function TripsList() {
               <Textarea
                 placeholder="Describe tu viaje..."
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
                 rows={3}
                 className="bg-input border-border text-foreground"
               />
@@ -486,12 +659,12 @@ export default function TripsList() {
               <Input
                 placeholder="https://images.unsplash.com/..."
                 value={formData.cover_image}
-                onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
+                onChange={(e) => setFormData((p) => ({ ...p, cover_image: e.target.value }))}
                 className="bg-input border-border text-foreground"
               />
             </div>
 
-            <div className="pt-4 border-t border-border">
+<div className="pt-4 border-t border-border">
               <TripTemplates onSelect={setSelectedTemplate} />
               {selectedTemplate && (
                 <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
@@ -504,19 +677,15 @@ export default function TripsList() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
 
               <Button
-                onClick={handleSubmit}
+                type="button"
+                onClick={() => createMutation.mutate(formData)}
                 className="bg-orange-700 hover:bg-orange-800"
-                disabled={
-                  !formData.name ||
-                  !formData.destination ||
-                  !formData.start_date ||
-                  createMutation.isPending
-                }
+                disabled={!canCreate}
               >
                 {createMutation.isPending ? 'Creando...' : 'Crear Viaje'}
               </Button>
@@ -527,3 +696,4 @@ export default function TripsList() {
     </div>
   );
 }
+
