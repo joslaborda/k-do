@@ -439,7 +439,7 @@ export default function TripsList() {
             </div>
 
             {/* Asignación de fechas por parada */}
-            {formData.start_date && normalizeStops().length > 0 && (
+            {formData.start_date && stops.length > 0 && (
               <div className="border border-border rounded-xl p-4 bg-white space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground">Fechas por parada</label>
@@ -461,7 +461,7 @@ export default function TripsList() {
 
                 {dateMode === 'nights' && (
                   <div className="space-y-2">
-                    {normalizeStops().map((stop, idx) => (
+                    {stops.map((stop, idx) => (
                       <div key={idx} className="flex items-center gap-3">
                         <span className="text-sm font-medium text-foreground w-24 truncate">{stop || `Parada ${idx + 1}`}</span>
                         <div className="flex items-center gap-1.5 flex-1">
@@ -477,7 +477,7 @@ export default function TripsList() {
                         </div>
                         {/* Preview */}
                         {nightsPerStop[idx] && formData.start_date && (() => {
-                          const alloc = computeNightsDates(formData.start_date, nightsPerStop.slice(0, normalizeStops().length));
+                          const alloc = computeNightsDates(formData.start_date, nightsPerStop);
                           const a = alloc[idx];
                           return a ? <span className="text-xs text-orange-600 font-medium">{a.start_date} → {a.end_date}</span> : null;
                         })()}
@@ -486,7 +486,7 @@ export default function TripsList() {
                     {formData.start_date && nightsPerStop.every((n) => n) && (
                       <p className="text-xs text-muted-foreground pt-1">
                         Fin calculado: <span className="font-semibold text-foreground">
-                          {computeNightsDates(formData.start_date, nightsPerStop.slice(0, normalizeStops().length)).at(-1)?.end_date}
+                          {computeNightsDates(formData.start_date, nightsPerStop).at(-1)?.end_date}
                         </span>
                       </p>
                     )}
@@ -495,7 +495,7 @@ export default function TripsList() {
 
                 {dateMode === 'manual' && (
                   <div className="space-y-2">
-                    {normalizeStops().map((stop, idx) => (
+                    {stops.map((stop, idx) => (
                       <div key={idx} className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
                         <span className="text-sm font-medium text-foreground truncate">{stop || `Parada ${idx + 1}`}</span>
                         <Input
