@@ -364,6 +364,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
                       <CityInput
+                        key={formData.country}
                         country={formData.country}
                         value={stop.city}
                         onChange={(v) => updateStop(idx, { city: v })}
