@@ -58,8 +58,10 @@ import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
 import Translator from './pages/Translator';
 import TripsList from './pages/TripsList';
+import TripDetail from './pages/TripDetail';
 import Utilities from './pages/Utilities';
 import Tickets from './pages/Tickets';
+import Calendar from './pages/Calendar';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyEmail from './pages/VerifyEmail';
@@ -78,8 +80,10 @@ export const PAGES = {
     "Restaurants": Restaurants,
     "Translator": Translator,
     "TripsList": TripsList,
+    "TripDetail": TripDetail,
     "Utilities": Utilities,
     "Tickets": Tickets,
+    "Calendar": Calendar,
     "Profile": Profile,
     "Settings": Settings,
     "VerifyEmail": VerifyEmail,
