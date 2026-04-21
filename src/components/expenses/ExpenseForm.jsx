@@ -24,16 +24,19 @@ const CATEGORIES = [
 export default function ExpenseForm({
   members = [],
   initialData = null,
+  defaultCurrency = 'EUR',
   onSave,
   onCancel,
   saving = false,
   userMap = {},
 }) {
   const getName = (email) => userMap[email] || email;
+  const currency = initialData?.currency || defaultCurrency;
   const [form, setForm] = useState(
     initialData || {
       description: '',
       amount: '',
+      currency: defaultCurrency,
       category: 'food',
       date: new Date().toISOString().split('T')[0],
       paid_by: members[0] || '',
@@ -257,13 +260,13 @@ export default function ExpenseForm({
       {form.split_type === 'equal' && form.split_with.length > 0 && form.amount && (
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
           <p className="text-sm font-semibold text-orange-900 mb-2">
-            División: {equalSplit()}€ por persona
+            División: {equalSplit()} {currency} por persona
           </p>
           <div className="space-y-1">
             {form.split_with.map((email) => (
               <div key={email} className="text-xs text-orange-700 flex justify-between">
                 <span>{getName(email)}</span>
-                <span className="font-semibold">{equalSplit()}€</span>
+                <span className="font-semibold">{equalSplit()} {currency}</span>
               </div>
             ))}
           </div>
@@ -332,7 +335,7 @@ export default function ExpenseForm({
       {form.split_type === 'custom' && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Especifica cuánto paga cada persona (total debe ser {form.amount}€)
+            Especifica cuánto paga cada persona (total debe ser {form.amount} {currency})
           </p>
           <div className="space-y-2 bg-secondary/30 rounded-lg p-3 max-h-48 overflow-y-auto">
             {form.split_with.map((email) => (
@@ -346,7 +349,7 @@ export default function ExpenseForm({
                   step="0.01"
                   className="w-20 h-8 bg-input border-border text-sm"
                 />
-                <span className="text-sm text-muted-foreground w-4">€</span>
+                <span className="text-sm text-muted-foreground">{currency}</span>
               </div>
             ))}
           </div>
@@ -354,7 +357,7 @@ export default function ExpenseForm({
           {amountMismatch && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-2">
               <p className="text-xs font-semibold text-red-700">
-                ❌ Total: {customTotal.toFixed(2)}€ (debe ser {form.amount}€)
+                ❌ Total: {customTotal.toFixed(2)} {currency} (debe ser {form.amount} {currency})
               </p>
             </div>
           )}
@@ -362,7 +365,7 @@ export default function ExpenseForm({
           {!amountMismatch && customTotal > 0 && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-2">
               <p className="text-xs font-semibold text-green-700">
-                ✓ Total: {customTotal.toFixed(2)}€
+                ✓ Total: {customTotal.toFixed(2)} {currency}
               </p>
             </div>
           )}

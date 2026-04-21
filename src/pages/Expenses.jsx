@@ -38,6 +38,7 @@ export default function Expenses() {
   });
 
   const members = trip?.members || [];
+  const defaultCurrency = trip?.currency || 'EUR';
 
   // Obtener datos de usuarios para crear mapa de nombres
   const { data: usersData = [] } = useQuery({
@@ -218,6 +219,7 @@ export default function Expenses() {
           <ExpenseForm
             members={members}
             initialData={editingExpense}
+            defaultCurrency={defaultCurrency}
             onSave={handleSave}
             onCancel={() => {
               setDialogOpen(false);
