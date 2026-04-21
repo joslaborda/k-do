@@ -20,20 +20,32 @@ function normalizeText(str = '') {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-function splitDestination(str = '') {
+function splitWords(str = '') {
   const s = normalizeText(str);
   if (!s) return [];
   return s
     .replace(/[()]/g, ' ')
-    .replace(/&/g, ' y ')
-    .replace(/\+/g, ' y ')
+    .replace(/&/g, ' ')
+    .replace(/\+/g, ' ')
     .replace(/->/g, ' ')
     .replace(/→/g, ' ')
     .replace(/\//g, ' ')
     .replace(/,/g, ' ')
+    .replace(/\./g, ' ')
+    .replace(/-/g, ' ')
     .replace(/\s+/g, ' ')
     .split(' ')
     .filter(Boolean);
+}
+
+function buildNGrams(words) {
+  const grams = new Set();
+  for (let i = 0; i < words.length; i++) {
+    grams.add(words[i]);
+    if (i < words.length - 1) grams.add(`${words[i]} ${words[i + 1]}`);
+    if (i < words.length - 2) grams.add(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
+  }
+  return grams;
 }
 
 const COUNTRY_PRESETS = [
@@ -60,107 +72,62 @@ const COUNTRY_PRESETS = [
   { keys: ['greece', 'grecia', 'gr'], display: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
 ];
 
-function getPresetForCountry(countryInput) {
-  const n = normalizeText(countryInput);
+function getPresetForCountry(input) {
+  const n = normalizeText(input);
   if (!n) return null;
-  return (
-    COUNTRY_PRESETS.find(p => p.keys.includes(n)) ||
-    COUNTRY_PRESETS.find(p => p.keys.some(k => n.includes(k) || k.includes(n))) ||
-    null
-  );
+  for (const p of COUNTRY_PRESETS) {
+    for (const k of p.keys) {
+      const kn = normalizeText(k);
+      if (n === kn) return p;
+    }
+  }
+  for (const p of COUNTRY_PRESETS) {
+    for (const k of p.keys) {
+      const kn = normalizeText(k);
+      if (n.includes(kn) || kn.includes(n)) return p;
+    }
+  }
+  return null;
 }
 
 const CITY_TO_COUNTRY = [
-  { city: ['tokyo', 'tokio'], country: 'Japón' },
-  { city: ['kyoto'], country: 'Japón' },
-  { city: ['osaka'], country: 'Japón' },
-  { city: ['hiroshima'], country: 'Japón' },
-  { city: ['nara'], country: 'Japón' },
-  { city: ['hakone'], country: 'Japón' },
-  { city: ['sapporo'], country: 'Japón' },
-  { city: ['fukuoka'], country: 'Japón' },
-  { city: ['nikko'], country: 'Japón' },
-
-  { city: ['rome', 'roma'], country: 'Italia' },
-  { city: ['milan', 'milano'], country: 'Italia' },
-  { city: ['florence', 'firenze'], country: 'Italia' },
-  { city: ['venice', 'venezia'], country: 'Italia' },
-  { city: ['naples', 'napoli'], country: 'Italia' },
-  { city: ['turin', 'torino'], country: 'Italia' },
-  { city: ['bologna'], country: 'Italia' },
-  { city: ['pisa'], country: 'Italia' },
-
-  { city: ['paris'], country: 'Francia' },
-  { city: ['lyon'], country: 'Francia' },
-  { city: ['marseille', 'marsella'], country: 'Francia' },
-  { city: ['nice', 'niza'], country: 'Francia' },
-
-  { city: ['madrid'], country: 'España' },
-  { city: ['barcelona'], country: 'España' },
-  { city: ['valencia'], country: 'España' },
-  { city: ['sevilla', 'seville'], country: 'España' },
-  { city: ['malaga', 'málaga'], country: 'España' },
-  { city: ['bilbao'], country: 'España' },
-
-  { city: ['london', 'londres'], country: 'Reino Unido' },
-  { city: ['manchester'], country: 'Reino Unido' },
-  { city: ['edinburgh', 'edimburgo'], country: 'Reino Unido' },
-
-  { city: ['new york', 'nyc'], country: 'Estados Unidos' },
-  { city: ['los angeles', 'la'], country: 'Estados Unidos' },
-  { city: ['san francisco'], country: 'Estados Unidos' },
-  { city: ['miami'], country: 'Estados Unidos' },
-  { city: ['chicago'], country: 'Estados Unidos' },
-
-  { city: ['bangkok'], country: 'Tailandia' },
-  { city: ['phuket'], country: 'Tailandia' },
-  { city: ['chiang mai'], country: 'Tailandia' },
-
-  { city: ['seoul', 'seul', 'seúl'], country: 'Corea del Sur' },
-  { city: ['busan'], country: 'Corea del Sur' },
-
-  { city: ['beijing', 'pekin', 'pekín'], country: 'China' },
-  { city: ['shanghai'], country: 'China' },
-  { city: ['hong kong'], country: 'China' },
-
-  { city: ['hanoi'], country: 'Vietnam' },
-  { city: ['ho chi minh', 'saigon', 'saigón'], country: 'Vietnam' },
-
-  { city: ['singapore', 'singapur'], country: 'Singapur' },
-
-  { city: ['bali'], country: 'Indonesia' },
-  { city: ['jakarta'], country: 'Indonesia' },
-
-  { city: ['marrakech', 'marrakech'], country: 'Marruecos' },
-  { city: ['casablanca'], country: 'Marruecos' },
-
-  { city: ['istanbul', 'estambul'], country: 'Turquía' },
-
-  { city: ['zurich', 'zúrich', 'zurich'], country: 'Suiza' },
-  { city: ['geneva', 'ginebra'], country: 'Suiza' },
-
-  { city: ['athens', 'atenas'], country: 'Grecia' },
-  { city: ['santorini'], country: 'Grecia' },
+  { aliases: ['tokyo', 'tokio', 'kyoto', 'osaka', 'hiroshima', 'nara', 'hakone', 'sapporo', 'fukuoka', 'nikko'], country: 'Japón' },
+  { aliases: ['rome', 'roma', 'milan', 'milano', 'florence', 'firenze', 'venice', 'venezia', 'naples', 'napoli', 'turin', 'torino', 'bologna', 'pisa'], country: 'Italia' },
+  { aliases: ['paris', 'lyon', 'marseille', 'marsella', 'nice', 'niza'], country: 'Francia' },
+  { aliases: ['madrid', 'barcelona', 'valencia', 'sevilla', 'seville', 'malaga', 'málaga', 'bilbao'], country: 'España' },
+  { aliases: ['london', 'londres', 'manchester', 'edinburgh', 'edimburgo'], country: 'Reino Unido' },
+  { aliases: ['new york', 'nyc', 'los angeles', 'san francisco', 'miami', 'chicago'], country: 'Estados Unidos' },
+  { aliases: ['bangkok', 'phuket', 'chiang mai'], country: 'Tailandia' },
+  { aliases: ['seoul', 'seul', 'seúl', 'busan'], country: 'Corea del Sur' },
+  { aliases: ['beijing', 'pekin', 'pekín', 'shanghai', 'hong kong'], country: 'China' },
+  { aliases: ['hanoi', 'ho chi minh', 'saigon', 'saigón'], country: 'Vietnam' },
+  { aliases: ['singapore', 'singapur'], country: 'Singapur' },
+  { aliases: ['bali', 'jakarta'], country: 'Indonesia' },
+  { aliases: ['marrakech', 'casablanca'], country: 'Marruecos' },
+  { aliases: ['istanbul', 'estambul'], country: 'Turquía' },
+  { aliases: ['zurich', 'zúrich', 'geneva', 'ginebra'], country: 'Suiza' },
+  { aliases: ['athens', 'atenas', 'santorini'], country: 'Grecia' },
 ];
 
 function detectCountryFromDestination(destination) {
-  const tokens = splitDestination(destination);
-  if (!tokens.length) return null;
+  const destNorm = normalizeText(destination);
+  if (!destNorm) return null;
 
-  const joined = normalizeText(destination);
+  const words = splitWords(destination);
+  const grams = buildNGrams(words);
 
   for (const row of CITY_TO_COUNTRY) {
-    for (const c of row.city) {
-      const cn = normalizeText(c);
-      if (joined.includes(cn)) return row.country;
+    for (const alias of row.aliases) {
+      const a = normalizeText(alias);
+      if (grams.has(a)) return row.country;
     }
   }
 
-  const byCountryName = getPresetForCountry(destination);
-  if (byCountryName) return byCountryName.display;
+  const presetDirect = getPresetForCountry(destination);
+  if (presetDirect) return presetDirect.display;
 
-  for (const t of tokens) {
-    const p = getPresetForCountry(t);
+  for (const w of words) {
+    const p = getPresetForCountry(w);
     if (p) return p.display;
   }
 
@@ -187,21 +154,23 @@ const CURRENCY_OPTIONS = [
 ];
 
 function currencySymbolFromCode(code) {
-  return (
-    code === 'EUR' ? '€' :
-    code === 'USD' ? '$' :
-    code === 'GBP' ? '£' :
-    code === 'JPY' ? '¥' :
-    code === 'CHF' ? 'Fr' :
-    code === 'THB' ? '฿' :
-    code === 'KRW' ? '₩' :
-    code === 'VND' ? '₫' :
-    code === 'MAD' ? 'DH' :
-    code === 'TRY' ? '₺' :
-    code === 'BRL' ? 'R$' :
-    code === 'IDR' ? 'Rp' :
-    '$'
-  );
+  if (code === 'EUR') return '€';
+  if (code === 'USD') return '$';
+  if (code === 'GBP') return '£';
+  if (code === 'JPY') return '¥';
+  if (code === 'CHF') return 'Fr';
+  if (code === 'THB') return '฿';
+  if (code === 'KRW') return '₩';
+  if (code === 'CNY') return '¥';
+  if (code === 'VND') return '₫';
+  if (code === 'MAD') return 'DH';
+  if (code === 'TRY') return '₺';
+  if (code === 'BRL') return 'R$';
+  if (code === 'IDR') return 'Rp';
+  if (code === 'MXN') return '$';
+  if (code === 'ARS') return '$';
+  if (code === 'SGD') return '$';
+  return '$';
 }
 
 export default function TripsList() {
@@ -264,7 +233,7 @@ export default function TripsList() {
 
   function setDestination(value) {
     const detectedCountry = detectCountryFromDestination(value);
-    const preset = getPresetForCountry(detectedCountry || '');
+    const preset = detectedCountry ? getPresetForCountry(detectedCountry) : null;
 
     setFormData(prev => {
       const next = { ...prev, destination: value };
@@ -276,7 +245,6 @@ export default function TripsList() {
 
       if (detectedCountry && (countryEmpty || countryWasSameAsDestination)) {
         next.country = detectedCountry;
-
         if (preset && !currencyTouched) {
           next.currency = preset.currency;
           next.currency_symbol = preset.symbol;
@@ -301,6 +269,8 @@ export default function TripsList() {
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
+      const userId = user?.id;
+
       const members = email ? [email] : [];
       const roles = email ? { [email]: 'admin' } : {};
 
@@ -315,7 +285,7 @@ export default function TripsList() {
           base44.entities.PackingItem.create({
             ...item,
             trip_id: trip.id,
-            user_id: user?.id,
+            user_id: userId,
             packed: false,
           })
         );
