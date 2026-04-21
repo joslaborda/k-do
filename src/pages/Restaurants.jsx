@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Search, BookOpen, Loader2, ChevronDown } from 'lucide-react';
+import { Search, BookOpen, Loader2, ChevronDown, ArrowRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
+import { createPageUrl } from '@/utils';
 
 // Fallback food data when LLM is slow/fails
 const FALLBACK_CATEGORIES = [
@@ -20,6 +23,7 @@ const FALLBACK_CATEGORIES = [
 ];
 
 export default function Restaurants() {
+  const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
 
@@ -28,7 +32,7 @@ export default function Restaurants() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // Use active city context
+  // Use active city context (hook always called)
   const { trip, activeCity } = useTripContext(tripId);
 
   const country = activeCity?.country_code
@@ -158,6 +162,35 @@ Responde SOLO con JSON válido:
         item.description.toLowerCase().includes(searchQuery.toLowerCase())
     ),
   })).filter((cat) => cat.items.length > 0);
+
+  // No tripId: show empty state
+  if (!tripId) {
+    return (
+      <div className="min-h-screen bg-orange-50 flex flex-col">
+        <div className="bg-orange-700 pt-12 pb-20">
+          <div className="max-w-6xl mx-auto px-6">
+            <h1 className="text-white text-4xl font-bold">Gastronomía 🍽️</h1>
+            <p className="text-white/90 mt-2">Descubre la gastronomía de tu destino</p>
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="text-center max-w-md">
+            <BookOpen className="w-20 h-20 text-muted-foreground mx-auto mb-6 opacity-50" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">Selecciona un viaje</h2>
+            <p className="text-muted-foreground mb-8">Abre Gastronomía desde un viaje para descubrir los platos típicos del país de destino.</p>
+            <Button
+              onClick={() => navigate(createPageUrl('TripsList'))}
+              className="bg-orange-700 hover:bg-orange-800 text-white w-full"
+            >
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Ir a Mis viajes
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-orange-50">
