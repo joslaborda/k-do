@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-
-const USERNAME_REGEX = /^[a-z][a-z0-9_]{2,29}$/;
+import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 
 export default function CreateProfileModal({ user, open }) {
   const [username, setUsername] = useState('');
@@ -14,29 +13,41 @@ export default function CreateProfileModal({ user, open }) {
   const [homeCountry, setHomeCountry] = useState('España');
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null); // null | true | false
+  const [usernameError, setUsernameError] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const queryClient = useQueryClient();
 
-  const handleUsernameChange = async (val) => {
-    const clean = val.toLowerCase().replace(/[^a-z0-9_]/g, '');
-    setUsername(clean);
-    setAvailable(null);
-    if (!USERNAME_REGEX.test(clean)) return;
+  // Debounce availability check
+  useEffect(() => {
+    if (!username) { setAvailable(null); setUsernameError(''); return; }
+    const err = validateUsername(username);
+    if (err) { setUsernameError(err); setAvailable(null); return; }
+    setUsernameError('');
     setChecking(true);
-    const existing = await base44.entities.UserProfile.filter({ username_normalized: clean });
-    setAvailable(existing.length === 0);
-    setChecking(false);
+    const timer = setTimeout(async () => {
+      const ok = await checkUsernameAvailability(username, user?.id);
+      setAvailable(ok);
+      setChecking(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [username, user?.id]);
+
+  const handleUsernameChange = (val) => {
+    setUsername(normalizeUsername(val));
+    setAvailable(null);
   };
 
   const handleSave = async () => {
-    if (!USERNAME_REGEX.test(username)) { setError('Username inválido'); return; }
+    const err = validateUsername(username);
+    if (err) { setError(err); return; }
     if (!available) { setError('Username no disponible'); return; }
-    if (!displayName.trim()) { setError('Nombre es obligatorio'); return; }
+    if (!displayName.trim()) { setError('El nombre es obligatorio'); return; }
     setSaving(true);
-    // Double-check atomicity: filter again right before create
-    const existing = await base44.entities.UserProfile.filter({ username_normalized: username });
-    if (existing.length > 0) { setError('Username ya en uso, elige otro'); setSaving(false); setAvailable(false); return; }
+    setError('');
+    // Re-check before creating (avoid race condition)
+    const ok = await checkUsernameAvailability(username, user?.id);
+    if (!ok) { setError('Username ya en uso, elige otro'); setSaving(false); setAvailable(false); return; }
     await base44.entities.UserProfile.create({
       user_id: user.id,
       username,
@@ -48,7 +59,7 @@ export default function CreateProfileModal({ user, open }) {
     setSaving(false);
   };
 
-  const usernameValid = USERNAME_REGEX.test(username);
+  const canSave = !validateUsername(username) && available === true && displayName.trim() && !saving;
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
@@ -56,7 +67,7 @@ export default function CreateProfileModal({ user, open }) {
         <DialogHeader>
           <DialogTitle className="text-2xl font-black">Crea tu perfil ✈️</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground -mt-2">Elige tu @username para unirte a Kōdo Social.</p>
+        <p className="text-sm text-muted-foreground -mt-2">Elige tu @username para unirte a Kōdo.</p>
 
         <div className="space-y-4 pt-2">
           {/* Username */}
@@ -70,6 +81,8 @@ export default function CreateProfileModal({ user, open }) {
                 value={username}
                 onChange={e => handleUsernameChange(e.target.value)}
                 maxLength={30}
+                autoCapitalize="none"
+                autoCorrect="off"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2">
                 {checking && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
@@ -77,9 +90,10 @@ export default function CreateProfileModal({ user, open }) {
                 {!checking && available === false && <XCircle className="w-4 h-4 text-destructive" />}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Solo letras minúsculas, números y _ · 3-30 caracteres · empieza por letra</p>
-            {!checking && available === false && <p className="text-xs text-destructive mt-0.5">Este username ya está en uso</p>}
-            {!checking && available === true && <p className="text-xs text-green-600 mt-0.5">¡Disponible!</p>}
+            <p className="text-xs text-muted-foreground mt-1">Solo letras, números y _ · 3-30 caracteres · empieza por letra</p>
+            {usernameError && <p className="text-xs text-destructive mt-0.5">{usernameError}</p>}
+            {!checking && !usernameError && available === false && <p className="text-xs text-destructive mt-0.5">Este username ya está en uso</p>}
+            {!checking && !usernameError && available === true && <p className="text-xs text-green-600 mt-0.5">¡Disponible!</p>}
           </div>
 
           {/* Display name */}
@@ -98,7 +112,7 @@ export default function CreateProfileModal({ user, open }) {
 
           <Button
             className="w-full bg-orange-700 hover:bg-orange-800 text-white font-semibold"
-            disabled={!usernameValid || available !== true || !displayName.trim() || saving}
+            disabled={!canSave}
             onClick={handleSave}
           >
             {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : 'Crear perfil'}

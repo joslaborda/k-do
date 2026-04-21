@@ -1,14 +1,62 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, User, LogOut } from 'lucide-react';
+import { Plus, User, LogOut, Settings } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import SocialExploreSection from '@/components/social/SocialExploreSection';
+
+function UserMenu({ user, profile }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef();
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const initials = profile?.display_name?.[0]?.toUpperCase()
+    || user?.full_name?.[0]?.toUpperCase()
+    || <User className="w-4 h-4" />;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/40 hover:border-white/70 transition-colors flex items-center justify-center bg-white/20 text-white font-bold text-sm"
+      >
+        {profile?.avatar_url
+          ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt="avatar" />
+          : initials}
+      </button>
+      {open && (
+        <div className="absolute right-0 top-12 bg-white border border-border rounded-xl shadow-xl w-48 z-50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-sm font-semibold truncate">{profile?.display_name || user?.full_name || 'Usuario'}</p>
+            {profile?.username && <p className="text-xs text-muted-foreground font-mono">@{profile.username}</p>}
+          </div>
+          <Link to="/Profile" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors">
+            <User className="w-4 h-4 text-muted-foreground" /> Perfil
+          </Link>
+          <Link to="/Settings" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors">
+            <Settings className="w-4 h-4 text-muted-foreground" /> Ajustes
+          </Link>
+          <button
+            onClick={() => base44.auth.logout()}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm text-destructive hover:bg-red-50 transition-colors w-full text-left border-t border-border"
+          >
+            <LogOut className="w-4 h-4" /> Cerrar sesión
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -148,11 +196,7 @@ export default function TripsList() {
             >
               <Plus className="w-4 h-4 mr-1.5" />Crear viaje
             </Button>
-            <Link to="/Profile">
-              <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-white font-bold text-sm hover:bg-white/30 transition-colors cursor-pointer">
-                {myProfile?.display_name ? myProfile.display_name[0].toUpperCase() : user?.full_name ? user.full_name[0].toUpperCase() : <User className="w-4 h-4" />}
-              </div>
-            </Link>
+            <UserMenu user={user} profile={myProfile} />
           </div>
         </div>
       </div>

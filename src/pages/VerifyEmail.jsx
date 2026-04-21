@@ -1,73 +1,55 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { MailCheck, RefreshCw } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 
 export default function VerifyEmail() {
   const [checking, setChecking] = useState(false);
-  const [message, setMessage] = useState('');
+  const [msg, setMsg] = useState('');
 
   const handleCheck = async () => {
     setChecking(true);
-    setMessage('');
+    setMsg('');
     try {
-      const user = await base44.auth.me();
-      if (user?.is_verified) {
-        // Reload so AuthContext re-runs and routes properly
+      const u = await base44.auth.me();
+      if (u?.is_verified) {
         window.location.reload();
       } else {
-        setMessage('Tu email aún no está verificado. Revisa tu bandeja de entrada.');
+        setMsg('Tu email aún no está verificado. Revisa tu bandeja de entrada.');
       }
     } catch {
-      setMessage('Error al verificar. Inténtalo de nuevo.');
+      setMsg('Error al verificar. Inténtalo de nuevo.');
+    } finally {
+      setChecking(false);
     }
-    setChecking(false);
   };
-
-  const handleLogout = () => base44.auth.logout();
 
   return (
     <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl border border-border shadow-lg p-8 max-w-md w-full text-center space-y-6">
-        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
-          <MailCheck className="w-8 h-8 text-orange-700" />
+      <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center shadow-sm">
+        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Mail className="w-8 h-8 text-orange-700" />
         </div>
-
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Verifica tu email</h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            Hemos enviado un enlace de verificación a tu correo electrónico.
-            Haz clic en el enlace y luego pulsa el botón de abajo.
-          </p>
-        </div>
-
-        {message && (
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-sm text-orange-700">
-            {message}
-          </div>
+        <h2 className="text-xl font-bold mb-2">Verifica tu email</h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Te hemos enviado un correo de verificación. Ábrelo y confirma tu cuenta para continuar usando Kōdo.
+        </p>
+        {msg && (
+          <p className="text-sm mb-4 text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">{msg}</p>
         )}
-
-        <div className="space-y-3">
-          <Button
-            onClick={handleCheck}
-            disabled={checking}
-            className="w-full bg-orange-700 hover:bg-orange-800 text-white"
-          >
-            {checking ? (
-              <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Comprobando...</>
-            ) : (
-              '✅ Ya verifiqué mi email'
-            )}
-          </Button>
-
-          <p className="text-xs text-muted-foreground">
-            ¿No recibiste el email? Revisa la carpeta de spam o contacta con soporte.
-          </p>
-
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground">
-            Cerrar sesión
-          </Button>
-        </div>
+        <Button
+          className="w-full bg-orange-700 hover:bg-orange-800 text-white"
+          onClick={handleCheck}
+          disabled={checking}
+        >
+          {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Comprobando...</> : 'Ya verifiqué ✓'}
+        </Button>
+        <button
+          onClick={() => base44.auth.logout()}
+          className="mt-4 text-xs text-muted-foreground hover:underline block mx-auto"
+        >
+          Cerrar sesión
+        </button>
       </div>
     </div>
   );
