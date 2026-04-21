@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { getCountryMeta, getEmergencyInfo, getExchangeRate } from '@/lib/countryConfig';
+import { useTripContext } from '@/hooks/useTripContext';
 function getCountryConfig(country) { const m = getCountryMeta(country); return { currency: m.currency, symbol: m.symbol, locale: m.languageCode, flag: m.flag }; }
 
 const infoCategories = [
@@ -70,24 +71,15 @@ export default function Utilities() {
     }
   }, [activeTab, navigate, tripId]);
 
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId,
-  });
+  // Trip context — cities y ciudad activa filtradas por este viaje
+  const { trip, cities, activeCity } = useTripContext(tripId);
 
-  const country = trip?.country || '';
+  const country = activeCity?.country || trip?.country || '';
   const countryConfig = getCountryConfig(country);
 
   const { data: infos = [] } = useQuery({
     queryKey: ['usefulInfo', tripId],
     queryFn: () => base44.entities.UsefulInfo.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-  });
-
-  const { data: cities = [] } = useQuery({
-    queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
     enabled: !!tripId,
   });
 
@@ -108,14 +100,14 @@ export default function Utilities() {
       .finally(() => setLoadingRate(false));
   }, [country, countryConfig.currency]);
 
-  // Cargar info de emergencias según país usando módulo central
+  // Cargar info de emergencias según país activo
   useEffect(() => {
     if (!country || !tripId) return;
+    setAiEmergencyData(null);
     setLoadingEmergency(true);
     getEmergencyInfo(country, 'España').then((data) => {
       if (data) {
-        // Normalize to expected shape
-        const normalized = {
+        setAiEmergencyData({
           emergency_numbers: [
             data.emergency_general && { name: 'Emergencias', number: data.emergency_general, icon: '🆘' },
             data.police && { name: 'Policía', number: data.police, icon: '🚔' },
@@ -125,8 +117,7 @@ export default function Utilities() {
           embassy: data.embassy || null,
           useful_apps: data.useful_apps || [],
           safety_tips: data.safety_tips || [],
-        };
-        setAiEmergencyData(normalized);
+        });
       }
     }).catch(() => {}).finally(() => setLoadingEmergency(false));
   }, [country, tripId]);
@@ -262,7 +253,7 @@ export default function Utilities() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                {cities.map((city) => <WeatherCard key={city.id} city={city} />)}
+                {cities.map((city) => <WeatherCard key={city.id} city={city} tripCountry={trip?.country} />)}
               </div>
             )}
           </TabsContent>

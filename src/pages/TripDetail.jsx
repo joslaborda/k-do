@@ -7,19 +7,20 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useTripContext } from '@/hooks/useTripContext';
+import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 
 export default function TripDetail() {
   const [tripId, setTripId] = useState(null);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Get trip ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     setTripId(urlParams.get('id'));
-    
-    // Get current user
     base44.auth.me().then(setUser);
   }, []);
+
+  const { cities: tripCities, activeCity, overrideCityId, setOverrideCityId, clearOverride } = useTripContext(tripId);
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ['trip', tripId],
@@ -96,6 +97,17 @@ export default function TripDetail() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-4xl font-bold text-foreground mb-2">{trip.name}</h1>
+              {tripCities.length > 0 && (
+                <div className="mb-3">
+                  <ActiveCitySelector
+                    cities={tripCities}
+                    overrideCityId={overrideCityId}
+                    setOverrideCityId={setOverrideCityId}
+                    clearOverride={clearOverride}
+                    activeCity={activeCity}
+                  />
+                </div>
+              )}
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
