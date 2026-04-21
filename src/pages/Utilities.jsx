@@ -9,231 +9,197 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Plus, Info, Cloud, DollarSign, Trash2, ExternalLink, Phone, Package, Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2, ChevronDown, BookOpen } from 'lucide-react';
+import { Plus, Info, Cloud, Trash2, ExternalLink, Package, Loader2, ChevronDown } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle } from
-'@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue } from
-'@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// ============ COUNTRY CONFIG ============
+function getCountryConfig(country) {
+  const CONFIGS = {
+    'Japón': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', flag: '🇯🇵' },
+    'Japan': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', flag: '🇯🇵' },
+    'Tailandia': { currency: 'THB', symbol: '฿', locale: 'th-TH', flag: '🇹🇭' },
+    'Corea del Sur': { currency: 'KRW', symbol: '₩', locale: 'ko-KR', flag: '🇰🇷' },
+    'China': { currency: 'CNY', symbol: '¥', locale: 'zh-CN', flag: '🇨🇳' },
+    'Vietnam': { currency: 'VND', symbol: '₫', locale: 'vi-VN', flag: '🇻🇳' },
+    'India': { currency: 'INR', symbol: '₹', locale: 'hi-IN', flag: '🇮🇳' },
+    'Francia': { currency: 'EUR', symbol: '€', locale: 'fr-FR', flag: '🇫🇷' },
+    'Italia': { currency: 'EUR', symbol: '€', locale: 'it-IT', flag: '🇮🇹' },
+    'Alemania': { currency: 'EUR', symbol: '€', locale: 'de-DE', flag: '🇩🇪' },
+    'Portugal': { currency: 'EUR', symbol: '€', locale: 'pt-PT', flag: '🇵🇹' },
+    'Grecia': { currency: 'EUR', symbol: '€', locale: 'el-GR', flag: '🇬🇷' },
+    'Reino Unido': { currency: 'GBP', symbol: '£', locale: 'en-GB', flag: '🇬🇧' },
+    'Suiza': { currency: 'CHF', symbol: 'Fr', locale: 'de-CH', flag: '🇨🇭' },
+    'México': { currency: 'MXN', symbol: '$', locale: 'es-MX', flag: '🇲🇽' },
+    'Estados Unidos': { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🇺🇸' },
+    'Brasil': { currency: 'BRL', symbol: 'R$', locale: 'pt-BR', flag: '🇧🇷' },
+    'Argentina': { currency: 'ARS', symbol: '$', locale: 'es-AR', flag: '🇦🇷' },
+    'Marruecos': { currency: 'MAD', symbol: 'DH', locale: 'ar-MA', flag: '🇲🇦' },
+    'Turquía': { currency: 'TRY', symbol: '₺', locale: 'tr-TR', flag: '🇹🇷' },
+    'Australia': { currency: 'AUD', symbol: '$', locale: 'en-AU', flag: '🇦🇺' },
+    'Indonesia': { currency: 'IDR', symbol: 'Rp', locale: 'id-ID', flag: '🇮🇩' },
+    'Filipinas': { currency: 'PHP', symbol: '₱', locale: 'fil-PH', flag: '🇵🇭' },
+    'Colombia': { currency: 'COP', symbol: '$', locale: 'es-CO', flag: '🇨🇴' },
+    'Perú': { currency: 'PEN', symbol: 'S/', locale: 'es-PE', flag: '🇵🇪' },
+    'Egipto': { currency: 'EGP', symbol: '£', locale: 'ar-EG', flag: '🇪🇬' },
+  };
+  if (!country) return { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🌍' };
+  return CONFIGS[country] || Object.entries(CONFIGS).find(([k]) => k.toLowerCase() === country.toLowerCase())?.[1] || { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🌍' };
+}
+// ============ FIN COUNTRY CONFIG ============
 
 const infoCategories = [
-{ value: 'emergencia', label: 'Emergencia', icon: '🚨' },
-{ value: 'salud', label: 'Salud y Seguridad', icon: '⚕️' },
-{ value: 'embajada', label: 'Embajada/Consulado', icon: '🏛️' },
-{ value: 'apps', label: 'Apps útiles', icon: '📱' },
-{ value: 'transporte', label: 'Transporte', icon: '🚇' },
-{ value: 'contactos', label: 'Contactos', icon: '📞' },
-{ value: 'otros', label: 'Otros', icon: '💡' }];
-
+  { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
+  { value: 'salud', label: 'Salud y Seguridad', icon: '⚕️' },
+  { value: 'embajada', label: 'Embajada/Consulado', icon: '🏛️' },
+  { value: 'apps', label: 'Apps útiles', icon: '📱' },
+  { value: 'transporte', label: 'Transporte', icon: '🚇' },
+  { value: 'contactos', label: 'Contactos', icon: '📞' },
+  { value: 'otros', label: 'Otros', icon: '💡' },
+];
 
 const packingCategories = [
-{ value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
-{ value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
-{ value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
-{ value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-amber-500 to-orange-500' },
-{ value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' }];
-
-
-const phraseCategories = [
-{
-  name: 'Básicas',
-  icon: '👋',
-  phrases: [
-  { spanish: 'Hola', japanese: 'こんにちは', romaji: 'Konnichiwa' },
-  { spanish: 'Gracias', japanese: 'ありがとうございます', romaji: 'Arigatou gozaimasu' },
-  { spanish: 'Por favor', japanese: 'お願いします', romaji: 'Onegaishimasu' },
-  { spanish: 'Disculpe', japanese: 'すみません', romaji: 'Sumimasen' }]
-
-},
-{
-  name: 'Restaurante',
-  icon: '🍜',
-  phrases: [
-  { spanish: '¿Puedo tener agua?', japanese: 'お水をください', romaji: 'Omizu wo kudasai' },
-  { spanish: 'La cuenta, por favor', japanese: 'お会計お願いします', romaji: 'Okaikei onegaishimasu' },
-  { spanish: 'Esto está delicioso', japanese: 'おいしいです', romaji: 'Oishii desu' }]
-
-},
-{
-  name: 'Direcciones',
-  icon: '🗺️',
-  phrases: [
-  { spanish: '¿Dónde está el baño?', japanese: 'トイレはどこですか？', romaji: 'Toire wa doko desu ka?' },
-  { spanish: '¿Dónde está la estación?', japanese: '駅はどこですか？', romaji: 'Eki wa doko desu ka?' },
-  { spanish: 'Estoy perdido', japanese: '道に迷いました', romaji: 'Michi ni mayoimashita' }]
-
-}];
-
+  { value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
+  { value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
+  { value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
+  { value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-amber-500 to-orange-500' },
+  { value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' },
+];
 
 export default function Utilities() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('currency');
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'diary') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tripId = urlParams.get('trip_id');
-      navigate(createPageUrl(`Diary?trip_id=${tripId}`));
-    }
-  }, [activeTab, navigate]);
-  const [exchangeRate, setExchangeRate] = useState(null);
-  const [loadingRate, setLoadingRate] = useState(false);
-  const [jpyAmount, setJpyAmount] = useState('');
-  const [eurAmount, setEurAmount] = useState('');
-  const [inputText, setInputText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [direction, setDirection] = useState('es-jp');
-  const [copiedId, setCopiedId] = useState(null);
-  const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true });
-  const [formData, setFormData] = useState({
-    title: '',
-    category: 'emergencia',
-    content: '',
-    link: '',
-    icon: '📌'
-  });
-  const [packingFormData, setPackingFormData] = useState({
-    name: '',
-    category: 'personal',
-    quantity: 1
-  });
-
   const [tripId, setTripId] = useState(null);
   const queryClient = useQueryClient();
 
+  // Currency state
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [loadingRate, setLoadingRate] = useState(false);
+  const [localAmount, setLocalAmount] = useState('');
+  const [eurAmount, setEurAmount] = useState('');
+
+  // Emergency AI state
+  const [loadingEmergency, setLoadingEmergency] = useState(false);
+  const [aiEmergencyData, setAiEmergencyData] = useState(null);
+
+  // Form state
+  const [formData, setFormData] = useState({ title: '', category: 'emergencia', content: '', link: '', icon: '📌' });
+  const [packingFormData, setPackingFormData] = useState({ name: '', category: 'personal', quantity: 1 });
+
   useEffect(() => {
+    window.scrollTo(0, 0);
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('trip_id');
     setTripId(id);
   }, []);
 
+  useEffect(() => {
+    if (activeTab === 'diary') {
+      navigate(createPageUrl(`Diary?trip_id=${tripId}`));
+    }
+  }, [activeTab, navigate, tripId]);
+
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: () => base44.entities.Trip.get(tripId),
+    enabled: !!tripId,
+  });
+
+  const country = trip?.country || '';
+  const countryConfig = getCountryConfig(country);
+
   const { data: infos = [] } = useQuery({
     queryKey: ['usefulInfo', tripId],
     queryFn: () => base44.entities.UsefulInfo.filter({ trip_id: tripId }),
-    enabled: !!tripId
+    enabled: !!tripId,
   });
 
-  // Crear datos de ejemplo si está vacío
-  useEffect(() => {
-    if (infos.length === 0 && tripId) {
-      const sampleData = [
-      { title: 'Emergencias Generales', category: 'emergencia', content: '110 - Policía\n119 - Ambulancia/Bomberos\n#9110 - Emergencias no urgentes (Policía)', icon: '🚨' },
-      { title: 'Línea de Urgencias Médicas', category: 'salud', content: 'Centro Médico Internacional de Tokio\nTeléfono: +81-3-5285-8185\nIntérprete disponible 24 horas\n\nKyoto Hospital (Kyoto)\nTeléfono: +81-75-751-3111\n\nOsaka Medical Center (Osaka)\nTeléfono: +81-6-6942-1331', icon: '⚕️' },
-      { title: 'Farmacias 24 horas', category: 'salud', content: 'Tokio: Matsumotokiyoshi\nKyoto: Tsuruha\nOsaka: Daikoku Drug\nDisponen de antídoto para alergias y medicinas básicas', icon: '💊' },
-      { title: 'Información de Seguros', category: 'salud', content: 'Verifica tu póliza de viaje antes de partir. Algunos hospitales requieren pago directo.\nGuarda tus recibos para reembolsos.', icon: '📋' },
-      { title: 'Embajada de España en Japón', category: 'embajada', content: 'Dirección: 1-3-29 Roppongi, Minato-ku, Tokio 106-0032\nTeléfono: +81-3-5798-8000\nHorario: Lunes a viernes 9:00-13:00 y 14:00-17:30', link: 'https://www.exteriores.gob.es', icon: '🏛️' },
-      { title: 'Centro de Llamadas de Turismo', category: 'contactos', content: 'Teléfono: +81-50-3816-2787\nDisponible 24/7 en múltiples idiomas\nAyuda con transporte, hoteles y emergencias', icon: '☎️' },
-      { title: 'Google Maps', category: 'apps', content: 'La app imprescindible para navegar. Funciona perfectamente con transporte público. Descarga mapas offline.', link: 'https://maps.google.com', icon: '📱' },
-      { title: 'Suica/Pasmo', category: 'transporte', content: 'Tarjeta recargable para transporte público en Tokio, Osaka y Kyoto.\nCómprala en cualquier estación o aeropuerto.\nValor típico: ¥2000-3000', link: 'https://www.pasmo.co.jp/', icon: '🚇' },
-      { title: 'Japan Rail Pass', category: 'transporte', content: 'Para viajes entre ciudades (Tokio → Kyoto → Osaka → Hiroshima).\nValor: ~¥29,650 (7 días)\nRequiere compra previa a llegada a Japón', icon: '🚄' },
-      { title: 'Normas de Seguridad', category: 'salud', content: 'Japón es muy seguro. Algunas normas:\n- Cuida tus pertenencias en estaciones concurridas\n- No comas caminando\n- Respeta los espacios en transporte público\n- Apaga la música en tren/autobús', icon: '🛡️' }];
-
-      sampleData.forEach((data) => {
-        base44.entities.UsefulInfo.create({ ...data, trip_id: tripId });
-      });
-    }
-  }, [infos.length, tripId]);
-
   const { data: cities = [] } = useQuery({
-    queryKey: ['cities'],
-    queryFn: () => base44.entities.City.list('order')
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    enabled: !!tripId,
   });
 
   const { data: packingItems = [] } = useQuery({
-    queryKey: ['packingItems'],
-    queryFn: () => base44.entities.PackingItem.list()
+    queryKey: ['packingItems', tripId],
+    queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }),
+    enabled: !!tripId,
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.UsefulInfo.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usefulInfo'] });
-      setDialogOpen(false);
-      setFormData({ title: '', category: 'emergencia', content: '', link: '', icon: '📌' });
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.UsefulInfo.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['usefulInfo'] })
-  });
-
-  const createPackingMutation = useMutation({
-    mutationFn: (data) => base44.entities.PackingItem.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['packingItems'] });
-      setPackingDialogOpen(false);
-      setPackingFormData({ name: '', category: 'personal', quantity: 1 });
-    }
-  });
-
-  const togglePackedMutation = useMutation({
-    mutationFn: ({ id, packed }) => base44.entities.PackingItem.update(id, { packed }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] })
-  });
-
-  const deletePackingMutation = useMutation({
-    mutationFn: (id) => base44.entities.PackingItem.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems'] })
-  });
-
-  // Obtener tasa de cambio
+  // Cargar tasa de cambio dinámica según país
   useEffect(() => {
-    const fetchExchangeRate = async () => {
-      setLoadingRate(true);
-      try {
-        const response = await base44.integrations.Core.InvokeLLM({
-          prompt: 'Dame la tasa de cambio actual de 1 EUR a JPY. Solo responde con el número, sin texto adicional.',
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              rate: { type: 'number' }
-            }
-          }
-        });
-        setExchangeRate(response.rate);
-      } catch (error) {
-        console.error('Error fetching exchange rate:', error);
-        setExchangeRate(160); // fallback
-      } finally {
-        setLoadingRate(false);
-      }
-    };
-    fetchExchangeRate();
-  }, []);
-
-  const handleJpyChange = (value) => {
-    setJpyAmount(value);
-    if (exchangeRate && value) {
-      setEurAmount((parseFloat(value) / exchangeRate).toFixed(2));
-    } else {
-      setEurAmount('');
+    if (!country || countryConfig.currency === 'EUR') {
+      setExchangeRate(1);
+      return;
     }
+    const cacheKey = `rate_EUR_${countryConfig.currency}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) { setExchangeRate(parseFloat(cached)); return; }
+
+    setLoadingRate(true);
+    base44.integrations.Core.InvokeLLM({
+      prompt: `Dame la tasa de cambio aproximada de 1 EUR a ${countryConfig.currency} (${country}). Solo responde con el número, sin texto.`,
+      response_json_schema: { type: 'object', properties: { rate: { type: 'number' } } }
+    }).then((r) => {
+      const rate = r.rate || 1;
+      setExchangeRate(rate);
+      sessionStorage.setItem(cacheKey, String(rate));
+    }).catch(() => setExchangeRate(1)).finally(() => setLoadingRate(false));
+  }, [country, countryConfig.currency]);
+
+  // Cargar info de emergencias por IA según país
+  useEffect(() => {
+    if (!country || !tripId) return;
+    const cacheKey = `emergency_${country}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) { try { setAiEmergencyData(JSON.parse(cached)); return; } catch {} }
+
+    setLoadingEmergency(true);
+    base44.integrations.Core.InvokeLLM({
+      prompt: `Eres un experto en viajes. Para un viajero ESPAÑOL que visita ${country}, proporciona:
+1. Números de emergencia del país (policía, ambulancia, bomberos, emergencias general)
+2. Embajada de España en ${country}: dirección, teléfono, web oficial
+3. Número de teléfono de turismo/asistencia si existe
+4. Apps de transporte o utilidad más usadas en ${country}
+5. 3 consejos de seguridad importantes para ${country}
+
+Responde SOLO con JSON válido:
+{
+  "emergency_numbers": [{"name": "Policía", "number": "...", "icon": "🚔"}, ...],
+  "embassy": {"address": "...", "phone": "...", "web": "...", "hours": "..."},
+  "tourism_phone": "...",
+  "useful_apps": [{"name": "...", "description": "...", "icon": "📱"}, ...],
+  "safety_tips": ["...", "...", "..."]
+}`,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          emergency_numbers: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, number: { type: 'string' }, icon: { type: 'string' } } } },
+          embassy: { type: 'object', properties: { address: { type: 'string' }, phone: { type: 'string' }, web: { type: 'string' }, hours: { type: 'string' } } },
+          tourism_phone: { type: 'string' },
+          useful_apps: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, description: { type: 'string' }, icon: { type: 'string' } } } },
+          safety_tips: { type: 'array', items: { type: 'string' } },
+        },
+      },
+    }).then((r) => {
+      setAiEmergencyData(r);
+      sessionStorage.setItem(cacheKey, JSON.stringify(r));
+    }).catch(() => {}).finally(() => setLoadingEmergency(false));
+  }, [country, tripId]);
+
+  const handleLocalChange = (value) => {
+    setLocalAmount(value);
+    if (exchangeRate && value) setEurAmount((parseFloat(value) / exchangeRate).toFixed(2));
+    else setEurAmount('');
   };
 
   const handleEurChange = (value) => {
     setEurAmount(value);
-    if (exchangeRate && value) {
-      setJpyAmount((parseFloat(value) * exchangeRate).toFixed(0));
-    } else {
-      setJpyAmount('');
-    }
+    if (exchangeRate && value) setLocalAmount((parseFloat(value) * exchangeRate).toFixed(0));
+    else setLocalAmount('');
   };
 
   const groupedInfos = infos.reduce((acc, info) => {
@@ -242,9 +208,30 @@ export default function Utilities() {
     return acc;
   }, {});
 
-  const handleSubmit = () => {
-    createMutation.mutate(formData);
-  };
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.UsefulInfo.create({ ...data, trip_id: tripId }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['usefulInfo', tripId] }); setDialogOpen(false); setFormData({ title: '', category: 'emergencia', content: '', link: '', icon: '📌' }); }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.UsefulInfo.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['usefulInfo', tripId] })
+  });
+
+  const createPackingMutation = useMutation({
+    mutationFn: (data) => base44.entities.PackingItem.create({ ...data, trip_id: tripId }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }); setPackingDialogOpen(false); setPackingFormData({ name: '', category: 'personal', quantity: 1 }); }
+  });
+
+  const togglePackedMutation = useMutation({
+    mutationFn: ({ id, packed }) => base44.entities.PackingItem.update(id, { packed }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] })
+  });
+
+  const deletePackingMutation = useMutation({
+    mutationFn: (id) => base44.entities.PackingItem.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] })
+  });
 
   const groupedPackingItems = packingItems.reduce((acc, item) => {
     if (!acc[item.category]) acc[item.category] = [];
@@ -258,147 +245,45 @@ export default function Utilities() {
 
   return (
     <div className="min-h-screen bg-orange-50">
-       {/* Header con caja naranja */}
-       <div className="bg-orange-700 pt-12 pb-20">
-         <div className="max-w-5xl mx-auto px-6">
-           <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
-           <p className="text-white/90 mt-2">Información útil para tu viaje</p>
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
+          <p className="text-white/90 mt-2">
+            {country ? `Información útil para tu viaje a ${country} ${countryConfig.flag}` : 'Información útil para tu viaje'}
+          </p>
         </div>
       </div>
 
-      {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 gap-2 bg-transparent border-0 p-0 h-auto">
-              <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                💱 Moneda
-              </TabsTrigger>
-              <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                ☁️ Clima
-              </TabsTrigger>
-              <TabsTrigger value="diary" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                📔 Diario
-              </TabsTrigger>
-              <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                🧳 Maleta
-              </TabsTrigger>
-              <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">
-                🚨 Emergencias
-              </TabsTrigger>
-            </TabsList>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 bg-transparent border-0 p-0 h-auto">
+            <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">💱 Moneda</TabsTrigger>
+            <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">☁️ Clima</TabsTrigger>
+            <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🧳 Maleta</TabsTrigger>
+            <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🚨 Emergencias</TabsTrigger>
+          </TabsList>
 
-          {/* Información Útil */}
-          <TabsContent value="info" className="space-y-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Emergencias y Contactos</h2>
-                <p className="text-muted-foreground">Teléfonos, embajadas, contactos de emergencia y más</p>
-              </div>
-              <Button
-                onClick={() => setDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700">
-               <Plus className="w-4 h-4 mr-2" />
-               Añadir
-              </Button>
-            </div>
-
-            {infos.length === 0 ?
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-                <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Añade información útil como números de emergencia o embajadas</p>
-              </div> :
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {infoCategories.map((category) => {
-                const categoryInfos = groupedInfos[category.value] || [];
-                if (categoryInfos.length === 0) return null;
-
-                return (
-                  <div key={category.value} className="bg-white p-4 rounded-2xl border border-border hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <h3 className="text-lg font-bold text-foreground">{category.label}</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {categoryInfos.map((info) =>
-                      <div key={info.id} className="border border-border rounded-lg p-2 hover:bg-secondary/30 transition-colors">
-                          <div className="flex items-start gap-2">
-                            <span className="text-lg flex-shrink-0 mt-0.5">{info.icon}</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm text-foreground">{info.title}</p>
-                              <p className="text-xs text-muted-foreground whitespace-pre-wrap mt-1">{info.content}</p>
-                              {info.link &&
-                            <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 font-medium mt-2">
-                                  <ExternalLink className="w-3 h-3" />
-                                  Enlace
-                                </a>
-                            }
-                            </div>
-                            <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteMutation.mutate(info.id)}
-                            className="text-destructive hover:bg-red-50 hover:text-destructive flex-shrink-0 h-7 w-7">
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>);
-
-              })}
-              </div>
-            }
-          </TabsContent>
-
-          {/* Clima */}
-          <TabsContent value="weather" className="space-y-6">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Clima actual</h2>
-              <p className="text-muted-foreground">Pronóstico del tiempo en tiempo real</p>
-            </div>
-            {cities.length === 0 ?
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-                <Cloud className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Añade ciudades primero en la sección Ruta</p>
-              </div> :
-
-            <div className="grid md:grid-cols-2 gap-6">
-                {cities.map((city) =>
-              <WeatherCard key={city.id} city={city} />
-              )}
-              </div>
-            }
-          </TabsContent>
-
-          {/* Conversión moneda */}
+          {/* MONEDA */}
           <TabsContent value="currency" className="space-y-6">
-            <div className="bg-[#ffffff] p-8 rounded-2xl glass border-2 border-border">
+            <div className="bg-white p-8 rounded-2xl border border-border shadow-sm">
               <div className="max-w-md mx-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
-                  {loadingRate ?
-                  <p className="text-muted-foreground">Cargando tasa de cambio...</p> :
-
-                  <p className="text-muted-foreground">
-                      1 EUR = <span className="font-bold text-foreground">{exchangeRate?.toFixed(2)} JPY</span>
-                    </p>
-                  }
+                  {loadingRate ? (
+                    <p className="text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Cargando tasa...</p>
+                  ) : exchangeRate && country ? (
+                    <p className="text-muted-foreground">1 EUR = <span className="font-bold text-foreground">{exchangeRate?.toFixed(2)} {countryConfig.currency}</span></p>
+                  ) : (
+                    <p className="text-muted-foreground">Abre desde un viaje para ver la conversión</p>
+                  )}
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Yenes (JPY)</label>
+                    <label className="text-sm font-medium text-foreground mb-2 block">{country ? `${countryConfig.flag} ${countryConfig.currency}` : 'Divisa local'}</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">¥</span>
-                      <Input
-                        type="number"
-                        placeholder="0"
-                        value={jpyAmount}
-                        onChange={(e) => handleJpyChange(e.target.value)}
-                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{countryConfig.symbol}</span>
+                      <Input type="number" placeholder="0" value={localAmount} onChange={(e) => handleLocalChange(e.target.value)} className="pl-8 text-lg border-border" />
                     </div>
                   </div>
 
@@ -409,258 +294,287 @@ export default function Utilities() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Euros (EUR)</label>
+                    <label className="text-sm font-medium text-foreground mb-2 block">🇪🇺 Euros (EUR)</label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
-                      <Input
-                        type="number"
-                        placeholder="0"
-                        value={eurAmount}
-                        onChange={(e) => handleEurChange(e.target.value)}
-                        className="pl-8 text-lg bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+                      <Input type="number" placeholder="0" value={eurAmount} onChange={(e) => handleEurChange(e.target.value)} className="pl-8 text-lg border-border" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-green-50 mt-8 p-4 opacity-100 rounded-xl border border-green-700">
-                  <p className="text-green-600 text-sm opacity-100">💡 La tasa de cambio se actualiza automáticamente al cargar esta página
-
-                  </p>
+                <div className="bg-green-50 mt-8 p-4 rounded-xl border border-green-200">
+                  <p className="text-green-700 text-sm">💡 La tasa de cambio se carga automáticamente según el país de tu viaje</p>
                 </div>
               </div>
             </div>
           </TabsContent>
 
-          {/* Maleta */}
+          {/* CLIMA */}
+          <TabsContent value="weather" className="space-y-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Clima actual</h2>
+              <p className="text-muted-foreground">Pronóstico del tiempo en tiempo real</p>
+            </div>
+            {cities.length === 0 ? (
+              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
+                <p className="text-muted-foreground">Añade ciudades primero en la sección Ruta</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {cities.map((city) => <WeatherCard key={city.id} city={city} />)}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* MALETA */}
           <TabsContent value="packing" className="space-y-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">Checklist de equipaje 🧳</h2>
-                <p className="text-muted-foreground">
-                  {packedCount} de {totalPackingItems} artículos listos
-                </p>
+                <p className="text-muted-foreground">{packedCount} de {totalPackingItems} artículos listos</p>
               </div>
-              <Button
-                onClick={() => setPackingDialogOpen(true)}
-                className="bg-green-600 hover:bg-green-700">
-
-                <Plus className="w-4 h-4 mr-2" />
-                Añadir
+              <Button onClick={() => setPackingDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
+                <Plus className="w-4 h-4 mr-2" />Añadir
               </Button>
             </div>
 
-            {/* Progress Bar */}
-            {totalPackingItems > 0 &&
-            <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-primary-foreground mb-6">
+            {totalPackingItems > 0 && (
+              <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-white mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium opacity-90">Progreso total</span>
                   <span className="text-4xl font-bold">{packingProgress}%</span>
                 </div>
-                <div className="h-4 bg-white/20 rounded-full overflow-hidden backdrop-blur">
-                  <div
-                  className="h-full bg-white transition-all duration-500 rounded-full"
-                  style={{ width: `${packingProgress}%` }} />
-
+                <div className="h-4 bg-white/20 rounded-full overflow-hidden">
+                  <div className="h-full bg-white transition-all duration-500 rounded-full" style={{ width: `${packingProgress}%` }} />
                 </div>
               </div>
-            }
+            )}
 
-            {totalPackingItems === 0 ?
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            {totalPackingItems === 0 ? (
+              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
                 <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">Empieza añadiendo artículos a tu maleta</p>
-              </div> :
-
-            <div className="grid md:grid-cols-2 gap-6">
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
                 {packingCategories.map((cat) => {
-                const categoryItems = groupedPackingItems[cat.value] || [];
-                const packedCategoryCount = categoryItems.filter((i) => i.packed).length;
-                const categoryProgress = categoryItems.length > 0 ?
-                Math.round(packedCategoryCount / categoryItems.length * 100) :
-                0;
-
-                return (
-                  <div
-                    key={cat.value}
-                    className="glass border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
-
-                      {/* Category Header */}
+                  const categoryItems = groupedPackingItems[cat.value] || [];
+                  const packedCategoryCount = categoryItems.filter((i) => i.packed).length;
+                  const categoryProgress = categoryItems.length > 0 ? Math.round(packedCategoryCount / categoryItems.length * 100) : 0;
+                  return (
+                    <div key={cat.value} className="border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
                       <div className={`bg-gradient-to-r ${cat.color} p-6 text-white`}>
                         <div className="flex items-center gap-3 mb-3">
                           <span className="text-4xl">{cat.icon}</span>
                           <div className="flex-1">
                             <h3 className="text-xl font-bold">{cat.label}</h3>
-                            <p className="text-sm opacity-90">
-                              {packedCategoryCount}/{categoryItems.length} completo
-                            </p>
+                            <p className="text-sm opacity-90">{packedCategoryCount}/{categoryItems.length} completo</p>
                           </div>
                           <div className="text-3xl font-bold">{categoryProgress}%</div>
                         </div>
                         <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div
-                          className="h-full bg-white transition-all duration-500 rounded-full"
-                          style={{ width: `${categoryProgress}%` }} />
-
+                          <div className="h-full bg-white transition-all duration-500 rounded-full" style={{ width: `${categoryProgress}%` }} />
                         </div>
                       </div>
-
-                      {/* Items List */}
-                      <div className="bg-[#ffffff] p-4 space-y-2">
-                        {categoryItems.length === 0 ?
-                      <p className="text-center text-muted-foreground py-8 text-sm">
-                              Sin artículos
-                            </p> :
-
-                      categoryItems.map((item) =>
-                      <div
-                        key={item.id} className="bg-slate-100 p-3 rounded-xl group flex items-center gap-3 transition-all hover:bg-secondary">
-
-
-
-
-
-
-                              <Checkbox
-                          checked={item.packed}
-                          onCheckedChange={(checked) =>
-                          togglePackedMutation.mutate({ id: item.id, packed: checked })
-                          }
-                          className="h-5 w-5" />
-
-                              <div className="flex-1 min-w-0">
-                                <p className={`font-medium truncate ${
-                          item.packed ?
-                          'text-muted-foreground line-through' :
-                          'text-foreground'}`
-                          }>
-                                  {item.name}
-                                  {item.quantity > 1 &&
-                            <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>
-                            }
-                                </p>
-                              </div>
-                              <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deletePackingMutation.mutate(item.id)}
-                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity">
-
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                      <div className="bg-white p-4 space-y-2">
+                        {categoryItems.length === 0 ? (
+                          <p className="text-center text-muted-foreground py-8 text-sm">Sin artículos</p>
+                        ) : categoryItems.map((item) => (
+                          <div key={item.id} className="bg-slate-100 p-3 rounded-xl group flex items-center gap-3 hover:bg-secondary transition-all">
+                            <Checkbox checked={item.packed} onCheckedChange={(checked) => togglePackedMutation.mutate({ id: item.id, packed: checked })} className="h-5 w-5" />
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-medium truncate ${item.packed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                                {item.name}{item.quantity > 1 && <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>}
+                              </p>
                             </div>
-                      )
-                      }
-                      </div>
-
-                      {/* Add button in category */}
-                      <div className="bg-[#ffffff] pt-0 p-4">
-                        <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setPackingFormData({ ...packingFormData, category: cat.value });
-                          setPackingDialogOpen(true);
-                        }}
-                        className="w-full border-dashed border-border text-foreground hover:bg-secondary/50">
-
-                          <Plus className="w-4 h-4 mr-2" />
-                          Añadir a {cat.label}
+                            <Button variant="ghost" size="icon" onClick={() => deletePackingMutation.mutate(item.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive h-7 w-7">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        <Button variant="outline" size="sm" onClick={() => { setPackingFormData({ ...packingFormData, category: cat.value }); setPackingDialogOpen(true); }} className="w-full border-dashed mt-2">
+                          <Plus className="w-4 h-4 mr-2" />Añadir a {cat.label}
                         </Button>
                       </div>
-                    </div>);
-
-              })}
+                    </div>
+                  );
+                })}
               </div>
-            }
+            )}
           </TabsContent>
 
-          {/* Diario */}
-          <TabsContent value="diary" className="space-y-6">
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
-              <div className="text-6xl mb-4">📔</div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Diario de Viaje</h2>
-              <p className="text-muted-foreground mb-6">Accede al diario completo desde el menú principal</p>
-              <Button
-                onClick={() => window.location.href = createPageUrl('Diary')}
-                className="bg-primary hover:bg-primary/90">
-
-                Ir al Diario
+          {/* EMERGENCIAS */}
+          <TabsContent value="info" className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Emergencias {countryConfig.flag}</h2>
+                <p className="text-muted-foreground">
+                  {country ? `Información esencial para tu viaje a ${country}` : 'Abre desde un viaje para ver info del país'}
+                </p>
+              </div>
+              <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
+                <Plus className="w-4 h-4 mr-2" />Añadir
               </Button>
             </div>
-          </TabsContent>
-          </Tabs>
-          </div>
 
-      {/* Add Dialog */}
+            {/* Info generada por IA */}
+            {loadingEmergency && (
+              <div className="text-center py-12">
+                <Loader2 className="w-10 h-10 mx-auto mb-3 animate-spin text-orange-500" />
+                <p className="font-medium">Cargando información de {country}...</p>
+                <p className="text-sm text-muted-foreground mt-1">La IA está buscando datos actualizados</p>
+              </div>
+            )}
+
+            {!loadingEmergency && aiEmergencyData && (
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Números de emergencia */}
+                {aiEmergencyData.emergency_numbers?.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+                    <h3 className="font-bold text-red-700 text-lg mb-3 flex items-center gap-2">🚨 Números de emergencia</h3>
+                    <div className="space-y-2">
+                      {aiEmergencyData.emergency_numbers.map((item, i) => (
+                        <div key={i} className="flex items-center justify-between bg-white rounded-xl px-4 py-2 border border-red-100">
+                          <span className="text-sm font-medium text-foreground">{item.icon} {item.name}</span>
+                          <span className="text-xl font-bold text-red-600">{item.number}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Embajada española */}
+                {aiEmergencyData.embassy && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
+                    <h3 className="font-bold text-yellow-700 text-lg mb-3">🏛️ Embajada de España</h3>
+                    <div className="space-y-2 text-sm">
+                      {aiEmergencyData.embassy.address && <p className="text-foreground">📍 {aiEmergencyData.embassy.address}</p>}
+                      {aiEmergencyData.embassy.phone && <p className="text-foreground">📞 <span className="font-bold">{aiEmergencyData.embassy.phone}</span></p>}
+                      {aiEmergencyData.embassy.hours && <p className="text-muted-foreground">🕐 {aiEmergencyData.embassy.hours}</p>}
+                      {aiEmergencyData.embassy.web && (
+                        <a href={aiEmergencyData.embassy.web} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium mt-2">
+                          <ExternalLink className="w-3 h-3" />Web oficial
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Apps útiles */}
+                {aiEmergencyData.useful_apps?.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+                    <h3 className="font-bold text-blue-700 text-lg mb-3">📱 Apps útiles en {country}</h3>
+                    <div className="space-y-2">
+                      {aiEmergencyData.useful_apps.map((app, i) => (
+                        <div key={i} className="bg-white rounded-xl px-4 py-2 border border-blue-100">
+                          <p className="font-medium text-sm text-foreground">{app.icon} {app.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{app.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Consejos de seguridad */}
+                {aiEmergencyData.safety_tips?.length > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+                    <h3 className="font-bold text-green-700 text-lg mb-3">🛡️ Consejos de seguridad</h3>
+                    <div className="space-y-2">
+                      {aiEmergencyData.safety_tips.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-2 bg-white rounded-xl px-4 py-2 border border-green-100">
+                          <span className="text-green-500 font-bold text-sm mt-0.5">✓</span>
+                          <p className="text-sm text-foreground">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Info manual añadida por el usuario */}
+            {infos.length > 0 && (
+              <div>
+                <h3 className="font-bold text-foreground text-lg mb-3">📌 Tus notas personales</h3>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {infoCategories.map((category) => {
+                    const categoryInfos = groupedInfos[category.value] || [];
+                    if (categoryInfos.length === 0) return null;
+                    return (
+                      <div key={category.value} className="bg-white p-4 rounded-2xl border border-border hover:shadow-lg transition-all">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-2xl">{category.icon}</span>
+                          <h3 className="text-lg font-bold text-foreground">{category.label}</h3>
+                        </div>
+                        <div className="space-y-2">
+                          {categoryInfos.map((info) => (
+                            <div key={info.id} className="border border-border rounded-lg p-2 hover:bg-secondary/30 transition-colors">
+                              <div className="flex items-start gap-2">
+                                <span className="text-lg flex-shrink-0 mt-0.5">{info.icon}</span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-foreground">{info.title}</p>
+                                  <p className="text-xs text-muted-foreground whitespace-pre-wrap mt-1">{info.content}</p>
+                                  {info.link && (
+                                    <a href={info.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 font-medium mt-2">
+                                      <ExternalLink className="w-3 h-3" />Enlace
+                                    </a>
+                                  )}
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(info.id)} className="text-destructive hover:bg-red-50 flex-shrink-0 h-7 w-7">
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {!loadingEmergency && !aiEmergencyData && !country && (
+              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
+                <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Abre esta sección desde un viaje para ver información del país de destino</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Dialog añadir info */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">Añadir información</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle className="text-foreground">Añadir información</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Título</label>
-              <Input
-                placeholder="ej. Policía Japón"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+              <Input placeholder="ej. Policía local" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="border-border" />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
               <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {infoCategories.map((cat) =>
-                  <SelectItem key={cat.value} value={cat.value}>
-                      {cat.icon} {cat.label}
-                    </SelectItem>
-                  )}
-                </SelectContent>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{infoCategories.map((cat) => <SelectItem key={cat.value} value={cat.value}>{cat.icon} {cat.label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Icono</label>
-              <Input
-                placeholder="Emoji"
-                value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                maxLength={2}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+              <Input placeholder="Emoji" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} maxLength={2} className="border-border" />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Contenido</label>
-              <Textarea
-                placeholder="Descripción o detalles..."
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={3}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+              <Textarea placeholder="Descripción o detalles..." value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={3} className="border-border" />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Enlace (opcional)</label>
-              <Input
-                placeholder="https://..."
-                value={formData.link}
-                onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+              <Input placeholder="https://..." value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="border-border" />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}>
-
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={() => createMutation.mutate(formData)} className="bg-green-600 hover:bg-green-700" disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}>
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
@@ -668,62 +582,35 @@ export default function Utilities() {
         </DialogContent>
       </Dialog>
 
-      {/* Packing Dialog */}
+      {/* Dialog añadir maleta */}
       <Dialog open={packingDialogOpen} onOpenChange={setPackingDialogOpen}>
         <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">Añadir artículo</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle className="text-foreground">Añadir artículo</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Artículo</label>
-              <Input
-                placeholder="ej. Camisetas"
-                value={packingFormData.name}
-                onChange={(e) => setPackingFormData({ ...packingFormData, name: e.target.value })}
-                className="bg-input border-border text-foreground placeholder:text-muted-foreground" />
-
+              <Input placeholder="ej. Camisetas" value={packingFormData.name} onChange={(e) => setPackingFormData({ ...packingFormData, name: e.target.value })} className="border-border" />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
               <Select value={packingFormData.category} onValueChange={(v) => setPackingFormData({ ...packingFormData, category: v })}>
-                <SelectTrigger className="bg-input border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {packingCategories.map((cat) =>
-                  <SelectItem key={cat.value} value={cat.value}>
-                      {cat.icon} {cat.label}
-                    </SelectItem>
-                  )}
-                </SelectContent>
+                <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
+                <SelectContent>{packingCategories.map((cat) => <SelectItem key={cat.value} value={cat.value}>{cat.icon} {cat.label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Cantidad</label>
-              <Input
-                type="number"
-                min="1"
-                value={packingFormData.quantity}
-                onChange={(e) => setPackingFormData({ ...packingFormData, quantity: parseInt(e.target.value) || 1 })}
-                className="bg-input border-border text-foreground" />
-
+              <Input type="number" min="1" value={packingFormData.quantity} onChange={(e) => setPackingFormData({ ...packingFormData, quantity: parseInt(e.target.value) || 1 })} className="border-border" />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setPackingDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => createPackingMutation.mutate(packingFormData)}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={!packingFormData.name.trim() || createPackingMutation.isPending}>
-
+              <Button variant="outline" onClick={() => setPackingDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={() => createPackingMutation.mutate(packingFormData)} className="bg-green-600 hover:bg-green-700" disabled={!packingFormData.name.trim() || createPackingMutation.isPending}>
                 {createPackingMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>);
-
+    </div>
+  );
 }
