@@ -81,6 +81,39 @@ const DEFAULT_FORM = {
   language: 'Español', language_code: 'es-ES',
 };
 
+// ---- Date assignment helpers ----
+function computeNightsDates(startDateStr, nightsArr) {
+  if (!startDateStr || !nightsArr.length) return [];
+  const result = [];
+  let cursor = new Date(startDateStr);
+  cursor.setHours(0, 0, 0, 0);
+  for (const nights of nightsArr) {
+    const n = parseInt(nights) || 1;
+    const s = cursor.toISOString().slice(0, 10);
+    const e = new Date(cursor);
+    e.setDate(e.getDate() + n - 1);
+    result.push({ start_date: s, end_date: e.toISOString().slice(0, 10) });
+    cursor.setDate(cursor.getDate() + n);
+  }
+  return result;
+}
+
+function validateManualDates(manualDates, tripStart, tripEnd) {
+  const errors = [];
+  for (let i = 0; i < manualDates.length; i++) {
+    const { start_date, end_date } = manualDates[i];
+    if (!start_date || !end_date) continue;
+    if (end_date < start_date) errors.push(`Parada ${i + 1}: fin < inicio`);
+    if (tripStart && start_date < tripStart) errors.push(`Parada ${i + 1}: antes del inicio del viaje`);
+    if (tripEnd && end_date > tripEnd) errors.push(`Parada ${i + 1}: después del fin del viaje`);
+    if (i > 0) {
+      const prevEnd = manualDates[i - 1].end_date;
+      if (prevEnd && start_date < prevEnd) errors.push(`Parada ${i + 1}: solape con parada anterior`);
+    }
+  }
+  return errors;
+}
+
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -89,6 +122,10 @@ export default function TripsList() {
   const [mode, setMode] = useState('multi');
   const [stops, setStops] = useState(['', '']);
   const [formData, setFormData] = useState({ ...DEFAULT_FORM });
+  // Date assignment mode
+  const [dateMode, setDateMode] = useState('auto'); // 'auto' | 'nights' | 'manual'
+  const [nightsPerStop, setNightsPerStop] = useState(['', '']);
+  const [manualDates, setManualDates] = useState([{ start_date: '', end_date: '' }, { start_date: '', end_date: '' }]);
 
   const queryClient = useQueryClient();
 
@@ -139,17 +176,42 @@ export default function TripsList() {
   }
 
   function addStop() {
-    setStops((prev) => [...prev, '']);
+    const next = (prev) => [...prev, ''];
+    setStops(next);
+    setNightsPerStop((prev) => [...prev, '']);
+    setManualDates((prev) => [...prev, { start_date: '', end_date: '' }]);
   }
 
   function removeStop(idx) {
     setStops((prev) => prev.filter((_, i) => i !== idx));
+    setNightsPerStop((prev) => prev.filter((_, i) => i !== idx));
+    setManualDates((prev) => prev.filter((_, i) => i !== idx));
   }
 
   function setModeValue(value) {
     setMode(value);
-    if (value === 'single') setStops((prev) => [prev[0] || '']);
-    else setStops((prev) => (prev.length >= 2 ? prev : [...prev, '']));
+    if (value === 'single') {
+      setStops((prev) => [prev[0] || '']);
+      setNightsPerStop(['']);
+      setManualDates([{ start_date: '', end_date: '' }]);
+    } else {
+      setStops((prev) => (prev.length >= 2 ? prev : [...prev, '']));
+      setNightsPerStop((prev) => (prev.length >= 2 ? prev : [...prev, '']));
+      setManualDates((prev) => (prev.length >= 2 ? prev : [...prev, { start_date: '', end_date: '' }]));
+    }
+  }
+
+  function syncStopsCount(newStops) {
+    setNightsPerStop((prev) => {
+      const next = [...prev];
+      while (next.length < newStops.length) next.push('');
+      return next.slice(0, newStops.length);
+    });
+    setManualDates((prev) => {
+      const next = [...prev];
+      while (next.length < newStops.length) next.push({ start_date: '', end_date: '' });
+      return next.slice(0, newStops.length);
+    });
   }
 
   function normalizeStops() {
@@ -173,11 +235,20 @@ export default function TripsList() {
         roles,
       });
 
-      const endForSplit = data.end_date || data.start_date;
-      const allocations = distributeDates(data.start_date, endForSplit, tripCities.length);
+      // Compute date allocations based on selected dateMode
+      let allocations = [];
+      if (dateMode === 'nights') {
+        allocations = computeNightsDates(data.start_date, nightsPerStop.slice(0, tripCities.length));
+      } else if (dateMode === 'manual') {
+        allocations = manualDates.slice(0, tripCities.length);
+      } else {
+        // auto
+        const endForSplit = data.end_date || data.start_date;
+        allocations = distributeDates(data.start_date, endForSplit, tripCities.length);
+      }
 
       for (let i = 0; i < tripCities.length; i++) {
-        const dates = allocations[i] || { start_date: data.start_date, end_date: endForSplit };
+        const dates = allocations[i] || { start_date: data.start_date, end_date: data.end_date || data.start_date };
         await base44.entities.City.create({
           trip_id: trip.id,
           name: tripCities[i],
@@ -208,12 +279,20 @@ export default function TripsList() {
       setMode('multi');
       setStops(['', '']);
       setFormData({ ...DEFAULT_FORM });
+      setDateMode('auto');
+      setNightsPerStop(['', '']);
+      setManualDates([{ start_date: '', end_date: '' }, { start_date: '', end_date: '' }]);
     },
   });
+
+  const manualDateErrors = dateMode === 'manual'
+    ? validateManualDates(manualDates.slice(0, normalizeStops().length), formData.start_date, formData.end_date)
+    : [];
 
   const canCreate = (() => {
     const tripCities = normalizeStops();
     const datesOk = !formData.end_date || formData.end_date >= formData.start_date;
+    if (dateMode === 'manual' && manualDateErrors.length > 0) return false;
     return formData.name.trim() && formData.country.trim() && formData.start_date && datesOk && tripCities.length > 0 && !createMutation.isPending;
   })();
 
@@ -358,6 +437,90 @@ export default function TripsList() {
                 />
               </div>
             </div>
+
+            {/* Asignación de fechas por parada */}
+            {formData.start_date && normalizeStops().length > 0 && (
+              <div className="border border-border rounded-xl p-4 bg-white space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-foreground">Fechas por parada</label>
+                  <div className="flex gap-1">
+                    {[{ v: 'auto', l: 'Auto' }, { v: 'nights', l: 'Noches' }, { v: 'manual', l: 'Manual' }].map(({ v, l }) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setDateMode(v)}
+                        className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${dateMode === v ? 'bg-orange-700 text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}
+                      >{l}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {dateMode === 'auto' && (
+                  <p className="text-xs text-muted-foreground">Las fechas del viaje se repartirán automáticamente entre las paradas.</p>
+                )}
+
+                {dateMode === 'nights' && (
+                  <div className="space-y-2">
+                    {normalizeStops().map((stop, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-foreground w-24 truncate">{stop || `Parada ${idx + 1}`}</span>
+                        <div className="flex items-center gap-1.5 flex-1">
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="noches"
+                            value={nightsPerStop[idx] || ''}
+                            onChange={(e) => setNightsPerStop((prev) => prev.map((n, i) => i === idx ? e.target.value : n))}
+                            className="w-24 text-sm"
+                          />
+                          <span className="text-xs text-muted-foreground">noches</span>
+                        </div>
+                        {/* Preview */}
+                        {nightsPerStop[idx] && formData.start_date && (() => {
+                          const alloc = computeNightsDates(formData.start_date, nightsPerStop.slice(0, normalizeStops().length));
+                          const a = alloc[idx];
+                          return a ? <span className="text-xs text-orange-600 font-medium">{a.start_date} → {a.end_date}</span> : null;
+                        })()}
+                      </div>
+                    ))}
+                    {formData.start_date && nightsPerStop.every((n) => n) && (
+                      <p className="text-xs text-muted-foreground pt-1">
+                        Fin calculado: <span className="font-semibold text-foreground">
+                          {computeNightsDates(formData.start_date, nightsPerStop.slice(0, normalizeStops().length)).at(-1)?.end_date}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {dateMode === 'manual' && (
+                  <div className="space-y-2">
+                    {normalizeStops().map((stop, idx) => (
+                      <div key={idx} className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+                        <span className="text-sm font-medium text-foreground truncate">{stop || `Parada ${idx + 1}`}</span>
+                        <Input
+                          type="date"
+                          value={manualDates[idx]?.start_date || ''}
+                          onChange={(e) => setManualDates((prev) => prev.map((d, i) => i === idx ? { ...d, start_date: e.target.value } : d))}
+                          className="text-xs w-36"
+                        />
+                        <Input
+                          type="date"
+                          value={manualDates[idx]?.end_date || ''}
+                          onChange={(e) => setManualDates((prev) => prev.map((d, i) => i === idx ? { ...d, end_date: e.target.value } : d))}
+                          className="text-xs w-36"
+                        />
+                      </div>
+                    ))}
+                    {manualDateErrors.length > 0 && (
+                      <div className="text-xs text-destructive space-y-0.5 pt-1">
+                        {manualDateErrors.map((err, i) => <p key={i}>⚠️ {err}</p>)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Descripción */}
             <div>

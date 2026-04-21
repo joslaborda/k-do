@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapPin, Sparkles } from 'lucide-react';
+import { MapPin, Sparkles, ArrowUpDown } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
 import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
@@ -104,6 +104,31 @@ export default function Cities() {
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
     enabled: !!tripId,
+  });
+
+  // Sort cities: start_date first, then order
+  const sortedCities = useMemo(() => {
+    return [...cities].sort((a, b) => {
+      if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
+      if (a.start_date) return -1;
+      if (b.start_date) return 1;
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
+  }, [cities]);
+
+  const reorderByDatesMutation = useMutation({
+    mutationFn: async () => {
+      const withDates = sortedCities.filter((c) => c.start_date);
+      const withoutDates = sortedCities.filter((c) => !c.start_date);
+      const ordered = [...withDates, ...withoutDates];
+      await Promise.all(ordered.map((city, idx) =>
+        base44.entities.City.update(city.id, { order: idx })
+      ));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
+      toast({ title: 'Ciudades reordenadas por fechas ✓' });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -223,13 +248,26 @@ export default function Cities() {
               <p className="text-white/90 mt-2">Explora tu itinerario</p>
             </div>
 
-            <Button
-              onClick={() => setAiPanelOpen(true)}
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm mt-1"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generar con IA
-            </Button>
+            <div className="flex gap-2 mt-1">
+              {cities.some((c) => c.start_date) && (
+                <Button
+                  onClick={() => reorderByDatesMutation.mutate()}
+                  disabled={reorderByDatesMutation.isPending}
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                  title="Actualiza el campo 'order' de las ciudades según sus fechas"
+                >
+                  <ArrowUpDown className="w-4 h-4 mr-2" />
+                  Ordenar por fechas
+                </Button>
+              )}
+              <Button
+                onClick={() => setAiPanelOpen(true)}
+                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generar con IA
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -257,7 +295,7 @@ export default function Cities() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cities.map((city) => (
+            {sortedCities.map((city) => (
               <CityCard key={city.id} city={city} daysCount={getDaysCount(city.id)} tripId={tripId} />
             ))}
           </div>
