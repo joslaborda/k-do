@@ -14,6 +14,7 @@ import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlace
 import CitySettingsModal from '@/components/cities/CitySettingsModal';
 import DayDocuments from '@/components/tickets/DayDocuments';
 import UnlinkedCityDocuments from '@/components/tickets/UnlinkedCityDocuments';
+import SpotsSection from '@/components/spots/SpotsSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -442,6 +443,15 @@ export default function CityDetail() {
 
         {/* Unlinked documents section */}
         <UnlinkedCityDocuments cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} />
+
+        {/* Spots section */}
+        <SpotsSection
+          cityId={cityId}
+          tripId={tripId}
+          currentUserEmail={currentUser?.email}
+          trip={trip}
+          days={days}
+        />
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

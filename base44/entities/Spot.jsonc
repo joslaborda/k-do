@@ -1,0 +1,89 @@
+{
+  "name": "Spot",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "city_id": {
+      "type": "string",
+      "description": "ID de la ciudad (opcional)"
+    },
+    "itinerary_day_id": {
+      "type": "string",
+      "description": "ID del d\u00eda de itinerario (opcional)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Nombre del lugar"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "food",
+        "sight",
+        "activity",
+        "shopping",
+        "transport",
+        "custom"
+      ],
+      "description": "Tipo de lugar"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "link": {
+      "type": "string",
+      "description": "Enlace externo (web, reserva, etc.)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Direcci\u00f3n del lugar"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitud (opcional)"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitud (opcional)"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Email del creador"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "trip_members",
+        "selected_users"
+      ],
+      "default": "trip_members",
+      "description": "Visibilidad del spot"
+    },
+    "shared_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails con acceso (solo si visibility=selected_users)"
+    },
+    "visited": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u00bfYa visitado?"
+    },
+    "visit_order": {
+      "type": "number",
+      "description": "Orden de visita (opcional)"
+    }
+  },
+  "required": [
+    "trip_id",
+    "title",
+    "type"
+  ]
+}
