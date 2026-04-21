@@ -9,206 +9,77 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, X } from 'lucide-react';
 import TripTemplates from '@/components/trip/TripTemplates';
 import CountryInput from '@/components/trip/CountryInput';
+import CityInput from '@/components/trip/CityInput';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
+import { getCountryMeta } from '@/lib/countryConfig';
 
-const OTHER_LABEL = 'Other / Otra';
-
-const COUNTRY_PRESETS = [
-  { country: 'España', currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
-  { country: 'Italia', currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
-  { country: 'Francia', currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
-  { country: 'Portugal', currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
-  { country: 'Alemania', currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
-  { country: 'Reino Unido', currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
-  { country: 'Estados Unidos', currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
-  { country: 'Mexico', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
-  { country: 'Argentina', currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
-  { country: 'Brasil', currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
-  { country: 'Japon', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
-  { country: 'Tailandia', currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
-  { country: 'Corea del Sur', currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
-  { country: 'China', currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
-  { country: 'Vietnam', currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
-  { country: 'Singapur', currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
-  { country: 'Indonesia', currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
-  { country: 'Marruecos', currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
-  { country: 'Turquia', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
-  { country: 'Suiza', currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
-  { country: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
-];
-
-const TOP_CITIES_BY_COUNTRY = {
-  España: [
-    'Madrid','Barcelona','Valencia','Sevilla','Bilbao','Malaga','Granada','Zaragoza','Alicante','San Sebastian',
-    'Cordoba','Toledo','Salamanca','Santiago de Compostela','Palma de Mallorca','Ibiza','Tenerife','Las Palmas de Gran Canaria','Mallorca','Marbella',
-    'Santander','Oviedo','Gijon','Pamplona','Valladolid','Murcia','Tarragona','Girona','Cadiz','Segovia',
-  ],
-  Italia: [
-    'Roma','Milan','Venecia','Florencia','Napoles','Turin','Bolonia','Genova','Verona','Pisa',
-    'Siena','Bari','Palermo','Catania','Trieste','Padua','Parma','Modena','Lecce','Trento',
-    'Vicenza','Brescia','Perugia','Ravenna','Cagliari','Ancona','Lucca','Como','Sorrento','Cinque Terre',
-  ],
-  Francia: [
-    'Paris','Marsella','Lyon','Toulouse','Niza','Nantes','Estrasburgo','Montpellier','Burdeos','Lille',
-    'Rennes','Reims','Le Havre','Toulon','Grenoble','Dijon','Angers','Nimes','Aix-en-Provence',
-    'Avignon','Cannes','Saint-Malo','Biarritz','Annecy','Tours','Metz','Nancy','Besancon','Perpignan',
-  ],
-  Portugal: [
-    'Lisboa','Oporto','Coimbra','Braga','Faro','Aveiro','Evora','Guimaraes','Cascais','Sintra',
-    'Madeira','Azores','Setubal','Viseu','Leiria','Portimao','Lagos','Albufeira','Tavira','Tomar',
-    'Obidos','Nazare','Ericeira','Peniche','Chaves','Viana do Castelo','Beja','Santarem','Figueira da Foz','Covilha',
-  ],
-  Alemania: [
-    'Berlin','Munich','Hamburgo','Colonia','Frankfurt','Stuttgart','Dusseldorf','Dresde','Leipzig','Nuremberg',
-    'Heidelberg','Bremen','Hannover','Bonn','Augsburgo','Wiesbaden','Freiburg','Mannheim','Mainz','Essen',
-    'Dortmund','Kiel','Rostock','Regensburg','Weimar','Potsdam','Wurzburg','Lubeck','Aachen','Garmisch-Partenkirchen',
-  ],
-  'Reino Unido': [
-    'Londres','Edimburgo','Manchester','Liverpool','Birmingham','Bristol','Glasgow','Cambridge','Oxford','Bath',
-    'Brighton','York','Newcastle','Leeds','Cardiff','Belfast','Inverness','Portsmouth','Southampton','Nottingham',
-    'Sheffield','Canterbury','Stonehenge','Windermere','Aberdeen','Swansea','Leicester','Coventry','Durham','Stratford-upon-Avon',
-  ],
-  'Estados Unidos': [
-    'New York','Los Angeles','San Francisco','Miami','Chicago','Las Vegas','Washington DC','Boston','Seattle','San Diego',
-    'Austin','New Orleans','Orlando','Philadelphia','Denver','Portland','Atlanta','Nashville','Houston','Dallas',
-    'Phoenix','Minneapolis','Detroit','Salt Lake City','Honolulu','Tampa','Charlotte','Pittsburgh','Cleveland','San Jose',
-  ],
-  Mexico: [
-    'Ciudad de Mexico','Cancun','Guadalajara','Monterrey','Tulum','Playa del Carmen','Puerto Vallarta','Oaxaca','Merida','San Miguel de Allende',
-    'Puebla','Guanajuato','Queretaro','Toluca','Veracruz','Acapulco','Cozumel','Los Cabos','La Paz',
-    'Mazatlan','Morelia','Xalapa','Aguascalientes','Leon','Tijuana','Ensenada','Campeche','Bacalar','Chiapas',
-  ],
-  Argentina: [
-    'Buenos Aires','Bariloche','Mendoza','Cordoba','Rosario','Ushuaia','El Calafate','Salta','Mar del Plata','Iguazu',
-    'La Plata','San Juan','San Luis','Neuquen','Puerto Madryn','Tigre','Tandil','San Martin de los Andes','Villa La Angostura','Jujuy',
-    'Bahia Blanca','Santa Fe','Corrientes','Resistencia','Comodoro Rivadavia','Rio Gallegos','Trelew','San Rafael','Cafayate','Choshuenco',
-  ],
-  Brasil: [
-    'Rio de Janeiro','Sao Paulo','Salvador','Brasilia','Fortaleza','Recife','Florianopolis','Curitiba','Porto Alegre','Belo Horizonte',
-    'Manaus','Belem','Natal','Joao Pessoa','Maceio','Vitoria','Campinas','Santos','Foz do Iguacu','Bonito',
-    'Ilhabela','Buzios','Paraty','Jericoacoara','Ouro Preto','Gramado','Petropolis','Olinda','Arraial do Cabo','Lencois Maranhenses',
-  ],
-  Japon: [
-    'Tokyo','Kyoto','Osaka','Hiroshima','Nara','Hakone','Sapporo','Fukuoka','Nikko','Nagoya',
-    'Kobe','Yokohama','Kamakura','Kanazawa','Takayama','Sendai','Kumamoto','Nagasaki','Okinawa','Kagoshima',
-    'Matsumoto','Shizuoka','Toyama','Okayama','Himeji','Beppu','Koyasan','Kawagoe','Ise','Fuji Five Lakes',
-  ],
-  Tailandia: [
-    'Bangkok','Chiang Mai','Phuket','Krabi','Pattaya','Ayutthaya','Chiang Rai','Koh Samui','Koh Phi Phi','Hua Hin',
-    'Sukhothai','Pai','Kanchanaburi','Koh Tao','Koh Phangan','Surat Thani','Hat Yai','Trang','Koh Lanta','Udon Thani',
-    'Ubon Ratchathani','Nakhon Ratchasima','Lampang','Nan','Rayong','Koh Chang','Mae Hong Son','Chumphon','Phetchabun','Samui',
-  ],
-  'Corea del Sur': [
-    'Seoul','Busan','Incheon','Daegu','Daejeon','Gwangju','Suwon','Jeonju','Gyeongju','Jeju',
-    'Gangneung','Pyeongchang','Ulsan','Pohang','Chuncheon','Seogwipo','Sokcho','Andong','Tongyeong','Yeosu',
-    'Gimhae','Changwon','Mokpo','Suncheon','Iksan','Cheonan','Seongnam','Yongin','Ilsan','Anyang',
-  ],
-  China: [
-    'Beijing','Shanghai','Hong Kong','Shenzhen','Guangzhou','Chengdu','Hangzhou','Xian','Nanjing','Suzhou',
-    'Wuhan','Chongqing','Tianjin','Xiamen','Harbin','Qingdao','Dalian','Kunming','Sanya','Lhasa',
-    'Zhangjiajie','Guilin','Yangshuo','Foshan','Zhuhai','Ningbo','Changsha','Jinan','Urumqi','Hefei',
-  ],
-  Vietnam: [
-    'Hanoi','Ho Chi Minh City','Da Nang','Hoi An','Hue','Nha Trang','Da Lat','Ha Long','Sapa','Can Tho',
-    'Phu Quoc','Vung Tau','Mui Ne','Hai Phong','Ninh Binh','Quy Nhon','Phong Nha','Dong Hoi','Buon Ma Thuot','Pleiku',
-    'Con Dao','Bac Ninh','Ha Tinh','Thanh Hoa','Vinh','Lao Cai','Cao Bang','Lang Son','My Tho','Ben Tre',
-  ],
-  Singapur: [
-    'Singapore','Marina Bay','Sentosa','Chinatown','Little India','Kampong Glam','Orchard','Clarke Quay','Bugis','Tiong Bahru',
-    'East Coast','Botanic Gardens','Gardens by the Bay','Jurong','Holland Village','Punggol','Joo Chiat','Kallang','Novena','Toa Payoh',
-    'Woodlands','Pasir Ris','Ang Mo Kio','Serangoon','Bukit Timah','Clementi','Queenstown','Raffles Place','HarbourFront','Seletar',
-  ],
-  Indonesia: [
-    'Bali','Jakarta','Yogyakarta','Bandung','Surabaya','Ubud','Lombok','Gili Islands','Seminyak','Uluwatu',
-    'Komodo','Flores','Makassar','Medan','Padang','Malang','Bogor','Batam','Bintan','Solo',
-    'Manado','Bunaken','Raja Ampat','Jayapura','Denpasar','Canggu','Nusa Penida','Nusa Lembongan','Balikpapan','Samarinda',
-  ],
-  Marruecos: [
-    'Marrakech','Casablanca','Fez','Rabat','Tanger','Chefchaouen','Essaouira','Agadir','Meknes','Ouarzazate',
-    'Merzouga','Ifrane','Tetouan','Asilah','El Jadida','Oujda','Al Hoceima','Safi','Taroudant','Tiznit',
-    'Errachidia','Midelt','Beni Mellal','Khenifra','Nador','Dakhla','Laayoune','Sidi Ifni','Azrou','Ait Benhaddou',
-  ],
-  Turquia: [
-    'Istanbul','Ankara','Izmir','Antalya','Bursa','Capadocia','Pamukkale','Bodrum','Fethiye','Marmaris',
-    'Konya','Trabzon','Gaziantep','Adana','Mersin','Eskisehir','Samsun','Kusadasi','Alanya','Side',
-    'Canakkale','Edirne','Sanliurfa','Kayseri','Rize','Amasya','Kars','Van','Sivas','Diyarbakir',
-  ],
-  Suiza: [
-    'Zurich','Ginebra','Lucerna','Berna','Basel','Interlaken','Zermatt','Lausana','Montreux','Lugano',
-    'St. Moritz','Grindelwald','Jungfraujoch','Thun','Friburgo','Sion','Chur','Davos','Appenzell','Schaffhausen',
-    'Brienz','Wengen','Kandersteg','Andermatt','Neuchatel','St. Gallen','Arosa','Murren','Bellinzona','Locarno',
-  ],
-  Grecia: [
-    'Atenas','Salonica','Santorini','Mykonos','Creta','Rodas','Corfu','Naxos','Paros','Milos',
-    'Kos','Delphi','Meteora','Nafplio','Patras','Chania','Rethymno','Kavala','Volos','Ioannina',
-    'Zakynthos','Kefalonia','Samos','Thassos','Skopelos','Hydra','Spetses','Mystras','Olympia','Lefkada',
-  ],
-};
-
-const COUNTRIES = Object.keys(TOP_CITIES_BY_COUNTRY);
-
+// Extended currency options
 const CURRENCY_OPTIONS = [
-  { value: 'EUR', label: 'EUR (€)' },
-  { value: 'USD', label: 'USD ($)' },
-  { value: 'GBP', label: 'GBP (£)' },
-  { value: 'JPY', label: 'JPY (¥)' },
-  { value: 'CHF', label: 'CHF (Fr)' },
-  { value: 'MXN', label: 'MXN ($)' },
-  { value: 'ARS', label: 'ARS ($)' },
-  { value: 'BRL', label: 'BRL (R$)' },
-  { value: 'THB', label: 'THB (฿)' },
-  { value: 'KRW', label: 'KRW (₩)' },
-  { value: 'CNY', label: 'CNY (¥)' },
-  { value: 'VND', label: 'VND (₫)' },
-  { value: 'MAD', label: 'MAD (DH)' },
-  { value: 'TRY', label: 'TRY (₺)' },
-  { value: 'SGD', label: 'SGD ($)' },
-  { value: 'IDR', label: 'IDR (Rp)' },
+  { value: 'EUR', label: 'EUR (€)' }, { value: 'USD', label: 'USD ($)' },
+  { value: 'GBP', label: 'GBP (£)' }, { value: 'JPY', label: 'JPY (¥)' },
+  { value: 'CHF', label: 'CHF (Fr)' }, { value: 'MXN', label: 'MXN ($)' },
+  { value: 'ARS', label: 'ARS ($)' }, { value: 'BRL', label: 'BRL (R$)' },
+  { value: 'THB', label: 'THB (฿)' }, { value: 'KRW', label: 'KRW (₩)' },
+  { value: 'CNY', label: 'CNY (¥)' }, { value: 'VND', label: 'VND (₫)' },
+  { value: 'MAD', label: 'MAD (DH)' }, { value: 'TRY', label: 'TRY (₺)' },
+  { value: 'SGD', label: 'SGD ($)' }, { value: 'IDR', label: 'IDR (Rp)' },
+  { value: 'CAD', label: 'CAD ($)' }, { value: 'AUD', label: 'AUD ($)' },
+  { value: 'NZD', label: 'NZD ($)' }, { value: 'NOK', label: 'NOK (kr)' },
+  { value: 'SEK', label: 'SEK (kr)' }, { value: 'DKK', label: 'DKK (kr)' },
+  { value: 'PLN', label: 'PLN (zł)' }, { value: 'CZK', label: 'CZK (Kč)' },
+  { value: 'HUF', label: 'HUF (Ft)' }, { value: 'INR', label: 'INR (₹)' },
+  { value: 'MYR', label: 'MYR (RM)' }, { value: 'PHP', label: 'PHP (₱)' },
+  { value: 'ZAR', label: 'ZAR (R)' }, { value: 'CLP', label: 'CLP ($)' },
+  { value: 'COP', label: 'COP ($)' }, { value: 'PEN', label: 'PEN (S/)' },
+  { value: 'AED', label: 'AED (د.إ)' }, { value: 'SAR', label: 'SAR (﷼)' },
+  { value: 'EGP', label: 'EGP (£)' }, { value: 'RUB', label: 'RUB (₽)' },
 ];
 
 function currencySymbolFromCode(code) {
-  const map = {
-    EUR: '€', USD: '$', GBP: '£', JPY: '¥', CHF: 'Fr',
-    THB: '฿', KRW: '₩', CNY: '¥', VND: '₫', MAD: 'DH',
-    TRY: '₺', BRL: 'R$', IDR: 'Rp', MXN: '$', ARS: '$', SGD: '$',
-  };
-  return map[code] || '$';
+  const found = [
+    { v: 'EUR', s: '€' }, { v: 'USD', s: '$' }, { v: 'GBP', s: '£' },
+    { v: 'JPY', s: '¥' }, { v: 'CHF', s: 'Fr' }, { v: 'THB', s: '฿' },
+    { v: 'KRW', s: '₩' }, { v: 'CNY', s: '¥' }, { v: 'VND', s: '₫' },
+    { v: 'MAD', s: 'DH' }, { v: 'TRY', s: '₺' }, { v: 'BRL', s: 'R$' },
+    { v: 'IDR', s: 'Rp' }, { v: 'INR', s: '₹' }, { v: 'PHP', s: '₱' },
+    { v: 'MYR', s: 'RM' }, { v: 'ZAR', s: 'R' }, { v: 'CLP', s: '$' },
+    { v: 'PEN', s: 'S/' }, { v: 'AED', s: 'د.إ' }, { v: 'NOK', s: 'kr' },
+    { v: 'SEK', s: 'kr' }, { v: 'DKK', s: 'kr' }, { v: 'PLN', s: 'zł' },
+    { v: 'CZK', s: 'Kč' }, { v: 'HUF', s: 'Ft' }, { v: 'RUB', s: '₽' },
+  ].find((x) => x.v === code);
+  return found?.s || '$';
 }
 
 function distributeDates(startDateStr, endDateStr, stopsCount) {
   if (!startDateStr || !endDateStr || !stopsCount || stopsCount <= 0) return [];
-
   const start = new Date(startDateStr);
   const end = new Date(endDateStr);
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);
-
   const totalDays = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
   if (totalDays <= 0) return [];
-
   const base = Math.floor(totalDays / stopsCount);
   const extra = totalDays % stopsCount;
-
   const allocations = [];
   let cursor = new Date(start);
-
   for (let i = 0; i < stopsCount; i++) {
     const len = Math.max(1, base + (i < extra ? 1 : 0));
     const s = new Date(cursor);
     const e = new Date(cursor);
     e.setDate(e.getDate() + len - 1);
-
-    allocations.push({
-      start_date: s.toISOString().slice(0, 10),
-      end_date: e.toISOString().slice(0, 10),
-    });
-
+    allocations.push({ start_date: s.toISOString().slice(0, 10), end_date: e.toISOString().slice(0, 10) });
     cursor.setDate(cursor.getDate() + len);
   }
-
   return allocations;
 }
+
+const DEFAULT_FORM = {
+  name: '', country: 'España', start_date: '', end_date: '',
+  description: '', cover_image: '',
+  currency: 'EUR', currency_symbol: '€',
+  language: 'Español', language_code: 'es-ES',
+};
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -216,22 +87,8 @@ export default function TripsList() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [currencyTouched, setCurrencyTouched] = useState(false);
   const [mode, setMode] = useState('multi');
-  const [stops, setStops] = useState([
-    { city: '', other: '' },
-    { city: '', other: '' },
-  ]);
-  const [formData, setFormData] = useState({
-    name: '',
-    country: 'España',
-    start_date: '',
-    end_date: '',
-    description: '',
-    cover_image: '',
-    currency: 'EUR',
-    currency_symbol: '€',
-    language: 'Spanish',
-    language_code: 'es-ES',
-  });
+  const [stops, setStops] = useState(['', '']);
+  const [formData, setFormData] = useState({ ...DEFAULT_FORM });
 
   const queryClient = useQueryClient();
 
@@ -258,79 +115,54 @@ export default function TripsList() {
   }, [trips, allCities]);
 
   function applyCountry(country) {
-    const preset = COUNTRY_PRESETS.find((p) => p.country === country) || null;
-    setFormData((prev) => {
-      const next = { ...prev, country };
-      if (preset && !currencyTouched) {
-        next.currency = preset.currency;
-        next.currency_symbol = preset.symbol;
-        next.language = preset.language;
-        next.language_code = preset.languageCode;
-      }
-      return next;
-    });
-    setStops((prev) => prev.map((s) => ({ ...s, city: '', other: '' })));
+    const meta = getCountryMeta(country);
+    setFormData((prev) => ({
+      ...prev,
+      country,
+      ...(!currencyTouched ? {
+        currency: meta.currency,
+        currency_symbol: meta.symbol,
+        language: meta.languageLabel,
+        language_code: meta.languageCode,
+      } : {}),
+    }));
+    setStops((prev) => prev.map(() => ''));
   }
 
   function setCurrency(value) {
     setCurrencyTouched(true);
-    setFormData((prev) => ({
-      ...prev,
-      currency: value,
-      currency_symbol: currencySymbolFromCode(value),
-    }));
+    setFormData((prev) => ({ ...prev, currency: value, currency_symbol: currencySymbolFromCode(value) }));
   }
 
-  function setStopCity(index, value) {
-    setStops((prev) =>
-      prev.map((s, i) => {
-        if (i !== index) return s;
-        if (value === OTHER_LABEL) return { ...s, city: OTHER_LABEL, other: '' };
-        return { ...s, city: value, other: '' };
-      })
-    );
-  }
-
-  function setStopOther(index, value) {
-    setStops((prev) => prev.map((s, i) => (i === index ? { ...s, other: value } : s)));
+  function setStop(idx, value) {
+    setStops((prev) => prev.map((s, i) => (i === idx ? value : s)));
   }
 
   function addStop() {
-    setStops((prev) => [...prev, { city: '', other: '' }]);
+    setStops((prev) => [...prev, '']);
   }
 
-  function removeStop(index) {
-    setStops((prev) => prev.filter((_, i) => i !== index));
+  function removeStop(idx) {
+    setStops((prev) => prev.filter((_, i) => i !== idx));
   }
 
   function setModeValue(value) {
     setMode(value);
-    if (value === 'single') {
-      setStops((prev) => [prev[0] || { city: '', other: '' }]);
-    } else {
-      setStops((prev) => (prev.length >= 2 ? prev : [...prev, { city: '', other: '' }]));
-    }
+    if (value === 'single') setStops((prev) => [prev[0] || '']);
+    else setStops((prev) => (prev.length >= 2 ? prev : [...prev, '']));
   }
 
-  function getStopLabel(s) {
-    if (s.city === OTHER_LABEL) return (s.other || '').trim();
-    return (s.city || '').trim();
-  }
-
-  function normalizeStopsForTrip() {
-    const clean = stops.map(getStopLabel).filter(Boolean);
-    if (mode === 'single') return clean.slice(0, 1);
-    return clean;
+  function normalizeStops() {
+    const clean = stops.map((s) => (s || '').trim()).filter(Boolean);
+    return mode === 'single' ? clean.slice(0, 1) : clean;
   }
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
       const userId = user?.id;
-
-      const tripCities = normalizeStopsForTrip();
-      const destinationString = tripCities.length ? tripCities.join(' → ') : '';
-
+      const tripCities = normalizeStops();
+      const destinationString = tripCities.join(' → ');
       const roles = email ? { [email]: 'admin' } : {};
       const members = email ? [email] : [];
 
@@ -357,19 +189,12 @@ export default function TripsList() {
       }
 
       if (selectedTemplate?.packingItems?.length) {
-        const packingPromises = selectedTemplate.packingItems.map((item) =>
-          base44.entities.PackingItem.create({
-            ...item,
-            trip_id: trip.id,
-            user_id: userId,
-            packed: false,
-          })
+        await Promise.all(
+          selectedTemplate.packingItems.map((item) =>
+            base44.entities.PackingItem.create({ ...item, trip_id: trip.id, user_id: userId, packed: false })
+          )
         );
-        await Promise.all(packingPromises);
-        toast({
-          title: 'Viaje creado! 🎉',
-          description: `${selectedTemplate.packingItems.length} articulos añadidos a tu maleta`,
-        });
+        toast({ title: 'Viaje creado! 🎉', description: `${selectedTemplate.packingItems.length} articulos añadidos a tu maleta` });
       }
 
       return trip;
@@ -381,36 +206,18 @@ export default function TripsList() {
       setSelectedTemplate(null);
       setCurrencyTouched(false);
       setMode('multi');
-      setStops([{ city: '', other: '' }, { city: '', other: '' }]);
-      setFormData({
-        name: '',
-        country: 'España',
-        start_date: '',
-        end_date: '',
-        description: '',
-        cover_image: '',
-        currency: 'EUR',
-        currency_symbol: '€',
-        language: 'Spanish',
-        language_code: 'es-ES',
-      });
+      setStops(['', '']);
+      setFormData({ ...DEFAULT_FORM });
     },
   });
 
-  const cityOptions = TOP_CITIES_BY_COUNTRY[formData.country] || [];
-
   const canCreate = (() => {
-    const tripCities = normalizeStopsForTrip();
+    const tripCities = normalizeStops();
     const datesOk = !formData.end_date || formData.end_date >= formData.start_date;
-    return (
-      formData.name.trim() &&
-      formData.country.trim() &&
-      formData.start_date &&
-      datesOk &&
-      tripCities.length > 0 &&
-      !createMutation.isPending
-    );
+    return formData.name.trim() && formData.country.trim() && formData.start_date && datesOk && tripCities.length > 0 && !createMutation.isPending;
   })();
+
+  const meta = getCountryMeta(formData.country);
 
   if (isLoading) {
     return (
@@ -432,12 +239,8 @@ export default function TripsList() {
             <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
             <p className="text-white/60 text-sm mt-1">Tu proximo viaje empieza aqui</p>
           </div>
-          <Button
-            onClick={() => setDialogOpen(true)}
-            className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Crear viaje
+          <Button onClick={() => setDialogOpen(true)} className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0">
+            <Plus className="w-4 h-4 mr-1.5" />Crear viaje
           </Button>
         </div>
       </div>
@@ -449,8 +252,7 @@ export default function TripsList() {
             <h2 className="text-xl font-semibold text-foreground mb-1">Aun no tienes viajes</h2>
             <p className="text-muted-foreground text-sm mb-6">Crea tu primer viaje y empieza a planificar</p>
             <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
-              <Plus className="w-4 h-4 mr-1.5" />
-              Crear tu primer viaje
+              <Plus className="w-4 h-4 mr-1.5" />Crear tu primer viaje
             </Button>
           </div>
         ) : (
@@ -468,123 +270,70 @@ export default function TripsList() {
           </DialogHeader>
 
           <div className="space-y-4 pt-4">
+            {/* Nombre */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
-              <Input
-                placeholder="ej. Italia 2026"
-                value={formData.name}
-                onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                className="bg-input border-border text-foreground"
-              />
+              <Input placeholder="ej. Italia 2026" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} className="bg-input border-border text-foreground" />
             </div>
 
+            {/* País + Modo */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Pais *</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">País *</label>
                 <CountryInput value={formData.country} onChange={applyCountry} />
+                {formData.country && (
+                  <p className="text-xs text-muted-foreground mt-1">{meta.flag} {meta.currency} · {meta.languageLabel}</p>
+                )}
               </div>
-
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Modo</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    type="button"
-                    variant={mode === 'single' ? 'default' : 'outline'}
-                    className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                    onClick={() => setModeValue('single')}
-                  >
-                    1 parada
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={mode === 'multi' ? 'default' : 'outline'}
-                    className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                    onClick={() => setModeValue('multi')}
-                  >
-                    Multi-ciudad
-                  </Button>
+                  <Button type="button" variant={mode === 'single' ? 'default' : 'outline'} className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''} onClick={() => setModeValue('single')}>1 parada</Button>
+                  <Button type="button" variant={mode === 'multi' ? 'default' : 'outline'} className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''} onClick={() => setModeValue('multi')}>Multi-ciudad</Button>
                 </div>
               </div>
             </div>
 
+            {/* Destinos */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-foreground">
-                  Destino{mode === 'multi' ? 's' : ''} *
-                </label>
-                {mode === 'multi' && (
-                  <Button type="button" variant="outline" onClick={addStop}>
-                    + Añadir ciudad
-                  </Button>
-                )}
+                <label className="text-sm font-medium text-foreground">Destino{mode === 'multi' ? 's' : ''} *</label>
+                {mode === 'multi' && <Button type="button" variant="outline" onClick={addStop}>+ Añadir ciudad</Button>}
               </div>
-
               <div className="space-y-2">
                 {stops.map((stop, idx) => (
-                  <div key={idx} className="bg-white border border-border rounded-xl p-3">
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1">
-                        <Select value={stop.city} onValueChange={(v) => setStopCity(idx, v)}>
-                          <SelectTrigger className="bg-input border-border text-foreground">
-                            <SelectValue placeholder="Elige una ciudad..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {cityOptions.map((city) => (
-                              <SelectItem key={city} value={city}>
-                                {city}
-                              </SelectItem>
-                            ))}
-                            <SelectItem value={OTHER_LABEL}>{OTHER_LABEL}</SelectItem>
-                          </SelectContent>
-                        </Select>
-
-                        {stop.city === OTHER_LABEL && (
-                          <Input
-                            placeholder="Escribe la ciudad"
-                            value={stop.other}
-                            onChange={(e) => setStopOther(idx, e.target.value)}
-                            className="bg-input border-border text-foreground mt-2"
-                          />
-                        )}
-                      </div>
-
-                      {mode === 'multi' && stops.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeStop(idx)}
-                          className="text-muted-foreground hover:text-destructive"
-                          aria-label="Eliminar ciudad"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      )}
+                  <div key={idx} className="bg-white border border-border rounded-xl p-3 flex items-start gap-2">
+                    <div className="flex-1">
+                      <CityInput
+                        country={formData.country}
+                        value={stop}
+                        onChange={(v) => setStop(idx, v)}
+                        placeholder={`Ciudad ${idx + 1}...`}
+                      />
                     </div>
+                    {mode === 'multi' && stops.length > 1 && (
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeStop(idx)} className="text-muted-foreground hover:text-destructive" aria-label="Eliminar">
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Moneda */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
                 <Select value={formData.currency} onValueChange={setCurrency}>
-                  <SelectTrigger className="bg-input border-border text-foreground">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {CURRENCY_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
+                    {CURRENCY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma detectado</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma destino</label>
                 <div className="bg-white border border-border rounded-md px-3 py-2 text-sm">
                   <div className="font-semibold">{formData.language}</div>
                   <div className="text-xs text-muted-foreground">{formData.language_code}</div>
@@ -592,80 +341,48 @@ export default function TripsList() {
               </div>
             </div>
 
+            {/* Fechas */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha inicio *</label>
-                <Input
-                  type="date"
-                  value={formData.start_date}
-                  onChange={(e) => setFormData((p) => ({ ...p, start_date: e.target.value }))}
-                  className="bg-input border-border text-foreground"
-                />
+                <Input type="date" value={formData.start_date} onChange={(e) => setFormData((p) => ({ ...p, start_date: e.target.value }))} className="bg-input border-border text-foreground" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
-                <Input
-                  type="date"
-                  value={formData.end_date}
-                  onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))}
-                  className="bg-input border-border text-foreground"
-                />
+                <Input type="date" value={formData.end_date} onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))} className="bg-input border-border text-foreground" />
               </div>
             </div>
 
+            {/* Descripción */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Descripcion</label>
-              <Textarea
-                placeholder="Describe tu viaje..."
-                value={formData.description}
-                onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
-                rows={3}
-                className="bg-input border-border text-foreground"
-              />
+              <Textarea placeholder="Describe tu viaje..." value={formData.description} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} rows={3} className="bg-input border-border text-foreground" />
             </div>
 
+            {/* Cover image */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
               {formData.cover_image && (
                 <div className="mb-2 rounded-lg overflow-hidden h-28 bg-muted">
-                  <img
-                    src={formData.cover_image}
-                    alt="preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                  />
+                  <img src={formData.cover_image} alt="preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
                 </div>
               )}
-              <Input
-                placeholder="https://images.unsplash.com/..."
-                value={formData.cover_image}
-                onChange={(e) => setFormData((p) => ({ ...p, cover_image: e.target.value }))}
-                className="bg-input border-border text-foreground"
-              />
+              <Input placeholder="https://images.unsplash.com/..." value={formData.cover_image} onChange={(e) => setFormData((p) => ({ ...p, cover_image: e.target.value }))} className="bg-input border-border text-foreground" />
             </div>
 
+            {/* Templates */}
             <div className="pt-4 border-t border-border">
               <TripTemplates onSelect={setSelectedTemplate} />
               {selectedTemplate && (
                 <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
-                  <p className="text-sm text-primary flex items-center gap-2">
-                    <span>{selectedTemplate.emoji}</span>
-                    <span>Plantilla "{selectedTemplate.name}" seleccionada</span>
-                  </p>
+                  <p className="text-sm text-primary flex items-center gap-2"><span>{selectedTemplate.emoji}</span><span>Plantilla "{selectedTemplate.name}" seleccionada</span></p>
                 </div>
               )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                type="button"
-                onClick={() => createMutation.mutate(formData)}
-                className="bg-orange-700 hover:bg-orange-800"
-                disabled={!canCreate}
-              >
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              <Button type="button" onClick={() => createMutation.mutate(formData)} className="bg-orange-700 hover:bg-orange-800" disabled={!canCreate}>
                 {createMutation.isPending ? 'Creando...' : 'Crear Viaje'}
               </Button>
             </div>

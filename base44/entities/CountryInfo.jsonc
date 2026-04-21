@@ -1,0 +1,28 @@
+{
+  "name": "CountryInfo",
+  "type": "object",
+  "properties": {
+    "country_label": {
+      "type": "string",
+      "description": "Nombre del pa\u00eds en espa\u00f1ol (ej: Jap\u00f3n, Reino Unido)"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "C\u00f3digo ISO 3166-1 alpha-2 (ej: JP, GB)"
+    },
+    "top_cities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de las 20 ciudades m\u00e1s tur\u00edsticas"
+    },
+    "emergency_info": {
+      "type": "object",
+      "description": "Informaci\u00f3n de emergencias y embajada generada por IA"
+    }
+  },
+  "required": [
+    "country_label"
+  ]
+}

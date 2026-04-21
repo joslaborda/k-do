@@ -14,40 +14,8 @@ import WeatherCard from '@/components/WeatherCard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// ============ COUNTRY CONFIG ============
-function getCountryConfig(country) {
-  const CONFIGS = {
-    'Japón': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', flag: '🇯🇵' },
-    'Japan': { currency: 'JPY', symbol: '¥', locale: 'ja-JP', flag: '🇯🇵' },
-    'Tailandia': { currency: 'THB', symbol: '฿', locale: 'th-TH', flag: '🇹🇭' },
-    'Corea del Sur': { currency: 'KRW', symbol: '₩', locale: 'ko-KR', flag: '🇰🇷' },
-    'China': { currency: 'CNY', symbol: '¥', locale: 'zh-CN', flag: '🇨🇳' },
-    'Vietnam': { currency: 'VND', symbol: '₫', locale: 'vi-VN', flag: '🇻🇳' },
-    'India': { currency: 'INR', symbol: '₹', locale: 'hi-IN', flag: '🇮🇳' },
-    'Francia': { currency: 'EUR', symbol: '€', locale: 'fr-FR', flag: '🇫🇷' },
-    'Italia': { currency: 'EUR', symbol: '€', locale: 'it-IT', flag: '🇮🇹' },
-    'Alemania': { currency: 'EUR', symbol: '€', locale: 'de-DE', flag: '🇩🇪' },
-    'Portugal': { currency: 'EUR', symbol: '€', locale: 'pt-PT', flag: '🇵🇹' },
-    'Grecia': { currency: 'EUR', symbol: '€', locale: 'el-GR', flag: '🇬🇷' },
-    'Reino Unido': { currency: 'GBP', symbol: '£', locale: 'en-GB', flag: '🇬🇧' },
-    'Suiza': { currency: 'CHF', symbol: 'Fr', locale: 'de-CH', flag: '🇨🇭' },
-    'México': { currency: 'MXN', symbol: '$', locale: 'es-MX', flag: '🇲🇽' },
-    'Estados Unidos': { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🇺🇸' },
-    'Brasil': { currency: 'BRL', symbol: 'R$', locale: 'pt-BR', flag: '🇧🇷' },
-    'Argentina': { currency: 'ARS', symbol: '$', locale: 'es-AR', flag: '🇦🇷' },
-    'Marruecos': { currency: 'MAD', symbol: 'DH', locale: 'ar-MA', flag: '🇲🇦' },
-    'Turquía': { currency: 'TRY', symbol: '₺', locale: 'tr-TR', flag: '🇹🇷' },
-    'Australia': { currency: 'AUD', symbol: '$', locale: 'en-AU', flag: '🇦🇺' },
-    'Indonesia': { currency: 'IDR', symbol: 'Rp', locale: 'id-ID', flag: '🇮🇩' },
-    'Filipinas': { currency: 'PHP', symbol: '₱', locale: 'fil-PH', flag: '🇵🇭' },
-    'Colombia': { currency: 'COP', symbol: '$', locale: 'es-CO', flag: '🇨🇴' },
-    'Perú': { currency: 'PEN', symbol: 'S/', locale: 'es-PE', flag: '🇵🇪' },
-    'Egipto': { currency: 'EGP', symbol: '£', locale: 'ar-EG', flag: '🇪🇬' },
-  };
-  if (!country) return { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🌍' };
-  return CONFIGS[country] || Object.entries(CONFIGS).find(([k]) => k.toLowerCase() === country.toLowerCase())?.[1] || { currency: 'USD', symbol: '$', locale: 'en-US', flag: '🌍' };
-}
-// ============ FIN COUNTRY CONFIG ============
+import { getCountryMeta, getEmergencyInfo, getExchangeRate } from '@/lib/countryConfig';
+function getCountryConfig(country) { const m = getCountryMeta(country); return { currency: m.currency, symbol: m.symbol, locale: m.languageCode, flag: m.flag }; }
 
 const infoCategories = [
   { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
@@ -131,62 +99,35 @@ export default function Utilities() {
 
   // Cargar tasa de cambio dinámica según país
   useEffect(() => {
-    if (!country || countryConfig.currency === 'EUR') {
-      setExchangeRate(1);
-      return;
-    }
-    const cacheKey = `rate_EUR_${countryConfig.currency}`;
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) { setExchangeRate(parseFloat(cached)); return; }
-
+    if (!country) return;
+    if (countryConfig.currency === 'EUR') { setExchangeRate(1); return; }
     setLoadingRate(true);
-    base44.integrations.Core.InvokeLLM({
-      prompt: `Dame la tasa de cambio aproximada de 1 EUR a ${countryConfig.currency} (${country}). Solo responde con el número, sin texto.`,
-      response_json_schema: { type: 'object', properties: { rate: { type: 'number' } } }
-    }).then((r) => {
-      const rate = r.rate || 1;
-      setExchangeRate(rate);
-      sessionStorage.setItem(cacheKey, String(rate));
-    }).catch(() => setExchangeRate(1)).finally(() => setLoadingRate(false));
+    getExchangeRate(countryConfig.currency)
+      .then((r) => setExchangeRate(r))
+      .catch(() => setExchangeRate(1))
+      .finally(() => setLoadingRate(false));
   }, [country, countryConfig.currency]);
 
-  // Cargar info de emergencias por IA según país
+  // Cargar info de emergencias según país usando módulo central
   useEffect(() => {
     if (!country || !tripId) return;
-    const cacheKey = `emergency_${country}`;
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) { try { setAiEmergencyData(JSON.parse(cached)); return; } catch {} }
-
     setLoadingEmergency(true);
-    base44.integrations.Core.InvokeLLM({
-      prompt: `Eres un experto en viajes. Para un viajero ESPAÑOL que visita ${country}, proporciona:
-1. Números de emergencia del país (policía, ambulancia, bomberos, emergencias general)
-2. Embajada de España en ${country}: dirección, teléfono, web oficial
-3. Número de teléfono de turismo/asistencia si existe
-4. Apps de transporte o utilidad más usadas en ${country}
-5. 3 consejos de seguridad importantes para ${country}
-
-Responde SOLO con JSON válido:
-{
-  "emergency_numbers": [{"name": "Policía", "number": "...", "icon": "🚔"}, ...],
-  "embassy": {"address": "...", "phone": "...", "web": "...", "hours": "..."},
-  "tourism_phone": "...",
-  "useful_apps": [{"name": "...", "description": "...", "icon": "📱"}, ...],
-  "safety_tips": ["...", "...", "..."]
-}`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          emergency_numbers: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, number: { type: 'string' }, icon: { type: 'string' } } } },
-          embassy: { type: 'object', properties: { address: { type: 'string' }, phone: { type: 'string' }, web: { type: 'string' }, hours: { type: 'string' } } },
-          tourism_phone: { type: 'string' },
-          useful_apps: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, description: { type: 'string' }, icon: { type: 'string' } } } },
-          safety_tips: { type: 'array', items: { type: 'string' } },
-        },
-      },
-    }).then((r) => {
-      setAiEmergencyData(r);
-      sessionStorage.setItem(cacheKey, JSON.stringify(r));
+    getEmergencyInfo(country, 'España').then((data) => {
+      if (data) {
+        // Normalize to expected shape
+        const normalized = {
+          emergency_numbers: [
+            data.emergency_general && { name: 'Emergencias', number: data.emergency_general, icon: '🆘' },
+            data.police && { name: 'Policía', number: data.police, icon: '🚔' },
+            data.ambulance && { name: 'Ambulancia', number: data.ambulance, icon: '🚑' },
+            data.fire && { name: 'Bomberos', number: data.fire, icon: '🚒' },
+          ].filter(Boolean),
+          embassy: data.embassy || null,
+          useful_apps: data.useful_apps || [],
+          safety_tips: data.safety_tips || [],
+        };
+        setAiEmergencyData(normalized);
+      }
     }).catch(() => {}).finally(() => setLoadingEmergency(false));
   }, [country, tripId]);
 

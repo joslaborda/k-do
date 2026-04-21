@@ -17,12 +17,18 @@ const weatherIcons = {
 export default function WeatherCard({ city }) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = [city.name, city.country].filter(Boolean).join(', ');
 
   useEffect(() => {
+    const cacheKey = `weather_${city.name}_${city.country || ''}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try { setWeather(JSON.parse(cached)); setLoading(false); return; } catch {}
+    }
     const fetchWeather = async () => {
       try {
         const response = await base44.integrations.Core.InvokeLLM({
-          prompt: `Dame el clima actual y pronóstico de HOY en ${city.name}, Japón. Devuelve SOLO estos datos:
+          prompt: `Dame el clima actual y pronóstico de HOY en ${location}. Devuelve SOLO estos datos:
 - Temperatura actual en °C (solo el número)
 - Condición: una palabra simple (soleado, nublado, lluvia, etc)
 - Sensación térmica en °C
@@ -45,6 +51,7 @@ export default function WeatherCard({ city }) {
           }
         });
         setWeather(response);
+        sessionStorage.setItem(cacheKey, JSON.stringify(response));
       } catch (error) {
         console.error('Error fetching weather:', error);
       } finally {
@@ -53,7 +60,7 @@ export default function WeatherCard({ city }) {
     };
 
     fetchWeather();
-  }, [city.name]);
+  }, [city.name, city.country]);
 
   if (loading) {
     return (
