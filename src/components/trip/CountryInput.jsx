@@ -17,9 +17,18 @@ export default function CountryInput({ value, onChange, locale = 'es-ES' }) {
         list="country-list"
         value={value}
         onChange={(e) => {
+          // Pass raw value while typing; canonicalize only on exact match
           const raw = e.target.value;
-          const canonical = canonicalizeCountry(raw, countries);
-          onChange(canonical);
+          const exact = countries.find((c) => c.label.toLowerCase() === raw.toLowerCase());
+          onChange(exact ? exact.label : raw);
+        }}
+        onBlur={(e) => {
+          // On blur, try to canonicalize what was typed
+          const raw = e.target.value.trim();
+          if (raw) {
+            const canonical = canonicalizeCountry(raw, countries);
+            onChange(canonical);
+          }
         }}
         placeholder="Escribe para buscar país…"
         className="bg-input border-border text-foreground"
