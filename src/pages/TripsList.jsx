@@ -17,46 +17,154 @@ function normalizeText(str = '') {
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, ''); // quita acentos
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
-// Presets: simple, sin IA. Puedes ampliar cuando quieras.
+function splitDestination(str = '') {
+  const s = normalizeText(str);
+  if (!s) return [];
+  return s
+    .replace(/[()]/g, ' ')
+    .replace(/&/g, ' y ')
+    .replace(/\+/g, ' y ')
+    .replace(/->/g, ' ')
+    .replace(/→/g, ' ')
+    .replace(/\//g, ' ')
+    .replace(/,/g, ' ')
+    .replace(/\s+/g, ' ')
+    .split(' ')
+    .filter(Boolean);
+}
+
 const COUNTRY_PRESETS = [
-  { keys: ['japan', 'japon', 'jp', 'japón'], currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
-  { keys: ['italy', 'italia', 'it'], currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
-  { keys: ['france', 'francia', 'fr'], currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
-  { keys: ['spain', 'espana', 'españa', 'es'], currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
-  { keys: ['portugal', 'pt'], currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
-  { keys: ['germany', 'alemania', 'de'], currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
-  { keys: ['united kingdom', 'uk', 'reino unido', 'england', 'britain'], currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
-  { keys: ['united states', 'usa', 'estados unidos', 'eeuu'], currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
-  { keys: ['mexico', 'méxico', 'mx'], currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
-  { keys: ['argentina', 'ar'], currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
-  { keys: ['brazil', 'brasil', 'br'], currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
-
-  { keys: ['thailand', 'tailandia', 'th'], currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
-  { keys: ['south korea', 'korea', 'corea', 'corea del sur', 'kr'], currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
-  { keys: ['china', 'cn'], currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
-  { keys: ['vietnam', 'vn'], currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
-  { keys: ['singapore', 'singapur', 'sg'], currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
-  { keys: ['indonesia', 'id'], currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
-
-  { keys: ['morocco', 'marruecos', 'ma'], currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
-  { keys: ['turkey', 'turquia', 'turquía', 'tr'], currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
-  { keys: ['switzerland', 'suiza', 'ch'], currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
-  { keys: ['greece', 'grecia', 'gr'], currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
+  { keys: ['japan', 'japon', 'japón', 'jp'], display: 'Japón', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
+  { keys: ['italy', 'italia', 'it'], display: 'Italia', currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
+  { keys: ['france', 'francia', 'fr'], display: 'Francia', currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
+  { keys: ['spain', 'espana', 'españa', 'es'], display: 'España', currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
+  { keys: ['portugal', 'pt'], display: 'Portugal', currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
+  { keys: ['germany', 'alemania', 'de'], display: 'Alemania', currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
+  { keys: ['united kingdom', 'uk', 'reino unido', 'england', 'britain'], display: 'Reino Unido', currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
+  { keys: ['united states', 'usa', 'estados unidos', 'eeuu'], display: 'Estados Unidos', currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
+  { keys: ['mexico', 'méxico', 'mx'], display: 'México', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
+  { keys: ['argentina', 'ar'], display: 'Argentina', currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
+  { keys: ['brazil', 'brasil', 'br'], display: 'Brasil', currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
+  { keys: ['thailand', 'tailandia', 'th'], display: 'Tailandia', currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
+  { keys: ['south korea', 'korea', 'corea', 'corea del sur', 'kr'], display: 'Corea del Sur', currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
+  { keys: ['china', 'cn'], display: 'China', currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
+  { keys: ['vietnam', 'vn'], display: 'Vietnam', currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
+  { keys: ['singapore', 'singapur', 'sg'], display: 'Singapur', currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
+  { keys: ['indonesia', 'id'], display: 'Indonesia', currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
+  { keys: ['morocco', 'marruecos', 'ma'], display: 'Marruecos', currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
+  { keys: ['turkey', 'turquia', 'turquía', 'tr'], display: 'Turquía', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
+  { keys: ['switzerland', 'suiza', 'ch'], display: 'Suiza', currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
+  { keys: ['greece', 'grecia', 'gr'], display: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
 ];
 
 function getPresetForCountry(countryInput) {
   const n = normalizeText(countryInput);
   if (!n) return null;
-
-  // match exact key or contained
   return (
     COUNTRY_PRESETS.find(p => p.keys.includes(n)) ||
     COUNTRY_PRESETS.find(p => p.keys.some(k => n.includes(k) || k.includes(n))) ||
     null
   );
+}
+
+const CITY_TO_COUNTRY = [
+  { city: ['tokyo', 'tokio'], country: 'Japón' },
+  { city: ['kyoto'], country: 'Japón' },
+  { city: ['osaka'], country: 'Japón' },
+  { city: ['hiroshima'], country: 'Japón' },
+  { city: ['nara'], country: 'Japón' },
+  { city: ['hakone'], country: 'Japón' },
+  { city: ['sapporo'], country: 'Japón' },
+  { city: ['fukuoka'], country: 'Japón' },
+  { city: ['nikko'], country: 'Japón' },
+
+  { city: ['rome', 'roma'], country: 'Italia' },
+  { city: ['milan', 'milano'], country: 'Italia' },
+  { city: ['florence', 'firenze'], country: 'Italia' },
+  { city: ['venice', 'venezia'], country: 'Italia' },
+  { city: ['naples', 'napoli'], country: 'Italia' },
+  { city: ['turin', 'torino'], country: 'Italia' },
+  { city: ['bologna'], country: 'Italia' },
+  { city: ['pisa'], country: 'Italia' },
+
+  { city: ['paris'], country: 'Francia' },
+  { city: ['lyon'], country: 'Francia' },
+  { city: ['marseille', 'marsella'], country: 'Francia' },
+  { city: ['nice', 'niza'], country: 'Francia' },
+
+  { city: ['madrid'], country: 'España' },
+  { city: ['barcelona'], country: 'España' },
+  { city: ['valencia'], country: 'España' },
+  { city: ['sevilla', 'seville'], country: 'España' },
+  { city: ['malaga', 'málaga'], country: 'España' },
+  { city: ['bilbao'], country: 'España' },
+
+  { city: ['london', 'londres'], country: 'Reino Unido' },
+  { city: ['manchester'], country: 'Reino Unido' },
+  { city: ['edinburgh', 'edimburgo'], country: 'Reino Unido' },
+
+  { city: ['new york', 'nyc'], country: 'Estados Unidos' },
+  { city: ['los angeles', 'la'], country: 'Estados Unidos' },
+  { city: ['san francisco'], country: 'Estados Unidos' },
+  { city: ['miami'], country: 'Estados Unidos' },
+  { city: ['chicago'], country: 'Estados Unidos' },
+
+  { city: ['bangkok'], country: 'Tailandia' },
+  { city: ['phuket'], country: 'Tailandia' },
+  { city: ['chiang mai'], country: 'Tailandia' },
+
+  { city: ['seoul', 'seul', 'seúl'], country: 'Corea del Sur' },
+  { city: ['busan'], country: 'Corea del Sur' },
+
+  { city: ['beijing', 'pekin', 'pekín'], country: 'China' },
+  { city: ['shanghai'], country: 'China' },
+  { city: ['hong kong'], country: 'China' },
+
+  { city: ['hanoi'], country: 'Vietnam' },
+  { city: ['ho chi minh', 'saigon', 'saigón'], country: 'Vietnam' },
+
+  { city: ['singapore', 'singapur'], country: 'Singapur' },
+
+  { city: ['bali'], country: 'Indonesia' },
+  { city: ['jakarta'], country: 'Indonesia' },
+
+  { city: ['marrakech', 'marrakech'], country: 'Marruecos' },
+  { city: ['casablanca'], country: 'Marruecos' },
+
+  { city: ['istanbul', 'estambul'], country: 'Turquía' },
+
+  { city: ['zurich', 'zúrich', 'zurich'], country: 'Suiza' },
+  { city: ['geneva', 'ginebra'], country: 'Suiza' },
+
+  { city: ['athens', 'atenas'], country: 'Grecia' },
+  { city: ['santorini'], country: 'Grecia' },
+];
+
+function detectCountryFromDestination(destination) {
+  const tokens = splitDestination(destination);
+  if (!tokens.length) return null;
+
+  const joined = normalizeText(destination);
+
+  for (const row of CITY_TO_COUNTRY) {
+    for (const c of row.city) {
+      const cn = normalizeText(c);
+      if (joined.includes(cn)) return row.country;
+    }
+  }
+
+  const byCountryName = getPresetForCountry(destination);
+  if (byCountryName) return byCountryName.display;
+
+  for (const t of tokens) {
+    const p = getPresetForCountry(t);
+    if (p) return p.display;
+  }
+
+  return null;
 }
 
 const CURRENCY_OPTIONS = [
@@ -77,6 +185,24 @@ const CURRENCY_OPTIONS = [
   { value: 'SGD', label: 'SGD ($)' },
   { value: 'IDR', label: 'IDR (Rp)' },
 ];
+
+function currencySymbolFromCode(code) {
+  return (
+    code === 'EUR' ? '€' :
+    code === 'USD' ? '$' :
+    code === 'GBP' ? '£' :
+    code === 'JPY' ? '¥' :
+    code === 'CHF' ? 'Fr' :
+    code === 'THB' ? '฿' :
+    code === 'KRW' ? '₩' :
+    code === 'VND' ? '₫' :
+    code === 'MAD' ? 'DH' :
+    code === 'TRY' ? '₺' :
+    code === 'BRL' ? 'R$' :
+    code === 'IDR' ? 'Rp' :
+    '$'
+  );
+}
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -100,7 +226,6 @@ export default function TripsList() {
 
   const queryClient = useQueryClient();
 
-  // Get current user (bien hecho: useEffect)
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
@@ -123,12 +248,61 @@ export default function TripsList() {
     });
   }, [trips, allCities]);
 
+  function setCountry(value) {
+    const preset = getPresetForCountry(value);
+    setFormData(prev => {
+      const next = { ...prev, country: value };
+      if (preset && !currencyTouched) {
+        next.currency = preset.currency;
+        next.currency_symbol = preset.symbol;
+        next.language = preset.language;
+        next.language_code = preset.languageCode;
+      }
+      return next;
+    });
+  }
+
+  function setDestination(value) {
+    const detectedCountry = detectCountryFromDestination(value);
+    const preset = getPresetForCountry(detectedCountry || '');
+
+    setFormData(prev => {
+      const next = { ...prev, destination: value };
+
+      const prevCountryNorm = normalizeText(prev.country);
+      const prevDestNorm = normalizeText(prev.destination);
+      const countryEmpty = !prevCountryNorm;
+      const countryWasSameAsDestination = prevCountryNorm && prevCountryNorm === prevDestNorm;
+
+      if (detectedCountry && (countryEmpty || countryWasSameAsDestination)) {
+        next.country = detectedCountry;
+
+        if (preset && !currencyTouched) {
+          next.currency = preset.currency;
+          next.currency_symbol = preset.symbol;
+          next.language = preset.language;
+          next.language_code = preset.languageCode;
+        }
+      }
+
+      return next;
+    });
+  }
+
+  function setCurrency(value) {
+    setCurrencyTouched(true);
+    setFormData(prev => ({
+      ...prev,
+      currency: value,
+      currency_symbol: currencySymbolFromCode(value),
+    }));
+  }
+
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
-
-      const roles = email ? { [email]: 'admin' } : {};
       const members = email ? [email] : [];
+      const roles = email ? { [email]: 'admin' } : {};
 
       const trip = await base44.entities.Trip.create({
         ...data,
@@ -136,7 +310,6 @@ export default function TripsList() {
         roles,
       });
 
-      // Si hay plantilla seleccionada, crear packing items
       if (selectedTemplate?.packingItems?.length) {
         const packingPromises = selectedTemplate.packingItems.map(item =>
           base44.entities.PackingItem.create({
@@ -147,7 +320,6 @@ export default function TripsList() {
           })
         );
         await Promise.all(packingPromises);
-
         toast({
           title: '¡Viaje creado! 🎉',
           description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
@@ -177,50 +349,6 @@ export default function TripsList() {
     },
   });
 
-  function setCountry(value) {
-    const preset = getPresetForCountry(value);
-
-    setFormData(prev => {
-      const next = { ...prev, country: value };
-
-      // Auto-set si hay preset y el usuario no tocó la moneda manualmente
-      if (preset && !currencyTouched) {
-        next.currency = preset.currency;
-        next.currency_symbol = preset.symbol;
-        next.language = preset.language;
-        next.language_code = preset.languageCode;
-      }
-
-      // Si no hay preset, dejamos lo que haya y NO inventamos nada
-      return next;
-    });
-  }
-
-  function setCurrency(value) {
-    setCurrencyTouched(true);
-    const opt = CURRENCY_OPTIONS.find(o => o.value === value);
-    const symbol =
-      value === 'EUR' ? '€' :
-      value === 'USD' ? '$' :
-      value === 'GBP' ? '£' :
-      value === 'JPY' ? '¥' :
-      value === 'CHF' ? 'Fr' :
-      value === 'THB' ? '฿' :
-      value === 'KRW' ? '₩' :
-      value === 'VND' ? '₫' :
-      value === 'MAD' ? 'DH' :
-      value === 'TRY' ? '₺' :
-      value === 'BRL' ? 'R$' :
-      value === 'IDR' ? 'Rp' :
-      '$';
-
-    setFormData(prev => ({
-      ...prev,
-      currency: value,
-      currency_symbol: symbol,
-    }));
-  }
-
   const handleSubmit = () => {
     createMutation.mutate(formData);
   };
@@ -238,7 +366,6 @@ export default function TripsList() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="bg-orange-700 px-6 py-10">
         <div className="max-w-6xl mx-auto flex items-end justify-between gap-4">
           <div>
@@ -257,7 +384,6 @@ export default function TripsList() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 py-8 max-w-6xl">
         {trips.length === 0 ? (
           <div className="text-center py-20 bg-white border border-border rounded-2xl">
@@ -279,7 +405,6 @@ export default function TripsList() {
         )}
       </div>
 
-      {/* Create Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -290,7 +415,7 @@ export default function TripsList() {
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
               <Input
-                placeholder="ej. Japón 2026"
+                placeholder="ej. Italia 2027"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="bg-input border-border text-foreground"
@@ -301,9 +426,9 @@ export default function TripsList() {
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Destino *</label>
                 <Input
-                  placeholder="ej. Tokio"
+                  placeholder="ej. Roma / Tokyo & Kyoto / Italia"
                   value={formData.destination}
-                  onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                  onChange={(e) => setDestination(e.target.value)}
                   className="bg-input border-border text-foreground"
                 />
               </div>
@@ -311,7 +436,7 @@ export default function TripsList() {
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
                 <Input
-                  placeholder="ej. Japón / Italy / Francia..."
+                  placeholder="Se auto-detecta (puedes cambiarlo)"
                   value={formData.country}
                   onChange={(e) => setCountry(e.target.value)}
                   className="bg-input border-border text-foreground"
@@ -319,7 +444,6 @@ export default function TripsList() {
               </div>
             </div>
 
-            {/* Currency + language preview */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
@@ -333,9 +457,6 @@ export default function TripsList() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Auto-se rellena por país (puedes cambiarla).
-                </p>
               </div>
 
               <div>
