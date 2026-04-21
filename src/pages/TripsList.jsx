@@ -1,23 +1,89 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, MapPin, Calendar, Plane, Users } from 'lucide-react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { createPageUrl } from '@/utils';
-import { Link } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus } from 'lucide-react';
 import TripTemplates from '@/components/trip/TripTemplates';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
+
+function normalizeText(str = '') {
+  return str
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // quita acentos
+}
+
+// Presets: simple, sin IA. Puedes ampliar cuando quieras.
+const COUNTRY_PRESETS = [
+  { keys: ['japan', 'japon', 'jp', 'japón'], currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
+  { keys: ['italy', 'italia', 'it'], currency: 'EUR', symbol: '€', language: 'Italian', languageCode: 'it-IT' },
+  { keys: ['france', 'francia', 'fr'], currency: 'EUR', symbol: '€', language: 'French', languageCode: 'fr-FR' },
+  { keys: ['spain', 'espana', 'españa', 'es'], currency: 'EUR', symbol: '€', language: 'Spanish', languageCode: 'es-ES' },
+  { keys: ['portugal', 'pt'], currency: 'EUR', symbol: '€', language: 'Portuguese', languageCode: 'pt-PT' },
+  { keys: ['germany', 'alemania', 'de'], currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
+  { keys: ['united kingdom', 'uk', 'reino unido', 'england', 'britain'], currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
+  { keys: ['united states', 'usa', 'estados unidos', 'eeuu'], currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
+  { keys: ['mexico', 'méxico', 'mx'], currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
+  { keys: ['argentina', 'ar'], currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
+  { keys: ['brazil', 'brasil', 'br'], currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
+
+  { keys: ['thailand', 'tailandia', 'th'], currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
+  { keys: ['south korea', 'korea', 'corea', 'corea del sur', 'kr'], currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
+  { keys: ['china', 'cn'], currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
+  { keys: ['vietnam', 'vn'], currency: 'VND', symbol: '₫', language: 'Vietnamese', languageCode: 'vi-VN' },
+  { keys: ['singapore', 'singapur', 'sg'], currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
+  { keys: ['indonesia', 'id'], currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
+
+  { keys: ['morocco', 'marruecos', 'ma'], currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
+  { keys: ['turkey', 'turquia', 'turquía', 'tr'], currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
+  { keys: ['switzerland', 'suiza', 'ch'], currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
+  { keys: ['greece', 'grecia', 'gr'], currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
+];
+
+function getPresetForCountry(countryInput) {
+  const n = normalizeText(countryInput);
+  if (!n) return null;
+
+  // match exact key or contained
+  return (
+    COUNTRY_PRESETS.find(p => p.keys.includes(n)) ||
+    COUNTRY_PRESETS.find(p => p.keys.some(k => n.includes(k) || k.includes(n))) ||
+    null
+  );
+}
+
+const CURRENCY_OPTIONS = [
+  { value: 'EUR', label: 'EUR (€)' },
+  { value: 'USD', label: 'USD ($)' },
+  { value: 'GBP', label: 'GBP (£)' },
+  { value: 'JPY', label: 'JPY (¥)' },
+  { value: 'CHF', label: 'CHF (Fr)' },
+  { value: 'MXN', label: 'MXN ($)' },
+  { value: 'ARS', label: 'ARS ($)' },
+  { value: 'BRL', label: 'BRL (R$)' },
+  { value: 'THB', label: 'THB (฿)' },
+  { value: 'KRW', label: 'KRW (₩)' },
+  { value: 'CNY', label: 'CNY (¥)' },
+  { value: 'VND', label: 'VND (₫)' },
+  { value: 'MAD', label: 'MAD (DH)' },
+  { value: 'TRY', label: 'TRY (₺)' },
+  { value: 'SGD', label: 'SGD ($)' },
+  { value: 'IDR', label: 'IDR (Rp)' },
+];
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [currencyTouched, setCurrencyTouched] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     destination: '',
@@ -26,19 +92,22 @@ export default function TripsList() {
     end_date: '',
     description: '',
     cover_image: '',
-    currency: 'EUR'
+    currency: 'EUR',
+    currency_symbol: '€',
+    language: 'English',
+    language_code: 'en-GB',
   });
 
   const queryClient = useQueryClient();
 
-  // Get current user
-  useState(() => {
-    base44.auth.me().then(setUser);
+  // Get current user (bien hecho: useEffect)
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
   const { data: trips = [], isLoading } = useQuery({
     queryKey: ['trips'],
-    queryFn: () => base44.entities.Trip.list('-created_date')
+    queryFn: () => base44.entities.Trip.list('-created_date'),
   });
 
   const { data: allCities = [] } = useQuery({
@@ -47,24 +116,41 @@ export default function TripsList() {
     staleTime: 60000,
   });
 
+  const tripCards = useMemo(() => {
+    return trips.map(trip => {
+      const tripCities = allCities.filter(c => c.trip_id === trip.id);
+      return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
+    });
+  }, [trips, allCities]);
+
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      const trip = await base44.entities.Trip.create({ ...data, members: [user?.email] });
+      const email = user?.email;
+
+      const roles = email ? { [email]: 'admin' } : {};
+      const members = email ? [email] : [];
+
+      const trip = await base44.entities.Trip.create({
+        ...data,
+        members,
+        roles,
+      });
 
       // Si hay plantilla seleccionada, crear packing items
-      if (selectedTemplate && selectedTemplate.packingItems) {
-        const packingPromises = selectedTemplate.packingItems.map((item) =>
-        base44.entities.PackingItem.create({
-          ...item,
-          trip_id: trip.id,
-          user_id: user?.id,
-          packed: false
-        })
+      if (selectedTemplate?.packingItems?.length) {
+        const packingPromises = selectedTemplate.packingItems.map(item =>
+          base44.entities.PackingItem.create({
+            ...item,
+            trip_id: trip.id,
+            user_id: user?.id,
+            packed: false,
+          })
         );
         await Promise.all(packingPromises);
+
         toast({
-          title: "¡Viaje creado! 🎉",
-          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`
+          title: '¡Viaje creado! 🎉',
+          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
         });
       }
 
@@ -74,6 +160,7 @@ export default function TripsList() {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       setDialogOpen(false);
       setSelectedTemplate(null);
+      setCurrencyTouched(false);
       setFormData({
         name: '',
         destination: '',
@@ -82,10 +169,57 @@ export default function TripsList() {
         end_date: '',
         description: '',
         cover_image: '',
-        currency: 'EUR'
+        currency: 'EUR',
+        currency_symbol: '€',
+        language: 'English',
+        language_code: 'en-GB',
       });
-    }
+    },
   });
+
+  function setCountry(value) {
+    const preset = getPresetForCountry(value);
+
+    setFormData(prev => {
+      const next = { ...prev, country: value };
+
+      // Auto-set si hay preset y el usuario no tocó la moneda manualmente
+      if (preset && !currencyTouched) {
+        next.currency = preset.currency;
+        next.currency_symbol = preset.symbol;
+        next.language = preset.language;
+        next.language_code = preset.languageCode;
+      }
+
+      // Si no hay preset, dejamos lo que haya y NO inventamos nada
+      return next;
+    });
+  }
+
+  function setCurrency(value) {
+    setCurrencyTouched(true);
+    const opt = CURRENCY_OPTIONS.find(o => o.value === value);
+    const symbol =
+      value === 'EUR' ? '€' :
+      value === 'USD' ? '$' :
+      value === 'GBP' ? '£' :
+      value === 'JPY' ? '¥' :
+      value === 'CHF' ? 'Fr' :
+      value === 'THB' ? '฿' :
+      value === 'KRW' ? '₩' :
+      value === 'VND' ? '₫' :
+      value === 'MAD' ? 'DH' :
+      value === 'TRY' ? '₺' :
+      value === 'BRL' ? 'R$' :
+      value === 'IDR' ? 'Rp' :
+      '$';
+
+    setFormData(prev => ({
+      ...prev,
+      currency: value,
+      currency_symbol: symbol,
+    }));
+  }
 
   const handleSubmit = () => {
     createMutation.mutate(formData);
@@ -98,8 +232,8 @@ export default function TripsList() {
           <div className="text-6xl mb-4">✈️</div>
           <p className="text-muted-foreground">Cargando viajes...</p>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
@@ -112,9 +246,11 @@ export default function TripsList() {
             <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
             <p className="text-white/60 text-sm mt-1">Tu próximo viaje empieza aquí</p>
           </div>
+
           <Button
             onClick={() => setDialogOpen(true)}
-            className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0">
+            className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0"
+          >
             <Plus className="w-4 h-4 mr-1.5" />
             Crear viaje
           </Button>
@@ -137,10 +273,7 @@ export default function TripsList() {
           <>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tus viajes</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {trips.map((trip) => {
-                const tripCities = allCities.filter(c => c.trip_id === trip.id);
-                return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
-              })}
+              {tripCards}
             </div>
           </>
         )}
@@ -152,17 +285,18 @@ export default function TripsList() {
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl">✈️ Nuevo Viaje</DialogTitle>
           </DialogHeader>
+
           <div className="space-y-4 pt-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
               <Input
-                placeholder="ej. Japón 2025"
+                placeholder="ej. Japón 2026"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-input border-border text-foreground" />
-
+                className="bg-input border-border text-foreground"
+              />
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Destino *</label>
@@ -170,17 +304,46 @@ export default function TripsList() {
                   placeholder="ej. Tokio"
                   value={formData.destination}
                   onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                  className="bg-input border-border text-foreground" />
-
+                  className="bg-input border-border text-foreground"
+                />
               </div>
+
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">País</label>
                 <Input
-                  placeholder="ej. Japón"
+                  placeholder="ej. Japón / Italy / Francia..."
                   value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="bg-input border-border text-foreground" />
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="bg-input border-border text-foreground"
+                />
+              </div>
+            </div>
 
+            {/* Currency + language preview */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
+                <Select value={formData.currency} onValueChange={setCurrency}>
+                  <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CURRENCY_OPTIONS.map(o => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Auto-se rellena por país (puedes cambiarla).
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma detectado</label>
+                <div className="bg-white border border-border rounded-md px-3 py-2 text-sm">
+                  <div className="font-semibold">{formData.language}</div>
+                  <div className="text-xs text-muted-foreground">{formData.language_code}</div>
+                </div>
               </div>
             </div>
 
@@ -191,17 +354,18 @@ export default function TripsList() {
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="bg-input border-border text-foreground" />
-
+                  className="bg-input border-border text-foreground"
+                />
               </div>
+
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
                 <Input
                   type="date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="bg-input border-border text-foreground" />
-
+                  className="bg-input border-border text-foreground"
+                />
               </div>
             </div>
 
@@ -212,51 +376,63 @@ export default function TripsList() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="bg-input border-border text-foreground" />
-
+                className="bg-input border-border text-foreground"
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
               {formData.cover_image && (
                 <div className="mb-2 rounded-lg overflow-hidden h-28 bg-muted">
-                  <img src={formData.cover_image} alt="preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display='none'} />
+                  <img
+                    src={formData.cover_image}
+                    alt="preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
                 </div>
               )}
               <Input
                 placeholder="https://images.unsplash.com/..."
                 value={formData.cover_image}
                 onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })}
-                className="bg-input border-border text-foreground" />
+                className="bg-input border-border text-foreground"
+              />
             </div>
 
             <div className="pt-4 border-t border-border">
               <TripTemplates onSelect={setSelectedTemplate} />
-              {selectedTemplate &&
-              <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+              {selectedTemplate && (
+                <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
                   <p className="text-sm text-primary flex items-center gap-2">
                     <span>{selectedTemplate.emoji}</span>
                     <span>Plantilla "{selectedTemplate.name}" seleccionada</span>
                   </p>
                 </div>
-              }
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
+
               <Button
                 onClick={handleSubmit}
                 className="bg-orange-700 hover:bg-orange-800"
-                disabled={!formData.name || !formData.destination || !formData.start_date || createMutation.isPending}>
-
+                disabled={
+                  !formData.name ||
+                  !formData.destination ||
+                  !formData.start_date ||
+                  createMutation.isPending
+                }
+              >
                 {createMutation.isPending ? 'Creando...' : 'Crear Viaje'}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>);
-
+    </div>
+  );
 }
