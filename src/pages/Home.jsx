@@ -24,8 +24,6 @@ import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TripMembersPanel from '@/components/trip/TripMembersPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
-import UserMenu from '@/components/account/UserMenu';
-import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -106,8 +104,6 @@ export default function Home() {
       navigate(createPageUrl('TripsList'), { replace: true });
     }
   });
-
-  const { profile: userProfile } = useUserProfile(currentUser?.id);
 
   const currentUserEmail = currentUser?.email;
   const roles = trip?.roles || {};
@@ -216,7 +212,6 @@ export default function Home() {
                     className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30">
                     <Settings className="w-4 h-4" />
                   </Button>
-                  <UserMenu user={currentUser} profile={userProfile} />
                 </div>
               </div>
               
