@@ -14,9 +14,11 @@ import WeatherCard from '@/components/WeatherCard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { getCountryMeta, getEmergencyInfo, getExchangeRate } from '@/lib/countryConfig';
+import { getCountryMeta, getEmergencyInfo, computeAvailableCurrencies } from '@/lib/countryConfig';
+import { getFxRate } from '@/lib/fxRates';
 import { useTripContext } from '@/hooks/useTripContext';
-function getCountryConfig(country) { const m = getCountryMeta(country); return { currency: m.currency, symbol: m.symbol, locale: m.languageCode, flag: m.flag }; }
+
+function getCountryConfig(country) { const m = getCountryMeta(country); return { currency: m.currency, symbol: m.symbol, locale: m.languageCode, flag: m.flag, iso: m.iso }; }
 
 const infoCategories = [
   { value: 'emergencia', label: 'Emergencia', icon: '🚨' },
@@ -46,9 +48,12 @@ export default function Utilities() {
 
   // Currency state
   const [exchangeRate, setExchangeRate] = useState(null);
+  const [exchangeRateSource, setExchangeRateSource] = useState('');
   const [loadingRate, setLoadingRate] = useState(false);
-  const [localAmount, setLocalAmount] = useState('');
-  const [eurAmount, setEurAmount] = useState('');
+  const [baseCurrency, setBaseCurrency] = useState('EUR');
+  const [quoteCurrency, setQuoteCurrency] = useState('EUR');
+  const [baseAmount, setBaseAmount] = useState('');
+  const [quoteAmount, setQuoteAmount] = useState('');
 
   // Emergency AI state
   const [loadingEmergency, setLoadingEmergency] = useState(false);
@@ -62,8 +67,12 @@ export default function Utilities() {
     window.scrollTo(0, 0);
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('trip_id');
+    if (!id) {
+      navigate('/TripsList', { replace: true });
+      return;
+    }
     setTripId(id);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (activeTab === 'diary') {
@@ -77,6 +86,17 @@ export default function Utilities() {
   const country = activeCity?.country || trip?.country || '';
   const countryConfig = getCountryConfig(country);
 
+  // Set base currency from trip, quote from active city
+  useEffect(() => {
+    if (trip?.currency) setBaseCurrency(trip.currency);
+  }, [trip?.currency]);
+
+  useEffect(() => {
+    if (countryConfig.currency && countryConfig.currency !== baseCurrency) {
+      setQuoteCurrency(countryConfig.currency);
+    }
+  }, [countryConfig.currency, baseCurrency]);
+
   const { data: infos = [] } = useQuery({
     queryKey: ['usefulInfo', tripId],
     queryFn: () => base44.entities.UsefulInfo.filter({ trip_id: tripId }),
@@ -89,16 +109,25 @@ export default function Utilities() {
     enabled: !!tripId,
   });
 
-  // Cargar tasa de cambio dinámica según país
+  // Cargar tasa de cambio dinámica (base → quote)
   useEffect(() => {
-    if (!country) return;
-    if (countryConfig.currency === 'EUR') { setExchangeRate(1); return; }
+    if (!baseCurrency || !quoteCurrency || baseCurrency === quoteCurrency) {
+      setExchangeRate(1);
+      setExchangeRateSource('same');
+      return;
+    }
     setLoadingRate(true);
-    getExchangeRate(countryConfig.currency)
-      .then((r) => setExchangeRate(r))
-      .catch(() => setExchangeRate(1))
+    getFxRate(baseCurrency, quoteCurrency)
+      .then((result) => {
+        setExchangeRate(result.rate);
+        setExchangeRateSource(result.source);
+      })
+      .catch(() => {
+        setExchangeRate(1);
+        setExchangeRateSource('unavailable');
+      })
       .finally(() => setLoadingRate(false));
-  }, [country, countryConfig.currency]);
+  }, [baseCurrency, quoteCurrency]);
 
   // Cargar info de emergencias según país activo
   useEffect(() => {
@@ -122,16 +151,24 @@ export default function Utilities() {
     }).catch(() => {}).finally(() => setLoadingEmergency(false));
   }, [country, tripId]);
 
-  const handleLocalChange = (value) => {
-    setLocalAmount(value);
-    if (exchangeRate && value) setEurAmount((parseFloat(value) / exchangeRate).toFixed(2));
-    else setEurAmount('');
+  const handleBaseChange = (value) => {
+    setBaseAmount(value);
+    if (exchangeRate && value) {
+      const converted = (parseFloat(value) * exchangeRate).toFixed(2);
+      setQuoteAmount(converted);
+    } else {
+      setQuoteAmount('');
+    }
   };
 
-  const handleEurChange = (value) => {
-    setEurAmount(value);
-    if (exchangeRate && value) setLocalAmount((parseFloat(value) * exchangeRate).toFixed(0));
-    else setLocalAmount('');
+  const handleQuoteChange = (value) => {
+    setQuoteAmount(value);
+    if (exchangeRate && value) {
+      const converted = (parseFloat(value) / exchangeRate).toFixed(2);
+      setBaseAmount(converted);
+    } else {
+      setBaseAmount('');
+    }
   };
 
   const groupedInfos = infos.reduce((acc, info) => {
@@ -178,13 +215,18 @@ export default function Utilities() {
   return (
     <div className="min-h-screen bg-orange-50">
       <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
-          <p className="text-white/90 mt-2">
-            {country ? `Información útil para tu viaje a ${country} ${countryConfig.flag}` : 'Información útil para tu viaje'}
-          </p>
-        </div>
-      </div>
+         <div className="max-w-5xl mx-auto px-6">
+           <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
+           <p className="text-white/90 mt-2">
+             {trip?.name ? `${trip.name} ${countryConfig.flag}` : 'Información útil para tu viaje'}
+           </p>
+           {trip && (
+             <p className="text-white/70 text-sm mt-1">
+               {country && `Moneda principal: ${baseCurrency}`}
+             </p>
+           )}
+         </div>
+       </div>
 
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -203,8 +245,11 @@ export default function Utilities() {
                   <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
                   {loadingRate ? (
                     <p className="text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Cargando tasa...</p>
-                  ) : exchangeRate && country ? (
-                    <p className="text-muted-foreground">1 EUR = <span className="font-bold text-foreground">{exchangeRate?.toFixed(2)} {countryConfig.currency}</span></p>
+                  ) : exchangeRate ? (
+                    <div>
+                      <p className="text-muted-foreground">1 {baseCurrency} = <span className="font-bold text-foreground">{exchangeRate?.toFixed(4)} {quoteCurrency}</span></p>
+                      <p className="text-xs text-muted-foreground mt-1">Fuente: {exchangeRateSource}</p>
+                    </div>
                   ) : (
                     <p className="text-muted-foreground">Abre desde un viaje para ver la conversión</p>
                   )}
@@ -212,10 +257,22 @@ export default function Utilities() {
 
                 <div className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">{country ? `${countryConfig.flag} ${countryConfig.currency}` : 'Divisa local'}</label>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Moneda base</label>
+                    <Select value={baseCurrency} onValueChange={setBaseCurrency}>
+                      <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {computeAvailableCurrencies(cities, trip?.currency || 'EUR').map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">{getCountryMeta(baseCurrency).symbol ? `${getCountryMeta(baseCurrency).symbol}` : baseCurrency}</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{countryConfig.symbol}</span>
-                      <Input type="number" placeholder="0" value={localAmount} onChange={(e) => handleLocalChange(e.target.value)} className="pl-8 text-lg border-border" />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getCountryMeta(baseCurrency).symbol}</span>
+                      <Input type="number" placeholder="0" value={baseAmount} onChange={(e) => handleBaseChange(e.target.value)} className="pl-8 text-lg border-border" />
                     </div>
                   </div>
 
@@ -226,16 +283,28 @@ export default function Utilities() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">🇪🇺 Euros (EUR)</label>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Moneda destino</label>
+                    <Select value={quoteCurrency} onValueChange={setQuoteCurrency}>
+                      <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {computeAvailableCurrencies(cities, trip?.currency || 'EUR').map((c) => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">{getCountryMeta(quoteCurrency).symbol ? `${getCountryMeta(quoteCurrency).symbol}` : quoteCurrency}</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
-                      <Input type="number" placeholder="0" value={eurAmount} onChange={(e) => handleEurChange(e.target.value)} className="pl-8 text-lg border-border" />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getCountryMeta(quoteCurrency).symbol}</span>
+                      <Input type="number" placeholder="0" value={quoteAmount} onChange={(e) => handleQuoteChange(e.target.value)} className="pl-8 text-lg border-border" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-green-50 mt-8 p-4 rounded-xl border border-green-200">
-                  <p className="text-green-700 text-sm">💡 La tasa de cambio se carga automáticamente según el país de tu viaje</p>
+                <div className="bg-blue-50 mt-8 p-4 rounded-xl border border-blue-200">
+                  <p className="text-blue-700 text-sm">💡 Tasas de cambio en directo desde Frankfurter (ECB). Las monedas se derivan de los países en tu viaje.</p>
                 </div>
               </div>
             </div>
@@ -466,10 +535,15 @@ export default function Utilities() {
               </div>
             )}
 
-            {!loadingEmergency && !aiEmergencyData && !country && (
+            {!loadingEmergency && !aiEmergencyData && infos.length === 0 && (
               <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
                 <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Abre esta sección desde un viaje para ver información del país de destino</p>
+                <p className="text-muted-foreground mb-4">
+                  {country ? `Sin información específica para ${country} todavía` : 'Abre desde un viaje para ver información'}
+                </p>
+                <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
+                  <Plus className="w-4 h-4 mr-2" />Añadir información manual
+                </Button>
               </div>
             )}
           </TabsContent>
