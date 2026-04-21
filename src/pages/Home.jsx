@@ -11,6 +11,8 @@ import {
   Package, Info, Clock,
   ArrowRight, Search, Languages, BookOpen, Users, Settings, Trash2 } from
 'lucide-react';
+import { useTripContext } from '@/hooks/useTripContext';
+import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -106,6 +108,9 @@ export default function Home() {
   const currentUserEmail = currentUser?.email;
   const roles = trip?.roles || {};
   const isAdmin = !trip || roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail || Object.keys(roles).length === 0;
+
+  // Active country context
+  const { activeCity, activeMeta, countryRoute, setOverrideCityId } = useTripContext(tripId);
 
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities', tripId],
@@ -229,6 +234,35 @@ export default function Home() {
                       {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
                     </div>
                   </div>
+
+                  {/* Ahora + Ruta multi-país */}
+                  {activeCity && (
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full text-white text-sm font-medium">
+                        <span>{activeMeta.flag}</span>
+                        <span>Ahora: {activeCity.name}, {activeCity.country}</span>
+                        <span className="text-white/70">· {activeMeta.currency}</span>
+                      </div>
+                      {countryRoute.length > 1 && (
+                        <div className="text-white/70 text-xs flex items-center gap-1">
+                          <span>Ruta:</span>
+                          {countryRoute.map((c, i) => (
+                            <span key={c} className="flex items-center gap-1">
+                              {i > 0 && <ArrowRight className="w-3 h-3" />}
+                              <span>{c}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="ml-auto">
+                        <ActiveCitySelector
+                          cities={cities}
+                          activeCity={activeCity}
+                          onSelect={setOverrideCityId}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={() => setSearchOpen(true)} className="bg-zinc-50 ml-4 px-4 py-2 rounded-lg hover:bg-white backdrop-blur-sm transition-colors flex items-center gap-2 shadow-md">

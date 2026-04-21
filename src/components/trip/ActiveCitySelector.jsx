@@ -7,14 +7,19 @@ import { MapPin } from 'lucide-react';
 
 const AUTO_VALUE = '__auto__';
 
-export default function ActiveCitySelector({ cities = [], overrideCityId, setOverrideCityId, clearOverride, activeCity }) {
+export default function ActiveCitySelector({ cities = [], overrideCityId, setOverrideCityId, clearOverride, activeCity, onSelect }) {
   if (!cities.length) return null;
 
+  // Soporte firma antigua (setOverrideCityId+clearOverride) y nueva (onSelect)
   const value = overrideCityId || AUTO_VALUE;
 
   const handleChange = (val) => {
-    if (val === AUTO_VALUE) clearOverride();
-    else setOverrideCityId(val);
+    if (onSelect) {
+      onSelect(val === AUTO_VALUE ? null : val);
+    } else {
+      if (val === AUTO_VALUE) clearOverride?.();
+      else setOverrideCityId?.(val);
+    }
   };
 
   return (

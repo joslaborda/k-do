@@ -2,6 +2,7 @@ import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { getActiveCity } from '@/lib/tripContext';
+import { getCountryMeta } from '@/lib/countryConfig';
 
 export function useTripContext(tripId) {
   const storageKey = tripId ? `kodo_active_city_${tripId}` : null;
@@ -47,5 +48,26 @@ export function useTripContext(tripId) {
     [cities, overrideCityId]
   );
 
-  return { trip, cities, activeCity, overrideCityId, setOverrideCityId, clearOverride };
+  // Meta del país activo (idioma, moneda, flag…) basado en activeCity
+  const activeMeta = useMemo(() => {
+    const country = activeCity?.country || trip?.country || '';
+    return getCountryMeta(country);
+  }, [activeCity, trip]);
+
+  // Ruta completa (países únicos en orden cronológico)
+  const countryRoute = useMemo(() => {
+    const sorted = [...cities].sort((a, b) => {
+      if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
+      return (a.order ?? 0) - (b.order ?? 0);
+    });
+    const seen = new Set();
+    const route = [];
+    for (const c of sorted) {
+      const country = c.country || trip?.country || '';
+      if (country && !seen.has(country)) { seen.add(country); route.push(country); }
+    }
+    return route;
+  }, [cities, trip]);
+
+  return { trip, cities, activeCity, activeMeta, countryRoute, overrideCityId, setOverrideCityId, clearOverride };
 }
