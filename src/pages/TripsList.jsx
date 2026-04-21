@@ -349,7 +349,13 @@ export default function TripsList() {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
-                <Input type="date" value={formData.end_date} onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))} className="bg-input border-border text-foreground" />
+                <Input
+                  type="date"
+                  value={formData.end_date}
+                  min={formData.start_date || undefined}
+                  onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))}
+                  className="bg-input border-border text-foreground"
+                />
               </div>
             </div>
 
