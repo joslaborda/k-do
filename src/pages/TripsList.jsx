@@ -2,20 +2,33 @@ import { useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, User } from 'lucide-react';
+import { Plus, User, LogOut } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link } from 'react-router-dom';
+import CreateProfileModal from '@/components/social/CreateProfileModal';
+import SocialExploreSection from '@/components/social/SocialExploreSection';
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(u => { setUser(u); setUserLoading(false); }).catch(() => setUserLoading(false));
   }, []);
+
+  const { data: myProfile, isLoading: profileLoading } = useQuery({
+    queryKey: ['myProfile', user?.id],
+    queryFn: async () => {
+      const results = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return results[0] || null;
+    },
+    enabled: !!user?.id && user?.is_verified === true,
+    staleTime: 60000,
+  });
 
   const { data: trips = [], isLoading } = useQuery({
     queryKey: ['trips'],
@@ -81,7 +94,9 @@ export default function TripsList() {
     },
   });
 
-  if (isLoading) {
+  const needsOnboarding = user?.is_verified === true && !profileLoading && myProfile === null;
+
+  if (isLoading || userLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -92,14 +107,39 @@ export default function TripsList() {
     );
   }
 
+  // Email not verified banner
+  if (user && user.is_verified === false) {
+    return (
+      <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center shadow-sm">
+          <div className="text-5xl mb-4">📧</div>
+          <h2 className="text-xl font-bold mb-2">Verifica tu email</h2>
+          <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada y confirma tu email para continuar.</p>
+          <Button
+            className="w-full bg-orange-700 hover:bg-orange-800 text-white"
+            onClick={() => base44.auth.me().then(u => setUser(u)).catch(() => {})}
+          >
+            Ya verifiqué ✓
+          </Button>
+          <button onClick={() => base44.auth.logout()} className="mt-3 text-xs text-muted-foreground hover:underline block mx-auto">Cerrar sesión</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding profile modal */}
+      {needsOnboarding && <CreateProfileModal user={user} open={true} />}
+
       <div className="bg-orange-700 px-6 py-10">
-        <div className="max-w-6xl mx-auto flex items-end justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-white text-4xl font-black tracking-tight">Kodo</h1>
+            <h1 className="text-white text-4xl font-black tracking-tight">Kōdo</h1>
             <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
-            <p className="text-white/60 text-sm mt-1">Tu próximo viaje empieza aquí</p>
+            {myProfile && (
+              <p className="text-white/70 text-sm mt-1 font-mono">@{myProfile.username}</p>
+            )}
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
             <Button
@@ -110,7 +150,7 @@ export default function TripsList() {
             </Button>
             <Link to="/Profile">
               <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-white font-bold text-sm hover:bg-white/30 transition-colors cursor-pointer">
-                {user?.full_name ? user.full_name[0].toUpperCase() : <User className="w-4 h-4" />}
+                {myProfile?.display_name ? myProfile.display_name[0].toUpperCase() : user?.full_name ? user.full_name[0].toUpperCase() : <User className="w-4 h-4" />}
               </div>
             </Link>
           </div>
@@ -129,9 +169,19 @@ export default function TripsList() {
           </div>
         ) : (
           <>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Tus viajes</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Mis viajes</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">{tripCards}</div>
           </>
+        )}
+
+        {/* Social section — only for verified users with profile */}
+        {user?.is_verified && myProfile && (
+          <SocialExploreSection
+            myUserId={user.id}
+            myProfile={myProfile}
+            trips={trips}
+            allCities={allCities}
+          />
         )}
       </div>
 

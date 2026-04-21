@@ -1,0 +1,23 @@
+{
+  "name": "Collection",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "default": "Guardados"
+    },
+    "template_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "name"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Follow",
+  "type": "object",
+  "properties": {
+    "follower_user_id": {
+      "type": "string",
+      "description": "ID del usuario que sigue"
+    },
+    "followed_user_id": {
+      "type": "string",
+      "description": "ID del usuario seguido"
+    }
+  },
+  "required": [
+    "follower_user_id",
+    "followed_user_id"
+  ]
+}
