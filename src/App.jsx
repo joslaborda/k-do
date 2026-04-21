@@ -8,6 +8,8 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import VerifyEmail from './pages/VerifyEmail';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
@@ -72,6 +74,8 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/Profile" element={<Profile />} />
+      <Route path="/Settings" element={<Settings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

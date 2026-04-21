@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
+import { Link } from 'react-router-dom';
 
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -100,12 +101,19 @@ export default function TripsList() {
             <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
             <p className="text-white/60 text-sm mt-1">Tu próximo viaje empieza aquí</p>
           </div>
-          <Button
-            onClick={() => setDialogOpen(true)}
-            className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />Crear viaje
-          </Button>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <Button
+              onClick={() => setDialogOpen(true)}
+              className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />Crear viaje
+            </Button>
+            <Link to="/Profile">
+              <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-white font-bold text-sm hover:bg-white/30 transition-colors cursor-pointer">
+                {user?.full_name ? user.full_name[0].toUpperCase() : <User className="w-4 h-4" />}
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
 
