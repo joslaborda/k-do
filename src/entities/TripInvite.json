@@ -2,8 +2,14 @@
   "name": "TripInvite",
   "type": "object",
   "properties": {
-    "trip_id": { "type": "string", "description": "ID del viaje" },
-    "email": { "type": "string", "description": "Email invitado" },
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email invitado"
+    },
     "role": {
       "type": "string",
       "enum": ["admin", "editor", "viewer"],
@@ -13,9 +19,22 @@
     "status": {
       "type": "string",
       "enum": ["pending", "accepted", "declined"],
-      "default": "pending"
+      "default": "pending",
+      "description": "Estado de la invitación"
     },
-    "invited_by": { "type": "string", "description": "Email del que invitó" }
+    "invite_token": {
+      "type": "string",
+      "description": "Token único para link de invitación"
+    },
+    "invited_by": {
+      "type": "string",
+      "description": "Email del que invitó"
+    },
+    "responded_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha cuando se respondió a la invitación"
+    }
   },
   "required": ["trip_id", "email", "role"]
 }

@@ -65,6 +65,7 @@ import Calendar from './pages/Calendar';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyEmail from './pages/VerifyEmail';
+import Invites from './pages/Invites';
 import __Layout from './Layout.jsx';
 
 
@@ -87,6 +88,7 @@ export const PAGES = {
     "Profile": Profile,
     "Settings": Settings,
     "VerifyEmail": VerifyEmail,
+    "Invites": Invites,
 }
 
 export const pagesConfig = {

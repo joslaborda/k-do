@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, UserPlus, Crown, Pencil, Eye, Shield } from 'lucide-react';
+import { Users, UserPlus, Crown, Pencil, Eye, Shield, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from '@/components/ui/use-toast';
+import { sendTripInvite } from '@/lib/invites';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -15,6 +17,7 @@ const roleConfig = {
 
 export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
   const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
   const queryClient = useQueryClient();
 
@@ -28,14 +31,40 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
 
   const handleInvite = async () => {
     if (!inviteEmail.trim()) return;
+    
+    // Validar que no esté ya en miembros
+    if (members.includes(inviteEmail.trim())) {
+      toast({
+        title: 'Ya es miembro',
+        description: 'Este usuario ya está en el viaje'
+      });
+      return;
+    }
+
     setInviting(true);
     try {
-      await base44.users.inviteUser(inviteEmail.trim(), 'user');
-      const newMembers = [...members, inviteEmail.trim()];
-      const newRoles = { ...roles, [inviteEmail.trim()]: 'editor' };
-      await updateTripMutation.mutateAsync({ members: newMembers, roles: newRoles });
+      await sendTripInvite({
+        tripId: trip.id,
+        email: inviteEmail.trim(),
+        role: inviteRole,
+        tripName: trip.name,
+        inviterEmail: currentUserEmail,
+        inviterName: currentUserEmail.split('@')[0]
+      });
+      
+      toast({
+        title: '✓ Invitación enviada',
+        description: `Email enviado a ${inviteEmail.trim()}`
+      });
+      
       setInviteEmail('');
+      setInviteRole('editor');
+      queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
     } catch (e) {
+      toast({
+        title: 'Error',
+        description: e.message || 'No se pudo enviar la invitación'
+      });
       console.error('Error inviting user:', e);
     } finally {
       setInviting(false);
@@ -102,26 +131,38 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
       </div>
 
       {isAdmin && (
-        <div className="pt-2 border-t border-border">
-          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-            <UserPlus className="w-3 h-3" />
-            Invitar viajero
+        <div className="pt-4 border-t border-border">
+          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+            <Mail className="w-3 h-3" />
+            Invitar viajero por email
           </p>
-          <div className="flex gap-2">
-            <Input
-              placeholder="email@ejemplo.com"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-              className="text-sm"
-            />
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="email@ejemplo.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
+                className="text-sm flex-1"
+              />
+              <Select value={inviteRole} onValueChange={setInviteRole}>
+                <SelectTrigger className="w-24 h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="viewer">Lector</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               onClick={handleInvite}
               disabled={!inviteEmail.trim() || inviting}
-              className="bg-orange-700 hover:bg-orange-800 text-white shrink-0"
+              className="w-full bg-orange-700 hover:bg-orange-800 text-white font-bold"
               size="sm"
             >
-              {inviting ? '...' : 'Invitar'}
+              {inviting ? '...' : 'Enviar invitación'}
             </Button>
           </div>
         </div>
