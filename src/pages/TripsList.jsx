@@ -8,7 +8,7 @@ import TripCard from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
-import SocialExploreSection from '@/components/social/SocialExploreSection';
+import TemplatesFeedTabs from '@/components/social/TemplatesFeedTabs';
 
 function UserMenu({ user, profile }) {
   const [open, setOpen] = useState(false);
@@ -218,13 +218,12 @@ export default function TripsList() {
           </>
         )}
 
-        {/* Social section — only for verified users with profile */}
+        {/* Social section — Feed with tabs */}
         {user?.is_verified && myProfile && (
-          <SocialExploreSection
-            myUserId={user.id}
+          <TemplatesFeedTabs
+            currentUserId={user.id}
+            currentUserEmail={user.email}
             myProfile={myProfile}
-            trips={trips}
-            allCities={allCities}
           />
         )}
       </div>
