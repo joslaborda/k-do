@@ -1,16 +1,16 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { MapPin, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronRight, Calendar } from 'lucide-react';
 import AccommodationInput from './AccommodationInput';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const cityImages = {
-  'Osaka': 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800',
-  'Hiroshima': 'https://images.unsplash.com/photo-1576675466969-38eeae4b41f6?w=800',
-  'Hakone': 'https://images.unsplash.com/photo-1578637387939-43c525550085?w=800',
-  'Kyoto': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800',
-  'Tokyo': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800'
+  Osaka: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800',
+  Hiroshima: 'https://images.unsplash.com/photo-1576675466969-38eeae4b41f6?w=800',
+  Hakone: 'https://images.unsplash.com/photo-1578637387939-43c525550085?w=800',
+  Kyoto: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800',
+  Tokyo: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
 };
 
 export default function CityCard({ city, daysCount, tripId }) {
@@ -18,6 +18,7 @@ export default function CityCard({ city, daysCount, tripId }) {
     if (!city.start_date) return null;
     const start = new Date(city.start_date);
     const end = city.end_date ? new Date(city.end_date) : null;
+
     if (end && start.getTime() === end.getTime()) {
       return format(start, 'd MMM', { locale: es });
     }
@@ -27,64 +28,59 @@ export default function CityCard({ city, daysCount, tripId }) {
     return format(start, 'd MMM', { locale: es });
   };
 
+  const countryLabel = city.country ? city.country : '';
+
   return (
-    <div className="group relative">
+    <div className="group relative overflow-hidden rounded-2xl border border-border bg-white shadow-sm hover:shadow-md transition-shadow">
       <Link
-        to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
+        to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}
         className="block"
       >
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
-          <div className="aspect-[16/10] overflow-hidden">
-            <img
-              src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
-              alt={city.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          </div>
-
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <img
+            src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
+            alt={city.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-col gap-1.5 mb-2">
-                  <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                    <MapPin className="w-4 h-4 flex-shrink-0" />
-                    <span>Japan</span>
-                  </div>
-                  {city.start_date && (
-                    <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>{formatDateRange()}</span>
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-3xl font-bold text-white tracking-tight">
-                  {city.name}
-                </h3>
-                {daysCount > 0 && (
-                  <p className="text-white text-sm mt-1 font-medium">
-                    {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
-                  </p>
-                )}
-                <AccommodationInput city={city} tripId={tripId} />
+            <div className="text-white text-xl font-bold leading-tight">{city.name}</div>
+
+            {countryLabel && (
+              <div className="text-white/80 text-sm mt-1">{countryLabel}</div>
+            )}
+
+            {city.start_date && (
+              <div className="flex items-center gap-1.5 text-white/85 text-sm mt-2">
+                <Calendar className="w-4 h-4" />
+                <span>{formatDateRange()}</span>
               </div>
-              {/* Spacer for chevron button */}
-              <div className="w-12 flex-shrink-0" />
+            )}
+          </div>
+        </div>
+
+        <div className="p-5">
+          <h4 className="text-lg font-semibold text-foreground mb-2">{city.name}</h4>
+
+          {daysCount > 0 && (
+            <div className="text-sm text-muted-foreground">
+              {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
             </div>
+          )}
+
+          <div className="mt-4">
+            <AccommodationInput city={city} tripId={tripId} />
           </div>
         </div>
       </Link>
 
-      {/* Chevron button — outside Link to prevent double navigation */}
-      <div className="absolute bottom-5 right-5">
-        <Link
-          to={createPageUrl('CityDetail') + `?id=${city.id}&trip_id=${tripId}`}
-          onClick={(e) => e.stopPropagation()}
-          className="w-10 h-10 rounded-full bg-orange-700 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-700 border border-orange-700"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </Link>
-      </div>
+      <button
+        onClick={(e) => e.stopPropagation()}
+        className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-orange-700 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-700 border border-orange-700"
+        aria-label="Abrir ciudad"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
     </div>
   );
 }
