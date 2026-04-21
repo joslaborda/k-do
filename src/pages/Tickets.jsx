@@ -32,6 +32,7 @@ const categories = [
 ];
 
 export default function Tickets() {
+  const tripId = new URLSearchParams(window.location.search).get('trip_id');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
@@ -47,8 +48,10 @@ export default function Tickets() {
   const queryClient = useQueryClient();
 
   const { data: tickets = [], isLoading } = useQuery({
-    queryKey: ['tickets'],
-    queryFn: () => base44.entities.Ticket.list('-date'),
+    queryKey: ['tickets', tripId],
+    queryFn: () => tripId
+      ? base44.entities.Ticket.filter({ trip_id: tripId }, '-date')
+      : base44.entities.Ticket.list('-date'),
   });
 
   const { data: todos = [], isLoading: todosLoading } = useQuery({

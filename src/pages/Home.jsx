@@ -23,6 +23,7 @@ import { getTripCoverImage } from '@/lib/tripImage';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TripMembersPanel from '@/components/trip/TripMembersPanel';
+import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 
 export default function Home() {
@@ -363,6 +364,12 @@ export default function Home() {
 
       {/* Navigation Section - Outside of background image */}
       <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl space-y-10">
+
+        {/* Hoy / Mañana */}
+        <div>
+          <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">📅 Hoy / Mañana</h2>
+          <TodayTomorrowPanel tripId={tripId} cities={cities} />
+        </div>
 
         {/* Shared sections */}
         <div>
