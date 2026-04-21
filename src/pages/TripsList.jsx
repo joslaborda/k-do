@@ -35,16 +35,14 @@ export default function TripsList() {
   }, [trips, allCities]);
 
   const createMutation = useMutation({
-    mutationFn: async ({ formData, stops, allocations, selectedTemplate }) => {
+    mutationFn: async ({ formData, stops, stopCountries = [], allocations, selectedTemplate }) => {
       const email = user?.email;
       const userId = user?.id;
-      const destinationString = stops.join(' → ');
       const roles = email ? { [email]: 'admin' } : {};
       const members = email ? [email] : [];
 
       const trip = await base44.entities.Trip.create({
         ...formData,
-        destination: destinationString,
         members,
         roles,
       });
@@ -54,7 +52,7 @@ export default function TripsList() {
         await base44.entities.City.create({
           trip_id: trip.id,
           name: stops[i],
-          country: formData.country,
+          country: stopCountries[i] || formData.country || '',
           order: i,
           start_date: dates.start_date,
           end_date: dates.end_date,

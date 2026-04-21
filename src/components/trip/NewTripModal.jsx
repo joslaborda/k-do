@@ -85,16 +85,16 @@ function autoDistribute(startDateStr, endDateStr, count) {
 
 // ─── Default state ────────────────────────────────────────────────────────────
 const DEFAULT_FORM = {
-  name: '', country: 'España', start_date: '', end_date: '',
+  name: '', start_date: '', end_date: '',
   description: '', cover_image: '',
   currency: 'EUR', currency_symbol: '€',
   language: 'Español', language_code: 'es-ES',
 };
 
 function defaultStops(mode) {
-  return mode === 'single' ? [{ city: '', nights: '', manual: { start_date: '', end_date: '' } }]
-    : [{ city: '', nights: '', manual: { start_date: '', end_date: '' } },
-       { city: '', nights: '', manual: { start_date: '', end_date: '' } }];
+  return mode === 'single' ? [{ city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]
+    : [{ city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } },
+       { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }];
 }
 
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
 
   const canCreate =
     formData.name.trim() &&
-    formData.country.trim() &&
+    stops[0]?.country?.trim() &&
     formData.start_date &&
     (!formData.end_date || formData.end_date >= formData.start_date) &&
     validStops.length > 0 &&
@@ -159,19 +159,19 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     !isPending;
 
   // ── event handlers ────────────────────────────────────────────────────────
-  function applyCountry(country) {
-    const meta = getCountryMeta(country);
-    setFormData((prev) => ({
-      ...prev,
-      country,
-      ...(!currencyTouched ? {
+  // When first stop's country changes, update trip-level currency/language
+  function applyStopCountry(idx, country) {
+    updateStop(idx, { city: '', country });
+    if (idx === 0 && !currencyTouched) {
+      const meta = getCountryMeta(country);
+      setFormData((prev) => ({
+        ...prev,
         currency: meta.currency,
         currency_symbol: meta.symbol,
         language: meta.languageLabel,
         language_code: meta.languageCode,
-      } : {}),
-    }));
-    setStops((prev) => prev.map((s) => ({ ...s, city: '' })));
+      }));
+    }
   }
 
   function setMode_(m) {
@@ -188,7 +188,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
   }
 
   function addStop() {
-    setStops((prev) => [...prev, { city: '', nights: '', manual: { start_date: '', end_date: '' } }]);
+    setStops((prev) => [...prev, { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]);
   }
 
   function removeStop(idx) {
@@ -242,9 +242,24 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     }
 
     const finalEndDate = computedTripEndDate();
+    // Country of first stop is the trip's main country
+    const firstCountry = tripCities[0]?.country || '';
+    const firstMeta = getCountryMeta(firstCountry);
     onSubmit({
-      formData: { ...formData, end_date: finalEndDate },
+      formData: {
+        ...formData,
+        end_date: finalEndDate,
+        country: firstCountry,
+        destination: tripCities.map((s) => s.city).join(' → '),
+        ...(!currencyTouched ? {
+          currency: firstMeta.currency,
+          currency_symbol: firstMeta.symbol,
+          language: firstMeta.languageLabel,
+          language_code: firstMeta.languageCode,
+        } : {}),
+      },
       stops: tripCities.map((s) => s.city),
+      stopCountries: tripCities.map((s) => s.country || firstCountry),
       allocations,
       selectedTemplate,
     });
@@ -260,8 +275,6 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     setCurrencyTouched(false);
     setSelectedTemplate(null);
   }
-
-  const meta = getCountryMeta(formData.country);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -282,25 +295,16 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             />
           </div>
 
-          {/* ── 2. País + Modo ── */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">País *</label>
-              <CountryInput value={formData.country} onChange={applyCountry} />
-              {formData.country && (
-                <p className="text-xs text-muted-foreground mt-1">{meta.flag} {meta.currency} · {meta.languageLabel}</p>
-              )}
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Modo</label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button type="button" variant={mode === 'single' ? 'default' : 'outline'}
-                  className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                  onClick={() => setMode_('single')}>1 parada</Button>
-                <Button type="button" variant={mode === 'multi' ? 'default' : 'outline'}
-                  className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                  onClick={() => setMode_('multi')}>Multi-ciudad</Button>
-              </div>
+          {/* ── 2. Modo ── */}
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">Modo</label>
+            <div className="grid grid-cols-2 gap-2 max-w-xs">
+              <Button type="button" variant={mode === 'single' ? 'default' : 'outline'}
+                className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''}
+                onClick={() => setMode_('single')}>1 parada</Button>
+              <Button type="button" variant={mode === 'multi' ? 'default' : 'outline'}
+                className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''}
+                onClick={() => setMode_('multi')}>Multi-ciudad</Button>
             </div>
           </div>
 
@@ -360,12 +364,19 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             <div className="space-y-2">
               {stops.map((stop, idx) => (
                 <div key={idx} className="bg-white border border-border rounded-xl p-3 space-y-2">
-                  {/* City + remove */}
+                  {/* Country + City + remove */}
                   <div className="flex items-center gap-2">
+                    <div className="w-40 flex-shrink-0">
+                      <CountryInput
+                        value={stop.country}
+                        onChange={(v) => applyStopCountry(idx, v)}
+                        placeholder="País..."
+                      />
+                    </div>
                     <div className="flex-1">
                       <CityInput
-                        key={formData.country}
-                        country={formData.country}
+                        key={stop.country}
+                        country={stop.country}
                         value={stop.city}
                         onChange={(v) => updateStop(idx, { city: v })}
                         placeholder={`Ciudad ${idx + 1}...`}

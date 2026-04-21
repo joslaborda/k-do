@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { getAllCountries, canonicalizeCountry } from '@/lib/countryCatalog';
 
-export default function CountryInput({ value, onChange, locale = 'es-ES' }) {
+export default function CountryInput({ value, onChange, locale = 'es-ES', placeholder = 'Escribe para buscar país…' }) {
   const countries = useMemo(() => getAllCountries(locale), [locale]);
 
   return (
@@ -30,7 +30,7 @@ export default function CountryInput({ value, onChange, locale = 'es-ES' }) {
             onChange(canonical);
           }
         }}
-        placeholder="Escribe para buscar país…"
+        placeholder={placeholder}
         className="bg-input border-border text-foreground"
       />
     </>
