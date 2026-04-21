@@ -21,10 +21,10 @@ const COUNTRY_PRESETS = [
   { country: 'Alemania', currency: 'EUR', symbol: '€', language: 'German', languageCode: 'de-DE' },
   { country: 'Reino Unido', currency: 'GBP', symbol: '£', language: 'English', languageCode: 'en-GB' },
   { country: 'Estados Unidos', currency: 'USD', symbol: '$', language: 'English', languageCode: 'en-US' },
-  { country: 'México', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
+  { country: 'Mexico', currency: 'MXN', symbol: '$', language: 'Spanish', languageCode: 'es-MX' },
   { country: 'Argentina', currency: 'ARS', symbol: '$', language: 'Spanish', languageCode: 'es-AR' },
   { country: 'Brasil', currency: 'BRL', symbol: 'R$', language: 'Portuguese', languageCode: 'pt-BR' },
-  { country: 'Japón', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
+  { country: 'Japon', currency: 'JPY', symbol: '¥', language: 'Japanese', languageCode: 'ja-JP' },
   { country: 'Tailandia', currency: 'THB', symbol: '฿', language: 'Thai', languageCode: 'th-TH' },
   { country: 'Corea del Sur', currency: 'KRW', symbol: '₩', language: 'Korean', languageCode: 'ko-KR' },
   { country: 'China', currency: 'CNY', symbol: '¥', language: 'Chinese', languageCode: 'zh-CN' },
@@ -32,116 +32,116 @@ const COUNTRY_PRESETS = [
   { country: 'Singapur', currency: 'SGD', symbol: '$', language: 'English', languageCode: 'en-SG' },
   { country: 'Indonesia', currency: 'IDR', symbol: 'Rp', language: 'Indonesian', languageCode: 'id-ID' },
   { country: 'Marruecos', currency: 'MAD', symbol: 'DH', language: 'Arabic', languageCode: 'ar-MA' },
-  { country: 'Turquía', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
+  { country: 'Turquia', currency: 'TRY', symbol: '₺', language: 'Turkish', languageCode: 'tr-TR' },
   { country: 'Suiza', currency: 'CHF', symbol: 'Fr', language: 'German', languageCode: 'de-CH' },
   { country: 'Grecia', currency: 'EUR', symbol: '€', language: 'Greek', languageCode: 'el-GR' },
 ];
 
 const TOP_CITIES_BY_COUNTRY = {
   España: [
-    'Madrid','Barcelona','Valencia','Sevilla','Bilbao','Málaga','Granada','Zaragoza','Alicante','San Sebastián',
-    'Córdoba','Toledo','Salamanca','Santiago de Compostela','Palma de Mallorca','Ibiza','Tenerife','Las Palmas de Gran Canaria','Mallorca','Marbella',
-    'Santander','Oviedo','Gijón','Pamplona','Valladolid','Murcia','Tarragona','Girona','Cádiz','Segovia'
+    'Madrid','Barcelona','Valencia','Sevilla','Bilbao','Malaga','Granada','Zaragoza','Alicante','San Sebastian',
+    'Cordoba','Toledo','Salamanca','Santiago de Compostela','Palma de Mallorca','Ibiza','Tenerife','Las Palmas de Gran Canaria','Mallorca','Marbella',
+    'Santander','Oviedo','Gijon','Pamplona','Valladolid','Murcia','Tarragona','Girona','Cadiz','Segovia',
   ],
   Italia: [
-    'Roma','Milán','Venecia','Florencia','Nápoles','Turín','Bolonia','Génova','Verona','Pisa',
+    'Roma','Milan','Venecia','Florencia','Napoles','Turin','Bolonia','Genova','Verona','Pisa',
     'Siena','Bari','Palermo','Catania','Trieste','Padua','Parma','Modena','Lecce','Trento',
-    'Vicenza','Brescia','Perugia','Ravenna','Cagliari','Ancona','Lucca','Como','Sorrento','Cinque Terre'
+    'Vicenza','Brescia','Perugia','Ravenna','Cagliari','Ancona','Lucca','Como','Sorrento','Cinque Terre',
   ],
   Francia: [
-    'París','Marsella','Lyon','Toulouse','Niza','Nantes','Estrasburgo','Montpellier','Burdeos','Lille',
-    'Rennes','Reims','Le Havre','Saint-Étienne','Toulon','Grenoble','Dijon','Angers','Nîmes','Aix-en-Provence',
-    'Avignon','Cannes','Saint-Malo','Biarritz','Annecy','Tours','Metz','Nancy','Besançon','Perpignan'
+    'Paris','Marsella','Lyon','Toulouse','Niza','Nantes','Estrasburgo','Montpellier','Burdeos','Lille',
+    'Rennes','Reims','Le Havre','Toulon','Grenoble','Dijon','Angers','Nimes','Aix-en-Provence',
+    'Avignon','Cannes','Saint-Malo','Biarritz','Annecy','Tours','Metz','Nancy','Besancon','Perpignan',
   ],
   Portugal: [
-    'Lisboa','Oporto','Coímbra','Braga','Faro','Aveiro','Évora','Guimarães','Cascais','Sintra',
-    'Madeira (Funchal)','Azores (Ponta Delgada)','Setúbal','Viseu','Leiria','Portimão','Lagos','Albufeira','Tavira','Tomar',
-    'Óbidos','Nazaré','Ericeira','Peniche','Chaves','Viana do Castelo','Beja','Santarém','Figueira da Foz','Covilhã'
+    'Lisboa','Oporto','Coimbra','Braga','Faro','Aveiro','Evora','Guimaraes','Cascais','Sintra',
+    'Madeira','Azores','Setubal','Viseu','Leiria','Portimao','Lagos','Albufeira','Tavira','Tomar',
+    'Obidos','Nazare','Ericeira','Peniche','Chaves','Viana do Castelo','Beja','Santarem','Figueira da Foz','Covilha',
   ],
   Alemania: [
-    'Berlín','Múnich','Hamburgo','Colonia','Fráncfort','Stuttgart','Düsseldorf','Dresde','Leipzig','Núremberg',
+    'Berlin','Munich','Hamburgo','Colonia','Frankfurt','Stuttgart','Dusseldorf','Dresde','Leipzig','Nuremberg',
     'Heidelberg','Bremen','Hannover','Bonn','Augsburgo','Wiesbaden','Freiburg','Mannheim','Mainz','Essen',
-    'Dortmund','Kiel','Rostock','Regensburg','Weimar','Potsdam','Würzburg','Lübeck','Aachen','Garmisch-Partenkirchen'
+    'Dortmund','Kiel','Rostock','Regensburg','Weimar','Potsdam','Wurzburg','Lubeck','Aachen','Garmisch-Partenkirchen',
   ],
   'Reino Unido': [
     'Londres','Edimburgo','Manchester','Liverpool','Birmingham','Bristol','Glasgow','Cambridge','Oxford','Bath',
     'Brighton','York','Newcastle','Leeds','Cardiff','Belfast','Inverness','Portsmouth','Southampton','Nottingham',
-    'Sheffield','Canterbury','Stratford-upon-Avon','Stonehenge','Windermere','Aberdeen','Swansea','Leicester','Coventry','Durham'
+    'Sheffield','Canterbury','Stonehenge','Windermere','Aberdeen','Swansea','Leicester','Coventry','Durham','Stratford-upon-Avon',
   ],
   'Estados Unidos': [
-    'New York','Los Angeles','San Francisco','Miami','Chicago','Las Vegas','Washington D.C.','Boston','Seattle','San Diego',
+    'New York','Los Angeles','San Francisco','Miami','Chicago','Las Vegas','Washington DC','Boston','Seattle','San Diego',
     'Austin','New Orleans','Orlando','Philadelphia','Denver','Portland','Atlanta','Nashville','Houston','Dallas',
-    'Phoenix','Minneapolis','Detroit','Salt Lake City','Honolulu','Tampa','Charlotte','Pittsburgh','Cleveland','San Jose'
+    'Phoenix','Minneapolis','Detroit','Salt Lake City','Honolulu','Tampa','Charlotte','Pittsburgh','Cleveland','San Jose',
   ],
-  México: [
-    'Ciudad de México','Cancún','Guadalajara','Monterrey','Tulum','Playa del Carmen','Puerto Vallarta','Oaxaca','Mérida','San Miguel de Allende',
-    'Puebla','Guanajuato','Querétaro','Toluca','Chiapas (San Cristóbal)','Veracruz','Acapulco','Cozumel','Los Cabos','La Paz',
-    'Mazatlán','Morelia','Tepotzotlán','Xalapa','Aguascalientes','León','Tijuana','Ensenada','Campeche','Bacalar'
+  Mexico: [
+    'Ciudad de Mexico','Cancun','Guadalajara','Monterrey','Tulum','Playa del Carmen','Puerto Vallarta','Oaxaca','Merida','San Miguel de Allende',
+    'Puebla','Guanajuato','Queretaro','Toluca','Veracruz','Acapulco','Cozumel','Los Cabos','La Paz',
+    'Mazatlan','Morelia','Xalapa','Aguascalientes','Leon','Tijuana','Ensenada','Campeche','Bacalar','Chiapas',
   ],
   Argentina: [
-    'Buenos Aires','Bariloche','Mendoza','Córdoba','Rosario','Ushuaia','El Calafate','Salta','Mar del Plata','Iguazú',
-    'La Plata','San Juan','San Luis','Neuquén','Puerto Madryn','Tigre','Tandil','San Martín de los Andes','Villa La Angostura','Jujuy (Purmamarca)',
-    'Bahía Blanca','Santa Fe','Corrientes','Resistencia','Comodoro Rivadavia','Río Gallegos','Trelew','San Rafael','Cafayate','Chaltén'
+    'Buenos Aires','Bariloche','Mendoza','Cordoba','Rosario','Ushuaia','El Calafate','Salta','Mar del Plata','Iguazu',
+    'La Plata','San Juan','San Luis','Neuquen','Puerto Madryn','Tigre','Tandil','San Martin de los Andes','Villa La Angostura','Jujuy',
+    'Bahia Blanca','Santa Fe','Corrientes','Resistencia','Comodoro Rivadavia','Rio Gallegos','Trelew','San Rafael','Cafayate','Choshuenco',
   ],
   Brasil: [
-    'Río de Janeiro','São Paulo','Salvador','Brasília','Fortaleza','Recife','Florianópolis','Curitiba','Porto Alegre','Belo Horizonte',
-    'Manaus','Belém','Natal','João Pessoa','Maceió','Vitória','Campinas','Santos','Foz do Iguaçu','Bonito',
-    'Ilhabela','Búzios','Paraty','Jericoacoara','Lençóis Maranhenses','Ouro Preto','Gramado','Petrópolis','Olinda','Arraial do Cabo'
+    'Rio de Janeiro','Sao Paulo','Salvador','Brasilia','Fortaleza','Recife','Florianopolis','Curitiba','Porto Alegre','Belo Horizonte',
+    'Manaus','Belem','Natal','Joao Pessoa','Maceio','Vitoria','Campinas','Santos','Foz do Iguacu','Bonito',
+    'Ilhabela','Buzios','Paraty','Jericoacoara','Ouro Preto','Gramado','Petropolis','Olinda','Arraial do Cabo','Lencois Maranhenses',
   ],
-  Japón: [
+  Japon: [
     'Tokyo','Kyoto','Osaka','Hiroshima','Nara','Hakone','Sapporo','Fukuoka','Nikko','Nagoya',
-    'Kobe','Yokohama','Kamakura','Kanazawa','Takayama','Sendai','Kumamoto','Nagasaki','Okinawa (Naha)','Kagoshima',
-    'Matsumoto','Shizuoka','Toyama','Okayama','Himeji','Beppu','Koyasan','Fuji Five Lakes','Kawagoe','Ise'
+    'Kobe','Yokohama','Kamakura','Kanazawa','Takayama','Sendai','Kumamoto','Nagasaki','Okinawa','Kagoshima',
+    'Matsumoto','Shizuoka','Toyama','Okayama','Himeji','Beppu','Koyasan','Kawagoe','Ise','Fuji Five Lakes',
   ],
   Tailandia: [
     'Bangkok','Chiang Mai','Phuket','Krabi','Pattaya','Ayutthaya','Chiang Rai','Koh Samui','Koh Phi Phi','Hua Hin',
     'Sukhothai','Pai','Kanchanaburi','Koh Tao','Koh Phangan','Surat Thani','Hat Yai','Trang','Koh Lanta','Udon Thani',
-    'Ubon Ratchathani','Nakhon Ratchasima','Lampang','Nan','Rayong','Koh Chang','Samut Prakan','Mae Hong Son','Chumphon','Phetchabun'
+    'Ubon Ratchathani','Nakhon Ratchasima','Lampang','Nan','Rayong','Koh Chang','Mae Hong Son','Chumphon','Phetchabun','Samui',
   ],
   'Corea del Sur': [
     'Seoul','Busan','Incheon','Daegu','Daejeon','Gwangju','Suwon','Jeonju','Gyeongju','Jeju',
     'Gangneung','Pyeongchang','Ulsan','Pohang','Chuncheon','Seogwipo','Sokcho','Andong','Tongyeong','Yeosu',
-    'Gimhae','Changwon','Mokpo','Suncheon','Iksan','Cheonan','Seongnam','Yongin','Ilsan','Anyang'
+    'Gimhae','Changwon','Mokpo','Suncheon','Iksan','Cheonan','Seongnam','Yongin','Ilsan','Anyang',
   ],
   China: [
-    'Beijing','Shanghai','Hong Kong','Shenzhen','Guangzhou','Chengdu','Hangzhou','Xi’an','Nanjing','Suzhou',
+    'Beijing','Shanghai','Hong Kong','Shenzhen','Guangzhou','Chengdu','Hangzhou','Xian','Nanjing','Suzhou',
     'Wuhan','Chongqing','Tianjin','Xiamen','Harbin','Qingdao','Dalian','Kunming','Sanya','Lhasa',
-    'Zhangjiajie','Guilin','Yangshuo','Foshan','Zhuhai','Ningbo','Changsha','Jinan','Urumqi','Hefei'
+    'Zhangjiajie','Guilin','Yangshuo','Foshan','Zhuhai','Ningbo','Changsha','Jinan','Urumqi','Hefei',
   ],
   Vietnam: [
     'Hanoi','Ho Chi Minh City','Da Nang','Hoi An','Hue','Nha Trang','Da Lat','Ha Long','Sapa','Can Tho',
     'Phu Quoc','Vung Tau','Mui Ne','Hai Phong','Ninh Binh','Quy Nhon','Phong Nha','Dong Hoi','Buon Ma Thuot','Pleiku',
-    'Con Dao','Bac Ninh','Ha Tinh','Thanh Hoa','Vinh','Lao Cai','Cao Bang','Lang Son','My Tho','Ben Tre'
+    'Con Dao','Bac Ninh','Ha Tinh','Thanh Hoa','Vinh','Lao Cai','Cao Bang','Lang Son','My Tho','Ben Tre',
   ],
   Singapur: [
     'Singapore','Marina Bay','Sentosa','Chinatown','Little India','Kampong Glam','Orchard','Clarke Quay','Bugis','Tiong Bahru',
     'East Coast','Botanic Gardens','Gardens by the Bay','Jurong','Holland Village','Punggol','Joo Chiat','Kallang','Novena','Toa Payoh',
-    'Woodlands','Pasir Ris','Ang Mo Kio','Serangoon','Bukit Timah','Clementi','Queenstown','Raffles Place','HarbourFront','Seletar'
+    'Woodlands','Pasir Ris','Ang Mo Kio','Serangoon','Bukit Timah','Clementi','Queenstown','Raffles Place','HarbourFront','Seletar',
   ],
   Indonesia: [
     'Bali','Jakarta','Yogyakarta','Bandung','Surabaya','Ubud','Lombok','Gili Islands','Seminyak','Uluwatu',
-    'Komodo (Labuan Bajo)','Flores','Makassar','Medan','Padang','Malang','Bogor','Batam','Bintan','Solo',
-    'Manado','Bunaken','Raja Ampat','Jayapura','Denpasar','Canggu','Nusa Penida','Nusa Lembongan','Balikpapan','Samarinda'
+    'Komodo','Flores','Makassar','Medan','Padang','Malang','Bogor','Batam','Bintan','Solo',
+    'Manado','Bunaken','Raja Ampat','Jayapura','Denpasar','Canggu','Nusa Penida','Nusa Lembongan','Balikpapan','Samarinda',
   ],
   Marruecos: [
-    'Marrakech','Casablanca','Fez','Rabat','Tánger','Chefchaouen','Essaouira','Agadir','Meknes','Ouarzazate',
+    'Marrakech','Casablanca','Fez','Rabat','Tanger','Chefchaouen','Essaouira','Agadir','Meknes','Ouarzazate',
     'Merzouga','Ifrane','Tetouan','Asilah','El Jadida','Oujda','Al Hoceima','Safi','Taroudant','Tiznit',
-    'Errachidia','Midelt','Beni Mellal','Khenifra','Nador','Dakhla','Laayoune','Sidi Ifni','Azrou','Aït Benhaddou'
+    'Errachidia','Midelt','Beni Mellal','Khenifra','Nador','Dakhla','Laayoune','Sidi Ifni','Azrou','Ait Benhaddou',
   ],
-  Turquía: [
-    'Istanbul','Ankara','Izmir','Antalya','Bursa','Cappadocia (Göreme)','Pamukkale','Bodrum','Fethiye','Marmaris',
+  Turquia: [
+    'Istanbul','Ankara','Izmir','Antalya','Bursa','Capadocia','Pamukkale','Bodrum','Fethiye','Marmaris',
     'Konya','Trabzon','Gaziantep','Adana','Mersin','Eskisehir','Samsun','Kusadasi','Alanya','Side',
-    'Canakkale','Edirne','Sanliurfa','Kayseri','Rize','Amasya','Kars','Van','Sivas','Diyarbakir'
+    'Canakkale','Edirne','Sanliurfa','Kayseri','Rize','Amasya','Kars','Van','Sivas','Diyarbakir',
   ],
   Suiza: [
-    'Zúrich','Ginebra','Lucerna','Berna','Basel','Interlaken','Zermatt','Lausana','Montreux','Lugano',
+    'Zurich','Ginebra','Lucerna','Berna','Basel','Interlaken','Zermatt','Lausana','Montreux','Lugano',
     'St. Moritz','Grindelwald','Jungfraujoch','Thun','Friburgo','Sion','Chur','Davos','Appenzell','Schaffhausen',
-    'Brienz','Wengen','Kandersteg','Andermatt','Neuchâtel','St. Gallen','Arosa','Mürren','Bellinzona','Locarno'
+    'Brienz','Wengen','Kandersteg','Andermatt','Neuchatel','St. Gallen','Arosa','Murren','Bellinzona','Locarno',
   ],
   Grecia: [
-    'Atenas','Salónica','Santorini','Mykonos','Creta (Heraklion)','Rodas','Corfú','Naxos','Paros','Milos',
+    'Atenas','Salonica','Santorini','Mykonos','Creta','Rodas','Corfu','Naxos','Paros','Milos',
     'Kos','Delphi','Meteora','Nafplio','Patras','Chania','Rethymno','Kavala','Volos','Ioannina',
-    'Zakynthos','Kefalonia','Samos','Thassos','Skopelos','Hydra','Spetses','Mystras','Olympia','Lefkada'
+    'Zakynthos','Kefalonia','Samos','Thassos','Skopelos','Hydra','Spetses','Mystras','Olympia','Lefkada',
   ],
 };
 
@@ -167,24 +167,15 @@ const CURRENCY_OPTIONS = [
 ];
 
 function currencySymbolFromCode(code) {
-  if (code === 'EUR') return '€';
-  if (code === 'USD') return '$';
-  if (code === 'GBP') return '£';
-  if (code === 'JPY') return '¥';
-  if (code === 'CHF') return 'Fr';
-  if (code === 'THB') return '฿';
-  if (code === 'KRW') return '₩';
-  if (code === 'CNY') return '¥';
-  if (code === 'VND') return '₫';
-  if (code === 'MAD') return 'DH';
-  if (code === 'TRY') return '₺';
-  if (code === 'BRL') return 'R$';
-  if (code === 'IDR') return 'Rp';
-  if (code === 'MXN') return '$';
-  if (code === 'ARS') return '$';
-  if (code === 'SGD') return '$';
-  return '$';
-}function distributeDates(startDateStr, endDateStr, stopsCount) {
+  const map = {
+    EUR: '€', USD: '$', GBP: '£', JPY: '¥', CHF: 'Fr',
+    THB: '฿', KRW: '₩', CNY: '¥', VND: '₫', MAD: 'DH',
+    TRY: '₺', BRL: 'R$', IDR: 'Rp', MXN: '$', ARS: '$', SGD: '$',
+  };
+  return map[code] || '$';
+}
+
+function distributeDates(startDateStr, endDateStr, stopsCount) {
   if (!startDateStr || !endDateStr || !stopsCount || stopsCount <= 0) return [];
 
   const start = new Date(startDateStr);
@@ -217,19 +208,17 @@ function currencySymbolFromCode(code) {
 
   return allocations;
 }
+
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [currencyTouched, setCurrencyTouched] = useState(false);
-
   const [mode, setMode] = useState('multi');
-
   const [stops, setStops] = useState([
     { city: '', other: '' },
     { city: '', other: '' },
   ]);
-
   const [formData, setFormData] = useState({
     name: '',
     country: 'España',
@@ -266,9 +255,9 @@ export default function TripsList() {
       return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
     });
   }, [trips, allCities]);
+
   function applyCountry(country) {
     const preset = COUNTRY_PRESETS.find((p) => p.country === country) || null;
-
     setFormData((prev) => {
       const next = { ...prev, country };
       if (preset && !currencyTouched) {
@@ -279,7 +268,6 @@ export default function TripsList() {
       }
       return next;
     });
-
     setStops((prev) => prev.map((s) => ({ ...s, city: '', other: '' })));
   }
 
@@ -329,10 +317,11 @@ export default function TripsList() {
   }
 
   function normalizeStopsForTrip() {
-    const clean = stops.map(getStopLabel).map((v) => v.trim()).filter(Boolean);
+    const clean = stops.map(getStopLabel).filter(Boolean);
     if (mode === 'single') return clean.slice(0, 1);
     return clean;
   }
+
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
@@ -377,8 +366,8 @@ export default function TripsList() {
         );
         await Promise.all(packingPromises);
         toast({
-          title: '¡Viaje creado! 🎉',
-          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
+          title: 'Viaje creado! 🎉',
+          description: `${selectedTemplate.packingItems.length} articulos añadidos a tu maleta`,
         });
       }
 
@@ -387,13 +376,11 @@ export default function TripsList() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
-
       setDialogOpen(false);
       setSelectedTemplate(null);
       setCurrencyTouched(false);
       setMode('multi');
       setStops([{ city: '', other: '' }, { city: '', other: '' }]);
-
       setFormData({
         name: '',
         country: 'España',
@@ -423,7 +410,8 @@ export default function TripsList() {
       !createMutation.isPending
     );
   })();
-if (isLoading) {
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -439,11 +427,10 @@ if (isLoading) {
       <div className="bg-orange-700 px-6 py-10">
         <div className="max-w-6xl mx-auto flex items-end justify-between gap-4">
           <div>
-            <h1 className="text-white text-4xl font-black tracking-tight">Kōdo</h1>
+            <h1 className="text-white text-4xl font-black tracking-tight">Kodo</h1>
             <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
-            <p className="text-white/60 text-sm mt-1">Tu próximo viaje empieza aquí</p>
+            <p className="text-white/60 text-sm mt-1">Tu proximo viaje empieza aqui</p>
           </div>
-
           <Button
             onClick={() => setDialogOpen(true)}
             className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm flex-shrink-0"
@@ -458,7 +445,7 @@ if (isLoading) {
         {trips.length === 0 ? (
           <div className="text-center py-20 bg-white border border-border rounded-2xl">
             <div className="text-5xl mb-4">✈️</div>
-            <h2 className="text-xl font-semibold text-foreground mb-1">Aún no tienes viajes</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-1">Aun no tienes viajes</h2>
             <p className="text-muted-foreground text-sm mb-6">Crea tu primer viaje y empieza a planificar</p>
             <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
               <Plus className="w-4 h-4 mr-1.5" />
@@ -472,7 +459,8 @@ if (isLoading) {
           </>
         )}
       </div>
-<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground text-2xl">✈️ Nuevo Viaje</DialogTitle>
@@ -491,7 +479,7 @@ if (isLoading) {
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">País *</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Pais *</label>
                 <Select value={formData.country} onValueChange={applyCountry}>
                   <SelectTrigger className="bg-input border-border text-foreground">
                     <SelectValue />
@@ -528,9 +516,12 @@ if (isLoading) {
                 </div>
               </div>
             </div>
+
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-foreground">Destino{mode === 'multi' ? 's' : ''} *</label>
+                <label className="text-sm font-medium text-foreground">
+                  Destino{mode === 'multi' ? 's' : ''} *
+                </label>
                 {mode === 'multi' && (
                   <Button type="button" variant="outline" onClick={addStop}>
                     + Añadir ciudad
@@ -585,7 +576,7 @@ if (isLoading) {
               </div>
             </div>
 
-<div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
                 <Select value={formData.currency} onValueChange={setCurrency}>
@@ -621,7 +612,6 @@ if (isLoading) {
                   className="bg-input border-border text-foreground"
                 />
               </div>
-
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha fin</label>
                 <Input
@@ -634,7 +624,7 @@ if (isLoading) {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Descripcion</label>
               <Textarea
                 placeholder="Describe tu viaje..."
                 value={formData.description}
@@ -664,7 +654,7 @@ if (isLoading) {
               />
             </div>
 
-<div className="pt-4 border-t border-border">
+            <div className="pt-4 border-t border-border">
               <TripTemplates onSelect={setSelectedTemplate} />
               {selectedTemplate && (
                 <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
@@ -680,7 +670,6 @@ if (isLoading) {
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
-
               <Button
                 type="button"
                 onClick={() => createMutation.mutate(formData)}
