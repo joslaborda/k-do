@@ -1,12 +1,23 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
 import { Search, BookOpen, Loader2, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getCountryMeta } from '@/lib/countryConfig';
-function getCountryConfig(country) { const m = getCountryMeta(country); return { flag: m.flag }; }
+import { useTripContext } from '@/hooks/useTripContext';
+
+// Fallback food data when LLM is slow/fails
+const FALLBACK_CATEGORIES = [
+  {
+    category: 'Platos típicos',
+    icon: '🍽️',
+    items: [
+      { name: 'Plato local 1', description: 'Cargando información gastronómica...', image: '' },
+      { name: 'Plato local 2', description: 'Cargando información gastronómica...', image: '' },
+    ],
+  },
+];
 
 export default function Restaurants() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -17,31 +28,45 @@ export default function Restaurants() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId,
-  });
+  // Use active city context
+  const { trip, activeCity } = useTripContext(tripId);
 
-  const country = trip?.country || '';
-  const countryConfig = getCountryConfig(country);
-  const flag = countryConfig.flag;
+  const country = activeCity?.country_code
+    ? getCountryMeta(activeCity.country_code).languageLabel
+      ? (activeCity.country || trip?.country || '')
+      : (trip?.country || '')
+    : (activeCity?.country || trip?.country || '');
+  const flag = getCountryMeta(activeCity?.country_code || activeCity?.country || trip?.country || '').flag;
 
   useEffect(() => {
     if (!country) return;
-    const cacheKey = `food_${country}`;
+    // Use stable key per active country
+    const activeKey = activeCity?.country_code || country;
+    const cacheKey = `food_${activeKey}`;
+    setFoodCategories([]); // reset on country change
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        setFoodCategories(parsed);
-        // Expand first category by default
-        if (parsed.length > 0) setExpandedCategories({ [parsed[0].category]: true });
-        return;
+        if (parsed.length > 0) {
+          setFoodCategories(parsed);
+          setExpandedCategories({ [parsed[0].category]: true });
+          return;
+        }
       } catch {}
     }
 
     setLoadingFood(true);
+
+    // Fallback timeout
+    const fallbackTimer = setTimeout(() => {
+      if (loadingFood) {
+        setFoodCategories(FALLBACK_CATEGORIES);
+        setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
+        setLoadingFood(false);
+      }
+    }, 10000);
+
     const prompt = `
 Eres un experto en gastronomía de ${country}. 
 Genera una guía gastronómica completa para un viajero hispanohablante que visita ${country}.
@@ -102,12 +127,24 @@ Responde SOLO con JSON válido:
         },
       },
     }).then((result) => {
-      const cats = result.categories || [];
-      setFoodCategories(cats);
-      sessionStorage.setItem(cacheKey, JSON.stringify(cats));
-      if (cats.length > 0) setExpandedCategories({ [cats[0].category]: true });
-    }).catch(() => {}).finally(() => setLoadingFood(false));
-  }, [country]);
+      const cats = result?.categories || [];
+      clearTimeout(fallbackTimer);
+      if (cats.length > 0) {
+        setFoodCategories(cats);
+        sessionStorage.setItem(cacheKey, JSON.stringify(cats));
+        setExpandedCategories({ [cats[0].category]: true });
+      } else {
+        setFoodCategories(FALLBACK_CATEGORIES);
+        setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
+      }
+    }).catch(() => {
+      clearTimeout(fallbackTimer);
+      setFoodCategories(FALLBACK_CATEGORIES);
+      setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
+    }).finally(() => setLoadingFood(false));
+
+    return () => clearTimeout(fallbackTimer);
+  }, [country, activeCity?.country_code]);
 
   const toggleCategory = (name) => {
     setExpandedCategories((prev) => ({ ...prev, [name]: !prev[name] }));

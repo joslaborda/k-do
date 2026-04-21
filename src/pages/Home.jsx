@@ -20,7 +20,7 @@ import { StatsSkeleton, CardSkeleton } from '@/components/LoadingSkeleton';
 import { getTripCoverImage } from '@/lib/tripImage';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import MembersPanel from '@/components/trip/MembersPanel';
+import TripMembersPanel from '@/components/trip/TripMembersPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 
 export default function Home() {
@@ -379,7 +379,10 @@ export default function Home() {
 
         {/* Members Panel */}
         <div className="glass rounded-2xl border border-border p-6">
-          <MembersPanel trip={trip} currentUserEmail={currentUserEmail} isAdmin={isAdmin} />
+          <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5" /> Viajeros
+          </h2>
+          <TripMembersPanel trip={trip} currentUserEmail={currentUserEmail} />
         </div>
       </div>
 

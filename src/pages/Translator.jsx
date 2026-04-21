@@ -7,10 +7,23 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { getCountryMeta } from '@/lib/countryConfig';
-import { useQuery } from '@tanstack/react-query';
-function getCountryConfig(country) { const m = getCountryMeta(country); return { lang: m.languageLabel, langNative: m.languageLabel, locale: m.languageCode, flag: m.flag }; }
+import { useTripContext } from '@/hooks/useTripContext';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+
+// Fallback phrases if LLM fails
+const FALLBACK_PHRASES = [
+  { spanish: 'Hola', translation: '...', romanization: '' },
+  { spanish: 'Gracias', translation: '...', romanization: '' },
+  { spanish: 'Por favor', translation: '...', romanization: '' },
+  { spanish: '¿Cuánto cuesta?', translation: '...', romanization: '' },
+  { spanish: 'No entiendo', translation: '...', romanization: '' },
+  { spanish: 'Ayuda', translation: '...', romanization: '' },
+  { spanish: '¿Dónde está el baño?', translation: '...', romanization: '' },
+  { spanish: 'Perdón', translation: '...', romanization: '' },
+  { spanish: 'La cuenta, por favor', translation: '...', romanization: '' },
+  { spanish: 'Llama a la policía', translation: '...', romanization: '' },
+];
 
 export default function Translator() {
   const navigate = useNavigate();
@@ -27,14 +40,16 @@ export default function Translator() {
   const [phraseCategories, setPhraseCategories] = useState([]);
   const [loadingPhrases, setLoadingPhrases] = useState(false);
 
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId,
-  });
+  // Use trip context for active city/country
+  const { trip, activeCity } = useTripContext(tripId);
 
-  const country = trip?.country || '';
-  const countryConfig = getCountryConfig(country);
+  const country = activeCity?.country_code
+    ? getCountryMeta(activeCity.country_code).languageLabel
+      ? (activeCity.country || trip?.country || '')
+      : (trip?.country || '')
+    : (activeCity?.country || trip?.country || '');
+  const meta = getCountryMeta(activeCity?.country_code || activeCity?.country || trip?.country || '');
+  const countryConfig = { lang: meta.languageLabel, langNative: meta.languageLabel, locale: meta.languageCode, flag: meta.flag };
   const targetLang = countryConfig.lang;
   const targetLangNative = countryConfig.langNative;
   const targetLocale = countryConfig.locale;
@@ -42,15 +57,31 @@ export default function Translator() {
   // Si el idioma destino es español, no tiene mucho sentido el traductor
   const isSameLang = targetLang === 'Spanish';
 
-  // Cargar frases útiles por IA según el país
+  // Cargar frases útiles por IA según el país activo
   useEffect(() => {
     if (!country || isSameLang) return;
-    const cacheKey = `phrases_${country}`;
+    // Use a stable cache key from the country name
+    const activeCountryKey = activeCity?.country_code || country;
+    const cacheKey = `phrases_${activeCountryKey}`;
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
-      try { setPhraseCategories(JSON.parse(cached)); return; } catch {}
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.length > 0) { setPhraseCategories(parsed); return; }
+      } catch {}
     }
+    setPhraseCategories([]); // reset on country change
     setLoadingPhrases(true);
+    let done = false;
+
+    // Fallback timeout — show basic phrases immediately if LLM takes too long
+    const fallbackTimer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        setPhraseCategories([{ name: 'Básicas', icon: '👋', phrases: FALLBACK_PHRASES }]);
+        setLoadingPhrases(false);
+      }
+    }, 8000);
     const prompt = `
 Genera un listado de frases útiles para un viajero hispanohablante que visita ${country}.
 El idioma local es ${targetLang} (${targetLangNative}).
@@ -111,11 +142,29 @@ Responde SOLO con JSON válido:
         },
       },
     }).then((result) => {
-      const cats = result.categories || [];
-      setPhraseCategories(cats);
-      sessionStorage.setItem(cacheKey, JSON.stringify(cats));
-    }).catch(() => {}).finally(() => setLoadingPhrases(false));
-  }, [country, isSameLang]);
+      const cats = result?.categories || [];
+      if (!done) {
+        done = true;
+        clearTimeout(fallbackTimer);
+        if (cats.length > 0) {
+          setPhraseCategories(cats);
+          sessionStorage.setItem(cacheKey, JSON.stringify(cats));
+        } else {
+          setPhraseCategories([{ name: 'Básicas', icon: '👋', phrases: FALLBACK_PHRASES }]);
+        }
+        setLoadingPhrases(false);
+      }
+    }).catch(() => {
+      if (!done) {
+        done = true;
+        clearTimeout(fallbackTimer);
+        setPhraseCategories([{ name: 'Básicas', icon: '👋', phrases: FALLBACK_PHRASES }]);
+        setLoadingPhrases(false);
+      }
+    });
+
+    return () => clearTimeout(fallbackTimer);
+  }, [country, isSameLang, activeCity?.country_code]);
 
   const handleTranslate = async () => {
     if (!inputText.trim()) return;

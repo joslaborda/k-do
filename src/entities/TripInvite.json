@@ -1,0 +1,21 @@
+{
+  "name": "TripInvite",
+  "type": "object",
+  "properties": {
+    "trip_id": { "type": "string", "description": "ID del viaje" },
+    "email": { "type": "string", "description": "Email invitado" },
+    "role": {
+      "type": "string",
+      "enum": ["admin", "editor", "viewer"],
+      "default": "viewer",
+      "description": "Rol asignado al aceptar"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "accepted", "declined"],
+      "default": "pending"
+    },
+    "invited_by": { "type": "string", "description": "Email del que invitó" }
+  },
+  "required": ["trip_id", "email", "role"]
+}

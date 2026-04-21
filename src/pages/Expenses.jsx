@@ -13,6 +13,8 @@ import ExpenseForm from '@/components/expenses/ExpenseForm';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import BalancesPanel from '@/components/expenses/BalancesPanel';
 import { useUndo } from '@/components/hooks/useUndo';
+import { useTripContext } from '@/hooks/useTripContext';
+import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
 
 export default function Expenses() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -38,7 +40,13 @@ export default function Expenses() {
   });
 
   const members = trip?.members || [];
-  const defaultCurrency = trip?.currency || 'EUR';
+
+  // Context: active city + available currencies
+  const { cities, activeCity } = useTripContext(tripId);
+  const baseCurrency = trip?.base_currency || trip?.currency || 'EUR';
+  const activeMeta = getCountryMeta(activeCity?.country_code || activeCity?.country || '');
+  const defaultCurrency = activeMeta?.currency || baseCurrency;
+  const availableCurrencies = computeAvailableCurrencies(cities, baseCurrency);
 
   // Obtener datos de usuarios para crear mapa de nombres
   const { data: usersData = [] } = useQuery({
@@ -220,6 +228,8 @@ export default function Expenses() {
             members={members}
             initialData={editingExpense}
             defaultCurrency={defaultCurrency}
+            baseCurrency={baseCurrency}
+            availableCurrencies={availableCurrencies}
             onSave={handleSave}
             onCancel={() => {
               setDialogOpen(false);
