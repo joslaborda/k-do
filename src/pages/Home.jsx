@@ -138,18 +138,8 @@ export default function Home() {
   const tripDuration = differenceInDays(tripEnd, tripStart) + 1;
 
   const totalExpenses = useMemo(() => {
-    let totalJPY = 0;
-    expenses.forEach((exp) => {
-      if (exp.currency === 'JPY') {
-        totalJPY += exp.amount;
-      } else {
-        totalJPY += exp.amount * 160;
-      }
-    });
-    return {
-      jpy: totalJPY,
-      eur: Math.round(totalJPY / 160)
-    };
+   const total = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+    return { total };
   }, [expenses]);
 
   const packedPercentage = useMemo(() => {
@@ -303,12 +293,10 @@ export default function Home() {
                     <div className="bg-orange-700 text-orange-700 p-2 rounded-lg">
                       <Receipt className="text-zinc-50 lucide lucide-receipt w-4 h-4" />
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Gastado</p>
-                      <p className="text-xl font-bold text-foreground">€{totalExpenses.eur.toLocaleString()}</p>
-                      <p className="text-[10px] text-muted-foreground">¥{totalExpenses.jpy.toLocaleString()}</p>
-                    </div>
-                  </div>
+              <div>
+  <p className="text-xs text-muted-foreground">Gastado</p>
+  <p className="text-xl font-bold text-foreground">{totalExpenses.total.toLocaleString()}</p>
+</div>
                 </motion.div>
               </Link>
 
