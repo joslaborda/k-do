@@ -333,7 +333,7 @@ export default function TripsList() {
     if (mode === 'single') return clean.slice(0, 1);
     return clean;
   }
-``const createMutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: async (data) => {
       const email = user?.email;
       const userId = user?.id;
@@ -696,4 +696,3 @@ if (isLoading) {
     </div>
   );
 }
-
