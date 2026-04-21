@@ -400,26 +400,6 @@ export default function TripsList() {
               </div>
             </div>
 
-            {/* Moneda */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
-                <Select value={formData.currency} onValueChange={setCurrency}>
-                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {CURRENCY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma destino</label>
-                <div className="bg-white border border-border rounded-md px-3 py-2 text-sm">
-                  <div className="font-semibold">{formData.language}</div>
-                  <div className="text-xs text-muted-foreground">{formData.language_code}</div>
-                </div>
-              </div>
-            </div>
-
             {/* Fechas */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -521,6 +501,26 @@ export default function TripsList() {
                 )}
               </div>
             )}
+
+            {/* Moneda */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda del viaje</label>
+                <Select value={formData.currency} onValueChange={setCurrency}>
+                  <SelectTrigger className="bg-input border-border text-foreground"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CURRENCY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma destino</label>
+                <div className="bg-white border border-border rounded-md px-3 py-2 text-sm">
+                  <div className="font-semibold">{formData.language}</div>
+                  <div className="text-xs text-muted-foreground">{formData.language_code}</div>
+                </div>
+              </div>
+            </div>
 
             {/* Descripción */}
             <div>
