@@ -25,11 +25,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TripMembersPanel from '@/components/trip/TripMembersPanel';
 import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
+import PublishSection from '@/components/trip/PublishSection';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({});
@@ -135,6 +137,17 @@ export default function Home() {
     queryKey: ['diaryEntries', tripId],
     queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }),
     enabled: !!tripId
+  });
+
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const results = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return results[0] || null;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 60000
   });
 
   const tripStart = trip?.start_date ? new Date(trip.start_date) : new Date();
@@ -426,6 +439,20 @@ export default function Home() {
           </h2>
           <TripMembersPanel trip={trip} currentUserEmail={currentUserEmail} />
         </div>
+
+        {/* Publish Section (only admins) */}
+        {isAdmin && (
+          <PublishSection
+            trip={trip}
+            cities={cities}
+            user={currentUser}
+            profile={myProfile}
+            isAdmin={isAdmin}
+            onPublish={() => {
+              queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
+            }}
+          />
+        )}
       </div>
 
       {/* Settings Dialog */}

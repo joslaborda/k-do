@@ -1,0 +1,95 @@
+{
+  "name": "Trip",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del viaje"
+    },
+    "destination": {
+      "type": "string",
+      "description": "Destino principal"
+    },
+    "country": {
+      "type": "string",
+      "description": "País"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de fin"
+    },
+    "cover_image": {
+      "type": "string",
+      "description": "Imagen de portada del viaje"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripción del viaje"
+    },
+    "currency": {
+      "type": "string",
+      "default": "EUR",
+      "description": "Moneda del viaje"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails de los miembros del viaje"
+    },
+    "roles": {
+      "type": "object",
+      "description": "Roles de los miembros: { email: 'admin' | 'editor' | 'viewer' }"
+    },
+    "ai_preferences": {
+      "type": "object",
+      "description": "Preferencias de la IA: { pace, places, restaurants, experiences, avoid }",
+      "properties": {
+        "pace": {
+          "type": "string"
+        },
+        "places": {
+          "type": "string"
+        },
+        "restaurants": {
+          "type": "string"
+        },
+        "experiences": {
+          "type": "string"
+        },
+        "avoid": {
+          "type": "string"
+        }
+      }
+    },
+    "visited_places": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de lugares ya incluidos en el itinerario (para evitar repeticiones)"
+    },
+    "template_visibility": {
+      "type": "string",
+      "enum": ["private", "unlisted", "public"],
+      "default": "private",
+      "description": "Visibilidad del itinerario publicado"
+    },
+    "template_id": {
+      "type": "string",
+      "description": "ID del ItineraryTemplate asociado si está publicado"
+    }
+  },
+  "required": [
+    "name",
+    "destination",
+    "start_date"
+  ]
+}

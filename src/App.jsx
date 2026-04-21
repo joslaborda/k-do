@@ -9,6 +9,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import Explore from './pages/Explore';
+import TemplateDetail from './pages/TemplateDetail';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -72,6 +74,9 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      {/* Explicit routes for Explore & TemplateDetail (not in pagesConfig) */}
+      <Route path="/Explore" element={<Explore />} />
+      <Route path="/TemplateDetail" element={<TemplateDetail />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
