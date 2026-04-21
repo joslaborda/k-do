@@ -26,6 +26,7 @@ import TripMembersPanel from '@/components/trip/TripMembersPanel';
 import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import PublishSection from '@/components/trip/PublishSection';
+import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -377,6 +378,16 @@ export default function Home() {
 
       {/* Navigation Section - Outside of background image */}
       <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl space-y-10">
+
+        {/* Countdown Banner */}
+        <TripCountdownBanner
+          daysUntilTrip={daysUntilTrip}
+          tripId={tripId}
+          cities={cities}
+          packingItems={packingItems}
+          trip={trip}
+          expenses={expenses}
+        />
 
         {/* Hoy / Mañana */}
         <div>
