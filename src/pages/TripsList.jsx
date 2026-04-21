@@ -123,7 +123,7 @@ export default function TripsList() {
   const [stops, setStops] = useState(['', '']);
   const [formData, setFormData] = useState({ ...DEFAULT_FORM });
   // Date assignment mode
-  const [dateMode, setDateMode] = useState('auto'); // 'auto' | 'nights' | 'manual'
+  const [dateMode, setDateMode] = useState('manual'); // 'nights' | 'manual'
   const [nightsPerStop, setNightsPerStop] = useState(['', '']);
   const [manualDates, setManualDates] = useState([{ start_date: '', end_date: '' }, { start_date: '', end_date: '' }]);
 
@@ -279,7 +279,7 @@ export default function TripsList() {
       setMode('multi');
       setStops(['', '']);
       setFormData({ ...DEFAULT_FORM });
-      setDateMode('auto');
+      setDateMode('manual');
       setNightsPerStop(['', '']);
       setManualDates([{ start_date: '', end_date: '' }, { start_date: '', end_date: '' }]);
     },
@@ -424,7 +424,7 @@ export default function TripsList() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-semibold text-foreground">Fechas por parada</label>
                   <div className="flex gap-1">
-                    {[{ v: 'auto', l: 'Auto' }, { v: 'nights', l: 'Noches' }, { v: 'manual', l: 'Manual' }].map(({ v, l }) => (
+                    {[{ v: 'manual', l: 'Manual' }, { v: 'nights', l: 'Noches' }].map(({ v, l }) => (
                       <button
                         key={v}
                         type="button"
@@ -434,10 +434,6 @@ export default function TripsList() {
                     ))}
                   </div>
                 </div>
-
-                {dateMode === 'auto' && (
-                  <p className="text-xs text-muted-foreground">Las fechas del viaje se repartirán automáticamente entre las paradas.</p>
-                )}
 
                 {dateMode === 'nights' && (
                   <div className="space-y-2">
