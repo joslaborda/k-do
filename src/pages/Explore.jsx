@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,13 @@ export default function Explore() {
   const [filterCountry, setFilterCountry] = useState('all');
   const [filterDuration, setFilterDuration] = useState('all');
   const [currentPage, setCurrentPage] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
   const itemsPerPage = 12;
+
+  // Una sola llamada a auth.me() para toda la página
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
 
   // Obtener SOLO templates públicos
   const { data: allTemplates = [], isLoading } = useQuery({
@@ -43,21 +49,19 @@ export default function Explore() {
   // Filtrar y buscar
   const filteredTemplates = useMemo(() => {
     return allTemplates.filter((template) => {
-      // Search: title, summary, tags
       const searchLower = searchQuery.toLowerCase();
       const matchesSearch =
         !searchQuery ||
         (template.title && template.title.toLowerCase().includes(searchLower)) ||
         (template.summary && template.summary.toLowerCase().includes(searchLower)) ||
         (template.tags &&
-          template.tags.some((tag) => tag.toLowerCase().includes(searchLower)));
+          template.tags.some((tag) => tag.toLowerCase().includes(searchLower))) ||
+        (template.creator_username && template.creator_username.toLowerCase().includes(searchLower));
 
-      // Filter: country
       const matchesCountry =
         filterCountry === 'all' ||
         (template.countries && template.countries.includes(filterCountry));
 
-      // Filter: duration
       let matchesDuration = true;
       if (filterDuration !== 'all') {
         const duration = template.duration_days || 0;
@@ -99,7 +103,7 @@ export default function Explore() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  placeholder="Título, descripción, tags..."
+                  placeholder="Título, descripción, tags, @usuario..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
@@ -111,7 +115,7 @@ export default function Explore() {
             </div>
 
             {/* Filters */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">País</label>
                 <Select value={filterCountry} onValueChange={(v) => { setFilterCountry(v); setCurrentPage(0); }}>
@@ -144,6 +148,20 @@ export default function Explore() {
                     <SelectItem value="4-7">4-7 días</SelectItem>
                     <SelectItem value="8-14">8-14 días</SelectItem>
                     <SelectItem value="15+">15+ días</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Tipo</label>
+                <Select defaultValue="all" onValueChange={() => setCurrentPage(0)}>
+                  <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="free">Gratuitos</SelectItem>
+                    <SelectItem value="premium">Premium ✦</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -180,9 +198,14 @@ export default function Explore() {
           </div>
         ) : (
           <>
+            <p className="text-sm text-muted-foreground mb-4">
+              {filteredTemplates.length} itinerario{filteredTemplates.length !== 1 ? 's' : ''} encontrado{filteredTemplates.length !== 1 ? 's' : ''}
+            </p>
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {paginatedTemplates.map((template) => (
-                <TemplateCard key={template.id} template={template} />
+                // currentUser se pasa una sola vez desde aquí — no hay llamadas individuales por card
+                <TemplateCard key={template.id} template={template} currentUser={currentUser} />
               ))}
             </div>
 
