@@ -46,6 +46,27 @@
     },
     "source_trip_id": {
       "type": "string"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false
+    },
+    "price": {
+      "type": "number",
+      "description": "Precio en EUR"
+    },
+    "saves_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Veces guardado"
+    },
+    "creator_username": {
+      "type": "string",
+      "description": "Username del creador al publicar"
+    },
+    "creator_avatar": {
+      "type": "string",
+      "description": "Avatar del creador al publicar"
     }
   },
   "required": [
