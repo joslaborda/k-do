@@ -59,7 +59,8 @@
       "enum": [
         "personal",
         "trip_members",
-        "selected_users"
+        "selected_users",
+        "public"
       ],
       "default": "trip_members",
       "description": "Visibilidad del spot"
@@ -79,6 +80,26 @@
     "visit_order": {
       "type": "number",
       "description": "Orden de visita (opcional)"
+    },
+    "created_by_user_id": {
+      "type": "string",
+      "description": "ID del usuario creador, para el perfil social"
+    },
+    "creator_username": {
+      "type": "string",
+      "description": "Username en el momento de crear"
+    },
+    "creator_avatar": {
+      "type": "string",
+      "description": "Avatar en el momento de crear"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds del spot, para b\u00fasqueda"
+    },
+    "city_name": {
+      "type": "string",
+      "description": "Ciudad del spot, para b\u00fasqueda"
     }
   },
   "required": [
