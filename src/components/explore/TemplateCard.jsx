@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,13 +7,8 @@ import { Heart, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { createPageUrl } from '@/utils';
 
-export default function TemplateCard({ template }) {
-  const [currentUser, setCurrentUser] = useState(null);
+export default function TemplateCard({ template, currentUser }) {
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
-  }, []);
 
   // Query para colección del usuario
   const { data: myCollection } = useQuery({
@@ -38,7 +33,6 @@ export default function TemplateCard({ template }) {
   const saveMutation = useMutation({
     mutationFn: async (save) => {
       if (!myCollection) {
-        // Crear colección si no existe
         const newCollection = await base44.entities.Collection.create({
           owner_user_id: currentUser.id,
           name: 'Guardados',
@@ -46,7 +40,6 @@ export default function TemplateCard({ template }) {
         });
         return newCollection;
       } else {
-        // Actualizar colección
         const updated = { ...myCollection };
         if (save) {
           if (!updated.template_ids) updated.template_ids = [];
@@ -96,6 +89,13 @@ export default function TemplateCard({ template }) {
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
+          {/* Badge premium */}
+          {template.is_premium && (
+            <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+              ✦ Premium · {template.price ? `${template.price}€` : ''}
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -109,6 +109,13 @@ export default function TemplateCard({ template }) {
           {template.summary && (
             <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
               {template.summary}
+            </p>
+          )}
+
+          {/* Creator */}
+          {template.creator_username && (
+            <p className="text-xs text-muted-foreground mb-2">
+              por <span className="font-medium text-orange-700">@{template.creator_username}</span>
             </p>
           )}
 
@@ -129,6 +136,12 @@ export default function TemplateCard({ template }) {
             {template.cities && template.cities.length > 0 && (
               <div className="text-xs text-muted-foreground">
                 {template.cities.length} ciudad{template.cities.length > 1 ? 'es' : ''}
+              </div>
+            )}
+            {template.saves_count > 0 && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Heart className="w-3 h-3" />
+                {template.saves_count} guardados
               </div>
             )}
           </div>
