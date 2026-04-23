@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -41,14 +42,11 @@ function SectionHeader({ icon: Icon, label, count }) {
 // ── Main component ──────────────────────────────────────────────────────────
 export default function CommunitySearch({ open, onOpenChange }) {
   const [query, setQuery] = useState('');
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (open) {
-      base44.auth.me().then(setCurrentUser).catch(() => {});
-      setQuery('');
-    }
+    if (open) setQuery('');
   }, [open]);
 
   // ── Datos base (se cargan una sola vez al abrir) ──────────────────────────
