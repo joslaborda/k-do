@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,20 +28,12 @@ export default function Documents() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [visFilter, setVisFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('all');
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const [userId, setUserId] = useState('');
 
   const queryClient = useQueryClient();
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const u = await base44.auth.me();
-      setCurrentUserEmail(u.email);
-      setUserId(u.id);
-      return u;
-    }
-  });
+  const { user: currentUser } = useAuth();
+  const currentUserEmail = currentUser?.email ?? '';
+  const userId = currentUser?.id ?? '';
 
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
