@@ -250,12 +250,9 @@ function ProfileSection({ user, profile, onUpdated }) {
 
 // ── Main Settings ─────────────────────────────────────────────────────────────
 export default function Settings() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile', user?.id],
