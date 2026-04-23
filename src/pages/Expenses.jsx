@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Receipt } from 'lucide-react';
@@ -22,14 +23,13 @@ export default function Expenses() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
 
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
 
   // Obtener usuario actual
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
   }, []);
 
   // Obtener trip
