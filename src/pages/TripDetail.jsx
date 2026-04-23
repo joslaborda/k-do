@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,11 @@ import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 
 export default function TripDetail() {
   const [tripId, setTripId] = useState(null);
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     setTripId(urlParams.get('id'));
-    base44.auth.me().then(setUser);
   }, []);
 
   const { cities: tripCities, activeCity, overrideCityId, setOverrideCityId, clearOverride } = useTripContext(tripId);
