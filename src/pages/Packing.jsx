@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -24,14 +25,13 @@ export default function Packing() {
     quantity: 1,
   });
 
+  const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: items = [] } = useQuery({
     queryKey: ['packingItems'],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      return base44.entities.PackingItem.filter({ created_by: user.email });
-    },
+    queryFn: () => base44.entities.PackingItem.filter({ created_by: currentUser?.email }),
+    enabled: !!currentUser?.email,
   });
 
   const createMutation = useMutation({
