@@ -175,16 +175,26 @@ export function TranslatorPanel({ tripId }) {
 
   // Derive country/language from active context
   const countryRaw = activeCity?.country || trip?.country || '';
-  const meta = getCountryMeta(activeCity?.country_code || countryRaw);
+  const meta = getCountryMeta(countryRaw);
   const targetLang = meta.languageLabel || 'English';
   const targetLangCode = meta.languageCode || 'en';
   const targetFlag = meta.flag || '🌍';
   const isSameLang = targetLang === 'Spanish' || targetLang === 'Español';
 
-  // Stable cache key
-  const countryKey = activeCity?.country_code || countryRaw || 'unknown';
+  // Stable cache key — always countryRaw, never country_code (doesn't exist on City)
+  const countryKey = countryRaw || 'unknown';
 
   // ─── useQuery with localStorage as initialData ───────────────────────────
+  // Auto-purge corrupt cache (categories empty) before query runs
+  const cachedInitialData = (() => {
+    const cached = readCache(countryKey);
+    if (cached && (!cached.categories || cached.categories.length === 0)) {
+      try { localStorage.removeItem(LS_PREFIX + countryKey); } catch {}
+      return undefined;
+    }
+    return cached ?? undefined;
+  })();
+
   const {
     data: phrasePack,
     isFetching,
@@ -196,7 +206,7 @@ export function TranslatorPanel({ tripId }) {
       writeCache(countryKey, pack);
       return pack;
     },
-    initialData: () => readCache(countryKey) ?? undefined,
+    initialData: cachedInitialData,
     staleTime: 30 * 24 * 60 * 60 * 1000, // 30 days
     refetchOnMount: false,
     refetchOnWindowFocus: false,
