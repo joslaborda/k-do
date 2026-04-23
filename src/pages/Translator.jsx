@@ -249,13 +249,19 @@ export function TranslatorPanel({ tripId }) {
   const handleTranslate = async () => {
     if (!inputText.trim()) return;
     setIsTranslating(true);
-    const isToTarget = direction === 'es-target';
-    const prompt = isToTarget
-      ? `Traduce del español al ${targetLang}. Proporciona la traducción y si el idioma no usa alfabeto latino, añade la romanización. Texto: "${inputText}"`
-      : `Traduce del ${targetLang} al español. Texto: "${inputText}"`;
-    const result = await base44.integrations.Core.InvokeLLM({ prompt });
-    setTranslatedText(result);
-    setIsTranslating(false);
+    setTranslatedText('');
+    try {
+      const isToTarget = direction === 'es-target';
+      const prompt = isToTarget
+        ? `Traduce del español al ${targetLang}. Proporciona la traducción y si el idioma no usa alfabeto latino, añade la romanización. Texto: "${inputText}"`
+        : `Traduce del ${targetLang} al español. Texto: "${inputText}"`;
+      const result = await base44.integrations.Core.InvokeLLM({ prompt });
+      setTranslatedText(typeof result === 'string' ? result : JSON.stringify(result));
+    } catch (err) {
+      setTranslatedText('Error al traducir. Inténtalo de nuevo.');
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const copyToClipboard = (text, id) => {
