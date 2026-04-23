@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Star } from 'lucide-react';
@@ -103,7 +104,7 @@ function StatBlock({ value, label }) {
 
 // ── Main component ──────────────────────────────────────────────────────────
 export default function Profile() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const fileRef = useRef();
@@ -115,7 +116,6 @@ export default function Profile() {
   const viewUserId = urlParams.get('user_id'); // si viene, es perfil ajeno
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
   }, []);
 
   const isOwnProfile = !viewUserId || (currentUser && viewUserId === currentUser.id);
