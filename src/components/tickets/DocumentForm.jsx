@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plane, Train, Hotel, CalendarDays, FileText, Package, MapPin, Sparkles, Upload, Eye, EyeOff, Users, Loader2, Check } from 'lucide-react';
+import { Plane, Train, Hotel, CalendarDays, FileText, Package, MapPin, Upload, Eye, EyeOff, Users, Loader2, Check } from 'lucide-react';
 
 export const CATEGORY_CONFIG = {
   flight:   { label: 'Vuelo',            icon: Plane,        color: 'from-blue-500 to-cyan-500',    bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-200' },
@@ -32,72 +32,18 @@ const EMPTY_FORM = {
 export default function DocumentForm({ cities = [], itineraryDays = [], members = [], initialData = null, onSave, onCancel, saving = false }) {
   const [form, setForm] = useState(initialData || EMPTY_FORM);
   const [uploadingFile, setUploadingFile] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [aiSuggested, setAiSuggested] = useState(false);
   const fileInputRef = useRef(null);
 
   const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
-  // ── File upload + AI analysis ────────────────────────────────────────────
+  // ── File upload ──────────────────────────────────────────────────────────
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploadingFile(true);
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     set('file_url', file_url);
     setUploadingFile(false);
-
-    // Only analyse if it's a PDF or image
-    const isPDForImage = file.type.startsWith('image/') || file.type === 'application/pdf';
-    if (!isPDForImage) return;
-
-    setAnalyzing(true);
-    try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analiza este documento de viaje y extrae la información disponible. Devuelve un JSON con los campos que puedas identificar. Haz sugerencias razonables basándote en el contexto visible.`,
-        file_urls: [file_url],
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            category:    { type: 'string', enum: ['flight','train','hotel','event','personal','other'] },
-            name:        { type: 'string' },
-            origin:      { type: 'string' },
-            destination: { type: 'string' },
-            airline:     { type: 'string' },
-            city:        { type: 'string' },
-            date:        { type: 'string', description: 'YYYY-MM-DD' },
-            end_date:    { type: 'string', description: 'YYYY-MM-DD' },
-            doc_type:    { type: 'string' },
-          }
-        }
-      });
-
-      const suggested = {};
-      for (const [k, v] of Object.entries(result)) {
-        if (v && typeof v === 'string' && v.trim()) suggested[k] = v.trim();
-      }
-
-      // Try to match city name to a city in the trip
-      if (suggested.destination || suggested.city) {
-        const cityName = (suggested.destination || suggested.city || '').toLowerCase();
-        const matched = cities.find(c => c.name.toLowerCase().includes(cityName) || cityName.includes(c.name.toLowerCase()));
-        if (matched) suggested.city_id = matched.id;
-      }
-
-      // Suggest itinerary day by date
-      if (suggested.date && itineraryDays.length > 0) {
-        const match = itineraryDays.find(d => d.date === suggested.date);
-        if (match) suggested.itinerary_day_id = match.id;
-      }
-
-      setForm(prev => ({ ...prev, ...suggested }));
-      setAiSuggested(true);
-    } catch (_) {
-      // AI failed silently — user fills manually
-    } finally {
-      setAnalyzing(false);
-    }
   };
 
   // ── Dynamic fields per category ──────────────────────────────────────────
@@ -166,23 +112,10 @@ export default function DocumentForm({ cities = [], itineraryDays = [], members 
     ? cities.find(c => c.name.toLowerCase().includes(primaryCity.toLowerCase()) || primaryCity.toLowerCase().includes(c.name.toLowerCase()))
     : null;
 
-  const canSave = form.name.trim() && !uploadingFile && !analyzing;
+  const canSave = form.name.trim() && !uploadingFile;
 
   return (
     <div className="space-y-4">
-      {/* AI status banner */}
-      {analyzing && (
-        <div className="flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-          <Loader2 className="w-4 h-4 text-orange-600 animate-spin flex-shrink-0" />
-          <span className="text-sm text-orange-700 font-medium">Analizando documento con IA...</span>
-        </div>
-      )}
-      {aiSuggested && !analyzing && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <Sparkles className="w-4 h-4 text-green-600 flex-shrink-0" />
-          <span className="text-sm text-green-700 font-medium">La IA ha rellenado los campos. Revisa y confirma.</span>
-        </div>
-      )}
 
       {/* File upload — first */}
       <div>
@@ -239,13 +172,7 @@ export default function DocumentForm({ cities = [], itineraryDays = [], members 
           <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5" /> Asociar a ciudad
           </label>
-          {suggestedCity && !form.city_id && (
-            <div className="mb-2 flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-lg text-sm">
-              <Sparkles className="w-3.5 h-3.5 text-orange-600" />
-              <span className="text-orange-700">IA sugiere: <strong>{suggestedCity.name}</strong></span>
-              <button onClick={() => set('city_id', suggestedCity.id)} className="ml-auto text-xs bg-orange-700 text-white px-2 py-0.5 rounded-md hover:bg-orange-800">Aceptar</button>
-            </div>
-          )}
+
           <Select value={form.city_id || 'none'} onValueChange={v => set('city_id', v === 'none' ? '' : v)}>
             <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
             <SelectContent>
@@ -274,13 +201,7 @@ export default function DocumentForm({ cities = [], itineraryDays = [], members 
           <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1.5">
             <CalendarDays className="w-3.5 h-3.5" /> Asociar a día de itinerario
           </label>
-          {suggestedDay && !form.itinerary_day_id && (
-            <div className="mb-2 flex items-center gap-2 p-2 bg-orange-50 border border-orange-200 rounded-lg text-sm">
-              <Sparkles className="w-3.5 h-3.5 text-orange-600" />
-              <span className="text-orange-700">IA sugiere: <strong>{suggestedDay.title}</strong></span>
-              <button onClick={() => set('itinerary_day_id', suggestedDay.id)} className="ml-auto text-xs bg-orange-700 text-white px-2 py-0.5 rounded-md hover:bg-orange-800">Aceptar</button>
-            </div>
-          )}
+
           <Select value={form.itinerary_day_id || 'none'} onValueChange={v => set('itinerary_day_id', v === 'none' ? '' : v)}>
             <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
             <SelectContent>
