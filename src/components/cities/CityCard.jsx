@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ChevronRight, Calendar } from 'lucide-react';
-import AccommodationInput from './AccommodationInput';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -57,10 +56,7 @@ export default function CityCard({ city, daysCount, tripId }) {
           </div>
         </Link>
 
-        {/* Alojamiento sobre la imagen */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4" onClick={e => e.stopPropagation()}>
-          <AccommodationInput city={city} tripId={tripId} />
-        </div>
+
       </div>
     </div>
   );
