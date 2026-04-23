@@ -2,35 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram, ImagePlus } from 'lucide-react';
+import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram } from 'lucide-react';
 import { createNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-
-// ── Avatar ─────────────────────────────────────────────────────────────────
-function UserAvatar({ profile, user, size = 24 }) {
-  const initials = profile?.display_name?.[0]?.toUpperCase()
-    || user?.full_name?.[0]?.toUpperCase()
-    || user?.email?.[0]?.toUpperCase()
-    || '?';
-  if (profile?.avatar_url) {
-    return (
-      <img
-        src={profile.avatar_url}
-        className={`w-${size} h-${size} rounded-full object-cover border-4 border-white/30`}
-        alt={initials}
-      />
-    );
-  }
-  return (
-    <div className={`w-${size} h-${size} rounded-full bg-white/20 flex items-center justify-center text-4xl font-bold text-white border-4 border-white/30`}>
-      {initials}
-    </div>
-  );
-}
 
 // ── Spot type icons ─────────────────────────────────────────────────────────
 const SPOT_TYPE_EMOJI = {
@@ -102,17 +80,12 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // ¿Estamos viendo el perfil de otro usuario?
   const urlParams = new URLSearchParams(window.location.search);
-  const viewUserId = urlParams.get('user_id'); // si viene, es perfil ajeno
-
-  useEffect(() => {
-  }, []);
+  const viewUserId = urlParams.get('user_id');
 
   const isOwnProfile = !viewUserId || (currentUser && viewUserId === currentUser.id);
   const targetUserId = viewUserId || currentUser?.id;
 
-  // Perfil del usuario objetivo
   const { data: profile, refetch: refetchProfile } = useQuery({
     queryKey: ['profile', targetUserId],
     queryFn: async () => {
@@ -123,7 +96,6 @@ export default function Profile() {
     staleTime: 30000,
   });
 
-  // Itinerarios publicados del usuario objetivo
   const { data: templates = [] } = useQuery({
     queryKey: ['userTemplates', targetUserId],
     queryFn: async () => {
@@ -133,17 +105,15 @@ export default function Profile() {
     enabled: !!targetUserId,
   });
 
-  // Spots públicos del usuario objetivo
   const { data: publicSpots = [] } = useQuery({
     queryKey: ['userSpots', targetUserId],
     queryFn: async () => {
       const all = await base44.entities.Spot.filter({ created_by_user_id: targetUserId });
-      return all.filter(s => isOwnProfile ? s.visibility === 'public' : s.visibility === 'public');
+      return all.filter(s => s.visibility === 'public');
     },
     enabled: !!targetUserId,
   });
 
-  // Seguidores y siguiendo
   const { data: followers = [] } = useQuery({
     queryKey: ['followers', targetUserId],
     queryFn: () => base44.entities.Follow.filter({ followed_user_id: targetUserId }),
@@ -156,7 +126,6 @@ export default function Profile() {
     enabled: !!targetUserId,
   });
 
-  // ¿El usuario actual sigue al perfil objetivo?
   const { data: myFollows = [] } = useQuery({
     queryKey: ['myFollows', currentUser?.id],
     queryFn: () => base44.entities.Follow.filter({ follower_user_id: currentUser.id }),
@@ -166,7 +135,6 @@ export default function Profile() {
   const isFollowing = myFollows.some(f => f.followed_user_id === targetUserId);
   const followRecord = myFollows.find(f => f.followed_user_id === targetUserId);
 
-  // Perfil del usuario actual (para adjuntar en notificación)
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', currentUser?.id],
     queryFn: async () => {
@@ -185,12 +153,7 @@ export default function Profile() {
           follower_user_id: currentUser.id,
           followed_user_id: targetUserId,
         });
-        // Notificar al seguido
-        createNotification({
-          userId: targetUserId,
-          type: 'follow',
-          actorProfile: myProfile,
-        });
+        createNotification({ userId: targetUserId, type: 'follow', actorProfile: myProfile });
       }
     },
     onSuccess: () => {
@@ -199,7 +162,6 @@ export default function Profile() {
     },
   });
 
-  // Cambio de avatar (solo perfil propio)
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
@@ -227,18 +189,15 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      {/* Header con portada */}
-      <div className="relative">
-        {/* Cover image */}
-        <div className="h-36 bg-orange-700 overflow-hidden">
-          {profile?.cover_image_url ? (
-            <img src={profile.cover_image_url} className="w-full h-full object-cover" alt="portada" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-orange-600 to-orange-800" />
-          )}
-        </div>
 
-        {/* Nav bar sobre la portada */}
+      {/* Cover image — overflow-hidden propio, NO envuelve el avatar */}
+      <div className="relative h-36 bg-orange-700 overflow-hidden">
+        {profile?.cover_image_url ? (
+          <img src={profile.cover_image_url} className="w-full h-full object-cover" alt="portada" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-orange-600 to-orange-800" />
+        )}
+        {/* Nav */}
         <div className="absolute top-0 left-0 right-0 px-6 pt-4 flex items-center justify-between">
           <Button variant="ghost" size="sm" className="text-white hover:bg-black/20" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-1" /> Volver
@@ -251,91 +210,100 @@ export default function Profile() {
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Sección del perfil — fuera del overflow-hidden */}
+      <div className="max-w-lg mx-auto px-6">
 
         {/* Avatar superpuesto */}
-        <div className="max-w-lg mx-auto px-6">
-          <div className="relative mb-3 flex items-end justify-between" style={{ marginTop: '-40px' }}>
-            <div className="relative z-10">
-              <UserAvatar profile={profile} user={currentUser} size={20} />
-              {isOwnProfile && profile && (
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-7 h-7 bg-orange-900 hover:bg-orange-800 rounded-full flex items-center justify-center border-2 border-white shadow"
-                >
-                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Camera className="w-3.5 h-3.5 text-white" />}
-                </button>
+        <div className="flex items-end justify-between" style={{ marginTop: '-40px' }}>
+          <div className="relative">
+            <div className="w-20 h-20 rounded-full border-4 border-white overflow-hidden bg-orange-200 shadow-md">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} className="w-full h-full object-cover" alt="avatar" />
+              ) : (
+                <div className="w-full h-full bg-orange-600 flex items-center justify-center text-3xl font-bold text-white">
+                  {profile?.display_name?.[0]?.toUpperCase() || currentUser?.full_name?.[0]?.toUpperCase() || '?'}
+                </div>
               )}
-              <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAvatarChange} />
             </div>
-            {/* Botón follow/unfollow */}
-            {!isOwnProfile && currentUser && (
-              <Button
-                size="sm"
-                className={`${isFollowing ? 'bg-white border border-orange-700 text-orange-700 hover:bg-orange-50' : 'bg-orange-700 text-white hover:bg-orange-800'}`}
-                onClick={() => followMutation.mutate()}
-                disabled={followMutation.isPending}
+            {isOwnProfile && profile && (
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="absolute bottom-0 right-0 w-7 h-7 bg-orange-900 hover:bg-orange-800 rounded-full flex items-center justify-center border-2 border-white shadow"
               >
-                {followMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> :
-                  isFollowing ? <><UserCheck className="w-4 h-4 mr-1" />Siguiendo</> : <><UserPlus className="w-4 h-4 mr-1" />Seguir</>}
-              </Button>
+                {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Camera className="w-3.5 h-3.5 text-white" />}
+              </button>
             )}
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAvatarChange} />
           </div>
 
-          {uploadError && <p className="text-destructive text-xs mb-2">{uploadError}</p>}
+          {!isOwnProfile && currentUser && (
+            <Button
+              size="sm"
+              className={`mb-1 ${isFollowing ? 'bg-white border border-orange-700 text-orange-700 hover:bg-orange-50' : 'bg-orange-700 text-white hover:bg-orange-800'}`}
+              onClick={() => followMutation.mutate()}
+              disabled={followMutation.isPending}
+            >
+              {followMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                isFollowing ? <><UserCheck className="w-4 h-4 mr-1" />Siguiendo</> : <><UserPlus className="w-4 h-4 mr-1" />Seguir</>}
+            </Button>
+          )}
+        </div>
 
-          <h1 className="text-xl font-bold text-foreground">{profile?.display_name || currentUser.full_name || 'Sin nombre'}</h1>
-          {profile?.username && <p className="text-muted-foreground text-sm font-mono">@{profile.username}</p>}
+        {uploadError && <p className="text-destructive text-xs mt-2">{uploadError}</p>}
 
-          {/* Travel style badge */}
-          {profile?.travel_style && (
-            <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold capitalize">
-              {profile.travel_style === 'mochilero' ? '🎒' : profile.travel_style === 'confort' ? '🏨' : profile.travel_style === 'lujo' ? '✨' : profile.travel_style === 'aventura' ? '🏔️' : profile.travel_style === 'cultural' ? '🏛️' : '🍽️'} {profile.travel_style}
+        <h1 className="text-xl font-bold text-foreground mt-3">{profile?.display_name || currentUser.full_name || 'Sin nombre'}</h1>
+        {profile?.username && <p className="text-muted-foreground text-sm font-mono">@{profile.username}</p>}
+
+        {profile?.travel_style && (
+          <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold capitalize">
+            {profile.travel_style === 'mochilero' ? '🎒' : profile.travel_style === 'confort' ? '🏨' : profile.travel_style === 'lujo' ? '✨' : profile.travel_style === 'aventura' ? '🏔️' : profile.travel_style === 'cultural' ? '🏛️' : '🍽️'} {profile.travel_style}
+          </span>
+        )}
+
+        {profile?.bio && <p className="text-foreground/80 text-sm mt-2 leading-relaxed">{profile.bio}</p>}
+
+        <div className="flex flex-wrap gap-3 mt-2">
+          {profile?.home_country && (
+            <span className="text-muted-foreground text-xs flex items-center gap-1">
+              <Globe className="w-3 h-3" /> {profile.home_country}
             </span>
           )}
+          {profile?.website && (
+            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
+              <LinkIcon className="w-3 h-3" /> {profile.website.replace(/^https?:\/\//, '')}
+            </a>
+          )}
+          {profile?.instagram && (
+            <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
+              <Instagram className="w-3 h-3" /> @{profile.instagram}
+            </a>
+          )}
+        </div>
 
-          {profile?.bio && <p className="text-foreground/80 text-sm mt-2 leading-relaxed">{profile.bio}</p>}
-
-          <div className="flex flex-wrap gap-3 mt-2">
-            {profile?.home_country && (
-              <span className="text-muted-foreground text-xs flex items-center gap-1">
-                <Globe className="w-3 h-3" /> {profile.home_country}
-              </span>
-            )}
-            {profile?.website && (
-              <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
-                <LinkIcon className="w-3 h-3" /> {profile.website.replace(/^https?:\/\//, '')}
-              </a>
-            )}
-            {profile?.instagram && (
-              <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
-                <Instagram className="w-3 h-3" /> @{profile.instagram}
-              </a>
-            )}
+        {/* Stats */}
+        <div className="flex items-center gap-6 mt-4 pb-4 border-b border-border">
+          <div className="text-center">
+            <p className="text-lg font-bold text-foreground">{templates.length}</p>
+            <p className="text-xs text-muted-foreground">Itinerarios</p>
           </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-6 mt-4 pb-4 border-b border-border">
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{templates.length}</p>
-              <p className="text-xs text-muted-foreground">Itinerarios</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{publicSpots.length}</p>
-              <p className="text-xs text-muted-foreground">Spots</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{followers.length}</p>
-              <p className="text-xs text-muted-foreground">Seguidores</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{following.length}</p>
-              <p className="text-xs text-muted-foreground">Siguiendo</p>
-            </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-foreground">{publicSpots.length}</p>
+            <p className="text-xs text-muted-foreground">Spots</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-foreground">{followers.length}</p>
+            <p className="text-xs text-muted-foreground">Seguidores</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-foreground">{following.length}</p>
+            <p className="text-xs text-muted-foreground">Siguiendo</p>
           </div>
         </div>
       </div>
 
-      {/* Contenido */}
+      {/* Tabs */}
       <div className="max-w-lg mx-auto px-4 py-4">
         <Tabs defaultValue="itinerarios">
           <TabsList className="w-full mb-6">
@@ -352,49 +320,36 @@ export default function Profile() {
             )}
           </TabsList>
 
-          {/* Tab: Itinerarios */}
           <TabsContent value="itinerarios">
             {templates.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <div className="text-5xl mb-3">🗺️</div>
                 <p className="font-medium">{isOwnProfile ? 'Aún no has publicado itinerarios' : 'Sin itinerarios publicados'}</p>
-                {isOwnProfile && (
-                  <p className="text-sm mt-1">Publica tu primer viaje desde la página del viaje</p>
-                )}
+                {isOwnProfile && <p className="text-sm mt-1">Publica tu primer viaje desde la página del viaje</p>}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 {templates.map(t => (
-                  <MiniTemplateCard
-                    key={t.id}
-                    template={t}
-                    onClick={(t) => navigate(`${createPageUrl('TemplateDetail')}?id=${t.id}`)}
-                  />
+                  <MiniTemplateCard key={t.id} template={t} onClick={(t) => navigate(`${createPageUrl('TemplateDetail')}?id=${t.id}`)} />
                 ))}
               </div>
             )}
           </TabsContent>
 
-          {/* Tab: Spots */}
           <TabsContent value="spots">
             {publicSpots.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <div className="text-5xl mb-3">📍</div>
                 <p className="font-medium">{isOwnProfile ? 'Aún no tienes spots públicos' : 'Sin recomendaciones públicas'}</p>
-                {isOwnProfile && (
-                  <p className="text-sm mt-1">Marca un spot como público desde cualquier viaje para que aparezca aquí</p>
-                )}
+                {isOwnProfile && <p className="text-sm mt-1">Marca un spot como público desde cualquier viaje para que aparezca aquí</p>}
               </div>
             ) : (
               <div className="space-y-3">
-                {publicSpots.map(s => (
-                  <MiniSpotCard key={s.id} spot={s} />
-                ))}
+                {publicSpots.map(s => <MiniSpotCard key={s.id} spot={s} />)}
               </div>
             )}
           </TabsContent>
 
-          {/* Tab: Cuenta (solo perfil propio) */}
           {isOwnProfile && (
             <TabsContent value="cuenta">
               <div className="space-y-4">
@@ -423,18 +378,12 @@ export default function Profile() {
                     </div>
                   )}
                 </div>
-
                 <Link to={createPageUrl('Settings')}>
                   <Button className="w-full bg-orange-700 hover:bg-orange-800">
                     <Settings className="w-4 h-4 mr-2" /> Editar ajustes
                   </Button>
                 </Link>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => base44.auth.logout()}
-                  className="w-full text-destructive hover:bg-destructive/10"
-                >
+                <Button variant="ghost" onClick={() => base44.auth.logout()} className="w-full text-destructive hover:bg-destructive/10">
                   Cerrar sesión
                 </Button>
               </div>
