@@ -33,7 +33,7 @@ async function translateWithMyMemory(text, fromLang, toLang) {
   return data.responseData.translatedText;
 }
 
-function TranslatorPanel({ tripId }) {
+export function TranslatorPanel({ tripId }) {
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
