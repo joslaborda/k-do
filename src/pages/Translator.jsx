@@ -157,10 +157,9 @@ const CAT_ICONS = {
   'Hoteles': '🏨', 'Ocio': '🎭', 'Social': '🥂',
 };
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-export default function Translator() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripId = urlParams.get('trip_id');
+// ─── MAIN COMPONENT (reutilizable) ───────────────────────────────────────────
+export function TranslatorPanel({ tripId }) {
+  // tripId viene como prop (desde Utilities) o desde URL (cuando es página standalone)
 
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -282,23 +281,8 @@ export default function Translator() {
   const isLoading = isFetching && categories.length === 0;
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <h1 className="text-white text-4xl font-bold">Traductor {targetFlag}</h1>
-          <p className="text-white/90 mt-2">
-            {countryRaw
-              ? `Español ↔ ${targetLang} · ${countryRaw}`
-              : 'Traduce y aprende frases para tu viaje'}
-          </p>
-          {!tripId && (
-            <p className="text-white/70 text-sm mt-1">⚠️ Abre desde un viaje para frases del país destino</p>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
-        <Tabs defaultValue="phrases" className="space-y-6">
+    <div>
+      <Tabs defaultValue="phrases" className="space-y-6">
           <TabsList className="bg-white border border-border p-1">
             <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
               📖 Frases útiles
@@ -542,6 +526,26 @@ export default function Translator() {
             )}
           </TabsContent>
         </Tabs>
+    </div>
+  );
+}
+
+export default function Translator() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
+
+  return (
+    <div className="min-h-screen bg-orange-50">
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <h1 className="text-white text-4xl font-bold">Traductor 🌐</h1>
+          <p className="text-white/90 mt-2">
+            {tripId ? 'Frases y traductor para tu viaje' : 'Traduce y aprende frases para tu viaje'}
+          </p>
+        </div>
+      </div>
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
+        <TranslatorPanel tripId={tripId} />
       </div>
     </div>
   );

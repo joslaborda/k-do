@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, LogOut, Save, Loader2, CheckCircle2, XCircle, Camera, Eye, EyeOff } from 'lucide-react';

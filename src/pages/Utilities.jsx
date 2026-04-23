@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { getCountryMeta, getEmergencyInfo, computeAvailableCurrencies } from '@/lib/countryConfig';
 import { getFxRate } from '@/lib/fxRates';
 import { useTripContext } from '@/hooks/useTripContext';
+import { TranslatorPanel } from './Translator';
 
 function getCountryConfig(country) { const m = getCountryMeta(country); return { currency: m.currency, symbol: m.symbol, locale: m.languageCode, flag: m.flag, iso: m.iso }; }
 
@@ -73,12 +73,6 @@ export default function Utilities() {
     }
     setTripId(id);
   }, [navigate]);
-
-  useEffect(() => {
-    if (activeTab === 'diary') {
-      navigate(createPageUrl(`Diary?trip_id=${tripId}`));
-    }
-  }, [activeTab, navigate, tripId]);
 
   // Trip context — cities y ciudad activa filtradas por este viaje
   const { trip, cities, activeCity } = useTripContext(tripId);
@@ -230,11 +224,12 @@ export default function Utilities() {
 
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 bg-transparent border-0 p-0 h-auto">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 gap-2 bg-transparent border-0 p-0 h-auto">
             <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">💱 Moneda</TabsTrigger>
             <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">☁️ Clima</TabsTrigger>
             <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🧳 Maleta</TabsTrigger>
             <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🚨 Emergencias</TabsTrigger>
+            <TabsTrigger value="translator" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🌐 Traducir</TabsTrigger>
           </TabsList>
 
           {/* MONEDA */}
@@ -546,6 +541,11 @@ export default function Utilities() {
                 </Button>
               </div>
             )}
+          </TabsContent>
+
+          {/* TRADUCTOR */}
+          <TabsContent value="translator" className="space-y-6">
+            <TranslatorPanel tripId={tripId} />
           </TabsContent>
         </Tabs>
       </div>
