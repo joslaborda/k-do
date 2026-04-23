@@ -254,8 +254,8 @@ export default function Profile() {
 
         {/* Avatar superpuesto */}
         <div className="max-w-lg mx-auto px-6">
-          <div className="relative -mt-12 mb-3 flex items-end justify-between">
-            <div className="relative">
+          <div className="relative mb-3 flex items-end justify-between" style={{ marginTop: '-40px' }}>
+            <div className="relative z-10">
               <UserAvatar profile={profile} user={currentUser} size={20} />
               {isOwnProfile && profile && (
                 <button
@@ -265,7 +265,7 @@ export default function Profile() {
                   {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Camera className="w-3.5 h-3.5 text-white" />}
                 </button>
               )}
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAvatarChange} />
             </div>
             {/* Botón follow/unfollow */}
             {!isOwnProfile && currentUser && (
@@ -320,16 +320,16 @@ export default function Profile() {
               <p className="text-xs text-muted-foreground">Itinerarios</p>
             </div>
             <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{publicSpots.length}</p>
+              <p className="text-xs text-muted-foreground">Spots</p>
+            </div>
+            <div className="text-center">
               <p className="text-lg font-bold text-foreground">{followers.length}</p>
               <p className="text-xs text-muted-foreground">Seguidores</p>
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-foreground">{following.length}</p>
               <p className="text-xs text-muted-foreground">Siguiendo</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-foreground">{publicSpots.length}</p>
-              <p className="text-xs text-muted-foreground">Spots</p>
             </div>
           </div>
         </div>
