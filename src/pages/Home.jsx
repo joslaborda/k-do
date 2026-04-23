@@ -28,6 +28,8 @@ import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import PublishSection from '@/components/trip/PublishSection';
 import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
+import TripChat from '@/components/trip/TripChat';
+import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -143,6 +145,18 @@ export default function Home() {
     enabled: !!tripId,
     staleTime: 30000,
   });
+
+  // Suscripciones tiempo real
+  useEffect(() => {
+    if (!tripId) return;
+    const unsubExpenses = base44.entities.Expense.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
+    });
+    const unsubDiary = base44.entities.DiaryEntry.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ['diaryEntries', tripId] });
+    });
+    return () => { unsubExpenses(); unsubDiary(); };
+  }, [tripId, queryClient]);
 
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', currentUser?.id],
@@ -383,6 +397,9 @@ export default function Home() {
       {/* Navigation Section - Outside of background image */}
       <div className="bg-orange-50 mx-auto pb-24 px-6 py-12 max-w-6xl space-y-10">
 
+        {/* Alertas próximas */}
+        <TripAlerts tripId={tripId} cities={cities} trip={trip} />
+
         {/* Countdown Banner */}
         <TripCountdownBanner
           daysUntilTrip={daysUntilTrip}
@@ -445,6 +462,12 @@ export default function Home() {
               </motion.div>
             )}
           </div>
+        </div>
+
+        {/* Chat del grupo */}
+        <div>
+          <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">💬 Chat del grupo</h2>
+          <TripChat tripId={tripId} myProfile={myProfile} />
         </div>
 
         {/* Members Panel */}

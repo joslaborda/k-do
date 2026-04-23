@@ -1,0 +1,35 @@
+{
+  "name": "TripMessage",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario autor"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email del autor"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Nombre visible del autor"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "Avatar del autor"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido del mensaje"
+    }
+  },
+  "required": [
+    "trip_id",
+    "user_id",
+    "content"
+  ]
+}
