@@ -57,8 +57,9 @@ export default function Diary() {
 
   const { data: entries = [] } = useQuery({
     queryKey: ['diaryEntries', tripId],
-    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }, '-date') : base44.entities.DiaryEntry.list('-date'),
-    enabled: !!tripId
+    queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }, '-date'),
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const createMutation = useMutation({

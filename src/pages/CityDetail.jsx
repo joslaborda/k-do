@@ -76,18 +76,21 @@ export default function CityDetail() {
       return cities[0];
     },
     enabled: !!cityId,
+    staleTime: 60000,
   });
 
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
     enabled: !!tripId,
+    staleTime: 60000,
   });
 
   const { data: days = [], isLoading } = useQuery({
     queryKey: ['itineraryDays', cityId],
     queryFn: () => base44.entities.ItineraryDay.filter({ city_id: cityId }, 'order'),
     enabled: !!cityId,
+    staleTime: 30000,
   });
 
   const createMutation = useMutation({

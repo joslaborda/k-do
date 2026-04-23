@@ -32,6 +32,7 @@ export default function Packing() {
     queryKey: ['packingItems'],
     queryFn: () => base44.entities.PackingItem.filter({ created_by: currentUser?.email }),
     enabled: !!currentUser?.email,
+    staleTime: 30000,
   });
 
   const createMutation = useMutation({
