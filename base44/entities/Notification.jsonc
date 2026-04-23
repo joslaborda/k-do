@@ -1,0 +1,53 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario destinatario"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "follow",
+        "template_save",
+        "trip_invite",
+        "trip_update"
+      ],
+      "description": "Tipo de notificaci\u00f3n"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false
+    },
+    "actor_user_id": {
+      "type": "string",
+      "description": "ID del usuario que genera la notificaci\u00f3n"
+    },
+    "actor_display_name": {
+      "type": "string"
+    },
+    "actor_avatar": {
+      "type": "string"
+    },
+    "actor_username": {
+      "type": "string"
+    },
+    "ref_id": {
+      "type": "string",
+      "description": "ID de referencia (trip_id, template_id, etc.)"
+    },
+    "ref_title": {
+      "type": "string",
+      "description": "T\u00edtulo legible del objeto referenciado"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensaje personalizado opcional"
+    }
+  },
+  "required": [
+    "user_id",
+    "type"
+  ]
+}

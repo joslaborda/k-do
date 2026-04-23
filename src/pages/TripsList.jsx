@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, User, LogOut, Settings, Compass, Users, Sparkles, ArrowRight } from 'lucide-react';
+import { Plus, User, LogOut, Settings, Compass } from 'lucide-react';
+import NotificationBell from '@/components/notifications/NotificationBell';
 import { toast } from '@/components/ui/use-toast';
 import TripCard from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
@@ -265,6 +266,7 @@ export default function TripsList() {
             >
               <Plus className="w-4 h-4 mr-1.5" />Crear viaje
             </Button>
+            {user?.id && <NotificationBell userId={user.id} />}
             <UserMenu user={user} profile={myProfile} />
           </div>
         </div>

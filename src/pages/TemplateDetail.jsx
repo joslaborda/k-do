@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowRight, MapPin, Calendar, Copy, CheckCircle, Heart, Share2, Loader2 } from 'lucide-react';
+import { createNotification } from '@/lib/notifications';
 import { toast } from '@/components/ui/use-toast';
 import { createPageUrl } from '@/utils';
 import { differenceInDays } from 'date-fns';
@@ -69,42 +70,54 @@ export default function TemplateDetail() {
     myCollection.template_ids &&
     myCollection.template_ids.includes(templateId);
 
+  // Perfil del usuario actual
+  const { data: saverProfile } = useQuery({
+    queryKey: ['myProfile', currentUser?.id],
+    queryFn: async () => {
+      const results = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return results[0] || null;
+    },
+    enabled: !!currentUser?.id,
+  });
+
   // Mutation para guardar/quitar
   const saveMutation = useMutation({
     mutationFn: async (save) => {
       if (!myCollection) {
-        // Crear colección si no existe
         const newCollection = await base44.entities.Collection.create({
           owner_user_id: currentUser.id,
           name: 'Guardados',
           template_ids: [templateId]
         });
-        return newCollection;
+        return { collection: newCollection, saved: true };
       } else {
-        // Actualizar colección
         const updated = { ...myCollection };
         if (save) {
           if (!updated.template_ids) updated.template_ids = [];
-          if (!updated.template_ids.includes(templateId)) {
-            updated.template_ids.push(templateId);
-          }
+          if (!updated.template_ids.includes(templateId)) updated.template_ids.push(templateId);
         } else {
           updated.template_ids = updated.template_ids.filter((id) => id !== templateId);
         }
-        await base44.entities.Collection.update(myCollection.id, {
-          template_ids: updated.template_ids
-        });
-        return updated;
+        await base44.entities.Collection.update(myCollection.id, { template_ids: updated.template_ids });
+        return { collection: updated, saved: save };
       }
     },
-    onSuccess: () => {
+    onSuccess: ({ saved }) => {
       queryClient.invalidateQueries({ queryKey: ['myCollection', currentUser?.id] });
       toast({
-        title: isSaved ? 'Removido de guardados' : 'Guardado ✓',
-        description: isSaved
-          ? 'Se removió de tu colección'
-          : 'Añadido a tu colección de guardados'
+        title: saved ? 'Guardado ✓' : 'Removido de guardados',
+        description: saved ? 'Añadido a tu colección de guardados' : 'Se removió de tu colección'
       });
+      // Notificar al creador del template si lo están guardando
+      if (saved && template?.created_by_user_id && template.created_by_user_id !== currentUser?.id) {
+        createNotification({
+          userId: template.created_by_user_id,
+          type: 'template_save',
+          actorProfile: saverProfile,
+          refId: templateId,
+          refTitle: template.title,
+        });
+      }
     }
   });
 

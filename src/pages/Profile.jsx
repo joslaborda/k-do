@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram, ImagePlus } from 'lucide-react';
+import { createNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -165,6 +166,16 @@ export default function Profile() {
   const isFollowing = myFollows.some(f => f.followed_user_id === targetUserId);
   const followRecord = myFollows.find(f => f.followed_user_id === targetUserId);
 
+  // Perfil del usuario actual (para adjuntar en notificación)
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', currentUser?.id],
+    queryFn: async () => {
+      const results = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return results[0] || null;
+    },
+    enabled: !!currentUser?.id && !isOwnProfile,
+  });
+
   const followMutation = useMutation({
     mutationFn: async () => {
       if (isFollowing && followRecord) {
@@ -173,6 +184,12 @@ export default function Profile() {
         await base44.entities.Follow.create({
           follower_user_id: currentUser.id,
           followed_user_id: targetUserId,
+        });
+        // Notificar al seguido
+        createNotification({
+          userId: targetUserId,
+          type: 'follow',
+          actorProfile: myProfile,
         });
       }
     },
