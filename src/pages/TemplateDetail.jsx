@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -16,7 +17,7 @@ export default function TemplateDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
   const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
   const [cloneData, setCloneData] = useState({
     name: '',
@@ -26,7 +27,6 @@ export default function TemplateDetail() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
   }, []);
 
   // Obtener template
