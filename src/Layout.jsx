@@ -31,7 +31,7 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   return (
-    <div className="min-h-screen bg-orange-50 text-foreground">
+    <div className="min-h-screen bg-orange-50 text-foreground overflow-x-hidden">
       <OfflineIndicator />
       <SyncIndicator />
       <KeyboardShortcuts />
@@ -40,7 +40,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Bottom Navigation - Mobile */}
       {showNav && tripId &&
       <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border md:hidden z-50">
-          <div className="flex items-center justify-around px-1 py-2 overflow-x-auto">
+          <div className="flex items-center justify-around px-1 py-2 overflow-x-hidden w-full">
             {navItems.map((item) => {
             const isActive = currentPageName === item.page ||
             item.page === 'Cities' && currentPageName === 'CityDetail';
@@ -49,14 +49,14 @@ export default function Layout({ children, currentPageName }) {
               <Link
                 key={item.page}
                 to={linkUrl}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors flex-shrink-0 ${
+                className={`flex flex-col items-center gap-1 px-1 py-2 rounded-lg transition-colors min-w-0 flex-1 ${
                 isActive ?
                 'bg-orange-700 text-white' :
                 'text-muted-foreground'}`
                 }>
 
-                  <item.icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className={`text-xs font-medium whitespace-nowrap ${isActive ? 'text-white' : 'text-gray-400'}`}>{item.name}</span>
+                  <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={`text-xs font-medium truncate w-full text-center ${isActive ? 'text-white' : 'text-gray-400'}`}>{item.name}</span>
                 </Link>);
 
           })}
