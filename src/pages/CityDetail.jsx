@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { 
   ArrowLeft, Plus, Calendar, ChevronDown, ChevronUp, 
-  Edit2, Trash2, Save, X, MapPin, Sparkles, RefreshCw, Settings, Hotel
+  Edit2, Trash2, Save, MapPin, RefreshCw, Hotel
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
