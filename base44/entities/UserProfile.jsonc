@@ -22,9 +22,21 @@
       "type": "string",
       "description": "URL del avatar"
     },
+    "cover_image_url": {
+      "type": "string",
+      "description": "URL de la foto de portada del perfil"
+    },
     "bio": {
       "type": "string",
-      "description": "Biograf\u00eda corta"
+      "description": "Biograf\u00eda corta (hasta 300 caracteres)"
+    },
+    "website": {
+      "type": "string",
+      "description": "Enlace personal o blog de viajes"
+    },
+    "instagram": {
+      "type": "string",
+      "description": "Username de Instagram (sin @)"
     },
     "home_country": {
       "type": "string",
@@ -34,6 +46,18 @@
     "home_currency": {
       "type": "string",
       "description": "Moneda preferida"
+    },
+    "travel_style": {
+      "type": "string",
+      "enum": [
+        "mochilero",
+        "confort",
+        "lujo",
+        "aventura",
+        "cultural",
+        "gastron\u00f3mico"
+      ],
+      "description": "Estilo de viaje preferido"
     },
     "default_spot_visibility": {
       "type": "string",

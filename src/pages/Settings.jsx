@@ -2,9 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, LogOut, Save, Loader2, CheckCircle2, XCircle, Camera, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, LogOut, Save, Loader2, CheckCircle2, XCircle, Camera, Eye, EyeOff, ImagePlus, Link as LinkIcon, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
@@ -93,14 +95,19 @@ function ProfileSection({ user, profile, onUpdated }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileRef = useRef();
+  const coverRef = useRef();
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
   const [homeCountry, setHomeCountry] = useState(profile?.home_country || 'España');
   const [username, setUsername] = useState(profile?.username || '');
+  const [website, setWebsite] = useState(profile?.website || '');
+  const [instagram, setInstagram] = useState(profile?.instagram || '');
+  const [travelStyle, setTravelStyle] = useState(profile?.travel_style || '');
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null);
   const [usernameError, setUsernameError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Debounce username check
@@ -140,6 +147,22 @@ function ProfileSection({ user, profile, onUpdated }) {
     }
   };
 
+  const handleCoverChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
+    setUploadingCover(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await base44.entities.UserProfile.update(profile.id, { cover_image_url: file_url });
+      queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
+      toast({ title: 'Portada actualizada ✓' });
+    } catch {
+      toast({ title: 'Error', description: 'No se pudo subir la imagen.', variant: 'destructive' });
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
   const handleSave = async () => {
     const err = validateUsername(username);
     if (err) { toast({ title: 'Username inválido', description: err, variant: 'destructive' }); return; }
@@ -158,6 +181,9 @@ function ProfileSection({ user, profile, onUpdated }) {
         display_name: displayName.trim(),
         bio,
         home_country: homeCountry,
+        website: website.trim(),
+        instagram: instagram.trim().replace('@', ''),
+        travel_style: travelStyle || null,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
       toast({ title: 'Perfil guardado ✓' });
@@ -172,6 +198,28 @@ function ProfileSection({ user, profile, onUpdated }) {
   return (
     <div className="bg-white rounded-xl border border-border p-4 space-y-4">
       <h2 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Perfil</h2>
+
+      {/* Cover image */}
+      <div>
+        <label className="text-xs font-medium text-foreground mb-1 block">Foto de portada</label>
+        <div
+          className="relative h-24 rounded-xl overflow-hidden border border-dashed border-border bg-orange-50 cursor-pointer hover:bg-orange-100 transition-colors"
+          onClick={() => coverRef.current?.click()}
+        >
+          {profile?.cover_image_url ? (
+            <img src={profile.cover_image_url} className="w-full h-full object-cover" alt="portada" />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1 text-muted-foreground">
+              <ImagePlus className="w-5 h-5" />
+              <span className="text-xs">Añadir portada</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+            {uploadingCover ? <Loader2 className="w-5 h-5 animate-spin text-white" /> : <Camera className="w-5 h-5 text-white" />}
+          </div>
+        </div>
+        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverChange} />
+      </div>
 
       {/* Avatar */}
       <div className="flex items-center gap-4">
@@ -228,14 +276,45 @@ function ProfileSection({ user, profile, onUpdated }) {
 
       {/* Bio */}
       <div>
-        <label className="text-xs font-medium text-foreground mb-1 block">Bio</label>
-        <Input value={bio} onChange={e => setBio(e.target.value)} placeholder="Cuéntanos algo sobre ti..." maxLength={160} />
+        <label className="text-xs font-medium text-foreground mb-1 block">Bio <span className="text-muted-foreground font-normal">({bio.length}/300)</span></label>
+        <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Cuéntanos algo sobre ti, tu estilo de viaje, tus destinos favoritos..." maxLength={300} rows={3} />
       </div>
 
       {/* Country */}
       <div>
         <label className="text-xs font-medium text-foreground mb-1 block">País de origen</label>
         <Input value={homeCountry} onChange={e => setHomeCountry(e.target.value)} placeholder="España" />
+      </div>
+
+      {/* Travel style */}
+      <div>
+        <label className="text-xs font-medium text-foreground mb-1 block">Estilo de viaje</label>
+        <Select value={travelStyle} onValueChange={setTravelStyle}>
+          <SelectTrigger><SelectValue placeholder="¿Cómo viajas?" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mochilero">🎒 Mochilero</SelectItem>
+            <SelectItem value="confort">🏨 Confort</SelectItem>
+            <SelectItem value="lujo">✨ Lujo</SelectItem>
+            <SelectItem value="aventura">🏔️ Aventura</SelectItem>
+            <SelectItem value="cultural">🏛️ Cultural</SelectItem>
+            <SelectItem value="gastronómico">🍽️ Gastronómico</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Website */}
+      <div>
+        <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><LinkIcon className="w-3 h-3" /> Web / Blog</label>
+        <Input value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://tublog.com" type="url" />
+      </div>
+
+      {/* Instagram */}
+      <div>
+        <label className="text-xs font-medium text-foreground mb-1 flex items-center gap-1"><Instagram className="w-3 h-3" /> Instagram</label>
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">@</span>
+          <Input className="pl-7" value={instagram} onChange={e => setInstagram(e.target.value.replace('@', ''))} placeholder="tuusuario" />
+        </div>
       </div>
 
       <Button

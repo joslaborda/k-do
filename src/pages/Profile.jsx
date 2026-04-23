@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Star } from 'lucide-react';
+import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram, ImagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -88,16 +88,6 @@ function MiniSpotCard({ spot }) {
           {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{spot.notes}</p>}
         </div>
       </div>
-    </div>
-  );
-}
-
-// ── Stat block ──────────────────────────────────────────────────────────────
-function StatBlock({ value, label }) {
-  return (
-    <div className="text-center">
-      <p className="text-xl font-bold text-white">{value}</p>
-      <p className="text-xs text-white/70">{label}</p>
     </div>
   );
 }
@@ -220,76 +210,116 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      {/* Header */}
-      <div className="bg-orange-700 px-6 pb-8 pt-6">
-        <div className="max-w-lg mx-auto flex items-center justify-between mb-6">
-          <Button variant="ghost" size="sm" className="text-white hover:bg-white/20" onClick={() => navigate(-1)}>
+      {/* Header con portada */}
+      <div className="relative">
+        {/* Cover image */}
+        <div className="h-36 bg-orange-700 overflow-hidden">
+          {profile?.cover_image_url ? (
+            <img src={profile.cover_image_url} className="w-full h-full object-cover" alt="portada" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-orange-600 to-orange-800" />
+          )}
+        </div>
+
+        {/* Nav bar sobre la portada */}
+        <div className="absolute top-0 left-0 right-0 px-6 pt-4 flex items-center justify-between">
+          <Button variant="ghost" size="sm" className="text-white hover:bg-black/20" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-1" /> Volver
           </Button>
           {isOwnProfile && (
             <Link to={createPageUrl('Settings')}>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-black/20">
                 <Settings className="w-4 h-4" />
               </Button>
             </Link>
           )}
         </div>
 
-        <div className="max-w-lg mx-auto flex flex-col items-center text-center">
-          {/* Avatar */}
-          <div className="relative mb-4">
-            <UserAvatar profile={profile} user={currentUser} size={24} />
-            {isOwnProfile && profile && (
-              <button
-                onClick={() => fileRef.current?.click()}
-                className="absolute bottom-0 right-0 w-8 h-8 bg-orange-900 hover:bg-orange-800 rounded-full flex items-center justify-center border-2 border-white shadow"
+        {/* Avatar superpuesto */}
+        <div className="max-w-lg mx-auto px-6">
+          <div className="relative -mt-12 mb-3 flex items-end justify-between">
+            <div className="relative">
+              <UserAvatar profile={profile} user={currentUser} size={20} />
+              {isOwnProfile && profile && (
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="absolute bottom-0 right-0 w-7 h-7 bg-orange-900 hover:bg-orange-800 rounded-full flex items-center justify-center border-2 border-white shadow"
+                >
+                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Camera className="w-3.5 h-3.5 text-white" />}
+                </button>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+            </div>
+            {/* Botón follow/unfollow */}
+            {!isOwnProfile && currentUser && (
+              <Button
+                size="sm"
+                className={`${isFollowing ? 'bg-white border border-orange-700 text-orange-700 hover:bg-orange-50' : 'bg-orange-700 text-white hover:bg-orange-800'}`}
+                onClick={() => followMutation.mutate()}
+                disabled={followMutation.isPending}
               >
-                {uploading ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <Camera className="w-4 h-4 text-white" />}
-              </button>
+                {followMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                  isFollowing ? <><UserCheck className="w-4 h-4 mr-1" />Siguiendo</> : <><UserPlus className="w-4 h-4 mr-1" />Seguir</>}
+              </Button>
             )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
           </div>
 
-          {uploadError && <p className="text-white/80 text-xs mb-2 bg-red-900/40 px-3 py-1 rounded-full">{uploadError}</p>}
+          {uploadError && <p className="text-destructive text-xs mb-2">{uploadError}</p>}
 
-          <h1 className="text-2xl font-bold text-white">{profile?.display_name || currentUser.full_name || 'Sin nombre'}</h1>
-          {profile?.username && <p className="text-white/70 text-sm mt-1 font-mono">@{profile.username}</p>}
-          {profile?.bio && <p className="text-white/80 text-sm mt-2 max-w-xs">{profile.bio}</p>}
-          {profile?.home_country && (
-            <p className="text-white/60 text-xs mt-1 flex items-center gap-1">
-              <Globe className="w-3 h-3" /> {profile.home_country}
-            </p>
+          <h1 className="text-xl font-bold text-foreground">{profile?.display_name || currentUser.full_name || 'Sin nombre'}</h1>
+          {profile?.username && <p className="text-muted-foreground text-sm font-mono">@{profile.username}</p>}
+
+          {/* Travel style badge */}
+          {profile?.travel_style && (
+            <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold capitalize">
+              {profile.travel_style === 'mochilero' ? '🎒' : profile.travel_style === 'confort' ? '🏨' : profile.travel_style === 'lujo' ? '✨' : profile.travel_style === 'aventura' ? '🏔️' : profile.travel_style === 'cultural' ? '🏛️' : '🍽️'} {profile.travel_style}
+            </span>
           )}
+
+          {profile?.bio && <p className="text-foreground/80 text-sm mt-2 leading-relaxed">{profile.bio}</p>}
+
+          <div className="flex flex-wrap gap-3 mt-2">
+            {profile?.home_country && (
+              <span className="text-muted-foreground text-xs flex items-center gap-1">
+                <Globe className="w-3 h-3" /> {profile.home_country}
+              </span>
+            )}
+            {profile?.website && (
+              <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
+                <LinkIcon className="w-3 h-3" /> {profile.website.replace(/^https?:\/\//, '')}
+              </a>
+            )}
+            {profile?.instagram && (
+              <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer" className="text-orange-600 text-xs flex items-center gap-1 hover:underline">
+                <Instagram className="w-3 h-3" /> @{profile.instagram}
+              </a>
+            )}
+          </div>
 
           {/* Stats */}
-          <div className="flex items-center gap-8 mt-5">
-            <StatBlock value={templates.length} label="Itinerarios" />
-            <StatBlock value={followers.length} label="Seguidores" />
-            <StatBlock value={following.length} label="Siguiendo" />
-            <StatBlock value={publicSpots.length} label="Spots" />
+          <div className="flex items-center gap-6 mt-4 pb-4 border-b border-border">
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{templates.length}</p>
+              <p className="text-xs text-muted-foreground">Itinerarios</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{followers.length}</p>
+              <p className="text-xs text-muted-foreground">Seguidores</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{following.length}</p>
+              <p className="text-xs text-muted-foreground">Siguiendo</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-foreground">{publicSpots.length}</p>
+              <p className="text-xs text-muted-foreground">Spots</p>
+            </div>
           </div>
-
-          {/* Botón follow/unfollow para perfil ajeno */}
-          {!isOwnProfile && currentUser && (
-            <Button
-              className={`mt-5 px-8 ${isFollowing ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-white text-orange-700 hover:bg-white/90'}`}
-              onClick={() => followMutation.mutate()}
-              disabled={followMutation.isPending}
-            >
-              {followMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : isFollowing ? (
-                <><UserCheck className="w-4 h-4 mr-2" />Siguiendo</>
-              ) : (
-                <><UserPlus className="w-4 h-4 mr-2" />Seguir</>
-              )}
-            </Button>
-          )}
         </div>
       </div>
 
       {/* Contenido */}
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-lg mx-auto px-4 py-4">
         <Tabs defaultValue="itinerarios">
           <TabsList className="w-full mb-6">
             <TabsTrigger value="itinerarios" className="flex-1">
