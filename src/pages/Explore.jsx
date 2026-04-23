@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -8,22 +8,19 @@ import TemplateCard from '@/components/explore/TemplateCard';
 import CommunitySearch from '@/components/social/CommunitySearch';
 import { Link, useSearchParams } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Explore() {
   const [filterCountry, setFilterCountry] = useState('all');
   const [filterDuration, setFilterDuration] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [currentPage, setCurrentPage] = useState(0);
-  const [currentUser, setCurrentUser] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const itemsPerPage = 12;
+  const { user: currentUser } = useAuth();
 
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
-
-  useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
-  }, []);
 
   const { data: allTemplates = [], isLoading } = useQuery({
     queryKey: ['templatesPublic'],
