@@ -25,8 +25,8 @@ export default function CityCard({ city, daysCount, tripId }) {
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
-      <Link to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}>
-        <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <Link to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}>
           <img
             src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
             alt={city.name}
@@ -51,18 +51,16 @@ export default function CityCard({ city, daysCount, tripId }) {
                 )}
               </div>
             </div>
-
-            {/* Botón navegar */}
             <div className="w-9 h-9 rounded-full bg-orange-700 flex items-center justify-center text-white border-2 border-white/30 flex-shrink-0">
               <ChevronRight className="w-5 h-5" />
             </div>
           </div>
-        </div>
-      </Link>
+        </Link>
 
-      {/* Alojamiento fuera del Link para no interferir */}
-      <div className="px-4 py-3 bg-white">
-        <AccommodationInput city={city} tripId={tripId} />
+        {/* Alojamiento sobre la imagen */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4" onClick={e => e.stopPropagation()}>
+          <AccommodationInput city={city} tripId={tripId} />
+        </div>
       </div>
     </div>
   );
