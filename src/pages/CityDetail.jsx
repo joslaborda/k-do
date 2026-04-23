@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -53,7 +54,7 @@ export default function CityDetail() {
    const cityId = urlParams.get('id');
    const tripId = urlParams.get('trip_id');
 
-   const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser } = useAuth();
    const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDay, setEditingDay] = useState(null);
   const [expandedDays, setExpandedDays] = useState({});
@@ -66,14 +67,7 @@ export default function CityDetail() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const u = await base44.auth.me();
-      setCurrentUser(u);
-      return u;
-    }
-  });
+
 
   const { data: city } = useQuery({
     queryKey: ['city', cityId],
