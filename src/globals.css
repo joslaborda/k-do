@@ -34,6 +34,10 @@ css
     @apply border-border;
     font-family: 'Nunito', sans-serif !important;
   }
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: 'Nunito', sans-serif;
