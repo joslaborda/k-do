@@ -1,122 +1,281 @@
-import { useRef, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { Home, MapPin, FileText, UtensilsCrossed, Receipt, Info, Languages } from 'lucide-react';
-import KeyboardShortcuts from '@/components/KeyboardShortcuts';
-import OfflineIndicator from '@/components/OfflineIndicator';
-import SyncIndicator from '@/components/SyncIndicator';
+import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, FileText, Eye, EyeOff, Users, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm';
+import DocumentCard from '@/components/tickets/DocumentCard';
 
-const navItems = [
-{ name: 'Inicio', page: 'Home', icon: Home },
-{ name: 'Ruta', page: 'Cities', icon: MapPin },
-{ name: 'Docs', page: 'Documents', icon: FileText },
-{ name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed },
-{ name: 'Gastos', page: 'Expenses', icon: Receipt },
-{ name: 'Útil', page: 'Utilities', icon: Info },
-{ name: 'Traducir', page: 'Translator', icon: Languages }];
+const EMPTY_FORM = {
+  name: '', category: 'flight', date: '', end_date: '', notes: '',
+  file_url: '', origin: '', destination: '', airline: '',
+  city: '', doc_type: '', city_id: '', arrival_city_id: '',
+  itinerary_day_id: '', visibility: 'personal', shared_with: [],
+};
 
+const VISIBILITY_FILTERS = [
+  { value: 'all',            label: 'Todos',   icon: Filter },
+  { value: 'personal',       label: 'Solo yo', icon: EyeOff },
+  { value: 'shared',         label: 'Grupo',   icon: Eye },
+  { value: 'selected_users', label: 'Concretos', icon: Users },
+];
 
-// Pages that should NOT show navigation (trip list and migration)
-const pagesWithoutNav = ['TripsList', 'MigrateData'];
+export default function Calendar() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
 
-export default function Layout({ children, currentPageName }) {
-  const [tripId, setTripId] = useState('default');
-  const showNav = !pagesWithoutNav.includes(currentPageName);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTicket, setEditingTicket] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState(null);
+  const [visFilter, setVisFilter] = useState('all');
+  const [catFilter, setCatFilter] = useState('all');
 
-  useEffect(() => {
-    // Get trip ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('trip_id') || urlParams.get('id');
-    setTripId(id || 'default'); // Use 'default' for backwards compatibility
-  }, [currentPageName]);
+  const queryClient = useQueryClient();
+
+  const { user: currentUser } = useAuth();
+  const currentUserEmail = currentUser?.email ?? '';
+  const userId = currentUser?.id ?? '';
+
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets', tripId],
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
+    enabled: !!tripId
+  });
+
+  const { data: cities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    enabled: !!tripId
+  });
+
+  const { data: itineraryDays = [] } = useQuery({
+    queryKey: ['itineraryDays', tripId],
+    queryFn: async () => {
+      const days = await base44.entities.ItineraryDay.filter({ trip_id: tripId }, 'date');
+      const cityMap = Object.fromEntries(cities.map(c => [c.id, c.name]));
+      return days.map(d => ({ ...d, cityName: cityMap[d.city_id] || '' }));
+    },
+    enabled: !!tripId && cities.length > 0
+  });
+
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: () => base44.entities.Trip.get(tripId),
+    enabled: !!tripId
+  });
+
+  const members = trip?.members || [];
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Ticket.create({ ...data, trip_id: tripId, user_id: userId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setDialogOpen(false);
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setEditingTicket(null);
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Ticket.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setDeleteDialogOpen(false);
+      setTicketToDelete(null);
+    }
+  });
+
+  // Visibility filter
+  const visibleTickets = tickets.filter(t => {
+    const vis = t.visibility || 'personal';
+    if (vis === 'personal' && t.created_by !== currentUserEmail && t.user_id !== userId) return false;
+    if (vis === 'selected_users' && t.created_by !== currentUserEmail && !(t.shared_with || []).includes(currentUserEmail)) return false;
+    if (visFilter !== 'all' && vis !== visFilter) return false;
+    if (catFilter !== 'all' && t.category !== catFilter) return false;
+    return true;
+  });
+
+  // Group by category
+  const grouped = visibleTickets.reduce((acc, t) => {
+    if (!acc[t.category]) acc[t.category] = [];
+    acc[t.category].push(t);
+    return acc;
+  }, {});
+
+  const handleSave = (formData) => {
+    createMutation.mutate(formData);
+  };
+
+  const handleUpdate = (formData) => {
+    updateMutation.mutate({ id: editingTicket.id, data: formData });
+  };
 
   return (
-    <div className="min-h-screen bg-orange-50 text-foreground">
-      <OfflineIndicator />
-      <SyncIndicator />
-      <KeyboardShortcuts />
-      {children}
-      
-      {/* Bottom Navigation - Mobile */}
-      {showNav && tripId &&
-      <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border md:hidden z-50">
-          <div className="flex items-center justify-around px-1 py-2 overflow-x-auto">
-            {navItems.map((item) => {
-            const isActive = currentPageName === item.page ||
-            item.page === 'Cities' && currentPageName === 'CityDetail';
-            const linkUrl = createPageUrl(`${item.page}?trip_id=${tripId}`);
-            return (
-              <Link
-                key={item.page}
-                to={linkUrl}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors flex-shrink-0 ${
-                isActive ?
-                'bg-orange-700 text-white' :
-                'text-muted-foreground'}`
-                }>
-
-                  <item.icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400'}`} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className={`text-xs font-medium whitespace-nowrap ${isActive ? 'text-white' : 'text-gray-400'}`}>{item.name}</span>
-                </Link>);
-
-          })}
-          </div>
-        </nav>
-      }
-
-      {/* Side Navigation - Desktop */}
-      {showNav && tripId &&
-      <nav className="fixed left-0 top-0 bottom-0 w-16 glass border-r border-border hidden md:flex flex-col items-center py-8 z-50">
-          <Link to={createPageUrl('TripsList')} className="text-3xl mb-12 hover:scale-110 transition-transform cursor-pointer" title="Ver todos los viajes">
-            🌸
-          </Link>
-          
-          <div className="flex-1 flex flex-col items-center gap-1">
-            {navItems.map((item) => {
-            const isActive = currentPageName === item.page ||
-            item.page === 'Cities' && currentPageName === 'CityDetail';
-            const linkUrl = createPageUrl(`${item.page}?trip_id=${tripId}`);
-            return (
-              <Link
-                key={item.page}
-                to={linkUrl}
-                className={`group flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all ${
-                isActive ?
-                'bg-orange-700 text-white' :
-                'text-muted-foreground hover:text-foreground'}`
-                }>
-
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-[9px] font-medium">{item.name}</span>
-                </Link>);
-
-          })}
-          </div>
-        </nav>
-      }
-
-      {/* Keyboard shortcuts hint */}
-      {showNav && tripId &&
-      <div className="hidden md:block fixed bottom-4 left-20 text-xs text-muted-foreground glass px-3 py-2 rounded-lg shadow-sm border border-border">
-          <kbd className="px-1.5 py-0.5 bg-secondary rounded text-foreground">⌘K</kbd> Buscar
+    <div className="min-h-screen bg-orange-50">
+      {/* Header */}
+      <div className="bg-orange-700 pt-12 pb-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h1 className="text-white text-4xl font-bold">Documentos ✈️</h1>
+          <p className="text-white/90 mt-1">Inteligente, contextual y colaborativo</p>
         </div>
-      }
+      </div>
 
-      {/* Content padding for desktop nav */}
-      {showNav && tripId &&
-      <style>{`
-          @media (min-width: 768px) {
-            .min-h-screen {
-              margin-left: 64px;
-            }
-          }
-          @media (max-width: 767px) {
-            .min-h-screen {
-              padding-bottom: 70px;
-            }
-          }
-        `}</style>
-      }
-    </div>);
+      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-6xl -mt-12">
+        {/* Toolbar */}
+        <div className="bg-white rounded-2xl border border-border p-4 mb-6 flex flex-wrap items-center gap-3">
+          {/* Category filter */}
+          <div className="flex items-center gap-1.5 flex-wrap flex-1">
+            <button
+              onClick={() => setCatFilter('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === 'all' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+            >
+              Todos
+            </button>
+            {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
+              const Icon = cfg.icon;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setCatFilter(catFilter === key ? 'all' : key)}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === key ? `${cfg.bg} ${cfg.text} border ${cfg.border}` : 'text-muted-foreground hover:bg-secondary'}`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {cfg.label}
+                </button>
+              );
+            })}
+          </div>
 
+          {/* Visibility filter */}
+          <div className="flex items-center gap-1 border-l border-border pl-3">
+            {VISIBILITY_FILTERS.map(f => {
+              const Icon = f.icon;
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => setVisFilter(f.value)}
+                  title={f.label}
+                  className={`p-1.5 rounded-lg transition-all ${visFilter === f.value ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              );
+            })}
+          </div>
+
+          <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 flex-shrink-0">
+            <Plus className="w-4 h-4 mr-2" />
+            Añadir
+          </Button>
+        </div>
+
+        {/* Empty state */}
+        {visibleTickets.length === 0 ? (
+          <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-foreground font-medium mb-1">Sin documentos todavía</p>
+            <p className="text-sm text-muted-foreground mb-5">Sube un PDF o imagen y la IA lo identificará automáticamente</p>
+            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800">
+              <Plus className="w-4 h-4 mr-2" />
+              Añadir documento
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
+              const items = grouped[key];
+              if (!items?.length) return null;
+              const Icon = cfg.icon;
+              return (
+                <div key={key}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${cfg.color} rounded-xl flex items-center justify-center`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-bold text-foreground">{cfg.label}</h2>
+                    <span className="text-xs bg-orange-200 text-orange-800 font-semibold px-2 py-0.5 rounded-full">{items.length}</span>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {items.map(ticket => (
+                      <DocumentCard
+                        key={ticket.id}
+                        ticket={ticket}
+                        onEdit={(t) => setEditingTicket(t)}
+                        onDelete={(t) => { setTicketToDelete(t); setDeleteDialogOpen(true); }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Add Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Añadir documento</DialogTitle>
+          </DialogHeader>
+          <DocumentForm
+            cities={cities}
+            itineraryDays={itineraryDays}
+            members={members}
+            onSave={handleSave}
+            onCancel={() => setDialogOpen(false)}
+            saving={createMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingTicket} onOpenChange={(open) => { if (!open) setEditingTicket(null); }}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Editar documento</DialogTitle>
+          </DialogHeader>
+          {editingTicket && (
+            <DocumentForm
+              cities={cities}
+              itineraryDays={itineraryDays}
+              members={members}
+              initialData={editingTicket}
+              onSave={handleUpdate}
+              onCancel={() => setEditingTicket(null)}
+              saving={updateMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Seguro que quieres eliminar "{ticketToDelete?.name}"? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteMutation.mutate(ticketToDelete.id)} className="bg-destructive hover:bg-destructive/90">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
 }
