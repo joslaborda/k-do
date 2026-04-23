@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
@@ -34,10 +35,10 @@ export default function Home() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -50,7 +51,6 @@ export default function Home() {
 
     setTripId(id);
     window.scrollTo(0, 0);
-    base44.auth.me().then(setCurrentUser).catch(() => {});
   }, [navigate]);
 
   const { data: trip, isLoading: tripLoading } = useQuery({
