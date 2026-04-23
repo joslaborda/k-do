@@ -1827,5 +1827,9 @@ export const PHRASES_BY_COUNTRY = {
 
 // Fallback para países sin frases definidas — devuelve frases básicas en inglés
 export function getPhrasesForCountry(countryName) {
-  return PHRASES_BY_COUNTRY[countryName] || null;
+  const data = PHRASES_BY_COUNTRY[countryName];
+  if (!data) return null;
+  // Normalizar: si es array, convertir a { categories: [...] }
+  if (Array.isArray(data)) return { categories: data };
+  return data;
 }

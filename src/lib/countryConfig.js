@@ -261,30 +261,6 @@ export async function getTopCities(countryLabel) {
     }
   } catch {}
 
-  try {
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Dame las 20 ciudades o destinos turísticos más visitados de ${countryLabel}. Solo nombres de ciudades, sin numeración.`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: { cities: { type: 'array', items: { type: 'string' } } },
-      },
-    });
-    const cities = result?.cities || [];
-    if (cities.length > 0) {
-      localStorage.setItem(lsKey, JSON.stringify(cities));
-      try {
-        const existing = await base44.entities.CountryInfo.filter({ country_label: countryLabel });
-        if (existing.length > 0) {
-          await base44.entities.CountryInfo.update(existing[0].id, { top_cities: cities });
-        } else {
-          await base44.entities.CountryInfo.create({ country_label: countryLabel, top_cities: cities });
-        }
-      } catch {}
-      return cities;
-    }
-  } catch {}
-
   return [];
 }
 
@@ -306,52 +282,6 @@ export async function getEmergencyInfo(countryLabel, homeCountry = 'España') {
       localStorage.setItem(lsKey, JSON.stringify(rows[0].emergency_info));
       return rows[0].emergency_info;
     }
-  } catch {}
-
-  try {
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Ciudadano de ${homeCountry} visita ${countryLabel}. Proporciona: número emergencias general, policía, ambulancia, bomberos; embajada de ${homeCountry} en ${countryLabel} (nombre, dirección, teléfono, web); 3-4 apps útiles de transporte/taxi; 3 consejos de seguridad.`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          emergency_general: { type: 'string' },
-          police: { type: 'string' },
-          ambulance: { type: 'string' },
-          fire: { type: 'string' },
-          embassy: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              address: { type: 'string' },
-              phone: { type: 'string' },
-              web: { type: 'string' },
-              hours: { type: 'string' },
-            },
-          },
-          useful_apps: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: { name: { type: 'string' }, description: { type: 'string' }, icon: { type: 'string' } },
-            },
-          },
-          safety_tips: { type: 'array', items: { type: 'string' } },
-        },
-      },
-    });
-    if (result) {
-      localStorage.setItem(lsKey, JSON.stringify(result));
-      try {
-        const existing = await base44.entities.CountryInfo.filter({ country_label: countryLabel });
-        if (existing.length > 0) {
-          await base44.entities.CountryInfo.update(existing[0].id, { emergency_info: result });
-        } else {
-          await base44.entities.CountryInfo.create({ country_label: countryLabel, emergency_info: result });
-        }
-      } catch {}
-    }
-    return result;
   } catch {}
 
   return null;
@@ -383,18 +313,7 @@ export async function getExchangeRate(toCurrency) {
     }
   } catch {}
 
-  // LLM fallback
-  try {
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Current exchange rate: 1 EUR to ${toCurrency}. Return only the number.`,
-      response_json_schema: { type: 'object', properties: { rate: { type: 'number' } } },
-    });
-    const rate = result?.rate || 1;
-    sessionStorage.setItem(lsKey, String(rate));
-    return rate;
-  } catch {
-    return 1;
-  }
+  return 1;
 }
 
 // ─── AVAILABLE CURRENCIES for a trip ─────────────────────────────────────────

@@ -1,16 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapPin, Sparkles, ArrowUpDown } from 'lucide-react';
+import { MapPin, ArrowUpDown, Plus } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
 import { useUndo } from '@/components/hooks/useUndo';
 import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import CityCard from '@/components/cities/CityCard';
 import { Button } from '@/components/ui/button';
-import AIGeneratorPanel from '@/components/itinerary/AIGeneratorPanel';
-import AIGeneratingStatus from '@/components/itinerary/AIGeneratingStatus';
-import { generateDaysForCity, suggestCitiesForTrip, savePreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 function normalizeText(str = '') {
   return str
@@ -67,10 +66,9 @@ export default function Cities() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
 
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatingStep, setGeneratingStep] = useState(0);
-  const [generatingCity, setGeneratingCity] = useState('');
+  const [addCityOpen, setAddCityOpen] = useState(false);
+  const [newCityName, setNewCityName] = useState('');
+  const [newCityCountry, setNewCityCountry] = useState('');
 
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
@@ -152,89 +150,21 @@ export default function Cities() {
     return itineraryDays.filter((day) => day.city_id === cityId).length;
   };
 
-  const handleGenerateItinerary = async (preferences) => {
-    if (!trip) return;
-
-    setAiPanelOpen(false);
-    setIsGenerating(true);
-    setGeneratingStep(0);
-
-    await savePreferences(tripId, preferences);
-
-    let citiesToProcess = cities;
-
-    const inferredTripCountry =
-      (trip.country && trip.country.trim()) ||
-      detectCountryFromText(trip.destination) ||
-      '';
-
-    if (cities.length === 0) {
-      setGeneratingCity('Definiendo ruta...');
-      setGeneratingStep(1);
-
-      const suggestedCities = await suggestCitiesForTrip({ trip, preferences });
-
-      for (let i = 0; i < suggestedCities.length; i++) {
-        await base44.entities.City.create({
-          ...suggestedCities[i],
-          trip_id: tripId,
-          country: inferredTripCountry,
-        });
-      }
-
-      citiesToProcess = await base44.entities.City.filter({ trip_id: tripId }, 'order');
+  const addCityMutation = useMutation({
+    mutationFn: () => base44.entities.City.create({
+      trip_id: tripId,
+      name: newCityName.trim(),
+      country: newCityCountry.trim() || (trip?.country || ''),
+      order: cities.length,
+    }),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
-    }
-
-    const allExistingDays = await base44.entities.ItineraryDay.filter({ trip_id: tripId });
-
-    for (let i = 0; i < citiesToProcess.length; i++) {
-      const city = citiesToProcess[i];
-      if (!city.start_date || !city.end_date) continue;
-
-      setGeneratingCity(city.name);
-      setGeneratingStep(Math.min(2 + i, 5));
-
-      const existingCityDays = allExistingDays.filter((d) => d.city_id === city.id);
-      for (const day of existingCityDays) {
-        await base44.entities.ItineraryDay.delete(day.id);
-      }
-
-      const newDays = await generateDaysForCity({
-        city,
-        trip,
-        existingDays: allExistingDays.filter((d) => d.city_id !== city.id),
-        preferences,
-        allCities: citiesToProcess.filter((c) => c.id !== city.id),
-        onStatus: (msg) => setGeneratingCity(`${city.name}: ${msg}`),
-      });
-
-      for (let j = 0; j < newDays.length; j++) {
-        await base44.entities.ItineraryDay.create({
-          ...newDays[j],
-          trip_id: tripId,
-          city_id: city.id,
-          order: j,
-        });
-      }
-
-      const latestTrip = await base44.entities.Trip.get(tripId);
-      await updateVisitedPlaces(latestTrip, newDays);
-
-      allExistingDays.push(...newDays.map((d) => ({ ...d, city_id: city.id })));
-    }
-
-    setIsGenerating(false);
-
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
-    queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
-    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-
-    toast({
-      title: '¡Itinerario generado! 🎌',
-      description: 'Tu viaje inteligente está listo. Entra en cada ciudad para ver el detalle.',
-    });
-  };
+      setAddCityOpen(false);
+      setNewCityName('');
+      setNewCityCountry('');
+      toast({ title: `Ciudad "${newCityName.trim()}" añadida ✓` });
+    },
+  });
 
   return (
     <div className="min-h-screen bg-orange-50">
@@ -261,11 +191,11 @@ export default function Cities() {
                 </Button>
               )}
               <Button
-                onClick={() => setAiPanelOpen(true)}
+                onClick={() => setAddCityOpen(true)}
                 className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
               >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Generar con IA
+                <Plus className="w-4 h-4 mr-2" />
+                Añadir ciudad
               </Button>
             </div>
           </div>
@@ -273,11 +203,7 @@ export default function Cities() {
       </div>
 
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-6xl -mt-12">
-        {isGenerating ? (
-          <div className="bg-white rounded-2xl border border-border p-8">
-            <AIGeneratingStatus step={generatingStep} cityName={generatingCity} />
-          </div>
-        ) : isLoading ? (
+        {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="aspect-[16/10] rounded-2xl bg-secondary animate-pulse" />
@@ -287,10 +213,10 @@ export default function Cities() {
           <div className="text-center py-20 glass rounded-2xl border border-border">
             <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-light text-foreground mb-2">Sin ciudades todavía</h3>
-            <p className="text-muted-foreground font-light mb-6">Tu ruta aparecerá aquí</p>
-            <Button onClick={() => setAiPanelOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generar itinerario con IA
+            <p className="text-muted-foreground font-light mb-6">Añade las ciudades de tu ruta</p>
+            <Button onClick={() => setAddCityOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Añadir primera ciudad
             </Button>
           </div>
         ) : (
@@ -302,14 +228,43 @@ export default function Cities() {
         )}
       </div>
 
-      <AIGeneratorPanel
-        open={aiPanelOpen}
-        onOpenChange={setAiPanelOpen}
-        onGenerate={handleGenerateItinerary}
-        isGenerating={isGenerating}
-        trip={trip}
-        cities={cities}
-      />
+      {/* Dialog añadir ciudad */}
+      <Dialog open={addCityOpen} onOpenChange={setAddCityOpen}>
+        <DialogContent className="bg-card border-border max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Añadir ciudad</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Nombre de la ciudad *</label>
+              <Input
+                placeholder="ej. Tokyo"
+                value={newCityName}
+                onChange={(e) => setNewCityName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && newCityName.trim() && addCityMutation.mutate()}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">País (opcional)</label>
+              <Input
+                placeholder={`ej. ${trip?.country || 'Japón'}`}
+                value={newCityCountry}
+                onChange={(e) => setNewCityCountry(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-3 justify-end pt-1">
+              <Button variant="outline" onClick={() => setAddCityOpen(false)}>Cancelar</Button>
+              <Button
+                onClick={() => addCityMutation.mutate()}
+                disabled={!newCityName.trim() || addCityMutation.isPending}
+                className="bg-orange-700 hover:bg-orange-800"
+              >
+                {addCityMutation.isPending ? 'Añadiendo...' : 'Añadir'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

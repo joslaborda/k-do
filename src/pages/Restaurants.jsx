@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
-import { Search, BookOpen, Loader2, ChevronDown, ArrowRight } from 'lucide-react';
+import { Search, BookOpen, ChevronDown, ArrowRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,141 +26,18 @@ export default function Restaurants() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
 
-  const [foodCategories, setFoodCategories] = useState([]);
-  const [loadingFood, setLoadingFood] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState({});
 
   // Use active city context (hook always called)
   const { trip, activeCity } = useTripContext(tripId);
 
-  const country = activeCity?.country_code
-    ? getCountryMeta(activeCity.country_code).languageLabel
-      ? (activeCity.country || trip?.country || '')
-      : (trip?.country || '')
-    : (activeCity?.country || trip?.country || '');
+  const country = activeCity?.country || trip?.country || '';
   const flag = getCountryMeta(activeCity?.country_code || activeCity?.country || trip?.country || '').flag;
 
-  useEffect(() => {
-    if (!country) return;
-    // Use stable key per active country
-    const activeKey = activeCity?.country_code || country;
-    const cacheKey = `food_${activeKey}`;
-    setFoodCategories([]); // reset on country change
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.length > 0) {
-          setFoodCategories(parsed);
-          setExpandedCategories({ [parsed[0].category]: true });
-          return;
-        }
-      } catch {}
-    }
+  // Datos gastronómicos estáticos — próximamente
+  const foodCategories = [];
 
-    setLoadingFood(true);
-
-    // Fallback timeout
-    const fallbackTimer = setTimeout(() => {
-      if (loadingFood) {
-        setFoodCategories(FALLBACK_CATEGORIES);
-        setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
-        setLoadingFood(false);
-      }
-    }, 10000);
-
-    const prompt = `
-Eres un experto en gastronomía de ${country}. 
-Genera una guía gastronómica completa para un viajero hispanohablante que visita ${country}.
-
-Crea entre 6 y 10 categorías gastronómicas representativas del país (platos principales, sopas, snacks, postres, bebidas, etc.).
-Para cada categoría incluye entre 8 y 15 platos/bebidas representativos.
-
-Para cada plato incluye:
-- name: nombre en el idioma local (o nombre más conocido internacionalmente)
-- description: descripción en español de 1-2 frases, qué es y de qué sabe
-- image: URL de una imagen real de alta calidad del plato (usa URLs de dominios conocidos como justonecookbook.com, foodnetwork.com, bonappetit.com, seriouseats.com, etc.)
-
-Responde SOLO con JSON válido:
-{
-  "categories": [
-    {
-      "category": "Nombre de la categoría",
-      "icon": "emoji representativo",
-      "items": [
-        {
-          "name": "Nombre del plato",
-          "description": "Descripción breve en español",
-          "image": "https://..."
-        }
-      ]
-    }
-  ]
-}
-`;
-
-    base44.integrations.Core.InvokeLLM({
-      prompt,
-      model: 'claude_sonnet_4_6',
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          categories: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                category: { type: 'string' },
-                icon: { type: 'string' },
-                items: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      name: { type: 'string' },
-                      description: { type: 'string' },
-                      image: { type: 'string' },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    }).then((result) => {
-      const cats = result?.categories || [];
-      clearTimeout(fallbackTimer);
-      if (cats.length > 0) {
-        setFoodCategories(cats);
-        sessionStorage.setItem(cacheKey, JSON.stringify(cats));
-        setExpandedCategories({ [cats[0].category]: true });
-      } else {
-        setFoodCategories(FALLBACK_CATEGORIES);
-        setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
-      }
-    }).catch(() => {
-      clearTimeout(fallbackTimer);
-      setFoodCategories(FALLBACK_CATEGORIES);
-      setExpandedCategories({ [FALLBACK_CATEGORIES[0].category]: true });
-    }).finally(() => setLoadingFood(false));
-
-    return () => clearTimeout(fallbackTimer);
-  }, [country, activeCity?.country_code]);
-
-  const toggleCategory = (name) => {
-    setExpandedCategories((prev) => ({ ...prev, [name]: !prev[name] }));
-  };
-
-  const filteredCategories = foodCategories.map((cat) => ({
-    ...cat,
-    items: cat.items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter((cat) => cat.items.length > 0);
+  const filteredCategories = [];
 
   // No tripId: show empty state
   if (!tripId) {
@@ -228,82 +104,32 @@ Responde SOLO con JSON válido:
               />
             </div>
 
-            {/* Loading */}
-            {loadingFood && (
-              <div className="text-center py-20">
-                <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-orange-500" />
-                <p className="text-lg font-medium text-foreground">Cargando gastronomía de {country}...</p>
-                <p className="text-sm text-muted-foreground mt-1">La IA está preparando los platos más representativos</p>
-              </div>
-            )}
-
             {/* Sin país */}
-            {!loadingFood && !country && (
+            {!country && (
               <div className="text-center py-20 text-muted-foreground">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-30" />
                 <p className="text-lg">Abre desde un viaje para ver la gastronomía del país</p>
               </div>
             )}
 
+            {/* Próximamente */}
+            {country && foodCategories.length === 0 && (
+              <div className="text-center py-20 text-muted-foreground">
+                <div className="text-6xl mb-4">🍽️</div>
+                <p className="text-xl font-semibold text-foreground mb-2">Gastronomía de {country}</p>
+                <p className="text-muted-foreground">Los platos típicos estarán disponibles próximamente.</p>
+              </div>
+            )}
+
             {/* Sin resultados de búsqueda */}
-            {!loadingFood && country && filteredCategories.length === 0 && searchQuery && (
+            {country && filteredCategories.length === 0 && searchQuery && foodCategories.length > 0 && (
               <div className="text-center py-16 text-muted-foreground">
                 <Search className="w-16 h-16 mx-auto mb-4 opacity-30" />
                 <p className="text-lg">No se encontraron platos con "{searchQuery}"</p>
               </div>
             )}
 
-            {/* Categorías */}
-            {!loadingFood && filteredCategories.length > 0 && (
-              <div className="grid gap-4">
-                {filteredCategories.map((cat) => (
-                  <Collapsible
-                    key={cat.category}
-                    open={!!expandedCategories[cat.category]}
-                    onOpenChange={() => toggleCategory(cat.category)}
-                  >
-                    <div className="border border-border rounded-2xl overflow-hidden shadow-lg hover:border-primary/50 transition-colors">
-                      <CollapsibleTrigger className="bg-orange-200 px-6 py-5 text-left w-full flex items-center justify-between hover:bg-orange-300/50 transition-colors">
-                        <div className="flex items-center gap-4">
-                          <span className="text-3xl">{cat.icon}</span>
-                          <div>
-                            <span className="text-orange-700 text-lg font-bold">{cat.category}</span>
-                            <span className="text-orange-700 ml-2 text-xs">({cat.items.length} platos)</span>
-                          </div>
-                        </div>
-                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${expandedCategories[cat.category] ? 'rotate-180' : ''}`} />
-                      </CollapsibleTrigger>
 
-                      <CollapsibleContent>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 divide-border bg-white">
-                          {cat.items.map((item, idx) => (
-                            <div key={idx} className="p-4 hover:bg-orange-50 transition-colors border-b border-border/30">
-                              <div className="flex gap-3 items-start">
-                                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-orange-100">
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                      e.target.style.display = 'none';
-                                      e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center text-3xl">${cat.icon}</div>`;
-                                    }}
-                                  />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-bold text-foreground text-sm leading-tight">{item.name}</p>
-                                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.description}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
-                ))}
-              </div>
-            )}
           </TabsContent>
         </Tabs>
       </div>
