@@ -103,6 +103,7 @@ export default function Profile() {
       return all.filter(t => isOwnProfile ? true : t.visibility === 'public');
     },
     enabled: !!targetUserId,
+    staleTime: 60000,
   });
 
   const { data: publicSpots = [] } = useQuery({
@@ -112,24 +113,28 @@ export default function Profile() {
       return all.filter(s => s.visibility === 'public');
     },
     enabled: !!targetUserId,
+    staleTime: 60000,
   });
 
   const { data: followers = [] } = useQuery({
     queryKey: ['followers', targetUserId],
     queryFn: () => base44.entities.Follow.filter({ followed_user_id: targetUserId }),
     enabled: !!targetUserId,
+    staleTime: 30000,
   });
 
   const { data: following = [] } = useQuery({
     queryKey: ['following', targetUserId],
     queryFn: () => base44.entities.Follow.filter({ follower_user_id: targetUserId }),
     enabled: !!targetUserId,
+    staleTime: 30000,
   });
 
   const { data: myFollows = [] } = useQuery({
     queryKey: ['myFollows', currentUser?.id],
     queryFn: () => base44.entities.Follow.filter({ follower_user_id: currentUser.id }),
     enabled: !!currentUser?.id && !isOwnProfile,
+    staleTime: 30000,
   });
 
   const isFollowing = myFollows.some(f => f.followed_user_id === targetUserId);

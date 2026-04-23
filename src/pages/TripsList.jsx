@@ -151,6 +151,7 @@ export default function TripsList() {
   const { data: trips = [], isLoading } = useQuery({
     queryKey: ['trips'],
     queryFn: () => base44.entities.Trip.list('-created_date'),
+    staleTime: 30000,
   });
 
   const { data: allCities = [] } = useQuery({
