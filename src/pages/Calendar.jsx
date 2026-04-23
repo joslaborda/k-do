@@ -1,9 +1,8 @@
 import { useState } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, FileText, Eye, EyeOff, Users, Filter, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { Plus, FileText, Eye, EyeOff, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -34,20 +33,12 @@ export default function Calendar() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [visFilter, setVisFilter] = useState('all');
   const [catFilter, setCatFilter] = useState('all');
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const [userId, setUserId] = useState('');
 
   const queryClient = useQueryClient();
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const u = await base44.auth.me();
-      setCurrentUserEmail(u.email);
-      setUserId(u.id);
-      return u;
-    }
-  });
+  const { user: currentUser } = useAuth();
+  const currentUserEmail = currentUser?.email ?? '';
+  const userId = currentUser?.id ?? '';
 
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
@@ -134,10 +125,6 @@ export default function Calendar() {
       {/* Header */}
       <div className="bg-orange-700 pt-12 pb-20">
         <div className="max-w-6xl mx-auto px-6">
-          <Link to={tripId ? createPageUrl(`Home?trip_id=${tripId}`) : createPageUrl('TripsList')} className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 text-sm">
-            <ArrowLeft className="w-4 h-4" />
-            Volver al viaje
-          </Link>
           <h1 className="text-white text-4xl font-bold">Documentos ✈️</h1>
           <p className="text-white/90 mt-1">Inteligente, contextual y colaborativo</p>
         </div>
