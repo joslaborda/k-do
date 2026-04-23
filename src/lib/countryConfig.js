@@ -56,6 +56,9 @@ const KNOWN_META = {
   'Georgia':            { currency: 'GEL', symbol: '₾',    languageCode: 'ka-GE', languageLabel: 'ქართული',      flag: '🇬🇪', iso: 'GE' },
   'Armenia':            { currency: 'AMD', symbol: '֏',    languageCode: 'hy-AM', languageLabel: 'Հայերեն',      flag: '🇦🇲', iso: 'AM' },
   'Azerbaiyán':         { currency: 'AZN', symbol: '₼',    languageCode: 'az-AZ', languageLabel: 'Azərbaycan',   flag: '🇦🇿', iso: 'AZ' },
+  'Kosovo':             { currency: 'EUR', symbol: '€',    languageCode: 'sq-XK', languageLabel: 'Shqip',        flag: '🇽🇰', iso: 'XK' },
+  'Moldova':            { currency: 'MDL', symbol: 'L',    languageCode: 'ro-MD', languageLabel: 'Română',       flag: '🇲🇩', iso: 'MD' },
+  'Bielorrusia':        { currency: 'BYN', symbol: 'Br',   languageCode: 'be-BY', languageLabel: 'Беларуская',   flag: '🇧🇾', iso: 'BY' },
 
   // ── Norteamérica ───────────────────────────────────────────────────────────
   'Estados Unidos':     { currency: 'USD', symbol: '$',    languageCode: 'en-US', languageLabel: 'English',      flag: '🇺🇸', iso: 'US' },
@@ -65,7 +68,15 @@ const KNOWN_META = {
   'Costa Rica':         { currency: 'CRC', symbol: '₡',    languageCode: 'es-CR', languageLabel: 'Español',      flag: '🇨🇷', iso: 'CR' },
   'Panamá':             { currency: 'PAB', symbol: 'B/.',  languageCode: 'es-PA', languageLabel: 'Español',      flag: '🇵🇦', iso: 'PA' },
   'Guatemala':          { currency: 'GTQ', symbol: 'Q',    languageCode: 'es-GT', languageLabel: 'Español',      flag: '🇬🇹', iso: 'GT' },
+  'Honduras':           { currency: 'HNL', symbol: 'L',    languageCode: 'es-HN', languageLabel: 'Español',      flag: '🇭🇳', iso: 'HN' },
+  'El Salvador':        { currency: 'USD', symbol: '$',    languageCode: 'es-SV', languageLabel: 'Español',      flag: '🇸🇻', iso: 'SV' },
+  'Nicaragua':          { currency: 'NIO', symbol: 'C$',   languageCode: 'es-NI', languageLabel: 'Español',      flag: '🇳🇮', iso: 'NI' },
   'República Dominicana':{ currency: 'DOP', symbol: 'RD$', languageCode: 'es-DO', languageLabel: 'Español',     flag: '🇩🇴', iso: 'DO' },
+  'Jamaica':            { currency: 'JMD', symbol: '$',    languageCode: 'en-JM', languageLabel: 'English',      flag: '🇯🇲', iso: 'JM' },
+  'Trinidad y Tobago':  { currency: 'TTD', symbol: '$',    languageCode: 'en-TT', languageLabel: 'English',      flag: '🇹🇹', iso: 'TT' },
+  'Barbados':           { currency: 'BBD', symbol: '$',    languageCode: 'en-BB', languageLabel: 'English',      flag: '🇧🇧', iso: 'BB' },
+  'Bahamas':            { currency: 'BSD', symbol: '$',    languageCode: 'en-BS', languageLabel: 'English',      flag: '🇧🇸', iso: 'BS' },
+  'Haití':              { currency: 'HTG', symbol: 'G',    languageCode: 'fr-HT', languageLabel: 'Français',     flag: '🇭🇹', iso: 'HT' },
 
   // ── Sudamérica ─────────────────────────────────────────────────────────────
   'Argentina':          { currency: 'ARS', symbol: '$',    languageCode: 'es-AR', languageLabel: 'Español',      flag: '🇦🇷', iso: 'AR' },
@@ -77,6 +88,9 @@ const KNOWN_META = {
   'Bolivia':            { currency: 'BOB', symbol: 'Bs.',  languageCode: 'es-BO', languageLabel: 'Español',      flag: '🇧🇴', iso: 'BO' },
   'Ecuador':            { currency: 'USD', symbol: '$',    languageCode: 'es-EC', languageLabel: 'Español',      flag: '🇪🇨', iso: 'EC' },
   'Venezuela':          { currency: 'VES', symbol: 'Bs.S', languageCode: 'es-VE', languageLabel: 'Español',      flag: '🇻🇪', iso: 'VE' },
+  'Paraguay':           { currency: 'PYG', symbol: '₲',    languageCode: 'es-PY', languageLabel: 'Español',      flag: '🇵🇾', iso: 'PY' },
+  'Guyana':             { currency: 'GYD', symbol: '$',    languageCode: 'en-GY', languageLabel: 'English',      flag: '🇬🇾', iso: 'GY' },
+  'Surinam':            { currency: 'SRD', symbol: '$',    languageCode: 'nl-SR', languageLabel: 'Nederlands',   flag: '🇸🇷', iso: 'SR' },
 
   // ── Asia Oriental ──────────────────────────────────────────────────────────
   'Japón':              { currency: 'JPY', symbol: '¥',    languageCode: 'ja-JP', languageLabel: 'Japanese',     flag: '🇯🇵', iso: 'JP' },
@@ -130,6 +144,9 @@ const KNOWN_META = {
   'Marruecos':          { currency: 'MAD', symbol: 'DH',   languageCode: 'ar-MA', languageLabel: 'Arabic',       flag: '🇲🇦', iso: 'MA' },
   'Egipto':             { currency: 'EGP', symbol: '£',    languageCode: 'ar-EG', languageLabel: 'Arabic',       flag: '🇪🇬', iso: 'EG' },
   'Túnez':              { currency: 'TND', symbol: 'DT',   languageCode: 'ar-TN', languageLabel: 'Arabic',       flag: '🇹🇳', iso: 'TN' },
+  'Argelia':            { currency: 'DZD', symbol: 'دج',   languageCode: 'ar-DZ', languageLabel: 'Arabic',       flag: '🇩🇿', iso: 'DZ' },
+  'Libia':              { currency: 'LYD', symbol: 'LD',   languageCode: 'ar-LY', languageLabel: 'Arabic',       flag: '🇱🇾', iso: 'LY' },
+  'Sudán':              { currency: 'SDG', symbol: '£',    languageCode: 'ar-SD', languageLabel: 'Arabic',       flag: '🇸🇩', iso: 'SD' },
 
   // ── África Subsahariana ────────────────────────────────────────────────────
   'Sudáfrica':          { currency: 'ZAR', symbol: 'R',    languageCode: 'en-ZA', languageLabel: 'English',      flag: '🇿🇦', iso: 'ZA' },
@@ -137,10 +154,13 @@ const KNOWN_META = {
   'Tanzania':           { currency: 'TZS', symbol: 'TSh',  languageCode: 'sw-TZ', languageLabel: 'Swahili',      flag: '🇹🇿', iso: 'TZ' },
   'Uganda':             { currency: 'UGX', symbol: 'USh',  languageCode: 'sw-UG', languageLabel: 'Swahili',      flag: '🇺🇬', iso: 'UG' },
   'Ruanda':             { currency: 'RWF', symbol: 'RF',   languageCode: 'rw-RW', languageLabel: 'Kinyarwanda',  flag: '🇷🇼', iso: 'RW' },
+  'Rwanda':             { currency: 'RWF', symbol: 'RF',   languageCode: 'rw-RW', languageLabel: 'Kinyarwanda',  flag: '🇷🇼', iso: 'RW' },
   'Etiopía':            { currency: 'ETB', symbol: 'Br',   languageCode: 'am-ET', languageLabel: 'Amharic',      flag: '🇪🇹', iso: 'ET' },
   'Ghana':              { currency: 'GHS', symbol: '₵',    languageCode: 'en-GH', languageLabel: 'English',      flag: '🇬🇭', iso: 'GH' },
   'Nigeria':            { currency: 'NGN', symbol: '₦',    languageCode: 'en-NG', languageLabel: 'English',      flag: '🇳🇬', iso: 'NG' },
   'Senegal':            { currency: 'XOF', symbol: 'CFA',  languageCode: 'fr-SN', languageLabel: 'Français',     flag: '🇸🇳', iso: 'SN' },
+  'Camerún':            { currency: 'XAF', symbol: 'CFA',  languageCode: 'fr-CM', languageLabel: 'Français',     flag: '🇨🇲', iso: 'CM' },
+  'Angola':             { currency: 'AOA', symbol: 'Kz',   languageCode: 'pt-AO', languageLabel: 'Português',    flag: '🇦🇴', iso: 'AO' },
   'Mozambique':         { currency: 'MZN', symbol: 'MT',   languageCode: 'pt-MZ', languageLabel: 'Português',    flag: '🇲🇿', iso: 'MZ' },
   'Zambia':             { currency: 'ZMW', symbol: 'ZK',   languageCode: 'en-ZM', languageLabel: 'English',      flag: '🇿🇲', iso: 'ZM' },
   'Zimbabue':           { currency: 'ZWL', symbol: '$',    languageCode: 'en-ZW', languageLabel: 'English',      flag: '🇿🇼', iso: 'ZW' },
