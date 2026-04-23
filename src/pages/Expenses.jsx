@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -28,15 +28,12 @@ export default function Expenses() {
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
 
-  // Obtener usuario actual
-  useEffect(() => {
-  }, []);
-
   // Obtener trip
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
     enabled: !!tripId,
+    staleTime: 60000,
   });
 
   const members = trip?.members || [];
@@ -52,6 +49,7 @@ export default function Expenses() {
   const { data: usersData = [] } = useQuery({
     queryKey: ['users'],
     queryFn: () => base44.entities.User.list(),
+    staleTime: 120000,
   });
 
   // Crear mapa: email -> nombre
@@ -63,11 +61,9 @@ export default function Expenses() {
   // Obtener gastos
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
-    queryFn: () =>
-      tripId
-        ? base44.entities.Expense.filter({ trip_id: tripId }, '-date')
-        : base44.entities.Expense.list('-date'),
+    queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }, '-date'),
     enabled: !!tripId,
+    staleTime: 30000,
   });
 
   // Crear gasto

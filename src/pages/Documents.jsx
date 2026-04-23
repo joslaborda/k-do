@@ -38,13 +38,15 @@ export default function Documents() {
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 60000,
   });
 
   const { data: itineraryDays = [] } = useQuery({
@@ -60,7 +62,8 @@ export default function Documents() {
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 60000,
   });
 
   const members = trip?.members || [];

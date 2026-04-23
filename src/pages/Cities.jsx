@@ -83,25 +83,23 @@ export default function Cities() {
 
   const { data: cities = [], isLoading } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () =>
-      tripId
-        ? base44.entities.City.filter({ trip_id: tripId }, 'order')
-        : base44.entities.City.list('order'),
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    enabled: !!tripId,
     staleTime: 30000,
   });
 
   const { data: itineraryDays = [] } = useQuery({
     queryKey: ['itineraryDays', tripId],
-    queryFn: () =>
-      tripId
-        ? base44.entities.ItineraryDay.filter({ trip_id: tripId })
-        : base44.entities.ItineraryDay.list(),
+    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
     enabled: !!tripId,
+    staleTime: 60000,
   });
 
   // Sort cities: start_date first, then order
