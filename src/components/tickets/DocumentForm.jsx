@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Plane, Train, Hotel, CalendarDays, FileText, Package, MapPin, Upload, Eye, EyeOff, Users, Loader2, Check } from 'lucide-react';
 
 export const CATEGORY_CONFIG = {
@@ -100,17 +99,6 @@ export default function DocumentForm({ cities = [], itineraryDays = [], members 
         return null;
     }
   };
-
-  // ── Itinerary day suggestions ────────────────────────────────────────────
-  const suggestedDay = form.date && !form.itinerary_day_id
-    ? itineraryDays.find(d => d.date === form.date)
-    : null;
-
-  // ── City suggestion ──────────────────────────────────────────────────────
-  const primaryCity = form.city || form.destination || form.origin || '';
-  const suggestedCity = !form.city_id && primaryCity
-    ? cities.find(c => c.name.toLowerCase().includes(primaryCity.toLowerCase()) || primaryCity.toLowerCase().includes(c.name.toLowerCase()))
-    : null;
 
   const canSave = form.name.trim() && !uploadingFile;
 

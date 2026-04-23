@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PDFViewer({ fileUrl, onClose }) {
   const canvasRef = useRef(null);
@@ -87,8 +87,8 @@ export default function PDFViewer({ fileUrl, onClose }) {
   return (
     <Dialog open={!!fileUrl} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[95vh] p-0 overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <h3 className="font-semibold text-foreground">Documento</h3>
+        <div className="flex items-center justify-between p-4 border-b bg-white pr-12">
+          <DialogTitle className="font-semibold text-foreground">Documento</DialogTitle>
           <div className="flex items-center gap-2">
             {isPDF && pageCount > 0 && (
               <div className="flex items-center gap-2">
@@ -113,18 +113,11 @@ export default function PDFViewer({ fileUrl, onClose }) {
                 </Button>
               </div>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-            >
+            <Button variant="outline" size="sm" asChild>
               <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
                 <Download className="w-4 h-4 mr-2" />
                 Descargar
               </a>
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
