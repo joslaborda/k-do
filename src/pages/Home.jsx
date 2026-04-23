@@ -119,25 +119,29 @@ export default function Home() {
   const { data: cities = [], isLoading: citiesLoading } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery({
     queryKey: ['expenses', tripId],
     queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: packingItems = [], isLoading: packingLoading } = useQuery({
     queryKey: ['packingItems', tripId],
     queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: diaryEntries = [], isLoading: diaryLoading } = useQuery({
     queryKey: ['diaryEntries', tripId],
     queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }),
-    enabled: !!tripId
+    enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: myProfile } = useQuery({

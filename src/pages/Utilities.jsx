@@ -95,12 +95,14 @@ export default function Utilities() {
     queryKey: ['usefulInfo', tripId],
     queryFn: () => base44.entities.UsefulInfo.filter({ trip_id: tripId }),
     enabled: !!tripId,
+    staleTime: 30000,
   });
 
   const { data: packingItems = [] } = useQuery({
     queryKey: ['packingItems', tripId],
     queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }),
     enabled: !!tripId,
+    staleTime: 30000,
   });
 
   // Cargar tasa de cambio dinámica (base → quote)
