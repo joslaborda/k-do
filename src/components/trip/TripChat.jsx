@@ -5,8 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, MessageCircle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { format } from 'date-fns';
 
 export default function TripChat({ tripId, myProfile }) {
   const { user } = useAuth();
@@ -97,9 +96,9 @@ export default function TripChat({ tripId, myProfile }) {
               </div>
               {/* Bubble */}
               <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
-                {!isMe && (
-                  <span className="text-[10px] text-muted-foreground px-1">{msg.display_name || msg.user_email}</span>
-                )}
+                <span className={`text-[10px] text-muted-foreground px-1 ${isMe ? 'text-right' : ''}`}>
+                  {isMe ? 'Tú' : (msg.display_name || msg.user_email)}
+                </span>
                 <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${
                   isMe
                     ? 'bg-orange-700 text-white rounded-br-sm'
@@ -108,7 +107,7 @@ export default function TripChat({ tripId, myProfile }) {
                   {msg.content}
                 </div>
                 <span className="text-[10px] text-muted-foreground px-1">
-                  {formatDistanceToNow(new Date(msg.created_date), { addSuffix: true, locale: es })}
+                  {isMe ? '' : ''}{format(new Date(msg.created_date), 'HH:mm')}
                 </span>
               </div>
             </div>
