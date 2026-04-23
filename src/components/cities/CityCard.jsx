@@ -18,69 +18,52 @@ export default function CityCard({ city, daysCount, tripId }) {
     if (!city.start_date) return null;
     const start = new Date(city.start_date);
     const end = city.end_date ? new Date(city.end_date) : null;
-
-    if (end && start.getTime() === end.getTime()) {
-      return format(start, 'd MMM', { locale: es });
-    }
-    if (end) {
-      return `${format(start, 'd', { locale: es })}-${format(end, 'd MMM', { locale: es })}`;
-    }
+    if (end && start.getTime() === end.getTime()) return format(start, 'd MMM', { locale: es });
+    if (end) return `${format(start, 'd', { locale: es })}-${format(end, 'd MMM', { locale: es })}`;
     return format(start, 'd MMM', { locale: es });
   };
 
-  const countryLabel = city.country ? city.country : '';
-
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-border bg-white shadow-sm hover:shadow-md transition-shadow">
-      <Link
-        to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}
-        className="block"
-      >
+    <div className="group relative overflow-hidden rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
+      <Link to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}>
         <div className="relative aspect-[16/10] overflow-hidden">
           <img
             src={city.image_url || cityImages[city.name] || 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=800'}
             alt={city.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <div className="text-white text-xl font-bold leading-tight">{city.name}</div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-            {countryLabel && (
-              <div className="text-white/80 text-sm mt-1">{countryLabel}</div>
-            )}
-
-            {city.start_date && (
-              <div className="flex items-center gap-1.5 text-white/85 text-sm mt-2">
-                <Calendar className="w-4 h-4" />
-                <span>{formatDateRange()}</span>
+          {/* Info sobre la imagen */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+            <div>
+              <div className="text-white text-xl font-bold leading-tight">{city.name}</div>
+              {city.country && <div className="text-white/80 text-sm mt-0.5">{city.country}</div>}
+              <div className="flex items-center gap-3 mt-1">
+                {city.start_date && (
+                  <span className="flex items-center gap-1 text-white/85 text-xs">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {formatDateRange()}
+                  </span>
+                )}
+                {daysCount > 0 && (
+                  <span className="text-white/75 text-xs">{daysCount} {daysCount === 1 ? 'día' : 'días'}</span>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="p-5">
-          <h4 className="text-lg font-semibold text-foreground mb-2">{city.name}</h4>
-
-          {daysCount > 0 && (
-            <div className="text-sm text-muted-foreground">
-              {daysCount} {daysCount === 1 ? 'día' : 'días'} planificados
             </div>
-          )}
 
-          <div className="mt-4">
-            <AccommodationInput city={city} tripId={tripId} />
+            {/* Botón navegar */}
+            <div className="w-9 h-9 rounded-full bg-orange-700 flex items-center justify-center text-white border-2 border-white/30 flex-shrink-0">
+              <ChevronRight className="w-5 h-5" />
+            </div>
           </div>
         </div>
       </Link>
 
-      <button
-        onClick={(e) => e.stopPropagation()}
-        className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-orange-700 flex items-center justify-center transition-all duration-200 hover:bg-white text-white hover:text-orange-700 border border-orange-700"
-        aria-label="Abrir ciudad"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
+      {/* Alojamiento fuera del Link para no interferir */}
+      <div className="px-4 py-3 bg-white">
+        <AccommodationInput city={city} tripId={tripId} />
+      </div>
     </div>
   );
 }
