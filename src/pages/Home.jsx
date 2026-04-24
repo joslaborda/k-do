@@ -30,7 +30,6 @@ import PublishSection from '@/components/trip/PublishSection';
 import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 import TripChat from '@/components/trip/TripChat';
 import TripAlerts from '@/components/trip/TripAlerts';
-import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
