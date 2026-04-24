@@ -318,7 +318,6 @@ export default function Restaurants() {
   });
 
   useEffect(() => {
-    if (panelMode !== 'search') return;
     if (!searchQuery.trim() || searchQuery.length < 2) { setSearchResults([]); return; }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(async () => {
@@ -328,7 +327,7 @@ export default function Restaurants() {
       finally { setSearching(false); }
     }, 700);
     return () => clearTimeout(searchTimer.current);
-  }, [searchQuery, city, country, panelMode]);
+  }, [searchQuery, city, country]);
 
   const handleNearby = async () => {
     setPanelMode('nearby'); setLoadingNearby(true); setNearbyError(''); setNearbyResults([]);
@@ -407,41 +406,40 @@ export default function Restaurants() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { mode:'search', icon:<Search className="w-5 h-5"/>, label:'Buscar' },
-              { mode:'nearby', icon:<Navigation className="w-5 h-5"/>, label:'Cerca de mí', action: handleNearby },
-              { mode:'manual', icon:<PenLine className="w-5 h-5"/>, label:'Crear' },
-            ].map(({ mode, icon, label, action }) => (
-              <button key={mode}
-                onClick={() => action ? action() : setPanelMode(panelMode===mode ? null : mode)}
-                className={"flex flex-col items-center gap-1 py-3 rounded-xl border transition-all text-xs font-medium " +
-                  (panelMode===mode ? 'bg-white text-orange-700 border-white' : 'bg-white/15 text-white border-white/30 hover:bg-white/25')}>
-                {icon}{label}
-              </button>
-            ))}
-          </div>
-
-          {panelMode === 'search' && (
-            <div className="mt-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
-                <Input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  placeholder={city ? `Busca en ${city}...` : 'Busca un lugar...'}
-                  className="pl-9 bg-white border-0 h-11 text-sm"/>
-                {searchQuery && <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"><X className="w-4 h-4"/></button>}
-              </div>
-              {searching && <p className="text-white/70 text-xs mt-2 text-center">Buscando...</p>}
-              {!searching && searchQuery.length >= 2 && searchResults.length === 0 && (
-                <p className="text-white/70 text-xs mt-2 text-center">Sin resultados — prueba en inglés o simplifica el nombre</p>
+          <div className="flex gap-2 items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
+              <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                placeholder={city ? `Busca en ${city}...` : 'Busca un lugar...'}
+                className="pl-9 pr-24 bg-white border-0 h-11 text-sm"/>
+              {searchQuery ? (
+                <button onClick={() => { setSearchQuery(''); setSearchResults([]); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground p-1">
+                  <X className="w-4 h-4"/>
+                </button>
+              ) : (
+                <button onClick={handleNearby}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-md font-medium whitespace-nowrap">
+                  <Navigation className="w-3 h-3"/>Cerca
+                </button>
               )}
             </div>
+            <button onClick={() => setPanelMode(panelMode === 'manual' ? null : 'manual')}
+              className={"w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center border transition-all " +
+                (panelMode === 'manual' ? 'bg-white text-orange-700 border-white' : 'bg-white/20 text-white border-white/30 hover:bg-white/30')}>
+              {panelMode === 'manual' ? <X className="w-5 h-5"/> : <Plus className="w-5 h-5"/>}
+            </button>
+          </div>
+          {searching && <p className="text-white/70 text-xs mt-2 text-center">Buscando...</p>}
+          {loadingNearby && <p className="text-white/70 text-xs mt-2 text-center">Obteniendo tu ubicación...</p>}
+          {!searching && searchQuery.length >= 2 && searchResults.length === 0 && (
+            <p className="text-white/70 text-xs mt-2 text-center">Sin resultados — prueba en inglés</p>
           )}
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 -mt-12 space-y-4">
-        {panelMode === 'search' && searchResults.length > 0 && (
+        {searchResults.length > 0 && (
           <div className="space-y-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{searchResults.length} resultados</p>
             {searchResults.map(p => <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id}/>)}
