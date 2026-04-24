@@ -53,22 +53,6 @@ async function fromHistoricalFrankfurter(from, to, dateStr) {
   return { rate, source: `frankfurter/ECB@${dateStr}` };
 }
 
-async function fromLLM(from, to) {
-  const result = await base44.integrations.Core.InvokeLLM({
-    prompt: `Give me the current exchange rate from ${from} to ${to}. Return only the numeric rate (how many ${to} equals 1 ${from}).`,
-    add_context_from_internet: true,
-    response_json_schema: {
-      type: 'object',
-      properties: {
-        rate: { type: 'number' },
-        source: { type: 'string' },
-      },
-    },
-  });
-  if (!result?.rate || result.rate <= 0) throw new Error('LLM returned invalid rate');
-  return { rate: result.rate, source: result.source || 'llm/internet' };
-}
-
 async function persistToEntity(from, to, rate, source) {
   try {
     const now = new Date().toISOString();
@@ -136,16 +120,7 @@ export async function getFxRate(from, to, dateStr = null) {
     return { ...result, fetchedAt };
   } catch {}
 
-  // 5. LLM fallback
-  try {
-    const result = await fromLLM(from, to);
-    const fetchedAt = new Date().toISOString();
-    lsSet(from, to, result.rate, result.source + '/fallback');
-    persistToEntity(from, to, result.rate, result.source + '/fallback');
-    return { ...result, fetchedAt };
-  } catch {}
-
-  // 6. Last resort: 1:1 with warning
+  // 5. Last resort: 1:1 con aviso
   return { rate: 1, source: 'unavailable', fetchedAt: new Date().toISOString() };
 }
 
