@@ -3,10 +3,12 @@ import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/lib/AuthContext';
 import {
-  ExternalLink, MapPin, Calendar, Copy, CheckCircle, Trash2, Eye, EyeOff,
-  Utensils, Landmark, Zap, ShoppingBag, Train, Star
+  ExternalLink, MapPin, Calendar, Copy, CheckCircle, Trash2,
+  Heart
 } from 'lucide-react';
+import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
   food:      { label: 'Comida',     emoji: '🍜', color: 'bg-orange-100 text-orange-700' },
@@ -36,8 +38,16 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
   const [assignOpen, setAssignOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
+
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLike({
+    targetId: spot.id,
+    targetType: 'spot',
+    userId: user?.id,
+    targetOwnerId: spot.created_by_user_id,
+  });
 
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.Spot.update(spot.id, data),
@@ -137,7 +147,17 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
 
       {/* Actions */}
       <div className="flex flex-wrap gap-2 pt-1">
-        {/* Link */}
+        {/* Like */}
+        <button
+          onClick={toggleLike}
+          className={'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-colors border ' +
+            (isLiked
+              ? 'bg-red-50 text-red-500 border-red-200'
+              : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-red-50 hover:text-red-400 hover:border-red-200')}
+        >
+          <Heart className={'w-3 h-3 ' + (isLiked ? 'fill-current' : '')} />
+          {likeCount > 0 ? likeCount : 'Me gusta'}
+        </button>
         {spot.link && (
           <a
             href={spot.link}

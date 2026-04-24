@@ -333,6 +333,8 @@ export default function Profile() {
     }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', currentUser?.id] }),
   });
+
+  const followMutation = useMutation({
     mutationFn: async () => {
       if (isFollowing && followRecord) {
         await base44.entities.Follow.delete(followRecord.id);
