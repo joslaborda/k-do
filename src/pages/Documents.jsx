@@ -148,12 +148,12 @@ export default function Documents() {
       <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
 
         {/* Toolbar card */}
-         <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 flex items-center gap-1 overflow-x-auto -translate-y-2.5">
-           {/* Category pills */}
-           <div className="flex items-center gap-1 flex-1">
+         <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 -translate-y-2.5">
+           {/* Category pills - scrollable row */}
+           <div className="flex items-center gap-1 overflow-x-auto pb-1 mb-1 border-b border-gray-100">
             <button
               onClick={() => setCatFilter('all')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${catFilter === 'all' ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${catFilter === 'all' ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
             >
               Todos
             </button>
@@ -164,27 +164,27 @@ export default function Documents() {
                  <button
                    key={key}
                    onClick={() => setCatFilter(active ? 'all' : key)}
-                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
+                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
                  >
                    <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                   <span className="hidden sm:inline">{cfg.label}</span>
+                   <span>{cfg.label}</span>
                  </button>
                );
              })}
           </div>
 
-          {/* Visibility filters */}
-          <div className="flex items-center gap-1 border-l border-gray-100 pl-1">
+          {/* Visibility filters - scrollable row */}
+          <div className="flex items-center gap-1 overflow-x-auto pt-1">
             {VISIBILITY_FILTERS.map(f => {
               const Icon = f.icon;
               return (
                 <button
                   key={f.value}
                   onClick={() => setVisFilter(f.value)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
                 >
                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="hidden sm:inline">{f.label}</span>
+                  <span>{f.label}</span>
                 </button>
               );
             })}
