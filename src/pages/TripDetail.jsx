@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useTripContext } from '@/hooks/useTripContext';
+import { getTripCoverImage } from '@/lib/tripImage';
 import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 
 export default function TripDetail() {
@@ -84,51 +84,38 @@ export default function TripDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="glass border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          <Link to={createPageUrl('TripsList')}>
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver a viajes
-            </Button>
-          </Link>
-          
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold text-foreground mb-2">{trip.name}</h1>
-              {tripCities.length > 0 && (
-                <div className="mb-3">
-                  <ActiveCitySelector
-                    cities={tripCities}
-                    overrideCityId={overrideCityId}
-                    setOverrideCityId={setOverrideCityId}
-                    clearOverride={clearOverride}
-                    activeCity={activeCity}
-                  />
-                </div>
-              )}
-              <div className="flex flex-wrap gap-4 text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  {trip.destination}, {trip.country}
-                </div>
-                {trip.start_date && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
-                    {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  {trip.members?.length || 1} viajero{(trip.members?.length || 1) > 1 ? 's' : ''}
-                </div>
-              </div>
-            </div>
-            <Button variant="outline" size="icon">
+      {/* Hero con foto de portada */}
+      <div className="relative h-56 overflow-hidden">
+        <img
+          src={getTripCoverImage(trip, tripCities)}
+          alt={trip.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+        <div className="absolute inset-0 flex flex-col justify-between p-6 pt-12">
+          <div className="flex items-center justify-between">
+            <Link to={createPageUrl('TripsList')}>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 -ml-2">
+                <ArrowLeft className="w-4 h-4 mr-1" />Volver
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
               <Settings className="w-4 h-4" />
             </Button>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-1">{trip.name}</h1>
+            <div className="flex flex-wrap gap-3 text-white/80 text-sm">
+              <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}, {trip.country}</span>
+              {trip.start_date && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
+                  {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                </span>
+              )}
+              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{trip.members?.length || 1} viajero{(trip.members?.length || 1) > 1 ? 's' : ''}</span>
+            </div>
           </div>
         </div>
       </div>
