@@ -1,36 +1,54 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { createNotification } from '@/lib/notifications';
 
-export function useLike({ entityType, entityId, userId }) {
+/**
+ * useLike — hook reutilizable para dar/quitar like a un spot o template
+ * @param {string} targetId — ID del contenido
+ * @param {string} targetType — 'spot' | 'template'
+ * @param {string} userId — ID del usuario actual
+ * @param {string} targetOwnerId — ID del propietario (para notificación)
+ */
+export function useLike({ targetId, targetType, userId, targetOwnerId }) {
   const queryClient = useQueryClient();
-  const queryKey = ['likes', entityType, entityId];
+  const qKey = ['likes', targetType, targetId];
 
   const { data: likes = [] } = useQuery({
-    queryKey,
-    queryFn: () => base44.entities.Like?.filter({ entity_type: entityType, entity_id: entityId }) || [],
-    enabled: !!entityId,
+    queryKey: qKey,
+    queryFn: () => base44.entities.Like.filter({ target_id: targetId, target_type: targetType }),
+    enabled: !!targetId && !!targetType,
     staleTime: 30000,
   });
 
-  const isLiked = userId ? likes.some(l => l.user_id === userId) : false;
-  const likeRecord = userId ? likes.find(l => l.user_id === userId) : null;
+  const likeRecord = likes.find(l => l.user_id === userId);
+  const isLiked = !!likeRecord;
+  const count = likes.length;
 
-  const toggleMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async () => {
       if (isLiked && likeRecord) {
         await base44.entities.Like.delete(likeRecord.id);
       } else {
-        await base44.entities.Like.create({ entity_type: entityType, entity_id: entityId, user_id: userId });
+        await base44.entities.Like.create({
+          user_id: userId,
+          target_id: targetId,
+          target_type: targetType,
+          target_owner_id: targetOwnerId || null,
+        });
+        if (targetOwnerId && targetOwnerId !== userId) {
+          try {
+            createNotification({
+              userId: targetOwnerId,
+              type: 'like',
+              refId: targetId,
+              message: targetType === 'spot' ? 'Le ha gustado tu spot' : 'Le ha gustado tu itinerario',
+            });
+          } catch {}
+        }
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
   });
 
-  return {
-    likes,
-    likesCount: likes.length,
-    isLiked,
-    toggle: () => toggleMutation.mutate(),
-    isPending: toggleMutation.isPending,
-  };
+  return { isLiked, count, toggle: () => mutation.mutate(), loading: mutation.isPending };
 }

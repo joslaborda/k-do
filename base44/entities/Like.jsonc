@@ -1,0 +1,31 @@
+{
+  "name": "Like",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario que da like"
+    },
+    "target_id": {
+      "type": "string",
+      "description": "ID del spot o itinerario"
+    },
+    "target_type": {
+      "type": "string",
+      "enum": [
+        "spot",
+        "template"
+      ],
+      "description": "Tipo de contenido"
+    },
+    "target_owner_id": {
+      "type": "string",
+      "description": "ID del propietario del contenido, para notificaciones"
+    }
+  },
+  "required": [
+    "user_id",
+    "target_id",
+    "target_type"
+  ]
+}
