@@ -6,9 +6,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/lib/AuthContext';
 import {
   ExternalLink, MapPin, Calendar, Copy, CheckCircle, Trash2,
-  Heart
+  Heart, Star
 } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const TYPE_CONFIG = {
   food:      { label: 'Comida',     emoji: '🍜', color: 'bg-orange-100 text-orange-700' },
@@ -31,6 +32,51 @@ function getMapsUrl(spot) {
   return isIOS
     ? `https://maps.apple.com/?q=${query}`
     : `https://www.openstreetmap.org/search?query=${query}`;
+}
+
+
+function SpotStars({ spotId, userId }) {
+  const queryClient = useQueryClient();
+  const [hovering, setHovering] = useState(null);
+  const [useState_] = [useState];
+
+  const { data: ratings = [] } = useQuery({
+    queryKey: ['spotRatings', spotId],
+    queryFn: () => base44.entities.SpotRating.filter({ spot_id: spotId }),
+    enabled: !!spotId,
+    staleTime: 30000,
+  });
+
+  const myRating = ratings.find(r => r.user_id === userId);
+  const avg = ratings.length > 1
+    ? Math.round(ratings.reduce((s, r) => s + r.rating, 0) / ratings.length * 10) / 10
+    : null;
+
+  const mut = useMutation({
+    mutationFn: async stars => {
+      if (myRating) await base44.entities.SpotRating.update(myRating.id, { rating: stars });
+      else await base44.entities.SpotRating.create({ spot_id: spotId, user_id: userId, rating: stars });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spotRatings', spotId] }),
+  });
+
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-0.5">
+        {[1,2,3,4,5].map(star => (
+          <button key={star}
+            onMouseEnter={() => setHovering(star)}
+            onMouseLeave={() => setHovering(null)}
+            onClick={() => mut.mutate(star)}
+            className="p-0.5 hover:scale-110 transition-transform">
+            <Star className={"w-4 h-4 " + ((hovering || myRating?.rating || 0) >= star ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30')}/>
+          </button>
+        ))}
+      </div>
+      {avg && <span className="text-xs text-muted-foreground">{avg} ({ratings.length})</span>}
+      {!myRating && <span className="text-xs text-muted-foreground">¿Cómo fue?</span>}
+    </div>
+  );
 }
 
 export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tripId }) {
