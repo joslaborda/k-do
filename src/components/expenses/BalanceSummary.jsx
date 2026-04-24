@@ -1,157 +1,76 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, TrendingUp, TrendingDown, Scale, RefreshCw, Loader2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { TrendingUp, TrendingDown, Scale } from 'lucide-react';
+import { getFxRate } from '@/lib/fxRates';
 
-export default function BalanceSummary({ expenses }) {
-  const [exchangeRate, setExchangeRate] = useState(null);
-  const [loadingRate, setLoadingRate] = useState(true);
+export default function BalanceSummary({ expenses, baseCurrency = 'EUR', members = [] }) {
+  const [rates, setRates] = useState({});
 
   useEffect(() => {
-    fetchExchangeRate();
-  }, []);
-
-  const fetchExchangeRate = async () => {
-    setLoadingRate(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: "What is the current EUR to JPY exchange rate? Reply with ONLY the number, nothing else. For example: 162.5",
-      add_context_from_internet: true
+    const currencies = [...new Set(expenses.map(e => e.currency || baseCurrency))].filter(c => c !== baseCurrency);
+    currencies.forEach(async (c) => {
+      try {
+        const { rate } = await getFxRate(c, baseCurrency);
+        setRates(prev => ({ ...prev, [c]: rate }));
+      } catch {}
     });
-    const rate = parseFloat(result.replace(/[^0-9.]/g, ''));
-    if (!isNaN(rate)) {
-      setExchangeRate(rate);
+  }, [expenses, baseCurrency]);
+
+  const toBase = (amount, currency) => {
+    if (!currency || currency === baseCurrency) return amount;
+    const rate = rates[currency];
+    return rate ? amount * rate : amount;
+  };
+
+  const balances = {};
+  const allMembers = members.length > 0
+    ? members
+    : [...new Set(expenses.flatMap(e => [e.paid_by, ...(e.split_with || [])].filter(Boolean)))];
+  allMembers.forEach(m => { balances[m] = 0; });
+
+  expenses.forEach(e => {
+    const amount = toBase(e.amount || 0, e.currency);
+    const payer = e.paid_by;
+    const splitWith = e.split_with || [];
+    if (!payer) return;
+    if (splitWith.length === 0) {
+      balances[payer] = (balances[payer] || 0) + amount;
+    } else {
+      const all = [...new Set([payer, ...splitWith])];
+      const share = amount / all.length;
+      all.forEach(m => { balances[m] = (balances[m] || 0) - share; });
+      balances[payer] = (balances[payer] || 0) + amount;
     }
-    setLoadingRate(false);
-  };
+  });
 
-  const convertToJPY = (amount, currency) => {
-    if (currency === 'JPY') return amount;
-    if (currency === 'EUR' && exchangeRate) return amount * exchangeRate;
-    return amount;
-  };
-
-  const convertToEUR = (amountJPY) => {
-    if (!exchangeRate) return null;
-    return amountJPY / exchangeRate;
-  };
-
-  const calculateBalances = () => {
-    let youPaidJPY = 0;
-    let carlosPaidJPY = 0;
-    let youOwesJPY = 0;
-    let carlosOwesJPY = 0;
-
-    expenses.forEach((expense) => {
-      const amount = expense.amount || 0;
-      const amountJPY = convertToJPY(amount, expense.currency || 'JPY');
-      const splitWith = expense.split_with || [];
-      const isSplit = splitWith.length > 0;
-      const splitAmount = isSplit ? amountJPY / 2 : 0;
-
-      if (expense.paid_by === 'You' || expense.paid_by === 'José') {
-        youPaidJPY += amountJPY;
-        if (isSplit && splitWith.includes('Carlos')) {
-          carlosOwesJPY += splitAmount;
-        }
-      } else if (expense.paid_by === 'Carlos') {
-        carlosPaidJPY += amountJPY;
-        if (isSplit && (splitWith.includes('You') || splitWith.includes('José'))) {
-          youOwesJPY += splitAmount;
-        }
-      }
-    });
-
-    const netBalanceJPY = carlosOwesJPY - youOwesJPY;
-    return { youPaidJPY, carlosPaidJPY, youOwesJPY, carlosOwesJPY, netBalanceJPY };
-  };
-
-  const { youPaidJPY, carlosPaidJPY, netBalanceJPY } = calculateBalances();
-  const totalSpentJPY = youPaidJPY + carlosPaidJPY;
-
-  const formatJPY = (amount) => `¥${Math.abs(amount).toLocaleString('es-ES', { maximumFractionDigits: 0 })}`;
-  const formatEUR = (amount) => `€${Math.abs(amount).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-  const netBalanceEUR = convertToEUR(netBalanceJPY);
+  const totalSpent = expenses.reduce((sum, e) => sum + toBase(e.amount || 0, e.currency), 0);
+  const fmt = (n) => `${Math.abs(n).toLocaleString('es-ES', { maximumFractionDigits: 0 })} ${baseCurrency}`;
 
   return (
-    <div className="bg-[#ffffff] p-6 rounded-2xl glass border border-border">
-       <div className="flex items-center justify-between mb-6">
-         <div className="flex items-center gap-2">
-           <Scale className="w-5 h-5 text-primary" />
-           <h3 className="font-medium text-foreground">Balance del Viaje</h3>
-         </div>
-         <button
-          onClick={fetchExchangeRate}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          disabled={loadingRate}>
-
-           {loadingRate ?
-          <Loader2 className="w-3 h-3 animate-spin" /> :
-
-          <RefreshCw className="w-3 h-3" />
-          }
-           {exchangeRate && <span>1€ = ¥{exchangeRate.toFixed(1)}</span>}
-         </button>
-       </div>
-
-       <div className="grid grid-cols-2 gap-4 mb-6">
-         <div className="bg-secondary rounded-xl p-4">
-           <p className="text-muted-foreground text-sm mb-1">Pagaste tú</p>
-           <p className="text-2xl font-semibold text-foreground">{formatJPY(youPaidJPY)}</p>
-           {exchangeRate && <p className="text-xs text-muted-foreground mt-1">{formatEUR(youPaidJPY / exchangeRate)}</p>}
-         </div>
-         <div className="bg-secondary rounded-xl p-4">
-           <p className="text-muted-foreground text-sm mb-1">Pagó Carlos</p>
-           <p className="text-2xl font-semibold text-foreground">{formatJPY(carlosPaidJPY)}</p>
-           {exchangeRate && <p className="text-xs text-muted-foreground mt-1">{formatEUR(carlosPaidJPY / exchangeRate)}</p>}
-         </div>
-       </div>
-
-       <div className="border-t border-border pt-4">
-         <div className="flex items-center justify-between mb-2">
-           <span className="text-muted-foreground">Total gastado</span>
-           <div className="text-right">
-             <span className="font-semibold text-foreground">{formatJPY(totalSpentJPY)}</span>
-             {exchangeRate && <span className="text-xs text-muted-foreground ml-2">({formatEUR(totalSpentJPY / exchangeRate)})</span>}
-           </div>
-         </div>
-        
-        {netBalanceJPY !== 0 &&
-        <div className={`p-4 rounded-xl mt-3 ${netBalanceJPY > 0 ? 'bg-green-600/10 border border-green-600/30' : 'bg-primary/10 border border-primary/30'}`}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {netBalanceJPY > 0 ?
-              <>
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                    <span className="text-green-700">Carlos te debe</span>
-                  </> :
-
-              <>
-                    <TrendingDown className="w-4 h-4 text-primary" />
-                    <span className="text-primary">Debes a Carlos</span>
-                  </>
-              }
-              </div>
-            </div>
-            <div className="text-right">
-              <p className={`text-2xl font-bold ${netBalanceJPY > 0 ? 'text-green-600' : 'text-primary'}`}>
-                {formatJPY(netBalanceJPY)}
-              </p>
-              {netBalanceEUR &&
-            <p className={`text-lg font-semibold mt-1 ${netBalanceJPY > 0 ? 'text-green-700' : 'text-primary/80'}`}>
-                  {formatEUR(netBalanceEUR)}
-                </p>
-            }
-            </div>
-          </div>
-        }
-
-        {netBalanceJPY === 0 && totalSpentJPY > 0 &&
-        <div className="flex items-center justify-center gap-2 p-3 rounded-xl mt-3 bg-secondary border border-border">
-            <Scale className="w-4 h-4 text-primary" />
-            <span className="text-foreground">¡Todo cuadrado!</span>
-          </div>
-        }
+    <div className="bg-white p-6 rounded-2xl border border-border">
+      <div className="flex items-center gap-2 mb-6">
+        <Scale className="w-5 h-5 text-primary" />
+        <h3 className="font-medium text-foreground">Balance del viaje</h3>
+        <span className="ml-auto text-sm text-muted-foreground">Total: {fmt(totalSpent)}</span>
       </div>
-    </div>);
-
+      <div className="space-y-3">
+        {Object.entries(balances).map(([member, balance]) => (
+          <div key={member} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+            <span className="text-sm font-medium text-foreground truncate max-w-[140px]">{member}</span>
+            <div className="flex items-center gap-2">
+              {balance > 0.5 ? (
+                <><TrendingUp className="w-4 h-4 text-green-600" /><span className="text-sm font-semibold text-green-600">+{fmt(balance)}</span></>
+              ) : balance < -0.5 ? (
+                <><TrendingDown className="w-4 h-4 text-red-500" /><span className="text-sm font-semibold text-red-500">-{fmt(Math.abs(balance))}</span></>
+              ) : (
+                <span className="text-sm text-muted-foreground">Equilibrado</span>
+              )}
+            </div>
+          </div>
+        ))}
+        {Object.keys(balances).length === 0 && (
+          <p className="text-center text-sm text-muted-foreground py-4">Sin gastos todavía</p>
+        )}
+      </div>
+    </div>
+  );
 }
