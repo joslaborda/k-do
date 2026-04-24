@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, MapPin, FileText, UtensilsCrossed, Receipt, Info, Languages } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
@@ -22,6 +22,11 @@ const pagesWithoutNav = ['TripsList', 'MigrateData', 'Profile', 'Settings'];
 export default function Layout({ children, currentPageName }) {
   const [tripId, setTripId] = useState('default');
   const showNav = !pagesWithoutNav.includes(currentPageName);
+
+  // Scroll al inicio al cambiar de página
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [currentPageName]);
 
   useEffect(() => {
     // Get trip ID from URL
