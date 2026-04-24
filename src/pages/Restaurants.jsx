@@ -59,6 +59,8 @@ async function searchPlaces(query, city, country) {
     osm_id: item.osm_id,
   }));
 }
+
+const SPOT_TYPES = [
   { value: 'all',       label: 'Todos',       emoji: '📍' },
   { value: 'food',      label: 'Restaurantes', emoji: '🍜' },
   { value: 'sight',     label: 'Atracciones',  emoji: '🏛️' },
@@ -128,15 +130,6 @@ function PlaceResultCard({ place, onSave, saving }) {
   );
 }
 
-        <Button
-          size="sm"
-          onClick={() => onSave(place, type)}
-          disabled={saving}
-          className="mt-2 h-7 text-xs bg-orange-700 hover:bg-orange-800 text-white px-3"
-        >
-          <Plus className="w-3 h-3 mr-1" />
-          {saving ? 'Guardando...' : 'Guardar spot'}
-        </Button>
 function SavedSpotCard({ spot, currentUserEmail, onDelete, onToggleVisited, onTogglePublic }) {
   const type = spot.type || 'custom';
   const typeConf = SPOT_TYPES.find(t => t.value === type) || SPOT_TYPES[6];
