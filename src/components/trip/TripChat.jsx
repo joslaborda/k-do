@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { createNotification } from '@/lib/notifications';
 
-export default function TripChat({ tripId, myProfile }) {
+export default function TripChat({ tripId, myProfile, trip }) {
   const { user } = useAuth();
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
@@ -45,9 +46,34 @@ export default function TripChat({ tripId, myProfile }) {
       avatar_url: myProfile?.avatar_url || null,
       content: text.trim(),
     }),
-    onSuccess: () => {
+    onSuccess: async () => {
       setText('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+
+      // Notificar a los demás miembros del viaje
+      const members = trip?.members || [];
+      const otherMembers = members.filter(email => email !== user.email);
+      if (otherMembers.length > 0) {
+        // Buscar perfiles de los otros miembros para obtener su user_id
+        try {
+          const profiles = await base44.entities.UserProfile.filter({ trip_id: null });
+          otherMembers.forEach(email => {
+            const profile = profiles.find(p => p.email === email || p.user_email === email);
+            if (profile?.user_id) {
+              createNotification({
+                userId: profile.user_id,
+                type: 'trip_update',
+                actorProfile: myProfile,
+                refId: tripId,
+                refTitle: trip?.name || 'el viaje',
+                message: text.trim().slice(0, 80),
+              });
+            }
+          });
+        } catch {
+          // silencioso
+        }
+      }
     },
   });
 
