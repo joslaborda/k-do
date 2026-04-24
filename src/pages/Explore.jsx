@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import TemplateCard from '@/components/explore/TemplateCard';
 import CommunitySearch from '@/components/social/CommunitySearch';
 import { createPageUrl } from '@/utils';
+import { useLike } from '@/hooks/useLike';
 
 const SPOT_TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
 const TYPE_COLORS = {
@@ -24,6 +25,21 @@ function Avatar({ profile, size }) {
   const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
   if (profile?.avatar_url) return <img src={profile.avatar_url} className={cls + ' rounded-full object-cover flex-shrink-0'} alt={initials} />;
   return <div className={cls + ' rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold flex-shrink-0'}>{initials}</div>;
+}
+
+function LikeButton({ targetId, targetType, userId, targetOwnerId, size = 'sm' }) {
+  const { isLiked, count, toggle, loading } = useLike({ targetId, targetType, userId, targetOwnerId });
+  if (!userId) return null;
+  return (
+    <button
+      onClick={toggle}
+      disabled={loading}
+      className={'flex items-center gap-1 transition-colors ' + (isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-400')}
+    >
+      <Heart className={'w-3.5 h-3.5 ' + (isLiked ? 'fill-current' : '')} />
+      {count > 0 && <span className="text-xs">{count}</span>}
+    </button>
+  );
 }
 
 function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
@@ -48,11 +64,14 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
         </div>
         <p className="font-semibold text-foreground text-sm mb-1">{spot.title}</p>
         {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
-        {!isOwn && currentUser && (
-          <button onClick={() => onSave(spot)} disabled={saving} className="mt-3 flex items-center gap-1.5 text-xs text-orange-700 font-medium hover:text-orange-800">
-            <Bookmark className="w-3.5 h-3.5" />{saving ? 'Guardando...' : 'Guardar en favoritos'}
-          </button>
-        )}
+        <div className="flex items-center gap-3 mt-3">
+          <LikeButton targetId={spot.id} targetType="spot" userId={currentUser?.id} targetOwnerId={spot.created_by_user_id} />
+          {!isOwn && currentUser && (
+            <button onClick={() => onSave(spot)} disabled={saving} className="flex items-center gap-1.5 text-xs text-orange-700 font-medium hover:text-orange-800">
+              <Bookmark className="w-3.5 h-3.5" />{saving ? 'Guardando...' : 'Guardar'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
