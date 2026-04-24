@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,6 +42,7 @@ const packingCategories = [
 
 export default function Utilities() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('currency');
@@ -77,6 +79,19 @@ export default function Utilities() {
 
   // Trip context — cities y ciudad activa filtradas por este viaje
   const { trip, cities, activeCity } = useTripContext(tripId);
+
+  // Perfil del usuario para obtener su país de origen
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', user?.id],
+    queryFn: async () => {
+      const results = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return results[0] || null;
+    },
+    enabled: !!user?.id,
+    staleTime: 60000,
+  });
+
+  const homeCountry = myProfile?.home_country || 'España';
 
   const country = activeCity?.country || trip?.country || '';
   const countryConfig = getCountryConfig(country);
@@ -130,7 +145,7 @@ export default function Utilities() {
   useEffect(() => {
     if (!country) { setAiEmergencyData(null); return; }
     setLoadingEmergency(true);
-    const data = getHardcodedEmergencyInfo(country, 'España');
+    const data = getHardcodedEmergencyInfo(country, homeCountry);
     if (data) {
       setAiEmergencyData({
         emergency_numbers: [
@@ -147,7 +162,7 @@ export default function Utilities() {
       setAiEmergencyData(null);
     }
     setLoadingEmergency(false);
-  }, [country]);
+  }, [country, homeCountry]);
 
   const handleBaseChange = (value) => {
     setBaseAmount(value);
@@ -446,7 +461,7 @@ export default function Utilities() {
                 {/* Embajada española */}
                 {aiEmergencyData.embassy && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
-                    <h3 className="font-bold text-yellow-700 text-lg mb-3">🏛️ Embajada de España</h3>
+                    <h3 className="font-bold text-yellow-700 text-lg mb-3">🏛️ Embajada de {homeCountry}</h3>
                     <div className="space-y-2 text-sm">
                       {aiEmergencyData.embassy.address && <p className="text-foreground">📍 {aiEmergencyData.embassy.address}</p>}
                       {aiEmergencyData.embassy.phone && <p className="text-foreground">📞 <span className="font-bold">{aiEmergencyData.embassy.phone}</span></p>}
