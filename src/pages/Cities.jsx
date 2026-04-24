@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MapPin, ArrowUpDown, Plus } from 'lucide-react';
 import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 function normalizeText(str = '') {
   return str
@@ -65,10 +67,12 @@ function detectCountryFromText(text) {
 export default function Cities() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
+  const navigate = useNavigate();
 
   const [addCityOpen, setAddCityOpen] = useState(false);
   const [newCityName, setNewCityName] = useState('');
   const [newCityCountry, setNewCityCountry] = useState('');
+  const [redirected, setRedirected] = useState(false);
 
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
@@ -101,6 +105,14 @@ export default function Cities() {
     enabled: !!tripId,
     staleTime: 60000,
   });
+
+  // Si solo hay 1 ciudad, ir directo a su detalle
+  useEffect(() => {
+    if (!redirected && !isLoading && cities.length === 1) {
+      setRedirected(true);
+      navigate(createPageUrl(`CityDetail?id=${cities[0].id}&trip_id=${tripId}`), { replace: true });
+    }
+  }, [cities, isLoading, redirected, navigate, tripId]);
 
   // Sort cities: start_date first, then order
   const sortedCities = useMemo(() => {
