@@ -461,6 +461,221 @@ export const GASTRONOMY_DB = {
     ],
   },
 
+
+  // ── ESPAÑA ────────────────────────────────────────────────────────────────
+  'España': {
+    categories: [
+      {
+        category: 'Tapas y raciones',
+        icon: '🍷',
+        items: [
+          { name: 'Jamón ibérico', description: 'Jamón curado de cerdo ibérico, el mejor de bellota. La pierna entera en tablas de madera es el símbolo de la gastronomía española.', tags: ['icónico', 'embutido'] },
+          { name: 'Patatas bravas', description: 'Patatas fritas con salsa brava picante y/o alioli. Cada bar tiene su receta secreta. Las mejores en Madrid en Docamar o Las Bravas.', tags: ['Madrid', 'tapa'] },
+          { name: 'Croquetas', description: 'Croquetas cremosas de jamón, bacalao o pollo. La bechamel perfecta es casi líquida por dentro y crujiente por fuera.', tags: ['tapa', 'popular'] },
+          { name: 'Pan con tomate (Pa amb tomàquet)', description: 'Pan tostado frotado con tomate maduro y aceite de oliva. Base de la gastronomía catalana, lo acompaña todo.', tags: ['Cataluña', 'básico'] },
+          { name: 'Pimientos de Padrón', description: 'Pimientos pequeños fritos en aceite y sal. La mayoría no pica pero alguno sí — la ruleta gallega. De Padrón, Galicia.', tags: ['Galicia', 'tapa'] },
+          { name: 'Tortilla española', description: 'Tortilla de patata con o sin cebolla — debate nacional eterno. Jugosa por dentro, dorada por fuera. Desayuno, almuerzo o cena.', tags: ['icónico', 'popular'] },
+        ],
+      },
+      {
+        category: 'Platos principales',
+        icon: '🥘',
+        items: [
+          { name: 'Paella valenciana', description: 'Arroz con pollo, conejo, judías verdes y garrofó. La auténtica es de Valencia, cocinada en paellera sobre fuego de leña. Sin marisco.', tags: ['Valencia', 'arroz'] },
+          { name: 'Cocido madrileño', description: 'Guiso de garbanzos con verduras, chorizo, morcilla y carne. Se sirve en tres vuelcos: caldo, garbanzos y carnes. Típico en invierno.', tags: ['Madrid', 'invierno'] },
+          { name: 'Gazpacho', description: 'Sopa fría de tomate, pepino, pimiento y aceite de oliva. Refrescante en verano, omnipresente en Andalucía. También salmorejo (más denso).', tags: ['Andalucía', 'verano'] },
+          { name: 'Pulpo a la gallega (Pulpo á feira)', description: 'Pulpo cocido sobre patatas, con aceite de oliva, pimentón dulce y sal gruesa. Especialidad de Galicia, en ferias y pulperías.', tags: ['Galicia', 'pulpo'] },
+          { name: 'Pintxos', description: 'Tapas sobre pan del País Vasco. Desde anchoas con guindilla hasta elaboraciones con foie o bacalao. San Sebastián tiene los mejores del mundo.', tags: ['País Vasco', 'San Sebastián'] },
+          { name: 'Fabada asturiana', description: 'Guiso de fabes (alubias blancas grandes) con compango: chorizo, morcilla y tocino. El plato más contundente de la cocina asturiana.', tags: ['Asturias', 'invierno'] },
+        ],
+      },
+      {
+        category: 'Postres y bebidas',
+        icon: '🍮',
+        items: [
+          { name: 'Churros con chocolate', description: 'Masa frita en forma de churro con chocolate espeso para mojar. En chocolatería San Ginés (Madrid, abierta 24h) o en cualquier feria.', tags: ['Madrid', 'desayuno'] },
+          { name: 'Crema catalana', description: 'Natilla de yema de huevo con corteza de naranja, quemada con caramelo. La crème brûlée original, de Cataluña. En San José (19 de marzo).', tags: ['Cataluña', 'postre'] },
+          { name: 'Sangría / Tinto de verano', description: 'Sangría: vino tinto con frutas y gaseosa. Tinto de verano: vino con Casera o Sprite — más ligero y más bebido por los locales.', tags: ['bebida', 'verano'] },
+          { name: 'Sidra asturiana', description: 'Sidra natural que se escancia desde altura para oxigenarla. En Asturias hay sidrería en cada pueblo. La temporada es septiembre-octubre.', tags: ['Asturias', 'bebida'] },
+        ],
+      },
+    ],
+  },
+
+  // ── PERÚ ──────────────────────────────────────────────────────────────────
+  'Perú': {
+    categories: [
+      {
+        category: 'Cevicherías y mar',
+        icon: '🐟',
+        items: [
+          { name: 'Ceviche peruano', description: 'Pescado crudo marinado en leche de tigre (jugo de limón, ají, cebolla). Se sirve con choclo, camote y cancha. El plato nacional.', tags: ['icónico', 'fresco'] },
+          { name: 'Tiradito', description: 'Similar al ceviche pero sin cebolla y el pescado cortado en láminas finas al estilo sashimi. Influencia japonesa (nikkei).', tags: ['Lima', 'nikkei'] },
+          { name: 'Leche de tigre', description: 'El jugo que sobra del ceviche — limón, ají, cebolla, cilantro. Se bebe como chupito o se sirve en vaso. Dicen que cura el resacón.', tags: ['Lima', 'shots'] },
+          { name: 'Causa limeña', description: 'Pastel frío de papa amarilla con ají amarillo, relleno de atún o pollo con mayonesa. Un color amarillo intenso y sabor suave.', tags: ['Lima', 'entrada'] },
+        ],
+      },
+      {
+        category: 'Platos de la sierra',
+        icon: '🥔',
+        items: [
+          { name: 'Lomo saltado', description: 'Salteado de tiras de carne con tomate, cebolla roja y soja, servido con papas fritas y arroz. Fusión chifa (chino-peruana) definitiva.', tags: ['fusión', 'popular'] },
+          { name: 'Ají de gallina', description: 'Pollo desmenuzado en salsa cremosa de ají amarillo con pan, nueces y queso. Sobre arroz y con papa amarilla. Reconfortante.', tags: ['clásico', 'Lima'] },
+          { name: 'Anticuchos', description: 'Brochetas de corazón de res marinadas en ají panca y vinagre, a la parrilla. Street food nocturno con papa y choclo. Anticucheras en cada esquina.', tags: ['street food', 'nocturno'] },
+          { name: 'Pachamanca', description: 'Carne, papa, choclo y habas cocidos bajo tierra con piedras calientes. Ritual andino, normalmente en celebraciones familiares en la sierra.', tags: ['sierra', 'ritual'] },
+        ],
+      },
+      {
+        category: 'Bebidas',
+        icon: '🍹',
+        items: [
+          { name: 'Pisco sour', description: 'Cóctel de pisco (aguardiente de uva), limón, clara de huevo y amargo de angostura. El cóctel nacional peruano. Mejor en bar Huaringas (Lima).', tags: ['cóctel', 'nacional'] },
+          { name: 'Chicha morada', description: 'Bebida de maíz morado con frutas, canela y clavo. No alcohólica, refrescante, de color morado intenso. En todos los menús del día.', tags: ['sin alcohol', 'tradicional'] },
+          { name: 'Inca Kola', description: 'Refresco amarillo de sabor dulce floral (hierba luisa). Más popular que Coca-Cola en Perú. Un sabor único que o amas o no entiendes.', tags: ['bebida', 'local'] },
+        ],
+      },
+    ],
+  },
+
+  // ── ARGENTINA ─────────────────────────────────────────────────────────────
+  'Argentina': {
+    categories: [
+      {
+        category: 'Asado y carnes',
+        icon: '🥩',
+        items: [
+          { name: 'Asado argentino', description: 'Ritual de parrilla con costillas, vacío, chorizo y morcilla cocidos lentamente a las brasas. El asado es cultura, no solo comida. Los domingos son sagrados.', tags: ['ritual', 'icónico'] },
+          { name: 'Empanadas', description: 'Masa rellena de carne picada especiada, cocida al horno o frita. Cada provincia tiene su versión: salteñas, cordobesas, tucumanas. Las mejores de carne cortada a cuchillo.', tags: ['popular', 'snack'] },
+          { name: 'Choripán', description: 'Chorizo a la parrilla en pan, con chimichurri y salsa criolla. El street food argentino definitivo. En las puertas de los estadios de fútbol.', tags: ['street food', 'fútbol'] },
+          { name: 'Milanesa', description: 'Filete de carne empanado y frito. En napolitana (con salsa de tomate y queso), en sándwich (milanesa completa) o con papas fritas. Omnipresente.', tags: ['popular', 'clásico'] },
+        ],
+      },
+      {
+        category: 'Dulces y panaderías',
+        icon: '🥐',
+        items: [
+          { name: 'Dulce de leche', description: 'Caramelo cremoso de leche concentrada y azúcar. En todo: medialunas, alfajores, facturas. Los argentinos lo ponen en absolutamente todo.', tags: ['dulce', 'icónico'] },
+          { name: 'Medialunas', description: 'Croissant argentino más pequeño, tierno y dulce (con almíbar). Desayuno de panadería con café con leche. Las mejores en panaderías de barrio en Buenos Aires.', tags: ['desayuno', 'Buenos Aires'] },
+          { name: 'Alfajores', description: 'Dos galletas de maicena unidas con dulce de leche, bañadas en chocolate o azúcar glas. Havanna es la marca nacional de referencia.', tags: ['dulce', 'regalo'] },
+          { name: 'Facturas', description: 'Bollería variada de las panaderías argentinas: cuernitos, vigilantes, cañoncitos. Para el desayuno o la merienda con mate.', tags: ['desayuno', 'panadería'] },
+        ],
+      },
+      {
+        category: 'Bebidas',
+        icon: '🧉',
+        items: [
+          { name: 'Mate', description: 'Infusión de yerba mate servida en calabaza con bombilla de metal. No es solo una bebida, es una forma de relacionarse. Se comparte en ronda.', tags: ['ritual', 'icónico'] },
+          { name: 'Vino Malbec', description: 'Uva francesa que encontró su casa en Mendoza a 900m de altitud. Cuerpo intenso, taninos suaves, notas a fruta roja. El vino argentino por excelencia.', tags: ['Mendoza', 'vino'] },
+          { name: 'Fernet con Coca', description: 'Fernet Branca con Coca-Cola en vaso con mucho hielo. Considerado casi una bebida nacional, especialmente en Córdoba. Sabor amargo e intenso.', tags: ['Córdoba', 'alcohol'] },
+        ],
+      },
+    ],
+  },
+
+  // ── CHINA ─────────────────────────────────────────────────────────────────
+  'China': {
+    categories: [
+      {
+        category: 'Dim Sum y dumplings',
+        icon: '🥟',
+        items: [
+          { name: 'Xiaolongbao (sopa en bolsa)', description: 'Dim sum relleno de carne de cerdo y caldo que explota en la boca. Originarios de Shanghai. Técnica: morder la punta, aspirar el caldo, comer.', tags: ['Shanghai', 'dim sum'] },
+          { name: 'Jiaozi', description: 'Empanadillas cocidas o al vapor rellenas de cerdo y col. Se comen en Año Nuevo Chino por tradición. Con vinagre de arroz y salsa de soja.', tags: ['tradicional', 'norte'] },
+          { name: 'Baozi', description: 'Bollos esponjosos al vapor rellenos de cerdo (char siu), verduras o pasta de judías rojas. Desayuno callejero omnipresente en toda China.', tags: ['desayuno', 'street food'] },
+          { name: 'Har Gow', description: 'Dim sum de gambas en masa translúcida y fina al vapor. El más delicado de todos los dim sum. Medida del buen cocinero en los restaurantes cantoneses.', tags: ['cantonés', 'dim sum'] },
+        ],
+      },
+      {
+        category: 'Platos regionales',
+        icon: '🌶️',
+        items: [
+          { name: 'Pato de Pekín', description: 'Pato asado con piel lacada crujiente, servido con tortitas, pepino, cebolleta y salsa hoisin. El plato más icónico de Beijing. En Quanjude o Da Dong.', tags: ['Beijing', 'icónico'] },
+          { name: 'Mapo Tofu', description: 'Tofu sedoso en salsa picante de pasta de judías fermentadas y carne picada con pimienta de Sichuan (provoca entumecimiento). Ardiente y adictivo.', tags: ['Sichuan', 'picante'] },
+          { name: 'Hot Pot de Sichuan', description: 'Caldo hirviendo muy picante donde se cocinan carnes, verduras y tofu. Experiencia social imprescindible. El caldo de Chongqing es el más intenso.', tags: ['Sichuan', 'experiencia'] },
+          { name: 'Char Siu (cerdo a la barbacoa)', description: 'Lomo de cerdo marinado en salsa dulce y roja, asado hasta caramelizarse. Base de muchos dim sum. Sobre arroz o en baozi.', tags: ['cantonés', 'popular'] },
+        ],
+      },
+      {
+        category: 'Street food y bebidas',
+        icon: '🧋',
+        items: [
+          { name: 'Jianbing (crepe de la mañana)', description: 'Crepe de harina de mijo con huevo, salsa hoisin, cilantro y cracker frito. El desayuno callejero más popular del norte de China. Menos de 2€.', tags: ['desayuno', 'street food'] },
+          { name: 'Bubble Tea (Boba)', description: 'Té con leche y perlas de tapioca. Originario de Taiwan pero omnipresente en toda China. Infinitas variantes de té, leche y toppings.', tags: ['bebida', 'popular'] },
+          { name: 'Baijiu', description: 'Licor de sorgo, entre 40-60° de alcohol. El alcohol más consumido del mundo. Sabor muy intenso, se bebe en brindis en banquetes. Moutai es la marca de lujo.', tags: ['alcohol', 'banquete'] },
+        ],
+      },
+    ],
+  },
+
+  // ── INDONESIA ─────────────────────────────────────────────────────────────
+  'Indonesia': {
+    categories: [
+      {
+        category: 'Platos principales',
+        icon: '🍚',
+        items: [
+          { name: 'Nasi Goreng', description: 'Arroz frito con huevo, kecap manis (salsa de soja dulce), gambas o pollo. El plato nacional de Indonesia, disponible a cualquier hora del día.', tags: ['nacional', 'popular'] },
+          { name: 'Rendang', description: 'Carne de res cocida horas en leche de coco y especias hasta absorber todo el líquido. Seco, intenso, picante. Originario de Sumatra occidental (Minang).', tags: ['Sumatra', 'icónico'] },
+          { name: 'Gado-Gado', description: 'Ensalada de verduras y tofu hervidos con salsa de cacahuete cremosa. Vegetariano, nutritivo y muy popular como almuerzo en Java.', tags: ['Java', 'vegetariano'] },
+          { name: 'Satay (Sate)', description: 'Brochetas de carne o pollo marinadas en salsa de cacahuete, a la parrilla sobre carbón. Con lontong (arroz comprimido) y salsa de soja dulce.', tags: ['parrilla', 'street food'] },
+          { name: 'Mie Goreng', description: 'Fideos fritos con huevo, verduras y salsa kecap, similares al Nasi Goreng pero con fideos. Indomie (versión instantánea) es el producto más vendido del país.', tags: ['popular', 'fideos'] },
+        ],
+      },
+      {
+        category: 'Bali especial',
+        icon: '🌺',
+        items: [
+          { name: 'Babi Guling (lechón de Bali)', description: 'Lechón entero asado con especias balinesas: cúrcuma, jengibre, galanga. Plato ceremonial que hoy se sirve en warungs. El más famoso en Ibu Oka, Ubud.', tags: ['Bali', 'Ubud', 'especial'] },
+          { name: 'Bebek Betutu', description: 'Pato envuelto en hojas de plátano con pasta de especias (betutu) y cocinado horas. Plato ritual balinés de preparación lenta y aroma intenso.', tags: ['Bali', 'ritual'] },
+          { name: 'Nasi Campur', description: 'Arroz con múltiples acompañamientos pequeños: sate, tempeh, verduras, salado y picante. El plato del día balinés, diferente en cada warung.', tags: ['Bali', 'popular'] },
+        ],
+      },
+      {
+        category: 'Bebidas y snacks',
+        icon: '🥥',
+        items: [
+          { name: 'Kopi Luwak', description: 'Café de los granos "procesados" por la civeta de palma. El café más caro del mundo. En Bali hay granjas donde puedes verlo y probarlo — precio honesto son unas 50.000 IDR.', tags: ['Bali', 'café', 'experiencia'] },
+          { name: 'Es Teh Manis', description: 'Té dulce con hielo, la bebida más consumida de Indonesia. Refrescante, muy azucarado, con menos de 0,50€ en cualquier warung.', tags: ['bebida', 'económico'] },
+          { name: 'Tempeh', description: 'Soja fermentada en bloque y frita. Más nutritivo que el tofu, textura más densa. Originario de Java, base de la dieta vegetariana indonesia.', tags: ['Java', 'vegetariano'] },
+        ],
+      },
+    ],
+  },
+
+  // ── BRASIL ────────────────────────────────────────────────────────────────
+  'Brasil': {
+    categories: [
+      {
+        category: 'Platos principales',
+        icon: '🫕',
+        items: [
+          { name: 'Feijoada', description: 'Guiso de frijoles negros con cerdo (costilla, chorizo, oreja, rabo). El plato nacional, servido los sábados con arroz, col rehogada, farofa y naranja.', tags: ['sábados', 'nacional'] },
+          { name: 'Churrasco brasileiro', description: 'Carne a la parrilla, especialmente picanha (corte de cadera con grasa). En churrascarías rodízio el camarero pasa con espadas de carne sin parar.', tags: ['parrilla', 'rodízio'] },
+          { name: 'Moqueca', description: 'Guiso de pescado o gambas con leche de coco, dendê (aceite de palma), tomate y cilantro. Especialidad de Bahía y Espírito Santo, dos versiones distintas.', tags: ['Bahía', 'pescado'] },
+          { name: 'Pão de queijo', description: 'Panecillo esponjoso de almidón de yuca y queso minas. Sin gluten naturalmente. Caliente recién hecho es insuperable. De Minas Gerais.', tags: ['Minas Gerais', 'snack'] },
+        ],
+      },
+      {
+        category: 'Street food y snacks',
+        icon: '🍢',
+        items: [
+          { name: 'Coxinha', description: 'Croqueta con forma de muslo de pollo, rellena de pollo desmenuzado y catupiry (queso crema). El snack más popular de São Paulo.', tags: ['São Paulo', 'snack'] },
+          { name: 'Acarajé', description: 'Bolita de masa de frijol careto frita en aceite de dendê, rellena de vatapá (pasta de gambas y cacahuetes). Iconico de Salvador de Bahía, vendido por Baianas.', tags: ['Salvador', 'Bahía'] },
+          { name: 'Brigadeiro', description: 'Trufa de chocolate condensado con cacao y granillo. El dulce nacional, en todas las fiestas de cumpleaños. Sencillo y adictivo.', tags: ['dulce', 'icónico'] },
+        ],
+      },
+      {
+        category: 'Bebidas',
+        icon: '🍹',
+        items: [
+          { name: 'Caipirinha', description: 'Cachaça (aguardiente de caña), lima machacada, azúcar y hielo. El cóctel nacional. Con frutas tropicales (maracuyá, mango) en versión caipifruta.', tags: ['cóctel', 'nacional'] },
+          { name: 'Açaí', description: 'Pulpa de baya amazónica servida helada con granola y plátano. En Brasil es espeso como helado, no el smoothie diluido que conoces en Europa.', tags: ['salud', 'Amazonia'] },
+          { name: 'Guaraná Antarctica', description: 'Refresco de guaraná (baya amazónica), más popular que Coca-Cola en Brasil. Sabor dulce y ligeramente amargo, muy energético por su cafeína natural.', tags: ['bebida', 'local'] },
+        ],
+      },
+    ],
+  },
+
 };
 
 /**
