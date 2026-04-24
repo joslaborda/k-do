@@ -1,242 +1,308 @@
 import { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
+import { Link } from 'react-router-dom';
+import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MapPin, ArrowRight, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import TemplateCard from '@/components/explore/TemplateCard';
 import CommunitySearch from '@/components/social/CommunitySearch';
-import { Link, useSearchParams } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { useAuth } from '@/lib/AuthContext';
+
+const SPOT_TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
+const TYPE_COLORS = {
+  food:'bg-orange-100 text-orange-700', sight:'bg-blue-100 text-blue-700',
+  activity:'bg-green-100 text-green-700', shopping:'bg-purple-100 text-purple-700',
+  transport:'bg-slate-100 text-slate-700', custom:'bg-yellow-100 text-yellow-700',
+};
+
+function Avatar({ profile, size }) {
+  const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
+  const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
+  if (profile?.avatar_url) return <img src={profile.avatar_url} className={cls + ' rounded-full object-cover flex-shrink-0'} alt={initials} />;
+  return <div className={cls + ' rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold flex-shrink-0'}>{initials}</div>;
+}
+
+function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
+  const emoji = SPOT_TYPE_EMOJI[spot.type] || '📍';
+  const color = TYPE_COLORS[spot.type] || TYPE_COLORS.custom;
+  const isOwn = currentUser?.id === spot.created_by_user_id;
+  return (
+    <div className="bg-white border border-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+      {spot.image_url && <div className="h-36 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover" /></div>}
+      <div className="p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Avatar profile={profile} size="sm" />
+          <div className="flex-1 min-w-0">
+            <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id} className="text-xs font-semibold text-foreground hover:text-orange-700 truncate block">
+              {profile?.display_name || 'Viajero'}{profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
+            </Link>
+            {(spot.city_name || spot.country) && (
+              <p className="text-xs text-muted-foreground flex items-center gap-0.5"><MapPin className="w-3 h-3" />{[spot.city_name, spot.country].filter(Boolean).join(', ')}</p>
+            )}
+          </div>
+          <span className={'text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ' + color}>{emoji}</span>
+        </div>
+        <p className="font-semibold text-foreground text-sm mb-1">{spot.title}</p>
+        {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
+        {!isOwn && currentUser && (
+          <button onClick={() => onSave(spot)} disabled={saving} className="mt-3 flex items-center gap-1.5 text-xs text-orange-700 font-medium hover:text-orange-800">
+            <Bookmark className="w-3.5 h-3.5" />{saving ? 'Guardando...' : 'Guardar en favoritos'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function UserCard({ profile, currentUser, myFollows, onFollow }) {
+  const isOwn = currentUser?.id === profile.user_id;
+  const followRecord = myFollows.find(f => f.followed_user_id === profile.user_id);
+  const isFollowing = !!followRecord;
+  return (
+    <div className="bg-white border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
+      <Avatar profile={profile} />
+      <div className="flex-1 min-w-0">
+        <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-orange-700 block truncate">
+          {profile.display_name || 'Viajero'}
+        </Link>
+        {profile.username && <p className="text-xs text-muted-foreground font-mono">@{profile.username}</p>}
+        {profile.travel_style && <p className="text-xs text-muted-foreground capitalize mt-0.5">{profile.travel_style}</p>}
+      </div>
+      {!isOwn && currentUser && (
+        <Button size="sm" onClick={() => onFollow(profile, followRecord)}
+          className={isFollowing ? 'border border-orange-200 text-orange-700 bg-white hover:bg-orange-50' : 'bg-orange-700 hover:bg-orange-800 text-white'}>
+          {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1" />Siguiendo</> : <><UserPlus className="w-3.5 h-3.5 mr-1" />Seguir</>}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function EmptyFeed({ emoji, title, subtitle }) {
+  return (
+    <div className="text-center py-16 text-muted-foreground">
+      <div className="text-5xl mb-3">{emoji}</div>
+      <p className="font-semibold text-foreground">{title}</p>
+      <p className="text-sm mt-1 max-w-xs mx-auto">{subtitle}</p>
+    </div>
+  );
+}
+
+function SectionHeader({ icon: Icon, label, count }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Icon className="w-4 h-4 text-orange-700" />
+      <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">{label}</h2>
+      {count > 0 && <Badge variant="secondary" className="ml-auto">{count}</Badge>}
+    </div>
+  );
+}
 
 export default function Explore() {
-  const [filterCountry, setFilterCountry] = useState('all');
-  const [filterDuration, setFilterDuration] = useState('all');
-  const [filterType, setFilterType] = useState('all');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const itemsPerPage = 12;
   const { user: currentUser } = useAuth();
+  const queryClient = useQueryClient();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [peopleQuery, setPeopleQuery] = useState('');
+  const [savingSpotId, setSavingSpotId] = useState(null);
 
-  const [searchParams] = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
-
-  const { data: allTemplates = [], isLoading } = useQuery({
+  const { data: publicTemplates = [], isLoading: loadingTemplates } = useQuery({
     queryKey: ['templatesPublic'],
-    queryFn: async () => {
-      const results = await base44.entities.ItineraryTemplate.filter(
-        { visibility: 'public' },
-        '-created_date'
-      );
-      return results || [];
-    },
+    queryFn: () => base44.entities.ItineraryTemplate.filter({ visibility: 'public' }, '-created_date'),
     staleTime: 10 * 60 * 1000,
   });
 
-  const countries = useMemo(() => {
-    const countrySet = new Set();
-    allTemplates.forEach((t) => t.countries?.forEach((c) => countrySet.add(c)));
-    return Array.from(countrySet).sort();
-  }, [allTemplates]);
+  const { data: publicSpots = [], isLoading: loadingSpots } = useQuery({
+    queryKey: ['spotsPublic'],
+    queryFn: () => base44.entities.Spot.filter({ visibility: 'public' }),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const filteredTemplates = useMemo(() => {
-    return allTemplates.filter((t) => {
-      const matchesCountry = filterCountry === 'all' || t.countries?.includes(filterCountry);
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['allProfiles'],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 10 * 60 * 1000,
+  });
 
-      let matchesDuration = true;
-      if (filterDuration !== 'all') {
-        const d = t.duration_days || 0;
-        if (filterDuration === '1-3') matchesDuration = d >= 1 && d <= 3;
-        else if (filterDuration === '4-7') matchesDuration = d >= 4 && d <= 7;
-        else if (filterDuration === '8-14') matchesDuration = d >= 8 && d <= 14;
-        else if (filterDuration === '15+') matchesDuration = d >= 15;
-      }
+  const { data: myFollows = [] } = useQuery({
+    queryKey: ['myFollows', currentUser?.id],
+    queryFn: () => base44.entities.Follow.filter({ follower_user_id: currentUser.id }),
+    enabled: !!currentUser?.id,
+    staleTime: 60000,
+  });
 
-      const matchesType =
-        filterType === 'all' ||
-        (filterType === 'free' && !t.is_premium) ||
-        (filterType === 'premium' && t.is_premium);
+  const followedUserIds = myFollows.map(f => f.followed_user_id);
 
-      return matchesCountry && matchesDuration && matchesType;
-    });
-  }, [allTemplates, filterCountry, filterDuration, filterType]);
-
-  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
-  const paginatedTemplates = filteredTemplates.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
+  const siguiendoTemplates = useMemo(() =>
+    publicTemplates.filter(t => followedUserIds.includes(t.created_by_user_id)),
+    [publicTemplates, followedUserIds]
   );
 
-  const resetFilters = () => {
-    setFilterCountry('all');
-    setFilterDuration('all');
-    setFilterType('all');
-    setCurrentPage(0);
-  };
+  const siguiendoSpots = useMemo(() =>
+    publicSpots.filter(s => followedUserIds.includes(s.created_by_user_id)),
+    [publicSpots, followedUserIds]
+  );
+
+  const filteredProfiles = useMemo(() => {
+    const q = peopleQuery.toLowerCase().trim();
+    return allProfiles.filter(p =>
+      p.user_id !== currentUser?.id && (!q ||
+        p.display_name?.toLowerCase().includes(q) ||
+        p.username?.toLowerCase().includes(q) ||
+        p.home_country?.toLowerCase().includes(q))
+    );
+  }, [allProfiles, peopleQuery, currentUser?.id]);
+
+  const profileMap = useMemo(() => {
+    const m = {};
+    allProfiles.forEach(p => { m[p.user_id] = p; });
+    return m;
+  }, [allProfiles]);
+
+  const followMutation = useMutation({
+    mutationFn: async ({ profile, followRecord }) => {
+      if (followRecord) {
+        await base44.entities.Follow.delete(followRecord.id);
+      } else {
+        await base44.entities.Follow.create({ follower_user_id: currentUser.id, followed_user_id: profile.user_id });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myFollows', currentUser?.id] }),
+  });
+
+  const saveSpotMutation = useMutation({
+    mutationFn: (spot) => base44.entities.SavedSpot.create({
+      user_id: currentUser.id, folder: 'General',
+      title: spot.title, type: spot.type,
+      address: spot.address || '', city_name: spot.city_name || '', country: spot.country || '',
+      lat: spot.lat, lng: spot.lng, link: spot.link || '',
+      notes: spot.notes || '', image_url: spot.image_url || '',
+      source_spot_id: spot.id, source_user_id: spot.created_by_user_id,
+    }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['savedSpots', currentUser?.id] }); setSavingSpotId(null); },
+  });
+
+  const handleSaveSpot = async (spot) => { setSavingSpotId(spot.id); await saveSpotMutation.mutateAsync(spot); };
+  const handleFollow = (profile, followRecord) => followMutation.mutate({ profile, followRecord });
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      {/* Header */}
-      <div className="bg-orange-700 pt-12 pb-8">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-white text-4xl font-bold">Explorar 🗺️</h1>
-            <Link to={createPageUrl('Profile')}>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2">
-                <Users className="w-4 h-4" />
-                Mi perfil
-              </Button>
-            </Link>
-          </div>
-          <p className="text-white/90 mb-5">Descubre viajes, spots y viajeros</p>
-
-          {/* Buscador prominente */}
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="w-full flex items-center gap-3 bg-white/15 hover:bg-white/25 transition-colors rounded-xl px-4 py-3 text-white/80 text-sm border border-white/20"
-          >
-            <Search className="w-5 h-5 flex-shrink-0" />
-            <span>Busca destinos, itinerarios, @usuarios, spots...</span>
-            <kbd className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded font-mono hidden sm:block">⌘K</kbd>
+    <div className="min-h-screen bg-orange-50 pb-24">
+      <div className="bg-orange-700 pt-12 pb-6 px-6">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-white text-4xl font-bold mb-1">Explorar</h1>
+          <p className="text-white/80 text-sm mb-4">Descubre viajes, spots y viajeros</p>
+          <button onClick={() => setSearchOpen(true)}
+            className="w-full flex items-center gap-3 bg-white/15 hover:bg-white/25 transition-colors rounded-xl px-4 py-3 text-white/80 text-sm border border-white/20">
+            <Search className="w-4 h-4 flex-shrink-0" />
+            <span>Busca destinos, @usuarios, spots...</span>
           </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Filtros */}
-        <div className="bg-white rounded-2xl border border-border p-5 mb-8 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-foreground text-sm">Filtrar itinerarios</h2>
-            {(filterCountry !== 'all' || filterDuration !== 'all' || filterType !== 'all') && (
-              <button onClick={resetFilters} className="text-xs text-orange-700 hover:underline">
-                Limpiar filtros
-              </button>
-            )}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">País</label>
-              <Select value={filterCountry} onValueChange={(v) => { setFilterCountry(v); setCurrentPage(0); }}>
-                <SelectTrigger className="bg-input border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  <SelectItem value="all">Todos los países</SelectItem>
-                  {countries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-3 h-3" />{country}
-                      </div>
-                    </SelectItem>
+      <div className="max-w-2xl mx-auto px-4 py-4">
+        <Tabs defaultValue="explorar">
+          <TabsList className="w-full mb-6 bg-white border border-border">
+            <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              <Globe className="w-4 h-4 mr-1" />Explorar
+            </TabsTrigger>
+            <TabsTrigger value="siguiendo" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              <Heart className="w-4 h-4 mr-1" />Siguiendo
+              {(siguiendoTemplates.length + siguiendoSpots.length) > 0 && (
+                <Badge variant="secondary" className="ml-1">{siguiendoTemplates.length + siguiendoSpots.length}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              <Users className="w-4 h-4 mr-1" />Personas
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="explorar" className="space-y-8">
+            <section>
+              <SectionHeader icon={Compass} label="Spots recientes" count={publicSpots.length} />
+              {loadingSpots ? (
+                <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-2xl border border-border animate-pulse" />)}</div>
+              ) : publicSpots.length === 0 ? (
+                <EmptyFeed emoji="📍" title="Sin spots todavía" subtitle="Sé el primero en publicar un spot desde tus viajes" />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {publicSpots.slice(0, 8).map(spot => (
+                    <FeedSpotCard key={spot.id} spot={spot} profile={profileMap[spot.created_by_user_id]}
+                      currentUser={currentUser} onSave={handleSaveSpot} saving={savingSpotId === spot.id} />
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
+                </div>
+              )}
+            </section>
+            <section>
+              <SectionHeader icon={Globe} label="Itinerarios" count={publicTemplates.length} />
+              {loadingTemplates ? (
+                <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-48 bg-white rounded-2xl border border-border animate-pulse" />)}</div>
+              ) : publicTemplates.length === 0 ? (
+                <EmptyFeed emoji="🗺️" title="Sin itinerarios todavía" subtitle="Publica tu primer viaje desde la página del viaje" />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {publicTemplates.slice(0, 6).map(t => <TemplateCard key={t.id} template={t} currentUser={currentUser} />)}
+                </div>
+              )}
+            </section>
+          </TabsContent>
 
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duración</label>
-              <Select value={filterDuration} onValueChange={(v) => { setFilterDuration(v); setCurrentPage(0); }}>
-                <SelectTrigger className="bg-input border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  <SelectItem value="all">Cualquier duración</SelectItem>
-                  <SelectItem value="1-3">1–3 días</SelectItem>
-                  <SelectItem value="4-7">4–7 días</SelectItem>
-                  <SelectItem value="8-14">8–14 días</SelectItem>
-                  <SelectItem value="15+">15+ días</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tipo</label>
-              <Select value={filterType} onValueChange={(v) => { setFilterType(v); setCurrentPage(0); }}>
-                <SelectTrigger className="bg-input border-border text-foreground">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-border">
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="free">Gratuitos</SelectItem>
-                  <SelectItem value="premium">Premium ✦</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        {/* Grid de resultados */}
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-64 bg-white rounded-2xl border border-border animate-pulse" />
-            ))}
-          </div>
-        ) : paginatedTemplates.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-foreground mb-2">
-              {filteredTemplates.length === 0 && allTemplates.length > 0
-                ? 'No hay itinerarios con esos filtros'
-                : 'Sin itinerarios públicos todavía'}
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              {filteredTemplates.length === 0 && allTemplates.length > 0
-                ? 'Prueba limpiando los filtros'
-                : 'Sé el primero en publicar tu viaje'}
-            </p>
-            {filteredTemplates.length === 0 && allTemplates.length > 0 ? (
-              <Button className="bg-orange-700 hover:bg-orange-800" onClick={resetFilters}>
-                Limpiar filtros
-              </Button>
+          <TabsContent value="siguiendo">
+            {followedUserIds.length === 0 ? (
+              <EmptyFeed emoji="👥" title="Aún no sigues a nadie" subtitle="Ve a Personas y sigue a viajeros para ver su contenido aquí" />
+            ) : (siguiendoSpots.length + siguiendoTemplates.length) === 0 ? (
+              <EmptyFeed emoji="✨" title="Sin contenido todavía" subtitle="Las personas que sigues no han publicado spots ni itinerarios aún" />
             ) : (
-              <Link to={createPageUrl('TripsList')}>
-                <Button className="bg-orange-700 hover:bg-orange-800">
-                  <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-                  Mis viajes
-                </Button>
-              </Link>
-            )}
-          </div>
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground mb-5">
-              {filteredTemplates.length} itinerario{filteredTemplates.length !== 1 ? 's' : ''}
-            </p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedTemplates.map((template) => (
-                <TemplateCard key={template.id} template={template} currentUser={currentUser} />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                <Button variant="outline" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}>
-                  Anterior
-                </Button>
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <Button
-                    key={i}
-                    variant={currentPage === i ? 'default' : 'outline'}
-                    onClick={() => setCurrentPage(i)}
-                    className={currentPage === i ? 'bg-orange-700' : ''}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-                <Button variant="outline" onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage === totalPages - 1}>
-                  Siguiente
-                </Button>
+              <div className="space-y-8">
+                {siguiendoSpots.length > 0 && (
+                  <section>
+                    <SectionHeader icon={Compass} label="Spots" count={siguiendoSpots.length} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {siguiendoSpots.map(spot => (
+                        <FeedSpotCard key={spot.id} spot={spot} profile={profileMap[spot.created_by_user_id]}
+                          currentUser={currentUser} onSave={handleSaveSpot} saving={savingSpotId === spot.id} />
+                      ))}
+                    </div>
+                  </section>
+                )}
+                {siguiendoTemplates.length > 0 && (
+                  <section>
+                    <SectionHeader icon={Globe} label="Itinerarios" count={siguiendoTemplates.length} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {siguiendoTemplates.map(t => <TemplateCard key={t.id} template={t} currentUser={currentUser} />)}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
-          </>
-        )}
+          </TabsContent>
+
+          <TabsContent value="personas">
+            <div className="relative mb-5">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Busca por nombre, @usuario o país..." value={peopleQuery}
+                onChange={e => setPeopleQuery(e.target.value)} className="pl-9 bg-white" />
+            </div>
+            {filteredProfiles.length === 0 ? (
+              <EmptyFeed emoji="🔍" title={peopleQuery ? 'Sin resultados' : 'Sin viajeros todavía'}
+                subtitle={peopleQuery ? 'Prueba con otro nombre o @usuario' : 'Sé de los primeros en unirte'} />
+            ) : (
+              <div className="space-y-3">
+                {filteredProfiles
+                  .sort((a, b) => (followedUserIds.includes(a.user_id) ? 0 : 1) - (followedUserIds.includes(b.user_id) ? 0 : 1))
+                  .map(profile => (
+                    <UserCard key={profile.user_id} profile={profile} currentUser={currentUser}
+                      myFollows={myFollows} onFollow={handleFollow} />
+                  ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
-      {/* Buscador social — se abre con el botón del header */}
-      <CommunitySearch open={searchOpen} onOpenChange={setSearchOpen} initialQuery={initialQuery} />
+      <CommunitySearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }
