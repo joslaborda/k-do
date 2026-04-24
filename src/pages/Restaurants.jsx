@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Plus, X, ExternalLink, CheckCircle, Trash2, Compass, Navigation, PenLine, Heart } from 'lucide-react';
+import { Search, MapPin, Plus, X, ExternalLink, CheckCircle, Trash2, Compass, Navigation, PenLine, Heart, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
@@ -159,7 +159,62 @@ function ManualForm({ onSave, saving, onClose }) {
   );
 }
 
-function SavedSpotCard({ spot, currentUserEmail, onDelete, onToggleVisited, onTogglePublic }) {
+
+function StarRating({ spotId, userId, visited }) {
+  const queryClient = useQueryClient();
+  const [hovering, setHovering] = useState(null);
+
+  const { data: ratings = [] } = useQuery({
+    queryKey: ['spotRatings', spotId],
+    queryFn: () => base44.entities.SpotRating.filter({ spot_id: spotId }),
+    enabled: !!spotId,
+    staleTime: 30000,
+  });
+
+  const myRating = ratings.find(r => r.user_id === userId);
+  const avgRating = ratings.length > 0
+    ? Math.round((ratings.reduce((s, r) => s + r.rating, 0) / ratings.length) * 10) / 10
+    : null;
+
+  const ratingMutation = useMutation({
+    mutationFn: async (stars) => {
+      if (myRating) {
+        await base44.entities.SpotRating.update(myRating.id, { rating: stars });
+      } else {
+        await base44.entities.SpotRating.create({ spot_id: spotId, user_id: userId, rating: stars });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spotRatings', spotId] }),
+  });
+
+  if (!visited) return null;
+
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-0.5">
+        {[1,2,3,4,5].map(star => (
+          <button key={star}
+            onMouseEnter={() => setHovering(star)}
+            onMouseLeave={() => setHovering(null)}
+            onClick={() => ratingMutation.mutate(star)}
+            className="p-0.5 transition-transform hover:scale-110">
+            <Star className={"w-4 h-4 transition-colors " + (
+              (hovering || myRating?.rating || 0) >= star
+                ? 'fill-amber-400 text-amber-400'
+                : 'text-muted-foreground/40'
+            )}/>
+          </button>
+        ))}
+      </div>
+      {avgRating && ratings.length > 1 && (
+        <span className="text-xs text-muted-foreground">{avgRating} ({ratings.length})</span>
+      )}
+      {!myRating && <span className="text-xs text-muted-foreground">¿Cómo fue?</span>}
+    </div>
+  );
+}
+
+function SavedSpotCard({ spot, currentUserEmail, userId, onDelete, onToggleVisited, onTogglePublic }) {
   const type = spot.type||'custom';
   const typeConf = SPOT_TYPES.find(t => t.value===type)||SPOT_TYPES[6];
   const canDelete = spot.created_by===currentUserEmail;
@@ -194,6 +249,7 @@ function SavedSpotCard({ spot, currentUserEmail, onDelete, onToggleVisited, onTo
           {spot.tags.map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">#{t}</span>)}
         </div>
       )}
+      <StarRating spotId={spot.id} userId={userId} visited={spot.visited}/>
       {spot.address && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><MapPin className="w-3 h-3"/>{spot.address}</p>}
       <div className="flex items-center gap-3 mt-2">
         {spot.lat && spot.lng && (
@@ -428,7 +484,7 @@ export default function Restaurants() {
         {filteredSpots.length > 0 ? (
           <div className="space-y-3">
             {filteredSpots.filter(s => !s.visited).map(spot => (
-              <SavedSpotCard key={spot.id} spot={spot} currentUserEmail={user?.email}
+              <SavedSpotCard key={spot.id} spot={spot} currentUserEmail={user?.email} userId={user?.id}
                 onDelete={id => deleteMutation.mutate(id)} onToggleVisited={handleToggleVisited} onTogglePublic={handleTogglePublic}/>
             ))}
             {filteredSpots.filter(s => s.visited).length > 0 && (
