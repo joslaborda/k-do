@@ -96,13 +96,19 @@ export default function Utilities() {
   const country = activeCity?.country || trip?.country || '';
   const countryConfig = getCountryConfig(country);
 
-  // Set base currency from trip, quote from active city
+  // Set base currency from trip
   useEffect(() => {
     if (trip?.currency) setBaseCurrency(trip.currency);
   }, [trip?.currency]);
 
+  // Set quote currency from destination country
+  // If same as base (e.g. EUR trip to Italy), pick a useful alternative
   useEffect(() => {
-    if (countryConfig.currency && countryConfig.currency !== baseCurrency) {
+    if (!countryConfig.currency) return;
+    if (countryConfig.currency !== baseCurrency) {
+      setQuoteCurrency(countryConfig.currency);
+    } else {
+      // Same currency — no conversion needed, leave quote same so section shows "mismo"
       setQuoteCurrency(countryConfig.currency);
     }
   }, [countryConfig.currency, baseCurrency]);
@@ -243,7 +249,7 @@ export default function Utilities() {
 
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 gap-2 bg-transparent border-0 p-0 h-auto">
+          <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0 h-auto justify-start">
             <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">💱 Moneda</TabsTrigger>
             <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">☁️ Clima</TabsTrigger>
             <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🧳 Maleta</TabsTrigger>
@@ -259,10 +265,12 @@ export default function Utilities() {
                   <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
                   {loadingRate ? (
                     <p className="text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Cargando tasa...</p>
+                  ) : baseCurrency === quoteCurrency ? (
+                    <p className="text-muted-foreground text-sm">El país de destino usa <span className="font-bold text-foreground">{baseCurrency}</span> — misma moneda que tu viaje. Puedes cambiar la moneda destino abajo.</p>
                   ) : exchangeRate ? (
                     <div>
                       <p className="text-muted-foreground">1 {baseCurrency} = <span className="font-bold text-foreground">{exchangeRate?.toFixed(4)} {quoteCurrency}</span></p>
-                      <p className="text-xs text-muted-foreground mt-1">Fuente: {exchangeRateSource}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Fuente: {exchangeRateSource === 'same' ? 'misma moneda' : exchangeRateSource}</p>
                     </div>
                   ) : (
                     <p className="text-muted-foreground">Abre desde un viaje para ver la conversión</p>
