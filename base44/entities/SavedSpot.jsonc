@@ -1,0 +1,76 @@
+{
+  "name": "SavedSpot",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario"
+    },
+    "folder": {
+      "type": "string",
+      "default": "General",
+      "description": "Nombre de la carpeta"
+    },
+    "title": {
+      "type": "string",
+      "description": "Nombre del lugar"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "food",
+        "sight",
+        "activity",
+        "shopping",
+        "transport",
+        "custom"
+      ],
+      "description": "Tipo de lugar"
+    },
+    "address": {
+      "type": "string",
+      "description": "Direcci\u00f3n"
+    },
+    "city_name": {
+      "type": "string",
+      "description": "Ciudad"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitud"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitud"
+    },
+    "link": {
+      "type": "string",
+      "description": "Web o enlace"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas personales"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Foto"
+    },
+    "source_spot_id": {
+      "type": "string",
+      "description": "ID del spot original si se guard\u00f3 de otro usuario"
+    },
+    "source_user_id": {
+      "type": "string",
+      "description": "ID del usuario original"
+    }
+  },
+  "required": [
+    "user_id",
+    "title",
+    "type"
+  ]
+}
