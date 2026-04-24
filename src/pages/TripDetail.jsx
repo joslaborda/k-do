@@ -187,52 +187,52 @@ export default function TripDetail() {
         </div>
 
         {/* Navigation Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-hidden">
           <Link to={createPageUrl(`Cities?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🗺️</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Ruta</h3>
-              <p className="text-sm text-muted-foreground">Ciudades e itinerario</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🗺️</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Ruta</h3>
+              <p className="text-xs text-muted-foreground">Ciudades e itinerario</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Calendar?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📅</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Docs</h3>
-              <p className="text-sm text-muted-foreground">Documentos y checklist</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
+              <p className="text-xs text-muted-foreground">Documentos y checklist</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🍜</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Yummy</h3>
-              <p className="text-sm text-muted-foreground">Restaurantes</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🍜</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Yummy</h3>
+              <p className="text-xs text-muted-foreground">Restaurantes</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">💰</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Gastos</h3>
-              <p className="text-sm text-muted-foreground">Gestión de gastos</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">💰</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Gastos</h3>
+              <p className="text-xs text-muted-foreground">Gestión de gastos</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Utilities?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🔧</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Útil</h3>
-              <p className="text-sm text-muted-foreground">Info útil y clima</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🔧</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Útil</h3>
+              <p className="text-xs text-muted-foreground">Info útil y clima</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Diary?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-3xl p-8 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📔</div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Diario</h3>
-              <p className="text-sm text-muted-foreground">{diaryEntries.length} entradas</p>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📔</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Diario</h3>
+              <p className="text-xs text-muted-foreground">{diaryEntries.length} entradas</p>
             </div>
           </Link>
         </div>
