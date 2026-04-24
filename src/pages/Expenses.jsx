@@ -16,6 +16,7 @@ import BalancesPanel from '@/components/expenses/BalancesPanel';
 import { useUndo } from '@/components/hooks/useUndo';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
+import { createNotification } from '@/lib/notifications';
 
 export default function Expenses() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -74,10 +75,32 @@ export default function Expenses() {
         trip_id: tripId,
         amount: parseFloat(formData.amount),
       }),
-    onSuccess: () => {
+    onSuccess: async (_, formData) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setDialogOpen(false);
       setEditingExpense(null);
+
+      // Notificar al resto de miembros del viaje
+      const otherMembers = (trip?.members || []).filter(email => email !== currentUser?.email);
+      if (otherMembers.length > 0) {
+        try {
+          const profiles = await base44.entities.UserProfile.filter({});
+          otherMembers.forEach(email => {
+            const profile = profiles.find(p => p.email === email || p.user_email === email);
+            if (profile?.user_id) {
+              createNotification({
+                userId: profile.user_id,
+                type: 'trip_update',
+                refId: tripId,
+                refTitle: trip?.name || 'el viaje',
+                message: `Nuevo gasto: ${formData.description} (${parseFloat(formData.amount).toFixed(2)} ${formData.currency || 'EUR'})`,
+              });
+            }
+          });
+        } catch {
+          // silencioso
+        }
+      }
     },
   });
 
