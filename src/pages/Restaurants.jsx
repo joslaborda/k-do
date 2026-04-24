@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Search, BookOpen, ChevronDown, ArrowRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
@@ -83,15 +82,7 @@ export default function Restaurants() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 -mt-12 pb-24">
-        <Tabs defaultValue="gastronomia" className="space-y-6">
-          <TabsList className="bg-white border border-border p-1">
-            <TabsTrigger value="gastronomia" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-              🍽️ Gastronomía
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="gastronomia">
+      <div className="max-w-6xl mx-auto px-6 -mt-12 pb-24 space-y-6">
             {/* Buscador */}
             <div className="relative mb-6">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -168,8 +159,6 @@ export default function Restaurants() {
             )}
 
 
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );
