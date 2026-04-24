@@ -128,19 +128,21 @@ export default function Documents() {
 
       {/* ── HERO HEADER ─────────────────────────────────────────────────────── */}
       <div className="bg-orange-700 pt-14 pb-24">
-        <div className="max-w-5xl mx-auto px-6 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-orange-200 text-sm font-semibold uppercase tracking-widest mb-2">Tu viaje</p>
-            <h1 className="text-white text-5xl font-extrabold leading-tight">Documentos</h1>
-            <p className="text-orange-100/80 mt-2 text-base">Vuelos, hoteles, trenes y más — todo en un lugar</p>
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-orange-200 text-sm font-semibold uppercase tracking-widest mb-2">Tu viaje</p>
+              <h1 className="text-white text-4xl font-extrabold leading-tight">Documentos</h1>
+              <p className="text-orange-100/80 mt-2 text-sm">Vuelos, hoteles, trenes y más — todo en un lugar</p>
+            </div>
+            <Button
+              onClick={() => setDialogOpen(true)}
+              className="bg-white text-orange-700 hover:bg-orange-50 font-bold shadow-lg flex-shrink-0 px-4 py-2 rounded-xl mt-1"
+            >
+              <Plus className="w-4 h-4 mr-1.5" />
+              Añadir
+            </Button>
           </div>
-          <Button
-            onClick={() => setDialogOpen(true)}
-            className="bg-white text-orange-700 hover:bg-orange-50 font-bold shadow-lg flex-shrink-0 px-5 py-2.5 rounded-xl"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Añadir
-          </Button>
         </div>
       </div>
 
