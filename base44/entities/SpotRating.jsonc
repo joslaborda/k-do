@@ -1,0 +1,28 @@
+{
+  "name": "SpotRating",
+  "type": "object",
+  "description": "Valoraci\u00f3n de un spot por un usuario",
+  "properties": {
+    "spot_id": {
+      "type": "string",
+      "description": "ID del spot valorado"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario que valora"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Valoraci\u00f3n del 1 al 5"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Comentario opcional"
+    }
+  },
+  "required": [
+    "spot_id",
+    "user_id",
+    "rating"
+  ]
+}

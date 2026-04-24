@@ -10,6 +10,8 @@ import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getTripCoverImage } from '@/lib/tripImage';
 import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
+import { useTripContext } from '@/hooks/useTripContext';
+import { useState, useEffect } from 'react';
 
 export default function TripDetail() {
   const [tripId, setTripId] = useState(null);

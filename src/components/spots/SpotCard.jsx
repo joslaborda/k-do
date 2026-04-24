@@ -9,7 +9,7 @@ import {
   Heart, Star
 } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 const TYPE_CONFIG = {
   food:      { label: 'Comida',     emoji: '🍜', color: 'bg-orange-100 text-orange-700' },
