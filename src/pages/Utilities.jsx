@@ -13,7 +13,8 @@ import WeatherCard from '@/components/WeatherCard';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { getCountryMeta, getEmergencyInfo, computeAvailableCurrencies } from '@/lib/countryConfig';
+import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
+import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getFxRate } from '@/lib/fxRates';
 import { useTripContext } from '@/hooks/useTripContext';
 import { TranslatorPanel } from './Translator';
@@ -125,27 +126,28 @@ export default function Utilities() {
       .finally(() => setLoadingRate(false));
   }, [baseCurrency, quoteCurrency]);
 
-  // Cargar info de emergencias según país activo
+  // Cargar info de emergencias según país activo — datos hardcodeados, sin IA
   useEffect(() => {
-    if (!country || !tripId) return;
-    setAiEmergencyData(null);
+    if (!country) { setAiEmergencyData(null); return; }
     setLoadingEmergency(true);
-    getEmergencyInfo(country, 'España').then((data) => {
-      if (data) {
-        setAiEmergencyData({
-          emergency_numbers: [
-            data.emergency_general && { name: 'Emergencias', number: data.emergency_general, icon: '🆘' },
-            data.police && { name: 'Policía', number: data.police, icon: '🚔' },
-            data.ambulance && { name: 'Ambulancia', number: data.ambulance, icon: '🚑' },
-            data.fire && { name: 'Bomberos', number: data.fire, icon: '🚒' },
-          ].filter(Boolean),
-          embassy: data.embassy || null,
-          useful_apps: data.useful_apps || [],
-          safety_tips: data.safety_tips || [],
-        });
-      }
-    }).catch(() => {}).finally(() => setLoadingEmergency(false));
-  }, [country, tripId]);
+    const data = getHardcodedEmergencyInfo(country, 'España');
+    if (data) {
+      setAiEmergencyData({
+        emergency_numbers: [
+          data.emergency_general && { name: 'Emergencias', number: data.emergency_general, icon: '🆘' },
+          data.police && data.police !== data.emergency_general && { name: 'Policía', number: data.police, icon: '🚔' },
+          data.ambulance && data.ambulance !== data.emergency_general && { name: 'Ambulancia', number: data.ambulance, icon: '🚑' },
+          data.fire && data.fire !== data.emergency_general && { name: 'Bomberos', number: data.fire, icon: '🚒' },
+        ].filter(Boolean),
+        embassy: data.embassy || null,
+        useful_apps: data.useful_apps || [],
+        safety_tips: data.safety_tips || [],
+      });
+    } else {
+      setAiEmergencyData(null);
+    }
+    setLoadingEmergency(false);
+  }, [country]);
 
   const handleBaseChange = (value) => {
     setBaseAmount(value);
