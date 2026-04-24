@@ -1,4 +1,5 @@
 import { base44 } from '@/api/base44Client';
+import { createNotification } from '@/lib/notifications';
 
 /**
  * Generar token único para invitación
@@ -105,6 +106,26 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
     members: newMembers,
     roles: newRoles
   });
+
+  // Notificar al creador del viaje que alguien aceptó
+  try {
+    const creatorEmail = trip.created_by;
+    if (creatorEmail && creatorEmail !== userEmail) {
+      const creatorProfiles = await base44.entities.UserProfile.filter({ email: creatorEmail });
+      const creatorProfile = creatorProfiles[0];
+      if (creatorProfile?.user_id) {
+        createNotification({
+          userId: creatorProfile.user_id,
+          type: 'trip_invite',
+          refId: tripId,
+          refTitle: trip.name || 'tu viaje',
+          message: `${userEmail} se ha unido al viaje`,
+        });
+      }
+    }
+  } catch {
+    // silencioso
+  }
 
   return trip;
 }
