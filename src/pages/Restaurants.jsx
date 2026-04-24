@@ -8,18 +8,7 @@ import { Button } from '@/components/ui/button';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
 import { createPageUrl } from '@/utils';
-
-// Fallback food data when LLM is slow/fails
-const FALLBACK_CATEGORIES = [
-  {
-    category: 'Platos típicos',
-    icon: '🍽️',
-    items: [
-      { name: 'Plato local 1', description: 'Cargando información gastronómica...', image: '' },
-      { name: 'Plato local 2', description: 'Cargando información gastronómica...', image: '' },
-    ],
-  },
-];
+import { getGastronomyData } from '@/lib/gastronomyDB';
 
 export default function Restaurants() {
   const navigate = useNavigate();
@@ -34,10 +23,20 @@ export default function Restaurants() {
   const country = activeCity?.country || trip?.country || '';
   const flag = getCountryMeta(activeCity?.country_code || activeCity?.country || trip?.country || '').flag;
 
-  // Datos gastronómicos estáticos — próximamente
-  const foodCategories = [];
+  // Datos gastronómicos hardcodeados por país
+  const gastronomyData = getGastronomyData(country);
+  const foodCategories = gastronomyData?.categories || [];
 
-  const filteredCategories = [];
+  const filteredCategories = searchQuery.trim()
+    ? foodCategories.map(cat => ({
+        ...cat,
+        items: cat.items.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (item.tags || []).some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+        ),
+      })).filter(cat => cat.items.length > 0)
+    : foodCategories;
 
   // No tripId: show empty state
   if (!tripId) {
@@ -112,12 +111,12 @@ export default function Restaurants() {
               </div>
             )}
 
-            {/* Próximamente */}
+            {/* País sin datos */}
             {country && foodCategories.length === 0 && (
               <div className="text-center py-20 text-muted-foreground">
                 <div className="text-6xl mb-4">🍽️</div>
                 <p className="text-xl font-semibold text-foreground mb-2">Gastronomía de {country}</p>
-                <p className="text-muted-foreground">Los platos típicos estarán disponibles próximamente.</p>
+                <p className="text-muted-foreground">Los platos típicos de este destino estarán disponibles próximamente.</p>
               </div>
             )}
 
@@ -126,6 +125,45 @@ export default function Restaurants() {
               <div className="text-center py-16 text-muted-foreground">
                 <Search className="w-16 h-16 mx-auto mb-4 opacity-30" />
                 <p className="text-lg">No se encontraron platos con "{searchQuery}"</p>
+              </div>
+            )}
+
+            {/* Lista de categorías con platos */}
+            {country && filteredCategories.length > 0 && (
+              <div className="space-y-4">
+                {filteredCategories.map((cat, catIdx) => (
+                  <Collapsible key={catIdx} defaultOpen={catIdx === 0}>
+                    <CollapsibleTrigger className="w-full">
+                      <div className="flex items-center justify-between bg-white rounded-2xl px-5 py-4 border border-border shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{cat.icon}</span>
+                          <span className="font-semibold text-foreground">{cat.category}</span>
+                          <span className="text-xs text-muted-foreground bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">{cat.items.length} platos</span>
+                        </div>
+                        <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform" />
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="grid md:grid-cols-2 gap-3 mt-3 px-1">
+                        {cat.items.map((item, itemIdx) => (
+                          <div key={itemIdx} className="bg-white rounded-xl border border-border p-4 hover:shadow-sm transition-shadow">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h4 className="font-semibold text-foreground leading-tight">{item.name}</h4>
+                              {item.tags && item.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 flex-shrink-0">
+                                  {item.tags.slice(0, 2).map((tag, ti) => (
+                                    <span key={ti} className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full whitespace-nowrap">{tag}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
               </div>
             )}
 
