@@ -29,7 +29,8 @@ import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import PublishSection from '@/components/trip/PublishSection';
 import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 import TripChat from '@/components/trip/TripChat';
-import NotificationBell from '@/components/notifications/NotificationBell';
+import TripAlerts from '@/components/trip/TripAlerts';
+import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -238,7 +239,6 @@ export default function Home() {
                   </Button>
                 </Link>
                 <div className="flex items-center gap-2">
-                  {currentUser?.id && <NotificationBell userId={currentUser.id} />}
                   <Button
                     variant="outline"
                     size="icon"
@@ -468,7 +468,7 @@ export default function Home() {
         {/* Chat del grupo */}
         <div>
           <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">💬 Chat del grupo</h2>
-          <TripChat tripId={tripId} myProfile={myProfile} trip={trip} />
+          <TripChat tripId={tripId} myProfile={myProfile} />
         </div>
 
         {/* Members Panel */}
