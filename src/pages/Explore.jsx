@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck, X, Tag } from 'lucide-react';
+import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck, X, Tag, Star } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -67,7 +67,15 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
             <Heart className="w-3 h-3 text-orange-400"/>Descubierto por @{attribution}
           </p>
         )}
-        <p className="font-semibold text-foreground text-sm mb-1">{spot.title}</p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+          {spot.avg_rating && (
+            <span className="flex items-center gap-0.5 text-xs text-amber-500 flex-shrink-0">
+              <Star className="w-3 h-3 fill-amber-400"/>
+              {spot.avg_rating}
+            </span>
+          )}
+        </div>
         {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
         {spot.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
