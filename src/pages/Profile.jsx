@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram } from 'lucide-react';
+import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram, Bookmark, FolderOpen, Plus, X, ChevronRight } from 'lucide-react';
 import { createNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,6 +66,164 @@ function MiniSpotCard({ spot }) {
           )}
           {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{spot.notes}</p>}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── SavedSpot card en carpeta ───────────────────────────────────────────────
+function SavedSpotCard({ spot, onDelete, onMoveFolder, folders }) {
+  const [showMove, setShowMove] = useState(false);
+  return (
+    <div className="bg-white border border-border rounded-xl p-3 hover:shadow-sm transition-shadow">
+      <div className="flex items-start gap-2">
+        <span className="text-xl flex-shrink-0">{SPOT_TYPE_EMOJI[spot.type] || '📍'}</span>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm text-foreground line-clamp-1">{spot.title}</p>
+          {spot.city_name && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+              <MapPin className="w-3 h-3" />{spot.city_name}{spot.country ? `, ${spot.country}` : ''}
+            </p>
+          )}
+          {spot.notes && <p className="text-xs text-muted-foreground line-clamp-1 mt-1">{spot.notes}</p>}
+          <div className="flex items-center gap-2 mt-2">
+            {spot.address && (
+              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.address)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="text-xs text-green-600 hover:underline flex items-center gap-0.5">
+                <MapPin className="w-3 h-3" />Maps
+              </a>
+            )}
+            <button onClick={() => setShowMove(s => !s)}
+              className="text-xs text-muted-foreground hover:text-orange-600 flex items-center gap-0.5 ml-auto">
+              <FolderOpen className="w-3 h-3" />Mover
+            </button>
+            <button onClick={() => onDelete(spot.id)}
+              className="text-xs text-muted-foreground hover:text-destructive">
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+          {showMove && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {folders.filter(f => f !== spot.folder).map(f => (
+                <button key={f} onClick={() => { onMoveFolder(spot.id, f); setShowMove(false); }}
+                  className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded-full border border-orange-200 hover:bg-orange-100">
+                  {f}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Guardados tab ───────────────────────────────────────────────────────────
+function SavedSpotsTab({ userId }) {
+  const queryClient = useQueryClient();
+  const [activeFolder, setActiveFolder] = useState('all');
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolder, setShowNewFolder] = useState(false);
+
+  const { data: savedSpots = [] } = useQuery({
+    queryKey: ['savedSpots', userId],
+    queryFn: () => base44.entities.SavedSpot.filter({ user_id: userId }),
+    enabled: !!userId,
+    staleTime: 30000,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.SavedSpot.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', userId] }),
+  });
+
+  const moveMutation = useMutation({
+    mutationFn: ({ id, folder }) => base44.entities.SavedSpot.update(id, { folder }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', userId] }),
+  });
+
+  // Carpetas únicas
+  const folders = ['General', ...new Set(savedSpots.map(s => s.folder).filter(f => f && f !== 'General'))];
+
+  const visibleSpots = activeFolder === 'all'
+    ? savedSpots
+    : savedSpots.filter(s => s.folder === activeFolder);
+
+  const createFolder = () => {
+    if (!newFolderName.trim()) return;
+    // La carpeta se crea al mover el primer spot
+    setActiveFolder(newFolderName.trim());
+    setNewFolderName('');
+    setShowNewFolder(false);
+  };
+
+  if (savedSpots.length === 0) return (
+    <div className="text-center py-16 text-muted-foreground">
+      <div className="text-5xl mb-3">🔖</div>
+      <p className="font-medium">Sin guardados todavía</p>
+      <p className="text-sm mt-1">Guarda spots de otros viajeros desde sus perfiles</p>
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Carpetas */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-4 -mx-4 px-4">
+        <button
+          onClick={() => setActiveFolder('all')}
+          className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+            activeFolder === 'all' ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border'
+          }`}
+        >
+          📚 Todos <span className="opacity-70">{savedSpots.length}</span>
+        </button>
+        {folders.map(f => (
+          <button key={f}
+            onClick={() => setActiveFolder(f)}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              activeFolder === f ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border'
+            }`}
+          >
+            📁 {f} <span className="opacity-70">{savedSpots.filter(s => s.folder === f).length}</span>
+          </button>
+        ))}
+        {/* Nueva carpeta */}
+        {showNewFolder ? (
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <input
+              autoFocus
+              value={newFolderName}
+              onChange={e => setNewFolderName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && createFolder()}
+              placeholder="Nombre carpeta"
+              className="text-xs border border-border rounded-full px-3 py-1.5 outline-none w-32"
+            />
+            <button onClick={createFolder} className="text-orange-700"><Plus className="w-4 h-4" /></button>
+            <button onClick={() => setShowNewFolder(false)} className="text-muted-foreground"><X className="w-4 h-4" /></button>
+          </div>
+        ) : (
+          <button onClick={() => setShowNewFolder(true)}
+            className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs text-muted-foreground border border-dashed border-border hover:border-orange-300 hover:text-orange-600 transition-colors">
+            <Plus className="w-3 h-3" /> Carpeta
+          </button>
+        )}
+      </div>
+
+      {/* Lista */}
+      <div className="space-y-3">
+        {visibleSpots.map(spot => (
+          <SavedSpotCard
+            key={spot.id}
+            spot={spot}
+            folders={folders}
+            onDelete={id => deleteMutation.mutate(id)}
+            onMoveFolder={(id, folder) => moveMutation.mutate({ id, folder })}
+          />
+        ))}
+        {visibleSpots.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground py-8">Esta carpeta está vacía</p>
+        )}
       </div>
     </div>
   );
@@ -149,7 +307,32 @@ export default function Profile() {
     enabled: !!currentUser?.id && !isOwnProfile,
   });
 
-  const followMutation = useMutation({
+  const { data: savedSpots = [] } = useQuery({
+    queryKey: ['savedSpots', targetUserId],
+    queryFn: () => base44.entities.SavedSpot.filter({ user_id: targetUserId }),
+    enabled: !!targetUserId && isOwnProfile,
+    staleTime: 30000,
+  });
+
+  const saveSpotMutation = useMutation({
+    mutationFn: (spot) => base44.entities.SavedSpot.create({
+      user_id: currentUser.id,
+      folder: 'General',
+      title: spot.title,
+      type: spot.type,
+      address: spot.address || '',
+      city_name: spot.city_name || '',
+      country: spot.country || '',
+      lat: spot.lat,
+      lng: spot.lng,
+      link: spot.link || '',
+      notes: spot.notes || '',
+      image_url: spot.image_url || '',
+      source_spot_id: spot.id,
+      source_user_id: targetUserId,
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', currentUser?.id] }),
+  });
     mutationFn: async () => {
       if (isFollowing && followRecord) {
         await base44.entities.Follow.delete(followRecord.id);
@@ -311,16 +494,21 @@ export default function Profile() {
       {/* Tabs */}
       <div className="max-w-lg mx-auto px-4 py-4">
         <Tabs defaultValue="itinerarios">
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="itinerarios" className="flex-1">
-              🗺️ Itinerarios {templates.length > 0 && <Badge variant="secondary" className="ml-2">{templates.length}</Badge>}
+          <TabsList className="w-full mb-6 flex-wrap h-auto gap-1">
+            <TabsTrigger value="itinerarios" className="flex-1 min-w-0">
+              🗺️ <span className="hidden sm:inline ml-1">Itinerarios</span> {templates.length > 0 && <Badge variant="secondary" className="ml-1">{templates.length}</Badge>}
             </TabsTrigger>
-            <TabsTrigger value="spots" className="flex-1">
-              📍 Spots {publicSpots.length > 0 && <Badge variant="secondary" className="ml-2">{publicSpots.length}</Badge>}
+            <TabsTrigger value="spots" className="flex-1 min-w-0">
+              📍 <span className="hidden sm:inline ml-1">Spots</span> {publicSpots.length > 0 && <Badge variant="secondary" className="ml-1">{publicSpots.length}</Badge>}
             </TabsTrigger>
             {isOwnProfile && (
-              <TabsTrigger value="cuenta" className="flex-1">
-                ⚙️ Cuenta
+              <TabsTrigger value="guardados" className="flex-1 min-w-0">
+                🔖 <span className="hidden sm:inline ml-1">Guardados</span> {savedSpots.length > 0 && <Badge variant="secondary" className="ml-1">{savedSpots.length}</Badge>}
+              </TabsTrigger>
+            )}
+            {isOwnProfile && (
+              <TabsTrigger value="cuenta" className="flex-1 min-w-0">
+                ⚙️ <span className="hidden sm:inline ml-1">Cuenta</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -350,10 +538,41 @@ export default function Profile() {
               </div>
             ) : (
               <div className="space-y-3">
-                {publicSpots.map(s => <MiniSpotCard key={s.id} spot={s} />)}
+                {publicSpots.map(s => (
+                  <div key={s.id} className="bg-white border border-border rounded-xl p-3 hover:shadow-md transition-all">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{SPOT_TYPE_EMOJI[s.type] || '📍'}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-foreground line-clamp-1">{s.title}</p>
+                        {s.city_name && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3 h-3" />{s.city_name}{s.country ? `, ${s.country}` : ''}
+                          </p>
+                        )}
+                        {s.notes && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{s.notes}</p>}
+                        {!isOwnProfile && currentUser && (
+                          <button
+                            onClick={() => saveSpotMutation.mutate(s)}
+                            disabled={saveSpotMutation.isPending}
+                            className="mt-2 flex items-center gap-1 text-xs text-orange-700 hover:text-orange-800 font-medium"
+                          >
+                            <Bookmark className="w-3.5 h-3.5" />
+                            {saveSpotMutation.isPending ? 'Guardando...' : 'Guardar en mis favoritos'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </TabsContent>
+
+          {isOwnProfile && (
+            <TabsContent value="guardados">
+              <SavedSpotsTab userId={currentUser?.id} />
+            </TabsContent>
+          )}
 
           {isOwnProfile && (
             <TabsContent value="cuenta">
