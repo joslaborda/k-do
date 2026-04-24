@@ -134,8 +134,23 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
       </div>
 
       {/* Notes */}
+      {/* Atribución */}
+      {(spot.source_username || spot.source_display_name) && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+          <Heart className="w-3 h-3 text-orange-400"/>
+          Recomendado por <span className="font-medium text-orange-700">@{spot.source_username || spot.source_display_name}</span>
+        </p>
+      )}
+
       {spot.notes && (
         <p className="text-sm text-muted-foreground">{spot.notes}</p>
+      )}
+
+      {/* Tags */}
+      {spot.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1">
+          {spot.tags.map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">#{t}</span>)}
+        </div>
       )}
 
       {/* Address */}
