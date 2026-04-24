@@ -59,8 +59,6 @@ async function searchPlaces(query, city, country) {
     osm_id: item.osm_id,
   }));
 }
-
-const SPOT_TYPES = [
   { value: 'all',       label: 'Todos',       emoji: '📍' },
   { value: 'food',      label: 'Restaurantes', emoji: '🍜' },
   { value: 'sight',     label: 'Atracciones',  emoji: '🏛️' },
