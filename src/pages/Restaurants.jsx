@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Plus, X, Star, Clock, ExternalLink, CheckCircle, Trash2, SlidersHorizontal, Compass } from 'lucide-react';
+import { Search, MapPin, Plus, X, ExternalLink, CheckCircle, Trash2, Compass } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
@@ -10,9 +10,55 @@ import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { createPageUrl } from '@/utils';
 
-const FSQ_KEY = 'PPREPG5DEWAMCOZLY1YU1MCF4KTRVSHITTHXDLWSML4RQFOO';
+// ── Búsqueda con OpenStreetMap Nominatim (sin CORS, sin API key) ────────────
+const OSM_CATEGORY_MAP = {
+  restaurant: 'food', cafe: 'food', bar: 'food', fast_food: 'food',
+  pub: 'food', bakery: 'food', ice_cream: 'food', food_court: 'food',
+  museum: 'sight', monument: 'sight', attraction: 'sight', artwork: 'sight',
+  viewpoint: 'sight', historic: 'sight', temple: 'sight', church: 'sight',
+  shrine: 'sight', castle: 'sight', ruins: 'sight', gallery: 'sight',
+  park: 'sight', nature_reserve: 'sight', beach: 'sight',
+  shop: 'shopping', mall: 'shopping', market: 'shopping', supermarket: 'shopping',
+  department_store: 'shopping', boutique: 'shopping',
+  bus_station: 'transport', train_station: 'transport', subway: 'transport',
+  airport: 'transport', ferry_terminal: 'transport',
+  sports_centre: 'activity', gym: 'activity', swimming_pool: 'activity',
+  cinema: 'activity', theatre: 'activity', nightclub: 'activity',
+};
 
-const SPOT_TYPES = [
+function osmTypeToSpotType(osmType, osmClass) {
+  const key = osmType || osmClass || '';
+  return OSM_CATEGORY_MAP[key] || 'sight';
+}
+
+async function searchPlaces(query, city, country) {
+  const q = [query, city, country].filter(Boolean).join(', ');
+  const url = 'https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+    q,
+    format: 'json',
+    limit: 10,
+    addressdetails: 1,
+    extratags: 1,
+    namedetails: 1,
+  });
+  const res = await fetch(url, {
+    headers: { 'Accept-Language': 'es,en', 'User-Agent': 'Kodo Travel App' },
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error('Nominatim error');
+  const data = await res.json();
+  return data.map(item => ({
+    id: item.place_id?.toString(),
+    name: item.namedetails?.name || item.display_name?.split(',')[0] || query,
+    display_name: item.display_name,
+    address: [item.address?.road, item.address?.city || item.address?.town || item.address?.village, item.address?.country].filter(Boolean).join(', '),
+    lat: parseFloat(item.lat),
+    lng: parseFloat(item.lon),
+    type: osmTypeToSpotType(item.type, item.class),
+    category: item.type || item.class || '',
+    osm_id: item.osm_id,
+  }));
+}
   { value: 'all',       label: 'Todos',       emoji: '📍' },
   { value: 'food',      label: 'Restaurantes', emoji: '🍜' },
   { value: 'sight',     label: 'Atracciones',  emoji: '🏛️' },
@@ -42,74 +88,35 @@ function fsqCategoryToType(cats = []) {
   return 'sight';
 }
 
-async function searchFoursquare(query, city, country) {
-  const near = [city, country].filter(Boolean).join(', ');
-  const url = `https://api.foursquare.com/v3/places/search?query=${encodeURIComponent(query)}&near=${encodeURIComponent(near)}&limit=8&fields=fsq_id,name,location,categories,rating,price,hours,photos,website,description`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: FSQ_KEY,
-      Accept: 'application/json',
-    },
-    signal: AbortSignal.timeout(6000),
-  });
-  if (!res.ok) throw new Error('Foursquare error');
-  const data = await res.json();
-  return data.results || [];
-}
-
-function FsqResultCard({ place, onSave, saving }) {
-  const type = fsqCategoryToType(place.categories);
-  const typeConf = SPOT_TYPES.find(t => t.value === type) || SPOT_TYPES[6];
-  const photo = place.photos?.[0];
-  const photoUrl = photo ? `${photo.prefix}200x200${photo.suffix}` : null;
-  const address = place.location?.formatted_address || place.location?.address || '';
-  const hours = place.hours?.display;
+function PlaceResultCard({ place, onSave, saving }) {
+  const typeConf = SPOT_TYPES.find(t => t.value === place.type) || SPOT_TYPES[6];
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden flex gap-0 shadow-sm hover:shadow-md transition-shadow">
-      {/* Foto */}
-      {photoUrl ? (
-        <img src={photoUrl} alt={place.name} className="w-20 h-20 object-cover flex-shrink-0 self-stretch" />
-      ) : (
-        <div className="w-20 h-20 bg-orange-50 flex-shrink-0 flex items-center justify-center self-stretch">
-          <span className="text-3xl">{typeConf.emoji}</span>
-        </div>
-      )}
+    <div className="bg-white rounded-2xl border border-border overflow-hidden flex shadow-sm hover:shadow-md transition-shadow">
+      <div className="w-16 h-16 bg-orange-50 flex-shrink-0 flex items-center justify-center self-stretch">
+        <span className="text-2xl">{typeConf.emoji}</span>
+      </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0 p-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="font-semibold text-foreground text-sm leading-tight truncate">{place.name}</p>
-            <span className={`inline-block text-xs px-2 py-0.5 rounded-full border mt-1 ${TYPE_COLORS[type]}`}>
+            <p className="font-semibold text-foreground text-sm leading-tight">{place.name}</p>
+            <span className={`inline-block text-xs px-2 py-0.5 rounded-full border mt-1 ${TYPE_COLORS[place.type] || TYPE_COLORS.custom}`}>
               {typeConf.emoji} {typeConf.label}
             </span>
           </div>
-          {place.rating && (
-            <div className="flex items-center gap-0.5 flex-shrink-0">
-              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-              <span className="text-xs font-medium text-foreground">{(place.rating / 2).toFixed(1)}</span>
-            </div>
-          )}
         </div>
 
-        {address && (
+        {place.address && (
           <p className="text-xs text-muted-foreground mt-1.5 flex items-start gap-1">
             <MapPin className="w-3 h-3 flex-shrink-0 mt-0.5" />
-            <span className="truncate">{address}</span>
-          </p>
-        )}
-
-        {hours && (
-          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-            <Clock className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">{hours}</span>
+            <span className="line-clamp-1">{place.address}</span>
           </p>
         )}
 
         <Button
           size="sm"
-          onClick={() => onSave(place, type)}
+          onClick={() => onSave(place)}
           disabled={saving}
           className="mt-2 h-7 text-xs bg-orange-700 hover:bg-orange-800 text-white px-3"
         >
@@ -121,6 +128,15 @@ function FsqResultCard({ place, onSave, saving }) {
   );
 }
 
+        <Button
+          size="sm"
+          onClick={() => onSave(place, type)}
+          disabled={saving}
+          className="mt-2 h-7 text-xs bg-orange-700 hover:bg-orange-800 text-white px-3"
+        >
+          <Plus className="w-3 h-3 mr-1" />
+          {saving ? 'Guardando...' : 'Guardar spot'}
+        </Button>
 function SavedSpotCard({ spot, currentUserEmail, onDelete, onToggleVisited, onTogglePublic }) {
   const type = spot.type || 'custom';
   const typeConf = SPOT_TYPES.find(t => t.value === type) || SPOT_TYPES[6];
@@ -265,7 +281,7 @@ export default function Restaurants() {
     searchTimer.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const results = await searchFoursquare(searchQuery, city, country);
+        const results = await searchPlaces(searchQuery, city, country);
         setFsqResults(results);
       } catch { setFsqResults([]); }
       finally { setSearching(false); }
@@ -273,28 +289,26 @@ export default function Restaurants() {
     return () => clearTimeout(searchTimer.current);
   }, [searchQuery, city, country]);
 
-  const handleSave = async (place, type) => {
-    const id = place.fsq_id;
+  const handleSave = async (place) => {
+    const id = place.id;
     setSavingId(id);
     try {
-      const photo = place.photos?.[0];
       await createMutation.mutateAsync({
         trip_id: tripId,
         city_id: cityId || undefined,
         title: place.name,
-        type,
-        address: place.location?.formatted_address || place.location?.address || '',
-        lat: place.geocodes?.main?.latitude,
-        lng: place.geocodes?.main?.longitude,
-        link: place.website || `https://foursquare.com/v/${place.fsq_id}`,
-        notes: place.description || '',
+        type: place.type || 'sight',
+        address: place.address || '',
+        lat: place.lat,
+        lng: place.lng,
+        link: place.osm_id ? `https://www.openstreetmap.org/node/${place.osm_id}` : '',
+        notes: '',
         city_name: city,
         country,
         visibility: 'trip_members',
         visited: false,
         created_by: user?.email,
         created_by_user_id: user?.id,
-        image_url: photo ? `${photo.prefix}400x400${photo.suffix}` : undefined,
       });
       setSearchQuery('');
       setFsqResults([]);
@@ -393,11 +407,11 @@ export default function Restaurants() {
               {fsqResults.length} resultados — toca para guardar
             </p>
             {fsqResults.map(place => (
-              <FsqResultCard
-                key={place.fsq_id}
+              <PlaceResultCard
+                key={place.id}
                 place={place}
                 onSave={handleSave}
-                saving={savingId === place.fsq_id}
+                saving={savingId === place.id}
               />
             ))}
           </div>
