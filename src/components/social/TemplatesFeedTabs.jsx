@@ -1,378 +1,277 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Loader2, Heart } from 'lucide-react';
+import { Search, Heart, Bookmark, UserPlus, UserCheck, MapPin, Globe, Compass } from 'lucide-react';
 import TemplateCard from '@/components/explore/TemplateCard';
-import UserSearchPanel from '@/components/social/UserSearchPanel';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
-const DURATION_RANGES = [
-  { label: '1–3 días', min: 1, max: 3 },
-  { label: '4–7 días', min: 4, max: 7 },
-  { label: '8–14 días', min: 8, max: 14 },
-  { label: '15+ días', min: 15, max: Infinity }
-];
+function Avatar({ profile }) {
+  const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
+  if (profile?.avatar_url) return <img src={profile.avatar_url} className="w-9 h-9 rounded-full object-cover flex-shrink-0" alt={initials}/>;
+  return <div className="w-9 h-9 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm flex-shrink-0">{initials}</div>;
+}
 
-export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myProfile }) {
-  const [activeTab, setActiveTab] = useState('explorar');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('all');
-  const [selectedDuration, setSelectedDuration] = useState('all');
-  const [explorarPage, setExplorarPage] = useState(1);
-  const [siguiendoPage, setSiguiendoPage] = useState(1);
+function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
+  const TYPE_EMOJI = { food:'🍽️', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
+  const emoji = TYPE_EMOJI[spot.type] || '📍';
+  const isOwn = currentUserId === spot.created_by_user_id;
 
-  // Query: templates públicos
-  const { data: publicTemplates, isLoading: publicLoading } = useQuery({
-    queryKey: ['templatesPublic'],
-    queryFn: () => base44.entities.ItineraryTemplate.filter({ visibility: 'public' }, '-created_date'),
-    staleTime: 1000 * 60 * 10, // 10 min
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    staleTime: 60000,
   });
-
-  // Query: usuarios seguidos
-  const { data: followingData = [] } = useQuery({
-    queryKey: ['following', currentUserId],
-    queryFn: () => base44.entities.Follow.filter({ follower_user_id: currentUserId }),
-    enabled: !!currentUserId,
-    staleTime: 1000 * 60 * 10,
-  });
-
-  const followedUserIds = followingData.map((f) => f.followed_user_id);
-
-  // Query: templates de usuarios seguidos
-  const { data: siguiendoTemplates, isLoading: siguiendoLoading } = useQuery({
-    queryKey: ['templatesFollowing', followedUserIds],
-    queryFn: async () => {
-      if (followedUserIds.length === 0) return [];
-      const templates = await base44.entities.ItineraryTemplate.list('-created_date');
-      return templates.filter(
-        (t) => t.visibility === 'public' && followedUserIds.includes(t.created_by_user_id)
-      );
-    },
-    enabled: !!currentUserId && followedUserIds.length > 0,
-    staleTime: 1000 * 60 * 10,
-  });
-
-  // Query: colección guardados
-  const { data: myCollection } = useQuery({
-    queryKey: ['guardados', currentUserId],
-    queryFn: async () => {
-      const results = await base44.entities.Collection.filter({
-        owner_user_id: currentUserId,
-        name: 'Guardados'
-      });
-      return results[0] || null;
-    },
-    enabled: !!currentUserId,
-    staleTime: 1000 * 60 * 10,
-  });
-
-  // Query: cargar templates guardados
-  const { data: guardadosTemplates, isLoading: guardadosLoading } = useQuery({
-    queryKey: ['guardadosDetails', myCollection?.template_ids],
-    queryFn: async () => {
-      if (!myCollection?.template_ids || myCollection.template_ids.length === 0) return [];
-      const allTemplates = await base44.entities.ItineraryTemplate.list();
-      return allTemplates.filter((t) => myCollection.template_ids.includes(t.id));
-    },
-    enabled: !!myCollection?.template_ids,
-    staleTime: 1000 * 60 * 10,
-  });
-
-  // Obtener países únicos
-  const allCountries = useMemo(() => {
-    const templates = activeTab === 'explorar' ? publicTemplates : activeTab === 'siguiendo' ? siguiendoTemplates : guardadosTemplates;
-    if (!templates) return [];
-    const countries = new Set();
-    templates.forEach((t) => {
-      if (t.countries && Array.isArray(t.countries)) {
-        t.countries.forEach((c) => countries.add(c));
-      }
-    });
-    return Array.from(countries).sort();
-  }, [activeTab, publicTemplates, siguiendoTemplates, guardadosTemplates]);
-
-  // Filtrar templates
-  const filterTemplates = (templates) => {
-    if (!templates) return [];
-    let filtered = templates;
-
-    // Search
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((t) =>
-        t.title.toLowerCase().includes(query) ||
-        (t.cities && t.cities.some((c) => c.toLowerCase().includes(query))) ||
-        (t.tags && t.tags.some((tag) => tag.toLowerCase().includes(query)))
-      );
-    }
-
-    // Country
-    if (selectedCountry !== 'all') {
-      filtered = filtered.filter((t) =>
-        t.countries && t.countries.includes(selectedCountry)
-      );
-    }
-
-    // Duration
-    if (selectedDuration !== 'all') {
-      const range = DURATION_RANGES.find((r) => r.label === selectedDuration);
-      if (range) {
-        filtered = filtered.filter((t) =>
-          t.duration_days >= range.min && t.duration_days <= range.max
-        );
-      }
-    }
-
-    return filtered;
-  };
-
-  const explorarFiltered = useMemo(
-    () => filterTemplates(publicTemplates),
-    [publicTemplates, searchQuery, selectedCountry, selectedDuration]
-  );
-
-  const siguiendoFiltered = useMemo(
-    () => filterTemplates(siguiendoTemplates),
-    [siguiendoTemplates, searchQuery, selectedCountry, selectedDuration]
-  );
-
-  const guardadosFiltered = useMemo(
-    () => filterTemplates(guardadosTemplates),
-    [guardadosTemplates, searchQuery, selectedCountry, selectedDuration]
-  );
-
-  // Paginación: 12 por página
-  const ITEMS_PER_PAGE = 12;
-
-  const paginatedExplorar = useMemo(() => {
-    const start = (explorarPage - 1) * ITEMS_PER_PAGE;
-    return explorarFiltered.slice(start, start + ITEMS_PER_PAGE);
-  }, [explorarFiltered, explorarPage]);
-
-  const paginatedSiguiendo = useMemo(() => {
-    const start = (siguiendoPage - 1) * ITEMS_PER_PAGE;
-    return siguiendoFiltered.slice(start, start + ITEMS_PER_PAGE);
-  }, [siguiendoFiltered, siguiendoPage]);
-
-  const totalExplorarPages = Math.ceil(explorarFiltered.length / ITEMS_PER_PAGE);
-  const totalSiguiendoPages = Math.ceil(siguiendoFiltered.length / ITEMS_PER_PAGE);
-
-  const resetFilters = () => {
-    setSearchQuery('');
-    setSelectedCountry('all');
-    setSelectedDuration('all');
-    setExplorarPage(1);
-    setSiguiendoPage(1);
-  };
+  const ups = comments.filter(c => c.thumb === 'up').length;
 
   return (
-    <div className="mt-16 pt-8 border-t border-border">
-      <h2 className="text-2xl font-bold text-foreground mb-1">🌍 Comunidad</h2>
-      <p className="text-muted-foreground text-sm mb-6">Descubre itinerarios de viajeros del mundo</p>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-white border border-border p-1 h-auto">
-          <TabsTrigger
-            value="explorar"
-            className="data-[state=active]:bg-orange-700 data-[state=active]:text-white"
-          >
-            🌐 Explorar
-          </TabsTrigger>
-          <TabsTrigger
-            value="siguiendo"
-            className="data-[state=active]:bg-orange-700 data-[state=active]:text-white"
-          >
-            👥 Siguiendo ({followedUserIds.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="guardados"
-            className="data-[state=active]:bg-orange-700 data-[state=active]:text-white"
-          >
-            <Heart className="w-4 h-4 mr-1 fill-current" />
-            Guardados ({myCollection?.template_ids?.length || 0})
-          </TabsTrigger>
-        </TabsList>
-
-        {/* EXPLORAR TAB */}
-        <TabsContent value="explorar" className="space-y-4">
-          {/* Filtros */}
-          <div className="bg-white p-4 rounded-xl border border-border space-y-3">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Buscar itinerarios, ciudades..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setExplorarPage(1);
-                }}
-                className="flex-1 bg-orange-50 border-border"
-              />
-              {(searchQuery || selectedCountry !== 'all' || selectedDuration !== 'all') && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={resetFilters}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Limpiar
-                </Button>
-              )}
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <Select value={selectedCountry} onValueChange={(v) => { setSelectedCountry(v); setExplorarPage(1); }}>
-                <SelectTrigger className="w-40 bg-orange-50 border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los países</SelectItem>
-                  {allCountries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedDuration} onValueChange={(v) => { setSelectedDuration(v); setExplorarPage(1); }}>
-                <SelectTrigger className="w-40 bg-orange-50 border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Cualquier duración</SelectItem>
-                  {DURATION_RANGES.map((range) => (
-                    <SelectItem key={range.label} value={range.label}>
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+      {spot.image_url && <div className="h-32 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover"/></div>}
+      <div className="p-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Avatar profile={profile}/>
+          <div className="flex-1 min-w-0">
+            <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id}
+              className="text-xs font-semibold text-foreground hover:text-orange-700 block truncate">
+              {profile?.display_name || 'Viajero'}
+              {profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
+            </Link>
+            {spot.city_name && <p className="text-xs text-muted-foreground flex items-center gap-0.5"><MapPin className="w-3 h-3"/>{spot.city_name}{spot.country ? ', ' + spot.country : ''}</p>}
           </div>
-
-          {/* Templates */}
-          {publicLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-orange-700" />
-            </div>
-          ) : explorarFiltered.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-border">
-              <p className="text-muted-foreground">No se encontraron itinerarios con esos filtros</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {paginatedExplorar.map((template) => (
-                  <TemplateCard key={template.id} template={template} />
-                ))}
-              </div>
-              {totalExplorarPages > 1 && (
-                <div className="flex justify-center gap-2 mt-6">
-                  <Button
-                    variant="outline"
-                    disabled={explorarPage === 1}
-                    onClick={() => setExplorarPage((p) => p - 1)}
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-sm text-muted-foreground py-2">
-                    Página {explorarPage} de {totalExplorarPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    disabled={explorarPage === totalExplorarPages}
-                    onClick={() => setExplorarPage((p) => p + 1)}
-                  >
-                    Siguiente
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* User search */}
-          <div className="mt-8 pt-8 border-t border-border">
-            <UserSearchPanel currentUserId={currentUserId} />
+          <span className="text-lg">{emoji}</span>
+        </div>
+        {spot.source_display_name && (
+          <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+            <Heart className="w-3 h-3 text-orange-400"/>Descubierto por @{spot.source_username || spot.source_display_name}
+          </p>
+        )}
+        <p className="font-semibold text-sm text-foreground mb-1">{spot.title}</p>
+        {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
+        {spot.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {spot.tags.slice(0,3).map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
           </div>
-        </TabsContent>
-
-        {/* SIGUIENDO TAB */}
-        <TabsContent value="siguiendo" className="space-y-4">
-          {followedUserIds.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-border">
-              <p className="text-muted-foreground mb-4">No sigues a nadie todavía</p>
-              <p className="text-sm text-muted-foreground mb-6">Busca usuarios para seguir su contenido</p>
-              <Button
-                onClick={() => setActiveTab('explorar')}
-                className="bg-orange-700 hover:bg-orange-800"
-              >
-                Buscar usuarios
-              </Button>
-            </div>
-          ) : siguiendoLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-orange-700" />
-            </div>
-          ) : siguiendoFiltered.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-border">
-              <p className="text-muted-foreground">Los usuarios que sigues no tienen itinerarios públicos</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {paginatedSiguiendo.map((template) => (
-                  <TemplateCard key={template.id} template={template} />
-                ))}
-              </div>
-              {totalSiguiendoPages > 1 && (
-                <div className="flex justify-center gap-2 mt-6">
-                  <Button
-                    variant="outline"
-                    disabled={siguiendoPage === 1}
-                    onClick={() => setSiguiendoPage((p) => p - 1)}
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-sm text-muted-foreground py-2">
-                    Página {siguiendoPage} de {totalSiguiendoPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    disabled={siguiendoPage === totalSiguiendoPages}
-                    onClick={() => setSiguiendoPage((p) => p + 1)}
-                  >
-                    Siguiente
-                  </Button>
-                </div>
-              )}
-            </>
+        )}
+        <div className="flex items-center gap-3 mt-2.5">
+          {ups > 0 && <span className="text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded-full">👍 {ups}</span>}
+          {comments.length > 0 && <span className="text-xs text-muted-foreground">💬 {comments.length}</span>}
+          {!isOwn && currentUserId && (
+            <button onClick={() => onSave(spot)} className="ml-auto text-xs text-orange-700 font-medium hover:underline flex items-center gap-1">
+              <Bookmark className="w-3 h-3"/>Guardar
+            </button>
           )}
-        </TabsContent>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* GUARDADOS TAB */}
-        <TabsContent value="guardados" className="space-y-4">
-          {guardadosLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-orange-700" />
+function UserCard({ profile, currentUserId, myFollows }) {
+  const queryClient = useQueryClient();
+  const followRecord = myFollows.find(f => f.followed_user_id === profile.user_id);
+  const isOwn = currentUserId === profile.user_id;
+
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      if (followRecord) await base44.entities.Follow.delete(followRecord.id);
+      else await base44.entities.Follow.create({ follower_user_id: currentUserId, followed_user_id: profile.user_id });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myFollows', currentUserId] }),
+  });
+
+  return (
+    <div className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3">
+      <Avatar profile={profile}/>
+      <div className="flex-1 min-w-0">
+        <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id}
+          className="font-semibold text-sm text-foreground hover:text-orange-700 block truncate">
+          {profile.display_name || 'Viajero'}
+        </Link>
+        {profile.username && <p className="text-xs text-muted-foreground">@{profile.username}</p>}
+      </div>
+      {!isOwn && currentUserId && (
+        <button onClick={() => followMutation.mutate()}
+          className={"flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium transition-colors " +
+            (followRecord ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-orange-700 text-white hover:bg-orange-800')}>
+          {followRecord ? <><UserCheck className="w-3 h-3"/>Siguiendo</> : <><UserPlus className="w-3 h-3"/>Seguir</>}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myProfile }) {
+  const [activeTab, setActiveTab] = useState('spots');
+  const [searchQuery, setSearchQuery] = useState('');
+  const queryClient = useQueryClient();
+
+  const { data: publicSpots = [], isLoading: loadingSpots } = useQuery({
+    queryKey: ['spotsPublic'],
+    queryFn: () => base44.entities.Spot.filter({ visibility: 'public' }),
+    staleTime: 3 * 60 * 1000,
+  });
+
+  const { data: publicTemplates = [], isLoading: loadingTemplates } = useQuery({
+    queryKey: ['templatesPublic'],
+    queryFn: () => base44.entities.ItineraryTemplate.filter({ visibility: 'public' }, '-created_date'),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['allProfiles'],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const { data: myFollows = [] } = useQuery({
+    queryKey: ['myFollows', currentUserId],
+    queryFn: () => base44.entities.Follow.filter({ follower_user_id: currentUserId }),
+    enabled: !!currentUserId,
+    staleTime: 60000,
+  });
+
+  const followedUserIds = myFollows.map(f => f.followed_user_id);
+
+  const profileMap = useMemo(() => {
+    const m = {};
+    allProfiles.forEach(p => { m[p.user_id] = p; });
+    return m;
+  }, [allProfiles]);
+
+  // Algoritmo: primero seguidos, luego por popularidad
+  const rankedSpots = useMemo(() => {
+    return [...publicSpots].sort((a, b) => {
+      const aF = followedUserIds.includes(a.created_by_user_id) ? 10 : 0;
+      const bF = followedUserIds.includes(b.created_by_user_id) ? 10 : 0;
+      return (bF + (b.saves_count || 0)) - (aF + (a.saves_count || 0));
+    });
+  }, [publicSpots, followedUserIds]);
+
+  const filteredSpots = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return rankedSpots;
+    return rankedSpots.filter(s =>
+      s.title?.toLowerCase().includes(q) ||
+      s.city_name?.toLowerCase().includes(q) ||
+      s.country?.toLowerCase().includes(q) ||
+      s.tags?.some(t => t.toLowerCase().includes(q))
+    );
+  }, [rankedSpots, searchQuery]);
+
+  const filteredTemplates = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return publicTemplates;
+    return publicTemplates.filter(t =>
+      t.title?.toLowerCase().includes(q) ||
+      t.cities?.some(c => c.toLowerCase().includes(q)) ||
+      t.countries?.some(c => c.toLowerCase().includes(q))
+    );
+  }, [publicTemplates, searchQuery]);
+
+  const filteredPeople = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return allProfiles.filter(p =>
+      p.user_id !== currentUserId && (!q ||
+        p.display_name?.toLowerCase().includes(q) ||
+        p.username?.toLowerCase().includes(q) ||
+        p.home_country?.toLowerCase().includes(q))
+    ).sort((a, b) => (followedUserIds.includes(a.user_id) ? 0 : 1) - (followedUserIds.includes(b.user_id) ? 0 : 1));
+  }, [allProfiles, searchQuery, currentUserId, followedUserIds]);
+
+  const saveSpotMutation = useMutation({
+    mutationFn: spot => base44.entities.SavedSpot.create({
+      user_id: currentUserId, folder: 'General',
+      title: spot.title, type: spot.type,
+      address: spot.address || '', city_name: spot.city_name || '', country: spot.country || '',
+      notes: spot.notes || '', image_url: spot.image_url || '',
+      source_spot_id: spot.id, source_user_id: spot.created_by_user_id,
+      source_username: profileMap[spot.created_by_user_id]?.username || '',
+      source_display_name: profileMap[spot.created_by_user_id]?.display_name || '',
+      tags: spot.tags || [],
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', currentUserId] }),
+  });
+
+  const tabs = [
+    { id: 'spots', label: 'Spots', icon: '📍', count: filteredSpots.length },
+    { id: 'viajes', label: 'Viajes', icon: '🗺️', count: filteredTemplates.length },
+    { id: 'gente', label: 'Gente', icon: '👥', count: filteredPeople.length },
+  ];
+
+  return (
+    <div>
+      {/* Buscador */}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
+        <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Busca spots, destinos, viajeros..."
+          className="pl-9 bg-white"/>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-5">
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            className={"flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border " +
+              (activeTab === t.id ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border hover:border-orange-300')}>
+            <span>{t.icon}</span>
+            <span>{t.label}</span>
+            {t.count > 0 && <span className={"text-xs " + (activeTab === t.id ? 'text-white/70' : 'text-muted-foreground')}>{t.count}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* SPOTS */}
+      {activeTab === 'spots' && (
+        loadingSpots ? (
+          <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+        ) : filteredSpots.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-3">📍</div>
+            <p className="font-semibold text-foreground">Sin spots todavía</p>
+            <p className="text-sm text-muted-foreground mt-1">Sé el primero en publicar un spot</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredSpots.slice(0, 12).map(spot => (
+              <SpotFeedCard key={spot.id} spot={spot} profile={profileMap[spot.created_by_user_id]}
+                currentUserId={currentUserId} onSave={s => saveSpotMutation.mutate(s)}/>
+            ))}
+          </div>
+        )
+      )}
+
+      {/* VIAJES */}
+      {activeTab === 'viajes' && (
+        loadingTemplates ? (
+          <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+        ) : filteredTemplates.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-3">🗺️</div>
+            <p className="font-semibold text-foreground">Sin itinerarios todavía</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredTemplates.slice(0, 6).map(t => <TemplateCard key={t.id} template={t} currentUser={{ id: currentUserId, email: currentUserEmail }}/>)}
+          </div>
+        )
+      )}
+
+      {/* GENTE */}
+      {activeTab === 'gente' && (
+        <div className="space-y-3">
+          {filteredPeople.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-5xl mb-3">👥</div>
+              <p className="font-semibold text-foreground">{searchQuery ? 'Sin resultados' : 'Sin viajeros todavía'}</p>
             </div>
-          ) : guardadosFiltered.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-border">
-              <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Aún no has guardado itinerarios</p>
-              <p className="text-sm text-muted-foreground mt-1">Guarda tus itinerarios favoritos</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guardadosFiltered.map((template) => (
-                <TemplateCard key={template.id} template={template} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          ) : filteredPeople.map(p => (
+            <UserCard key={p.user_id} profile={p} currentUserId={currentUserId} myFollows={myFollows}/>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
