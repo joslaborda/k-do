@@ -725,6 +725,8 @@ export default function CityDetail() {
           currentUserEmail={currentUser?.email}
           trip={trip}
           days={days}
+          city={city?.name || ''}
+          country={city?.country || trip?.country || ''}
         />
         </div>
 
