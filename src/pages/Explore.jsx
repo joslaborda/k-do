@@ -119,6 +119,97 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
   );
 }
 
+
+function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotId }) {
+  const [cityFilter, setCityFilter] = useState('');
+  const queryClient = useQueryClient();
+
+  // Get all unique cities from public spots
+  const cities = [...new Set(publicSpots.map(s => s.city_name).filter(Boolean))].sort();
+
+  // For each spot get comment counts to rank
+  const { data: allComments = [] } = useQuery({
+    queryKey: ['allSpotComments'],
+    queryFn: async () => {
+      const results = await Promise.allSettled(
+        publicSpots.slice(0, 30).map(s => base44.entities.SpotComment.filter({ spot_id: s.id }))
+      );
+      return results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+    },
+    enabled: publicSpots.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const filteredSpots = useMemo(() => {
+    let spots = cityFilter
+      ? publicSpots.filter(s => s.city_name?.toLowerCase().includes(cityFilter.toLowerCase()) || s.country?.toLowerCase().includes(cityFilter.toLowerCase()))
+      : publicSpots;
+
+    // Score: ups from comments
+    return [...spots].sort((a, b) => {
+      const aComments = allComments.filter(c => c.spot_id === a.id);
+      const bComments = allComments.filter(c => c.spot_id === b.id);
+      const aScore = aComments.filter(c => c.thumb === 'up').length * 2 + aComments.length;
+      const bScore = bComments.filter(c => c.thumb === 'up').length * 2 + bComments.length;
+      return bScore - aScore;
+    }).slice(0, 20);
+  }, [publicSpots, allComments, cityFilter]);
+
+  const TYPE_EMOJI = { food:'🍽️', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
+
+  return (
+    <div>
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
+        <Input value={cityFilter} onChange={e => setCityFilter(e.target.value)}
+          placeholder="Filtra por ciudad o país..." className="pl-9 bg-white"/>
+      </div>
+      {filteredSpots.length === 0 ? (
+        <EmptyFeed emoji="⭐" title="Sin spots todavía" subtitle="Sé el primero en publicar un spot con valoraciones"/>
+      ) : (
+        <div className="space-y-3">
+          {filteredSpots.map((spot, idx) => {
+            const comments = allComments.filter(c => c.spot_id === spot.id);
+            const ups = comments.filter(c => c.thumb === 'up').length;
+            const profile = profileMap[spot.created_by_user_id];
+            const isOwn = currentUser?.id === spot.created_by_user_id;
+            return (
+              <div key={spot.id} className="bg-white border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-shadow">
+                <div className={"w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 " +
+                  (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-slate-100 text-slate-600' : idx === 2 ? 'bg-orange-100 text-orange-700' : 'bg-secondary text-muted-foreground')}>
+                  {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-sm text-foreground">{spot.title}</p>
+                    <span className="text-lg flex-shrink-0">{TYPE_EMOJI[spot.type] || '📍'}</span>
+                  </div>
+                  {(spot.city_name || spot.country) && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3 h-3"/>{[spot.city_name, spot.country].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    {ups > 0 && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>}
+                    {comments.length > 0 && <span className="text-xs text-muted-foreground">💬 {comments.length}</span>}
+                    {profile && <span className="text-xs text-muted-foreground ml-auto">@{profile.username || profile.display_name}</span>}
+                  </div>
+                  {!isOwn && currentUser && (
+                    <button onClick={() => onSave(spot)} disabled={savingSpotId === spot.id}
+                      className="mt-2 text-xs text-orange-700 font-medium hover:underline flex items-center gap-1">
+                      <Bookmark className="w-3 h-3"/>{savingSpotId === spot.id ? 'Guardando...' : 'Guardar'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EmptyFeed({ emoji, title, subtitle }) {
   return (
     <div className="text-center py-16 text-muted-foreground">
@@ -286,6 +377,9 @@ export default function Explore() {
             <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
               <Users className="w-4 h-4 mr-1"/>Personas
             </TabsTrigger>
+            <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              ⭐ Top
+            </TabsTrigger>
           </TabsList>
 
           {/* ── EXPLORAR ──────────────────────────────────────────────────── */}
@@ -421,6 +515,11 @@ export default function Explore() {
         </Tabs>
       </div>
 
+          <TabsContent value="top">
+            <TopSpotsTab publicSpots={publicSpots} profileMap={profileMap} currentUser={currentUser} onSave={handleSaveSpot} savingSpotId={savingSpotId}/>
+          </TabsContent>
+        </Tabs>
+      </div>
       <CommunitySearch open={searchOpen} onOpenChange={setSearchOpen}/>
     </div>
   );
