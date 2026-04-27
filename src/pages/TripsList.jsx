@@ -246,52 +246,78 @@ export default function TripsList() {
     );
   }
 
+  const [activeTab, setActiveTab] = useState('viajes');
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-orange-50">
       {needsOnboarding && <CreateProfileModal user={user} open={true} />}
 
       {/* Header */}
-      <div className="bg-orange-700 px-6 py-10">
-        <div className="max-w-6xl mx-auto flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-white text-4xl font-black tracking-tight">Kōdo</h1>
-            <p className="text-white/90 text-base font-medium mt-0.5">Travel your way</p>
-            {myProfile && (
-              <p className="text-white/70 text-sm mt-1 font-mono">@{myProfile.username}</p>
-            )}
+      <div className="bg-orange-700 px-5 pt-12 pb-5">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-white text-3xl font-black tracking-tight">Kōdo</h1>
+              {myProfile?.username && (
+                <p className="text-white/70 text-sm font-mono mt-0.5">@{myProfile.username}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {user?.id && <NotificationBell userId={user.id} />}
+              <UserMenu user={user} profile={myProfile} />
+            </div>
           </div>
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <Button
-              onClick={() => setDialogOpen(true)}
-              className="bg-white text-orange-700 hover:bg-orange-50 font-semibold px-5 shadow-sm"
-            >
-              <Plus className="w-4 h-4 mr-1.5" />Crear viaje
-            </Button>
-            {user?.id && <NotificationBell userId={user.id} />}
-            <UserMenu user={user} profile={myProfile} />
+
+          {/* Tabs */}
+          <div className="flex gap-1 bg-white/15 p-1 rounded-xl">
+            <button
+              onClick={() => setActiveTab('viajes')}
+              className={"flex-1 py-2 rounded-lg text-sm font-semibold transition-all " +
+                (activeTab === 'viajes' ? 'bg-white text-orange-700 shadow-sm' : 'text-white/80 hover:text-white')}>
+              ✈️ Mis viajes
+            </button>
+            <button
+              onClick={() => setActiveTab('social')}
+              className={"flex-1 py-2 rounded-lg text-sm font-semibold transition-all " +
+                (activeTab === 'social' ? 'bg-white text-orange-700 shadow-sm' : 'text-white/80 hover:text-white')}>
+              🌍 Kōdo Social
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 py-8 max-w-6xl">
-        {trips.length === 0 ? (
-          <EmptyState
-            userName={displayName}
-            onCreateTrip={() => setDialogOpen(true)}
-          />
-        ) : (
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* TAB: MIS VIAJES */}
+        {activeTab === 'viajes' && (
           <>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Mis viajes</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">{tripCards}</div>
+            <button
+              onClick={() => setDialogOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-dashed border-orange-300 text-orange-700 font-semibold text-sm hover:bg-orange-50 transition-colors mb-5 bg-white">
+              <Plus className="w-5 h-5" />Crear nuevo viaje
+            </button>
+
+            {trips.length === 0 ? (
+              <EmptyState userName={displayName} onCreateTrip={() => setDialogOpen(true)} />
+            ) : (
+              <div className="space-y-4">{tripCards}</div>
+            )}
           </>
         )}
 
-        {user?.is_verified && myProfile && (
+        {/* TAB: COMUNIDAD */}
+        {activeTab === 'social' && user?.is_verified && myProfile && (
           <TemplatesFeedTabs
             currentUserId={user.id}
             currentUserEmail={user.email}
             myProfile={myProfile}
           />
+        )}
+        {activeTab === 'social' && (!user?.is_verified || !myProfile) && (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-4">🌍</div>
+            <p className="font-semibold text-foreground mb-2">Únete a la comunidad</p>
+            <p className="text-sm text-muted-foreground">Completa tu perfil para ver y compartir itinerarios</p>
+          </div>
         )}
       </div>
 
