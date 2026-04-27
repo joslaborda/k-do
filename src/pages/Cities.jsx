@@ -120,10 +120,6 @@ export default function Cities() {
       if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
       if (a.start_date) return -1;
       if (b.start_date) return 1;
-
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-  // Scroll al inicio al montar
-
       return (a.order ?? 0) - (b.order ?? 0);
     });
   }, [cities]);

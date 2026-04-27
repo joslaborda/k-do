@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2,
   ChevronDown, Search, Mic, MicOff
