@@ -24,13 +24,17 @@ const globalNavItems = [
   { name: 'Perfil', page: 'Profile', icon: User },
 ];
 
-const pagesWithoutNav = ['MigrateData'];
-const globalPages = ['TripsList', 'Explore', 'Profile', 'Settings'];
+const pagesWithoutNav = ['MigrateData', 'TripsList'];
+const globalPages = ['Explore', 'Profile', 'Settings'];
+const tripOnlyPages = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
 
 export default function Layout({ children, currentPageName }) {
   const [tripId, setTripId] = useState(null);
   const showNav = !pagesWithoutNav.includes(currentPageName);
   const isGlobalPage = globalPages.includes(currentPageName);
+  const isTripPage = tripOnlyPages.includes(currentPageName);
+  const showGlobalNav = isGlobalPage;
+  const showTripNav = isTripPage && !!tripId;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -43,8 +47,6 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   const navItems = isGlobalPage ? globalNavItems : tripNavItems;
-  const showTripNav = !isGlobalPage && tripId;
-  const showGlobalNav = isGlobalPage;
 
   return (
     <div className="min-h-screen bg-orange-50 text-foreground overflow-x-hidden">
