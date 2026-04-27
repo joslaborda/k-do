@@ -32,28 +32,26 @@ import TripChat from '@/components/trip/TripChat';
 import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
+  // Lee el tripId directamente del URL — sin estado, sin delay
+  const tripId = new URLSearchParams(window.location.search).get('trip_id');
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
-  const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
+  // Scroll al top cada vez que cambia el tripId (cambio de viaje)
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('trip_id');
-
-    if (!id || id === 'null' || id === 'default') {
+    if (!tripId || tripId === 'null' || tripId === 'default') {
       navigate(createPageUrl('TripsList'), { replace: true });
       return;
     }
-
-    setTripId(id);
-    window.scrollTo(0, 0);
-  }, [navigate]);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [tripId]);
 
   const { data: trip, isLoading: tripLoading } = useQuery({
     queryKey: ['trip', tripId],
@@ -80,7 +78,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (trip && !formData.name) {
+    if (trip) {
       setFormData({
         name: trip.name || '',
         destination: trip.destination || '',
@@ -93,7 +91,7 @@ export default function Home() {
         members: trip.members || []
       });
     }
-  }, [trip]);
+  }, [trip?.id]);
 
   const updateTripMutation = useMutation({
     mutationFn: (data) => base44.entities.Trip.update(tripId, data),
@@ -200,7 +198,7 @@ export default function Home() {
   ];
 
 
-  if (tripLoading || !tripId) {
+  if (!tripId || tripId === 'null' || tripLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

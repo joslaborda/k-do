@@ -42,12 +42,22 @@ const LANGUAGES = [
 ];
 
 async function translateWithMyMemory(text, fromCode, toCode) {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromCode}|${toCode}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  if (!res.ok) throw new Error('Network error');
+  if (fromCode === toCode) return text;
+  // MyMemory tiene límite de 500 chars
+  const truncated = text.slice(0, 500);
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncated)}&langpair=${fromCode}|${toCode}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error(`Error de red (${res.status})`);
   const data = await res.json();
-  if (data.responseStatus !== 200) throw new Error(data.responseDetails || 'Error');
-  return data.responseData.translatedText;
+  const result = data.responseData?.translatedText || '';
+  // MyMemory devuelve este mensaje cuando se supera el límite diario
+  if (!result || result.toUpperCase().includes('MYMEMORY WARNING') || data.responseStatus === 429) {
+    throw new Error('Límite de traducciones alcanzado. Inténtalo en unos minutos.');
+  }
+  if (data.responseStatus !== 200 && data.responseStatus !== '200') {
+    throw new Error(data.responseDetails || 'Error al traducir');
+  }
+  return result;
 }
 
 function speakText(text, bcpLang) {
