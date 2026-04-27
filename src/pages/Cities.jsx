@@ -120,6 +120,10 @@ export default function Cities() {
       if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
       if (a.start_date) return -1;
       if (b.start_date) return 1;
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  // Scroll al inicio al montar
+
       return (a.order ?? 0) - (b.order ?? 0);
     });
   }, [cities]);
@@ -193,19 +197,22 @@ export default function Cities() {
                 <Button
                   onClick={() => reorderByDatesMutation.mutate()}
                   disabled={reorderByDatesMutation.isPending}
-                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm"
-                  title="Actualiza el campo 'order' de las ciudades según sus fechas"
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm px-3"
+                  title="Ordenar por fechas"
+                  size="sm"
                 >
-                  <ArrowUpDown className="w-4 h-4 mr-2" />
-                  Ordenar por fechas
+                  <ArrowUpDown className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Ordenar</span>
                 </Button>
               )}
               <Button
                 onClick={() => setAddCityOpen(true)}
-                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-3"
+                size="sm"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Añadir ciudad
+                <Plus className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Añadir ciudad</span>
+                <span className="sm:hidden">Ciudad</span>
               </Button>
             </div>
           </div>
