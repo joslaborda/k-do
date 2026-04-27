@@ -597,8 +597,7 @@ export default function Profile() {
                 {isOwnProfile && <p className="text-sm mt-1">Marca un spot como público desde cualquier viaje para que aparezca aquí</p>}
               </div>
             ) : (
-              {migratingSpot && <MigrateToTripModal spot={migratingSpot} userId={userId} onClose={() => setMigratingSpot(null)}/>}
-      <div className="space-y-3">
+              <div className="space-y-3">
                 {publicSpots.map(s => (
                   <div key={s.id} className="bg-white border border-border rounded-xl p-3 hover:shadow-md transition-all">
                     <div className="flex items-start gap-3">

@@ -512,8 +512,6 @@ export default function Explore() {
               </div>
             )}
           </TabsContent>
-        </Tabs>
-      </div>
 
           <TabsContent value="top">
             <TopSpotsTab publicSpots={publicSpots} profileMap={profileMap} currentUser={currentUser} onSave={handleSaveSpot} savingSpotId={savingSpotId}/>
@@ -524,4 +522,3 @@ export default function Explore() {
     </div>
   );
 }
-
