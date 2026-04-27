@@ -94,15 +94,7 @@ export default function TripDetail() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
         <div className="absolute inset-0 flex flex-col justify-between p-6 pt-12">
-          <div className="flex items-center justify-between">
-            <Link to={createPageUrl('TripsList')}>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 -ml-2">
-                <ArrowLeft className="w-4 h-4 mr-1" />Volver
-              </Button>
-            </Link>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20">
-              <Settings className="w-4 h-4" />
-            </Button>
+          <div className="flex items-center justify-end">
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white mb-1">{trip.name}</h1>
