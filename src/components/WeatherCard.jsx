@@ -68,20 +68,26 @@ export default function WeatherCard({ city, tripCountry }) {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) { try { setWeather(JSON.parse(cached)); setLoading(false); return; } catch {} }
     setLoading(true); setError(false);
+    const processWeather = (data) => {
+      const code = data.current.weathercode;
+      const cond = WMO_CONDITIONS[code] || { label: 'Variable', icon: 'cloud' };
+      return {
+        temp: Math.round(data.current.temperature_2m),
+        feels_like: Math.round(data.current.apparent_temperature),
+        condition: cond.label, icon: cond.icon,
+        humidity: data.current.relative_humidity_2m,
+        wind: Math.round(data.current.windspeed_10m),
+        temp_max: Math.round(data.daily.temperature_2m_max[0]),
+        temp_min: Math.round(data.daily.temperature_2m_min[0]),
+      };
+    };
+
+    // Try city name first, fallback to country name
     geocode(city.name, country)
+      .catch(() => country ? geocode(country, '') : Promise.reject())
       .then(({ lat, lon, timezone }) => fetchWeather(lat, lon, timezone))
-      .then((data) => {
-        const code = data.current.weathercode;
-        const cond = WMO_CONDITIONS[code] || { label: 'Variable', icon: 'cloud' };
-        const w = {
-          temp: Math.round(data.current.temperature_2m),
-          feels_like: Math.round(data.current.apparent_temperature),
-          condition: cond.label, icon: cond.icon,
-          humidity: data.current.relative_humidity_2m,
-          wind: Math.round(data.current.windspeed_10m),
-          temp_max: Math.round(data.daily.temperature_2m_max[0]),
-          temp_min: Math.round(data.daily.temperature_2m_min[0]),
-        };
+      .then(data => {
+        const w = processWeather(data);
         setWeather(w);
         sessionStorage.setItem(cacheKey, JSON.stringify(w));
       })
