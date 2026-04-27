@@ -19,6 +19,7 @@ export default function TripDetail() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     setTripId(urlParams.get('id'));
+    window.scrollTo(0, 0);
   }, []);
 
   const { cities: tripCities, activeCity, overrideCityId, setOverrideCityId, clearOverride } = useTripContext(tripId);
