@@ -3,12 +3,20 @@ import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Heart, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { Heart, MapPin, Calendar, ArrowRight, ThumbsUp } from 'lucide-react';
+import { useLike } from '@/hooks/useLike';
 import { toast } from '@/components/ui/use-toast';
 import { createPageUrl } from '@/utils';
 
 export default function TemplateCard({ template, currentUser }) {
   const queryClient = useQueryClient();
+
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLike({
+    targetId: template.id,
+    targetType: 'template',
+    userId: currentUser?.id,
+    targetOwnerId: template.created_by_user_id,
+  });
 
   // Query para colección del usuario
   const { data: myCollection } = useQuery({
@@ -156,6 +164,14 @@ export default function TemplateCard({ template, currentUser }) {
               <ArrowRight className="w-3 h-3" />
               Ver
             </Button>
+            <button
+              onClick={(e) => { e.preventDefault(); toggleLike(); }}
+              className={"inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors " +
+                (isLiked ? "bg-red-50 text-red-500 border border-red-200" : "bg-slate-50 text-slate-500 border border-slate-200 hover:bg-red-50 hover:text-red-400")}
+            >
+              <Heart className={"w-3.5 h-3.5 " + (isLiked ? "fill-current" : "")}/>
+              {likeCount > 0 ? likeCount : ""}
+            </button>
             <Button
               size="sm"
               variant="ghost"
