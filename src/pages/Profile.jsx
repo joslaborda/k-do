@@ -72,7 +72,7 @@ function MiniSpotCard({ spot }) {
 }
 
 // ── SavedSpot card en carpeta ───────────────────────────────────────────────
-function SavedSpotCard({ spot, onDelete, onMoveFolder, folders }) {
+function SavedSpotCard({ spot, onDelete, onMoveFolder, folders, onMigrate }) {
   const [showMove, setShowMove] = useState(false);
   return (
     <div className="bg-white border border-border rounded-xl p-3 hover:shadow-sm transition-shadow">
@@ -120,9 +120,65 @@ function SavedSpotCard({ spot, onDelete, onMoveFolder, folders }) {
 }
 
 // ── Guardados tab ───────────────────────────────────────────────────────────
+function MigrateToTripModal({ spot, userId, onClose }) {
+  const queryClient = useQueryClient();
+  const { data: trips = [] } = useQuery({
+    queryKey: ['myTrips', userId],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      return base44.entities.Trip.filter({ created_by: user.email });
+    },
+    enabled: !!userId,
+    staleTime: 30000,
+  });
+
+  const migrateMutation = useMutation({
+    mutationFn: (tripId) => base44.entities.Spot.create({
+      trip_id: tripId,
+      title: spot.title, type: spot.type,
+      address: spot.address || '', city_name: spot.city_name || '', country: spot.country || '',
+      lat: spot.lat, lng: spot.lng, notes: spot.notes || '',
+      image_url: spot.image_url || '', tags: spot.tags || [],
+      source_spot_id: spot.source_spot_id || spot.id,
+      source_user_id: spot.source_user_id || userId,
+      source_username: spot.source_username || '',
+      source_display_name: spot.source_display_name || '',
+      visibility: 'trip_members', visited: false,
+      created_by_user_id: userId,
+    }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spots'] }); onClose(); },
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4"/>
+        <p className="font-semibold text-sm mb-1">Añadir a un viaje</p>
+        <p className="text-xs text-muted-foreground mb-4">¿A qué viaje quieres añadir <strong>{spot.title}</strong>?</p>
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {trips.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No tienes viajes activos</p>}
+          {trips.map(t => (
+            <button key={t.id} onClick={() => migrateMutation.mutate(t.id)}
+              disabled={migrateMutation.isPending}
+              className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-orange-50 hover:border-orange-200 transition-colors text-left">
+              <span className="text-xl">✈️</span>
+              <div>
+                <p className="font-medium text-sm">{t.name}</p>
+                <p className="text-xs text-muted-foreground">{t.destination}{t.country ? ', ' + t.country : ''}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+        <button onClick={onClose} className="w-full mt-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-secondary">Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
 function SavedSpotsTab({ userId }) {
   const queryClient = useQueryClient();
   const [activeFolder, setActiveFolder] = useState('all');
+  const [migratingSpot, setMigratingSpot] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolder, setShowNewFolder] = useState(false);
 
@@ -211,6 +267,7 @@ function SavedSpotsTab({ userId }) {
       </div>
 
       {/* Lista */}
+      {migratingSpot && <MigrateToTripModal spot={migratingSpot} userId={userId} onClose={() => setMigratingSpot(null)}/>}
       <div className="space-y-3">
         {visibleSpots.map(spot => (
           <SavedSpotCard
@@ -219,6 +276,7 @@ function SavedSpotsTab({ userId }) {
             folders={folders}
             onDelete={id => deleteMutation.mutate(id)}
             onMoveFolder={(id, folder) => moveMutation.mutate({ id, folder })}
+            onMigrate={spot => setMigratingSpot(spot)}
           />
         ))}
         {visibleSpots.length === 0 && (
@@ -539,7 +597,8 @@ export default function Profile() {
                 {isOwnProfile && <p className="text-sm mt-1">Marca un spot como público desde cualquier viaje para que aparezca aquí</p>}
               </div>
             ) : (
-              <div className="space-y-3">
+              {migratingSpot && <MigrateToTripModal spot={migratingSpot} userId={userId} onClose={() => setMigratingSpot(null)}/>}
+      <div className="space-y-3">
                 {publicSpots.map(s => (
                   <div key={s.id} className="bg-white border border-border rounded-xl p-3 hover:shadow-md transition-all">
                     <div className="flex items-start gap-3">
