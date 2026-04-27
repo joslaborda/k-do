@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* â”€â”€ Fix overflow global y botones cortados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+* {
+  min-width: 0;
+  box-sizing: border-box;
+}
+button, a {
+  max-width: 100%;
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
