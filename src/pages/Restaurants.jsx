@@ -160,114 +160,256 @@ function ManualForm({ onSave, saving, onClose }) {
 }
 
 
-function StarRating({ spotId, userId, visited }) {
+// ── Popup valoración (mismo que SpotCard) ────────────────────────────────────
+function RatingPopup({ spot, userId, userProfile, onClose }) {
   const queryClient = useQueryClient();
-  const [hovering, setHovering] = useState(null);
+  const [thumb, setThumb] = useState(null);
+  const [text, setText] = useState('');
+  const [showImageField, setShowImageField] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
 
-  const { data: ratings = [] } = useQuery({
-    queryKey: ['spotRatings', spotId],
-    queryFn: () => base44.entities.SpotRating.filter({ spot_id: spotId }),
-    enabled: !!spotId,
+  const mutation = useMutation({
+    mutationFn: () => base44.entities.SpotComment.create({
+      spot_id: spot.id, user_id: userId,
+      user_display_name: userProfile?.display_name || '',
+      username: userProfile?.username || '',
+      user_avatar: userProfile?.avatar_url || '',
+      thumb, text: text.trim() || null,
+      image_url: imageUrl.trim() || null,
+    }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); onClose(); },
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <p className="font-semibold text-sm">¿Qué te pareció?</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{spot.title}</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-muted-foreground"><X className="w-4 h-4"/></button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <button onClick={() => setThumb('up')} className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " + (thumb==='up' ? 'bg-green-50 border-green-300' : 'bg-secondary border-border hover:border-green-200')}>
+            <span className="text-xl">👍</span><span className={"text-sm font-medium " + (thumb==='up' ? 'text-green-700' : 'text-muted-foreground')}>Me gustó</span>
+          </button>
+          <button onClick={() => setThumb('down')} className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " + (thumb==='down' ? 'bg-red-50 border-red-300' : 'bg-secondary border-border hover:border-red-200')}>
+            <span className="text-xl">👎</span><span className={"text-sm font-medium " + (thumb==='down' ? 'text-red-700' : 'text-muted-foreground')}>No tanto</span>
+          </button>
+        </div>
+        <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Cuéntanos qué tal... (opcional)"
+          className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-orange-400 bg-secondary mb-3"/>
+        {showImageField
+          ? <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="URL de la foto..." className="w-full text-sm border border-border rounded-xl px-3 py-2.5 outline-none focus:border-orange-400 bg-secondary mb-3"/>
+          : <button onClick={() => setShowImageField(true)} className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-orange-300 hover:text-orange-600 mb-3"><Camera className="w-4 h-4"/>Añadir foto</button>
+        }
+        <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
+          className="w-full py-3 rounded-xl bg-green-600 text-white font-medium text-sm disabled:opacity-50 hover:bg-green-700">
+          {mutation.isPending ? 'Guardando...' : 'Guardar valoración'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Popup comentarios ─────────────────────────────────────────────────────────
+function CommentsPopup({ spot, userId, userProfile, onClose }) {
+  const queryClient = useQueryClient();
+  const [text, setText] = useState('');
+  const [thumb, setThumb] = useState(null);
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    staleTime: 30000,
+  });
+  const mutation = useMutation({
+    mutationFn: () => base44.entities.SpotComment.create({
+      spot_id: spot.id, user_id: userId,
+      user_display_name: userProfile?.display_name || '',
+      username: userProfile?.username || '',
+      thumb, text: text.trim() || null,
+    }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); setText(''); setThumb(null); },
+  });
+  const ups = comments.filter(c => c.thumb==='up').length;
+  const downs = comments.filter(c => c.thumb==='down').length;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col max-h-[75vh]" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b border-border flex-shrink-0">
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3"/>
+          <div className="flex items-start justify-between">
+            <div><p className="font-semibold text-sm">Comentarios</p>
+              <div className="flex gap-2 mt-1">
+                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>
+                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
+              </div>
+            </div>
+            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-muted-foreground"><X className="w-4 h-4"/></button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {comments.length === 0 && <p className="text-center text-sm text-muted-foreground py-8">Sin comentarios todavía</p>}
+          {comments.map(c => (
+            <div key={c.id} className="flex gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs flex-shrink-0">{c.user_display_name?.[0]?.toUpperCase()||'?'}</div>
+              <div className="flex-1 bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-semibold">@{c.username||c.user_display_name}</span>
+                  <span className="text-sm">{c.thumb==='up'?'👍':'👎'}</span>
+                </div>
+                {c.text && <p className="text-sm">{c.text}</p>}
+                {c.image_url && <img src={c.image_url} alt="foto" className="w-full rounded-xl mt-2 object-cover max-h-40" onError={e=>e.currentTarget.style.display='none'}/>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="p-4 border-t border-border flex-shrink-0">
+          <div className="flex gap-2 mb-2">
+            <button onClick={() => setThumb(thumb==='up'?null:'up')} className={"px-3 py-1.5 rounded-lg text-sm border " + (thumb==='up'?'bg-green-50 border-green-300':'bg-secondary border-border')}>👍</button>
+            <button onClick={() => setThumb(thumb==='down'?null:'down')} className={"px-3 py-1.5 rounded-lg text-sm border " + (thumb==='down'?'bg-red-50 border-red-300':'bg-secondary border-border')}>👎</button>
+            <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Añade un comentario..."
+              className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-orange-400 bg-secondary h-9"/>
+          </div>
+          <button onClick={() => mutation.mutate()} disabled={!thumb||mutation.isPending}
+            className="w-full py-2 rounded-xl bg-orange-700 text-white text-sm font-medium disabled:opacity-50 hover:bg-orange-800">
+            {mutation.isPending ? '...' : 'Publicar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── SavedSpotCard ─────────────────────────────────────────────────────────────
+function SavedSpotCard({ spot, currentUserEmail, userId, userProfile, onDelete, onToggleVisited, onTogglePublic }) {
+  const [showRating, setShowRating] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
     staleTime: 30000,
   });
 
-  const myRating = ratings.find(r => r.user_id === userId);
-  const avgRating = ratings.length > 0
-    ? Math.round((ratings.reduce((s, r) => s + r.rating, 0) / ratings.length) * 10) / 10
-    : null;
+  const type = spot.type || 'custom';
+  const TYPE_CONFIG = {
+    food:{ label:'Restaurante', emoji:'🍽️', color:'bg-orange-100 text-orange-800' },
+    sight:{ label:'Atracción', emoji:'🏛️', color:'bg-blue-100 text-blue-800' },
+    activity:{ label:'Actividad', emoji:'⚡', color:'bg-green-100 text-green-800' },
+    shopping:{ label:'Compras', emoji:'🛍️', color:'bg-purple-100 text-purple-800' },
+    transport:{ label:'Transporte', emoji:'🚆', color:'bg-slate-100 text-slate-800' },
+    custom:{ label:'Otro', emoji:'⭐', color:'bg-yellow-100 text-yellow-800' },
+  };
+  const tc = TYPE_CONFIG[type] || TYPE_CONFIG.custom;
+  const canDelete = spot.created_by === currentUserEmail;
+  const ups = comments.filter(c => c.thumb==='up').length;
+  const downs = comments.filter(c => c.thumb==='down').length;
 
-  const ratingMutation = useMutation({
-    mutationFn: async (stars) => {
-      if (myRating) {
-        await base44.entities.SpotRating.update(myRating.id, { rating: stars });
-      } else {
-        await base44.entities.SpotRating.create({ spot_id: spotId, user_id: userId, rating: stars });
-      }
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spotRatings', spotId] }),
-  });
-
-  if (!visited) return null;
+  const handleMarkVisited = () => {
+    if (!spot.visited) { onToggleVisited(spot); setShowRating(true); }
+    else { onToggleVisited(spot); }
+  };
 
   return (
-    <div className="flex items-center gap-2 mt-2">
-      <div className="flex items-center gap-0.5">
-        {[1,2,3,4,5].map(star => (
-          <button key={star}
-            onMouseEnter={() => setHovering(star)}
-            onMouseLeave={() => setHovering(null)}
-            onClick={() => ratingMutation.mutate(star)}
-            className="p-0.5 transition-transform hover:scale-110">
-            <Star className={"w-4 h-4 transition-colors " + (
-              (hovering || myRating?.rating || 0) >= star
-                ? 'fill-amber-400 text-amber-400'
-                : 'text-muted-foreground/40'
-            )}/>
+    <>
+      <div className={"rounded-2xl border transition-all " + (spot.visited ? 'bg-green-50 border-green-200' : 'bg-white border-border')}>
+        <div className="p-4">
+          {(spot.source_username||spot.source_display_name) && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+              <Heart className="w-3 h-3 text-orange-400"/>
+              Recomendado por <span className="font-medium text-orange-700">@{spot.source_username||spot.source_display_name}</span>
+            </p>
+          )}
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0 mt-0.5">{tc.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-semibold text-foreground text-sm leading-tight">{spot.title}</p>
+                {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">✅ Visitado</span>}
+              </div>
+              <span className={"inline-block text-xs px-2 py-0.5 rounded-full mt-1 " + tc.color}>{tc.label}</span>
+              {spot.address && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1.5"><MapPin className="w-3 h-3 flex-shrink-0"/>{spot.address}</p>}
+              {spot.notes && <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{spot.notes}</p>}
+              {spot.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {spot.tags.map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">#{t}</span>)}
+                </div>
+              )}
+            </div>
+          </div>
+          {(ups+downs) > 0 && (
+            <div className="flex items-center gap-2 mt-3">
+              {ups>0 && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>}
+              {downs>0 && <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>}
+              <button onClick={() => setShowComments(true)} className="text-xs text-muted-foreground hover:text-orange-700 ml-1">
+                💬 {comments.length} comentario{comments.length!==1?'s':''}
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="border-t border-inherit px-4 py-3 flex gap-2">
+          <button onClick={handleMarkVisited}
+            className={"flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-all " +
+              (spot.visited ? 'bg-green-100 border-green-300' : 'bg-secondary border-border hover:bg-green-50 hover:border-green-200')}>
+            <span className="text-base">✅</span>
+            <span className={"text-xs font-medium " + (spot.visited ? 'text-green-700' : 'text-muted-foreground')}>{spot.visited?'Hecho':'Marcar hecho'}</span>
           </button>
-        ))}
+          <button onClick={() => setShowComments(true)}
+            className="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border border-border bg-secondary hover:bg-blue-50 hover:border-blue-200 transition-all">
+            <span className="text-base">💬</span>
+            <span className="text-xs font-medium text-muted-foreground">{comments.length>0?`${comments.length} comentarios`:'Comentar'}</span>
+          </button>
+          <button onClick={() => onTogglePublic(spot)}
+            className={"flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-all " +
+              (spot.visibility==='public' ? 'bg-blue-50 border-blue-200' : 'bg-secondary border-border hover:bg-blue-50 hover:border-blue-200')}>
+            <span className="text-base">🌍</span>
+            <span className={"text-xs font-medium " + (spot.visibility==='public'?'text-blue-700':'text-muted-foreground')}>{spot.visibility==='public'?'Publicado':'Compartir'}</span>
+          </button>
+          {canDelete && (
+            <button onClick={() => setShowDeleteConfirm(true)}
+              className="flex flex-col items-center gap-1 py-2 px-3 rounded-xl border border-border bg-secondary hover:bg-red-50 hover:border-red-200 transition-all">
+              <span className="text-base">🗑️</span>
+              <span className="text-xs font-medium text-muted-foreground">Borrar</span>
+            </button>
+          )}
+        </div>
+        <div className="px-4 pb-3 flex items-center gap-3">
+          {(spot.lat&&spot.lng) && (
+            <a href={`https://www.google.com/maps?q=${spot.lat},${spot.lng}`} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-green-700 hover:underline flex items-center gap-1">
+              <Navigation className="w-3 h-3"/>Abrir en Maps
+            </a>
+          )}
+          {spot.visited && (
+            <button onClick={() => onToggleVisited(spot)} className="text-xs text-muted-foreground hover:text-foreground ml-auto underline underline-offset-2">
+              Desmarcar como visitado
+            </button>
+          )}
+        </div>
       </div>
-      {avgRating && ratings.length > 1 && (
-        <span className="text-xs text-muted-foreground">{avgRating} ({ratings.length})</span>
-      )}
-      {!myRating && <span className="text-xs text-muted-foreground">¿Cómo fue?</span>}
-    </div>
-  );
-}
-
-function SavedSpotCard({ spot, currentUserEmail, userId, onDelete, onToggleVisited, onTogglePublic }) {
-  const type = spot.type||'custom';
-  const typeConf = SPOT_TYPES.find(t => t.value===type)||SPOT_TYPES[6];
-  const canDelete = spot.created_by===currentUserEmail;
-  const hasSource = spot.source_display_name||spot.source_username;
-  return (
-    <div className={"bg-white rounded-2xl border border-border p-4 transition-all "+(spot.visited?'opacity-60':'')}>
-      {hasSource && (
-        <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-          <Heart className="w-3 h-3 text-orange-400"/>
-          Recomendado por <span className="font-medium text-orange-700">@{spot.source_username||spot.source_display_name}</span>
-        </p>
-      )}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-2 flex-1 min-w-0">
-          <span className="text-xl mt-0.5 flex-shrink-0">{typeConf.emoji}</span>
-          <div className="min-w-0">
-            <p className={"font-semibold text-sm leading-tight "+(spot.visited?'line-through text-muted-foreground':'text-foreground')}>{spot.title}</p>
-            <span className={"inline-block text-xs px-2 py-0.5 rounded-full border mt-1 "+TYPE_COLORS[type]}>{typeConf.label}</span>
+      {showRating && <RatingPopup spot={spot} userId={userId} userProfile={userProfile} onClose={() => setShowRating(false)}/>}
+      {showComments && <CommentsPopup spot={spot} userId={userId} userProfile={userProfile} onClose={() => setShowComments(false)}/>}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4"/>
+            <p className="font-semibold text-sm mb-1">¿Eliminar este spot?</p>
+            <p className="text-xs text-muted-foreground mb-5">Se eliminará <strong>{spot.title}</strong>. Esta acción no se puede deshacer.</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setShowDeleteConfirm(false)} className="py-3 rounded-xl border border-border bg-secondary text-sm font-medium">Cancelar</button>
+              <button onClick={() => { onDelete(spot.id); setShowDeleteConfirm(false); }} className="py-3 rounded-xl bg-red-600 text-white text-sm font-medium">Eliminar</button>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => onTogglePublic(spot)} className={"p-1.5 rounded-lg transition-colors "+(spot.visibility==='public'?'text-orange-600 bg-orange-50':'text-muted-foreground hover:text-orange-600 hover:bg-orange-50')}>🌍</button>
-          <button onClick={() => onToggleVisited(spot)} className={"p-1.5 rounded-lg transition-colors "+(spot.visited?'text-green-600 bg-green-50':'text-muted-foreground hover:text-green-600 hover:bg-green-50')}>
-            <CheckCircle className="w-4 h-4"/>
-          </button>
-          {canDelete && <button onClick={() => onDelete(spot.id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"><Trash2 className="w-4 h-4"/></button>}
-        </div>
-      </div>
-      {spot.notes && <p className="text-xs text-muted-foreground mt-2">{spot.notes}</p>}
-      {spot.tags?.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
-          {spot.tags.map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-2 py-0.5 rounded-full">#{t}</span>)}
-        </div>
       )}
-      <StarRating spotId={spot.id} userId={userId} visited={spot.visited}/>
-      {spot.address && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><MapPin className="w-3 h-3"/>{spot.address}</p>}
-      <div className="flex items-center gap-3 mt-2">
-        {spot.lat && spot.lng && (
-          <a href={"https://www.google.com/maps?q="+spot.lat+","+spot.lng} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline flex items-center gap-1">
-            <Navigation className="w-3 h-3"/>Maps
-          </a>
-        )}
-        {!spot.lat && spot.address && (
-          <a href={"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(spot.title+' '+spot.address)} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 hover:underline flex items-center gap-1">
-            <MapPin className="w-3 h-3"/>Maps
-          </a>
-        )}
-        {spot.link && <a href={spot.link} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1"><ExternalLink className="w-3 h-3"/>Web</a>}
-        {spot.visibility==='public' && <span className="text-xs text-orange-600 ml-auto">🌍 En perfil</span>}
-      </div>
-    </div>
+    </>
   );
 }
+
 
 export default function Restaurants() {
   const navigate = useNavigate();
@@ -482,7 +624,7 @@ export default function Restaurants() {
         {filteredSpots.length > 0 ? (
           <div className="space-y-3">
             {filteredSpots.filter(s => !s.visited).map(spot => (
-              <SavedSpotCard key={spot.id} spot={spot} currentUserEmail={user?.email} userId={user?.id}
+              <SavedSpotCard key={spot.id} spot={spot} currentUserEmail={user?.email} userId={user?.id} userProfile={myProfile}
                 onDelete={id => deleteMutation.mutate(id)} onToggleVisited={handleToggleVisited} onTogglePublic={handleTogglePublic}/>
             ))}
             {filteredSpots.filter(s => s.visited).length > 0 && (
