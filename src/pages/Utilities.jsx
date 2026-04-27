@@ -45,7 +45,7 @@ export default function Utilities() {
   const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [packingDialogOpen, setPackingDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('currency');
+  const [activeTab, setActiveTab] = useState('weather');
   const [tripId, setTripId] = useState(null);
   const queryClient = useQueryClient();
 
@@ -250,87 +250,10 @@ export default function Utilities() {
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0 h-auto justify-start">
-            <TabsTrigger value="currency" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">💱 Moneda</TabsTrigger>
             <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">☁️ Clima</TabsTrigger>
             <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🧳 Maleta</TabsTrigger>
             <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🚨 Emergencias</TabsTrigger>
-            <TabsTrigger value="translator" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🌐 Traducir</TabsTrigger>
           </TabsList>
-
-          {/* MONEDA */}
-          <TabsContent value="currency" className="space-y-6">
-            <div className="bg-white p-8 rounded-2xl border border-border shadow-sm">
-              <div className="max-w-md mx-auto">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Conversión de Moneda</h2>
-                  {loadingRate ? (
-                    <p className="text-muted-foreground flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Cargando tasa...</p>
-                  ) : baseCurrency === quoteCurrency ? (
-                    <p className="text-muted-foreground text-sm">El país de destino usa <span className="font-bold text-foreground">{baseCurrency}</span> — misma moneda que tu viaje. Puedes cambiar la moneda destino abajo.</p>
-                  ) : exchangeRate ? (
-                    <div>
-                      <p className="text-muted-foreground">1 {baseCurrency} = <span className="font-bold text-foreground">{exchangeRate?.toFixed(4)} {quoteCurrency}</span></p>
-                      <p className="text-xs text-muted-foreground mt-1">Fuente: {exchangeRateSource === 'same' ? 'misma moneda' : exchangeRateSource}</p>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Abre desde un viaje para ver la conversión</p>
-                  )}
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Moneda base</label>
-                    <Select value={baseCurrency} onValueChange={setBaseCurrency}>
-                      <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {computeAvailableCurrencies(cities, trip?.currency || 'EUR').map((c) => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">{getCountryMeta(baseCurrency).symbol ? `${getCountryMeta(baseCurrency).symbol}` : baseCurrency}</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getCountryMeta(baseCurrency).symbol}</span>
-                      <Input type="number" placeholder="0" value={baseAmount} onChange={(e) => handleBaseChange(e.target.value)} className="pl-8 text-lg border-border" />
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="inline-block p-3 bg-secondary rounded-full">
-                      <div className="text-2xl">⇅</div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Moneda destino</label>
-                    <Select value={quoteCurrency} onValueChange={setQuoteCurrency}>
-                      <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {computeAvailableCurrencies(cities, trip?.currency || 'EUR').map((c) => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">{getCountryMeta(quoteCurrency).symbol ? `${getCountryMeta(quoteCurrency).symbol}` : quoteCurrency}</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getCountryMeta(quoteCurrency).symbol}</span>
-                      <Input type="number" placeholder="0" value={quoteAmount} onChange={(e) => handleQuoteChange(e.target.value)} className="pl-8 text-lg border-border" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-blue-50 mt-8 p-4 rounded-xl border border-blue-200">
-                  <p className="text-blue-700 text-sm">💡 Tasas de cambio en directo desde Frankfurter (ECB). Las monedas se derivan de los países en tu viaje.</p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
 
           {/* CLIMA */}
           <TabsContent value="weather" className="space-y-6">
@@ -570,10 +493,6 @@ export default function Utilities() {
             )}
           </TabsContent>
 
-          {/* TRADUCTOR */}
-          <TabsContent value="translator" className="space-y-6">
-            <TranslatorPanel tripId={tripId} />
-          </TabsContent>
         </Tabs>
       </div>
 

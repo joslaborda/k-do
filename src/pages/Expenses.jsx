@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -171,6 +171,7 @@ function CurrencyConverter({ baseCurrency, tripCurrency }) {
 }
 
 export default function Expenses() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
 
