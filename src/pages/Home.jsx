@@ -8,7 +8,7 @@ import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
-  MapPin, Calendar, Plane, UtensilsCrossed, Receipt,
+  MapPin, Calendar, Plane, Receipt,
   Package, Info, Clock,
   ArrowRight, Search, Languages, BookOpen, Users, Settings, Trash2 } from
 'lucide-react';
@@ -187,7 +187,7 @@ export default function Home() {
 
   const sharedSections = [
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
-    { name: 'Yummy', page: 'Restaurants', icon: UtensilsCrossed, color: 'from-orange-500 to-red-500', emoji: '🍜' },
+    { name: 'Spots', page: 'Restaurants', icon: MapPin, color: 'from-orange-500 to-red-500', emoji: '📍' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
     { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
     { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
