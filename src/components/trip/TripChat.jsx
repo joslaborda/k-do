@@ -12,6 +12,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
   const { user } = useAuth();
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const queryClient = useQueryClient();
 
   const { data: messages = [] } = useQuery({
@@ -32,9 +33,11 @@ export default function TripChat({ tripId, myProfile, trip }) {
     return unsub;
   }, [tripId, queryClient]);
 
-  // Auto-scroll al último mensaje
+  // Auto-scroll al último mensaje — solo dentro del contenedor del chat
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const sendMutation = useMutation({
@@ -99,7 +102,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />

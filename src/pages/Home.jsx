@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -32,8 +32,9 @@ import TripChat from '@/components/trip/TripChat';
 import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
-  // Lee el tripId directamente del URL — sin estado, sin delay
-  const tripId = new URLSearchParams(window.location.search).get('trip_id');
+  // useLocation garantiza re-render cuando cambia el query param
+  const location = useLocation();
+  const tripId = new URLSearchParams(location.search).get('trip_id');
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
