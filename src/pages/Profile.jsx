@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Link as LinkIcon, Instagram, Bookmark, FolderOpen, Plus, X, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Settings, Camera, Loader2, UserPlus, UserCheck, MapPin, Globe, Heart, Instagram, Bookmark, FolderOpen, Plus, X } from 'lucide-react';
 import { createNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
