@@ -130,6 +130,7 @@ function EmptyState({ userName, onCreateTrip }) {
 // ── Main ────────────────────────────────────────────────────────────────────
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('viajes');
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const queryClient = useQueryClient();
@@ -245,8 +246,6 @@ export default function TripsList() {
       </div>
     );
   }
-
-  const [activeTab, setActiveTab] = useState('viajes');
 
   return (
     <div className="min-h-screen bg-orange-50">
