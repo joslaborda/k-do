@@ -264,28 +264,44 @@ export function TranslatorPanel({ tripId }) {
         )}
       </TabsContent>
 
-      <TabsContent value="translator" className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold text-foreground">Entrada</span>
-              {voiceSupported && (
-                <button onClick={startVoice} title="Hablar"
-                  className={"ml-2 p-1.5 rounded-full transition-colors " + (isListening ? "bg-red-100 text-red-600 animate-pulse" : "hover:bg-orange-50 text-muted-foreground hover:text-orange-600")}>
-                  {isListening ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
-                </button>
-              )}
-              <span className="ml-auto text-xs bg-slate-100 px-2 py-1 rounded">
+      <TabsContent value="translator" className="space-y-4">
+        {/* Botón de voz prominente */}
+        {voiceSupported && (
+          <div className="flex flex-col items-center gap-3 py-4">
+            <button onClick={startVoice}
+              className={"w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all " +
+                (isListening
+                  ? "bg-red-500 text-white scale-110 shadow-red-200 animate-pulse"
+                  : "bg-orange-700 text-white hover:bg-orange-800 hover:scale-105")}>
+              {isListening ? <MicOff className="w-8 h-8"/> : <Mic className="w-8 h-8"/>}
+            </button>
+            <p className={"text-sm font-medium " + (isListening ? "text-red-600" : "text-muted-foreground")}>
+              {isListening ? "Escuchando... habla ahora" : "Pulsa para hablar"}
+            </p>
+            <p className="text-xs text-muted-foreground">Traduce tu voz automáticamente</p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-border shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-foreground">
                 {direction === 'es-target' ? '🇪🇸 Español' : `${targetFlag} ${targetLang}`}
               </span>
             </div>
-            <Textarea
-              placeholder={direction === 'es-target' ? 'Escribe algo en español...' : `Escribe en ${targetLang}...`}
-              value={inputText}
-              onChange={e => setInputText(e.target.value)}
-              rows={6}
-              className="border border-border"
-            />
+            <div className="relative">
+              <Textarea
+                placeholder={direction === 'es-target' ? 'Escribe o habla en español...' : `Escribe o habla en ${targetLang}...`}
+                value={inputText}
+                onChange={e => setInputText(e.target.value)}
+                rows={5}
+                className="border border-border pr-14 resize-none"
+              />
+              <button onClick={handleTranslate} disabled={!inputText.trim() || isTranslating}
+                className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-orange-700 text-white text-xs font-medium disabled:opacity-40 hover:bg-orange-800 transition-colors">
+                {isTranslating ? '...' : '→'}
+              </button>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
@@ -360,6 +376,10 @@ export default function Translator() {
   const { trip, activeCity } = useTripContext(tripId);
   const countryRaw = activeCity?.country || trip?.country || '';
   const meta = getCountryMeta(countryRaw);
+
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  // Scroll al inicio al montar
 
   return (
     <div className="min-h-screen bg-orange-50">
