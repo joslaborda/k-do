@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2,
-  ChevronDown, Search
+  ChevronDown, Search, Mic, MicOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,6 +42,8 @@ export function TranslatorPanel({ tripId }) {
   const [copiedId, setCopiedId] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
   const [searchQuery, setSearchQuery] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported] = useState(() => 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
 
   const { trip, activeCity } = useTripContext(tripId);
   const countryRaw = activeCity?.country || trip?.country || '';
@@ -53,6 +55,34 @@ export function TranslatorPanel({ tripId }) {
 
   const phrasePack = countryRaw ? getPhrasesForCountry(countryRaw) : null;
   const categories = phrasePack?.categories || [];
+
+  const startVoice = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.lang = direction === 'es-target' ? 'es-ES' : (targetLangCode || 'en-US');
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setInputText(transcript);
+      // Auto-translate after voice input
+      setTimeout(async () => {
+        const from = direction === 'es-target' ? 'es' : (targetLangCode || 'en');
+        const to = direction === 'es-target' ? (targetLangCode || 'en') : 'es';
+        try {
+          const result = await translateWithMyMemory(transcript, from, to);
+          setTranslatedText(result);
+          // Auto-speak the translation
+          speakText(result, to === 'es' ? 'es-ES' : (targetLangCode || 'en-US'));
+        } catch {}
+      }, 300);
+    };
+    recognition.start();
+  };
 
   const handleTranslate = async () => {
     if (!inputText.trim()) return;
@@ -239,6 +269,12 @@ export function TranslatorPanel({ tripId }) {
           <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-sm font-semibold text-foreground">Entrada</span>
+              {voiceSupported && (
+                <button onClick={startVoice} title="Hablar"
+                  className={"ml-2 p-1.5 rounded-full transition-colors " + (isListening ? "bg-red-100 text-red-600 animate-pulse" : "hover:bg-orange-50 text-muted-foreground hover:text-orange-600")}>
+                  {isListening ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
+                </button>
+              )}
               <span className="ml-auto text-xs bg-slate-100 px-2 py-1 rounded">
                 {direction === 'es-target' ? '🇪🇸 Español' : `${targetFlag} ${targetLang}`}
               </span>
