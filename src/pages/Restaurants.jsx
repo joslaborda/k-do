@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Plus, X, ExternalLink, CheckCircle, Trash2, Compass, Navigation, PenLine, Heart, Star } from 'lucide-react';
+import { Search, MapPin, Plus, X, ExternalLink, CheckCircle, Trash2, Compass, Navigation, PenLine, Heart, Star, Camera } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
