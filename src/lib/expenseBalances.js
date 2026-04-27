@@ -1,79 +1,99 @@
 /**
- * Calcula balances de gastos tipo Tricount
- * Devuelve quién debe a quién y cuánto
+ * expenseBalances.js
+ * Calcula balances tipo Splitwise con algoritmo de mínimas transacciones
+ * Soporta multi-divisa: todos los montos se normalizan a la moneda base del viaje
  */
 
+/**
+ * Calcula balances netos por usuario
+ * @param {Array} expenses - gastos con amount_base (convertido a moneda base)
+ * @param {Array} members - emails de los miembros
+ */
 export function calculateBalances(expenses, members) {
-  // Inicializar balance por usuario (cuánto pagó - cuánto debe)
   const balances = {};
-  members.forEach(email => {
-    balances[email] = 0;
-  });
+  members.forEach(email => { balances[email] = 0; });
 
-  // Procesar cada gasto
   expenses.forEach(expense => {
-    const { amount, paid_by, split_type, split_with, amounts_by_user } = expense;
+    // Usar amount_base si existe (ya convertido), si no usar amount
+    const amount = parseFloat(expense.amount_base || expense.amount) || 0;
+    const { paid_by, split_type, split_with, amounts_by_user } = expense;
 
-    // El que paga registra lo que pagó
+    if (!paid_by || !amount) return;
+
+    // Quien paga suma lo que pagó
     balances[paid_by] = (balances[paid_by] || 0) + amount;
 
-    // Calcular cuánto debe pagar cada usuario
-    let shares = {};
-
+    // Calcular parte de cada uno
     if (split_type === 'equal') {
-      // División a partes iguales entre los de split_with
-      const participants = split_with || [paid_by];
-      const sharePerPerson = amount / participants.length;
+      const participants = split_with?.length > 0 ? split_with : [paid_by];
+      const share = amount / participants.length;
       participants.forEach(email => {
-        shares[email] = sharePerPerson;
+        balances[email] = (balances[email] || 0) - share;
       });
-    } else if (split_type === 'custom') {
-      // División personalizada
-      shares = { ...amounts_by_user };
+    } else if (split_type === 'custom' && amounts_by_user) {
+      // amounts_by_user en moneda original — usar ratios para calcular en base
+      const totalCustom = Object.values(amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
+      Object.entries(amounts_by_user).forEach(([email, val]) => {
+        const ratio = totalCustom > 0 ? parseFloat(val) / totalCustom : 0;
+        balances[email] = (balances[email] || 0) - (amount * ratio);
+      });
+    } else if (split_type === 'solo') {
+      // Solo para el que paga, nadie más debe nada
+      // No restamos nada a nadie
     }
-
-    // Restar de cada usuario su parte
-    Object.entries(shares).forEach(([email, share]) => {
-      balances[email] = (balances[email] || 0) - share;
-    });
   });
 
   return balances;
 }
 
 /**
- * Convierte balances en relaciones de deuda claras
- * Ej: "Juan debe 24€ a María"
+ * Algoritmo de mínimas transacciones (greedy)
+ * Minimiza el número de pagos necesarios para saldar todas las deudas
  */
 export function getDebts(balances) {
-  const debts = [];
-  const users = Object.keys(balances);
+  // Filtrar balances significativos
+  const credits = []; // positivo: te deben
+  const debts_list = []; // negativo: debes
 
-  for (let i = 0; i < users.length; i++) {
-    for (let j = i + 1; j < users.length; j++) {
-      const user1 = users[i];
-      const user2 = users[j];
-      const balance1 = balances[user1];
-      const balance2 = balances[user2];
+  Object.entries(balances).forEach(([email, bal]) => {
+    if (bal > 0.01) credits.push({ email, amount: bal });
+    else if (bal < -0.01) debts_list.push({ email, amount: -bal });
+  });
 
-      // Si uno tiene positivo y otro negativo, hay deuda
-      if (balance1 > 0.01 && balance2 < -0.01) {
-        const amount = Math.min(balance1, -balance2);
-        debts.push({
-          from: user2,
-          to: user1,
-          amount: parseFloat(amount.toFixed(2))
-        });
-      } else if (balance1 < -0.01 && balance2 > 0.01) {
-        const amount = Math.min(-balance1, balance2);
-        debts.push({
-          from: user1,
-          to: user2,
-          amount: parseFloat(amount.toFixed(2))
-        });
-      }
+  // Ordenar de mayor a menor
+  credits.sort((a, b) => b.amount - a.amount);
+  debts_list.sort((a, b) => b.amount - a.amount);
+
+  const result = [];
+
+  // Greedy: el que más debe paga al que más le deben
+  let i = 0, j = 0;
+  while (i < credits.length && j < debts_list.length) {
+    const credit = credits[i];
+    const debt = debts_list[j];
+
+    const amount = Math.min(credit.amount, debt.amount);
+    if (amount > 0.01) {
+      result.push({
+        from: debt.email,
+        to: credit.email,
+        amount: parseFloat(amount.toFixed(2)),
+      });
     }
+
+    credit.amount -= amount;
+    debt.amount -= amount;
+
+    if (credit.amount < 0.01) i++;
+    if (debt.amount < 0.01) j++;
   }
 
-  return debts.filter(d => d.amount > 0.01);
+  return result;
+}
+
+/**
+ * Calcula el total gastado normalizado a moneda base
+ */
+export function getTotalInBase(expenses) {
+  return expenses.reduce((sum, e) => sum + parseFloat(e.amount_base || e.amount || 0), 0);
 }
