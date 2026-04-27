@@ -11,6 +11,7 @@ import { es } from 'date-fns/locale';
 import { getTripCoverImage } from '@/lib/tripImage';
 import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 import { useTripContext } from '@/hooks/useTripContext';
+import { useState, useEffect } from 'react';
 
 export default function TripDetail() {
   const [tripId, setTripId] = useState(null);
@@ -194,9 +195,9 @@ export default function TripDetail() {
 
           <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🍜</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Yummy</h3>
-              <p className="text-xs text-muted-foreground">Restaurantes</p>
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📍</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Spots</h3>
+              <p className="text-xs text-muted-foreground">Lugares que visitar</p>
             </div>
           </Link>
 
