@@ -33,6 +33,60 @@ async function translateWithMyMemory(text, fromLang, toLang) {
   return data.responseData.translatedText;
 }
 
+
+function VoiceButton({ label, sublabel, lang, toLang, isListening, onResult, onListening, speakResult, speakLang }) {
+  const handlePress = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const recognition = new SR();
+    recognition.lang = lang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    onListening(true);
+    recognition.onend = () => onListening(false);
+    recognition.onerror = () => onListening(false);
+    recognition.onresult = async (e) => {
+      const text = e.results[0][0].transcript;
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang.split('-')[0]}|${toLang}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const translation = data.responseData?.translatedText || '';
+        onResult(text, translation);
+        if (speakResult && translation) {
+          const utt = new SpeechSynthesisUtterance(translation);
+          utt.lang = speakLang;
+          window.speechSynthesis.speak(utt);
+        }
+      } catch {}
+    };
+    recognition.start();
+  };
+
+  return (
+    <button onClick={handlePress}
+      className={"flex flex-col items-center gap-2 p-5 rounded-2xl border-2 transition-all w-full " +
+        (isListening
+          ? "bg-red-500 border-red-400 text-white animate-pulse"
+          : "bg-white border-border hover:border-orange-400 hover:bg-orange-50 text-foreground")}>
+      <div className={"w-14 h-14 rounded-full flex items-center justify-center " +
+        (isListening ? "bg-white/20" : "bg-orange-100")}>
+        {isListening
+          ? <MicOff className="w-6 h-6 text-white"/>
+          : <Mic className="w-6 h-6 text-orange-700"/>}
+      </div>
+      <div className="text-center">
+        <p className={"text-sm font-semibold " + (isListening ? "text-white" : "text-foreground")}>
+          {isListening ? "Escuchando..." : label}
+        </p>
+        <p className={"text-xs mt-0.5 " + (isListening ? "text-white/80" : "text-muted-foreground")}>
+          {isListening ? "Habla ahora" : sublabel}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 export function TranslatorPanel({ tripId }) {
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -42,7 +96,7 @@ export function TranslatorPanel({ tripId }) {
   const [copiedId, setCopiedId] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
   const [searchQuery, setSearchQuery] = useState('');
-  const [isListening, setIsListening] = useState(false);
+  const [isListening, setIsListening] = useState(null);
   const [voiceSupported] = useState(() => 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
 
   const { trip, activeCity } = useTripContext(tripId);
@@ -160,13 +214,13 @@ export function TranslatorPanel({ tripId }) {
   }
 
   return (
-    <Tabs defaultValue="phrases" className="space-y-6">
+    <Tabs defaultValue="translator" className="space-y-6">
       <TabsList className="bg-white border border-border p-1">
-        <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
-          📖 Frases útiles{totalPhrases > 0 && <span className="ml-1.5 text-xs opacity-70">({totalPhrases})</span>}
-        </TabsTrigger>
         <TabsTrigger value="translator" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
           🔄 Traductor
+        </TabsTrigger>
+        <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+          📖 Frases útiles{totalPhrases > 0 && <span className="ml-1.5 text-xs opacity-70">({totalPhrases})</span>}
         </TabsTrigger>
       </TabsList>
 
@@ -265,106 +319,97 @@ export function TranslatorPanel({ tripId }) {
       </TabsContent>
 
       <TabsContent value="translator" className="space-y-4">
-        {/* Botón de voz prominente */}
-        {voiceSupported && (
-          <div className="flex flex-col items-center gap-3 py-4">
-            <button onClick={startVoice}
-              className={"w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all " +
-                (isListening
-                  ? "bg-red-500 text-white scale-110 shadow-red-200 animate-pulse"
-                  : "bg-orange-700 text-white hover:bg-orange-800 hover:scale-105")}>
-              {isListening ? <MicOff className="w-8 h-8"/> : <Mic className="w-8 h-8"/>}
+        {/* Selector de idioma con swap */}
+        <div className="bg-white rounded-2xl border border-border p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Tú hablas</p>
+              <p className="font-semibold text-sm">🇪🇸 Español</p>
+            </div>
+            <button onClick={() => { setDirection(d => d === 'es-target' ? 'target-es' : 'es-target'); setInputText(''); setTranslatedText(''); }}
+              className="p-2 rounded-full border border-border hover:border-orange-400 hover:bg-orange-50 transition-colors">
+              <ArrowRightLeft className="w-4 h-4 text-orange-700"/>
             </button>
-            <p className={"text-sm font-medium " + (isListening ? "text-red-600" : "text-muted-foreground")}>
-              {isListening ? "Escuchando... habla ahora" : "Pulsa para hablar"}
-            </p>
-            <p className="text-xs text-muted-foreground">Traduce tu voz automáticamente</p>
+            <div className="flex-1 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Idioma destino</p>
+              <p className="font-semibold text-sm">{targetFlag} {targetLang || 'Local'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dos micrófonos */}
+        {voiceSupported && (
+          <div className="grid grid-cols-2 gap-3">
+            <VoiceButton
+              label="Hablo yo"
+              sublabel={direction === 'es-target' ? 'Español → ' + targetLang : targetLang + ' → Español'}
+              lang={direction === 'es-target' ? 'es-ES' : (targetLangCode || 'en-US')}
+              toLang={direction === 'es-target' ? (targetLangCode || 'en') : 'es'}
+              isListening={isListening === 'me'}
+              onResult={(text, translation) => { setInputText(text); setTranslatedText(translation); }}
+              onListening={v => setIsListening(v ? 'me' : null)}
+              speakResult={true}
+              speakLang={direction === 'es-target' ? (targetLangCode || 'en-US') : 'es-ES'}
+            />
+            <VoiceButton
+              label="Me hablan"
+              sublabel={direction === 'es-target' ? targetLang + ' → Español' : 'Español → ' + targetLang}
+              lang={direction === 'es-target' ? (targetLangCode || 'en-US') : 'es-ES'}
+              toLang={direction === 'es-target' ? 'es' : (targetLangCode || 'en')}
+              isListening={isListening === 'them'}
+              onResult={(text, translation) => { setInputText(text); setTranslatedText(translation); }}
+              onListening={v => setIsListening(v ? 'them' : null)}
+              speakResult={false}
+              speakLang="es-ES"
+            />
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-2xl border border-border shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-foreground">
-                {direction === 'es-target' ? '🇪🇸 Español' : `${targetFlag} ${targetLang}`}
-              </span>
-            </div>
-            <div className="relative">
-              <Textarea
-                placeholder={direction === 'es-target' ? 'Escribe o habla en español...' : `Escribe o habla en ${targetLang}...`}
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                rows={5}
-                className="border border-border pr-14 resize-none"
-              />
-              <button onClick={handleTranslate} disabled={!inputText.trim() || isTranslating}
-                className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-orange-700 text-white text-xs font-medium disabled:opacity-40 hover:bg-orange-800 transition-colors">
-                {isTranslating ? '...' : '→'}
-              </button>
-            </div>
+        {/* Resultado de voz o texto */}
+        {(inputText || translatedText) && (
+          <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+            {inputText && (
+              <div className="p-4 border-b border-border">
+                <p className="text-xs text-muted-foreground mb-1">Original</p>
+                <p className="text-sm text-foreground">{inputText}</p>
+              </div>
+            )}
+            {translatedText && (
+              <div className="p-4 bg-orange-50">
+                <p className="text-xs text-muted-foreground mb-1">Traducción</p>
+                <p className="text-base font-medium text-foreground">{translatedText}</p>
+                <div className="flex gap-2 mt-3">
+                  <Button variant="ghost" size="sm" onClick={() => speakText(translatedText, direction === 'es-target' ? targetLangCode : 'es-ES')}>
+                    <Volume2 className="w-4 h-4 mr-1 text-orange-500"/>Escuchar
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => copyToClipboard(translatedText, 'translation')}>
+                    {copiedId === 'translation' ? <><Check className="w-4 h-4 mr-1 text-green-500"/>Copiado</> : <><Copy className="w-4 h-4 mr-1"/>Copiar</>}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
+        )}
 
-          <div className="bg-white p-6 rounded-2xl border border-border shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold text-foreground">Traducción</span>
-              <span className="ml-auto text-xs bg-slate-100 px-2 py-1 rounded">
-                {direction === 'target-es' ? '🇪🇸 Español' : `${targetFlag} ${targetLang}`}
-              </span>
-            </div>
-            <div className="border border-border rounded-lg p-4 min-h-40 flex flex-col justify-between bg-white">
-              {translatedText ? (
-                <>
-                  <div className="flex-1 whitespace-pre-wrap text-foreground text-sm">{translatedText}</div>
-                  <div className="flex gap-2 mt-3 self-end">
-                    <Button variant="ghost" size="sm"
-                      onClick={() => speakText(translatedText, direction === 'es-target' ? targetLangCode : 'es-ES')}>
-                      <Volume2 className="w-4 h-4 mr-1 text-orange-500" />Escuchar
-                    </Button>
-                    <Button variant="ghost" size="sm"
-                      onClick={() => copyToClipboard(translatedText, 'translation')}>
-                      {copiedId === 'translation'
-                        ? <><Check className="w-4 h-4 mr-1 text-green-500" />Copiado</>
-                        : <><Copy className="w-4 h-4 mr-1 text-stone-400" />Copiar</>}
-                    </Button>
-                  </div>
-                </>
-              ) : translateError ? (
-                <p className="text-destructive text-sm">{translateError}</p>
-              ) : (
-                <p className="text-muted-foreground text-sm">Aquí aparecerá la traducción...</p>
-              )}
-            </div>
+        {/* Caja de texto manual */}
+        <div className="bg-white rounded-2xl border border-border shadow-sm p-4">
+          <p className="text-xs text-muted-foreground mb-2">O escribe directamente:</p>
+          <div className="relative">
+            <Textarea
+              placeholder={direction === 'es-target' ? 'Escribe en español...' : `Escribe en ${targetLang}...`}
+              value={inputText}
+              onChange={e => { setInputText(e.target.value); setTranslatedText(''); }}
+              rows={3}
+              className="border border-border resize-none pr-16"
+            />
+            <button onClick={handleTranslate} disabled={!inputText.trim() || isTranslating}
+              className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-orange-700 text-white text-xs font-medium disabled:opacity-40 hover:bg-orange-800">
+              {isTranslating ? <Loader2 className="w-3 h-3 animate-spin"/> : '→ Traducir'}
+            </button>
           </div>
         </div>
 
-        <p className="text-xs text-center text-muted-foreground">
-          Traducción por{' '}
-          <a href="https://mymemory.translated.net" target="_blank" rel="noopener noreferrer"
-            className="underline hover:text-orange-700">MyMemory</a>
-          {' '}· Gratis · Sin cuenta
-        </p>
-
-        <div className="flex gap-3 items-center justify-center">
-          <Button
-            onClick={handleTranslate}
-            disabled={!inputText.trim() || isTranslating}
-            className="flex-1 bg-orange-700 hover:bg-orange-800 text-white py-6 text-base"
-          >
-            {isTranslating
-              ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Traduciendo...</>
-              : <><Languages className="w-4 h-4 mr-2" />Traducir</>}
-          </Button>
-          <button
-            onClick={() => {
-              setDirection(direction === 'es-target' ? 'target-es' : 'es-target');
-              setInputText(''); setTranslatedText(''); setTranslateError(null);
-            }}
-            className="p-3 rounded-full border border-border hover:border-orange-400 transition-colors"
-            title="Intercambiar idiomas"
-          >
-            <ArrowRightLeft className="w-5 h-5 text-orange-700" />
-          </button>
-        </div>
+        {translateError && <p className="text-destructive text-sm text-center">{translateError}</p>}
       </TabsContent>
     </Tabs>
   );
