@@ -176,6 +176,8 @@ export default function Cities() {
     },
   });
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   return (
     <div className="min-h-screen bg-orange-50">
       <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
