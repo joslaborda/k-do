@@ -1,0 +1,48 @@
+{
+  "name": "SpotComment",
+  "type": "object",
+  "description": "Comentario y valoraci\u00f3n de un usuario sobre un spot",
+  "properties": {
+    "spot_id": {
+      "type": "string",
+      "description": "ID del spot"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario"
+    },
+    "user_display_name": {
+      "type": "string",
+      "description": "Nombre visible del usuario"
+    },
+    "username": {
+      "type": "string",
+      "description": "Username del usuario"
+    },
+    "user_avatar": {
+      "type": "string",
+      "description": "URL del avatar del usuario"
+    },
+    "thumb": {
+      "type": "string",
+      "enum": [
+        "up",
+        "down"
+      ],
+      "description": "Valoraci\u00f3n thumbs up o down"
+    },
+    "text": {
+      "type": "string",
+      "description": "Texto del comentario (opcional)"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL de foto adjunta (opcional)"
+    }
+  },
+  "required": [
+    "spot_id",
+    "user_id",
+    "thumb"
+  ]
+}
