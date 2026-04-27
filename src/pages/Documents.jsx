@@ -152,7 +152,9 @@ export default function Documents() {
         {/* Toolbar card */}
          <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 -translate-y-2.5">
            {/* Category pills - scrollable row */}
-           <div className="flex items-center gap-1 overflow-x-auto pb-1 mb-1 border-b border-gray-100">
+           <div className="relative">
+           <div className="flex items-center gap-1 overflow-x-auto pb-1 mb-1 border-b border-gray-100 scrollbar-hide">
+
             <button
               onClick={() => setCatFilter('all')}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${catFilter === 'all' ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
@@ -175,8 +177,11 @@ export default function Documents() {
              })}
           </div>
 
+           </div>
+           <div className="absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-white pointer-events-none"/>
+           </div>
           {/* Visibility filters - scrollable row */}
-          <div className="flex items-center gap-1 overflow-x-auto pt-1">
+          <div className="relative"><div className="flex items-center gap-1 overflow-x-auto pt-1 scrollbar-hide">
             {VISIBILITY_FILTERS.map(f => {
               const Icon = f.icon;
               return (
