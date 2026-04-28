@@ -139,23 +139,13 @@ export default function Home() {
     staleTime: 30000,
   });
 
-  const { data: diaryEntries = [], isLoading: diaryLoading } = useQuery({
-    queryKey: ['diaryEntries', tripId],
-    queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-    staleTime: 30000,
-  });
-
   // Suscripciones tiempo real
   useEffect(() => {
     if (!tripId) return;
     const unsubExpenses = base44.entities.Expense.subscribe(() => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
     });
-    const unsubDiary = base44.entities.DiaryEntry.subscribe(() => {
-      queryClient.invalidateQueries({ queryKey: ['diaryEntries', tripId] });
-    });
-    return () => { unsubExpenses(); unsubDiary(); };
+    return () => { unsubExpenses(); };
   }, [tripId, queryClient]);
 
   const { data: myProfile } = useQuery({
@@ -310,7 +300,6 @@ export default function Home() {
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
-        </div>
       </div>
 
       {/* Navigation Section - Outside of background image */}
