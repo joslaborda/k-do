@@ -179,7 +179,7 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
                   renderItem={(ticket) => (
                     <Link
                       key={ticket.id}
-                      to={createPageUrl(`Calendar?trip_id=${tripId}`)}
+                      to={createPageUrl(`Documents?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
                       className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
