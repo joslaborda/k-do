@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import Explore from './pages/Explore';
 import TemplateDetail from './pages/TemplateDetail';
+import TripsList from './pages/TripsList';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -58,11 +59,7 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
-      <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
-      } />
+      <Route path="/" element={<LayoutWrapper currentPageName="TripsList"><TripsList /></LayoutWrapper>} />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
