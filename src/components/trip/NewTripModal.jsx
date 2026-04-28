@@ -501,6 +501,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             <Textarea placeholder="Describe tu viaje..." value={formData.description} rows={2}
               onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
           </div>
+
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
             {formData.cover_image && (
