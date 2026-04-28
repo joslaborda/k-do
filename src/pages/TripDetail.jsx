@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Settings, MapPin, Calendar, DollarSign, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Users, MapPin, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays } from 'date-fns';
@@ -125,47 +125,7 @@ export default function TripDetail() {
           </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="glass border-2 border-border rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-green-500/20 rounded-xl">
-                <CheckSquare className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Equipaje</p>
-                <p className="text-2xl font-bold text-foreground">{packingProgress}%</p>
-              </div>
-            </div>
-            <div className="h-2 bg-secondary rounded-full overflow-hidden">
-              <div className="h-full bg-green-500 transition-all" style={{ width: `${packingProgress}%` }} />
-            </div>
-          </div>
 
-          <div className="glass border-2 border-border rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-blue-500/20 rounded-xl">
-                <DollarSign className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Gastos</p>
-                <p className="text-2xl font-bold text-foreground">{totalExpenses.toFixed(0)} {trip.currency}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass border-2 border-border rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-3 bg-purple-500/20 rounded-xl">
-                <MapPin className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Destinos</p>
-                <p className="text-2xl font-bold text-foreground">{cities.length}</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Navigation Cards */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-hidden">
@@ -177,7 +137,7 @@ export default function TripDetail() {
             </div>
           </Link>
 
-          <Link to={createPageUrl(`Calendar?trip_id=${tripId}`)}>
+          <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
               <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
               <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
