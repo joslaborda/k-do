@@ -1,450 +1,161 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowRight, MapPin, Calendar, Copy, CheckCircle, Heart, Share2, Loader2 } from 'lucide-react';
-import { createNotification } from '@/lib/notifications';
-import { toast } from '@/components/ui/use-toast';
+import { ArrowLeft, Users, Settings, MapPin, Calendar, DollarSign, CheckSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { differenceInDays } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { getTripCoverImage } from '@/lib/tripImage';
+import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
+import { useTripContext } from '@/hooks/useTripContext';
 
-export default function TemplateDetail() {
-  const [searchParams] = useSearchParams();
-  const templateId = searchParams.get('id');
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const { user: currentUser } = useAuth();
-  const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
-  const [cloneData, setCloneData] = useState({
-    name: '',
-    start_date: '',
-    nights: 7
-  });
-  const [copied, setCopied] = useState(false);
+export default function TripDetail() {
+  const [tripId, setTripId] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    setTripId(urlParams.get('id'));
+    window.scrollTo(0, 0);
   }, []);
 
-  // Obtener template
-  const { data: template, isLoading, error } = useQuery({
-    queryKey: ['template', templateId],
+  const { cities: tripCities, activeCity, overrideCityId, setOverrideCityId, clearOverride } = useTripContext(tripId);
+
+  const { data: trip, isLoading } = useQuery({
+    queryKey: ['trip', tripId],
     queryFn: async () => {
-      if (!templateId) return null;
-      return base44.entities.ItineraryTemplate.get(templateId);
-    },
-    enabled: !!templateId
-  });
-
-  // Validar acceso
-  const canAccess = () => {
-    if (!template) return false;
-    if (template.visibility === 'public') return true;
-    if (template.visibility === 'unlisted') return true; // accesible por link
-    if (template.visibility === 'private') {
-      return currentUser?.id === template.created_by_user_id;
-    }
-    return false;
-  };
-
-  // Query para colección del usuario (para guardar)
-  const { data: myCollection } = useQuery({
-    queryKey: ['myCollection', currentUser?.id],
-    queryFn: async () => {
-      if (!currentUser?.id) return null;
-      const results = await base44.entities.Collection.filter({
-        owner_user_id: currentUser.id,
-        name: 'Guardados'
-      });
-      return results[0] || null;
-    },
-    enabled: !!currentUser?.id
-  });
-
-  const isSaved =
-    myCollection &&
-    myCollection.template_ids &&
-    myCollection.template_ids.includes(templateId);
-
-  // Perfil del usuario actual
-  const { data: saverProfile } = useQuery({
-    queryKey: ['myProfile', currentUser?.id],
-    queryFn: async () => {
-      const results = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
-      return results[0] || null;
-    },
-    enabled: !!currentUser?.id,
-  });
-
-  // Mutation para guardar/quitar
-  const saveMutation = useMutation({
-    mutationFn: async (save) => {
-      if (!myCollection) {
-        const newCollection = await base44.entities.Collection.create({
-          owner_user_id: currentUser.id,
-          name: 'Guardados',
-          template_ids: [templateId]
-        });
-        return { collection: newCollection, saved: true };
-      } else {
-        const updated = { ...myCollection };
-        if (save) {
-          if (!updated.template_ids) updated.template_ids = [];
-          if (!updated.template_ids.includes(templateId)) updated.template_ids.push(templateId);
-        } else {
-          updated.template_ids = updated.template_ids.filter((id) => id !== templateId);
-        }
-        await base44.entities.Collection.update(myCollection.id, { template_ids: updated.template_ids });
-        return { collection: updated, saved: save };
+      // Si el tripId es "default", no existe trip real, ir a TripsList
+      if (tripId === 'default') {
+        window.location.href = createPageUrl('TripsList');
+        return null;
       }
-    },
-    onSuccess: ({ saved }) => {
-      queryClient.invalidateQueries({ queryKey: ['myCollection', currentUser?.id] });
-      toast({
-        title: saved ? 'Guardado ✓' : 'Removido de guardados',
-        description: saved ? 'Añadido a tu colección de guardados' : 'Se removió de tu colección'
-      });
-      // Notificar al creador del template si lo están guardando
-      if (saved && template?.created_by_user_id && template.created_by_user_id !== currentUser?.id) {
-        createNotification({
-          userId: template.created_by_user_id,
-          type: 'template_save',
-          actorProfile: saverProfile,
-          refId: templateId,
-          refTitle: template.title,
-        });
+      const trips = await base44.entities.Trip.list();
+      const foundTrip = trips.find(t => t.id === tripId);
+      if (!foundTrip) {
+        // Si no se encuentra el trip, redirigir a TripsList
+        window.location.href = createPageUrl('TripsList');
+        return null;
       }
-    }
+      return foundTrip;
+    },
+    enabled: !!tripId,
   });
 
-  // Mutation para clonar
-  const cloneMutation = useMutation({
-    mutationFn: async () => {
-      if (!template || !cloneData.name || !cloneData.start_date) {
-        throw new Error('Faltan datos requeridos');
-      }
-
-      // Calcular end_date
-      const startDate = new Date(cloneData.start_date);
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + parseInt(cloneData.nights));
-
-      // Crear Trip
-      const newTrip = await base44.entities.Trip.create({
-        name: cloneData.name,
-        destination: template.cities?.[0] || template.title,
-        country: template.countries?.[0] || '',
-        start_date: cloneData.start_date,
-        end_date: endDate.toISOString().split('T')[0],
-        description: template.summary || '',
-        cover_image: template.cover_image || '',
-        members: [currentUser.email],
-        roles: { [currentUser.email]: 'admin' },
-        currency: 'EUR'
-      });
-
-      // Crear Cities
-      if (template.cities && template.cities.length > 0) {
-        const nights = parseInt(cloneData.nights);
-        const nightsPerCity = Math.floor(nights / template.cities.length);
-        const extraNights = nights % template.cities.length;
-
-        for (let i = 0; i < template.cities.length; i++) {
-          const cityStart = new Date(cloneData.start_date);
-          cityStart.setDate(
-            cityStart.getDate() + i * nightsPerCity + Math.min(i, extraNights)
-          );
-
-          const cityEnd = new Date(cityStart);
-          cityEnd.setDate(
-            cityEnd.getDate() + nightsPerCity + (i < extraNights ? 1 : 0) - 1
-          );
-
-          const country = template.countries?.[i] || template.countries?.[0] || '';
-
-          await base44.entities.City.create({
-            trip_id: newTrip.id,
-            name: template.cities[i],
-            country: country,
-            order: i,
-            start_date: cityStart.toISOString().split('T')[0],
-            end_date: cityEnd.toISOString().split('T')[0]
-          });
-        }
-      }
-
-      return newTrip;
-    },
-    onSuccess: (newTrip) => {
-      toast({
-        title: '✨ Viaje creado',
-        description: 'Redirigiendo a tu nuevo viaje...'
-      });
-      setTimeout(() => {
-        navigate(createPageUrl(`Home?trip_id=${newTrip.id}`));
-      }, 1000);
-    }
+  const { data: cities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId,
   });
 
-  const handleSaveToggle = () => {
-    if (!currentUser) {
-      toast({
-        title: 'Debes iniciar sesión',
-        description: 'Inicia sesión para guardar itinerarios'
-      });
-      return;
-    }
-    saveMutation.mutate(!isSaved);
-  };
+  const { data: expenses = [] } = useQuery({
+    queryKey: ['expenses', tripId],
+    queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+  });
 
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/TemplateDetail?id=${templateId}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast({ title: 'Enlace copiado' });
-  };
+  const { data: packingItems = [] } = useQuery({
+    queryKey: ['packingItems', tripId],
+    queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId, user_id: user?.id }),
+    enabled: !!tripId && !!user,
+  });
 
-  if (isLoading) {
+  const { data: diaryEntries = [] } = useQuery({
+    queryKey: ['diaryEntries', tripId],
+    queryFn: () => base44.entities.DiaryEntry.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+  });
+
+  if (isLoading || !trip) {
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin text-orange-700" />
-      </div>
-    );
-  }
-
-  if (error || !template || !canAccess()) {
-    return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            {!template ? 'Itinerario no encontrado' : 'No tienes acceso'}
-          </h1>
-          <p className="text-muted-foreground mb-6">
-            {!template
-              ? 'El itinerario que buscas no existe'
-              : template.visibility === 'private'
-              ? 'Este itinerario es privado y solo su creador puede verlo'
-              : 'No tienes permiso para acceder a este itinerario'}
-          </p>
-          <Button onClick={() => navigate(createPageUrl('Explore'))} className="bg-orange-700">
-            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-            Volver a Explorar
-          </Button>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">✈️</div>
+          <p className="text-muted-foreground">Cargando viaje...</p>
         </div>
       </div>
     );
   }
+
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      {/* Hero */}
-      <div className="relative h-96 overflow-hidden">
-        {template.cover_image && (
-          <img
-            src={template.cover_image}
-            alt={template.title}
-            className="w-full h-full object-cover"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
-
-        {/* Header Actions */}
-        <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between">
-          <Button
-            onClick={() => navigate(createPageUrl('Explore'))}
-            variant="ghost"
-            className="bg-white/20 backdrop-blur text-white hover:bg-white/30"
-          >
-            <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-            Volver
-          </Button>
-          <div className="flex gap-2">
-            {(template.visibility === 'unlisted' || template.visibility === 'public') && (
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handleCopyLink}
-                className="bg-white/20 backdrop-blur text-white hover:bg-white/30"
-              >
-                {copied ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  <Copy className="w-5 h-5" />
-                )}
-              </Button>
-            )}
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={handleSaveToggle}
-              disabled={saveMutation.isPending || !currentUser}
-              className={`bg-white/20 backdrop-blur hover:bg-white/30 ${
-                isSaved ? 'text-red-400' : 'text-white'
-              }`}
-            >
-              <Heart className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} />
-            </Button>
+    <div className="min-h-screen bg-background">
+      {/* Hero con foto de portada */}
+      <div className="relative h-56 overflow-hidden">
+        <img
+          src={getTripCoverImage(trip, tripCities)}
+          alt={trip.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+        <div className="absolute inset-0 flex flex-col justify-between p-6 pt-12">
+          <div className="flex items-center justify-end">
           </div>
-        </div>
-
-        {/* Title */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-          <h1 className="text-4xl font-bold text-white">{template.title}</h1>
-          {template.summary && (
-            <p className="text-white/90 mt-2 line-clamp-2">{template.summary}</p>
-          )}
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-1">{trip.name}</h1>
+            <div className="flex flex-wrap gap-3 text-white/80 text-sm">
+              <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}, {trip.country}</span>
+              {trip.start_date && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
+                  {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                </span>
+              )}
+              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{trip.members?.length || 1} viajero{(trip.members?.length || 1) > 1 ? 's' : ''}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12 pb-24">
-        {/* Meta */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-4 border border-border">
-            <p className="text-xs text-muted-foreground mb-1">Duración</p>
-            <p className="text-2xl font-bold text-foreground">{template.duration_days} días</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-border">
-            <p className="text-xs text-muted-foreground mb-1">Ciudades</p>
-            <p className="text-2xl font-bold text-foreground">{template.cities?.length || 0}</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-border md:col-span-2">
-            <p className="text-xs text-muted-foreground mb-1">Países</p>
-            <p className="text-sm font-medium text-foreground flex flex-wrap gap-1">
-              {template.countries?.join(', ') || 'N/A'}
-            </p>
-          </div>
-        </div>
-
-        {/* Cities List */}
-        {template.cities && template.cities.length > 0 && (
-          <div className="bg-white rounded-2xl border border-border p-6 mb-8">
-            <h2 className="text-xl font-bold text-foreground mb-4">Ruta</h2>
-            <div className="space-y-2">
-              {template.cities.map((city, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-700 text-white flex items-center justify-center text-sm font-bold">
-                    {idx + 1}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{city}</p>
-                    {template.countries?.[idx] && (
-                      <p className="text-sm text-muted-foreground">{template.countries[idx]}</p>
-                    )}
-                  </div>
-                  {idx < template.cities.length - 1 && (
-                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </div>
-              ))}
+      <div className="max-w-5xl mx-auto px-6 py-8 pb-24">
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-hidden">
+          <Link to={createPageUrl(`Cities?trip_id=${tripId}`)}>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🗺️</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Ruta</h3>
+              <p className="text-xs text-muted-foreground">Ciudades e itinerario</p>
             </div>
-          </div>
-        )}
+          </Link>
 
-        {/* CTA Buttons */}
-        <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <Button
-            onClick={() => setCloneDialogOpen(true)}
-            disabled={!currentUser || cloneMutation.isPending}
-            className="bg-orange-700 hover:bg-orange-800 text-white font-bold h-12"
-          >
-            {cloneMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Creando viaje...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Usar Este Itinerario
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={handleCopyLink}
-            variant="outline"
-            className="border-border text-foreground hover:bg-secondary"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Compartir
-          </Button>
+          <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
+              <p className="text-xs text-muted-foreground">Documentos y checklist</p>
+            </div>
+          </Link>
+
+          <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📍</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Spots</h3>
+              <p className="text-xs text-muted-foreground">Lugares que visitar</p>
+            </div>
+          </Link>
+
+          <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">💰</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Gastos</h3>
+              <p className="text-xs text-muted-foreground">Gestión de gastos</p>
+            </div>
+          </Link>
+
+          <Link to={createPageUrl(`Utilities?trip_id=${tripId}`)}>
+            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🔧</div>
+              <h3 className="text-base font-bold text-foreground mb-1">Útil</h3>
+              <p className="text-xs text-muted-foreground">Info útil y clima</p>
+            </div>
+          </Link>
+
         </div>
       </div>
-
-      {/* Clone Dialog */}
-      <Dialog open={cloneDialogOpen} onOpenChange={setCloneDialogOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">Crear viaje desde este itinerario</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Nombre del viaje *
-              </label>
-              <Input
-                placeholder="ej. Mi primer viaje..."
-                value={cloneData.name}
-                onChange={(e) => setCloneData({ ...cloneData, name: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Fecha de inicio *
-              </label>
-              <Input
-                type="date"
-                value={cloneData.start_date}
-                onChange={(e) => setCloneData({ ...cloneData, start_date: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Duración (noches)
-              </label>
-              <Input
-                type="number"
-                min="1"
-                value={cloneData.nights}
-                onChange={(e) => setCloneData({ ...cloneData, nights: e.target.value })}
-                className="bg-input border-border text-foreground"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Aproximadamente {Math.ceil(parseInt(cloneData.nights) / (template.cities?.length || 1))} noches por ciudad
-              </p>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setCloneDialogOpen(false)}
-                className="border-border text-foreground"
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => cloneMutation.mutate()}
-                disabled={
-                  !cloneData.name.trim() || !cloneData.start_date || cloneMutation.isPending
-                }
-                className="bg-orange-700 hover:bg-orange-800"
-              >
-                Crear Viaje
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
