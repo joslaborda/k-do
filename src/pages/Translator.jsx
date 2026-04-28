@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2,
   ChevronDown, Mic, MicOff, AlertCircle
@@ -42,22 +42,12 @@ const LANGUAGES = [
 ];
 
 async function translateWithMyMemory(text, fromCode, toCode) {
-  if (fromCode === toCode) return text;
-  // MyMemory tiene límite de 500 chars
-  const truncated = text.slice(0, 500);
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(truncated)}&langpair=${fromCode}|${toCode}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) throw new Error(`Error de red (${res.status})`);
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromCode}|${toCode}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error('Network error');
   const data = await res.json();
-  const result = data.responseData?.translatedText || '';
-  // MyMemory devuelve este mensaje cuando se supera el límite diario
-  if (!result || result.toUpperCase().includes('MYMEMORY WARNING') || data.responseStatus === 429) {
-    throw new Error('Límite de traducciones alcanzado. Inténtalo en unos minutos.');
-  }
-  if (data.responseStatus !== 200 && data.responseStatus !== '200') {
-    throw new Error(data.responseDetails || 'Error al traducir');
-  }
-  return result;
+  if (data.responseStatus !== 200) throw new Error(data.responseDetails || 'Error');
+  return data.responseData.translatedText;
 }
 
 function speakText(text, bcpLang) {
@@ -92,23 +82,39 @@ function LangSelector({ value, onChange, label }) {
 function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, onError, autoSpeak }) {
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
+  const recognitionRef = useRef(null);
 
   const handlePress = () => {
+    // Si ya está grabando, parar
+    if (isActive && recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+      onActivate(false);
+      return;
+    }
+
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { onError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.'); return; }
 
-    onActivate(true);
+    onError(''); // limpiar error previo
     const recognition = new SR();
+    recognitionRef.current = recognition;
     recognition.lang = fromL.bcp;
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = false;
 
-    recognition.onend = () => onActivate(false);
+    recognition.onstart = () => onActivate(true);
+    recognition.onend = () => {
+      recognitionRef.current = null;
+      onActivate(false);
+    };
 
     recognition.onerror = (e) => {
+      recognitionRef.current = null;
       onActivate(false);
       if (e.error === 'not-allowed') onError('Permiso de micrófono denegado. Actívalo en los ajustes del navegador.');
-      else if (e.error === 'no-speech') onError('No se detectó voz. Intenta hablar más cerca del micrófono.');
+      else if (e.error === 'no-speech') onError('No se detectó voz. Habla más cerca del micrófono.');
+      else if (e.error === 'aborted') return; // parada manual, no es error
       else onError('Error al grabar. Inténtalo de nuevo.');
     };
 
@@ -123,7 +129,13 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
       }
     };
 
-    recognition.start();
+    try {
+      recognition.start();
+    } catch (e) {
+      recognitionRef.current = null;
+      onActivate(false);
+      onError('No se pudo iniciar el micrófono. Inténtalo de nuevo.');
+    }
   };
 
   return (
@@ -150,10 +162,10 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
       ) : (
         <>
           <p className="text-sm font-semibold text-foreground">{label}</p>
-          <p className="text-xs text-muted-foreground">{fromL.flag} → {toL.flag}</p>
+          <p className="text-xs text-muted-foreground">{fromL.flag} {fromL.label} → {toL.flag} {toL.label}</p>
         </>
       )}
-      {isActive && <p className="text-xs text-white/80">Habla ahora...</p>}
+      {isActive && <p className="text-xs text-white font-semibold">Toca para parar ⏹</p>}
       <style>{`@keyframes pulse{from{opacity:.3}to{opacity:1}}`}</style>
     </button>
   );
@@ -286,6 +298,15 @@ export function TranslatorPanel({ tripId }) {
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
             <p className="text-sm text-amber-800">El micrófono no está disponible en este navegador. Usa Chrome o Safari.</p>
+          </div>
+        )}
+
+
+        {/* Aviso PWA iOS */}
+        {/iphone|ipad|ipod/i.test(navigator.userAgent) && window.navigator.standalone && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <p className="text-xs text-amber-800">Para usar el micrófono, abre Kōdo en <strong>Safari</strong> en lugar de desde el icono del Home Screen.</p>
           </div>
         )}
 
