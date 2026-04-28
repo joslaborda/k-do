@@ -150,31 +150,21 @@ export default function TripsList() {
   });
 
   const { data: trips = [], isLoading } = useQuery({
-    queryKey: ['trips', user?.email],
+    queryKey: ['trips'],
     queryFn: async () => {
       if (!user?.email) return [];
-      // Only return trips where user is a member or creator
-      const allTrips = await base44.entities.Trip.list('-created_date');
-      return allTrips.filter(trip =>
-        trip.members?.includes(user.email) ||
-        trip.created_by === user.email ||
-        trip.roles?.[user.email]
+      const all = await base44.entities.Trip.list('-created_date');
+      return all.filter(t =>
+        t.created_by === user.email ||
+        (Array.isArray(t.members) && t.members.includes(user.email))
       );
     },
-    enabled: !!user?.email,
     staleTime: 30000,
   });
 
   const { data: allCities = [] } = useQuery({
-    queryKey: ['allCities', user?.email],
-    queryFn: async () => {
-      if (!user?.email) return [];
-      const all = await base44.entities.City.list('order');
-      // Only cities for user's trips
-      const tripIds = new Set(trips.map(t => t.id));
-      return all.filter(c => tripIds.has(c.trip_id));
-    },
-    enabled: !!user?.email && trips.length >= 0,
+    queryKey: ['allCities'],
+    queryFn: () => base44.entities.City.list('order'),
     staleTime: 60000,
   });
 
