@@ -150,7 +150,7 @@ export default function TripsList() {
   });
 
   const { data: trips = [], isLoading } = useQuery({
-    queryKey: ['trips'],
+    queryKey: ['trips', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
       const all = await base44.entities.Trip.list('-created_date');
@@ -159,6 +159,7 @@ export default function TripsList() {
         (Array.isArray(t.members) && t.members.includes(user.email))
       );
     },
+    enabled: !!user?.email,
     staleTime: 30000,
   });
 
