@@ -388,10 +388,6 @@ export default function Expenses() {
         </div>
       </div>
 
-          </TabsContent>
-        </Tabs>
-      </div>
-
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-white border-border max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
