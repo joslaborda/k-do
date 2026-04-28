@@ -12,7 +12,6 @@ export default function TripChat({ tripId, myProfile, trip }) {
   const { user } = useAuth();
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
-  const scrollContainerRef = useRef(null);
   const queryClient = useQueryClient();
 
   const { data: messages = [] } = useQuery({
@@ -33,11 +32,9 @@ export default function TripChat({ tripId, myProfile, trip }) {
     return unsub;
   }, [tripId, queryClient]);
 
-  // Auto-scroll al último mensaje — solo dentro del contenedor del chat
+  // Auto-scroll al último mensaje
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const sendMutation = useMutation({
@@ -59,9 +56,13 @@ export default function TripChat({ tripId, myProfile, trip }) {
       if (otherMembers.length > 0) {
         // Buscar perfiles de los otros miembros para obtener su user_id
         try {
-          const profiles = await base44.entities.UserProfile.filter({ trip_id: null });
+          const allProfiles = await base44.entities.UserProfile.list();
           otherMembers.forEach(email => {
-            const profile = profiles.find(p => p.email === email || p.user_email === email);
+            const profile = allProfiles.find(p =>
+              p.email === email ||
+              p.user_email === email ||
+              p.contact_email === email
+            );
             if (profile?.user_id) {
               createNotification({
                 userId: profile.user_id,
@@ -102,7 +103,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
       </div>
 
       {/* Messages */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
