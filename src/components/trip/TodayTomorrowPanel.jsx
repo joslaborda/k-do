@@ -133,7 +133,7 @@ function DocsCard({ docs, tripId }) {
             })}
           </ul>
       }
-      <Link to={createPageUrl(`Tickets?trip_id=${tripId}`)}>
+      <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
         <Button size="sm" variant="outline" className="w-full text-xs h-7">Ver todos los docs</Button>
       </Link>
 
