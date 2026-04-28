@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -32,27 +32,28 @@ import TripChat from '@/components/trip/TripChat';
 import TripAlerts from '@/components/trip/TripAlerts';
 
 export default function Home() {
-  // useLocation garantiza re-render cuando cambia el query param
-  const location = useLocation();
-  const tripId = new URLSearchParams(location.search).get('trip_id');
-
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
-  // Scroll al top cada vez que cambia el tripId (cambio de viaje)
   useEffect(() => {
-    if (!tripId || tripId === 'null' || tripId === 'default') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('trip_id');
+
+    if (!id || id === 'null' || id === 'default') {
       navigate(createPageUrl('TripsList'), { replace: true });
       return;
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [tripId]);
+
+    setTripId(id);
+    window.scrollTo(0, 0);
+  }, [navigate]);
 
   const { data: trip, isLoading: tripLoading } = useQuery({
     queryKey: ['trip', tripId],
@@ -79,7 +80,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (trip) {
+    if (trip && !formData.name) {
       setFormData({
         name: trip.name || '',
         destination: trip.destination || '',
@@ -92,7 +93,7 @@ export default function Home() {
         members: trip.members || []
       });
     }
-  }, [trip?.id]);
+  }, [trip]);
 
   const updateTripMutation = useMutation({
     mutationFn: (data) => base44.entities.Trip.update(tripId, data),
@@ -188,7 +189,6 @@ export default function Home() {
     { name: 'Ruta', page: 'Cities', icon: MapPin, color: 'from-red-500 to-pink-500', emoji: '🗾' },
     { name: 'Spots', page: 'Restaurants', icon: MapPin, color: 'from-orange-500 to-red-500', emoji: '📍' },
     { name: 'Gastos', page: 'Expenses', icon: Receipt, color: 'from-green-500 to-emerald-500', emoji: '💴' },
-    { name: 'Diario', page: 'Diary', icon: BookOpen, color: 'from-purple-500 to-pink-500', emoji: '📔' },
     { name: 'Traductor', page: 'Translator', icon: Languages, color: 'from-indigo-500 to-purple-500', emoji: '🈯' },
     { name: 'Útil', page: 'Utilities', icon: Info, color: 'from-teal-500 to-green-500', emoji: '🔧' }
   ];
@@ -199,7 +199,7 @@ export default function Home() {
   ];
 
 
-  if (!tripId || tripId === 'null' || tripLoading) {
+  if (tripLoading || !tripId) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -310,87 +310,6 @@ export default function Home() {
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
-          {/* Stats Cards - 2 columns */}
-          <div className="max-w-6xl mx-auto px-6 py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg">
-
-
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-orange-700 p-2 rounded-lg">
-                    <Calendar className="text-zinc-50 lucide lucide-calendar w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Duración</p>
-                    <p className="text-xl font-bold text-foreground">{tripDuration} días</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {daysUntilTrip > 0 &&
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-primary/30 shadow-lg">
-
-
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="bg-orange-700 p-2 rounded-lg">
-                      <Clock className="text-zinc-50 lucide lucide-clock w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Comienza en</p>
-                      <p className="text-xl font-bold text-primary">{daysUntilTrip} días</p>
-                    </div>
-                  </div>
-                </motion.div>
-              }
-
-              <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
-
-
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="bg-orange-700 text-orange-700 p-2 rounded-lg">
-                      <Receipt className="text-zinc-50 lucide lucide-receipt w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Gastado</p>
-                      <p className="text-xl font-bold text-foreground">{totalExpenses.total.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </Link>
-
-              <Link to={createPageUrl(`Diary?trip_id=${tripId}`)}>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }} className="bg-orange-50 p-4 rounded-xl backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer">
-
-
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="bg-orange-700 p-2 rounded-lg">
-                      <BookOpen className="text-zinc-50 lucide lucide-book-open w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Recuerdos</p>
-                      <p className="text-xl font-bold text-foreground">{diaryEntries.length}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </Link>
-            </div>
-
-
-          </div>
-        </div>
       </div>
 
       {/* Navigation Section - Outside of background image */}
@@ -559,8 +478,8 @@ export default function Home() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
                 className="bg-input border-border text-foreground" />
-
             </div>
+
 
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
