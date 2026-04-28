@@ -310,7 +310,6 @@ export default function Home() {
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
-        </div>
       </div>
 
       {/* Navigation Section - Outside of background image */}
