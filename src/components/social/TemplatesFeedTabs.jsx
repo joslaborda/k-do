@@ -26,6 +26,8 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
   });
   const ups = comments.filter(c => c.thumb === 'up').length;
 
+  const downs = comments.filter(c => c.thumb === 'down').length;
+
   return (
     <div className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
       {spot.image_url && <div className="h-32 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover"/></div>}
@@ -42,7 +44,7 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
           </div>
           <span className="text-lg">{emoji}</span>
         </div>
-        {spot.source_display_name && (
+        {(spot.source_display_name || spot.source_username) && (
           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
             <Heart className="w-3 h-3 text-orange-400"/>Descubierto por @{spot.source_username || spot.source_display_name}
           </p>
@@ -54,8 +56,9 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
             {spot.tags.slice(0,3).map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
           </div>
         )}
-        <div className="flex items-center gap-3 mt-2.5">
+        <div className="flex items-center gap-2 mt-2.5">
           {ups > 0 && <span className="text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded-full">👍 {ups}</span>}
+          {downs > 0 && <span className="text-xs text-red-700 bg-red-50 px-2 py-0.5 rounded-full">👎 {downs}</span>}
           {comments.length > 0 && <span className="text-xs text-muted-foreground">💬 {comments.length}</span>}
           {!isOwn && currentUserId && (
             <button onClick={() => onSave(spot)} className="ml-auto text-xs text-orange-700 font-medium hover:underline flex items-center gap-1">
