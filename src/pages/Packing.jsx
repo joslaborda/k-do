@@ -5,7 +5,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Package, Trash2, Grip } from 'lucide-react';
+import { Plus, Package, Trash2, Grip, Sparkles, AlertTriangle, CheckCircle2, Info, ChevronDown, ChevronRight } from 'lucide-react';
+import { useTripContext } from '@/hooks/useTripContext';
+import { getSmartPackingList, COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -19,6 +21,12 @@ const categories = [
 
 export default function Packing() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
+  const { trip } = useTripContext(tripId);
+  const country = trip?.country || '';
+  const { items: suggestedItems, requirements } = getSmartPackingList(country);
+  const [showSmartPanel, setShowSmartPanel] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -87,6 +95,68 @@ export default function Packing() {
             </Button>
           </div>
 
+          {/* Requisitos del destino */}
+          {requirements && (
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-white mt-4 border border-white/20">
+              <button onClick={() => setShowSmartPanel(o => !o)}
+                className="w-full flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-semibold text-sm">Requisitos para {country}</span>
+                </div>
+                {showSmartPanel ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
+              </button>
+              {showSmartPanel && (
+                <div className="mt-3 space-y-2">
+                  {/* Visado */}
+                  <div className={"flex items-start gap-2 p-2.5 rounded-xl " + (requirements.visa?.needed ? "bg-red-500/20" : "bg-green-500/20")}>
+                    {requirements.visa?.needed
+                      ? <AlertTriangle className="w-4 h-4 text-red-200 flex-shrink-0 mt-0.5"/>
+                      : <CheckCircle2 className="w-4 h-4 text-green-200 flex-shrink-0 mt-0.5"/>}
+                    <div>
+                      <p className="text-xs font-semibold">{requirements.visa?.needed ? '⚠️ Visado necesario' : '✅ Sin visado'}</p>
+                      <p className="text-xs text-white/80 mt-0.5">{requirements.visa?.info}</p>
+                    </div>
+                  </div>
+                  {/* Adaptador */}
+                  {requirements.adapter?.needed && (
+                    <div className="flex items-start gap-2 p-2.5 rounded-xl bg-yellow-500/20">
+                      <AlertTriangle className="w-4 h-4 text-yellow-200 flex-shrink-0 mt-0.5"/>
+                      <div>
+                        <p className="text-xs font-semibold">🔌 Adaptador {requirements.adapter.type}</p>
+                        <p className="text-xs text-white/80 mt-0.5">{requirements.adapter.info}</p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Vacunas */}
+                  {requirements.vaccines?.length > 0 && (
+                    <div className="flex items-start gap-2 p-2.5 rounded-xl bg-blue-500/20">
+                      <Info className="w-4 h-4 text-blue-200 flex-shrink-0 mt-0.5"/>
+                      <div>
+                        <p className="text-xs font-semibold">💉 Vacunas recomendadas</p>
+                        <p className="text-xs text-white/80 mt-0.5">{requirements.vaccines.map(v => v.name).join(' · ')}</p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Moneda */}
+                  {requirements.currency?.info && (
+                    <div className="flex items-start gap-2 p-2.5 rounded-xl bg-white/10">
+                      <Info className="w-4 h-4 text-white/60 flex-shrink-0 mt-0.5"/>
+                      <p className="text-xs text-white/80">{requirements.currency.info}</p>
+                    </div>
+                  )}
+                  {/* Tips */}
+                  {requirements.tips?.map((tip, i) => (
+                    <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-white/10">
+                      <span className="text-xs text-white/60 flex-shrink-0">→</span>
+                      <p className="text-xs text-white/80">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Progress */}
           <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white mt-6">
             <div className="flex items-center justify-between mb-3">
@@ -109,9 +179,26 @@ export default function Packing() {
       {/* Content */}
       <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
         {totalItems === 0 ? (
-            <div className="text-center py-24 glass border-2 border-dashed border-border rounded-3xl">
+            <div className="text-center py-12 glass border-2 border-dashed border-border rounded-3xl">
               <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Empieza añadiendo artículos a tu maleta</p>
+              <p className="text-foreground font-semibold mb-1">Tu maleta está vacía</p>
+              <p className="text-muted-foreground text-sm mb-5">Añade items manualmente o usa la lista inteligente</p>
+              {country && suggestedItems.length > 0 && (
+                <button
+                  onClick={async () => {
+                    for (const item of suggestedItems) {
+                      await base44.entities.PackingItem.create({
+                        trip_id: tripId, name: item.name,
+                        category: item.category, packed: false,
+                      });
+                    }
+                    queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] });
+                  }}
+                  className="bg-orange-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-800 transition-colors flex items-center gap-2 mx-auto">
+                  <Sparkles className="w-4 h-4"/>
+                  Generar lista para {country}
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
