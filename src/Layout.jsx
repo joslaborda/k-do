@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, MapPin, FileText, Compass, Receipt, Info, Languages, User } from 'lucide-react';
@@ -20,34 +20,12 @@ const tripNavItems = [
 // Items del nav global (fuera del trip)
 const globalNavItems = [
   { name: 'Viajes', page: 'TripsList', icon: Home },
-  { name: 'Explorar', page: 'Explore', icon: Compass },
   { name: 'Perfil', page: 'Profile', icon: User },
 ];
 
-const pagesWithoutNav = ['MigrateData', 'TripsList'];
+const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore'];
 const globalPages = ['Explore', 'Profile', 'Settings'];
 const tripOnlyPages = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
-
-// NavLink que siempre hace scroll al top, incluso si ya está en esa página
-function NavLink({ to, className, children, onClick }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleClick = (e) => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    if (location.pathname + location.search !== to) {
-      navigate(to);
-    }
-    onClick?.();
-  };
-
-  return (
-    <a href={to} onClick={handleClick} className={className}>
-      {children}
-    </a>
-  );
-}
 
 export default function Layout({ children, currentPageName }) {
   const [tripId, setTripId] = useState(null);
@@ -88,14 +66,14 @@ export default function Layout({ children, currentPageName }) {
                 ? createPageUrl(item.page)
                 : createPageUrl(`${item.page}?trip_id=${tripId}`);
               return (
-                <NavLink key={item.page} to={linkUrl}
+                <Link key={item.page} to={linkUrl}
                   className={"flex flex-col items-center gap-0.5 px-1 py-1.5 rounded-lg transition-colors min-w-0 flex-1 " +
                     (isActive ? 'text-orange-700' : 'text-muted-foreground')}>
                   <item.icon className={"w-5 h-5 flex-shrink-0 " + (isActive ? 'text-orange-700' : 'text-gray-400')} strokeWidth={isActive ? 2.5 : 2} />
                   <span className={"text-[10px] font-medium truncate w-full text-center " + (isActive ? 'text-orange-700' : 'text-gray-400')}>
                     {item.name}
                   </span>
-                </NavLink>
+                </Link>
               );
             })}
           </div>
@@ -114,12 +92,12 @@ export default function Layout({ children, currentPageName }) {
                 ? createPageUrl(item.page)
                 : createPageUrl(`${item.page}?trip_id=${tripId}`);
               return (
-                <NavLink key={item.page} to={linkUrl}
+                <Link key={item.page} to={linkUrl}
                   className={"group flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all " +
                     (isActive ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:text-foreground')}>
                   <item.icon className={"w-5 h-5 " + (isActive ? 'text-white' : '')} strokeWidth={isActive ? 2.5 : 2} />
                   <span className="text-[9px] font-medium">{item.name}</span>
-                </NavLink>
+                </Link>
               );
             })}
           </div>
