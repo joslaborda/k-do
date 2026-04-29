@@ -24,7 +24,7 @@ import { getTripCoverImage } from '@/lib/tripImage';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TripMembersPanel from '@/components/trip/TripMembersPanel';
-import IntelligentTimeline from '@/components/trip/IntelligentTimeline';
+import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 import TripChat from '@/components/trip/TripChat';
@@ -299,6 +299,7 @@ export default function Home() {
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
+        </div>
       </div>
 
       {/* Navigation Section - Outside of background image */}
