@@ -553,24 +553,19 @@ export default function Profile() {
 
       {/* Tabs */}
       <div className="max-w-lg mx-auto px-4 py-4">
-        <Tabs defaultValue="itinerarios">
+        <Tabs defaultValue="guardados">
           <TabsList className="w-full mb-6 flex-wrap h-auto gap-1">
-            <TabsTrigger value="itinerarios" className="flex-1 min-w-0">
-              🗺️ <span className="hidden sm:inline ml-1">Itinerarios</span> {templates.length > 0 && <Badge variant="secondary" className="ml-1">{templates.length}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="spots" className="flex-1 min-w-0">
-              📍 <span className="hidden sm:inline ml-1">Spots</span> {publicSpots.length > 0 && <Badge variant="secondary" className="ml-1">{publicSpots.length}</Badge>}
-            </TabsTrigger>
             {isOwnProfile && (
               <TabsTrigger value="guardados" className="flex-1 min-w-0">
-                🔖 <span className="hidden sm:inline ml-1">Guardados</span> {savedSpots.length > 0 && <Badge variant="secondary" className="ml-1">{savedSpots.length}</Badge>}
+                🔖 <span className="ml-1">Guardados</span> {savedSpots.length > 0 && <Badge variant="secondary" className="ml-1">{savedSpots.length}</Badge>}
               </TabsTrigger>
             )}
             {isOwnProfile && (
               <TabsTrigger value="cuenta" className="flex-1 min-w-0">
-                ⚙️ <span className="hidden sm:inline ml-1">Cuenta</span>
+                ⚙️ <span className="ml-1">Cuenta</span>
               </TabsTrigger>
             )}
+            {/* Social tabs hidden - Phase 2 */}
           </TabsList>
 
           <TabsContent value="itinerarios">
