@@ -24,9 +24,8 @@ import { getTripCoverImage } from '@/lib/tripImage';
 import { motion } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TripMembersPanel from '@/components/trip/TripMembersPanel';
-import TodayTomorrowPanel from '@/components/trip/TodayTomorrowPanel';
+import IntelligentTimeline from '@/components/trip/IntelligentTimeline';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
-import PublishSection from '@/components/trip/PublishSection';
 import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 import TripChat from '@/components/trip/TripChat';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -300,7 +299,6 @@ export default function Home() {
 
           <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
 
-        </div>
       </div>
 
       {/* Navigation Section - Outside of background image */}
@@ -319,87 +317,24 @@ export default function Home() {
           expenses={expenses}
         />
 
-        {/* Hoy / Mañana */}
+        {/* Timeline Inteligente */}
         <div>
-          <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">📅 Hoy / Mañana</h2>
-          <TodayTomorrowPanel tripId={tripId} cities={cities} />
+          <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">📅 Tu viaje</h2>
+          <IntelligentTimeline
+            tripId={tripId}
+            cities={cities}
+            expenses={expenses}
+            trip={trip}
+          />
         </div>
 
-        {/* Shared sections */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-slate-800 text-lg font-medium uppercase tracking-widest">Compartido</h2>
-            <Badge className="bg-orange-100 text-orange-700 border-orange-200 border text-xs font-medium">👥 Todo el grupo</Badge>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {sharedSections.map((section, idx) =>
-              <motion.div key={section.page} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-                <Link to={createPageUrl(`${section.page}?trip_id=${tripId}`)} className="group relative overflow-hidden glass rounded-2xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                  <div className="bg-white p-6 relative flex flex-col items-center gap-3">
-                    <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">{section.emoji}</div>
-                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors text-center">{section.name}</div>
-                  </div>
-                  <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowRight className="w-5 h-5 text-primary" />
-                  </div>
-                </Link>
-              </motion.div>
-            )}
-          </div>
-        </div>
-
-        {/* Personal sections */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-slate-800 text-lg font-medium uppercase tracking-widest">Personal</h2>
-            <Badge className="bg-blue-100 text-blue-700 border-blue-200 border text-xs font-medium">🔒 Solo visible para ti</Badge>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {personalSections.map((section, idx) =>
-              <motion.div key={section.page} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
-                <Link to={createPageUrl(`${section.page}?trip_id=${tripId}`)} className="group relative overflow-hidden glass rounded-2xl border border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 block">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                  <div className="bg-white p-6 relative flex flex-col items-center gap-3">
-                    <div className="text-5xl transform group-hover:scale-110 transition-transform duration-300">{section.emoji}</div>
-                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors text-center">{section.name}</div>
-                  </div>
-                  <div className="absolute bottom-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowRight className="w-5 h-5 text-primary" />
-                  </div>
-                </Link>
-              </motion.div>
-            )}
-          </div>
-        </div>
-
-        {/* Chat del grupo */}
-        <div>
-          <h2 className="text-slate-800 text-sm font-semibold uppercase tracking-widest mb-3">💬 Chat del grupo</h2>
-          <TripChat tripId={tripId} myProfile={myProfile} />
-        </div>
-
-        {/* Members Panel */}
-        <div className="glass rounded-2xl border border-border p-6">
-          <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5" /> Viajeros
+        {/* Viajeros */}
+        <div className="glass rounded-2xl border border-border p-5">
+          <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
+            <Users className="w-4 h-4" /> Viajeros
           </h2>
           <TripMembersPanel trip={trip} currentUserEmail={currentUserEmail} />
         </div>
-
-        {/* Publish Section (only admins) */}
-        {isAdmin && (
-          <PublishSection
-            trip={trip}
-            cities={cities}
-            user={currentUser}
-            profile={myProfile}
-            isAdmin={isAdmin}
-            onPublish={() => {
-              queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-            }}
-          />
-        )}
       </div>
 
       {/* Settings Dialog */}
