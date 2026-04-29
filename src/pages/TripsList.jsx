@@ -150,7 +150,7 @@ export default function TripsList() {
   });
 
   const { data: trips = [], isLoading } = useQuery({
-    queryKey: ['trips', user?.email],
+    queryKey: ['trips'],
     queryFn: async () => {
       if (!user?.email) return [];
       const all = await base44.entities.Trip.list('-created_date');
@@ -159,7 +159,6 @@ export default function TripsList() {
         (Array.isArray(t.members) && t.members.includes(user.email))
       );
     },
-    enabled: !!user?.email,
     staleTime: 30000,
   });
 
@@ -275,20 +274,11 @@ export default function TripsList() {
             </div>
           </div>
 
-          {/* Tabs */}
+          {/* Social tab hidden - Phase 2 */}
           <div className="flex gap-1 bg-white/15 p-1 rounded-xl">
-            <button
-              onClick={() => setActiveTab('viajes')}
-              className={"flex-1 py-2 rounded-lg text-sm font-semibold transition-all " +
-                (activeTab === 'viajes' ? 'bg-white text-orange-700 shadow-sm' : 'text-white/80 hover:text-white')}>
+            <div className="flex-1 py-2 rounded-lg text-sm font-semibold text-white text-center">
               ✈️ Mis viajes
-            </button>
-            <button
-              onClick={() => setActiveTab('social')}
-              className={"flex-1 py-2 rounded-lg text-sm font-semibold transition-all " +
-                (activeTab === 'social' ? 'bg-white text-orange-700 shadow-sm' : 'text-white/80 hover:text-white')}>
-              🌍 Kōdo Social
-            </button>
+            </div>
           </div>
         </div>
       </div>
