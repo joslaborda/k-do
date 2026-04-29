@@ -1,297 +1,300 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { format, parseISO, isToday, isTomorrow, isValid, differenceInCalendarDays } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Plane, Train, Hotel, Calendar, MapPin, Receipt, ChevronDown, ChevronRight, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import {
+  Plane, Train, Hotel, Calendar, MapPin, FileText,
+  Shield, Ticket, ChevronDown, ChevronRight, Eye,
+  Navigation, Receipt, Clock, AlertCircle
+} from 'lucide-react';
+import TicketQuickViewer from './TicketQuickViewer';
 
-const ticketIcon = (category) => {
-  switch (category) {
-    case 'flight': return <Plane className="w-4 h-4 text-blue-600" />;
-    case 'train': return <Train className="w-4 h-4 text-green-600" />;
-    case 'hotel': return <Hotel className="w-4 h-4 text-purple-600" />;
-    default: return <Calendar className="w-4 h-4 text-gray-500" />;
-  }
+// ── helpers ──────────────────────────────────────────────────────────────────
+function dateStr(offset = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().split('T')[0];
+}
+
+function formatDay(dateString) {
+  const d = new Date(dateString + 'T00:00:00');
+  const today = dateStr(0);
+  const tomorrow = dateStr(1);
+  if (dateString === today) return 'Hoy';
+  if (dateString === tomorrow) return 'Mañana';
+  return d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'short' });
+}
+
+const DOC_ICON = {
+  flight: Plane, train: Train, hotel: Hotel, insurance: Shield,
+  event: Calendar, personal: FileText, other: FileText, freetour: Ticket,
 };
-
-const ticketBg = (category) => {
-  switch (category) {
-    case 'flight': return 'bg-blue-50 border-blue-200';
-    case 'train': return 'bg-green-50 border-green-200';
-    case 'hotel': return 'bg-purple-50 border-purple-200';
-    default: return 'bg-gray-50 border-gray-200';
-  }
+const DOC_COLOR = {
+  flight: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+  train: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  hotel: 'bg-purple-100 text-purple-700 border-purple-200',
+  insurance: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  event: 'bg-orange-100 text-orange-700 border-orange-200',
+  personal: 'bg-blue-100 text-blue-700 border-blue-200',
+  other: 'bg-gray-100 text-gray-600 border-gray-200',
+  freetour: 'bg-orange-100 text-orange-700 border-orange-200',
 };
+const DOC_LABEL = {
+  flight: 'Vuelo', train: 'Tren', hotel: 'Hotel', insurance: 'Seguro',
+  event: 'Evento', personal: 'Doc personal', other: 'Documento', freetour: 'Free Tour',
+};
+const SPOT_EMOJI = { food: '🍜', sight: '🏛️', activity: '⚡', shopping: '🛍️', transport: '🚆', custom: '📍' };
 
-function DayCard({ date, label, isOpen, onToggle, itineraryDay, tickets, spots, dayExpenses, tripId, isHighlighted }) {
-  const hasContent = itineraryDay || tickets.length > 0 || spots.length > 0;
-
+// ── TimelineItem ─────────────────────────────────────────────────────────────
+function DocItem({ doc, onClick }) {
+  const Icon = DOC_ICON[doc.category] || FileText;
+  const color = DOC_COLOR[doc.category] || DOC_COLOR.other;
+  const label = DOC_LABEL[doc.category] || doc.category;
   return (
-    <div className={`rounded-2xl border overflow-hidden transition-all ${isHighlighted ? 'border-orange-400 shadow-md' : 'border-border bg-white'}`}>
-      {/* Header */}
-      <button
-        onClick={onToggle}
-        className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
-          isHighlighted ? 'bg-orange-600 text-white' : 'bg-white hover:bg-secondary'
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div className={`text-center ${isHighlighted ? 'text-white' : 'text-foreground'}`}>
-            <p className={`text-xs font-semibold uppercase tracking-wide ${isHighlighted ? 'text-orange-100' : 'text-muted-foreground'}`}>
-              {label}
-            </p>
-            <p className="text-base font-bold leading-tight">
-              {format(date, 'dd MMM', { locale: es })}
-            </p>
-          </div>
-          {itineraryDay?.title && (
-            <span className={`text-sm font-medium truncate max-w-[160px] ${isHighlighted ? 'text-white/90' : 'text-muted-foreground'}`}>
-              {itineraryDay.title}
-            </span>
-          )}
+    <button onClick={onClick}
+      className={"w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left " +
+        (doc.file_url ? "hover:bg-orange-50 hover:border-orange-200 cursor-pointer " : "cursor-default opacity-80 ") + color}>
+      <div className={"w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 border " + color}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-sm text-foreground truncate">{doc.name}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-muted-foreground">{label}</span>
+          {doc.time && <span className="text-xs font-medium text-foreground flex items-center gap-0.5"><Clock className="w-3 h-3" />{doc.time}</span>}
+          {doc.file_url && <span className="text-xs text-muted-foreground flex items-center gap-0.5"><Eye className="w-3 h-3" />Ver</span>}
         </div>
-        <div className="flex items-center gap-2">
-          {!isOpen && tickets.length > 0 && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isHighlighted ? 'bg-white/20 text-white' : 'bg-secondary text-muted-foreground'}`}>
-              {tickets.length} doc{tickets.length > 1 ? 's' : ''}
-            </span>
-          )}
-          {!isOpen && spots.length > 0 && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isHighlighted ? 'bg-white/20 text-white' : 'bg-secondary text-muted-foreground'}`}>
-              {spots.length} spot{spots.length > 1 ? 's' : ''}
-            </span>
-          )}
-          {isOpen
-            ? <ChevronDown className={`w-4 h-4 flex-shrink-0 ${isHighlighted ? 'text-white' : 'text-muted-foreground'}`} />
-            : <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isHighlighted ? 'text-white' : 'text-muted-foreground'}`} />
-          }
-        </div>
-      </button>
+      </div>
+    </button>
+  );
+}
 
-      {/* Body */}
-      {isOpen && (
-        <div className="px-4 py-3 space-y-3 bg-white">
-
-          {/* Gastos resumen (solo hoy) */}
-          {dayExpenses.length > 0 && (
-            <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 hover:bg-amber-100 transition-colors">
-                <Receipt className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                <span className="text-sm font-medium text-amber-800">
-                  {dayExpenses.length} gasto{dayExpenses.length > 1 ? 's' : ''} hoy
-                  {' · '}
-                  {dayExpenses.reduce((s, e) => s + (e.amount || 0), 0).toFixed(2)} {dayExpenses[0]?.currency || 'EUR'}
-                </span>
-              </div>
-            </Link>
-          )}
-
-          {/* Plan del itinerario */}
-          {itineraryDay?.content && (
-            <div className="bg-orange-50 border border-orange-100 rounded-xl px-3 py-2">
-              <p className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-1">Plan del día</p>
-              <p className="text-sm text-foreground leading-relaxed line-clamp-4">{itineraryDay.content}</p>
-            </div>
-          )}
-
-          {/* Tickets del día */}
-          {tickets.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Documentos</p>
-              {tickets.map(ticket => (
-                <Link key={ticket.id} to={createPageUrl(`Documents?trip_id=${tripId}`)}>
-                  <div className={`flex items-center gap-3 border rounded-xl px-3 py-2 hover:opacity-80 transition-opacity ${ticketBg(ticket.category)}`}>
-                    {ticketIcon(ticket.category)}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{ticket.name}</p>
-                      {(ticket.origin || ticket.destination) && (
-                        <p className="text-xs text-muted-foreground">{ticket.origin}{ticket.origin && ticket.destination ? ' → ' : ''}{ticket.destination}</p>
-                      )}
-                      {ticket.city && !ticket.origin && (
-                        <p className="text-xs text-muted-foreground">{ticket.city}</p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {/* Spots del día */}
-          {spots.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Spots</p>
-              {spots.map(spot => (
-                <Link key={spot.id} to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
-                  <div className="flex items-center gap-3 border border-border rounded-xl px-3 py-2 hover:bg-secondary transition-colors">
-                    <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
-                      {spot.address && <p className="text-xs text-muted-foreground truncate">{spot.address}</p>}
-                    </div>
-                    {spot.visited && <span className="text-xs text-green-600 font-medium">✓</span>}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {!itineraryDay && tickets.length === 0 && spots.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-2">Sin contenido para este día</p>
-          )}
-        </div>
-      )}
+function SpotItem({ spot }) {
+  const emoji = SPOT_EMOJI[spot.type] || '📍';
+  return (
+    <div className={"flex items-center gap-3 p-3 rounded-xl border border-border bg-white " + (spot.visited ? 'opacity-50' : '')}>
+      <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 text-lg">
+        {emoji}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={"font-semibold text-sm truncate " + (spot.visited ? 'line-through text-muted-foreground' : 'text-foreground')}>{spot.title}</p>
+        {spot.address && <p className="text-xs text-muted-foreground truncate">{spot.address}</p>}
+      </div>
+      {spot.visited && <span className="text-green-600 text-xs flex-shrink-0">✅</span>}
     </div>
   );
 }
 
-export default function IntelligentTimeline({ tripId, cities, expenses, trip }) {
-  const [openDays, setOpenDays] = useState(new Set(['today']));
+// ── DaySection ───────────────────────────────────────────────────────────────
+function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const [viewerTicket, setViewerTicket] = useState(null);
+  const hasContent = docs.length > 0 || spots.length > 0 || itDay;
+  const isToday = date === dateStr(0);
+  const isTomorrow = date === dateStr(1);
 
-  const { data: itineraryDays = [] } = useQuery({
+  return (
+    <div className={"rounded-2xl border overflow-hidden " + (isToday ? "border-orange-300 shadow-sm" : "border-border")}>
+      <button onClick={() => setOpen(o => !o)}
+        className={"w-full flex items-center justify-between px-4 py-3.5 transition-colors " +
+          (isToday ? "bg-orange-700 text-white" : "bg-white text-foreground hover:bg-orange-50")}>
+        <div className="flex items-center gap-3">
+          <span className="text-lg">{isToday ? '☀️' : isTomorrow ? '🌙' : '📅'}</span>
+          <div className="text-left">
+            <p className={"font-bold text-sm " + (isToday ? "text-white" : "text-foreground")}>{label}</p>
+            {cityOfDay && <p className={"text-xs " + (isToday ? "text-white/70" : "text-muted-foreground")}>{cityOfDay.name}</p>}
+          </div>
+          {hasContent && (
+            <div className="flex gap-1.5">
+              {docs.length > 0 && <span className={"text-xs px-2 py-0.5 rounded-full font-medium " + (isToday ? "bg-white/20 text-white" : "bg-orange-100 text-orange-700")}>{docs.length} docs</span>}
+              {spots.length > 0 && <span className={"text-xs px-2 py-0.5 rounded-full font-medium " + (isToday ? "bg-white/20 text-white" : "bg-blue-100 text-blue-700")}>{spots.length} spots</span>}
+            </div>
+          )}
+        </div>
+        {open
+          ? <ChevronDown className={"w-4 h-4 " + (isToday ? "text-white" : "text-muted-foreground")} />
+          : <ChevronRight className={"w-4 h-4 " + (isToday ? "text-white" : "text-muted-foreground")} />}
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-3 bg-white">
+          {!hasContent && (
+            <p className="text-sm text-muted-foreground text-center py-3">Sin actividad planificada para este día</p>
+          )}
+
+          {/* Plan del día */}
+          {itDay && (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 border border-orange-200">
+              <div className="w-9 h-9 rounded-xl bg-orange-100 border border-orange-300 flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-4 h-4 text-orange-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-foreground">{itDay.title || 'Plan del día'}</p>
+                {cityOfDay && (
+                  <Link to={createPageUrl(`CityDetail?trip_id=${tripId}&city_id=${cityOfDay.id}`)}
+                    className="text-xs text-orange-700 hover:underline">Ver itinerario →</Link>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Docs */}
+          {docs.length > 0 && (
+            <div className="space-y-2">
+              {docs.map(doc => (
+                <DocItem key={doc.id} doc={doc} onClick={() => doc.file_url && setViewerTicket(doc)} />
+              ))}
+            </div>
+          )}
+
+          {/* Spots */}
+          {spots.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Spots del día</p>
+              {spots.map(spot => <SpotItem key={spot.id} spot={spot} />)}
+            </div>
+          )}
+
+          {/* Link a ciudad */}
+          {cityOfDay && (
+            <Link to={createPageUrl(`CityDetail?trip_id=${tripId}&city_id=${cityOfDay.id}`)}
+              className="flex items-center justify-center gap-1.5 text-xs text-orange-700 font-medium py-2 hover:underline">
+              <Navigation className="w-3 h-3" />Ver todo el día en detalle
+            </Link>
+          )}
+        </div>
+      )}
+
+      <TicketQuickViewer ticket={viewerTicket} open={!!viewerTicket} onOpenChange={o => !o && setViewerTicket(null)} />
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+export default function IntelligentTimeline({ tripId, cities, expenses, trip }) {
+  const today = dateStr(0);
+  const tomorrow = dateStr(1);
+
+  const { data: itDays = [] } = useQuery({
     queryKey: ['itineraryDays', tripId],
-    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }, 'date'),
-    enabled: !!tripId,
-    staleTime: 30000,
+    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
   });
 
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
-    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, 'date'),
-    enabled: !!tripId,
-    staleTime: 30000,
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
   });
 
   const { data: spots = [] } = useQuery({
     queryKey: ['spots', tripId],
     queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-    staleTime: 30000,
+    enabled: !!tripId, staleTime: 60000,
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const sortedCities = useMemo(() => [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [cities]);
 
-  // Build set of dates that have content
-  const daysWithContent = useMemo(() => {
-    const map = new Map();
+  function getCityForDate(date) {
+    let city = sortedCities.find(c => c.start_date && c.end_date && date >= c.start_date && date <= c.end_date);
+    if (!city) city = sortedCities.find(c => c.start_date && date >= c.start_date);
+    if (!city && sortedCities.length > 0) city = sortedCities[0];
+    return city || null;
+  }
 
-    itineraryDays.forEach(d => {
-      if (d.date) map.set(d.date, { ...map.get(d.date), itineraryDay: d });
-    });
+  function getDocsForDate(date, cityOfDay) {
+    const itDay = itDays.find(d => d.date === date);
+    return tickets.filter(t => {
+      if (t.date === date) return true;
+      if (itDay && t.itinerary_day_id === itDay.id) return true;
+      return false;
+    }).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  }
 
-    tickets.forEach(t => {
-      if (t.date) {
-        const cur = map.get(t.date) || {};
-        map.set(t.date, { ...cur, tickets: [...(cur.tickets || []), t] });
-      }
-    });
+  function getSpotsForDate(date, cityOfDay) {
+    if (!cityOfDay) return [];
+    const itDay = itDays.find(d => d.date === date);
+    if (itDay) return spots.filter(s => s.itinerary_day_id === itDay.id && !s.visited);
+    return spots.filter(s => s.city_id === cityOfDay.id && !s.visited).slice(0, 3);
+  }
 
-    spots.forEach(s => {
-      // spots linked to an itinerary day get shown on that day
-      const day = itineraryDays.find(d => d.id === s.itinerary_day_id);
-      if (day?.date) {
-        const cur = map.get(day.date) || {};
-        map.set(day.date, { ...cur, spots: [...(cur.spots || []), s] });
-      }
-    });
-
-    return map;
-  }, [itineraryDays, tickets, spots]);
-
+  // Build timeline: today + tomorrow + next 5 days with content
   const days = useMemo(() => {
     const result = [];
-    const todayStr = format(today, 'yyyy-MM-dd');
-    const tomorrowDate = new Date(today);
-    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-    const tomorrowStr = format(tomorrowDate, 'yyyy-MM-dd');
-
-    const allDates = new Set([...daysWithContent.keys(), todayStr, tomorrowStr]);
-
-    // Filter dates that are within trip range or have content
-    const tripStart = trip?.start_date ? parseISO(trip.start_date) : null;
-    const tripEnd = trip?.end_date ? parseISO(trip.end_date) : null;
-
-    [...allDates].sort().forEach(dateStr => {
-      const date = parseISO(dateStr);
-      if (!isValid(date)) return;
-
-      const isT = isToday(date);
-      const isTom = isTomorrow(date);
-      const hasContent = daysWithContent.has(dateStr);
-
-      // Skip days with no content unless today or tomorrow
-      if (!hasContent && !isT && !isTom) return;
-
-      // Skip days far outside trip range (more than 1 day before/after)
-      if (tripStart && differenceInCalendarDays(date, tripStart) < -1) return;
-      if (tripEnd && differenceInCalendarDays(date, tripEnd) > 1) return;
-
-      const data = daysWithContent.get(dateStr) || {};
-      const dayExpenses = isT
-        ? expenses.filter(e => e.date === dateStr)
-        : [];
-
-      let label;
-      if (isT) label = 'Hoy';
-      else if (isTom) label = 'Mañana';
-      else label = format(date, 'EEEE', { locale: es }).charAt(0).toUpperCase() + format(date, 'EEEE', { locale: es }).slice(1);
-
-      result.push({
-        dateStr,
-        date,
-        label,
-        isToday: isT,
-        isTomorrow: isTom,
-        itineraryDay: data.itineraryDay || null,
-        tickets: data.tickets || [],
-        spots: data.spots || [],
-        dayExpenses,
-      });
-    });
-
+    // Always show today and tomorrow
+    for (let i = 0; i <= 1; i++) {
+      const date = dateStr(i);
+      const city = getCityForDate(date);
+      const itDay = itDays.find(d => d.date === date) || null;
+      result.push({ date, city, itDay });
+    }
+    // Show next 7 days only if they have content
+    for (let i = 2; i <= 8; i++) {
+      const date = dateStr(i);
+      const city = getCityForDate(date);
+      const itDay = itDays.find(d => d.date === date) || null;
+      const docs = getDocsForDate(date, city);
+      const daySpots = getSpotsForDate(date, city);
+      if (docs.length > 0 || daySpots.length > 0 || itDay) {
+        result.push({ date, city, itDay });
+      }
+    }
     return result;
-  }, [daysWithContent, expenses, trip, today]);
+  }, [itDays, tickets, spots, sortedCities]);
 
-  const toggle = (dateStr) => {
-    setOpenDays(prev => {
-      const next = new Set(prev);
-      if (next.has(dateStr)) next.delete(dateStr);
-      else next.add(dateStr);
-      return next;
-    });
-  };
+  // Today's expenses summary
+  const todayExpenses = useMemo(() => {
+    return expenses.filter(e => e.date === today);
+  }, [expenses, today]);
 
-  // Auto-open today
-  const todayStr = format(today, 'yyyy-MM-dd');
+  const todayTotal = todayExpenses.reduce((s, e) => s + (e.amount || 0), 0);
 
-  if (days.length === 0) {
+  if (cities.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-2xl p-6 text-center text-muted-foreground text-sm">
-        Sin itinerario planificado aún
+      <div className="bg-white rounded-2xl border border-dashed border-border p-8 text-center">
+        <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
+        <p className="text-sm text-muted-foreground">Añade paradas a tu viaje para ver la timeline</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      {days.map(day => (
-        <DayCard
-          key={day.dateStr}
-          date={day.date}
-          label={day.label}
-          isOpen={openDays.has(day.dateStr) || day.isToday}
-          onToggle={() => toggle(day.dateStr)}
-          itineraryDay={day.itineraryDay}
-          tickets={day.tickets}
-          spots={day.spots}
-          dayExpenses={day.dayExpenses}
-          tripId={tripId}
-          isHighlighted={day.isToday}
-        />
-      ))}
+    <div className="space-y-3">
+      {/* Gastos de hoy si hay */}
+      {todayExpenses.length > 0 && (
+        <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
+          <div className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+              <Receipt className="w-4 h-4 text-green-700" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-sm text-foreground">Gastos de hoy</p>
+              <p className="text-xs text-muted-foreground">{todayExpenses.length} gasto{todayExpenses.length > 1 ? 's' : ''} · {todayTotal.toFixed(0)} {trip?.currency || ''}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </div>
+        </Link>
+      )}
+
+      {/* Days */}
+      {days.map(({ date, city, itDay }, idx) => {
+        const docs = getDocsForDate(date, city);
+        const daySpots = getSpotsForDate(date, city);
+        return (
+          <DaySection
+            key={date}
+            label={formatDay(date)}
+            date={date}
+            docs={docs}
+            spots={daySpots}
+            itDay={itDay}
+            cityOfDay={city}
+            tripId={tripId}
+            defaultOpen={idx === 0}
+          />
+        );
+      })}
     </div>
   );
 }
