@@ -1,355 +1,186 @@
 /**
- * spotsDB.js
- * Librería de spots/lugares destacados hardcodeados por ciudad y país.
- * Sin dependencias externas.
+ * spotsDB.js — Seed content de spots curados para ciudades de todo el mundo
+ * Contenido real y útil para el lanzamiento de Kōdo
+ * Organizado por país → ciudad
  */
 
-// ── Spots por ciudad ──────────────────────────────────────────────────────────
+export const SEED_SPOTS = {
 
-const spotsByCity = {
-  // JAPÓN
-  'tokyo': [
-    { title: 'Senso-ji', type: 'sight', notes: 'Templo budista más antiguo de Tokio, en Asakusa', address: 'Asakusa, Taito, Tokyo' },
-    { title: 'Shibuya Crossing', type: 'sight', notes: 'El cruce peatonal más famoso del mundo', address: 'Shibuya, Tokyo' },
-    { title: 'Shinjuku Gyoen', type: 'activity', notes: 'Jardín nacional con cerezos espectaculares en primavera', address: 'Shinjuku, Tokyo' },
-    { title: 'Tsukiji Outer Market', type: 'food', notes: 'Mercado con el mejor sushi y marisco fresco', address: 'Tsukiji, Chuo, Tokyo' },
-    { title: 'Meiji Shrine', type: 'sight', notes: 'Santuario sintoísta rodeado de bosque en plena ciudad', address: 'Yoyogi, Shibuya, Tokyo' },
-    { title: 'Akihabara', type: 'shopping', notes: 'Barrio electrónico y cultura otaku', address: 'Akihabara, Chiyoda, Tokyo' },
-    { title: 'teamLab Borderless', type: 'activity', notes: 'Museo de arte digital inmersivo', address: 'Odaiba, Koto, Tokyo' },
-    { title: 'Ramen Street (Tokyo Station)', type: 'food', notes: '8 de los mejores ramen de Japón bajo tierra', address: 'Tokyo Station B1, Marunouchi' },
-  ],
-  'kyoto': [
-    { title: 'Fushimi Inari Taisha', type: 'sight', notes: 'Miles de torii naranjas en la montaña. Madrugad para evitar turistas', address: 'Fukakusa Yabunouchicho, Fushimi, Kyoto' },
-    { title: 'Arashiyama Bamboo Grove', type: 'sight', notes: 'Bosque de bambú mágico', address: 'Sagaogurayama Tabuchiyamacho, Ukyo, Kyoto' },
-    { title: 'Kinkaku-ji', type: 'sight', notes: 'El Pabellón Dorado. Uno de los más fotografiados de Japón', address: 'Kinkakujicho, Kita, Kyoto' },
-    { title: 'Nishiki Market', type: 'food', notes: 'El estómago de Kyoto. 400 años de historia gastronómica', address: 'Nishiki, Nakagyo, Kyoto' },
-    { title: 'Philosopher\'s Path', type: 'activity', notes: 'Paseo junto al canal bordeado de cerezos', address: 'Jodoji, Sakyo, Kyoto' },
-    { title: 'Gion District', type: 'sight', notes: 'El barrio de las geishas. Mejor al atardecer', address: 'Gion, Higashiyama, Kyoto' },
-  ],
-  'osaka': [
-    { title: 'Dotonbori', type: 'sight', notes: 'El corazón gastronómico de Osaka, lleno de vida nocturna', address: 'Dotonbori, Chuo, Osaka' },
-    { title: 'Osaka Castle', type: 'sight', notes: 'Castillo histórico con vistas panorámicas', address: 'Osakajo, Chuo, Osaka' },
-    { title: 'Kuromon Market', type: 'food', notes: 'Mercado cubierto con 150 tiendas de productos frescos', address: 'Nipponbashi, Naniwa, Osaka' },
-    { title: 'Takoyaki Juhachiban', type: 'food', notes: 'Los mejores takoyaki de Osaka, frente al castillo', address: 'Tanimachi, Chuo, Osaka' },
-    { title: 'Universal Studios Japan', type: 'activity', notes: 'Parque temático con zona de Harry Potter y Nintendo', address: 'Sakurajima, Konohana, Osaka' },
-  ],
+  // ── ESPAÑA ────────────────────────────────────────────────────────────────
+  'España': {
+    'Madrid': [
+      { title: 'Mercado de San Miguel', type: 'food', address: 'Plaza de San Miguel, s/n', lat: 40.4153, lng: -3.7093, notes: 'Mercado gourmet con tapas y vinos. Mejor entre semana para evitar colas. No te pierdas las croquetas de La Sanabresa.', tags: ['tapas', 'mercado', 'gourmet'], price: 'mid', best_time: 'tarde', visits: 342 },
+      { title: 'Barrio de las Letras', type: 'sight', address: 'Barrio de las Letras, Madrid', lat: 40.4138, lng: -3.6936, notes: 'El barrio más bohemio de Madrid. Calles empedradas, librerías y tabernas históricas. Imprescindible perderse por sus callejuelas.', tags: ['cultura', 'bohemio', 'paseo'], price: 'low', best_time: 'tarde', visits: 287 },
+      { title: 'Mirador del Templo de Debod', type: 'sight', address: 'C. de Ferraz, 1', lat: 40.4243, lng: -3.7178, notes: 'Las mejores vistas del atardecer de Madrid. Llega 30 min antes del sunset para conseguir sitio. Entrada al templo gratuita.', tags: ['sunset', 'mirador', 'gratuito'], price: 'low', best_time: 'tarde', visits: 521 },
+      { title: 'Casa Macareno', type: 'food', address: 'C. de la Ruda, 5', lat: 40.4121, lng: -3.7059, notes: 'Taberna madrileña de 1927. Cocido y callos imprescindibles. Reserva los fines de semana con antelación.', tags: ['cocido', 'tradicional', 'histórico'], price: 'mid', best_time: 'comida', visits: 198 },
+      { title: 'El Rastro', type: 'shopping', address: 'Calle de la Ribera de Curtidores', lat: 40.4089, lng: -3.7083, notes: 'El mercadillo más famoso de Madrid, solo los domingos por la mañana. Llega antes de las 10h para ver lo mejor. Cuidado con los carteristas.', tags: ['mercadillo', 'domingo', 'vintage'], price: 'low', best_time: 'mañana', visits: 412 },
+      { title: 'Rooftop del Círculo de Bellas Artes', type: 'sight', address: 'C. de Alcalá, 42', lat: 40.4187, lng: -3.6983, notes: 'Las mejores vistas de la Gran Vía. 4€ de entrada que merece la pena. Perfecto al atardecer con una cerveza.', tags: ['rooftop', 'vistas', 'terraza'], price: 'low', best_time: 'tarde', visits: 376 },
+    ],
+    'Barcelona': [
+      { title: 'Bunkers del Carmel', type: 'sight', address: 'Turó de la Rovira', lat: 41.4179, lng: 2.1680, notes: 'Las mejores vistas panorámicas de Barcelona. Sube en bici o taxi. Al atardecer hay ambiente increíble. Lleva algo de beber.', tags: ['vistas', 'sunset', 'panorámica'], price: 'low', best_time: 'tarde', visits: 634 },
+      { title: 'Mercado de Santa Caterina', type: 'food', address: 'Av. de Francesc Cambó, 16', lat: 41.3855, lng: 2.1789, notes: 'Alternativa menos turística al Boqueria. Techo ondulado precioso, precios razonables, productos frescos. El bar del mercado tiene tapas excelentes.', tags: ['mercado', 'local', 'tapas'], price: 'low', best_time: 'mañana', visits: 287 },
+      { title: 'El Born', type: 'sight', address: 'El Born, Barcelona', lat: 41.3851, lng: 2.1834, notes: 'El barrio más trendy de Barcelona. Tiendas de diseño, cocktail bars y restaurantes con terraza. Mejor de jueves a sábado por la noche.', tags: ['trendy', 'barrio', 'nocturno'], price: 'mid', best_time: 'noche', visits: 445 },
+      { title: 'Barceloneta al amanecer', type: 'activity', address: 'Playa de la Barceloneta', lat: 41.3789, lng: 2.1900, notes: 'La playa sin turistas. Amanecer en la Barceloneta con muy poca gente, es mágico. Lleva un café del bar de la esquina.', tags: ['playa', 'amanecer', 'tranquilo'], price: 'low', best_time: 'mañana', visits: 312 },
+      { title: 'La Cova Fumada', type: 'food', address: 'C/ del Baluard, 56', lat: 41.3797, lng: 2.1876, notes: 'El bar que inventó la bombas (croqueta gigante de patata). Sin carta, sin reservas, llega antes de las 13h. Cierra cuando se acaba la comida.', tags: ['bomba', 'local', 'histórico'], price: 'low', best_time: 'comida', visits: 234 },
+    ],
+    'Sevilla': [
+      { title: 'Azotea del Ateneo', type: 'sight', address: 'C. Orfila, 7', lat: 37.3882, lng: -5.9915, notes: 'Rooftop secreto con vistas a la Giralda. Cócteles a precios razonables. Solo abierto en verano. Una de las mejores vistas de Sevilla.', tags: ['rooftop', 'secreto', 'vistas'], price: 'mid', best_time: 'tarde', visits: 189 },
+      { title: 'Bodega Dos de Mayo', type: 'food', address: 'Pl. de la Gavidia, 6', lat: 37.3912, lng: -5.9952, notes: 'La mejor manzanilla de Sevilla. Tapas de jamón, queso y boquerones. Los martes tienen flamenco espontáneo. Local de toda la vida.', tags: ['tapas', 'manzanilla', 'flamenco'], price: 'low', best_time: 'tarde', visits: 267 },
+    ],
+  },
 
-  // TAILANDIA
-  'bangkok': [
-    { title: 'Wat Phra Kaew', type: 'sight', notes: 'Templo del Buda de Esmeralda, el más sagrado de Tailandia', address: 'Grand Palace, Bangkok' },
-    { title: 'Chatuchak Weekend Market', type: 'shopping', notes: 'Uno de los mercados más grandes del mundo (15.000 puestos)', address: 'Chatuchak, Bangkok' },
-    { title: 'Khao San Road', type: 'activity', notes: 'La calle mochilera por excelencia, ambiente vibrante', address: 'Khao San Rd, Phra Nakhon, Bangkok' },
-    { title: 'Floating Market Damnoen Saduak', type: 'sight', notes: 'Mercado flotante tradicional, mejor ir temprano', address: 'Damnoen Saduak, Ratchaburi' },
-    { title: 'Pad Thai Fawt Ew', type: 'food', notes: 'Considerado el mejor pad thai de Bangkok', address: 'Wang Lang Market, Bangkok' },
-    { title: 'Wat Arun', type: 'sight', notes: 'El Templo del Amanecer con vistas al río Chao Phraya', address: 'Arun Amarin Rd, Bangkok Yai' },
-  ],
-  'chiang mai': [
-    { title: 'Doi Suthep', type: 'sight', notes: 'Templo dorado en lo alto de la montaña, vistas increíbles', address: 'Doi Suthep, Chiang Mai' },
-    { title: 'Night Bazaar', type: 'shopping', notes: 'Mercado nocturno con artesanía local y comida callejera', address: 'Chang Klan Rd, Chiang Mai' },
-    { title: 'Elephant Nature Park', type: 'activity', notes: 'Santuario ético para elefantes rescatados', address: 'Mae Taeng, Chiang Mai' },
-    { title: 'Sunday Walking Street', type: 'shopping', notes: 'La calle peatonal más popular del domingo por la noche', address: 'Wualai Rd, Chiang Mai' },
-  ],
+  // ── JAPÓN ─────────────────────────────────────────────────────────────────
+  'Japón': {
+    'Tokio': [
+      { title: 'Senso-ji al amanecer', type: 'sight', address: '2 Chome-3-1 Asakusa, Taito', lat: 35.7148, lng: 139.7967, notes: 'El templo más famoso de Tokio sin turistas. Llega antes de las 7h. El mercado de Nakamise está cerrado pero el templo y el ambiente son únicos.', tags: ['templo', 'amanecer', 'asakusa'], price: 'low', best_time: 'mañana', visits: 891 },
+      { title: 'Shinjuku Gyoen', type: 'sight', address: '11 Naitomachi, Shinjuku', lat: 35.6852, lng: 139.7101, notes: 'El jardín más bello de Tokio. En primavera los cerezos son impresionantes. 500¥ de entrada. Prohibido el alcohol (pero todo el mundo lo lleva).', tags: ['jardín', 'sakura', 'naturaleza'], price: 'low', best_time: 'mañana', visits: 734 },
+      { title: 'Tsukiji Outer Market', type: 'food', address: '4 Chome-16-2 Tsukiji, Chuo', lat: 35.6655, lng: 139.7707, notes: 'El mercado exterior (gratuito) sigue siendo increíble. Sushi y marisco fresco para desayunar por menos de 1000¥. Llega antes de las 8h.', tags: ['sushi', 'mercado', 'desayuno'], price: 'low', best_time: 'mañana', visits: 612 },
+      { title: 'Omoide Yokocho', type: 'food', address: '1 Chome-2 Nishishinjuku, Shinjuku', lat: 35.6916, lng: 139.7003, notes: 'El callejón del recuerdo. Pequeños bares de yakitori llenos de humo y salaryman japoneses. La experiencia más auténtica de Tokio nocturno. Reserva imposible, llega y espera.', tags: ['yakitori', 'nocturno', 'auténtico'], price: 'low', best_time: 'noche', visits: 445 },
+      { title: 'Yanaka Ginza', type: 'sight', address: 'Yanaka, Taito', lat: 35.7267, lng: 139.7714, notes: 'El barrio más tradicional de Tokio, casi sin cambios desde los años 60. Tiendas de artesanía, templos pequeños y gatos por todas partes. Tranquilo y sin turistas.', tags: ['tradicional', 'vintage', 'local'], price: 'low', best_time: 'tarde', visits: 378 },
+      { title: 'TeamLab Borderless', type: 'activity', address: '1-3-8 Ariake, Koto', lat: 35.6339, lng: 139.7880, notes: 'Arte digital inmersivo impresionante. Reserva online con semanas de antelación. No lleves ropa blanca (absorbe las proyecciones). Mínimo 2 horas.', tags: ['arte', 'digital', 'inmersivo'], price: 'high', best_time: 'tarde', visits: 567 },
+      { title: 'Ichiran Ramen', type: 'food', address: 'Varias ubicaciones en Tokio', lat: 35.6938, lng: 139.7034, notes: 'El ramen más famoso de Japón. Cabinas individuales para comer solo (cultura japonesa). El caldo de cerdo tonkotsu es adictivo. Cola inevitable pero merece.', tags: ['ramen', 'tonkotsu', 'clásico'], price: 'low', best_time: 'cualquier hora', visits: 823 },
+    ],
+    'Kioto': [
+      { title: 'Fushimi Inari de noche', type: 'sight', address: '68 Fukakusa Yabunouchicho, Fushimi', lat: 34.9671, lng: 135.7727, notes: 'Los miles de torii naranjas sin turistas. Después de las 20h estás prácticamente solo. Lleva linterna o usa el móvil. Los zorros son sagrados, no los molestes.', tags: ['torii', 'nocturno', 'fotográfico'], price: 'low', best_time: 'noche', visits: 756 },
+      { title: 'Arashiyama Bamboo Grove', type: 'sight', address: 'Sagaogurayama Tabuchiyamacho, Ukyo', lat: 35.0170, lng: 135.6720, notes: 'El bosque de bambú más famoso de Japón. Llega antes de las 7h o después de las 17h para evitar la multitud. 10 minutos a pie desde la estación.', tags: ['bambú', 'naturaleza', 'fotográfico'], price: 'low', best_time: 'mañana', visits: 892 },
+      { title: 'Nishiki Market', type: 'food', address: 'Nishiki Market, Nakagyo', lat: 35.0052, lng: 135.7652, notes: 'La cocina de Kioto. 400 metros de puestos de comida callejera, encurtidos y dulces tradicionales. Cierra a las 18h. Prueba el tofu frito y los dango.', tags: ['mercado', 'comida', 'tradicional'], price: 'low', best_time: 'mediodía', visits: 634 },
+      { title: 'Philosopher\'s Path al amanecer', type: 'sight', address: 'Philosopher\'s Walk, Sakyo', lat: 35.0268, lng: 135.7948, notes: 'El camino de los filósofos bordeando un canal con cerezos. En primavera es de los más bonitos del mundo. En verano y otoño también merece mucho.', tags: ['paseo', 'canal', 'sakura'], price: 'low', best_time: 'mañana', visits: 445 },
+    ],
+    'Osaka': [
+      { title: 'Dotonbori de noche', type: 'sight', address: 'Dotonbori, Chuo', lat: 34.6687, lng: 135.5013, notes: 'El corazón de Osaka de noche. Letreros de neón, takoyaki en la calle y el famoso cartel del hombre corriendo. Ruidoso, caótico y absolutamente único.', tags: ['nocturno', 'comida', 'neon'], price: 'low', best_time: 'noche', visits: 934 },
+      { title: 'Kuromon Market', type: 'food', address: '2 Chome-4-1 Nipponbashi, Chuo', lat: 34.6643, lng: 135.5072, notes: 'La cocina de Osaka. Marisco fresco, wagyu y frutas exóticas. Muchos puestos te cocinan en el momento. Mejor entre semana por la mañana.', tags: ['mercado', 'marisco', 'wagyu'], price: 'mid', best_time: 'mañana', visits: 523 },
+    ],
+  },
 
-  // VIETNAM
-  'hanoi': [
-    { title: 'Hoan Kiem Lake', type: 'sight', notes: 'El lago del centro histórico, precioso al amanecer', address: 'Hoan Kiem, Hanoi' },
-    { title: 'Old Quarter', type: 'sight', notes: '36 calles medievales, la Medina de Asia', address: 'Hoan Kiem, Hanoi' },
-    { title: 'Bun Cha Huong Lien', type: 'food', notes: 'El restaurante donde Obama y Bourdain comieron bun cha', address: '24 Le Van Huu, Hanoi' },
-    { title: 'Temple of Literature', type: 'sight', notes: 'Primera universidad de Vietnam, fundada en 1070', address: 'Dong Da, Hanoi' },
-  ],
-  'ho chi minh': [
-    { title: 'War Remnants Museum', type: 'sight', notes: 'Museo impactante sobre la guerra de Vietnam', address: '28 Vo Van Tan, Ho Chi Minh City' },
-    { title: 'Ben Thanh Market', type: 'shopping', notes: 'Mercado central histórico con productos locales', address: 'Le Loi, District 1, Ho Chi Minh City' },
-    { title: 'Cu Chi Tunnels', type: 'activity', notes: 'Red de túneles subterráneos usados durante la guerra', address: 'Cu Chi District, Ho Chi Minh City' },
-    { title: 'Banh Mi Huynh Hoa', type: 'food', notes: 'El mejor banh mi de la ciudad, colas kilométricas', address: '26 Le Thi Rieng, District 1' },
-  ],
-  'hoi an': [
-    { title: 'Ancient Town', type: 'sight', notes: 'Casco histórico UNESCO, precioso de noche con linternas', address: 'Hoi An Ancient Town' },
-    { title: 'White Rose Restaurant', type: 'food', notes: 'Especialidad local: banh bao vac (rosas blancas de arroz)', address: '533 Hai Ba Trung, Hoi An' },
-    { title: 'An Bang Beach', type: 'activity', notes: 'La playa más tranquila cerca de Hoi An', address: 'An Bang, Hoi An' },
-    { title: 'Cao Lau', type: 'food', notes: 'Plato único de Hoi An que solo se puede comer aquí', address: 'Central Market, Hoi An' },
-  ],
+  // ── MÉXICO ────────────────────────────────────────────────────────────────
+  'México': {
+    'Ciudad de México': [
+      { title: 'Mercado de Coyoacán', type: 'food', address: 'Ignacio Allende 6, Coyoacán', lat: 19.3500, lng: -99.1616, notes: 'El mercado más bonito de CDMX. Tostadas de tinga, quesillo y agua de jamaica. Los fines de semana hay artesanías y música. Cerca de la Casa Azul de Frida Kahlo.', tags: ['tostadas', 'mercado', 'local'], price: 'low', best_time: 'mediodía', visits: 567 },
+      { title: 'Azotea del Hotel Ritz', type: 'sight', address: 'Av. Madero 30, Centro', lat: 19.4330, lng: -99.1392, notes: 'Vistas impresionantes al Zócalo y la Catedral. Acceso gratuito, solo consume algo en el bar. Al atardecer es especialmente bonito.', tags: ['rooftop', 'vistas', 'centro'], price: 'mid', best_time: 'tarde', visits: 389 },
+      { title: 'Cantina La Faena', type: 'food', address: 'C. de Uruguay 4, Centro', lat: 19.4324, lng: -99.1344, notes: 'La cantina más antigua del Centro. Mezcal, pulque y botanas de regalo con cada copa. Ambiente de los años 50. Los mariachis pasan a veces.', tags: ['cantina', 'mezcal', 'histórico'], price: 'low', best_time: 'tarde', visits: 312 },
+      { title: 'Roma Norte at Night', type: 'sight', address: 'Colonia Roma Norte, CDMX', lat: 19.4194, lng: -99.1617, notes: 'El barrio más cool de CDMX. Restaurantes de autor, natural wine bars y galerías. Álvaro Obregón de noche tiene una energía increíble. Nada que ver con la película.', tags: ['barrio', 'restaurantes', 'nocturno'], price: 'mid', best_time: 'noche', visits: 445 },
+      { title: 'Tacos de Canasta El Karly', type: 'food', address: 'Mercado de Medellín, Roma', lat: 19.4089, lng: -99.1673, notes: 'Los mejores tacos de canasta de la ciudad. 10 pesos cada uno. De chicharrón, frijoles y papa. Desayuno perfecto antes de las 11h cuando se acaban.', tags: ['tacos', 'canasta', 'desayuno'], price: 'low', best_time: 'mañana', visits: 234 },
+    ],
+    'Oaxaca': [
+      { title: 'Mercado 20 de Noviembre', type: 'food', address: 'C. 20 de Noviembre, Centro', lat: 17.0639, lng: -96.7200, notes: 'El mercado donde probar el mole negro, tlayudas y chapulines. Los pasillos de humo del asado son espectaculares. No te vayas sin probar el chocolate oaxaqueño.', tags: ['mole', 'tlayuda', 'chapulines'], price: 'low', best_time: 'mediodía', visits: 478 },
+      { title: 'Monte Albán al atardecer', type: 'sight', address: 'San Pablo Villa de Mitla', lat: 17.0433, lng: -96.7672, notes: 'Zona arqueológica zapoteca con vistas de 360° al Valle de Oaxaca. Al atardecer es mágico. Tarda 30 min en taxi desde el centro. Cierra a las 18h.', tags: ['arqueología', 'sunset', 'zapoteca'], price: 'low', best_time: 'tarde', visits: 356 },
+    ],
+  },
 
-  // INDONESIA
-  'bali': [
-    { title: 'Tanah Lot', type: 'sight', notes: 'Templo sobre una roca en el mar, espectacular al atardecer', address: 'Tanah Lot, Tabanan, Bali' },
-    { title: 'Ubud Monkey Forest', type: 'activity', notes: 'Bosque sagrado con cientos de macacos', address: 'Ubud, Gianyar, Bali' },
-    { title: 'Tegallalang Rice Terraces', type: 'sight', notes: 'Terrazas de arroz icónicas, mejor por la mañana', address: 'Tegallalang, Gianyar, Bali' },
-    { title: 'Seminyak Beach', type: 'activity', notes: 'La playa más animada con bares y puestas de sol', address: 'Seminyak, Kuta Utara, Bali' },
-    { title: 'Nasi Goreng Bali', type: 'food', notes: 'Arroz frito balinés, mejor en warungs locales', address: 'Ubud Market, Bali' },
-  ],
+  // ── COLOMBIA ──────────────────────────────────────────────────────────────
+  'Colombia': {
+    'Medellín': [
+      { title: 'El Poblado de noche', type: 'sight', address: 'El Poblado, Medellín', lat: 6.2087, lng: -75.5671, notes: 'El barrio más seguro y animado para salir. Parque Lleras lleno de terrazas y bares. Empieza la noche en Pergamino tomando café.', tags: ['barrio', 'nocturno', 'terraza'], price: 'mid', best_time: 'noche', visits: 534 },
+      { title: 'Metrocable a Santo Domingo', type: 'activity', address: 'Estación Acevedo, Metrocable', lat: 6.2813, lng: -75.5583, notes: 'El teleférico que transforma comunas en destino turístico. Vistas increíbles de la ciudad. Usa el metro normal hasta Acevedo y sube. Completamente seguro.', tags: ['teleférico', 'comunas', 'vistas'], price: 'low', best_time: 'tarde', visits: 423 },
+      { title: 'Pergamino Café', type: 'food', address: 'Av. El Poblado 43A-106', lat: 6.2104, lng: -75.5680, notes: 'El mejor café de especialidad de Medellín. Granos colombianos de alta calidad, baristas expertos. Perfecto para trabajar o empezar el día. Cola frecuente pero rápida.', tags: ['café', 'especialidad', 'workfriendly'], price: 'mid', best_time: 'mañana', visits: 389 },
+    ],
+    'Cartagena': [
+      { title: 'Ciudad Amurallada al atardecer', type: 'sight', address: 'Ciudad Amurallada, Cartagena', lat: 10.4236, lng: -75.5508, notes: 'Caminar las murallas al atardecer es uno de los mejores momentos de Colombia. Las casas de colores se iluminan con la luz dorada. Lleva agua — hace mucho calor.', tags: ['murallas', 'sunset', 'colonial'], price: 'low', best_time: 'tarde', visits: 712 },
+      { title: 'Getsemaní', type: 'sight', address: 'Barrio Getsemaní, Cartagena', lat: 10.4258, lng: -75.5539, notes: 'El barrio más auténtico de Cartagena. Street art increíble, arepas de huevo en la esquina y menos turistas que el centro. De noche hay salsa en la calle.', tags: ['streetart', 'local', 'salsa'], price: 'low', best_time: 'tarde', visits: 456 },
+    ],
+  },
 
-  // INDIA
-  'delhi': [
-    { title: 'Red Fort', type: 'sight', notes: 'Fortaleza Mughal declarada Patrimonio de la Humanidad', address: 'Netaji Subhash Marg, Lal Qila, Delhi' },
-    { title: 'Jama Masjid', type: 'sight', notes: 'La mezquita más grande de India', address: 'Jama Masjid Rd, Old Delhi' },
-    { title: 'Chandni Chowk', type: 'shopping', notes: 'El bazar más antiguo y caótico de Delhi', address: 'Chandni Chowk, Old Delhi' },
-    { title: 'Humayun\'s Tomb', type: 'sight', notes: 'Precursora del Taj Mahal, menos turistas', address: 'Mathura Rd, Nizamuddin, Delhi' },
-  ],
-  'agra': [
-    { title: 'Taj Mahal', type: 'sight', notes: 'Una de las 7 maravillas del mundo. Entrar al amanecer', address: 'Dharmapuri, Agra, Uttar Pradesh' },
-    { title: 'Agra Fort', type: 'sight', notes: 'Fortaleza con vistas al Taj Mahal', address: 'Rakabganj, Agra' },
-    { title: 'Mehtab Bagh', type: 'sight', notes: 'Los jardines frente al Taj, perfectos para la puesta de sol', address: 'Nagla Devjit, Agra' },
-  ],
+  // ── ARGENTINA ─────────────────────────────────────────────────────────────
+  'Argentina': {
+    'Buenos Aires': [
+      { title: 'Feria de San Telmo', type: 'shopping', address: 'Defensa 1050, San Telmo', lat: -34.6213, lng: -58.3731, notes: 'El mercado de pulgas más famoso de BA, solo los domingos. Antigüedades, tango en la calle y empanadas. Llega antes de las 11h para ver lo mejor antes de las hordas.', tags: ['feria', 'domingo', 'tango'], price: 'low', best_time: 'mañana', visits: 623 },
+      { title: 'La Birrera', type: 'food', address: 'Lavalle 947, San Nicolás', lat: -34.6028, lng: -58.3833, notes: 'Parrilla bonaerense de toda la vida. Vacío, entraña y chorizo al punto. Sin reservas. Los vinos de la casa son perfectos. El mejor precio-calidad de la ciudad.', tags: ['parrilla', 'vacío', 'auténtico'], price: 'mid', best_time: 'noche', visits: 345 },
+      { title: 'Caminito La Boca', type: 'sight', address: 'Caminito, La Boca', lat: -34.6345, lng: -58.3631, notes: 'Las casas de chapa de colores más fotogénicas de BA. Solo visitar de día y no alejarse de la calle principal. Tango en vivo y mucho color.', tags: ['colorido', 'tango', 'fotográfico'], price: 'low', best_time: 'mediodía', visits: 789 },
+      { title: 'El Ateneo Grand Splendid', type: 'sight', address: 'Av. Santa Fe 1860, Recoleta', lat: -34.5959, lng: -58.3929, notes: 'La librería más bonita del mundo según National Geographic. Teatro convertido en librería. Incluso si no compras nada, merece la visita solo por verla.', tags: ['librería', 'arquitectura', 'imprescindible'], price: 'low', best_time: 'tarde', visits: 934 },
+    ],
+  },
 
-  // COREA DEL SUR
-  'seoul': [
-    { title: 'Gyeongbokgung Palace', type: 'sight', notes: 'El palacio más grande de la dinastía Joseon', address: 'Sejongno, Jongno-gu, Seoul' },
-    { title: 'Bukchon Hanok Village', type: 'sight', notes: 'Barrio de casas tradicionales coreanas (hanok)', address: 'Gahoe-dong, Jongno-gu, Seoul' },
-    { title: 'Myeongdong', type: 'shopping', notes: 'El paraíso del K-beauty y la moda coreana', address: 'Myeongdong, Jung-gu, Seoul' },
-    { title: 'N Seoul Tower', type: 'sight', notes: 'Torre icónica con vistas panorámicas de la ciudad', address: 'Yongsan-gu, Seoul' },
-    { title: 'Gwangjang Market', type: 'food', notes: 'Mercado histórico con bindaetteok y bibimbap auténtico', address: 'Jongno, Seoul' },
-  ],
+  // ── PERÚ ──────────────────────────────────────────────────────────────────
+  'Perú': {
+    'Cusco': [
+      { title: 'Mirador de San Blas', type: 'sight', address: 'Barrio de San Blas, Cusco', lat: -13.5155, lng: -71.9773, notes: 'Las mejores vistas del centro histórico de Cusco. El barrio de artesanos es el más bonito de la ciudad. Sube caminando — aclimatación obligatoria.', tags: ['mirador', 'artesanos', 'vistas'], price: 'low', best_time: 'tarde', visits: 534 },
+      { title: 'Mercado de San Pedro', type: 'food', address: 'C. Cascaparo, Cusco', lat: -13.5218, lng: -71.9794, notes: 'El mercado local de Cusco. Desayuno cusqueño por menos de 5 soles: api morada, tamales y chicharrón. Los turistas van al de San Blas pero este es el real.', tags: ['mercado', 'local', 'desayuno'], price: 'low', best_time: 'mañana', visits: 378 },
+    ],
+    'Lima': [
+      { title: 'Miraflores Malecón', type: 'sight', address: 'Malecón de la Reserva, Miraflores', lat: -12.1328, lng: -77.0282, notes: 'El acantilado sobre el Pacífico más impresionante de Lima. Parapente disponible. Al atardecer con la ciudad de fondo es espectacular.', tags: ['acantilado', 'pacífico', 'parapente'], price: 'low', best_time: 'tarde', visits: 623 },
+      { title: 'Central Restaurante', type: 'food', address: 'Av. Pedro de Osma 301, Barranco', lat: -12.1461, lng: -77.0219, notes: 'El mejor restaurante de Latinoamérica según rankings mundiales. Cocina de Virgilio Martínez. Reserva con meses de antelación. Una experiencia única de gastronomía peruana.', tags: ['fine dining', 'virgilio', 'imprescindible'], price: 'high', best_time: 'noche', visits: 234 },
+    ],
+  },
 
-  // MARRUECOS
-  'marrakech': [
-    { title: 'Jemaa el-Fna', type: 'sight', notes: 'La plaza más famosa de África, llena de vida día y noche', address: 'Jemaa el-Fna, Marrakech' },
-    { title: 'Souks de Marrakech', type: 'shopping', notes: 'Laberinto de mercados tradicionales', address: 'Medina, Marrakech' },
-    { title: 'Bahia Palace', type: 'sight', notes: 'Palacio del siglo XIX con patios y jardines increíbles', address: 'Rue Riad Zitoun el Jedid, Marrakech' },
-    { title: 'Jardín Majorelle', type: 'sight', notes: 'Jardín botánico y museo Berber de Yves Saint Laurent', address: 'Rue Yves Saint Laurent, Marrakech' },
-    { title: 'Café des Épices', type: 'food', notes: 'Terraza con vistas a la plaza de las especias', address: '75 Rahba Lakdima, Marrakech' },
-  ],
+  // ── FRANCIA ───────────────────────────────────────────────────────────────
+  'Francia': {
+    'París': [
+      { title: 'Sacré-Cœur al amanecer', type: 'sight', address: '35 Rue du Chevalier de la Barre, 75018', lat: 48.8867, lng: 2.3431, notes: 'La basílica sin turistas. Antes de las 7h tienes Montmartre para ti solo. Las vistas de París al amanecer son imposibles de superar. Lleva un croissant.', tags: ['amanecer', 'montmartre', 'vistas'], price: 'low', best_time: 'mañana', visits: 812 },
+      { title: 'Marché d\'Aligre', type: 'food', address: 'Place d\'Aligre, 75012', lat: 48.8494, lng: 2.3783, notes: 'El mercado más auténtico de París, lejos del turismo. Frutas, quesos y vino natural. Los domingos hay además un mercado de pulgas. Precios de mercado local, no turístico.', tags: ['mercado', 'local', 'queso'], price: 'low', best_time: 'mañana', visits: 345 },
+      { title: 'Canal Saint-Martin', type: 'sight', address: 'Canal Saint-Martin, 75010', lat: 48.8703, lng: 2.3636, notes: 'El canal más bonito de París. Terrazas de cafés, puentes de hierro y parisinos comiendo en la orilla. Los sábados hay mercadillo. Zona muy local.', tags: ['canal', 'terrazas', 'local'], price: 'low', best_time: 'tarde', visits: 567 },
+    ],
+  },
 
-  // TURQUÍA
-  'istanbul': [
-    { title: 'Hagia Sophia', type: 'sight', notes: 'Basílica-mezquita del siglo VI, imprescindible', address: 'Sultanahmet, Fatih, Istanbul' },
-    { title: 'Grand Bazaar', type: 'shopping', notes: 'Uno de los mercados cubiertos más grandes del mundo', address: 'Beyazit, Fatih, Istanbul' },
-    { title: 'Bosphorus Cruise', type: 'activity', notes: 'Crucero entre Europa y Asia, vistas únicas', address: 'Eminonu Pier, Istanbul' },
-    { title: 'Blue Mosque', type: 'sight', notes: 'La única mezquita de Estambul con 6 alminares', address: 'Sultanahmet, Fatih, Istanbul' },
-    { title: 'Galata Tower', type: 'sight', notes: 'Torre medieval con vistas 360° de la ciudad', address: 'Galata, Beyoglu, Istanbul' },
-    { title: 'Karakoy Gulluoglu', type: 'food', notes: 'El baklava más famoso de Estambul desde 1949', address: 'Mumhane Cad 171, Karakoy' },
-  ],
+  // ── ITALIA ────────────────────────────────────────────────────────────────
+  'Italia': {
+    'Roma': [
+      { title: 'Gianicolo al amanecer', type: 'sight', address: 'Passeggiata del Gianicolo, Roma', lat: 41.8926, lng: 12.4673, notes: 'Las mejores vistas de Roma sin turistas. Subida a pie de 20 min desde Trastevere. Los domingos hay espectáculo de marionetas para niños. La cañonada del mediodía es una tradición.', tags: ['vistas', 'amanecer', 'colina'], price: 'low', best_time: 'mañana', visits: 445 },
+      { title: 'Testaccio Market', type: 'food', address: 'Via Galvani, Roma', lat: 41.8763, lng: 12.4785, notes: 'El mercado gastronómico más auténtico de Roma. Supplì, porchetta y frutta fresca. Precios de mercado local. El box 15 tiene la mejor pizza al taglio de la ciudad.', tags: ['mercado', 'supplì', 'local'], price: 'low', best_time: 'mediodía', visits: 378 },
+    ],
+    'Florencia': [
+      { title: 'Piazzale Michelangelo al atardecer', type: 'sight', address: 'Piazzale Michelangelo, Firenze', lat: 43.7629, lng: 11.2652, notes: 'La panorámica más famosa de Florencia. En verano lleno de turistas pero merece la pena. Sube a pie por los jardines (20 min) o en autobús. Lleva algo de beber.', tags: ['panorámica', 'sunset', 'imprescindible'], price: 'low', best_time: 'tarde', visits: 789 },
+    ],
+  },
 
-  // GRECIA
-  'athens': [
-    { title: 'Acropolis', type: 'sight', notes: 'El símbolo de la civilización occidental. Ir por la mañana', address: 'Acropolis, Athens' },
-    { title: 'Monastiraki Flea Market', type: 'shopping', notes: 'Mercadillo ecléctico en el corazón de Atenas', address: 'Monastiraki, Athens' },
-    { title: 'Plaka District', type: 'sight', notes: 'El barrio más pintoresco de Atenas, al pie de la Acrópolis', address: 'Plaka, Athens' },
-    { title: 'Tzitzikas Kai Mermigas', type: 'food', notes: 'Taverna moderna con los mejores mezes de la ciudad', address: '12 Mitropoleos, Athens' },
-  ],
+  // ── TAILANDIA ─────────────────────────────────────────────────────────────
+  'Tailandia': {
+    'Bangkok': [
+      { title: 'Wat Arun al amanecer', type: 'sight', address: '158 Thanon Wang Doem, Bangkok', lat: 13.7437, lng: 100.4888, notes: 'El templo del amanecer desde el otro lado del río. Toma el ferry (4 baht) desde Tha Tien. Antes de las 8h estás casi solo. Las vistas de Wat Arun reflejado en el agua son mágicas.', tags: ['templo', 'amanecer', 'río'], price: 'low', best_time: 'mañana', visits: 678 },
+      { title: 'Or Tor Kor Market', type: 'food', address: 'Kamphaeng Phet 1 Rd, Bangkok', lat: 13.7989, lng: 100.5498, notes: 'El mercado de frutas más bonito de Bangkok. Mangos, durian, mangostán y todo tipo de fruta tropical. El restaurante interior tiene curry excelente. Muy local.', tags: ['frutas', 'curry', 'local'], price: 'low', best_time: 'mañana', visits: 345 },
+      { title: 'Khao San Road de noche', type: 'sight', address: 'Khao San Road, Phra Nakhon', lat: 13.7588, lng: 100.4974, notes: 'La calle más famosa de Bangkok. Caótica, ruidosa y absolutamente única. Cervezas baratas, comida callejera y todos los viajeros del mundo. Amor u odio, hay que verla.', tags: ['mochileros', 'nocturno', 'caótico'], price: 'low', best_time: 'noche', visits: 912 },
+    ],
+    'Chiang Mai': [
+      { title: 'Doi Suthep al amanecer', type: 'sight', address: 'Doi Suthep-Pui National Park', lat: 18.8047, lng: 98.9216, notes: 'El templo en la montaña sobre Chiang Mai. Sale una songthaew (pickup compartido) desde el centro por 50 baht. Al amanecer las nubes rodean el templo. Espectacular.', tags: ['templo', 'montaña', 'amanecer'], price: 'low', best_time: 'mañana', visits: 534 },
+    ],
+  },
 
-  // ITALIA
-  'rome': [
-    { title: 'Colosseum', type: 'sight', notes: 'El anfiteatro romano más grande del mundo. Reservar online', address: 'Piazza del Colosseo, Rome' },
-    { title: 'Trevi Fountain', type: 'sight', notes: 'La fuente más famosa del mundo. Mejor de madrugada', address: 'Piazza di Trevi, Rome' },
-    { title: 'Vatican Museums', type: 'sight', notes: 'La Capilla Sixtina y los museos del Vaticano', address: 'Viale Vaticano, Vatican City' },
-    { title: 'Trastevere', type: 'sight', notes: 'El barrio más auténtico de Roma para cenar', address: 'Trastevere, Rome' },
-    { title: 'Supplì Roma', type: 'food', notes: 'Las mejores supplì (croquetas de arroz) de Roma', address: 'Via di San Francesco a Ripa 137, Rome' },
-  ],
-  'florence': [
-    { title: 'Uffizi Gallery', type: 'sight', notes: 'El mejor museo del Renacimiento. Reserva con antelación', address: 'Piazzale degli Uffizi, Florence' },
-    { title: 'Ponte Vecchio', type: 'sight', notes: 'El puente medieval más famoso de Italia', address: 'Ponte Vecchio, Florence' },
-    { title: 'Mercato Centrale', type: 'food', notes: 'Mercado histórico con la mejor comida florentina', address: 'Piazza del Mercato Centrale, Florence' },
-    { title: 'Piazzale Michelangelo', type: 'sight', notes: 'Las mejores vistas de Florencia, ideal al atardecer', address: 'Piazzale Michelangelo, Florence' },
-  ],
-  'venice': [
-    { title: 'St. Mark\'s Basilica', type: 'sight', notes: 'La catedral más espectacular de Italia', address: 'Piazza San Marco, Venice' },
-    { title: 'Rialto Market', type: 'food', notes: 'El mercado de pescado más antiguo de Venecia', address: 'Rialto, San Polo, Venice' },
-    { title: 'Burano Island', type: 'sight', notes: 'La isla de las casas de colores, a 40 min en vaporetto', address: 'Burano, Venice' },
-    { title: 'Cicchetti Bar All\'Arco', type: 'food', notes: 'Los mejores cicchetti (tapas venecianas) de la ciudad', address: 'Calle Arco 436, Rialto, Venice' },
-  ],
+  // ── MARRUECOS ─────────────────────────────────────────────────────────────
+  'Marruecos': {
+    'Marrakech': [
+      { title: 'Jardín Majorelle al abrir', type: 'sight', address: 'Rue Yves St Laurent, Marrakech', lat: 31.6416, lng: -8.0000, notes: 'El jardín azul más famoso de Marrakech. Llega justo cuando abre (9h) para estar casi solo. Diseñado por Yves Saint Laurent. Los cactus y el azul cobalto son únicos.', tags: ['jardín', 'azul', 'fotográfico'], price: 'mid', best_time: 'mañana', visits: 723 },
+      { title: 'Derb Chtouka at dusk', type: 'sight', address: 'Medina de Marrakech', lat: 31.6258, lng: -7.9891, notes: 'Perderse por las calles de la medina al atardecer. Los souks se llenan de luz naranja. Contrata un guía local para la primera vez (20 dirhams) — el laberinto es real.', tags: ['medina', 'souk', 'sunset'], price: 'low', best_time: 'tarde', visits: 456 },
+    ],
+  },
 
-  // ESPAÑA
-  'barcelona': [
-    { title: 'Sagrada Família', type: 'sight', notes: 'La obra maestra de Gaudí. Reservar con meses de antelación', address: 'Carrer de Mallorca 401, Barcelona' },
-    { title: 'Park Güell', type: 'sight', notes: 'Jardín de mosaicos de Gaudí con vistas a la ciudad', address: 'Carrer d\'Olot, Barcelona' },
-    { title: 'La Boqueria', type: 'food', notes: 'El mercado más famoso de Barcelona', address: 'La Rambla 91, Barcelona' },
-    { title: 'El Born', type: 'sight', notes: 'El barrio más cool de Barcelona, lleno de bares y arte', address: 'El Born, Barcelona' },
-    { title: 'Bar El Xampanyet', type: 'food', notes: 'La mejor bodega de pintxos de El Born', address: 'Carrer de Montcada 22, Barcelona' },
-  ],
-  'madrid': [
-    { title: 'Museo del Prado', type: 'sight', notes: 'Uno de los mejores museos del mundo. Imprescindible', address: 'Calle Ruiz de Alarcón 23, Madrid' },
-    { title: 'Mercado de San Miguel', type: 'food', notes: 'Mercado gourmet en el corazón de Madrid', address: 'Plaza de San Miguel, Madrid' },
-    { title: 'Retiro Park', type: 'activity', notes: 'El pulmón verde de Madrid. Alquilar barcas en el lago', address: 'Plaza de la Independencia 7, Madrid' },
-    { title: 'Sobrino de Botín', type: 'food', notes: 'El restaurante más antiguo del mundo (1725)', address: 'Calle de los Cuchilleros 17, Madrid' },
-  ],
-
-  // FRANCIA
-  'paris': [
-    { title: 'Eiffel Tower', type: 'sight', notes: 'El símbolo de París. Subir al atardecer para el mejor show de luces', address: 'Champ de Mars, 5 Av. Anatole France, Paris' },
-    { title: 'Louvre Museum', type: 'sight', notes: 'El museo más visitado del mundo. Reservar online', address: 'Rue de Rivoli, Paris' },
-    { title: 'Montmartre', type: 'sight', notes: 'El barrio bohemio de los artistas', address: 'Montmartre, Paris' },
-    { title: 'Marché des Enfants Rouges', type: 'food', notes: 'El mercado cubierto más antiguo de París (1615)', address: '39 Rue de Bretagne, Paris' },
-    { title: 'Sainte-Chapelle', type: 'sight', notes: 'Las vidrieras góticas más impresionantes de Europa', address: '8 Bd du Palais, Paris' },
-  ],
-
-  // REINO UNIDO
-  'london': [
-    { title: 'British Museum', type: 'sight', notes: 'El museo más visitado del mundo. Entrada gratuita', address: 'Great Russell St, London' },
-    { title: 'Borough Market', type: 'food', notes: 'El mercado gastronómico más famoso de Londres', address: '8 Southwark St, London' },
-    { title: 'Tower of London', type: 'sight', notes: 'Fortaleza medieval con las joyas de la Corona', address: 'Tower of London, London' },
-    { title: 'Shoreditch', type: 'sight', notes: 'El barrio del street art y las startups', address: 'Shoreditch, London' },
-    { title: 'Dishoom', type: 'food', notes: 'El mejor restaurante indio-irani de Londres, colas épicas', address: '12 Upper St Martin\'s Lane, London' },
-  ],
-
-  // ALEMANIA
-  'berlin': [
-    { title: 'Brandenburg Gate', type: 'sight', notes: 'El símbolo de la reunificación alemana', address: 'Pariser Platz, Berlin' },
-    { title: 'East Side Gallery', type: 'sight', notes: '1,3 km del muro de Berlín convertido en galería de arte', address: 'Mühlenstraße 3-100, Berlin' },
-    { title: 'Markthalle Neun', type: 'food', notes: 'Mercado gourmet en Kreuzberg, mejor los jueves', address: 'Eisenbahnstraße 42-43, Berlin' },
-    { title: 'Museum Island', type: 'sight', notes: 'Cinco museos en una isla en el centro de Berlín', address: 'Museum Island, Mitte, Berlin' },
-  ],
-
-  // PORTUGAL
-  'lisbon': [
-    { title: 'Alfama District', type: 'sight', notes: 'El barrio más antiguo de Lisboa, precioso al atardecer', address: 'Alfama, Lisbon' },
-    { title: 'Pastéis de Belém', type: 'food', notes: 'Los pasteles de nata originales desde 1837', address: 'Rua de Belém 84-92, Lisbon' },
-    { title: 'Tram 28', type: 'transport', notes: 'El tranvía histórico que recorre los barrios más pintorescos', address: 'Largo Martim Moniz, Lisbon' },
-    { title: 'LX Factory', type: 'shopping', notes: 'Mercado dominical en una fábrica del siglo XIX', address: 'Rua Rodrigues Faria 103, Lisbon' },
-    { title: 'Miradouro da Graça', type: 'sight', notes: 'El mejor mirador de Lisboa, sin turistas', address: 'Largo da Graça, Lisbon' },
-  ],
-
-  // EEUU
-  'new york': [
-    { title: 'Central Park', type: 'activity', notes: '341 hectáreas de naturaleza en el centro de Manhattan', address: 'Central Park, New York, NY' },
-    { title: 'Metropolitan Museum of Art', type: 'sight', notes: 'Uno de los mejores museos del mundo', address: '1000 5th Ave, New York, NY' },
-    { title: 'Brooklyn Bridge', type: 'sight', notes: 'El puente más famoso de Nueva York. Cruzarlo a pie', address: 'Brooklyn Bridge, New York, NY' },
-    { title: 'Katz\'s Delicatessen', type: 'food', notes: 'El deli más famoso de NY, abierto desde 1888', address: '205 E Houston St, New York, NY' },
-    { title: 'High Line', type: 'activity', notes: 'Parque elevado sobre una vía de tren en desuso', address: 'High Line, New York, NY' },
-  ],
-  'los angeles': [
-    { title: 'Griffith Observatory', type: 'sight', notes: 'Vistas panorámicas de LA y las estrellas por la noche', address: '2800 E Observatory Rd, Los Angeles, CA' },
-    { title: 'Venice Beach', type: 'activity', notes: 'La playa más característica de LA con el paseo Muscle Beach', address: 'Venice Beach, Los Angeles, CA' },
-    { title: 'Getty Center', type: 'sight', notes: 'Museo de arte gratuito con vistas espectaculares', address: '1200 Getty Center Dr, Los Angeles, CA' },
-    { title: 'Grand Central Market', type: 'food', notes: 'Mercado histórico con lo mejor de la gastronomía angelina', address: '317 S Broadway, Los Angeles, CA' },
-  ],
-
-  // MÉXICO
-  'ciudad de mexico': [
-    { title: 'Teotihuacán', type: 'sight', notes: 'Pirámides a 50 km de la ciudad. Ir al amanecer', address: 'Teotihuacán, Estado de México' },
-    { title: 'Xochimilco', type: 'activity', notes: 'Canales con trajineras de colores y música en vivo', address: 'Xochimilco, CDMX' },
-    { title: 'Museo Nacional de Antropología', type: 'sight', notes: 'El mejor museo de arqueología prehispánica del mundo', address: 'Av. Paseo de la Reforma, CDMX' },
-    { title: 'Mercado de Medellín', type: 'food', notes: 'El mercado más auténtico de la Roma, sin turistas', address: 'Calle Medellín 234, Colonia Roma' },
-    { title: 'Taqueria Los Cocuyos', type: 'food', notes: 'Los mejores tacos nocturnos del centro histórico', address: 'Calle Aranda 14, Centro Histórico' },
-  ],
-
-  // COLOMBIA
-  'cartagena': [
-    { title: 'Ciudad Amurallada', type: 'sight', notes: 'El casco histórico más bello de Colombia, Patrimonio UNESCO', address: 'Centro, Cartagena de Indias' },
-    { title: 'Castillo San Felipe', type: 'sight', notes: 'La fortaleza española más grande de América', address: 'Carrera 17, San Felipe, Cartagena' },
-    { title: 'La Vitrola', type: 'food', notes: 'El restaurante más famoso de Cartagena, gastronomía caribeña', address: 'Calle Baloco 2-01, Cartagena' },
-    { title: 'Playa Blanca', type: 'activity', notes: 'La playa más bonita cerca de Cartagena, en las Islas del Rosario', address: 'Isla Barú, Cartagena' },
-  ],
-
-  // ARGENTINA
-  'buenos aires': [
-    { title: 'La Boca - El Caminito', type: 'sight', notes: 'El barrio más colorido de Buenos Aires', address: 'El Caminito, La Boca, Buenos Aires' },
-    { title: 'San Telmo Market', type: 'shopping', notes: 'Mercado vintage y antigüedades en el barrio más antiguo', address: 'Defensa 961, San Telmo, Buenos Aires' },
-    { title: 'Recoleta Cemetery', type: 'sight', notes: 'El cementerio más fascinante del mundo, con la tumba de Evita', address: 'Junín 1760, Recoleta, Buenos Aires' },
-    { title: 'Don Julio', type: 'food', notes: 'La mejor parrilla de Buenos Aires según muchos porteños', address: 'Guatemala 4691, Palermo, Buenos Aires' },
-  ],
-
-  // EMIRATOS ÁRABES
-  'dubai': [
-    { title: 'Burj Khalifa', type: 'sight', notes: 'El edificio más alto del mundo. Subir al atardecer', address: '1 Sheikh Mohammed Bin Rashid Blvd, Dubai' },
-    { title: 'Dubai Creek', type: 'sight', notes: 'El corazón histórico de Dubai, cruzar en abra', address: 'Al Seef, Bur Dubai' },
-    { title: 'Gold Souk', type: 'shopping', notes: 'El mercado de oro más grande del mundo', address: 'Gold Souk, Deira, Dubai' },
-    { title: 'Al Ustad Special Kabab', type: 'food', notes: 'Kebabs legendarios en Bur Dubai desde los 70s', address: 'Bur Dubai, Dubai' },
-  ],
-
-  // SINGAPUR
-  'singapore': [
-    { title: 'Gardens by the Bay', type: 'sight', notes: 'El jardín futurista con Supertrees. El show de luces es gratis', address: '18 Marina Gardens Dr, Singapore' },
-    { title: 'Hawker Centre Maxwell', type: 'food', notes: 'El hawker centre más famoso de Singapur, Hainanese Chicken Rice', address: '1 Kadayanallur St, Singapore' },
-    { title: 'Marina Bay Sands', type: 'sight', notes: 'El hotel icónico con la piscina infinita más alta del mundo', address: '10 Bayfront Ave, Singapore' },
-    { title: 'Chinatown Heritage Centre', type: 'sight', notes: 'El barrio chino más auténtico del sudeste asiático', address: '48 Pagoda St, Singapore' },
-  ],
+  // ── PORTUGAL ──────────────────────────────────────────────────────────────
+  'Portugal': {
+    'Lisboa': [
+      { title: 'Miradouro da Graça', type: 'sight', address: 'Largo da Graça, Lisboa', lat: 38.7165, lng: -9.1302, notes: 'El mirador más local de Lisboa, sin turistas. Vistas del castillo y el río. Los vecinos vienen a tomar cerveza al atardecer. Mucho mejor que el Portas do Sol.', tags: ['mirador', 'local', 'sunset'], price: 'low', best_time: 'tarde', visits: 534 },
+      { title: 'Tasca do Chico', type: 'food', address: 'R. do Diário de Notícias 39, Lisboa', lat: 38.7116, lng: -9.1433, notes: 'El fado más auténtico de Lisboa. Pequeño, íntimo, sin turismo masivo. Solo 20 mesas — reserva imprescindible. El bacalhau à Brás es de los mejores de la ciudad.', tags: ['fado', 'bacalhau', 'auténtico'], price: 'mid', best_time: 'noche', visits: 389 },
+      { title: 'LX Factory el domingo', type: 'shopping', address: 'R. Rodrigues de Faria 103, Lisboa', lat: 38.7027, lng: -9.1762, notes: 'El mercado hipster de Lisboa en una fábrica abandonada. Los domingos hay mercadillo, food trucks y música en vivo. Las librerías son increíbles. Ambiente muy cool.', tags: ['mercadillo', 'hipster', 'domingo'], price: 'low', best_time: 'mediodía', visits: 445 },
+    ],
+    'Porto': [
+      { title: 'Livraria Lello', type: 'sight', address: 'R. das Carmelitas 144, Porto', lat: 41.1470, lng: -8.6151, notes: 'La librería que inspiró Harry Potter. Cola inevitable, pero comprar un libro por 3€ te da acceso. Las escaleras de madera son impresionantes. Llega antes de las 10h.', tags: ['librería', 'arquitectura', 'imprescindible'], price: 'low', best_time: 'mañana', visits: 867 },
+      { title: 'Cais da Ribeira al atardecer', type: 'sight', address: 'Cais da Ribeira, Porto', lat: 41.1408, lng: -8.6136, notes: 'El paseo fluvial más bonito de Portugal. Las casas de colores reflejadas en el Douro al atardecer son mágicas. Las tascas de la orilla tienen el mejor vino del Porto.', tags: ['ribeira', 'douro', 'sunset'], price: 'low', best_time: 'tarde', visits: 712 },
+    ],
+  },
 };
 
-// ── Spots genéricos por tipo de destino ──────────────────────────────────────
-
-const genericSpotsByCountry = {
-  'japan': [
-    { title: '7-Eleven Japan', type: 'food', notes: 'Los konbini japoneses son un fenómeno: onigiri, ramen y mucho más a cualquier hora' },
-    { title: 'Onsen local', type: 'activity', notes: 'Baño termal tradicional japonés. Busca los sentos públicos, más baratos que los resorts' },
-    { title: 'Depachika', type: 'food', notes: 'La planta de alimentación de los grandes almacenes japoneses. Una joya gastronómica' },
-  ],
-  'thailand': [
-    { title: 'Night market local', type: 'food', notes: 'Los mercados nocturnos tailandeses son la mejor forma de comer auténtico y barato' },
-    { title: 'Wat local', type: 'sight', notes: 'Cada pueblo tailandés tiene un templo budista que merece una visita tranquila' },
-    { title: 'Masaje tailandés tradicional', type: 'activity', notes: 'Masaje de 1 hora por 5-10€. Busca los que usan mat en el suelo' },
-  ],
-  'vietnam': [
-    { title: 'Pho local', type: 'food', notes: 'La sopa nacional de Vietnam. Busca los locales sin carta en inglés' },
-    { title: 'Bia Hoi Corner', type: 'food', notes: 'La cerveza más barata del mundo (20 centavos) en pequeñas sillas de plástico' },
-    { title: 'Motorbike street food tour', type: 'activity', notes: 'La mejor forma de explorar la gastronomía callejera vietnamita' },
-  ],
-  'morocco': [
-    { title: 'Hammam local', type: 'activity', notes: 'Baño árabe tradicional. Evita los turísticos y busca los de barrio' },
-    { title: 'Mechoui local', type: 'food', notes: 'Cordero asado en horno de barro. La comida más auténtica de Marruecos' },
-    { title: 'Riad con terraza', type: 'sight', notes: 'Pide subir a la terraza de cualquier riad para vistas sobre la medina' },
-  ],
-  'italy': [
-    { title: 'Aperitivo local', type: 'food', notes: 'Entre las 18 y las 20h, muchos bares sirven aperitivo con snacks incluidos' },
-    { title: 'Mercato locale', type: 'food', notes: 'El mercado local es siempre más auténtico que los turísticos' },
-    { title: 'Gellateria artigianale', type: 'food', notes: 'Busca gelatería con cubetas cubiertas, señal de que es artesanal' },
-  ],
-};
-
-// ── Función principal ─────────────────────────────────────────────────────────
-
-/**
- * Devuelve spots destacados para una ciudad y/o país dados.
- * @param {string} cityName - Nombre de la ciudad
- * @param {string} countryName - Nombre del país (en inglés o español)
- * @returns {{ spots: Array, hasData: boolean }}
- */
-export function getSpotsForDestination(cityName = '', countryName = '') {
-  const cityKey = cityName.toLowerCase().trim();
-  const countryKey = countryName.toLowerCase().trim();
-
-  const citySpots = spotsByCity[cityKey] || [];
-
-  // Intentar país en inglés o español
-  const countryKeyMap = {
-    'japón': 'japan', 'japan': 'japan',
-    'tailandia': 'thailand', 'thailand': 'thailand',
-    'vietnam': 'vietnam',
-    'marruecos': 'morocco', 'morocco': 'morocco',
-    'italia': 'italy', 'italy': 'italy',
-  };
-  const normalizedCountry = countryKeyMap[countryKey] || countryKey;
-  const countrySpots = genericSpotsByCountry[normalizedCountry] || [];
-
-  // Combinar: primero los de ciudad, luego los genéricos del país
-  const combined = [...citySpots, ...countrySpots];
-
-  return {
-    spots: combined,
-    hasData: combined.length > 0,
-    cityOnly: citySpots.length > 0,
-  };
+export function getSeedSpotsForCity(country, city) {
+  return SEED_SPOTS[country]?.[city] || [];
 }
 
-/**
- * Devuelve las ciudades disponibles en la DB.
- */
-export function getAvailableCities() {
-  return Object.keys(spotsByCity);
+export function getSeedSpotsForCountry(country) {
+  const countryData = SEED_SPOTS[country] || {};
+  return Object.entries(countryData).flatMap(([city, spots]) =>
+    spots.map(s => ({ ...s, city_name: city, country }))
+  );
 }
 
-/**
- * Busca spots por texto en título o notas.
- * @param {string} query
- * @returns {Array}
- */
-export function searchSpots(query = '') {
-  const q = query.toLowerCase().trim();
-  if (!q) return [];
-
-  const results = [];
-  for (const [city, spots] of Object.entries(spotsByCity)) {
-    for (const spot of spots) {
-      if (
-        spot.title.toLowerCase().includes(q) ||
-        (spot.notes || '').toLowerCase().includes(q) ||
-        city.includes(q)
-      ) {
-        results.push({ ...spot, city });
-      }
-    }
-  }
-  return results;
+export function getAvailableCountries() {
+  return Object.keys(SEED_SPOTS);
 }
 
-export { spotsByCity, genericSpotsByCountry };
+export function getAvailableCities(country) {
+  return Object.keys(SEED_SPOTS[country] || {});
+}
+
+export function getTopSpotsGlobal(limit = 20) {
+  const all = [];
+  Object.entries(SEED_SPOTS).forEach(([country, cities]) => {
+    Object.entries(cities).forEach(([city, spots]) => {
+      spots.forEach(s => all.push({ ...s, city_name: city, country }));
+    });
+  });
+  return all.sort((a, b) => (b.visits || 0) - (a.visits || 0)).slice(0, limit);
+}
