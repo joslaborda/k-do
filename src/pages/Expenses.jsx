@@ -327,6 +327,21 @@ export default function Expenses() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 pt-6 pb-20 -mt-12">
+        <Tabs defaultValue="gastos" className="space-y-4">
+          <TabsList className="bg-white border border-border w-full shadow-sm">
+            <TabsTrigger value="gastos" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              💸 Gastos
+            </TabsTrigger>
+            <TabsTrigger value="conversor" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+              💱 Conversor
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="conversor">
+            <CurrencyConverter baseCurrency={baseCurrency} tripCurrency={defaultCurrency}/>
+          </TabsContent>
+
+          <TabsContent value="gastos" className="space-y-4">
         {/* Balances Panel */}
         {!isLoading && (
           <div className="mb-8">
@@ -386,6 +401,10 @@ export default function Expenses() {
             </div>
           )}
         </div>
+      </div>
+
+      </TabsContent>
+        </Tabs>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
