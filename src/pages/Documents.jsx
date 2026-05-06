@@ -134,7 +134,11 @@ export default function Documents() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-orange-200 text-sm font-semibold uppercase tracking-widest mb-2">Tu viaje</p>
-              <h1 className="text-white text-4xl font-extrabold leading-tight">Documentos</h1>
+              <button onClick={() => window.history.back()} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            Mis viajes
+          </button>
+          <h1 className="text-white text-4xl font-extrabold leading-tight">Documentos</h1>
               <p className="text-orange-100/80 mt-2 text-sm">Vuelos, hoteles, trenes y más — todo en un lugar</p>
             </div>
             <Button
