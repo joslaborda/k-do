@@ -23,8 +23,8 @@ const globalNavItems = [
   { name: 'Perfil', page: 'Profile', icon: User },
 ];
 
-const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore'];
-const globalPages = ['Explore', 'Profile', 'Settings'];
+const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile'];
+const globalPages = ['Explore', 'Settings'];
 const tripOnlyPages = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
 
 export default function Layout({ children, currentPageName }) {
