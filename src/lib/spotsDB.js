@@ -184,3 +184,80 @@ export function getTopSpotsGlobal(limit = 20) {
   });
   return all.sort((a, b) => (b.visits || 0) - (a.visits || 0)).slice(0, limit);
 }
+
+// Append additional countries to SEED_SPOTS
+Object.assign(SEED_SPOTS, {
+
+  // ── CHINA ─────────────────────────────────────────────────────────────────
+  'China': {
+    'Shanghái': [
+      { title: 'The Bund al amanecer', type: 'sight', address: 'Zhongshan East 1st Rd, Huangpu', lat: 31.2400, lng: 121.4900, notes: 'El paseo con vistas al skyline de Pudong. Antes de las 7h estás casi solo. La luz del amanecer sobre los rascacielos es increíble. Gratis.', tags: ['skyline', 'amanecer', 'clásico'], price: 'low', best_time: 'mañana', visits: 892 },
+      { title: 'Tianzifang', type: 'sight', address: 'Taikang Lu, Huangpu', lat: 31.2119, lng: 121.4726, notes: 'El laberinto de callejones más bohemio de Shanghái. Galerías, cafés y tiendas de diseño en casas shikumen. Mejor entre semana para evitar colas.', tags: ['callejones', 'arte', 'bohemio'], price: 'mid', best_time: 'tarde', visits: 654 },
+      { title: 'Din Tai Fung', type: 'food', address: 'IFC Mall, Pudong', lat: 31.2359, lng: 121.5066, notes: 'Los xiaolongbao (dumplings de sopa) más famosos del mundo. Cola de 1-2h inevitable pero vale la pena. Pide también los fideos con salsa de sésamo.', tags: ['dumplings', 'xiaolongbao', 'clásico'], price: 'mid', best_time: 'mediodía', visits: 723 },
+      { title: 'Mercado de Yuyuan', type: 'sight', address: 'Anren Jie, Huangpu', lat: 31.2274, lng: 121.4920, notes: 'El jardín clásico chino más bonito de Shanghái. Rodeado de un mercado de artesanías y comida callejera. Los shengjian bao (bollos fritos) del mercado son increíbles.', tags: ['jardín', 'tradicional', 'artesanías'], price: 'low', best_time: 'mañana', visits: 567 },
+      { title: 'Xintiandi', type: 'sight', address: 'Xintiandi, Huangpu', lat: 31.2196, lng: 121.4733, notes: 'Barrio histórico transformado en zona de restaurantes y bares de lujo. Las casas shikumen son preciosas. Mejor de noche con las luces.', tags: ['barrio', 'nocturno', 'premium'], price: 'high', best_time: 'noche', visits: 445 },
+    ],
+    'Pekín': [
+      { title: 'Gran Muralla en Mutianyu', type: 'sight', address: 'Mutianyu, Huairou', lat: 40.4319, lng: 116.5704, notes: 'El tramo más bonito y menos masificado de la Gran Muralla. Téleferico de subida, tobogán de bajada. Llega antes de las 9h. A 2h de Pekín en bus.', tags: ['muralla', 'imprescindible', 'histórico'], price: 'mid', best_time: 'mañana', visits: 934 },
+      { title: 'Hutongs de Nanluoguxiang', type: 'sight', address: 'Nanluoguxiang, Dongcheng', lat: 39.9368, lng: 116.4030, notes: 'Los callejones tradicionales más animados de Pekín. Tiendas indie, street food y bares de sake. De noche hay ambiente increíble. Muy Instagram.', tags: ['hutongs', 'callejones', 'local'], price: 'low', best_time: 'tarde', visits: 678 },
+      { title: 'Templo del Cielo al amanecer', type: 'sight', address: 'Tiantan Donglu, Dongcheng', lat: 39.8823, lng: 116.4066, notes: 'El parque donde los pekineses hacen tai chi al amanecer. Ver a los abuelos bailar, hacer ejercicio y cantar es uno de los momentos más auténticos de China.', tags: ['tai chi', 'amanecer', 'auténtico'], price: 'low', best_time: 'mañana', visits: 756 },
+    ],
+    'Chengdu': [
+      { title: 'Base de investigación del panda gigante', type: 'activity', address: 'Panda Ave, Chengdu', lat: 30.7375, lng: 104.1503, notes: 'El mejor lugar del mundo para ver pandas gigantes. Llega antes de las 8h cuando están más activos (hora de alimentación). Bebés pandas en primavera.', tags: ['panda', 'imprescindible', 'naturaleza'], price: 'mid', best_time: 'mañana', visits: 845 },
+      { title: 'Hotpot en Haidilao', type: 'food', address: 'Varias ubicaciones en Chengdu', lat: 30.6571, lng: 104.0656, notes: 'El hotpot más famoso de China. Picante auténtico de Sichuan. Servicio increíble — te hacen la compra mientras esperas. El caldo mapo tofu es para valientes.', tags: ['hotpot', 'picante', 'sichuan'], price: 'mid', best_time: 'noche', visits: 612 },
+    ],
+  },
+
+  // ── VIETNAM ───────────────────────────────────────────────────────────────
+  'Vietnam': {
+    'Hanói': [
+      { title: 'Lago Hoan Kiem al amanecer', type: 'sight', address: 'Hoan Kiem Lake, Hoan Kiem', lat: 21.0285, lng: 105.8542, notes: 'El corazón de Hanói. Al amanecer los locales hacen ejercicio alrededor. El puente rojo al templo Ngoc Son es precioso. Gratis y sin turistas a las 6h.', tags: ['lago', 'amanecer', 'local'], price: 'low', best_time: 'mañana', visits: 678 },
+      { title: 'Bun cha en Huong Lien', type: 'food', address: '24 Le Van Huu, Hai Ba Trung', lat: 21.0209, lng: 105.8487, notes: 'El restaurante donde Obama comió con Anthony Bourdain. Bun cha (fideos con cerdo a la parrilla) por menos de 3€. Cola siempre pero rápida.', tags: ['buncha', 'obama', 'local'], price: 'low', best_time: 'mediodía', visits: 534 },
+      { title: 'Barrio antiguo de noche', type: 'sight', address: '36 Streets, Hoan Kiem', lat: 21.0341, lng: 105.8489, notes: 'Las 36 calles del barrio antiguo de noche. Cada calle vendía un gremio diferente. Los viernes y sábados se cierra al tráfico y se llena de gente.', tags: ['barrio antiguo', 'nocturno', 'histórico'], price: 'low', best_time: 'noche', visits: 445 },
+    ],
+    'Hội An': [
+      { title: 'Lantern release en el río', type: 'activity', address: 'Riverside, Hoi An', lat: 15.8801, lng: 108.3380, notes: 'Soltar linternas en el río Thu Bon al atardecer. Los vendedores te las ofrecen por 1-2 USD. El 14 de cada mes lunar hay festival de linternas con todo el pueblo iluminado.', tags: ['linternas', 'río', 'romántico'], price: 'low', best_time: 'noche', visits: 756 },
+      { title: 'Banh mi Phuong', type: 'food', address: '2B Phan Chau Trinh, Hoi An', lat: 15.8787, lng: 108.3323, notes: 'El banh mi más famoso de Vietnam. Anthony Bourdain lo llamó "el mejor sandwich del mundo". Cola siempre. 1.5 USD. Imprescindible.', tags: ['banhmi', 'bourdain', 'street food'], price: 'low', best_time: 'mañana', visits: 892 },
+    ],
+  },
+
+  // ── INDONESIA ─────────────────────────────────────────────────────────────
+  'Indonesia': {
+    'Bali': [
+      { title: 'Templo de Tanah Lot al atardecer', type: 'sight', address: 'Tanah Lot, Tabanan', lat: -8.6215, lng: 115.0865, notes: 'El templo sobre una roca en el mar más famoso de Bali. El atardecer detrás del templo es icónico. Muy concurrido — llega 1h antes para ver las fotos sin multitudes.', tags: ['templo', 'sunset', 'icónico'], price: 'low', best_time: 'tarde', visits: 934 },
+      { title: 'Terrazas de arroz de Tegalalang', type: 'sight', address: 'Tegalalang, Gianyar', lat: -8.4312, lng: 115.2793, notes: 'Las terrazas de arroz más fotogénicas de Bali. Las de Jatiluwih son más grandes y menos turísticas. Entrada 15k IDR. Mejor luz por la mañana.', tags: ['arrozales', 'fotográfico', 'naturaleza'], price: 'low', best_time: 'mañana', visits: 812 },
+      { title: 'Warung Babi Guling Ibu Oka', type: 'food', address: 'Jl. Tegal Sari, Ubud', lat: -8.5068, lng: 115.2629, notes: 'El cerdo asado balinés más famoso de Bali. Anthony Bourdain lo visitó en No Reservations. Llega antes de las 11h — se acaba. 50k IDR el plato.', tags: ['babiGuling', 'cerdo', 'balinés'], price: 'low', best_time: 'mañana', visits: 567 },
+    ],
+  },
+
+  // ── COREA DEL SUR ─────────────────────────────────────────────────────────
+  'Corea del Sur': {
+    'Seúl': [
+      { title: 'Bukchon Hanok Village', type: 'sight', address: 'Bukchon-ro, Jongno-gu', lat: 37.5826, lng: 126.9840, notes: 'El barrio de casas tradicionales hanok más bonito de Seúl. Vistas impresionantes al palacio Gyeongbok. Los viernes y fines de semana hay mucha gente — ve entre semana.', tags: ['hanok', 'tradicional', 'fotográfico'], price: 'low', best_time: 'mañana', visits: 723 },
+      { title: 'Mercado de Gwangjang', type: 'food', address: 'Gwangjang Market, Jongno-gu', lat: 37.5702, lng: 126.9995, notes: 'El mercado de comida callejera más famoso de Seúl. Bindaetteok (tortitas de mung bean), mayak kimbap y makgeolli. Visto en Street Food de Netflix.', tags: ['bindaetteok', 'kimbap', 'netflix'], price: 'low', best_time: 'mediodía', visits: 678 },
+      { title: 'Hongdae de noche', type: 'sight', address: 'Hongdae, Mapo-gu', lat: 37.5563, lng: 126.9219, notes: 'El barrio universitario más animado de Seúl. Música en directo en la calle, tiendas de K-pop, clubes y street food. Los viernes y sábados de noche es impresionante.', tags: ['kpop', 'nocturno', 'universitario'], price: 'mid', best_time: 'noche', visits: 589 },
+      { title: 'Namsan Seoul Tower', type: 'sight', address: 'Namsan-gil 105, Yongsan-gu', lat: 37.5512, lng: 126.9882, notes: 'Las mejores vistas panorámicas de Seúl. El teleférico es caro — sube a pie por el parque Namsan (30 min) y es gratis. Al atardecer la ciudad se ilumina.', tags: ['vistas', 'torre', 'panorámica'], price: 'low', best_time: 'tarde', visits: 812 },
+    ],
+  },
+
+  // ── INDIA ─────────────────────────────────────────────────────────────────
+  'India': {
+    'Delhi': [
+      { title: 'Chandni Chowk al amanecer', type: 'sight', address: 'Chandni Chowk, Old Delhi', lat: 28.6562, lng: 77.2300, notes: 'El mercado más caótico y fascinante de India. Al amanecer antes de que lleguen las multitudes. Templos sikh, mezquitas y parathas para desayunar por 50 rupias.', tags: ['mercado', 'caótico', 'histórico'], price: 'low', best_time: 'mañana', visits: 567 },
+    ],
+    'Rajastán': [
+      { title: 'Fuerte Mehrangarh de Jodhpur', type: 'sight', address: 'Fort Rd, Jodhpur', lat: 26.2975, lng: 73.0187, notes: 'El fuerte más impresionante de India. Vistas sobre la ciudad azul de Jodhpur. La audio guía es excelente. Atardecer desde el fuerte es memorable.', tags: ['fuerte', 'ciudad azul', 'rajastán'], price: 'mid', best_time: 'tarde', visits: 712 },
+    ],
+  },
+
+  // ── TAILANDIA (Añadir Phuket) ──────────────────────────────────────────────
+  // Ya existe Bangkok y Chiang Mai — añadir Phuket
+});
+
+// Add Phuket to Thailand
+if (SEED_SPOTS['Tailandia']) {
+  SEED_SPOTS['Tailandia']['Phuket'] = [
+    { title: 'Promthep Cape al atardecer', type: 'sight', address: 'Promthep Cape, Rawai', lat: 7.7714, lng: 98.3044, notes: 'El mejor atardecer de Phuket. Desde el cabo puedes ver el sol caer sobre el mar de Andamán. Muy concurrido — llega 45 min antes para conseguir sitio.', tags: ['atardecer', 'cabo', 'vistas'], price: 'low', best_time: 'tarde', visits: 723 },
+    { title: 'Mercado nocturno de Phuket Town', type: 'food', address: 'Thalang Rd, Phuket Town', lat: 7.8877, lng: 98.3923, notes: 'El mercado nocturno más auténtico de Phuket. Comida local, no turística. Los domingos la calle Thalang se convierte en el Sunday Walking Street. Imprescindible.', tags: ['nocturno', 'local', 'street food'], price: 'low', best_time: 'noche', visits: 456 },
+  ];
+}
