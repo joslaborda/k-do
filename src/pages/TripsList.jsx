@@ -271,10 +271,8 @@ export default function TripsList() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-white text-3xl font-black tracking-tight">Kōdo</h1>
-              {myProfile?.username && (
-                <p className="text-white/80 text-sm mt-0.5">Travel your way</p>
-            {myProfile?.username && <p className="text-white/60 text-xs font-mono mt-0.5">@{myProfile.username}</p>}
-              )}
+              <p className="text-white/80 text-sm mt-0.5">Travel your way</p>
+              {myProfile?.username && <p className="text-white/60 text-xs font-mono mt-0.5">@{myProfile.username}</p>}
             </div>
             <div className="flex items-center gap-2">
               {user?.id && <NotificationBell userId={user.id} />}
