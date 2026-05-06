@@ -68,6 +68,20 @@ export default function TripDetail() {
     enabled: !!tripId,
   });
 
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets', tripId],
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+
+  const { data: spots = [] } = useQuery({
+    queryKey: ['spots_count', tripId],
+    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+
   if (isLoading || !trip) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -81,16 +95,6 @@ export default function TripDetail() {
 
   const daysUntilTrip = trip.start_date ? differenceInDays(new Date(trip.start_date), new Date()) : 0;
 
-  const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets', tripId],
-    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 60000,
-  });
-  const { data: spots = [] } = useQuery({
-    queryKey: ['spots_count', tripId],
-    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 60000,
-  });
   const totalExpenses = expenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
   const packedCount = packingItems.filter(i => i.packed).length;
 
