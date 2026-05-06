@@ -150,14 +150,29 @@ export default function TripsList() {
   });
 
   const { data: trips = [], isLoading } = useQuery({
-    queryKey: ['trips'],
+    queryKey: ['trips', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      const all = await base44.entities.Trip.list('-created_date');
-      return all.filter(t =>
-        t.created_by === user.email ||
-        (Array.isArray(t.members) && t.members.includes(user.email))
-      );
+      // Primero busca por created_by (forma nativa de base44)
+      let myTrips = [];
+      try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch {}
+      // Si no hay resultados, carga todos y filtra (fallback para viajes antiguos)
+      if (myTrips.length === 0) {
+        const all = await base44.entities.Trip.list('-created_date');
+        myTrips = all.filter(t => t.created_by === user.email);
+      }
+      // Añadir viajes donde el usuario es miembro invitado
+      let memberTrips = [];
+      try {
+        const all = await base44.entities.Trip.list('-created_date');
+        memberTrips = all.filter(t =>
+          t.created_by !== user.email &&
+          Array.isArray(t.members) && t.members.includes(user.email)
+        );
+      } catch {}
+      const seen = new Set(myTrips.map(t => t.id));
+      return [...myTrips, ...memberTrips.filter(t => !seen.has(t.id))]
+        .sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
     },
     staleTime: 30000,
   });
