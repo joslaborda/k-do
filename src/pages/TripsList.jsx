@@ -272,7 +272,8 @@ export default function TripsList() {
             <div>
               <h1 className="text-white text-3xl font-black tracking-tight">Kōdo</h1>
               {myProfile?.username && (
-                <p className="text-white/70 text-sm font-mono mt-0.5">@{myProfile.username}</p>
+                <p className="text-white/80 text-sm mt-0.5">Travel your way</p>
+            {myProfile?.username && <p className="text-white/60 text-xs font-mono mt-0.5">@{myProfile.username}</p>}
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -281,11 +282,7 @@ export default function TripsList() {
             </div>
           </div>
 
-          <div className="flex gap-1 bg-white/15 p-1 rounded-xl">
-            <div className="flex-1 py-2 rounded-lg text-sm font-semibold text-white text-center bg-white/20">
-              ✈️ Mis viajes
-            </div>
-          </div>
+
         </div>
       </div>
 
