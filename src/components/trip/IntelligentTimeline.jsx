@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { differenceInDays, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -255,6 +256,55 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
       <div className="bg-white rounded-2xl border border-dashed border-border p-8 text-center">
         <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
         <p className="text-sm text-muted-foreground">Añade paradas a tu viaje para ver la timeline</p>
+      </div>
+    );
+  }
+
+  // Check if trip hasn't started yet
+  const tripStartDate = trip?.start_date;
+  const daysUntilTrip = tripStartDate ? differenceInDays(parseISO(tripStartDate), new Date()) : 0;
+  const tripNotStarted = daysUntilTrip > 0;
+
+  if (tripNotStarted) {
+    return (
+      <div className="space-y-3">
+        {/* Countdown banner */}
+        <div className="bg-orange-700 rounded-2xl p-5 text-white text-center">
+          <p className="text-4xl font-black mb-1">{daysUntilTrip}</p>
+          <p className="text-white/90 font-semibold">día{daysUntilTrip !== 1 ? 's' : ''} para el viaje ✈️</p>
+          {trip?.destination && <p className="text-white/70 text-sm mt-1">{trip.destination}</p>}
+        </div>
+        {/* Show upcoming docs if any */}
+        {tickets.length > 0 && (
+          <div className="bg-white rounded-2xl border border-border p-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Documentos del viaje</p>
+            <div className="space-y-2">
+              {tickets.slice(0, 3).map(doc => {
+                const Icon = doc.category === 'flight' ? Plane : doc.category === 'hotel' ? Hotel : FileText;
+                return (
+                  <div key={doc.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary">
+                    <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-orange-700" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{doc.name}</p>
+                      {doc.date && <p className="text-xs text-muted-foreground">{doc.date}{doc.time ? ' · ' + doc.time : ''}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {/* Packing reminder */}
+        <div className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3">
+          <span className="text-2xl">🧳</span>
+          <div className="flex-1">
+            <p className="font-semibold text-sm">¿Lista la maleta?</p>
+            <p className="text-xs text-muted-foreground">Revisa que llevas todo lo necesario</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </div>
       </div>
     );
   }
