@@ -113,15 +113,7 @@ function EmptyState({ userName, onCreateTrip }) {
           <Plus className="w-5 h-5 mr-2" />
           Crear mi primer viaje
         </Button>
-        <Link to={createPageUrl('Explore')}>
-          <Button
-            variant="outline"
-            className="border-orange-200 text-orange-700 hover:bg-orange-50 px-8 py-6 text-base font-semibold rounded-xl"
-          >
-            <Compass className="w-5 h-5 mr-2" />
-            Ver itinerarios de la comunidad
-          </Button>
-        </Link>
+
       </div>
     </div>
   );
@@ -289,9 +281,8 @@ export default function TripsList() {
             </div>
           </div>
 
-          {/* Social tab hidden - Phase 2 */}
           <div className="flex gap-1 bg-white/15 p-1 rounded-xl">
-            <div className="flex-1 py-2 rounded-lg text-sm font-semibold text-white text-center">
+            <div className="flex-1 py-2 rounded-lg text-sm font-semibold text-white text-center bg-white/20">
               ✈️ Mis viajes
             </div>
           </div>
