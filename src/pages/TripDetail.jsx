@@ -91,13 +91,7 @@ export default function TripDetail() {
     queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 60000,
   });
-  const { data: expenses = [] } = useQuery({
-    queryKey: ['expenses_count', tripId],
-    queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 60000,
-  });
   const totalExpenses = expenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
-  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const packedCount = packingItems.filter(i => i.packed).length;
 
   return (
@@ -173,7 +167,7 @@ export default function TripDetail() {
               <p className="text-xs text-muted-foreground">{totalExpenses > 0 ? totalExpenses.toFixed(0) + ' ' + (trip?.currency || '') : 'Sin gastos'}</p>
             </div>
           </Link>
-        </div></div>
+        </div>
       </div>
     </div>
   );
