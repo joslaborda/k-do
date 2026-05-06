@@ -80,6 +80,23 @@ export default function TripDetail() {
   }
 
   const daysUntilTrip = trip.start_date ? differenceInDays(new Date(trip.start_date), new Date()) : 0;
+
+  const { data: tickets = [] } = useQuery({
+    queryKey: ['tickets', tripId],
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+  const { data: spots = [] } = useQuery({
+    queryKey: ['spots_count', tripId],
+    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+  const { data: expenses = [] } = useQuery({
+    queryKey: ['expenses_count', tripId],
+    queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+  const totalExpenses = expenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const packedCount = packingItems.filter(i => i.packed).length;
 
@@ -126,49 +143,37 @@ export default function TripDetail() {
 
 
 
-        {/* Navigation Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-hidden">
-          <Link to={createPageUrl(`Cities?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🗺️</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Ruta</h3>
-              <p className="text-xs text-muted-foreground">Ciudades e itinerario</p>
+        {/* Quick access — resumen útil */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link to={createPageUrl(`Cities?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
+            <span className="text-2xl">🗺️</span>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-foreground">Ruta</p>
+              <p className="text-xs text-muted-foreground">{cities.length} parada{cities.length !== 1 ? 's' : ''}</p>
             </div>
           </Link>
-
-          <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
-              <p className="text-xs text-muted-foreground">Documentos y checklist</p>
+          <Link to={createPageUrl(`Documents?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
+            <span className="text-2xl">📄</span>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-foreground">Docs</p>
+              <p className="text-xs text-muted-foreground">{tickets.length} documento{tickets.length !== 1 ? 's' : ''}</p>
             </div>
           </Link>
-
-          <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📍</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Spots</h3>
-              <p className="text-xs text-muted-foreground">Lugares que visitar</p>
+          <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
+            <span className="text-2xl">📍</span>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-foreground">Spots</p>
+              <p className="text-xs text-muted-foreground">{spots.length} spot{spots.length !== 1 ? 's' : ''}</p>
             </div>
           </Link>
-
-          <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">💰</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Gastos</h3>
-              <p className="text-xs text-muted-foreground">Gestión de gastos</p>
+          <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
+            <span className="text-2xl">💰</span>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-foreground">Gastos</p>
+              <p className="text-xs text-muted-foreground">{totalExpenses > 0 ? totalExpenses.toFixed(0) + ' ' + (trip?.currency || '') : 'Sin gastos'}</p>
             </div>
           </Link>
-
-          <Link to={createPageUrl(`Utilities?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🔧</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Útil</h3>
-              <p className="text-xs text-muted-foreground">Info útil y clima</p>
-            </div>
-          </Link>
-
-        </div>
+        </div></div>
       </div>
     </div>
   );
