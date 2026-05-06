@@ -323,6 +323,33 @@ export default function Expenses() {
               Añadir
             </Button>
           </div>
+
+          {/* Balance summary */}
+          {expenses.length > 0 && currentUser?.email && (() => {
+            const balances = {};
+            members.forEach(m => { balances[m] = 0; });
+            expenses.forEach(e => {
+              const amount = parseFloat(e.amount_base || e.amount) || 0;
+              if (!amount) return;
+              balances[e.paid_by] = (balances[e.paid_by] || 0) + amount;
+              const participants = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+              const share = amount / participants.length;
+              participants.forEach(p => { balances[p] = (balances[p] || 0) - share; });
+            });
+            const myBalance = balances[currentUser.email] || 0;
+            const currency = trip?.currency || '';
+            if (Math.abs(myBalance) < 0.5) return null;
+            return (
+              <div className={"mt-4 px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 " +
+                (myBalance > 0 ? "bg-green-500/20 text-green-100" : "bg-red-500/20 text-red-100")}>
+                <span>{myBalance > 0 ? '💚' : '🔴'}</span>
+                <span>{myBalance > 0
+                  ? `Te deben ${myBalance.toFixed(0)} ${currency}`
+                  : `Debes ${Math.abs(myBalance).toFixed(0)} ${currency}`}
+                </span>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
