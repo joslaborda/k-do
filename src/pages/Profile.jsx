@@ -163,6 +163,18 @@ export default function Profile() {
               </select>
             </div>
 
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">Moneda base</label>
+              <select value={form.home_currency}
+                onChange={e => setForm(p => ({ ...p, home_currency: e.target.value }))}
+                className="w-full border border-border rounded-xl px-3 py-2 text-sm bg-secondary outline-none focus:border-orange-400">
+                {['EUR','USD','MXN','COP','ARS','CLP','PEN','DOP','BOB','UYU','VES','GTQ','PYG','GBP','JPY','BRL','CAD','AUD','CHF','CNY'].map(cur => (
+                  <option key={cur} value={cur}>{cur}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground mt-1">Se usa para el conversor de moneda en gastos</p>
+            </div>
+
             <Button onClick={() => updateMutation.mutate(form)}
               disabled={updateMutation.isPending}
               className="w-full bg-orange-700 hover:bg-orange-800 text-white">
@@ -191,7 +203,12 @@ export default function Profile() {
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-sm text-muted-foreground">Moneda base</span>
-              <span className="text-sm font-medium text-foreground">{profile?.home_currency || '—'}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground">{profile?.home_currency || '—'}</span>
+                {!profile?.home_currency && (
+                  <button onClick={() => setEditing(true)} className="text-xs text-orange-700 underline">Configurar</button>
+                )}
+              </div>
             </div>
           </div>
           <button onClick={() => base44.auth.logout()}
