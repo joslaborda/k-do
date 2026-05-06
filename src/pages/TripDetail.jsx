@@ -82,7 +82,6 @@ export default function TripDetail() {
   const daysUntilTrip = trip.start_date ? differenceInDays(new Date(trip.start_date), new Date()) : 0;
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const packedCount = packingItems.filter(i => i.packed).length;
-  const packingProgress = packingItems.length > 0 ? Math.round((packedCount / packingItems.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,13 +168,6 @@ export default function TripDetail() {
             </div>
           </Link>
 
-          <Link to={createPageUrl(`Diary?trip_id=${tripId}`)}>
-            <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📔</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Diario</h3>
-              <p className="text-xs text-muted-foreground">{diaryEntries.length} entradas</p>
-            </div>
-          </Link>
         </div>
       </div>
     </div>
