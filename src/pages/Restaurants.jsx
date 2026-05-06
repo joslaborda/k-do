@@ -395,7 +395,10 @@ export default function Restaurants() {
   };
 
   // Seed spots for community section
-  const seedSpots = useMemo(() => getSeedSpotsForCity(country, selectedCity || city), [country, selectedCity, city]);
+  const seedSpots = useMemo(() => {
+    if (!country || !city) return [];
+    return getSeedSpotsForCity(country, selectedCity || city);
+  }, [country, selectedCity, city]);
 
   // Community spots (public from other users + seed)
   const communitySpots = useMemo(() => {
@@ -453,6 +456,10 @@ export default function Restaurants() {
     <div className="min-h-screen bg-orange-50">
       {/* Header */}
       <div className="bg-orange-700 pt-12 pb-5 px-4">
+        <button onClick={() => window.history.back()} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          Mis viajes
+        </button>
         <h1 className="text-white text-3xl font-bold mb-4">Spots</h1>
 
         {/* Search bar */}
