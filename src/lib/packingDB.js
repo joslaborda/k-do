@@ -1,106 +1,102 @@
 /**
- * packingDB.js — Sugerencias inteligentes de equipaje por destino
- * Basado en: país destino, tipo de viaje, clima esperado
+ * packingDB.js — Requisitos de viaje y sugerencias de equipaje por país
+ * Cobertura global — optimizado para viajeros hispanohablantes
  */
 
-// Requisitos por país: visado, adaptador, vacunas, moneda
 export const COUNTRY_REQUIREMENTS = {
-  'Japón': {
-    visa: { needed: false, info: 'Los ciudadanos de la UE y España no necesitan visado para estancias de hasta 90 días.' },
-    adapter: { needed: true, type: 'Tipo A/B', info: 'Los enchufes japoneses son de tipo A (dos clavijas planas). Necesitarás adaptador.' },
-    currency: { info: 'El yen japonés (JPY) se usa en efectivo con frecuencia. Muchos locales no aceptan tarjeta.' },
-    vaccines: [],
-    tips: ['Descarga Google Maps offline antes de llegar.', 'Compra una SIM de datos o alquila un pocket WiFi en el aeropuerto.', 'Lleva tarjeta IC (Suica/Pasmo) para el transporte.'],
-    emergency: '110 (policía) · 119 (ambulancia/bomberos)',
-  },
-  'Tailandia': {
-    visa: { needed: false, info: 'España: sin visado hasta 30 días. México/Colombia: verificar en consulado.' },
-    adapter: { needed: true, type: 'Tipo A/B/C', info: 'Tipo A y C más comunes. Lleva un adaptador universal.' },
-    currency: { info: 'El baht tailandés (THB). Lleva efectivo — los cajeros cobran comisión alta.' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
-    tips: ['Compra SIM en el aeropuerto. AIS y DTAC son las mejores.', 'Usa Grab (como Uber) en lugar de taxis para evitar estafas.'],
-    emergency: '191 (policía) · 1669 (ambulancia)',
-  },
-  'Francia': {
-    visa: { needed: false, info: 'Espacio Schengen — libre circulación para ciudadanos de la UE.' },
-    adapter: { needed: false, info: 'Mismo tipo de enchufe que España (tipo C/F).' },
-    currency: { info: 'Euro. Tarjetas aceptadas en casi todos los sitios.' },
-    vaccines: [],
-    tips: ['El tren (TGV) conecta las ciudades principales muy rápido.', 'La mayoría de museos en París tienen día gratuito.'],
-    emergency: '112 (emergencias) · 17 (policía) · 15 (SAMU)',
-  },
-  'Italia': {
-    visa: { needed: false, info: 'Espacio Schengen — libre circulación.' },
-    adapter: { needed: false, info: 'Tipo C/F — igual que España.' },
-    currency: { info: 'Euro. En zonas turísticas muy populares lleva algo de efectivo.' },
-    vaccines: [],
-    tips: ['Reserva museos como el Vaticano o la Uffizi con antelación.', 'Valida siempre el billete de tren antes de subir.'],
-    emergency: '112 · 118 (ambulancia) · 113 (policía)',
-  },
-  'Portugal': {
-    visa: { needed: false, info: 'Schengen — libre circulación.' },
-    adapter: { needed: false, info: 'Tipo C/F — igual que España.' },
-    currency: { info: 'Euro.' },
-    vaccines: [],
-    tips: ['Las zonas de Lisboa tienen tranvías históricos muy concurridos. Cuidado con carteristas.'],
-    emergency: '112',
-  },
-  'México': {
-    visa: { needed: false, info: 'Sin visado para ciudadanos europeos hasta 180 días.' },
-    adapter: { needed: true, type: 'Tipo A/B', info: 'Enchufes de tipo A/B (clavijas planas). Los europeos necesitan adaptador.' },
-    currency: { info: 'Peso mexicano (MXN). Efectivo necesario en mercados y zonas más rurales.' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
-    tips: ['Usa Uber en ciudades grandes — más seguro que taxis de calle.', 'No bebas agua del grifo.'],
-    emergency: '911',
-  },
-  'Colombia': {
-    visa: { needed: false, info: 'Sin visado para europeos y muchos latinoamericanos.' },
-    adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas planas americanas. Los europeos necesitan adaptador.' },
-    currency: { info: 'Peso colombiano (COP). Lleva efectivo para zonas fuera de centros urbanos.' },
-    vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada (zonas selváticas)' }],
-    tips: ['Usa apps como InDriver o Uber para taxis.', 'Registra tu seguro de viaje antes de salir.'],
-    emergency: '123',
-  },
-  'Argentina': {
-    visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' },
-    adapter: { needed: true, type: 'Tipo I', info: 'Argentina usa tipo I (tres clavijas en triángulo). Adaptador necesario.' },
-    currency: { info: 'Peso argentino (ARS). La economía es compleja — infórmate del cambio oficial vs informal.' },
-    vaccines: [],
-    tips: ['Buenos Aires es enorme — usa el metro (Subte) o apps de transporte.'],
-    emergency: '911',
-  },
-  'Estados Unidos': {
-    visa: { needed: true, info: 'ESTA requerido para europeos (visa exenta). Tramítalo en advance.travel.state.gov. Coste: 21 USD.' },
-    adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas planas. Los europeos necesitan adaptador.' },
-    currency: { info: 'Dólar (USD). Tarjeta aceptada en prácticamente todo.' },
-    vaccines: [],
-    tips: ['Contrata seguro médico — la sanidad es muy cara.', 'Propina del 15-20% es obligatoria socialmente.'],
-    emergency: '911',
-  },
-  'Marruecos': {
-    visa: { needed: false, info: 'Sin visado para europeos y ciudadanos de muchos países latinoamericanos.' },
-    adapter: { needed: false, info: 'Tipo C/E — compatible con enchufes españoles.' },
-    currency: { info: 'Dírham marroquí (MAD). No se puede sacar del país. Efectivo necesario en zocos.' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }],
-    tips: ['Negocia precios en zocos — el primer precio nunca es el final.', 'No bebas agua del grifo.'],
-    emergency: '190 (policía) · 150 (ambulancia)',
-  },
+
+  // EUROPA
+  'España': { visa: { needed: false, info: 'Estás en casa.' }, adapter: { needed: false, info: 'Tipo C/F — estándar europeo.' }, currency: { info: 'Euro (EUR).' }, vaccines: [], tips: ['El 112 funciona en toda España.'], emergency: '112' },
+  'Francia': { visa: { needed: false, info: 'Schengen — libre circulación para ciudadanos de la UE.' }, adapter: { needed: false, info: 'Tipo C/E — compatible con enchufes españoles.' }, currency: { info: 'Euro. Tarjeta aceptada en casi todo.' }, vaccines: [], tips: ['El TGV conecta ciudades principales muy rápido.', 'Muchos museos en París tienen día gratuito.'], emergency: '112 · 17 (policía) · 15 (SAMU)' },
+  'Italia': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F/L — enchufes españoles funcionan.' }, currency: { info: 'Euro. Lleva efectivo para zonas turísticas.' }, vaccines: [], tips: ['Reserva el Vaticano y la Uffizi con antelación.', 'Valida siempre el billete de tren.'], emergency: '112 · 118 (ambulancia) · 113 (policía)' },
+  'Portugal': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F — igual que España.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['Cuidado con carteristas en los tranvías de Lisboa.'], emergency: '112' },
+  'Alemania': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F — compatible.' }, currency: { info: 'Euro. El efectivo sigue siendo muy usado en Alemania.' }, vaccines: [], tips: ['Muchos establecimientos solo aceptan efectivo.'], emergency: '112 · 110 (policía)' },
+  'Reino Unido': { visa: { needed: false, info: 'Sin visado hasta 6 meses. Puede requerir ETA — verifica en gov.uk.' }, adapter: { needed: true, type: 'Tipo G', info: 'Tres patillas cuadradas. Adaptador imprescindible.' }, currency: { info: 'Libra esterlina (GBP). Tarjeta ampliamente aceptada.' }, vaccines: [], tips: ['Circulación por la izquierda.', 'Oyster Card para transporte en Londres.'], emergency: '999 · 112' },
+  'Países Bajos': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['Cuidado con los carriles bici en Amsterdam.'], emergency: '112' },
+  'Bélgica': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/E.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['Bruselas es sede de la UE — controles de seguridad frecuentes.'], emergency: '112 · 101 (policía) · 100 (ambulancia)' },
+  'Suiza': { visa: { needed: false, info: 'Sin visado para europeos (no UE pero Schengen).' }, adapter: { needed: true, type: 'Tipo J', info: 'Suiza tiene su propio enchufe. Adaptador necesario.' }, currency: { info: 'Franco suizo (CHF). Todo es muy caro — presupuesta el doble.' }, vaccines: [], tips: ['Transporte público impecable.', 'Swiss Travel Pass si usas mucho el tren.'], emergency: '112 · 117 (policía) · 144 (ambulancia)' },
+  'Austria': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['Viena City Card merece la pena.'], emergency: '112 · 133 (policía) · 144 (ambulancia)' },
+  'Grecia': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Euro. En islas pequeñas lleva efectivo.' }, vaccines: [], tips: ['En verano el calor es extremo.', 'Reserva ferrys entre islas con antelación.'], emergency: '112 · 100 (policía) · 166 (ambulancia)' },
+  'Turquía': { visa: { needed: true, info: 'E-Visa para españoles: aprox 50 USD. Tramitar en evisa.gov.tr antes de viajar.' }, adapter: { needed: false, info: 'Tipo C/F — compatible con enchufes españoles.' }, currency: { info: 'Lira turca (TRY). Mejor cambiar allí.' }, vaccines: [], tips: ['El Gran Bazar cierra domingos.', 'Negocia precios en mercados.'], emergency: '112 · 155 (policía)' },
+  'República Checa': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/E.' }, currency: { info: 'Corona checa (CZK). No usan euro.' }, vaccines: [], tips: ['Praga muy concurrida en temporada alta — reserva con antelación.'], emergency: '112 · 158 (policía) · 155 (ambulancia)' },
+  'Hungría': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Forinto húngaro (HUF). No usan euro.' }, vaccines: [], tips: ['Budapest es muy asequible.'], emergency: '112 · 107 (policía) · 104 (ambulancia)' },
+  'Polonia': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/E.' }, currency: { info: 'Esloti polaco (PLN). No usan euro.' }, vaccines: [], tips: ['Cracovia y Varsovia son asequibles.'], emergency: '112 · 997 (policía) · 999 (ambulancia)' },
+  'Noruega': { visa: { needed: false, info: 'Schengen (no UE).' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Corona noruega (NOK). Uno de los países más caros del mundo.' }, vaccines: [], tips: ['Todo con tarjeta — apenas se usa efectivo.', 'Ferrys para fiordos: reserva con semanas de antelación.'], emergency: '112 · 02800 (policía) · 113 (ambulancia)' },
+  'Suecia': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Corona sueca (SEK). País prácticamente cashless.' }, vaccines: [], tips: ['Muchos museos en Estocolmo son gratuitos.'], emergency: '112' },
+  'Dinamarca': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F/K.' }, currency: { info: 'Corona danesa (DKK). No usan euro.' }, vaccines: [], tips: ['Copenhague es muy ciclista — alquila una bici.'], emergency: '112' },
+  'Irlanda': { visa: { needed: false, info: 'Sin visado para españoles. No es Schengen pero sin visado.' }, adapter: { needed: true, type: 'Tipo G', info: 'Tres patillas cuadradas como UK. Adaptador necesario.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['El clima es muy cambiante — lleva siempre impermeable.'], emergency: '112 · 999' },
+  'Croacia': { visa: { needed: false, info: 'Schengen desde 2023.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Euro (desde enero 2023).' }, vaccines: [], tips: ['Islas del Adriático: reserva ferrys en verano.'], emergency: '112 · 192 (policía) · 194 (ambulancia)' },
+  'Eslovenia': { visa: { needed: false, info: 'Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Euro.' }, vaccines: [], tips: ['Ljubljana es muy pequeña y caminable.', 'El lago Bled es impresionante pero muy concurrido.'], emergency: '112 · 113 (policía)' },
+  'Serbia': { visa: { needed: false, info: 'Sin visado para españoles hasta 90 días. No es Schengen.' }, adapter: { needed: false, info: 'Tipo C/F.' }, currency: { info: 'Dinar serbio (RSD). Efectivo principalmente.' }, vaccines: [], tips: ['Belgrado tiene vida nocturna increíble.'], emergency: '112 · 192 (policía) · 194 (ambulancia)' },
+
+  // ASIA
+  'Japón': { visa: { needed: false, info: 'Sin visado para españoles y la mayoría de latinoamericanos hasta 90 días.' }, adapter: { needed: true, type: 'Tipo A', info: 'Dos clavijas planas. Adaptador necesario.' }, currency: { info: 'Yen (JPY). El efectivo es imprescindible — muchos locales no aceptan tarjeta.' }, vaccines: [], tips: ['Suica/Pasmo card para el transporte.', 'Compra SIM de datos en el aeropuerto.', 'JR Pass: actívalo el primer día de uso.'], emergency: '110 (policía) · 119 (ambulancia)' },
+  'Tailandia': { visa: { needed: false, info: 'Sin visado para españoles hasta 60 días. Latinoamericanos verificar.' }, adapter: { needed: true, type: 'Tipo A/B/C', info: 'Varios tipos. Adaptador universal recomendado.' }, currency: { info: 'Baht (THB). Los cajeros cobran comisión alta (220 THB). Lleva efectivo.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['Usa Grab en vez de taxis de calle.', 'No bebas agua del grifo.', 'Ropa que cubra para templos.'], emergency: '191 (policía) · 1669 (ambulancia)' },
+  'Vietnam': { visa: { needed: true, info: 'E-visa: 25 USD, válida 90 días. En evisa.xuatnhapcanh.gov.vn.' }, adapter: { needed: true, type: 'Tipo A/C', info: 'Adaptador recomendado.' }, currency: { info: 'Dong (VND). Solo efectivo. 1€ ≈ 26.000 VND.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['Usa Grab para transporte.', 'Cruza la calle despacio y sin parar.'], emergency: '113 (policía) · 115 (ambulancia)' },
+  'Indonesia': { visa: { needed: true, info: 'Visa on Arrival en aeropuertos principales: 35 USD por 30 días.' }, adapter: { needed: false, info: 'Tipo C/F — compatible con enchufes europeos.' }, currency: { info: 'Rupia (IDR). Efectivo en zonas fuera de centros turísticos.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['Repelente de mosquitos esencial.', 'En Bali, respeta las ceremonias.'], emergency: '110 (policía) · 118 (ambulancia)' },
+  'India': { visa: { needed: true, info: 'E-Visa obligatoria: 25-80 USD. En indianvisaonline.gov.in — al menos 4 días de antelación.' }, adapter: { needed: true, type: 'Tipo C/D/M', info: 'Varios tipos. Adaptador universal necesario.' }, currency: { info: 'Rupia (INR). Efectivo necesario fuera de ciudades grandes.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Rabia', priority: 'considerar' }], tips: ['Solo agua embotellada.', 'Lleva papel higiénico propio.', 'Seguro médico con cobertura alta.'], emergency: '100 (policía) · 102 (ambulancia)' },
+  'China': { visa: { needed: true, info: 'Visado requerido. Transit visa-free 72/144h en algunas ciudades. Consulta el consulado.' }, adapter: { needed: true, type: 'Tipo A/C/I', info: 'Varios tipos. Adaptador universal recomendado.' }, currency: { info: 'Yuan (CNY). Alipay y WeChat Pay imprescindibles — descarga las apps antes de llegar.' }, vaccines: [], tips: ['Google/WhatsApp/Instagram no funcionan — instala VPN antes de entrar.', 'WeChat es esencial.'], emergency: '110 (policía) · 120 (ambulancia)' },
+  'Corea del Sur': { visa: { needed: false, info: 'Sin visado para españoles y la mayoría de latinoamericanos hasta 90 días.' }, adapter: { needed: false, info: 'Tipo C/F — compatible.' }, currency: { info: 'Won (KRW). Tarjeta aceptada en casi todo.' }, vaccines: [], tips: ['Usa Kakao Maps — Google Maps no funciona bien en Corea.', 'T-Money card para transporte.'], emergency: '112 (policía) · 119 (ambulancia)' },
+  'Singapur': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos hasta 30-90 días.' }, adapter: { needed: true, type: 'Tipo G', info: 'Tres patillas cuadradas. Adaptador necesario.' }, currency: { info: 'Dólar singapurense (SGD). Tarjeta aceptada en todo.' }, vaccines: [], tips: ['Hawker Centers para comer barato.', 'MRT eficiente y económico.'], emergency: '999 (policía) · 995 (ambulancia)' },
+  'Camboya': { visa: { needed: true, info: 'E-visa en evisa.gov.kh: 36 USD. También visa on arrival.' }, adapter: { needed: true, type: 'Tipo A/C/G', info: 'Varios tipos. Adaptador universal.' }, currency: { info: 'USD ampliamente aceptado. El riel (KHR) también circula.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['Angkor Wat: cubrir hombros y rodillas.', 'No bebas agua del grifo.'], emergency: '117 (policía) · 119 (ambulancia)' },
+  'Filipinas': { visa: { needed: false, info: 'Sin visado para españoles hasta 30 días (ampliable).' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Peso filipino (PHP). Efectivo muy usado fuera de Manila.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Temporada de tifones: junio-noviembre.'], emergency: '911' },
+  'Nepal': { visa: { needed: true, info: 'Visa on Arrival en Katmandú: 30 USD (15 días) o 50 USD (30 días).' }, adapter: { needed: true, type: 'Tipo C/D/M', info: 'Adaptador universal necesario.' }, currency: { info: 'Rupia nepalesa (NPR). Solo efectivo en zonas de trekking.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Rabia', priority: 'recomendada' }], tips: ['Aclimatarse despacio para el mal de altura.', 'Lleva mucho efectivo para el Himalaya.'], emergency: '100 (policía) · 102 (ambulancia)' },
+  'Sri Lanka': { visa: { needed: true, info: 'ETA online obligatoria: 20 USD. En eta.gov.lk.' }, adapter: { needed: true, type: 'Tipo D/G', info: 'Tipo D y G. Adaptador necesario.' }, currency: { info: 'Rupia de Sri Lanka (LKR). Efectivo necesario.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Ropa respetuosa para templos.', 'Malaria en algunas zonas — consultar.'], emergency: '119 (policía) · 110 (ambulancia)' },
+
+  // ORIENTE MEDIO
+  'Emiratos Árabes Unidos': { visa: { needed: false, info: 'Sin visado para españoles y muchos latinoamericanos hasta 30-90 días.' }, adapter: { needed: true, type: 'Tipo G', info: 'Tres patillas cuadradas. Adaptador necesario.' }, currency: { info: 'Dírham (AED). Tarjeta aceptada en todo.' }, vaccines: [], tips: ['Ropa respetuosa en zonas públicas y mezquitas.', 'Alcohol solo en hoteles y zonas específicas.'], emergency: '999 (policía) · 998 (ambulancia)' },
+  'Israel': { visa: { needed: false, info: 'Sin visado para españoles hasta 90 días.' }, adapter: { needed: true, type: 'Tipo H', info: 'Israel tiene su propio enchufe tipo H. Adaptador necesario.' }, currency: { info: 'Séquel (ILS). Tarjeta aceptada en casi todo.' }, vaccines: [], tips: ['Consulta siempre el Ministerio de AAEE antes de viajar.'], emergency: '100 (policía) · 101 (ambulancia)' },
+  'Jordania': { visa: { needed: true, info: 'Visa on Arrival: 40 JOD. Jordan Pass incluye visa + Petra.' }, adapter: { needed: true, type: 'Tipo C/D/G', info: 'Adaptador universal recomendado.' }, currency: { info: 'Dinar jordano (JOD). Efectivo fuera de Amán.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Jordan Pass es la mejor opción si visitas Petra.'], emergency: '911' },
+
+  // ÁFRICA
+  'Marruecos': { visa: { needed: false, info: 'Sin visado para españoles y latinoamericanos hasta 90 días.' }, adapter: { needed: false, info: 'Tipo C/E — compatible con enchufes españoles.' }, currency: { info: 'Dírham (MAD). No se puede sacar del país. Efectivo necesario en zocos.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Negocia siempre precios en zocos.', 'No bebas agua del grifo.', 'Ropa respetuosa en zonas conservadoras.'], emergency: '190 (policía) · 150 (ambulancia)' },
+  'Egipto': { visa: { needed: true, info: 'E-visa en visa2egypt.gov.eg: 25 USD. También visa on arrival.' }, adapter: { needed: false, info: 'Tipo C/F — compatible.' }, currency: { info: 'Libra egipcia (EGP). Efectivo muy necesario.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['No bebas agua del grifo.', 'Las propinas (baksheesh) son muy comunes.'], emergency: '122 (policía) · 123 (ambulancia)' },
+  'Sudáfrica': { visa: { needed: false, info: 'Sin visado para españoles hasta 30 días. Latinoamericanos verificar.' }, adapter: { needed: true, type: 'Tipo M', info: 'Tipo M — tres clavijas redondas grandes. Adaptador necesario.' }, currency: { info: 'Rand (ZAR). Tarjeta en zonas urbanas.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'requerida si vienes de zona endémica' }], tips: ['No camines solo de noche.', 'Uber es económico y seguro.'], emergency: '10111 (policía) · 10177 (ambulancia)' },
+  'Kenia': { visa: { needed: true, info: 'E-visa obligatoria: 50 USD. En evisa.go.ke.' }, adapter: { needed: true, type: 'Tipo G', info: 'Tres patillas cuadradas. Adaptador necesario.' }, currency: { info: 'Chelín keniano (KES). Efectivo fuera de Nairobi.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Malaria endémica — toma profilaxis.', 'Safari Masai Mara: julio-octubre.'], emergency: '999 · 112' },
+  'Tanzania': { visa: { needed: true, info: 'E-visa: 50 USD. En visa.immigration.go.tz.' }, adapter: { needed: true, type: 'Tipo D/G', info: 'Adaptador necesario.' }, currency: { info: 'Chelín tanzano (TZS). Efectivo muy necesario.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Malaria endémica — profilaxis obligatoria.', 'Zanzíbar: ropa respetuosa en ciudad.'], emergency: '112 · 115 (policía)' },
+  'Etiopía': { visa: { needed: true, info: 'E-visa disponible en evisa.et: 52 USD.' }, adapter: { needed: true, type: 'Tipo C/F/L', info: 'Adaptador universal recomendado.' }, currency: { info: 'Birr (ETB). Solo efectivo.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'requerida' }, { name: 'Hepatitis A', priority: 'recomendada' }], tips: ['No bebas agua del grifo.', 'Addis Abeba está a 2.355m — posible mal de altura.'], emergency: '991 (policía) · 907 (ambulancia)' },
+
+  // AMÉRICAS
+  'Estados Unidos': { visa: { needed: true, info: 'ESTA para españoles: 21 USD en esta.cbp.dhs.gov. Latinoamericanos necesitan visa B1/B2.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas planas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Dólar (USD). Propina del 15-20% obligatoria.' }, vaccines: [], tips: ['Seguro médico imprescindible — la sanidad es carísima.', 'Tip obligatorio en restaurantes y servicios.'], emergency: '911' },
+  'Canadá': { visa: { needed: true, info: 'ETA para europeos: 7 CAD en canada.ca/eta. Latinoamericanos suelen necesitar visa.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Mismo que EEUU. Adaptador necesario.' }, currency: { info: 'Dólar canadiense (CAD). Propina del 15-18%.' }, vaccines: [], tips: ['En invierno temperaturas extremas — ropa técnica obligatoria.'], emergency: '911' },
+  'México': { visa: { needed: false, info: 'Sin visado para españoles y europeos hasta 180 días.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas planas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Peso mexicano (MXN). Efectivo en mercados y zonas rurales.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }], tips: ['Usa Uber — más seguro que taxis de calle.', 'No bebas agua del grifo.'], emergency: '911' },
+  'Colombia': { visa: { needed: false, info: 'Sin visado para europeos y la mayoría de latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas planas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Peso colombiano (COP). Efectivo fuera de centros urbanos.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada (zonas selváticas)' }, { name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Usa InDriver o Uber.', 'Precaución nocturna en zonas desconocidas.'], emergency: '123' },
+  'Argentina': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: true, type: 'Tipo I', info: 'Tres clavijas en triángulo. Adaptador necesario.' }, currency: { info: 'Peso argentino (ARS). Economía compleja — infórmate del tipo de cambio.' }, vaccines: [], tips: ['La Patagonia requiere planificación — distancias enormes.'], emergency: '911' },
+  'Chile': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: false, info: 'Tipo C/L — compatible con enchufes españoles.' }, currency: { info: 'Peso chileno (CLP). Tarjeta aceptada en ciudades.' }, vaccines: [], tips: ['Atacama: protección solar extrema.', 'Vuelos internos necesarios para cubrir el país.'], emergency: '133 (policía) · 131 (ambulancia)' },
+  'Perú': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/B/C', info: 'Varios tipos. Adaptador recomendado.' }, currency: { info: 'Sol (PEN). Efectivo en Cusco y Machu Picchu.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Fiebre amarilla', priority: 'recomendada (Amazonas)' }], tips: ['Cusco a 3.400m — aclimatarse 2 días.', 'Tren a Machu Picchu: reserva con meses de antelación.'], emergency: '105 (policía) · 117 (ambulancia)' },
+  'Brasil': { visa: { needed: false, info: 'Sin visado para españoles hasta 90 días.' }, adapter: { needed: true, type: 'Tipo N', info: 'Tipo N — similar al C pero patillas más gruesas. Adaptador recomendado.' }, currency: { info: 'Real (BRL). Efectivo en playas y locales pequeños.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada' }], tips: ['No muestres móvil o joyas en la calle.', 'Uber muy popular y seguro.'], emergency: '190 (policía) · 192 (ambulancia)' },
+  'Ecuador': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos hasta 90 días.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Dólar americano (USD) — Ecuador lo usa desde 2000.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada (Amazonas)' }], tips: ['Quito a 2.850m — posible mal de altura.', 'Galápagos: permisos y reserva con mucha antelación.'], emergency: '911' },
+  'Bolivia': { visa: { needed: false, info: 'Sin visado para europeos y la mayoría de latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/C', info: 'Adaptador recomendado.' }, currency: { info: 'Boliviano (BOB). Efectivo principalmente.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada (zonas tropicales)' }], tips: ['La Paz a 3.600m — aclimatación obligatoria.', 'Salar de Uyuni: impresionante en época de lluvia.'], emergency: '110 (policía) · 118 (ambulancia)' },
+  'Uruguay': { visa: { needed: false, info: 'Sin visado.' }, adapter: { needed: true, type: 'Tipo C/F/L', info: 'Uruguay usa tipo L. Adaptador recomendado.' }, currency: { info: 'Peso uruguayo (UYU). Tarjeta ampliamente aceptada.' }, vaccines: [], tips: ['Uno de los países más seguros de Sudamérica.'], emergency: '911' },
+  'Paraguay': { visa: { needed: false, info: 'Sin visado.' }, adapter: { needed: true, type: 'Tipo A/B/C', info: 'Adaptador recomendado.' }, currency: { info: 'Guaraní (PYG). Efectivo principalmente.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Ciudad del Este: zona de compras con precios muy bajos.'], emergency: '911' },
+  'Venezuela': { visa: { needed: false, info: 'Sin visado para europeos. Consulta el Ministerio de AAEE antes de viajar.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Bolívar (VES). El USD es ampliamente aceptado.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Consulta siempre las recomendaciones de seguridad actualizadas.'], emergency: '171' },
+  'Cuba': { visa: { needed: true, info: 'Tarjeta del turista requerida: 25-80 USD. Puede obtenerse en el aeropuerto o consulado.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Peso cubano (CUP). Solo efectivo — tarjetas internacionales no funcionan bien.' }, vaccines: [], tips: ['No lleves tarjetas de bancos americanos.', 'WiFi caro y escaso — tarjetas ETECSA en tiendas oficiales.', 'Casas particulares: mejor opción de alojamiento.'], emergency: '106 (policía) · 104 (ambulancia)' },
+  'República Dominicana': { visa: { needed: false, info: 'Sin visado. Tasa turística incluida en muchos vuelos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Peso dominicano (DOP). USD aceptado en zonas turísticas.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['No bebas agua del grifo.', 'Repelente de mosquitos necesario.'], emergency: '911' },
+  'Costa Rica': { visa: { needed: false, info: 'Sin visado hasta 90 días.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Colón (CRC). El USD también es aceptado.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Alquila coche 4x4 para zonas remotas.', 'Temporada seca: diciembre-abril.'], emergency: '911' },
+  'Guatemala': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Quetzal (GTQ). Efectivo necesario.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Antigua muy segura y bonita.', 'No bebas agua del grifo.'], emergency: '110 (policía) · 122 (ambulancia)' },
+  'Honduras': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Lempira (HNL). Efectivo principalmente.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Islas de la Bahía: excelente buceo.'], emergency: '911' },
+  'El Salvador': { visa: { needed: false, info: 'Sin visado.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Dólar (USD) y Bitcoin (BTC) — legal tender oficial.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Consulta recomendaciones de seguridad.'], emergency: '911' },
+  'Nicaragua': { visa: { needed: false, info: 'Sin visado para europeos. Tasa de ingreso: 10 USD.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Córdoba (NIO). Efectivo principalmente.' }, vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }], tips: ['Granada y León son ciudades coloniales preciosas.'], emergency: '118 (policía) · 128 (ambulancia)' },
+  'Panamá': { visa: { needed: false, info: 'Sin visado para europeos y latinoamericanos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Adaptador necesario.' }, currency: { info: 'Dólar (USD) — Panamá usa el dólar americano.' }, vaccines: [{ name: 'Fiebre amarilla', priority: 'recomendada (zonas selváticas)' }], tips: ['El Canal de Panamá es imprescindible.', 'Casco Viejo es el barrio más bonito de Ciudad de Panamá.'], emergency: '911' },
+  'Puerto Rico': { visa: { needed: false, info: 'Es territorio de EEUU — mismas reglas. ESTA para europeos.' }, adapter: { needed: true, type: 'Tipo A/B', info: 'Clavijas americanas. Europeos necesitan adaptador.' }, currency: { info: 'Dólar (USD).' }, vaccines: [], tips: ['Es como estar en EEUU pero con sabor caribeño.'], emergency: '911' },
+
+  // OCEANÍA
+  'Australia': { visa: { needed: true, info: 'ETA: 20 AUD en immi.homeaffairs.gov.au.' }, adapter: { needed: true, type: 'Tipo I', info: 'Clavillas en ángulo. Adaptador necesario.' }, currency: { info: 'Dólar australiano (AUD). Tarjeta aceptada en prácticamente todo.' }, vaccines: [], tips: ['Sol muy intenso — protector FPS 50+ imprescindible.', 'Conducción por la izquierda.', 'Vuelos internos para cubrir distancias enormes.'], emergency: '000' },
+  'Nueva Zelanda': { visa: { needed: true, info: 'NZeTA: 23 NZD en immigration.govt.nz.' }, adapter: { needed: true, type: 'Tipo I', info: 'Mismo que Australia. Adaptador necesario.' }, currency: { info: 'Dólar neozelandés (NZD). Tarjeta aceptada en todo.' }, vaccines: [], tips: ['Campervan es la mejor forma de viajar.', 'Temporada alta: diciembre-febrero.'], emergency: '111' },
 };
 
-// Plantillas de items por categoría y tipo de viaje
+// Plantillas de items de maleta
 export const PACKING_TEMPLATES = {
   base: [
-    // Personal
     { name: 'Pasaporte', category: 'personal', essential: true },
     { name: 'DNI', category: 'personal', essential: true },
     { name: 'Tarjeta de crédito/débito', category: 'personal', essential: true },
     { name: 'Seguro de viaje', category: 'personal', essential: true },
-    { name: 'Copia de reservas (hotel, vuelo)', category: 'personal', essential: true },
+    { name: 'Copia de reservas impresa', category: 'personal', essential: true },
     { name: 'Efectivo en moneda local', category: 'personal', essential: true },
     { name: 'Cargador del móvil', category: 'tecnologia', essential: true },
-    { name: 'Auriculares', category: 'tecnologia', essential: false },
     { name: 'Power bank', category: 'tecnologia', essential: false },
-    // Neceser base
+    { name: 'Auriculares', category: 'tecnologia', essential: false },
     { name: 'Cepillo y pasta de dientes', category: 'neceser', essential: true },
     { name: 'Desodorante', category: 'neceser', essential: true },
     { name: 'Champú y gel', category: 'neceser', essential: true },
@@ -109,64 +105,43 @@ export const PACKING_TEMPLATES = {
     { name: 'Ibuprofeno / Paracetamol', category: 'medicinas', essential: true },
     { name: 'Antidiarreico', category: 'medicinas', essential: false },
     { name: 'Tiritas y antiséptico', category: 'medicinas', essential: false },
-    // Ropa base
-    { name: 'Ropa interior (x días)', category: 'ropa', essential: true },
-    { name: 'Calcetines (x días)', category: 'ropa', essential: true },
+    { name: 'Ropa interior', category: 'ropa', essential: true },
+    { name: 'Calcetines', category: 'ropa', essential: true },
     { name: 'Camisetas', category: 'ropa', essential: true },
-    { name: 'Pantalones/faldas', category: 'ropa', essential: true },
+    { name: 'Pantalones', category: 'ropa', essential: true },
   ],
-  adapter: [
-    { name: 'Adaptador de enchufe', category: 'tecnologia', essential: true },
-  ],
-  warm: [
-    { name: 'Gafas de sol', category: 'neceser', essential: true },
-    { name: 'Bañador', category: 'ropa', essential: true },
-    { name: 'Chanclas', category: 'ropa', essential: true },
-    { name: 'Ropa ligera', category: 'ropa', essential: true },
-  ],
-  cold: [
-    { name: 'Abrigo', category: 'ropa', essential: true },
-    { name: 'Bufanda y guantes', category: 'ropa', essential: true },
-    { name: 'Ropa térmica interior', category: 'ropa', essential: false },
-    { name: 'Botas de agua', category: 'ropa', essential: false },
-  ],
+  adapter: [{ name: 'Adaptador de enchufe', category: 'tecnologia', essential: true }],
   asia: [
     { name: 'Repelente de mosquitos', category: 'neceser', essential: true },
+    { name: 'Antidiarreico extra', category: 'medicinas', essential: true },
     { name: 'Pastillas potabilizadoras', category: 'medicinas', essential: false },
-    { name: 'Medicación antidiarreica extra', category: 'medicinas', essential: true },
   ],
-  japan_specific: [
+  japan_extra: [
     { name: 'Tarjeta IC Suica/Pasmo', category: 'personal', essential: true },
     { name: 'Efectivo en yenes', category: 'personal', essential: true },
     { name: 'SIM de datos / Pocket WiFi', category: 'tecnologia', essential: true },
+  ],
+  usa_extra: [{ name: 'ESTA impresa (confirmación)', category: 'personal', essential: true }],
+  cold: [
+    { name: 'Abrigo', category: 'ropa', essential: true },
+    { name: 'Bufanda y guantes', category: 'ropa', essential: true },
+    { name: 'Ropa térmica', category: 'ropa', essential: false },
+  ],
+  beach: [
+    { name: 'Bañador', category: 'ropa', essential: true },
+    { name: 'Chanclas', category: 'ropa', essential: true },
+    { name: 'Gafas de sol', category: 'neceser', essential: true },
   ],
 };
 
 export function getSmartPackingList(country) {
   const req = COUNTRY_REQUIREMENTS[country] || null;
   const items = [...PACKING_TEMPLATES.base];
-
-  if (req?.adapter?.needed) {
-    items.push(...PACKING_TEMPLATES.adapter);
-  }
-
-  // Asia items
-  const asiaCountries = ['Japón', 'Tailandia', 'Vietnam', 'India', 'Indonesia', 'China', 'Corea del Sur'];
-  if (asiaCountries.includes(country)) {
-    items.push(...PACKING_TEMPLATES.asia);
-  }
-  if (country === 'Japón') {
-    items.push(...PACKING_TEMPLATES.japan_specific);
-  }
-
-  return { items: removeDuplicates(items), requirements: req };
-}
-
-function removeDuplicates(items) {
+  if (req?.adapter?.needed) items.push(...PACKING_TEMPLATES.adapter);
+  const asiaCountries = ['Japón', 'Tailandia', 'Vietnam', 'India', 'Indonesia', 'China', 'Corea del Sur', 'Camboya', 'Filipinas', 'Nepal', 'Sri Lanka', 'Singapur'];
+  if (asiaCountries.includes(country)) items.push(...PACKING_TEMPLATES.asia);
+  if (country === 'Japón') items.push(...PACKING_TEMPLATES.japan_extra);
+  if (country === 'Estados Unidos' || country === 'Canadá') items.push(...PACKING_TEMPLATES.usa_extra);
   const seen = new Set();
-  return items.filter(item => {
-    if (seen.has(item.name)) return false;
-    seen.add(item.name);
-    return true;
-  });
+  return { items: items.filter(i => { if (seen.has(i.name)) return false; seen.add(i.name); return true; }), requirements: req };
 }
