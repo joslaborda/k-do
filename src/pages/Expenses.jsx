@@ -401,9 +401,8 @@ export default function Expenses() {
             </div>
           )}
         </div>
-      </div>
 
-      </TabsContent>
+          </TabsContent>
         </Tabs>
       </div>
 
