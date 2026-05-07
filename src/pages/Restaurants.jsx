@@ -1,3 +1,4 @@
+import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -84,6 +85,157 @@ function PlaceResultCard({ place, onSave, saving }) {
 }
 
 // ── Manual form ───────────────────────────────────────────────────────────────
+// ── Leaflet map loader ────────────────────────────────────────────────────────
+async function loadLeaflet() {
+  if (window.L) return window.L;
+  await new Promise((res, rej) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = res; script.onerror = rej;
+    document.head.appendChild(script);
+  });
+  return window.L;
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+      { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' }, signal: AbortSignal.timeout(6000) }
+    );
+    const d = await res.json();
+    const a = d.address || {};
+    const road = a.road || a.pedestrian || a.footway || '';
+    const city = a.city || a.town || a.village || a.municipality || '';
+    return [road, city].filter(Boolean).join(', ') || d.display_name?.split(',').slice(0,2).join(',') || '';
+  } catch { return ''; }
+}
+
+function LeafletMap({ lat, lng, onMove }) {
+  const mapRef = useRef(null);
+  const leafletRef = useRef(null);
+  const markerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadLeaflet().then(L => {
+      if (cancelled || !containerRef.current || leafletRef.current) return;
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false }).setView([lat, lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      const icon = L.divIcon({
+        html: '<div style="width:28px;height:28px;background:#c2410c;border:3px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
+        iconSize: [28, 28], iconAnchor: [14, 28], className: ''
+      });
+      const marker = L.marker([lat, lng], { icon, draggable: true }).addTo(map);
+      marker.on('dragend', async e => {
+        const { lat: la, lng: ln } = e.target.getLatLng();
+        const addr = await reverseGeocode(la, ln);
+        onMove(la, ln, addr);
+      });
+      map.on('click', async e => {
+        const { lat: la, lng: ln } = e.latlng;
+        marker.setLatLng([la, ln]);
+        const addr = await reverseGeocode(la, ln);
+        onMove(la, ln, addr);
+      });
+      leafletRef.current = map;
+      markerRef.current = marker;
+      mapRef.current = map;
+      setTimeout(() => map.invalidateSize(), 100);
+    }).catch(() => {});
+    return () => { cancelled = true; if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null; } };
+  }, []);
+
+  // Update marker when lat/lng change externally
+  useEffect(() => {
+    if (markerRef.current && leafletRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+      leafletRef.current.setView([lat, lng], 15);
+    }
+  }, [lat, lng]);
+
+  return <div ref={containerRef} style={{ height: '200px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
+}
+
+// ── Leaflet map loader ────────────────────────────────────────────────────────
+async function loadLeaflet() {
+  if (window.L) return window.L;
+  await new Promise((res, rej) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = res; script.onerror = rej;
+    document.head.appendChild(script);
+  });
+  return window.L;
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+      { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' }, signal: AbortSignal.timeout(6000) }
+    );
+    const d = await res.json();
+    const a = d.address || {};
+    const road = a.road || a.pedestrian || a.footway || '';
+    const city2 = a.city || a.town || a.village || a.municipality || '';
+    return [road, city2].filter(Boolean).join(', ') || d.display_name?.split(',').slice(0,2).join(',') || '';
+  } catch { return ''; }
+}
+
+function LeafletMap({ lat, lng, onMove }) {
+  const leafletRef = useRef(null);
+  const markerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadLeaflet().then(L => {
+      if (cancelled || !containerRef.current || leafletRef.current) return;
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false }).setView([lat, lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      const icon = L.divIcon({
+        html: '<div style="width:28px;height:28px;background:#c2410c;border:3px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
+        iconSize: [28, 28], iconAnchor: [14, 28], className: ''
+      });
+      const marker = L.marker([lat, lng], { icon, draggable: true }).addTo(map);
+      marker.on('dragend', async e => {
+        const { lat: la, lng: ln } = e.target.getLatLng();
+        const addr = await reverseGeocode(la, ln);
+        onMove(la, ln, addr);
+      });
+      map.on('click', async e => {
+        const { lat: la, lng: ln } = e.latlng;
+        marker.setLatLng([la, ln]);
+        const addr = await reverseGeocode(la, ln);
+        onMove(la, ln, addr);
+      });
+      leafletRef.current = map;
+      markerRef.current = marker;
+      setTimeout(() => map.invalidateSize(), 100);
+    }).catch(() => {});
+    return () => { cancelled = true; if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null; } };
+  }, []);
+
+  useEffect(() => {
+    if (markerRef.current && leafletRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+      leafletRef.current.setView([lat, lng], 15);
+    }
+  }, [lat, lng]);
+
+  return <div ref={containerRef} style={{ height: '200px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
+}
+
 function ManualForm({ onSave, saving, onClose, city, country }) {
   const [title, setTitle] = useState('');
   const [type, setType] = useState('custom');
@@ -91,15 +243,45 @@ function ManualForm({ onSave, saving, onClose, city, country }) {
   const [address, setAddress] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState([]);
+  const [pinLat, setPinLat] = useState(null);
+  const [pinLng, setPinLng] = useState(null);
+  const [locating, setLocating] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+
   const addTag = v => { const t=v.trim().toLowerCase(); if(t&&!tags.includes(t)) setTags(p=>[...p,t]); setTagInput(''); };
 
   const SUGGESTED_TAGS = {
-    food: ['ramen','sushi','tapas','barato','reservar','sin-gluten','vistas','terraza'],
+    food: ['tapas','barato','reservar','terraza','vistas','sin-gluten'],
     sight: ['amanecer','sunset','gratuito','fotográfico','histórico','mirador'],
     activity: ['adrenalina','naturaleza','familiar','exterior'],
     shopping: ['mercadillo','vintage','souvenirs','artesanía'],
   };
   const suggested = (SUGGESTED_TAGS[type] || []).filter(t => !tags.includes(t));
+
+  const handleGPS = () => {
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const la = pos.coords.latitude, ln = pos.coords.longitude;
+        setPinLat(la); setPinLng(ln);
+        const addr = await reverseGeocode(la, ln);
+        if (addr) setAddress(addr);
+        setShowMap(true);
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
+  const handleMapMove = (la, ln, addr) => {
+    setPinLat(la); setPinLng(ln);
+    if (addr) setAddress(addr);
+  };
+
+  const defaultLat = pinLat || 40.4168;
+  const defaultLng = pinLng || -3.7038;
 
   return (
     <div className="bg-white rounded-xl border border-border p-4 space-y-3">
@@ -146,13 +328,54 @@ function ManualForm({ onSave, saving, onClose, city, country }) {
           placeholder="Añade tus propios tags (Enter)" className="h-8 text-xs"/>
       </div>
 
-      <Input value={address} onChange={e => setAddress(e.target.value)} placeholder="Dirección (opcional)" className="h-8 text-xs"/>
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-xs text-muted-foreground">Ubicación</p>
+          <button onClick={handleGPS} disabled={locating}
+            className="flex items-center gap-1 text-xs text-orange-700 font-medium hover:text-orange-800">
+            <Navigation className="w-3 h-3"/>
+            {locating ? 'Localizando...' : pinLat ? 'Actualizar GPS' : 'Usar mi ubicación'}
+          </button>
+        </div>
+        <Input value={address} onChange={e => setAddress(e.target.value)}
+          placeholder="Dirección (o usa el GPS)" className="h-8 text-xs mb-2"/>
+        <button onClick={() => { if(!showMap && !pinLat) handleGPS(); else setShowMap(p=>!p); }}
+          className={"flex items-center gap-1.5 text-xs font-medium transition-colors " +
+            (showMap ? 'text-orange-700' : 'text-muted-foreground hover:text-orange-600')}>
+          <MapPin className="w-3.5 h-3.5"/>
+          {showMap ? 'Ocultar mapa' : 'Añadir pin en el mapa'}
+          {pinLat && <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block ml-1"/>}
+        </button>
+        {showMap && (
+          <div className="mt-2 rounded-xl overflow-hidden border border-border">
+            <LeafletMap lat={defaultLat} lng={defaultLng} onMove={handleMapMove}/>
+            <div className="px-3 py-2 bg-secondary">
+              <p className="text-xs text-muted-foreground">
+                {pinLat
+                  ? `📍 ${pinLat.toFixed(5)}, ${pinLng.toFixed(5)} — arrastra el pin o toca el mapa`
+                  : 'Toca el mapa para colocar el pin'}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
 
       <textarea value={notes} onChange={e => setNotes(e.target.value)}
         placeholder="Notas: mejor hora, qué pedir, por qué mola..."
         className="w-full text-sm border border-border rounded-xl px-3 py-2 h-20 resize-none outline-none focus:border-orange-400"/>
 
-      <Button onClick={() => onSave({ title, type, notes, address, tags })} disabled={!title.trim()||saving}
+      <button onClick={() => setIsPublic(p=>!p)}
+        className={"flex items-center gap-2 text-xs px-3 py-2 rounded-xl border transition-colors w-full " +
+          (isPublic ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-white border-border text-muted-foreground')}>
+        <span className={"w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 " +
+          (isPublic ? 'bg-orange-700 border-orange-700' : 'border-border')}>
+          {isPublic && <span className="text-white text-xs">✓</span>}
+        </span>
+        Publicar para la comunidad de Kōdo
+      </button>
+
+      <Button onClick={() => onSave({ title, type, notes, address, tags, lat: pinLat, lng: pinLng, visibility: isPublic ? 'public' : 'trip_members' })}
+        disabled={!title.trim()||saving}
         className="w-full bg-orange-700 hover:bg-orange-800 text-white h-9">
         {saving ? 'Guardando...' : 'Guardar spot'}
       </Button>
