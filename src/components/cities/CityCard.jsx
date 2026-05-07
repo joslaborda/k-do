@@ -134,10 +134,10 @@ const cityImages = {
   'Mont Saint-Michel': 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800',
 
   // ── ESPAÑA ─────────────────────────────────────────────────────────────────
-  'Barcelona':      'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800',
-  'Madrid':         'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800',
+  'Barcelona':      'https://images.unsplash.com/photo-1464790719320-516ecd75af6c?w=800',
+  'Madrid':         'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800',
   'Seville':        'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
-  'Sevilla':        'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
+  'Sevilla':        'https://images.unsplash.com/photo-1558618047-3c8c0e0e0e27?w=800',
   'Granada':        'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800',
   'Valencia':       'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800',
   'Bilbao':         'https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800',
@@ -148,8 +148,8 @@ const cityImages = {
 
   // ── PORTUGAL ───────────────────────────────────────────────────────────────
   'Lisbon':         'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
-  'Lisboa':         'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
-  'Porto':          'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
+  'Lisboa':         'https://images.unsplash.com/photo-1588416936097-41850ab3d86d?w=800',
+  'Porto':          'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800',
   'Algarve':        'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
   'Sintra':         'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800',
 
@@ -271,8 +271,12 @@ const cityImages = {
 
   // ── COLOMBIA ───────────────────────────────────────────────────────────────
   'Bogotá':         'https://images.unsplash.com/photo-1533577116850-9cc66cad8a9b?w=800',
-  'Medellín':       'https://images.unsplash.com/photo-1533577116850-9cc66cad8a9b?w=800',
-  'Cartagena':      'https://images.unsplash.com/photo-1533577116850-9cc66cad8a9b?w=800',
+  'Medellín':       'https://images.unsplash.com/photo-1599946347371-68eb71b16afc?w=800',
+  'Salento':        'https://images.unsplash.com/photo-1593467685842-9e10c3c5e8c3?w=800',
+  'El Tayrona':     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+  'Tayrona':        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+  'Santa Marta':    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+  'Cartagena':      'https://images.unsplash.com/photo-1583997052301-0e71dc7d56e2?w=800',
 
   // ── PERÚ ───────────────────────────────────────────────────────────────────
   'Lima':           'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800',
