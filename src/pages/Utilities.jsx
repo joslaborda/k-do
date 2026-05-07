@@ -1,3 +1,4 @@
+import { createPageUrl } from '@/utils';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -235,10 +236,7 @@ export default function Utilities() {
     <div className="min-h-screen bg-orange-50">
       <div className="bg-orange-700 pt-12 pb-20">
          <div className="max-w-5xl mx-auto px-6">
-           <button onClick={() => window.history.back()} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-            Mis viajes
-          </button>
+           <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
           <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
            <p className="text-white/90 mt-2">
              {trip?.name ? `${trip.name} ${countryConfig.flag}` : 'Información útil para tu viaje'}
