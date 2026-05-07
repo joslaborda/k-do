@@ -274,7 +274,14 @@ export default function Restaurants() {
   const [stateFilter, setStateFilter] = useState('all'); // all | pending | visited
   const [typeFilter, setTypeFilter] = useState('all');
   const [communitySort, setCommunitySort] = useState('visits'); // visits | likes | recent
-  const [selectedCity, setSelectedCity] = useState(city);
+  // Ciudad activa inteligente: usa activeCity (ya calcula por fecha en useTripContext)
+  const [selectedCity, setSelectedCity] = useState('');
+  // Sync selectedCity with activeCity whenever it resolves
+  useEffect(() => {
+    if (activeCity?.name && !selectedCity) {
+      setSelectedCity(activeCity.name);
+    }
+  }, [activeCity?.name]);
   const [toast, setToast] = useState({ visible: false, spot: null });
   const [lastSavedId, setLastSavedId] = useState(null);
   const searchTimer = useRef(null);
@@ -456,10 +463,7 @@ export default function Restaurants() {
     <div className="min-h-screen bg-orange-50">
       {/* Header */}
       <div className="bg-orange-700 pt-12 pb-5 px-4">
-        <button onClick={() => window.history.back()} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-          Mis viajes
-        </button>
+        <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
         <h1 className="text-white text-3xl font-bold mb-4">Spots</h1>
 
         {/* Search bar */}
@@ -591,12 +595,29 @@ export default function Restaurants() {
             {/* Comunidad section */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold text-foreground">
-                  Comunidad en {selectedCity || city}
-                </h2>
+                <h2 className="font-semibold text-foreground">Kōdo Community</h2>
               </div>
 
-              {/* Community sort filters */}
+              {/* City chips — smart active city by trip dates */}
+              {tripCities.length > 0 && (
+                <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
+                  {tripCities.map(c => {
+                    const isActive = (selectedCity || activeCity?.name) === c.name;
+                    const today = new Date().toISOString().slice(0,10);
+                    const isCurrent = c.start_date && c.end_date && today >= c.start_date && today <= c.end_date;
+                    return (
+                      <button key={c.id} onClick={() => setSelectedCity(c.name)}
+                        className={"text-xs px-3 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors flex items-center gap-1 " +
+                          (isActive ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
+                        {c.name}
+                        {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Sort tabs */}
               <div className="flex gap-2 mb-3">
                 {[['visits','Más visitados'],['likes','Más gustados'],['recent','Recientes']].map(([v,l]) => (
                   <button key={v} onClick={() => setCommunitySort(v)}
