@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, Settings, MapPin, Globe, ChevronDown, ChevronRight, BookmarkCheck, Pencil, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { createPageUrl } from '@/utils';
 
 const COUNTRIES = [
   { name: 'España', flag: '🇪🇸', currency: 'EUR' },
