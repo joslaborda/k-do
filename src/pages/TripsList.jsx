@@ -182,6 +182,9 @@ export default function TripsList() {
     });
   }, [trips, allCities]);
 
+  const [spotSuggestion, setSpotSuggestion] = useState(null); // { tripId, cityName, spots[] }
+  const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
+
   const createMutation = useMutation({
     mutationFn: async ({ formData, stops, stopCountries = [], allocations, selectedTemplate }) => {
       const email = user?.email;
@@ -221,12 +224,43 @@ export default function TripsList() {
 
       return trip;
     },
-    onSuccess: () => {
+    onSuccess: async (trip) => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
       setDialogOpen(false);
+      setDismissedSuggestion(false);
+
+      // Check for saved spots matching the new trip's cities
+      try {
+        const savedSpots = await base44.entities.Spot.filter({ created_by: user?.email });
+        const newCities = await base44.entities.City.filter({ trip_id: trip.id });
+        const savedWithoutTrip = savedSpots.filter(s => !s.trip_id || s.trip_id !== trip.id);
+        if (savedWithoutTrip.length > 0 && newCities.length > 0) {
+          // Find spots matching any new city
+          const matchingSpots = savedWithoutTrip.filter(s =>
+            newCities.some(nc =>
+              nc.name?.toLowerCase() === s.city_name?.toLowerCase() ||
+              nc.country?.toLowerCase() === s.country?.toLowerCase()
+            )
+          );
+          if (matchingSpots.length > 0) {
+            setSpotSuggestion({ tripId: trip.id, spots: matchingSpots, cities: newCities });
+          }
+        }
+      } catch {}
     },
   });
+
+  const addSuggestedSpots = async () => {
+    if (!spotSuggestion) return;
+    try {
+      await Promise.all(spotSuggestion.spots.map(s =>
+        base44.entities.Spot.update(s.id, { trip_id: spotSuggestion.tripId })
+      ));
+      queryClient.invalidateQueries({ queryKey: ['spots', spotSuggestion.tripId] });
+    } catch {}
+    setSpotSuggestion(null);
+  };
 
   const needsOnboarding = user?.is_verified === true && !profileLoading && myProfile === null;
   const displayName = myProfile?.display_name || user?.full_name || '';
@@ -264,6 +298,31 @@ export default function TripsList() {
   return (
     <div className="min-h-screen bg-orange-50">
       {needsOnboarding && <CreateProfileModal user={user} open={true} />}
+
+      {/* Spot suggestion banner */}
+      {spotSuggestion && !dismissedSuggestion && (
+        <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
+          <div className="bg-gray-900 rounded-2xl p-4 shadow-xl border border-white/10">
+            <div className="flex items-start gap-3 mb-3">
+              <span className="text-2xl flex-shrink-0">📍</span>
+              <div>
+                <p className="text-white text-sm font-semibold">¡Tienes spots guardados para este destino!</p>
+                <p className="text-white/60 text-xs mt-0.5">{spotSuggestion.spots.length} spot{spotSuggestion.spots.length !== 1 ? 's' : ''} guardados que coinciden con tu nuevo viaje</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={addSuggestedSpots}
+                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium py-2 rounded-xl transition-colors">
+                Añadir al viaje
+              </button>
+              <button onClick={() => setDismissedSuggestion(true)}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-xl transition-colors">
+                Ahora no
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="bg-orange-700 px-5 pt-12 pb-5">
