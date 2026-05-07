@@ -13,7 +13,6 @@ import {
   ArrowRight, Search, Languages, BookOpen, Users, Settings, Trash2 } from
 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
-import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -263,13 +262,7 @@ export default function Home() {
                           ))}
                         </div>
                       )}
-                      <div className="ml-auto">
-                        <ActiveCitySelector
-                          cities={cities}
-                          activeCity={activeCity}
-                          onSelect={setOverrideCityId}
-                        />
-                      </div>
+
                     </div>
                   )}
                 </div>
@@ -322,6 +315,14 @@ export default function Home() {
             <Users className="w-4 h-4" /> Viajeros
           </h2>
           <TripMembersPanel trip={trip} currentUserEmail={currentUserEmail} />
+        </div>
+
+        {/* Chat del viaje */}
+        <div className="glass rounded-2xl border border-border p-5">
+          <h2 className="text-base font-bold text-foreground mb-3 flex items-center gap-2">
+            💬 Chat del viaje
+          </h2>
+          <TripChat tripId={tripId} currentUserEmail={currentUserEmail} />
         </div>
       </div>
 
