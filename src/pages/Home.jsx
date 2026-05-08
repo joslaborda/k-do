@@ -186,7 +186,9 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
 
       {/* Viajeros */}
       <div className="bg-white rounded-xl border border-border p-4">
-        <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><Users className="w-4 h-4" /> Viajeros</p>
+        <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+          <Users className="w-4 h-4" /> Viajeros
+        </p>
         <TripMembersPanel trip={trip} currentUserEmail={''} />
       </div>
     </div>
@@ -194,116 +196,185 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
 }
 
 // ── Today tab ─────────────────────────────────────────────────────────────────
-function TodayTab({ trip, cities, expenses, tripId }) {
-  const today = new Date();
-  const todayStr = format(today, 'yyyy-MM-dd');
+function DaySection({ label, city, docs, spots, tripId, isToday }) {
+  const DOC_ICONS = { flight: '✈️', hotel: '🏨', train: '🚆', bus: '🚌', car: '🚗', ticket: '🎟️', insurance: '🛡️', other: '📄' };
+  const SPOT_ICONS = { food: '🍜', sight: '🏛️', activity: '⚡', shopping: '🛍️', custom: '📍' };
 
-  const todayCity = useMemo(() => {
-    return cities.find(c => {
-      if (!c.start_date || !c.end_date) return false;
-      return todayStr >= c.start_date && todayStr <= c.end_date;
-    }) || cities[0];
-  }, [cities, todayStr]);
-
-  const todayExpenses = useMemo(() =>
-    expenses.filter(e => e.date === todayStr || (e.created_date || '').startsWith(todayStr)),
-    [expenses, todayStr]
-  );
-
-  const todayTotal = todayExpenses.reduce((s, e) => s + (e.amount || 0), 0);
-  const totalSoFar = expenses.reduce((s, e) => s + (e.amount || 0), 0);
-  const currency = trip?.currency || 'EUR';
-
-  const tomorrowStr = format(new Date(today.getTime() + 86400000), 'yyyy-MM-dd');
-  const tomorrowCity = useMemo(() =>
-    cities.find(c => c.start_date === tomorrowStr),
-    [cities, tomorrowStr]
-  );
-
-  const { data: todayDocs = [] } = useQuery({
-    queryKey: ['todayDocs', tripId, todayStr],
-    queryFn: async () => {
-      const all = await base44.entities.Document.filter({ trip_id: tripId });
-      return all.filter(d => d.date === todayStr || d.valid_from === todayStr);
-    },
-    enabled: !!tripId,
-    staleTime: 60000,
-  });
-
-  const dayNumber = trip?.start_date ? differenceInDays(today, parseISO(trip.start_date)) + 1 : null;
-  const totalDays = (trip?.start_date && trip?.end_date) ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1 : null;
+  const hasContent = docs.length > 0 || spots.length > 0;
 
   return (
-    <div className="space-y-4">
-      {todayCity && (
-        <div className="bg-white rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-orange-600" />
-            <p className="text-sm font-semibold text-foreground">Hoy en {todayCity.name}</p>
-            {dayNumber && totalDays && <span className="ml-auto text-xs text-muted-foreground">Día {dayNumber} de {totalDays}</span>}
-          </div>
-          {todayCity.notes && <p className="text-xs text-muted-foreground mt-2">{todayCity.notes}</p>}
+    <div className={`rounded-2xl border overflow-hidden ${isToday ? 'border-orange-300 bg-white' : 'border-border bg-white'}`}>
+      {/* Day header */}
+      <div className={`px-4 py-3 flex items-center justify-between ${isToday ? 'bg-orange-50 border-b border-orange-200' : 'bg-secondary/40 border-b border-border'}`}>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-bold uppercase tracking-wide ${isToday ? 'text-orange-700' : 'text-muted-foreground'}`}>{label}</span>
+          <span className="text-sm font-semibold text-foreground">{city.name}</span>
+        </div>
+        {city.start_date && (
+          <span className="text-xs text-muted-foreground">
+            {format(parseISO(city.start_date), 'dd MMM', { locale: es })}
+          </span>
+        )}
+      </div>
+
+      {/* Documents for this day */}
+      {docs.length > 0 && (
+        <div className="divide-y divide-border">
+          {docs.map(doc => (
+            <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors">
+              <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
+                {doc.description && <p className="text-xs text-muted-foreground truncate">{doc.description}</p>}
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            </Link>
+          ))}
         </div>
       )}
 
-      {todayDocs.length > 0 && (
-        <div className="bg-white rounded-xl border border-border overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold text-foreground flex items-center gap-2"><FileText className="w-4 h-4" /> Documentos de hoy</p>
-          </div>
-          {todayDocs.map(doc => (
-            <div key={doc.id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
-              <span className="text-lg">📄</span>
+      {/* Spots for this day */}
+      {spots.length > 0 && (
+        <div className={`divide-y divide-border ${docs.length > 0 ? 'border-t border-border' : ''}`}>
+          {spots.map(spot => (
+            <div key={spot.id} className="flex items-center gap-3 px-4 py-2.5">
+              <span className="text-base shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
-                {doc.description && <p className="text-xs text-muted-foreground">{doc.description}</p>}
+                <p className="text-sm text-foreground truncate">{spot.title}</p>
+                {spot.notes && <p className="text-xs text-muted-foreground truncate">{spot.notes}</p>}
               </div>
-              <Link to={createPageUrl('Documents') + '?trip_id=' + tripId} className="text-xs text-orange-600 shrink-0">Ver →</Link>
             </div>
           ))}
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-border p-4">
-        <p className="text-sm font-semibold text-foreground mb-3">💰 Gastos</p>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-xs text-muted-foreground">Hoy</span>
-          <span className="text-sm font-semibold text-foreground">{todayTotal.toFixed(2)} {currency}</span>
+      {/* Empty state */}
+      {!hasContent && (
+        <div className="px-4 py-4 text-center">
+          <p className="text-xs text-muted-foreground">Sin documentos ni spots para este día</p>
+          <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+            className="text-xs text-orange-600 mt-1 inline-block">+ Añadir spots →</Link>
         </div>
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-xs text-muted-foreground">Total viaje</span>
-          <span className="text-sm text-muted-foreground">{totalSoFar.toFixed(2)} {currency}</span>
+      )}
+    </div>
+  );
+}
+
+function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
+  const today = new Date();
+  const todayStr = format(today, 'yyyy-MM-dd');
+  const tomorrowStr = format(new Date(today.getTime() + 86400000), 'yyyy-MM-dd');
+  const currency = trip?.currency || 'EUR';
+
+  // Sort cities by start_date
+  const sortedCities = useMemo(() =>
+    [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
+    [cities]
+  );
+
+  const todayCity = useMemo(() =>
+    sortedCities.find(c => c.start_date && c.end_date && todayStr >= c.start_date && todayStr <= c.end_date) || sortedCities[0],
+    [sortedCities, todayStr]
+  );
+
+  const tomorrowCity = useMemo(() =>
+    sortedCities.find(c => c.start_date === tomorrowStr) ||
+    sortedCities.find(c => c.start_date && c.end_date && tomorrowStr >= c.start_date && tomorrowStr <= c.end_date),
+    [sortedCities, tomorrowStr]
+  );
+
+  // Fetch all docs and spots once
+  const { data: allDocs = [] } = useQuery({
+    queryKey: ['allDocs', tripId],
+    queryFn: () => base44.entities.Document.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+
+  const { data: allSpots = [] } = useQuery({
+    queryKey: ['spots', tripId],
+    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 30000,
+  });
+
+  // Filter docs by date
+  const docsForDate = (dateStr) =>
+    allDocs.filter(d => d.date === dateStr || d.valid_from === dateStr || d.start_date === dateStr);
+
+  // Filter spots by city (only those assigned to a day = have trip_date field)
+  const spotsForCity = (cityId) =>
+    allSpots.filter(s => s.city_id === cityId && s.trip_date);
+
+  // Today's expenses
+  const todayExpenses = useMemo(() =>
+    expenses.filter(e => e.date === todayStr || (e.created_date || '').startsWith(todayStr)),
+    [expenses, todayStr]
+  );
+  const todayTotal = todayExpenses.reduce((s, e) => s + (e.amount || 0), 0);
+
+  const dayNumber = trip?.start_date ? differenceInDays(today, parseISO(trip.start_date)) + 1 : null;
+  const totalDays = (trip?.start_date && trip?.end_date) ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1 : null;
+
+  return (
+    <div className="space-y-3">
+      {/* Day counter */}
+      {dayNumber && totalDays && (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs text-muted-foreground font-medium">Día {dayNumber} de {totalDays}</span>
+          <Link to={createPageUrl('Cities') + '?trip_id=' + tripId} className="text-xs text-orange-600">Ver ruta completa →</Link>
         </div>
-        {todayExpenses.length > 0 && (
-          <div className="space-y-1.5 border-t border-border pt-3">
-            {todayExpenses.slice(0, 4).map(exp => (
+      )}
+
+      {/* HOY */}
+      {todayCity && (
+        <DaySection
+          label="Hoy"
+          city={todayCity}
+          docs={docsForDate(todayStr)}
+          spots={spotsForCity(todayCity.id)}
+          tripId={tripId}
+          isToday={true}
+        />
+      )}
+
+      {/* MAÑANA */}
+      {tomorrowCity && (
+        <DaySection
+          label="Mañana"
+          city={tomorrowCity}
+          docs={docsForDate(tomorrowStr)}
+          spots={spotsForCity(tomorrowCity.id)}
+          tripId={tripId}
+          isToday={false}
+        />
+      )}
+
+      {/* Gastos hoy — solo si hay */}
+      {todayExpenses.length > 0 && (
+        <div className="bg-white rounded-xl border border-border p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-foreground">💰 Gastos de hoy</p>
+            <span className="text-sm font-semibold text-foreground">{todayTotal.toFixed(2)} {currency}</span>
+          </div>
+          <div className="space-y-1.5">
+            {todayExpenses.slice(0, 3).map(exp => (
               <div key={exp.id} className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground truncate flex-1">{exp.description || exp.category || 'Gasto'}</span>
                 <span className="text-xs font-medium text-foreground ml-2">{(exp.amount || 0).toFixed(2)} {currency}</span>
               </div>
             ))}
           </div>
-        )}
-        <Link to={createPageUrl('Expenses') + '?trip_id=' + tripId} className="block mt-3 text-xs text-orange-600 text-center">Ver todos los gastos →</Link>
-      </div>
-
-      {tomorrowCity && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <p className="text-xs font-semibold text-amber-800 mb-1">🚆 Mañana</p>
-          <p className="text-sm text-amber-900 font-medium">Llegas a {tomorrowCity.name}</p>
-          {tomorrowCity.transport_notes && <p className="text-xs text-amber-700 mt-0.5">{tomorrowCity.transport_notes}</p>}
+          <Link to={createPageUrl('Expenses') + '?trip_id=' + tripId} className="block mt-2 text-xs text-orange-600 text-center">Ver todos →</Link>
         </div>
       )}
 
-      <Link to={todayCity
-          ? createPageUrl('CityDetail') + '?city_id=' + todayCity.id + '&trip_id=' + tripId
-          : createPageUrl('Cities') + '?trip_id=' + tripId}
-        className="flex items-center justify-between bg-white rounded-xl border border-border px-4 py-3 hover:shadow-sm transition-shadow">
-        <span className="text-sm font-medium text-foreground">
-          {todayCity ? `Ver itinerario de hoy en ${todayCity.name}` : 'Ver itinerario completo'}
-        </span>
-        <ArrowRight className="w-4 h-4 text-muted-foreground" />
-      </Link>
+      {/* Viajeros */}
+      <div className="bg-white rounded-xl border border-border p-4">
+        <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+          <Users className="w-4 h-4" /> Viajeros
+        </p>
+        <TripMembersPanel trip={trip} currentUserEmail={''} />
+      </div>
     </div>
   );
 }
@@ -398,7 +469,7 @@ function ChatTab({ tripId, currentUserEmail, myProfile }) {
               )}
               <div className={`flex flex-col max-w-[75%] ${me ? 'items-end' : 'items-start'}`}>
                 {!me && <p className="text-xs text-muted-foreground mb-0.5 px-1">{displayName}</p>}
-                <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${me ? 'bg-orange-700 text-white rounded-br-sm' : 'bg-white border border-border text-foreground rounded-bl-sm'}`}>
+                <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${me ? 'bg-orange-700 text-white rounded-br-sm' : 'bg-secondary border border-border text-foreground rounded-bl-sm'}`}>
                   {msg.content}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 px-1">{formatTime(msg.created_date)}</p>
@@ -524,7 +595,7 @@ export default function Home() {
             {cities.length > 0 ? (
               <span className="flex items-center gap-1.5 flex-wrap">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
-                {cities.map((city, i) => (
+                {[...cities].sort((a,b) => (a.start_date||'').localeCompare(b.start_date||'')).map((city, i) => (
                   <span key={city.id} className="flex items-center gap-1">
                     {i > 0 && <ArrowRight className="w-3 h-3 opacity-60" />}
                     {city.name}
@@ -567,7 +638,7 @@ export default function Home() {
               <TripCountdownBanner daysUntilTrip={daysUntilTrip} tripId={tripId} cities={cities} packingItems={packingItems} trip={trip} expenses={expenses} />
             )}
             {tripInProgress
-              ? <TodayTab trip={trip} cities={cities} expenses={expenses} tripId={tripId} />
+              ? <TodayTab trip={trip} cities={cities} expenses={expenses} tripId={tripId} trip_members={trip?.members} />
               : <PreTripTab trip={trip} cities={cities} packingItems={packingItems} documents={documents} myProfile={myProfile} />
             }
           </>
