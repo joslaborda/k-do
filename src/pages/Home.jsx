@@ -21,73 +21,25 @@ import TripCountdownBanner from '@/components/trip/TripCountdownBanner';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 
-// ── Convert COUNTRY_REQUIREMENTS to requirements array ────────────────────────
-function getDestinationRequirements(country, originCountry) {
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function getDestinationRequirements(country) {
   const data = COUNTRY_REQUIREMENTS[country];
   if (!data) return [];
-
   const reqs = [];
-
-  // Visa
-  if (data.visa) {
-    reqs.push({
-      type: 'visa',
-      title: data.visa.needed ? 'Visado requerido' : 'Sin visado',
-      description: data.visa.info,
-      level: data.visa.needed ? 'required' : 'optional',
-    });
-  }
-
-  // Adapter
-  if (data.adapter?.needed) {
-    reqs.push({
-      type: 'tech',
-      title: `Adaptador de enchufe — ${data.adapter.type || ''}`,
-      description: data.adapter.info,
-      level: 'required',
-    });
-  }
-
-  // Currency tip
-  if (data.currency?.info) {
-    reqs.push({
-      type: 'money',
-      title: 'Moneda y pagos',
-      description: data.currency.info,
-      level: 'optional',
-    });
-  }
-
-  // Vaccines
-  (data.vaccines || []).forEach(v => {
-    reqs.push({
-      type: 'vaccine',
-      title: `Vacuna: ${v.name}`,
-      description: v.priority,
-      level: v.priority?.includes('requer') ? 'required' : 'recommended',
-    });
-  });
-
-  // Tips
-  (data.tips || []).forEach(tip => {
-    reqs.push({ type: 'safety', title: tip, description: '', level: 'optional' });
-  });
-
+  if (data.visa) reqs.push({ type: 'visa', title: data.visa.needed ? 'Visado requerido' : 'Sin visado necesario', description: data.visa.info, level: data.visa.needed ? 'required' : 'ok' });
+  if (data.adapter?.needed) reqs.push({ type: 'tech', title: `Adaptador ${data.adapter.type || ''}`, description: data.adapter.info, level: 'required' });
+  if (data.currency?.info) reqs.push({ type: 'money', title: 'Moneda y pagos', description: data.currency.info, level: 'info' });
+  (data.vaccines || []).forEach(v => reqs.push({ type: 'vaccine', title: `Vacuna: ${v.name}`, description: v.priority, level: v.priority?.includes('requer') ? 'required' : 'recommended' }));
   return reqs;
 }
 
-// ── Requirement badge ─────────────────────────────────────────────────────────
-function ReqBadge({ level }) {
-  if (level === 'required') return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0">Obligatorio</span>;
-  if (level === 'recommended') return <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0">Recomendado</span>;
-  return null;
-}
-
-const REQ_ICONS = { visa:'🛂', vaccine:'💉', health:'🏥', safety:'💡', money:'💰', transport:'🚌', climate:'🌡️', culture:'🙏', tech:'🔌', nature:'🦟' };
+const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡' };
+const DOC_ICONS = { flight:'✈️', hotel:'🏨', train:'🚆', bus:'🚌', car:'🚗', ticket:'🎟️', insurance:'🛡️', other:'📄' };
+const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
 
 // ── Pre-trip tab ──────────────────────────────────────────────────────────────
 function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
-  const [reqExpanded, setReqExpanded] = useState(true);
+  const [reqOpen, setReqOpen] = useState(true);
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
 
@@ -98,23 +50,44 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
     return [...s];
   }, [trip, cities]);
 
-  const allRequirements = useMemo(() => {
+  const requirements = useMemo(() => {
     return allCountries.flatMap(country => {
-      const reqs = getDestinationRequirements(country, originCountry);
-      return reqs.map(r => ({ ...r, country }));
+      const reqs = getDestinationRequirements(country);
+      return reqs.map(r => ({ ...r, country, showCountry: allCountries.length > 1 }));
     }).sort((a, b) => {
-      const order = { required: 0, recommended: 1, optional: 2 };
-      return (order[a.level] ?? 3) - (order[b.level] ?? 3);
+      const o = { required: 0, recommended: 1, info: 2, ok: 3 };
+      return (o[a.level] ?? 4) - (o[b.level] ?? 4);
     });
-  }, [allCountries, originCountry]);
+  }, [allCountries]);
 
-  const urgentCount = allRequirements.filter(r => r.level === 'required').length;
+  const urgentCount = requirements.filter(r => r.level === 'required').length;
   const packedCount = packingItems.filter(i => i.packed).length;
   const packedPct = packingItems.length ? Math.round(packedCount / packingItems.length * 100) : 0;
   const docsCount = documents?.length || 0;
 
+  const tripStart = trip?.start_date ? parseISO(trip.start_date) : null;
+  const daysLeft = tripStart ? differenceInDays(tripStart, new Date()) : null;
+
+  const sortedCities = useMemo(() =>
+    [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
+    [cities]
+  );
+
   return (
     <div className="space-y-4">
+      {/* Countdown hero */}
+      {daysLeft !== null && daysLeft > 0 && (
+        <div className="bg-orange-700 rounded-2xl p-5 text-white">
+          <p className="text-5xl font-bold mb-1">{daysLeft}</p>
+          <p className="text-white/80 text-sm">días para el viaje</p>
+          {sortedCities.length > 0 && (
+            <p className="text-white/60 text-xs mt-2">
+              Primera parada: {sortedCities[0].name} · {trip?.start_date ? format(parseISO(trip.start_date), 'dd MMM yyyy', { locale: es }) : ''}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Quick status */}
       <div className="grid grid-cols-2 gap-3">
         <Link to={createPageUrl('Packing') + '?trip_id=' + tripId}>
@@ -122,7 +95,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
             <p className="text-xs text-muted-foreground mb-1">Maleta</p>
             <p className="text-xl font-semibold text-foreground">{packedPct}%</p>
             <div className="mt-2 h-1.5 bg-secondary rounded-full overflow-hidden">
-              <div className="h-full bg-orange-600 rounded-full transition-all" style={{ width: packedPct + '%' }} />
+              <div className="h-full bg-orange-600 rounded-full" style={{ width: packedPct + '%' }} />
             </div>
             <p className="text-xs text-muted-foreground mt-1">{packedCount}/{packingItems.length} items</p>
           </div>
@@ -136,48 +109,38 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
         </Link>
       </div>
 
-      {/* Destination requirements */}
-      {allRequirements.length > 0 && (
+      {/* Requirements */}
+      {requirements.length > 0 && (
         <div className="bg-white rounded-xl border border-border overflow-hidden">
-          <button onClick={() => setReqExpanded(e => !e)}
+          <button onClick={() => setReqOpen(e => !e)}
             className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/30 transition-colors">
             <div className="flex items-center gap-2">
-              <span className="text-base">🗂️</span>
+              <span>🗂️</span>
               <div className="text-left">
                 <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
                 {urgentCount > 0 && <p className="text-xs text-red-600 mt-0.5">{urgentCount} obligatorio{urgentCount > 1 ? 's' : ''}</p>}
               </div>
             </div>
-            {reqExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            {reqOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
           </button>
-          {reqExpanded && (
+          {reqOpen && (
             <div className="border-t border-border divide-y divide-border">
-              {allRequirements.filter(r => r.level !== 'optional' || r.type === 'tech').map((req, i) => (
+              {requirements.filter(r => r.level !== 'ok').map((req, i) => (
                 <div key={i} className="flex items-start gap-3 px-4 py-3">
-                  <span className="text-lg shrink-0 mt-0.5">{REQ_ICONS[req.type] || '📋'}</span>
+                  <span className="text-lg shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
                       <p className="text-sm font-medium text-foreground">{req.title}</p>
-                      <ReqBadge level={req.level} />
+                      {req.level === 'required' && <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">Obligatorio</span>}
+                      {req.level === 'recommended' && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Recomendado</span>}
                     </div>
                     {req.description && <p className="text-xs text-muted-foreground leading-relaxed">{req.description}</p>}
-                    {allCountries.length > 1 && <p className="text-xs text-muted-foreground mt-0.5">📍 {req.country}</p>}
+                    {req.showCountry && <p className="text-xs text-muted-foreground mt-0.5">📍 {req.country}</p>}
                   </div>
                 </div>
               ))}
-              {/* Tips separately collapsible */}
-              {allRequirements.filter(r => r.type === 'safety').length > 0 && (
-                <details className="px-4 py-3">
-                  <summary className="text-xs font-medium text-muted-foreground cursor-pointer">💡 Consejos del destino</summary>
-                  <div className="mt-2 space-y-1">
-                    {allRequirements.filter(r => r.type === 'safety').map((req, i) => (
-                      <p key={i} className="text-xs text-muted-foreground">· {req.title}</p>
-                    ))}
-                  </div>
-                </details>
-              )}
               <div className="px-4 py-2.5 bg-secondary/30">
-                <p className="text-xs text-muted-foreground">Basado en pasaporte de {originCountry}. Verifica con fuentes oficiales antes de viajar.</p>
+                <p className="text-xs text-muted-foreground">Basado en pasaporte de {originCountry}. Verifica siempre con fuentes oficiales.</p>
               </div>
             </div>
           )}
@@ -186,88 +149,103 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
 
       {/* Viajeros */}
       <div className="bg-white rounded-xl border border-border p-4">
-        <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-          <Users className="w-4 h-4" /> Viajeros
-        </p>
+        <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><Users className="w-4 h-4" /> Viajeros</p>
         <TripMembersPanel trip={trip} currentUserEmail={''} />
       </div>
     </div>
   );
 }
 
-// ── Today tab ─────────────────────────────────────────────────────────────────
-function DaySection({ label, city, docs, spots, tripId, isToday }) {
-  const DOC_ICONS = { flight: '✈️', hotel: '🏨', train: '🚆', bus: '🚌', car: '🚗', ticket: '🎟️', insurance: '🛡️', other: '📄' };
-  const SPOT_ICONS = { food: '🍜', sight: '🏛️', activity: '⚡', shopping: '🛍️', custom: '📍' };
+// ── Day card (Hoy / Mañana) ───────────────────────────────────────────────────
+function DayCard({ label, city, docs, spots, tripId, defaultOpen, itineraryDays }) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  // Check if there's an itinerary for this city
+  const cityItinerary = itineraryDays?.filter(d => d.city_id === city?.id) || [];
+  const hasItinerary = cityItinerary.length > 0;
+
+  const destUrl = hasItinerary
+    ? createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId + '&open_itinerary=true'
+    : createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId;
 
   const hasContent = docs.length > 0 || spots.length > 0;
 
   return (
-    <div className={`rounded-2xl border overflow-hidden ${isToday ? 'border-orange-300 bg-white' : 'border-border bg-white'}`}>
-      {/* Day header */}
-      <div className={`px-4 py-3 flex items-center justify-between ${isToday ? 'bg-orange-50 border-b border-orange-200' : 'bg-secondary/40 border-b border-border'}`}>
-        <div className="flex items-center gap-2">
-          <span className={`text-xs font-bold uppercase tracking-wide ${isToday ? 'text-orange-700' : 'text-muted-foreground'}`}>{label}</span>
-          <span className="text-sm font-semibold text-foreground">{city.name}</span>
+    <div className={`rounded-2xl border overflow-hidden ${defaultOpen ? 'border-orange-300' : 'border-border'} bg-white`}>
+      <button onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between px-4 py-3 ${defaultOpen ? 'bg-orange-50' : 'bg-secondary/30'} transition-colors`}>
+        <div className="flex items-center gap-3">
+          <span className={`text-xs font-bold uppercase tracking-wide ${defaultOpen ? 'text-orange-700' : 'text-muted-foreground'}`}>{label}</span>
+          <span className="text-sm font-semibold text-foreground">{city?.name}</span>
+          {city?.start_date && <span className="text-xs text-muted-foreground">{format(parseISO(city.start_date), 'dd MMM', { locale: es })}</span>}
         </div>
-        {city.start_date && (
-          <span className="text-xs text-muted-foreground">
-            {format(parseISO(city.start_date), 'dd MMM', { locale: es })}
-          </span>
-        )}
-      </div>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
 
-      {/* Documents for this day */}
-      {docs.length > 0 && (
-        <div className="divide-y divide-border">
-          {docs.map(doc => (
-            <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors">
-              <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
-                {doc.description && <p className="text-xs text-muted-foreground truncate">{doc.description}</p>}
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Spots for this day */}
-      {spots.length > 0 && (
-        <div className={`divide-y divide-border ${docs.length > 0 ? 'border-t border-border' : ''}`}>
-          {spots.map(spot => (
-            <div key={spot.id} className="flex items-center gap-3 px-4 py-2.5">
-              <span className="text-base shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-foreground truncate">{spot.title}</p>
-                {spot.notes && <p className="text-xs text-muted-foreground truncate">{spot.notes}</p>}
-              </div>
+      {open && (
+        <div>
+          {/* Docs */}
+          {docs.length > 0 && (
+            <div className="divide-y divide-border border-t border-border">
+              {docs.map(doc => (
+                <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/20 transition-colors">
+                  <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
+                    {doc.description && <p className="text-xs text-muted-foreground truncate">{doc.description}</p>}
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
 
-      {/* Empty state */}
-      {!hasContent && (
-        <div className="px-4 py-4 text-center">
-          <p className="text-xs text-muted-foreground">Sin documentos ni spots para este día</p>
-          <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-            className="text-xs text-orange-600 mt-1 inline-block">+ Añadir spots →</Link>
+          {/* Spots */}
+          {spots.length > 0 && (
+            <div className="divide-y divide-border border-t border-border">
+              {spots.map(spot => (
+                <div key={spot.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <span className="text-base shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">{spot.title}</p>
+                    {spot.notes && <p className="text-xs text-muted-foreground truncate">{spot.notes}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!hasContent && (
+            <div className="px-4 py-5 text-center border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Sin documentos ni spots asignados</p>
+              <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+                className="text-xs text-orange-600">+ Añadir spots al día →</Link>
+            </div>
+          )}
+
+          {/* Link to city itinerary */}
+          <Link to={destUrl}
+            className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
+            <span className="text-xs font-medium text-orange-600">
+              {hasItinerary ? `Ver itinerario de ${city?.name}` : `Abrir ${city?.name}`}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5 text-orange-600" />
+          </Link>
         </div>
       )}
     </div>
   );
 }
 
-function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
+// ── Today + Route tab ─────────────────────────────────────────────────────────
+function TodayRouteTab({ trip, cities, expenses, tripId }) {
   const today = new Date();
   const todayStr = format(today, 'yyyy-MM-dd');
   const tomorrowStr = format(new Date(today.getTime() + 86400000), 'yyyy-MM-dd');
   const currency = trip?.currency || 'EUR';
 
-  // Sort cities by start_date
   const sortedCities = useMemo(() =>
     [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
     [cities]
@@ -284,7 +262,6 @@ function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
     [sortedCities, tomorrowStr]
   );
 
-  // Fetch all docs and spots once
   const { data: allDocs = [] } = useQuery({
     queryKey: ['allDocs', tripId],
     queryFn: () => base44.entities.Document.filter({ trip_id: tripId }),
@@ -297,15 +274,18 @@ function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
     enabled: !!tripId, staleTime: 30000,
   });
 
-  // Filter docs by date
+  const { data: itineraryDays = [] } = useQuery({
+    queryKey: ['itineraryDays', tripId],
+    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+
   const docsForDate = (dateStr) =>
     allDocs.filter(d => d.date === dateStr || d.valid_from === dateStr || d.start_date === dateStr);
 
-  // Filter spots by city (only those assigned to a day = have trip_date field)
-  const spotsForCity = (cityId) =>
-    allSpots.filter(s => s.city_id === cityId && s.trip_date);
+  const spotsForCity = (cityId, dateStr) =>
+    allSpots.filter(s => s.city_id === cityId && s.trip_date === dateStr);
 
-  // Today's expenses
   const todayExpenses = useMemo(() =>
     expenses.filter(e => e.date === todayStr || (e.created_date || '').startsWith(todayStr)),
     [expenses, todayStr]
@@ -317,7 +297,6 @@ function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
 
   return (
     <div className="space-y-3">
-      {/* Day counter */}
       {dayNumber && totalDays && (
         <div className="flex items-center justify-between px-1">
           <span className="text-xs text-muted-foreground font-medium">Día {dayNumber} de {totalDays}</span>
@@ -327,29 +306,31 @@ function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
 
       {/* HOY */}
       {todayCity && (
-        <DaySection
+        <DayCard
           label="Hoy"
           city={todayCity}
           docs={docsForDate(todayStr)}
-          spots={spotsForCity(todayCity.id)}
+          spots={spotsForCity(todayCity.id, todayStr)}
           tripId={tripId}
-          isToday={true}
+          defaultOpen={true}
+          itineraryDays={itineraryDays}
         />
       )}
 
       {/* MAÑANA */}
-      {tomorrowCity && (
-        <DaySection
+      {tomorrowCity && tomorrowCity.id !== todayCity?.id && (
+        <DayCard
           label="Mañana"
           city={tomorrowCity}
           docs={docsForDate(tomorrowStr)}
-          spots={spotsForCity(tomorrowCity.id)}
+          spots={spotsForCity(tomorrowCity.id, tomorrowStr)}
           tripId={tripId}
-          isToday={false}
+          defaultOpen={false}
+          itineraryDays={itineraryDays}
         />
       )}
 
-      {/* Gastos hoy — solo si hay */}
+      {/* Gastos hoy */}
       {todayExpenses.length > 0 && (
         <div className="bg-white rounded-xl border border-border p-4">
           <div className="flex items-center justify-between mb-2">
@@ -375,6 +356,68 @@ function TodayTab({ trip, cities, expenses, tripId, trip_members }) {
         </p>
         <TripMembersPanel trip={trip} currentUserEmail={''} />
       </div>
+    </div>
+  );
+}
+
+// ── Trip finished summary ─────────────────────────────────────────────────────
+function TripFinishedTab({ trip, cities, expenses, spots }) {
+  const totalDays = (trip?.start_date && trip?.end_date)
+    ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1
+    : null;
+  const totalSpent = expenses.reduce((s, e) => s + (e.amount || 0), 0);
+  const avgPerDay = totalDays ? (totalSpent / totalDays) : 0;
+  const visitedSpots = spots.filter(s => s.visited).length;
+  const likedSpots = spots.filter(s => s.liked).length;
+  const currency = trip?.currency || 'EUR';
+  const members = trip?.members?.length || 1;
+
+  return (
+    <div className="space-y-4">
+      {/* Hero cierre */}
+      <div className="bg-orange-700 rounded-2xl p-6 text-white text-center">
+        <p className="text-4xl mb-3">🌸</p>
+        <h2 className="text-xl font-bold mb-1">Gracias por visitar</h2>
+        <p className="text-2xl font-bold">{trip?.destination}</p>
+        <p className="text-white/60 text-sm mt-2">
+          {trip?.start_date && trip?.end_date
+            ? `${format(parseISO(trip.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}`
+            : ''}
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { label: 'Días de viaje', value: totalDays || '—', icon: '📅' },
+          { label: members === 1 ? 'Viajero' : 'Viajeros', value: members, icon: '👥' },
+          { label: 'Ciudades', value: cities.length, icon: '🏙️' },
+          { label: 'Spots visitados', value: visitedSpots, icon: '📍' },
+          { label: 'Total gastado', value: `${totalSpent.toFixed(0)} ${currency}`, icon: '💰' },
+          { label: 'Media por día', value: `${avgPerDay.toFixed(0)} ${currency}`, icon: '📊' },
+        ].map(stat => (
+          <div key={stat.label} className="bg-white rounded-xl border border-border p-4">
+            <p className="text-xl mb-1">{stat.icon}</p>
+            <p className="text-lg font-bold text-foreground">{stat.value}</p>
+            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Cities visited */}
+      {cities.length > 0 && (
+        <div className="bg-white rounded-xl border border-border p-4">
+          <p className="text-sm font-semibold text-foreground mb-3">🗺️ Ruta del viaje</p>
+          <div className="flex flex-wrap gap-2">
+            {[...cities].sort((a,b) => (a.start_date||'').localeCompare(b.start_date||'')).map((city, i) => (
+              <div key={city.id} className="flex items-center gap-1">
+                {i > 0 && <ArrowRight className="w-3 h-3 text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground">{city.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -411,19 +454,23 @@ function ChatTab({ tripId, currentUserEmail, myProfile }) {
   );
 
   const sendMessage = async () => {
-    if (!message.trim() || sending) return;
+    const content = message.trim();
+    if (!content || sending) return;
     setSending(true);
+    setMessage('');
     try {
       await base44.entities.TripMessage.create({
         trip_id: tripId,
-        content: message.trim(),
+        content,
         created_by: currentUserEmail,
         sender_name: myProfile?.display_name || currentUserEmail,
       });
-      setMessage('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
-    } catch {}
-    setSending(false);
+    } catch(e) {
+      setMessage(content); // restore on error
+    } finally {
+      setSending(false);
+    }
   };
 
   const formatTime = (d) => { try { return format(new Date(d), 'HH:mm'); } catch { return ''; } };
@@ -442,7 +489,7 @@ function ChatTab({ tripId, currentUserEmail, myProfile }) {
 
   return (
     <div className="flex flex-col" style={{ minHeight: '55vh' }}>
-      <div className="flex-1 space-y-1 pb-4" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+      <div className="flex-1 pb-4" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
         {grouped.length === 0 && (
           <div className="text-center py-16">
             <p className="text-3xl mb-3">💬</p>
@@ -463,13 +510,17 @@ function ChatTab({ tripId, currentUserEmail, myProfile }) {
           const displayName = profile?.display_name || msg.sender_name || (msg.created_by || '').split('@')[0] || 'Usuario';
           const initials = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
           return (
-            <div key={msg.id || i} className={`flex items-end gap-2 ${me ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div key={msg.id || i} className={`flex items-end gap-2 mb-2 ${me ? 'flex-row-reverse' : 'flex-row'}`}>
               {!me && (
                 <div className="w-7 h-7 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-xs font-semibold text-orange-700 shrink-0 mb-1">{initials}</div>
               )}
               <div className={`flex flex-col max-w-[75%] ${me ? 'items-end' : 'items-start'}`}>
                 {!me && <p className="text-xs text-muted-foreground mb-0.5 px-1">{displayName}</p>}
-                <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${me ? 'bg-orange-700 text-white rounded-br-sm' : 'bg-secondary border border-border text-foreground rounded-bl-sm'}`}>
+                <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                  me
+                    ? 'bg-orange-700 text-white rounded-br-sm'
+                    : 'bg-white text-foreground rounded-bl-sm border border-border shadow-sm'
+                }`}>
                   {msg.content}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 px-1">{formatTime(msg.created_date)}</p>
@@ -479,11 +530,19 @@ function ChatTab({ tripId, currentUserEmail, myProfile }) {
         })}
       </div>
       <div className="flex gap-2 pt-3 border-t border-border">
-        <Input value={message} onChange={e => setMessage(e.target.value)}
+        <Input
+          value={message}
+          onChange={e => setMessage(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-          placeholder="Mensaje..." className="flex-1 h-10 text-sm" disabled={sending} />
-        <Button onClick={sendMessage} disabled={!message.trim() || sending}
-          className="h-10 px-4 bg-orange-700 hover:bg-orange-800 text-white">
+          placeholder="Mensaje..."
+          className="flex-1 h-10 text-sm bg-white"
+          disabled={sending}
+        />
+        <Button
+          onClick={sendMessage}
+          disabled={!message.trim() || sending}
+          className="h-10 px-4 bg-orange-700 hover:bg-orange-800 text-white shrink-0"
+        >
           <Send className="w-4 h-4" />
         </Button>
       </div>
@@ -542,23 +601,31 @@ export default function Home() {
   const { data: expenses = [] } = useQuery({ queryKey: ['expenses', tripId], queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: packingItems = [] } = useQuery({ queryKey: ['packingItems', tripId], queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: documents = [] } = useQuery({ queryKey: ['documents', tripId], queryFn: () => base44.entities.Document.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
+  const { data: allSpots = [] } = useQuery({ queryKey: ['spots', tripId], queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: tripMessages = [] } = useQuery({ queryKey: ['tripMessages', tripId], queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 10000, refetchInterval: 30000 });
   const { data: myProfile } = useQuery({ queryKey: ['myProfile', currentUser?.id], queryFn: async () => { if (!currentUser?.id) return null; const r = await base44.entities.UserProfile.filter({ user_id: currentUser.id }); return r[0]||null; }, enabled: !!currentUser?.id, staleTime: 60000 });
 
-  const today = new Date();
-  const todayStr = format(today, 'yyyy-MM-dd');
-  const tripStart = trip?.start_date;
-  const tripEnd = trip?.end_date;
-  const tripInProgress = tripStart && tripEnd && todayStr >= tripStart && todayStr <= tripEnd;
+  // Trip state
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const tripStart = trip?.start_date || '';
+  const tripEnd = trip?.end_date || '';
   const tripNotStarted = tripStart && todayStr < tripStart;
-  const daysUntilTrip = tripStart ? differenceInDays(parseISO(tripStart), today) : null;
+  const tripFinished = tripEnd && todayStr > tripEnd;
+  const tripInProgress = tripStart && tripEnd && todayStr >= tripStart && todayStr <= tripEnd;
+  const daysUntilTrip = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
 
   const unreadCount = useMemo(() => {
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return tripMessages.filter(m => m.created_by !== currentUserEmail && new Date(m.created_date) > cutoff).length;
   }, [tripMessages, currentUserEmail]);
 
-  const mainTabLabel = tripInProgress ? 'Hoy' : 'Preparación';
+  const sortedCities = useMemo(() =>
+    [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
+    [cities]
+  );
+
+  // Determine main tab label
+  const mainTabLabel = tripFinished ? 'Resumen' : tripNotStarted ? 'Preparación' : 'Hoy';
 
   if (tripLoading || !tripId) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -589,13 +656,13 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Trip info */}
+          {/* Trip title */}
           <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">{trip?.name}</h1>
-          <div className="flex flex-wrap gap-3 text-white/80 text-sm mb-3">
-            {cities.length > 0 ? (
-              <span className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex flex-wrap gap-3 text-white/80 text-sm mb-4">
+            {sortedCities.length > 0 ? (
+              <span className="flex items-center gap-1 flex-wrap">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
-                {[...cities].sort((a,b) => (a.start_date||'').localeCompare(b.start_date||'')).map((city, i) => (
+                {sortedCities.map((city, i) => (
                   <span key={city.id} className="flex items-center gap-1">
                     {i > 0 && <ArrowRight className="w-3 h-3 opacity-60" />}
                     {city.name}
@@ -603,19 +670,25 @@ export default function Home() {
                 ))}
               </span>
             ) : (
-              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{trip?.destination}, {trip?.country}</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{trip?.destination}</span>
             )}
-            {trip?.start_date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{format(parseISO(trip.start_date), 'dd MMM', { locale: es })}{trip.end_date && ` - ${format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}`}</span>}
-            <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />{trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}</span>
+            {trip?.start_date && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                {format(parseISO(trip.start_date), 'dd MMM', { locale: es })}
+                {trip.end_date && ` - ${format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              {trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}
+            </span>
           </div>
-
-
 
           {/* Tabs */}
           <div className="flex border-b border-white/20">
             {[
               { key: 'main', label: mainTabLabel },
-              { key: 'itinerary', label: 'Itinerario' },
               { key: 'chat', label: unreadCount > 0 ? `Chat · ${unreadCount}` : 'Chat' },
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
@@ -632,33 +705,44 @@ export default function Home() {
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} />
 
-        {tab === 'main' && (
+        {/* PRE-TRIP */}
+        {tab === 'main' && tripNotStarted && (
+          <PreTripTab
+            trip={trip}
+            cities={sortedCities}
+            packingItems={packingItems}
+            documents={documents}
+            myProfile={myProfile}
+          />
+        )}
+
+        {/* IN PROGRESS */}
+        {tab === 'main' && tripInProgress && (
           <>
-            {tripNotStarted && daysUntilTrip !== null && (
+            {daysUntilTrip !== null && daysUntilTrip > 0 && (
               <TripCountdownBanner daysUntilTrip={daysUntilTrip} tripId={tripId} cities={cities} packingItems={packingItems} trip={trip} expenses={expenses} />
             )}
-            {tripInProgress
-              ? <TodayTab trip={trip} cities={cities} expenses={expenses} tripId={tripId} trip_members={trip?.members} />
-              : <PreTripTab trip={trip} cities={cities} packingItems={packingItems} documents={documents} myProfile={myProfile} />
-            }
+            <TodayRouteTab trip={trip} cities={sortedCities} expenses={expenses} tripId={tripId} />
           </>
         )}
 
-        {tab === 'itinerary' && (
-          <IntelligentTimeline tripId={tripId} cities={cities} expenses={expenses} trip={trip} />
+        {/* FINISHED */}
+        {tab === 'main' && tripFinished && (
+          <TripFinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />
         )}
 
+        {/* CHAT */}
         {tab === 'chat' && (
           <ChatTab tripId={tripId} currentUserEmail={currentUserEmail} myProfile={myProfile} />
         )}
       </div>
 
-      {/* Settings Dialog */}
+      {/* Settings */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="text-foreground text-2xl">⚙️ Configuración del Viaje</DialogTitle></DialogHeader>
           <div className="space-y-4 pt-4">
-            <div><label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label><Input value={formData.name||''} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="ej. Japón 2025" className="bg-input border-border text-foreground" /></div>
+            <div><label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label><Input value={formData.name||''} onChange={e => setFormData({...formData, name: e.target.value})} className="bg-input border-border text-foreground" /></div>
             <div className="grid md:grid-cols-2 gap-4">
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">Destino *</label><Input value={formData.destination||''} onChange={e => setFormData({...formData, destination: e.target.value})} className="bg-input border-border text-foreground" /></div>
               <div><label className="text-sm font-medium text-foreground mb-1.5 block">País</label><Input value={formData.country||''} onChange={e => setFormData({...formData, country: e.target.value})} className="bg-input border-border text-foreground" /></div>
@@ -674,7 +758,7 @@ export default function Home() {
               <Input value={formData.cover_image||''} onChange={e => setFormData({...formData, cover_image: e.target.value})} placeholder="https://images.unsplash.com/..." className="bg-input border-border text-foreground" />
             </div>
             <div className="flex items-center justify-between pt-4">
-              {isAdmin && <Button variant="ghost" size="sm" onClick={() => { setSettingsOpen(false); setDeleteOpen(true); }} className="text-destructive hover:text-destructive hover:bg-destructive/10"><Trash2 className="w-4 h-4 mr-2" />Eliminar viaje</Button>}
+              {isAdmin && <Button variant="ghost" size="sm" onClick={() => { setSettingsOpen(false); setDeleteOpen(true); }} className="text-destructive hover:bg-destructive/10"><Trash2 className="w-4 h-4 mr-2" />Eliminar viaje</Button>}
               <div className="flex gap-3 ml-auto">
                 <Button variant="outline" onClick={() => setSettingsOpen(false)}>Cancelar</Button>
                 <Button onClick={() => updateTripMutation.mutate(formData)} className="bg-orange-700 hover:bg-orange-800" disabled={!formData.name || !formData.destination || updateTripMutation.isPending}>{updateTripMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}</Button>
