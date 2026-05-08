@@ -295,9 +295,13 @@ function TodayTab({ trip, cities, expenses, tripId }) {
         </div>
       )}
 
-      <Link to={createPageUrl('Cities') + '?trip_id=' + tripId}
+      <Link to={todayCity
+          ? createPageUrl('CityDetail') + '?city_id=' + todayCity.id + '&trip_id=' + tripId
+          : createPageUrl('Cities') + '?trip_id=' + tripId}
         className="flex items-center justify-between bg-white rounded-xl border border-border px-4 py-3 hover:shadow-sm transition-shadow">
-        <span className="text-sm font-medium text-foreground">Ver itinerario completo</span>
+        <span className="text-sm font-medium text-foreground">
+          {todayCity ? `Ver itinerario de hoy en ${todayCity.name}` : 'Ver itinerario completo'}
+        </span>
         <ArrowRight className="w-4 h-4 text-muted-foreground" />
       </Link>
     </div>
@@ -517,26 +521,24 @@ export default function Home() {
           {/* Trip info */}
           <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">{trip?.name}</h1>
           <div className="flex flex-wrap gap-3 text-white/80 text-sm mb-3">
-            <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{trip?.destination}, {trip?.country}</span>
+            {cities.length > 0 ? (
+              <span className="flex items-center gap-1.5 flex-wrap">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                {cities.map((city, i) => (
+                  <span key={city.id} className="flex items-center gap-1">
+                    {i > 0 && <ArrowRight className="w-3 h-3 opacity-60" />}
+                    {city.name}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{trip?.destination}, {trip?.country}</span>
+            )}
             {trip?.start_date && <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{format(parseISO(trip.start_date), 'dd MMM', { locale: es })}{trip.end_date && ` - ${format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}`}</span>}
             <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />{trip?.members?.length || 1} viajero{(trip?.members?.length || 1) > 1 ? 's' : ''}</span>
           </div>
 
-          {/* Active city */}
-          {activeCity && (
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="flex items-center gap-2 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full text-white text-sm">
-                <span>{activeMeta?.flag}</span>
-                <span>Ahora: {activeCity.name}</span>
-                <span className="text-white/60">· {activeMeta?.currency}</span>
-              </span>
-              {countryRoute?.length > 1 && (
-                <span className="text-white/60 text-xs flex items-center gap-1">
-                  {countryRoute.map((c, i) => <span key={c} className="flex items-center gap-1">{i > 0 && <ArrowRight className="w-3 h-3" />}{c}</span>)}
-                </span>
-              )}
-            </div>
-          )}
+
 
           {/* Tabs */}
           <div className="flex border-b border-white/20">
