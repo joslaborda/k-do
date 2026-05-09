@@ -17,8 +17,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getTripCoverImage } from '@/lib/tripImage';
-import TripMembersPanel from '@/components/trip/TripMembersPanel';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
@@ -302,9 +300,15 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
                 {doneCount}/{actionableReqs.length} completados · pasaporte de {originCountry}
               </p>
             </div>
-            {doneCount === actionableReqs.length && (
+            {doneCount === actionableReqs.length && actionableReqs.length > 0 ? (
               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Todo listo ✓</span>
-            )}
+            ) : (actionableReqs.length - doneCount) > 0 ? (
+              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
+                {actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 0
+                  ? `${actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length} pendiente${actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 1 ? 's' : ''}`
+                  : null}
+              </span>
+            ) : null}
           </div>
           {actionableReqs.map(req => (
             <button key={req.id} onClick={() => toggleCheck(req.id)}
@@ -347,7 +351,28 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
             <UserPlus className="w-3.5 h-3.5" />Invitar
           </Link>
         </div>
-        <TripMembersPanel trip={trip} currentUserEmail={''} />
+        <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
+          {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
+            const initials = (email || '').split('@')[0].slice(0,2).toUpperCase();
+            const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+            return (
+              <div key={email} className="flex flex-col items-center gap-1">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>
+                  {initials}
+                </div>
+                <span className="text-xs text-muted-foreground">{i === 0 ? 'Admin' : email.split('@')[0]}</span>
+              </div>
+            );
+          })}
+          <Link to={createPageUrl('TripDetail') + '?trip_id=' + trip?.id}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center">
+                <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+              </div>
+              <span className="text-xs text-muted-foreground">Añadir</span>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -461,7 +486,28 @@ function TodayTab({ trip, cities, tripId }) {
             <UserPlus className="w-3.5 h-3.5" />Invitar
           </Link>
         </div>
-        <TripMembersPanel trip={trip} currentUserEmail={''} />
+        <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
+          {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
+            const initials = (email || '').split('@')[0].slice(0,2).toUpperCase();
+            const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+            return (
+              <div key={email} className="flex flex-col items-center gap-1">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>
+                  {initials}
+                </div>
+                <span className="text-xs text-muted-foreground">{i === 0 ? 'Tú' : email.split('@')[0]}</span>
+              </div>
+            );
+          })}
+          <Link to={createPageUrl('TripDetail') + '?trip_id=' + trip?.id}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center">
+                <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+              </div>
+              <span className="text-xs text-muted-foreground">Añadir</span>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -826,25 +872,22 @@ export default function Home() {
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Hero */}
-      <div className="relative"
-        style={{ backgroundImage: `url(${getTripCoverImage(trip, cities)})`, backgroundSize: 'cover', backgroundPosition: 'center 20%' }}>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/75" />
-        <div className="relative z-10 max-w-3xl mx-auto px-5 pt-12">
+      {/* Header — light option D */}
+      <div className="bg-background border-b border-border">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
 
-          {/* Header */}
+          {/* Top row */}
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('TripsList')}>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-1.5">
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                 <ArrowRight className="w-4 h-4 rotate-180" />Mis viajes
-              </Button>
+              </button>
             </Link>
             <div className="flex items-center gap-2">
-              {/* Bell */}
               <div className="relative">
                 <button onClick={() => setNotifOpen(o => !o)}
-                  className="bg-white/15 border border-white/25 rounded-xl w-9 h-9 flex items-center justify-center hover:bg-white/25 transition-colors relative">
-                  <Bell className="w-4 h-4 text-white" />
+                  className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-border/40 transition-colors relative">
+                  <Bell className="w-4 h-4 text-muted-foreground" />
                   {notifications.length > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
                       {notifications.length > 9 ? '9+' : notifications.length}
@@ -855,9 +898,7 @@ export default function Home() {
                   <div className="absolute top-11 right-0 w-72 bg-white rounded-2xl border border-border shadow-xl z-50 overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                       <p className="text-sm font-semibold text-foreground">Notificaciones</p>
-                      <button onClick={() => setNotifOpen(false)}>
-                        <X className="w-4 h-4 text-muted-foreground" />
-                      </button>
+                      <button onClick={() => setNotifOpen(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
                     </div>
                     {notifications.length === 0 ? (
                       <div className="px-4 py-8 text-center">
@@ -877,31 +918,29 @@ export default function Home() {
                   </div>
                 )}
               </div>
-
-              {/* Settings */}
               <button onClick={() => setSettingsOpen(true)}
-                className="bg-white/15 border border-white/25 rounded-xl w-9 h-9 flex items-center justify-center hover:bg-white/25 transition-colors">
-                <Settings className="w-4 h-4 text-white" />
+                className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-border/40 transition-colors">
+                <Settings className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
           </div>
 
           {/* Trip info */}
-          <h1 className="text-3xl font-semibold text-white mb-2 drop-shadow-lg">{trip?.name}</h1>
-          <div className="flex flex-wrap gap-3 text-white/70 text-sm mb-4">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">{trip?.name}</h1>
+          <div className="flex flex-wrap gap-3 text-muted-foreground text-sm mb-4">
             {sortedCities.length > 0 ? (
               <span className="flex items-center gap-1 flex-wrap">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 shrink-0 text-primary" />
                 {sortedCities.map((city, i) => (
                   <span key={city.id} className="flex items-center gap-1">
-                    {i > 0 && <ArrowRight className="w-3 h-3 opacity-50" />}
+                    {i > 0 && <ArrowRight className="w-3 h-3 opacity-40" />}
                     {city.name}
                   </span>
                 ))}
               </span>
             ) : (
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5" />{trip?.destination}
+                <MapPin className="w-3.5 h-3.5 text-primary" />{trip?.destination}
               </span>
             )}
             {trip?.start_date && (
@@ -914,16 +953,16 @@ export default function Home() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-white/20">
+          <div className="flex border-b border-border">
             {[
               { key: 'main', label: mainTabLabel },
               { key: 'chat', label: unreadMessages > 0 ? `Chat · ${unreadMessages}` : 'Chat' },
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
-                className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+                className={`px-5 py-3 text-sm font-medium transition-colors border-b-2 ${
                   tab === t.key
-                    ? 'text-white border-white'
-                    : 'text-white/50 border-transparent hover:text-white/75'
+                    ? 'text-primary border-primary'
+                    : 'text-muted-foreground border-transparent hover:text-foreground'
                 }`}>
                 {t.label}
               </button>
