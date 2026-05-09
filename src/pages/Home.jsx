@@ -190,12 +190,17 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           )}
 
           {!hasContent && (
-            <div className="px-4 py-5 text-center border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2">Sin documentos ni spots asignados para este día</p>
-              <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId} className="text-xs text-primary font-medium">
-                + Explorar spots →
-              </Link>
-            </div>
+            <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+              className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-accent/30 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                <span className="text-lg">📍</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Guarda y asigna lugares para hoy</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </Link>
           )}
 
           <Link to={createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId}
@@ -1063,6 +1068,12 @@ export default function Home() {
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const [tab, setTab] = useState('main');
+  const [chatLastRead, setChatLastRead] = useState(new Date());
+
+  const handleTabChange = (key) => {
+    setTab(key);
+    if (key === 'chat') setChatLastRead(new Date());
+  };
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -1169,13 +1180,12 @@ export default function Home() {
   }, [expenses, documents, allSpots, currentUserEmail, trip]);
 
   const unreadMessages = useMemo(() => {
-    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return tripMessages.filter(m =>
       m.user_id !== currentUserId &&
       m.user_email !== currentUserEmail &&
-      new Date(m.created_date) > cutoff
+      new Date(m.created_date) > chatLastRead
     ).length;
-  }, [tripMessages, currentUserId, currentUserEmail]);
+  }, [tripMessages, currentUserId, currentUserEmail, chatLastRead]);
 
   const sortedCities = useMemo(() =>
     [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
@@ -1277,13 +1287,13 @@ export default function Home() {
 
           {/* Tabs */}
           <div className="flex border-b border-border">
-            <button onClick={() => setTab('main')}
+            <button onClick={() => handleTabChange('main')}
               className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
                 tab === 'main' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
               }`}>
               {mainTabLabel}
             </button>
-            <button onClick={() => setTab('chat')}
+            <button onClick={() => handleTabChange('chat')}
               className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 flex items-center justify-center gap-2 ${
                 tab === 'chat' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
               }`}>
@@ -1299,7 +1309,7 @@ export default function Home() {
       </div>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-5 py-5 pb-4 space-y-3">
+      <div className="max-w-3xl mx-auto px-5 pt-5 pb-2 space-y-3">
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} />
 
