@@ -1277,25 +1277,29 @@ export default function Home() {
 
           {/* Tabs */}
           <div className="flex border-b border-border">
-            {[
-              { key: 'main', label: mainTabLabel },
-              { key: 'chat', label: unreadMessages > 0 ? `Chat · ${unreadMessages}` : 'Chat' },
-            ].map(t => (
-              <button key={t.key} onClick={() => setTab(t.key)}
-                className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
-                  tab === t.key
-                    ? 'text-primary border-primary'
-                    : 'text-muted-foreground border-transparent hover:text-foreground'
-                }`}>
-                {t.label}
-              </button>
-            ))}
+            <button onClick={() => setTab('main')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
+                tab === 'main' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
+              }`}>
+              {mainTabLabel}
+            </button>
+            <button onClick={() => setTab('chat')}
+              className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 flex items-center justify-center gap-2 ${
+                tab === 'chat' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
+              }`}>
+              Chat
+              {unreadMessages > 0 && (
+                <span className="w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center leading-none">
+                  {unreadMessages > 9 ? '9+' : unreadMessages}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-5 py-5 pb-20 space-y-3">
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-4 space-y-3">
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} />
 
