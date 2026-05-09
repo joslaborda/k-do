@@ -100,6 +100,15 @@
     "city_name": {
       "type": "string",
       "description": "Ciudad del spot, para b\u00fasqueda"
+    },
+    "assigned_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha asignada del spot en el itinerario del viaje"
+    },
+    "day_order": {
+      "type": "number",
+      "description": "Orden del spot dentro del d\u00eda para el itinerario"
     }
   },
   "required": [
