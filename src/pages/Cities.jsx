@@ -1,289 +1,627 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapPin, ArrowUpDown, Plus } from 'lucide-react';
-import { usePullToRefresh } from '@/components/hooks/usePullToRefresh';
-import { useUndo } from '@/components/hooks/useUndo';
-import PullToRefreshIndicator from '@/components/PullToRefreshIndicator';
-import { base44 } from '@/api/base44Client';
-import CityCard from '@/components/cities/CityCard';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, X, Check, GripVertical, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-function normalizeText(str = '') {
-  return str
-    .toString()
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+// ── Constants ─────────────────────────────────────────────────────────────────
+const DOC_ICONS = { flight:'✈️', hotel:'🏨', train:'🚆', bus:'🚌', car:'🚗', ticket:'🎟️', insurance:'🛡️', other:'📄' };
+const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
+const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
+
+function getTransportIcon(docs, cityStartDate) {
+  if (!docs || !cityStartDate) return null;
+  const doc = docs.find(d => {
+    const docDate = d.date || d.valid_from || d.start_date;
+    return docDate === cityStartDate && DOC_TRANSPORT.has(d.type || d.doc_type);
+  });
+  if (!doc) return null;
+  const t = doc.type || doc.doc_type;
+  return t === 'flight' ? '✈️' : t === 'train' ? '🚆' : t === 'bus' ? '🚌' : '⛴️';
 }
 
-const COUNTRY_ALIASES = [
-  { keys: ['japan', 'japon', 'japón', 'jp'], value: 'Japón' },
-  { keys: ['italy', 'italia', 'it'], value: 'Italia' },
-  { keys: ['france', 'francia', 'fr'], value: 'Francia' },
-  { keys: ['spain', 'espana', 'españa', 'es'], value: 'España' },
-  { keys: ['portugal', 'pt'], value: 'Portugal' },
-  { keys: ['germany', 'alemania', 'de'], value: 'Alemania' },
-  { keys: ['united kingdom', 'uk', 'reino unido', 'england', 'britain'], value: 'Reino Unido' },
-  { keys: ['united states', 'usa', 'estados unidos', 'eeuu'], value: 'Estados Unidos' },
-  { keys: ['mexico', 'méxico', 'mx'], value: 'México' },
-  { keys: ['argentina', 'ar'], value: 'Argentina' },
-  { keys: ['brazil', 'brasil', 'br'], value: 'Brasil' },
-  { keys: ['thailand', 'tailandia', 'th'], value: 'Tailandia' },
-  { keys: ['south korea', 'korea', 'corea', 'corea del sur', 'kr'], value: 'Corea del Sur' },
-  { keys: ['china', 'cn'], value: 'China' },
-  { keys: ['vietnam', 'vn'], value: 'Vietnam' },
-  { keys: ['singapore', 'singapur', 'sg'], value: 'Singapur' },
-  { keys: ['indonesia', 'id'], value: 'Indonesia' },
-  { keys: ['morocco', 'marruecos', 'ma'], value: 'Marruecos' },
-  { keys: ['turkey', 'turquia', 'turquía', 'tr'], value: 'Turquía' },
-  { keys: ['switzerland', 'suiza', 'ch'], value: 'Suiza' },
-  { keys: ['greece', 'grecia', 'gr'], value: 'Grecia' },
-];
+// ── Draggable spot list ───────────────────────────────────────────────────────
+function DraggableSpots({ spots, onReorder, onEdit }) {
+  const [items, setItems] = useState(spots);
+  const [dragging, setDragging] = useState(null);
+  const [dragOver, setDragOver] = useState(null);
+  const touchRef = useRef(null);
 
-function detectCountryFromText(text) {
-  const n = normalizeText(text);
-  if (!n) return '';
-  for (const row of COUNTRY_ALIASES) {
-    for (const k of row.keys) {
-      const kn = normalizeText(k);
-      if (n === kn) return row.value;
+  useEffect(() => { setItems(spots); }, [spots]);
+
+  const onDragStart = (e, i) => { setDragging(i); e.dataTransfer.effectAllowed = 'move'; };
+  const onDragOver = (e, i) => { e.preventDefault(); setDragOver(i); };
+  const onDrop = (e, i) => {
+    e.preventDefault();
+    if (dragging === null || dragging === i) return;
+    const next = [...items];
+    const [m] = next.splice(dragging, 1);
+    next.splice(i, 0, m);
+    setItems(next); setDragging(null); setDragOver(null);
+    onReorder(next);
+  };
+  const onDragEnd = () => { setDragging(null); setDragOver(null); };
+
+  const onTouchStart = (e, i) => { touchRef.current = i; setDragging(i); };
+  const onTouchMove = (e) => {
+    if (touchRef.current === null) return;
+    e.preventDefault();
+    const y = e.touches[0].clientY;
+    document.querySelectorAll('[data-spot-row]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (y >= r.top && y <= r.bottom) setDragOver(parseInt(el.dataset.spotRow));
+    });
+  };
+  const onTouchEnd = () => {
+    if (touchRef.current !== null && dragOver !== null && touchRef.current !== dragOver) {
+      const next = [...items];
+      const [m] = next.splice(touchRef.current, 1);
+      next.splice(dragOver, 0, m);
+      setItems(next);
+      onReorder(next);
     }
-  }
-  for (const row of COUNTRY_ALIASES) {
-    for (const k of row.keys) {
-      const kn = normalizeText(k);
-      if (n.includes(kn) || kn.includes(n)) return row.value;
-    }
-  }
-  return '';
-}
-
-export default function Cities() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripId = urlParams.get('trip_id');
-  const navigate = useNavigate();
-
-  const [addCityOpen, setAddCityOpen] = useState(false);
-  const [newCityName, setNewCityName] = useState('');
-  const [newCityCountry, setNewCityCountry] = useState('');
-  const [redirected, setRedirected] = useState(false);
-
-  const queryClient = useQueryClient();
-  const { performDelete } = useUndo();
-  const { toast } = useToast();
-
-  const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['cities'] });
-    await queryClient.invalidateQueries({ queryKey: ['itineraryDays'] });
+    touchRef.current = null; setDragging(null); setDragOver(null);
   };
 
-  const { isPulling, pullDistance } = usePullToRefresh(handleRefresh);
+  return (
+    <div onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+      {items.map((spot, i) => (
+        <div key={spot.id} data-spot-row={i}
+          draggable
+          onDragStart={e => onDragStart(e, i)}
+          onDragOver={e => onDragOver(e, i)}
+          onDrop={e => onDrop(e, i)}
+          onDragEnd={onDragEnd}
+          onTouchStart={e => onTouchStart(e, i)}
+          className={`flex items-center gap-2 px-4 py-3 border-t border-border transition-all select-none
+            ${dragging === i ? 'opacity-40' : ''}
+            ${dragOver === i && dragging !== i ? 'bg-accent/40' : ''}
+          `}>
+          <GripVertical className="w-4 h-4 text-muted-foreground/30 shrink-0 cursor-grab touch-none" />
+          <span className="text-sm shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
+            {spot.notes
+              ? <p className="text-xs text-muted-foreground mt-0.5 truncate">{spot.notes}</p>
+              : <button onClick={() => onEdit(spot)} className="text-xs text-primary mt-0.5 flex items-center gap-1">
+                  <Plus className="w-3 h-3" />Añadir nota
+                </button>
+            }
+          </div>
+          <button onClick={() => onEdit(spot)}
+            className="w-7 h-7 rounded-lg border border-border bg-white flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  const { data: cities = [], isLoading } = useQuery({
+// ── Spot edit modal ───────────────────────────────────────────────────────────
+function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
+  const [notes, setNotes] = useState(spot?.notes || '');
+  useEffect(() => { if (spot) setNotes(spot.notes || ''); }, [spot]);
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
+        <DialogHeader className="px-4 py-3 border-b border-border">
+          <DialogTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <span>{SPOT_ICONS[spot?.type] || '📍'}</span>
+            {spot?.title}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="px-4 py-4">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Nota personal</p>
+          <Textarea
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="Añade una nota para este spot..."
+            className="text-sm bg-secondary border-border resize-none"
+            rows={3}
+            autoFocus
+          />
+        </div>
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+          <button onClick={() => onRemove(spot)}
+            className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            Quitar del día
+          </button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
+            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
+              onClick={() => onSave(spot, notes)}>Guardar</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Day expanded content ──────────────────────────────────────────────────────
+function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient }) {
+  const [editingSpot, setEditingSpot] = useState(null);
+  const [notes, setNotes] = useState(day?.content || '');
+  const [notesChanged, setNotesChanged] = useState(false);
+  const [titleVal, setTitleVal] = useState(day?.title || '');
+  const [titleEditing, setTitleEditing] = useState(isEmpty && !day?.title);
+
+  const dayDocs = useMemo(() =>
+    [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')),
+    [docs]
+  );
+
+  const saveNotes = async () => {
+    if (!day?.id || !notesChanged) return;
+    await base44.entities.ItineraryDay.update(day.id, { content: notes });
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    setNotesChanged(false);
+  };
+
+  const saveTitle = async () => {
+    if (!day?.id) return;
+    await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    setTitleEditing(false);
+  };
+
+  const handleReorder = async (newOrder) => {
+    await Promise.all(newOrder.map((s, i) => base44.entities.Spot.update(s.id, { day_order: i })));
+    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+  };
+
+  const handleSpotSave = async (spot, newNotes) => {
+    await base44.entities.Spot.update(spot.id, { notes: newNotes });
+    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+    setEditingSpot(null);
+  };
+
+  const handleSpotRemove = async (spot) => {
+    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null });
+    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+    setEditingSpot(null);
+  };
+
+  const bgClass = isToday_ ? 'bg-orange-50/50' : 'bg-white';
+  const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
+
+  return (
+    <div className={`${bgClass} ${borderLeft}`}>
+      {/* Title — for empty days or editing */}
+      {(isEmpty || titleEditing) && (
+        <div className="px-4 py-3 border-t border-border bg-white">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Título del día</p>
+          <div className="flex items-center gap-2">
+            <Input
+              value={titleVal}
+              onChange={e => setTitleVal(e.target.value)}
+              placeholder="¿Qué harás este día?"
+              className="flex-1 h-9 text-sm bg-secondary border-border"
+              autoFocus={isEmpty}
+              onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }}
+            />
+            <button onClick={() => setTitleEditing(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+            <button onClick={saveTitle} className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center"><Check className="w-3.5 h-3.5 text-white" /></button>
+          </div>
+        </div>
+      )}
+
+      {/* Documents */}
+      {dayDocs.length > 0 && (
+        <div>
+          <div className="px-4 py-1.5 bg-secondary/50 border-t border-border">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Documentos</p>
+          </div>
+          {dayDocs.map(doc => (
+            <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
+              className="flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
+              <span className="text-lg shrink-0">{DOC_ICONS[doc.type || doc.doc_type] || DOC_ICONS.other}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
+                {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Spots */}
+      {spots.length > 0 && (
+        <div>
+          <div className="px-4 py-1.5 bg-secondary/50 border-t border-border">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Spots</p>
+          </div>
+          <DraggableSpots
+            spots={spots}
+            onReorder={handleReorder}
+            onEdit={setEditingSpot}
+          />
+        </div>
+      )}
+
+      {/* Add spot */}
+      <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+        className="flex items-center gap-2 px-4 py-3 border-t border-border hover:bg-accent/20 transition-colors">
+        <MapPin className="w-3.5 h-3.5 text-primary" />
+        <span className="text-sm text-primary font-medium">Añadir spot</span>
+      </Link>
+
+      {/* Notes */}
+      <div className="px-4 py-3 border-t border-border">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Notas del día</p>
+        <Textarea
+          value={notes}
+          onChange={e => { setNotes(e.target.value); setNotesChanged(true); }}
+          onBlur={saveNotes}
+          placeholder={
+            isToday_ ? '¿Algo que apuntar para hoy?' :
+            isTomorrow_ ? '¿Algo que apuntar para mañana?' :
+            '¿Algo que apuntar para este día?'
+          }
+          className="text-sm bg-white border-border resize-none min-h-[60px] w-full"
+          rows={2}
+        />
+      </div>
+
+      {editingSpot && (
+        <SpotEditModal
+          spot={editingSpot}
+          open={!!editingSpot}
+          onClose={() => setEditingSpot(null)}
+          onSave={handleSpotSave}
+          onRemove={handleSpotRemove}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Day row ───────────────────────────────────────────────────────────────────
+function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  const docs = useMemo(() =>
+    allDocs.filter(d => {
+      const dd = d.date || d.valid_from || d.start_date;
+      return dd === dateStr;
+    }),
+    [allDocs, dateStr]
+  );
+
+  const spots = useMemo(() =>
+    allSpots
+      .filter(s => s.assigned_date === dateStr && s.city_id === cityId)
+      .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999)),
+    [allSpots, dateStr, cityId]
+  );
+
+  const hasContent = docs.length > 0 || spots.length > 0;
+  const isEmpty = !day?.title && !hasContent;
+  const label = isToday_ ? format(parseISO(dateStr), 'dd MMM', { locale: es }) : format(parseISO(dateStr), 'dd MMM', { locale: es });
+
+  const rowBg = isToday_
+    ? 'bg-orange-50 border-l-2 border-l-primary'
+    : 'bg-white';
+
+  return (
+    <div className={`border-t-4 border-t-background ${isToday_ ? '' : ''}`}>
+      <button onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center gap-3 px-4 py-3 ${rowBg} transition-colors hover:bg-opacity-80`}>
+        <span className={`text-xs font-semibold w-12 shrink-0 text-left ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
+          {label}
+        </span>
+        <span className={`flex-1 text-sm text-left truncate ${
+          day?.title
+            ? isToday_ ? 'font-semibold text-primary' : 'font-medium text-foreground'
+            : 'text-muted-foreground italic'
+        }`}>
+          {day?.title || 'Sin planificar'}
+        </span>
+        {isToday_ && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0">hoy</span>}
+        {isTomorrow_ && open && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full shrink-0">mañana</span>}
+        {open
+          ? <ChevronUp className={`w-4 h-4 shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
+          : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+      </button>
+
+      {open && (
+        <DayContent
+          day={day}
+          dayDate={dateStr}
+          docs={docs}
+          spots={spots}
+          tripId={tripId}
+          cityId={cityId}
+          isToday_={isToday_}
+          isTomorrow_={isTomorrow_}
+          isEmpty={isEmpty}
+          onReorderSpots={() => {}}
+          queryClient={queryClient}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── City block ────────────────────────────────────────────────────────────────
+function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient }) {
+  const [open, setOpen] = useState(isActive);
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
+
+  // Generate all days for this city from start to end date
+  const cityDays = useMemo(() => {
+    if (!city.start_date || !city.end_date) return [];
+    try {
+      const start = parseISO(city.start_date);
+      const end = parseISO(city.end_date);
+      if (end < start) return [];
+      return eachDayOfInterval({ start, end }).map(d => format(d, 'yyyy-MM-dd'));
+    } catch { return []; }
+  }, [city]);
+
+  // Map itinerary days by date
+  const daysByDate = useMemo(() => {
+    const m = {};
+    itineraryDays.filter(d => d.city_id === city.id).forEach(d => { if (d.date) m[d.date] = d; });
+    return m;
+  }, [itineraryDays, city.id]);
+
+  // Transport icon from docs
+  const transportIcon = useMemo(() =>
+    getTransportIcon(allDocs, city.start_date),
+    [allDocs, city.start_date]
+  );
+
+  const dotClass = isPast
+    ? 'bg-green-700 w-3 h-3'
+    : isActive
+    ? 'w-3.5 h-3.5 bg-primary border-2 border-background ring-2 ring-primary'
+    : 'bg-border w-3 h-3';
+
+  return (
+    <div className="flex gap-3">
+      {/* Timeline */}
+      <div className="flex flex-col items-center shrink-0 pt-3.5">
+        <div className={`rounded-full shrink-0 ${dotClass}`} />
+        {idx < total - 1 && <div className="w-px bg-border flex-1 min-h-8 mt-1" />}
+      </div>
+
+      {/* Card */}
+      <div className={`flex-1 mb-0 min-w-0 ${idx < total - 1 ? 'pb-0' : ''}`}>
+        <div className={`bg-white rounded-2xl border overflow-hidden mb-1 ${
+          isActive ? 'border-orange-200' : isPast ? 'border-border opacity-75' : 'border-border'
+        }`}>
+          {/* City header */}
+          <button onClick={() => setOpen(o => !o)}
+            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
+              isActive ? 'bg-orange-50' : 'hover:bg-secondary/30'
+            }`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+              isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
+            }`}>
+              {isPast ? '✓' : idx + 1}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                {city.name}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {city.start_date && city.end_date
+                  ? `${format(parseISO(city.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: es })}`
+                  : city.start_date
+                  ? format(parseISO(city.start_date), 'dd MMM yyyy', { locale: es })
+                  : 'Sin fechas'}
+              </p>
+            </div>
+            {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0">Visitada</span>}
+            {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0">Ahora</span>}
+            {!isActive && !isPast && <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full shrink-0">Próxima</span>}
+            {open
+              ? <ChevronUp className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+              : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+          </button>
+
+          {/* Days */}
+          {open && cityDays.length > 0 && (
+            <div>
+              {cityDays.map(dateStr => (
+                <DayRow
+                  key={dateStr}
+                  day={daysByDate[dateStr] || null}
+                  dateStr={dateStr}
+                  allDocs={allDocs}
+                  allSpots={allSpots}
+                  tripId={tripId}
+                  cityId={city.id}
+                  isToday_={dateStr === todayStr}
+                  isTomorrow_={dateStr === tomorrowStr}
+                  queryClient={queryClient}
+                  defaultOpen={dateStr === todayStr}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* No dates — prompt */}
+          {open && cityDays.length === 0 && (
+            <div className="px-4 py-4 text-center border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Sin fechas asignadas</p>
+              <p className="text-xs text-primary">Edita el viaje para añadir fechas →</p>
+            </div>
+          )}
+        </div>
+
+        {/* Transport connector to next city */}
+        {idx < total - 1 && transportIcon && (
+          <div className="flex items-center gap-2 px-4 py-1 mb-1">
+            <span className="text-sm">{transportIcon}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+export default function Cities() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
+
+  const [tripId, setTripId] = useState(null);
+
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('trip_id');
+    if (!id || id === 'null') { navigate(createPageUrl('TripsList'), { replace: true }); return; }
+    setTripId(id);
+    window.scrollTo(0, 0);
+  }, [navigate]);
+
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: () => tripId ? base44.entities.Trip.get(tripId) : null,
+    enabled: !!tripId, staleTime: 30000,
+  });
+
+  const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
-    enabled: !!tripId,
-    staleTime: 30000,
+    enabled: !!tripId, staleTime: 30000,
   });
 
   const { data: itineraryDays = [] } = useQuery({
     queryKey: ['itineraryDays', tripId],
     queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-    staleTime: 30000,
+    enabled: !!tripId, staleTime: 30000,
   });
 
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId,
-    staleTime: 60000,
+  const { data: allDocs = [] } = useQuery({
+    queryKey: ['allDocs', tripId],
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
   });
 
-  // Si solo hay 1 ciudad, ir directo a su detalle
-  useEffect(() => {
-    if (!redirected && !isLoading && cities.length === 1) {
-      setRedirected(true);
-      navigate(createPageUrl(`CityDetail?id=${cities[0].id}&trip_id=${tripId}`), { replace: true });
-    }
-  }, [cities, isLoading, redirected, navigate, tripId]);
-
-  // Sort cities: start_date first, then order
-  const sortedCities = useMemo(() => {
-    return [...cities].sort((a, b) => {
-      if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
-      if (a.start_date) return -1;
-      if (b.start_date) return 1;
-      return (a.order ?? 0) - (b.order ?? 0);
-    });
-  }, [cities]);
-
-  const reorderByDatesMutation = useMutation({
-    mutationFn: async () => {
-      const withDates = sortedCities.filter((c) => c.start_date);
-      const withoutDates = sortedCities.filter((c) => !c.start_date);
-      const ordered = [...withDates, ...withoutDates];
-      await Promise.all(ordered.map((city, idx) =>
-        base44.entities.City.update(city.id, { order: idx })
-      ));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
-      toast({ title: 'Ciudades reordenadas por fechas ✓' });
-    },
+  const { data: allSpots = [] } = useQuery({
+    queryKey: ['spots', tripId],
+    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 30000,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.City.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cities'] });
-      queryClient.invalidateQueries({ queryKey: ['itineraryDays'] });
-    },
-  });
+  const sortedCities = useMemo(() =>
+    [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
+    [cities]
+  );
 
-  const handleDelete = async (city) => {
-    const cityData = { ...city };
-    await performDelete(
-      () => deleteMutation.mutateAsync(city.id),
-      () => base44.entities.City.create(cityData),
-      city.name
-    );
-  };
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-  const getDaysCount = (cityId) => {
-    return itineraryDays.filter((day) => day.city_id === cityId).length;
-  };
+  // Progress
+  const tripStart = trip?.start_date;
+  const tripEnd = trip?.end_date;
+  const totalDays = tripStart && tripEnd ? differenceInDays(parseISO(tripEnd), parseISO(tripStart)) + 1 : null;
+  const dayNumber = tripStart && todayStr >= tripStart ? differenceInDays(parseISO(todayStr), parseISO(tripStart)) + 1 : null;
+  const progress = totalDays && dayNumber ? Math.min(100, Math.round((dayNumber / totalDays) * 100)) : 0;
+  const tripNotStarted = tripStart && todayStr < tripStart;
+  const tripFinished = tripEnd && todayStr > tripEnd;
+  const daysLeft = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
 
-  const addCityMutation = useMutation({
-    mutationFn: () => base44.entities.City.create({
-      trip_id: tripId,
-      name: newCityName.trim(),
-      country: newCityCountry.trim() || (trip?.country || ''),
-      order: cities.length,
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
-      setAddCityOpen(false);
-      setNewCityName('');
-      setNewCityCountry('');
-      toast({ title: `Ciudad "${newCityName.trim()}" añadida ✓` });
-    },
-  });
+  const activeCityName = useMemo(() => {
+    const c = sortedCities.find(c => c.start_date && c.end_date && todayStr >= c.start_date && todayStr <= c.end_date);
+    return c?.name || '';
+  }, [sortedCities, todayStr]);
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  if (!tripId) return null;
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} />
+    <div className="bg-background min-h-screen">
+      {/* Header */}
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+                <ArrowRight className="w-4 h-4 rotate-180" />Inicio
+              </button>
+            </Link>
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
+              <button className="text-xs text-primary flex items-center gap-1 font-medium">
+                <Plus className="w-3.5 h-3.5" />Ciudad
+              </button>
+            </Link>
+          </div>
 
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <button onClick={() => window.history.back()} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-            Mis viajes
-          </button>
-          <h1 className="text-white text-4xl font-bold">Ruta 🗺️</h1>
-              <p className="text-white/90 mt-2">Explora tu itinerario</p>
-            </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Ruta</h1>
 
-            <div className="flex gap-2 mt-1">
-              {cities.some((c) => c.start_date) && (
-                <Button
-                  onClick={() => reorderByDatesMutation.mutate()}
-                  disabled={reorderByDatesMutation.isPending}
-                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm px-3"
-                  title="Ordenar por fechas"
-                  size="sm"
-                >
-                  <ArrowUpDown className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Ordenar</span>
-                </Button>
-              )}
-              <Button
-                onClick={() => setAddCityOpen(true)}
-                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm px-3"
-                size="sm"
-              >
-                <Plus className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Añadir ciudad</span>
-                <span className="sm:hidden">Ciudad</span>
-              </Button>
-            </div>
+          {/* Progress */}
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-muted-foreground">
+              {tripNotStarted && daysLeft !== null ? `Faltan ${daysLeft} días` :
+               tripFinished ? 'Viaje completado' :
+               dayNumber && totalDays ? `Día ${dayNumber} de ${totalDays}${activeCityName ? ` · ${activeCityName}` : ''}` :
+               'Sin fechas'}
+            </span>
+            <span className={`text-xs font-medium ${tripFinished ? 'text-green-700' : 'text-primary'}`}>
+              {tripFinished ? '100%' : progress > 0 ? `${progress}%` : ''}
+            </span>
+          </div>
+          <div className="h-1 bg-secondary rounded-full overflow-hidden mb-4">
+            <div className={`h-full rounded-full transition-all ${tripFinished ? 'bg-green-600' : 'bg-primary'}`}
+              style={{ width: `${tripFinished ? 100 : progress}%` }} />
           </div>
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-6 max-w-6xl -mt-12">
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="aspect-[16/10] rounded-2xl bg-secondary animate-pulse" />
-            ))}
-          </div>
-        ) : cities.length === 0 ? (
-          <div className="text-center py-20 glass rounded-2xl border border-border">
-            <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-light text-foreground mb-2">Sin ciudades todavía</h3>
-            <p className="text-muted-foreground font-light mb-6">Añade las ciudades de tu ruta</p>
-            <Button onClick={() => setAddCityOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white">
-              <Plus className="w-4 h-4 mr-2" />
-              Añadir primera ciudad
-            </Button>
+      {/* Content */}
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
+        {sortedCities.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-4xl mb-4">🗺️</p>
+            <p className="text-muted-foreground mb-4">Aún no hay ciudades en la ruta</p>
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
+              <Button className="bg-primary hover:bg-primary/90 text-white">
+                <Plus className="w-4 h-4 mr-2" />Añadir ciudad
+              </Button>
+            </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedCities.map((city) => (
-              <CityCard key={city.id} city={city} daysCount={getDaysCount(city.id)} tripId={tripId} />
-            ))}
+          <div className="flex flex-col gap-0">
+            {sortedCities.map((city, idx) => {
+              const isPast = city.end_date && todayStr > city.end_date;
+              const isActive = city.start_date && city.end_date && todayStr >= city.start_date && todayStr <= city.end_date;
+              return (
+                <CityBlock
+                  key={city.id}
+                  city={city}
+                  idx={idx}
+                  total={sortedCities.length}
+                  allDocs={allDocs}
+                  allSpots={allSpots}
+                  itineraryDays={itineraryDays}
+                  tripId={tripId}
+                  isActive={isActive}
+                  isPast={isPast}
+                  queryClient={queryClient}
+                />
+              );
+            })}
           </div>
         )}
       </div>
-
-      {/* Dialog añadir ciudad */}
-      <Dialog open={addCityOpen} onOpenChange={setAddCityOpen}>
-        <DialogContent className="bg-card border-border max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Añadir ciudad</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Nombre de la ciudad *</label>
-              <Input
-                placeholder="ej. Tokyo"
-                value={newCityName}
-                onChange={(e) => setNewCityName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && newCityName.trim() && addCityMutation.mutate()}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">País (opcional)</label>
-              <Input
-                placeholder={`ej. ${trip?.country || 'Japón'}`}
-                value={newCityCountry}
-                onChange={(e) => setNewCityCountry(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-3 justify-end pt-1">
-              <Button variant="outline" onClick={() => setAddCityOpen(false)}>Cancelar</Button>
-              <Button
-                onClick={() => addCityMutation.mutate()}
-                disabled={!newCityName.trim() || addCityMutation.isPending}
-                className="bg-orange-700 hover:bg-orange-800"
-              >
-                {addCityMutation.isPending ? 'Añadiendo...' : 'Añadir'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
