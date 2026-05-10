@@ -156,7 +156,7 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
 const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50', bus:'bg-amber-50', car:'bg-orange-50', ticket:'bg-rose-50', insurance:'bg-teal-50', other:'bg-secondary' };
 
 function DocViewerModal({ doc, open, onClose }) {
-  const type = doc?.type || doc?.doc_type || 'other';
+  const type = doc?.category || doc?.type || doc?.doc_type || 'other';
   const icon = DOC_ICONS[type] || '📄';
   const bgColor = DOC_BG[type] || 'bg-secondary';
 
@@ -322,7 +322,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
           {dayDocs.map(doc => (
             <button key={doc.id} onClick={() => setViewingDoc(doc)}
               className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-              <span className="text-lg shrink-0">{DOC_ICONS[doc.type || doc.doc_type] || DOC_ICONS.other}</span>
+              <span className="text-lg shrink-0">{DOC_ICONS[doc.category || doc.type || doc.doc_type] || DOC_ICONS.other}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
                 {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
