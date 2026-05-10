@@ -1,144 +1,126 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Download, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { X, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PDFViewer({ fileUrl, onClose }) {
   const canvasRef = useRef(null);
-  const [pdfDoc, setPdfDoc] = useState(null);
-  const [pageNum, setPageNum] = useState(1);
+  const [pdfDoc, setPdfDoc]       = useState(null);
+  const [pageNum, setPageNum]     = useState(1);
   const [pageCount, setPageCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
+
+  const isPDF = fileUrl?.toLowerCase().includes('.pdf');
+  const isImg = fileUrl && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(fileUrl);
+  const fileName = fileUrl?.split('/').pop()?.split('?')[0] || 'documento';
 
   useEffect(() => {
-    if (!fileUrl) return;
+    const h = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
 
-    const loadPDF = async () => {
+  useEffect(() => {
+    if (!fileUrl || !isPDF) { setLoading(false); return; }
+    const load = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Load PDF.js
-        let pdfjsLib = window['pdfjs-dist/build/pdf'];
-        
-        if (!pdfjsLib) {
-          // Dynamically load PDF.js
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-          script.async = true;
-          document.head.appendChild(script);
-          
-          await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-          });
-          
-          pdfjsLib = window['pdfjs-dist/build/pdf'];
+        setLoading(true); setError(null);
+        let lib = window['pdfjs-dist/build/pdf'];
+        if (!lib) {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          document.head.appendChild(s);
+          await new Promise((res, rej) => { s.onload = res; s.onerror = rej; });
+          lib = window['pdfjs-dist/build/pdf'];
         }
-
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        const pdf = await pdfjsLib.getDocument(fileUrl).promise;
-        setPdfDoc(pdf);
-        setPageCount(pdf.numPages);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error loading PDF:', err);
-        setError('Error al cargar el PDF');
-        setLoading(false);
-      }
+        lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await lib.getDocument(fileUrl).promise;
+        setPdfDoc(pdf); setPageCount(pdf.numPages); setLoading(false);
+      } catch { setError('No se pudo cargar el PDF'); setLoading(false); }
     };
-
-    loadPDF();
-  }, [fileUrl]);
+    load();
+  }, [fileUrl, isPDF]);
 
   useEffect(() => {
     if (!pdfDoc || !canvasRef.current) return;
-
-    const renderPage = async () => {
-      try {
-        const page = await pdfDoc.getPage(pageNum);
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-
-        const viewport = page.getViewport({ scale: 1.5 });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-
-        await page.render(renderContext).promise;
-      } catch (err) {
-        console.error('Error rendering page:', err);
-      }
+    const render = async () => {
+      const page = await pdfDoc.getPage(pageNum);
+      const vp = page.getViewport({ scale: 1.8 });
+      const canvas = canvasRef.current;
+      canvas.height = vp.height; canvas.width = vp.width;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
     };
-
-    renderPage();
+    render();
   }, [pdfDoc, pageNum]);
 
   if (!fileUrl) return null;
 
-  const isPDF = fileUrl?.toLowerCase().endsWith('.pdf');
-
   return (
-    <Dialog open={!!fileUrl} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[95vh] p-0 overflow-hidden [&>button:last-child]:hidden">
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <DialogTitle className="font-semibold text-foreground">Documento</DialogTitle>
-          <div className="flex items-center gap-2">
-            {isPDF && pageCount > 0 && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPageNum(Math.max(1, pageNum - 1))}
-                  disabled={pageNum <= 1}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-sm">
-                  {pageNum} / {pageCount}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setPageNum(Math.min(pageCount, pageNum + 1))}
-                  disabled={pageNum >= pageCount}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-            <Button variant="outline" size="sm" asChild>
-              <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
-                <Download className="w-4 h-4 mr-2" />
-                Descargar
-              </a>
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#1a1714' }}>
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>
+        <div className="w-8" />
+        <p className="text-sm font-medium truncate max-w-xs" style={{ color: 'rgba(255,255,255,.75)' }}>{fileName}</p>
+        <button onClick={onClose}
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+          style={{ background: 'rgba(255,255,255,.1)' }}>
+          <X className="w-5 h-5" style={{ color: 'rgba(255,255,255,.8)' }} />
+        </button>
+      </div>
 
-        <div className="bg-gray-100 overflow-auto flex items-center justify-center" style={{ height: 'calc(95vh - 64px)' }}>
-          {isPDF ? (
+      {/* Content */}
+      <div className="flex-1 overflow-auto flex items-start justify-center px-4 py-4">
+        {loading && <p className="text-sm mt-8" style={{ color: 'rgba(255,255,255,.4)' }}>Cargando...</p>}
+        {error && (
+          <div className="text-center mt-8">
+            <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,.4)' }}>{error}</p>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">Abrir en nueva pestaña</a>
+          </div>
+        )}
+        {!loading && !error && isPDF && (
+          <canvas ref={canvasRef} className="rounded-lg shadow-2xl" style={{ maxWidth: '100%' }} />
+        )}
+        {!loading && isImg && (
+          <img src={fileUrl} alt={fileName} className="rounded-lg shadow-2xl object-contain"
+            style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 140px)' }} />
+        )}
+        {!loading && !error && !isPDF && !isImg && (
+          <div className="text-center mt-8">
+            <p className="text-4xl mb-4">📄</p>
+            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.4)' }}>Vista previa no disponible</p>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white transition-colors"
+              style={{ background: 'rgba(255,255,255,.12)' }}>
+              <Download className="w-4 h-4" />Abrir archivo
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom bar */}
+      <div className="shrink-0 px-5 py-3 flex items-center justify-between" style={{ background: 'rgba(0,0,0,.5)' }}>
+        <div className="flex items-center gap-2">
+          {isPDF && pageCount > 1 && (
             <>
-              {loading && <div className="text-center py-8">Cargando PDF...</div>}
-              {error && <div className="text-center py-8 text-red-500">{error}</div>}
-              <canvas ref={canvasRef} className="max-w-full" />
+              <button onClick={() => setPageNum(p => Math.max(1, p - 1))} disabled={pageNum <= 1}
+                className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 transition-colors"
+                style={{ background: 'rgba(255,255,255,.1)' }}>
+                <ChevronLeft className="w-4 h-4 text-white" />
+              </button>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>{pageNum} / {pageCount}</span>
+              <button onClick={() => setPageNum(p => Math.min(pageCount, p + 1))} disabled={pageNum >= pageCount}
+                className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 transition-colors"
+                style={{ background: 'rgba(255,255,255,.1)' }}>
+                <ChevronRight className="w-4 h-4 text-white" />
+              </button>
             </>
-          ) : (
-            <div className="flex items-center justify-center h-full p-4">
-              <img src={fileUrl} alt="Documento" className="max-w-full max-h-full object-contain" />
-            </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+        <a href={fileUrl} download target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white transition-colors"
+          style={{ background: 'rgba(255,255,255,.12)' }}>
+          <Download className="w-4 h-4" />Descargar
+        </a>
+      </div>
+    </div>
   );
 }
