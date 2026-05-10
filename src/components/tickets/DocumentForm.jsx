@@ -5,6 +5,17 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
 
+// ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
+export const CATEGORY_CONFIG = {
+  flight:   { icon: '✈️', label: 'Vuelo',   color: 'bg-blue-50'   },
+  train:    { icon: '🚆', label: 'Tren',    color: 'bg-green-50'  },
+  hotel:    { icon: '🏨', label: 'Hotel',   color: 'bg-purple-50' },
+  event:    { icon: '🎟️', label: 'Evento',  color: 'bg-orange-50' },
+  personal: { icon: '🛡️', label: 'Seguro',  color: 'bg-amber-50'  },
+  other:    { icon: '📄', label: 'Otro',    color: 'bg-secondary' },
+};
+
+
 const CATEGORIES = [
   { key: 'flight',   icon: '✈️', label: 'Vuelo'   },
   { key: 'hotel',    icon: '🏨', label: 'Hotel'   },
