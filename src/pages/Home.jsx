@@ -173,13 +173,13 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
 
       {open && (
         <div>
-          {docs.map(doc => (
+          {[...docs].sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99')).map(doc => (
             <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
               className="flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
               <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
-                {doc.description && <p className="text-xs text-muted-foreground truncate">{doc.description}</p>}
+                {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
               </div>
               <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             </Link>
@@ -1155,6 +1155,31 @@ export default function Home() {
   const notifications = useMemo(() => {
     const notifs = [];
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const todayStr_ = format(new Date(), 'yyyy-MM-dd');
+    const nowHour = new Date().getHours() * 60 + new Date().getMinutes();
+
+    // Doc time alerts — docs today with a time field
+    documents
+      .filter(d => {
+        const docDate = d.date || d.valid_from || d.start_date;
+        return docDate === todayStr_ && d.time;
+      })
+      .forEach(d => {
+        const [h, m] = (d.time || '').split(':').map(Number);
+        const docMinutes = (h || 0) * 60 + (m || 0);
+        const diff = docMinutes - nowHour;
+        if (diff > 0 && diff <= 240) {
+          const icon = d.type === 'flight' ? '✈️' : d.type === 'train' ? '🚆' : d.type === 'bus' ? '🚌' : '📄';
+          const label = diff <= 60 ? `en ${diff} min` : `en ${Math.round(diff/60)}h`;
+          notifs.push({
+            id: `doctime-${d.id}`, icon,
+            message: `${d.title || d.name} · ${d.time} (${label})`,
+            time: new Date().toISOString(),
+            urgent: diff <= 120,
+          });
+        }
+      });
+
     expenses
       .filter(e => e.split_with?.includes(currentUserEmail) && e.created_by !== currentUserEmail && new Date(e.created_date) > cutoff)
       .forEach(e => notifs.push({
@@ -1241,9 +1266,9 @@ export default function Home() {
                     ) : (
                       <div className="max-h-72 overflow-y-auto divide-y divide-border">
                         {notifications.map(n => (
-                          <div key={n.id} className="px-4 py-3 flex items-start gap-3">
+                          <div key={n.id} className={`px-4 py-3 flex items-start gap-3 ${n.urgent ? 'bg-red-50' : ''}`}>
                             <span className="text-base shrink-0 mt-0.5">{n.icon}</span>
-                            <p className="text-xs text-foreground leading-relaxed">{n.message}</p>
+                            <p className={`text-xs leading-relaxed ${n.urgent ? 'text-red-700 font-medium' : 'text-foreground'}`}>{n.message}</p>
                           </div>
                         ))}
                       </div>
