@@ -151,9 +151,89 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
   );
 }
 
+
+// ── Doc viewer modal ──────────────────────────────────────────────────────────
+const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50', bus:'bg-amber-50', car:'bg-orange-50', ticket:'bg-rose-50', insurance:'bg-teal-50', other:'bg-secondary' };
+
+function DocViewerModal({ doc, open, onClose }) {
+  const type = doc?.type || doc?.doc_type || 'other';
+  const icon = DOC_ICONS[type] || '📄';
+  const bgColor = DOC_BG[type] || 'bg-secondary';
+
+  const openFile = () => {
+    if (doc?.file_url) window.open(doc.file_url, '_blank');
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+          <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center text-xl shrink-0`}>{icon}</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center shrink-0">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        {/* File preview / upload zone */}
+        {doc?.file_url ? (
+          <button onClick={openFile} className="mx-4 my-3 bg-secondary rounded-xl p-4 flex items-center gap-3 hover:bg-border/40 transition-colors text-left w-[calc(100%-2rem)]">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">Ver documento</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Toca para abrir en el navegador</p>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </button>
+        ) : (
+          <div className="mx-4 my-3 border-2 border-dashed border-border rounded-xl p-4 text-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/40 mx-auto mb-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p className="text-xs text-muted-foreground">Sin archivo adjunto</p>
+          </div>
+        )}
+
+        {/* Fields */}
+        <div className="px-4 pb-3 flex flex-col gap-2 border-t border-border pt-3">
+          {doc?.time && (
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Hora</span><span className="text-sm text-primary font-medium">{doc.time}</span></div>
+          )}
+          {doc?.origin && (
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Origen</span><span className="text-sm text-foreground">{doc.origin}</span></div>
+          )}
+          {doc?.destination && (
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Destino</span><span className="text-sm text-foreground">{doc.destination}</span></div>
+          )}
+          {doc?.notes && (
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Notas</span><span className="text-sm text-foreground">{doc.notes}</span></div>
+          )}
+          {doc?.visibility === 'shared' && (
+            <div className="flex gap-3 items-center"><span className="text-xs text-muted-foreground w-14 shrink-0">Con</span><span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">👥 Grupo</span></div>
+          )}
+        </div>
+
+        <div className="px-4 py-3 border-t border-border flex justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={onClose}>Cerrar</Button>
+          {doc?.file_url && (
+            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" onClick={openFile}>
+              Abrir documento
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ── Day expanded content ──────────────────────────────────────────────────────
 function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient }) {
   const [editingSpot, setEditingSpot] = useState(null);
+  const [viewingDoc, setViewingDoc] = useState(null);
   const [notes, setNotes] = useState(day?.content || '');
   const [notesChanged, setNotesChanged] = useState(false);
   const [titleVal, setTitleVal] = useState(day?.title || '');
@@ -165,16 +245,30 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   );
 
   const saveNotes = async () => {
-    if (!day?.id || !notesChanged) return;
-    await base44.entities.ItineraryDay.update(day.id, { content: notes });
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    if (!notesChanged) return;
+    if (day?.id) {
+      await base44.entities.ItineraryDay.update(day.id, { content: notes });
+    } else {
+      // Create ItineraryDay if it doesn't exist
+      await base44.entities.ItineraryDay.create({
+        city_id: cityId, trip_id: tripId, date: dayDate,
+        title: '', content: notes, order: 0
+      });
+    }
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
     setNotesChanged(false);
   };
 
   const saveTitle = async () => {
-    if (!day?.id) return;
-    await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
+    if (day?.id) {
+      await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
+    } else {
+      await base44.entities.ItineraryDay.create({
+        city_id: cityId, trip_id: tripId, date: dayDate,
+        title: titleVal, content: '', order: 0
+      });
+    }
+    queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
     setTitleEditing(false);
   };
 
@@ -226,15 +320,15 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Documentos</p>
           </div>
           {dayDocs.map(doc => (
-            <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
-              className="flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
+            <button key={doc.id} onClick={() => setViewingDoc(doc)}
+              className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
               <span className="text-lg shrink-0">{DOC_ICONS[doc.type || doc.doc_type] || DOC_ICONS.other}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
                 {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            </Link>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           ))}
         </div>
       )}
@@ -272,8 +366,8 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             isTomorrow_ ? '¿Algo que apuntar para mañana?' :
             '¿Algo que apuntar para este día?'
           }
-          className="text-sm bg-white border-border resize-none min-h-[60px] w-full"
-          rows={2}
+          className="text-sm bg-white border-border resize-none min-h-[100px] w-full"
+          rows={4}
         />
       </div>
 
@@ -284,6 +378,14 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
           onClose={() => setEditingSpot(null)}
           onSave={handleSpotSave}
           onRemove={handleSpotRemove}
+        />
+      )}
+
+      {viewingDoc && (
+        <DocViewerModal
+          doc={viewingDoc}
+          open={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
         />
       )}
     </div>
@@ -314,13 +416,14 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
   const label = isToday_ ? format(parseISO(dateStr), 'dd MMM', { locale: es }) : format(parseISO(dateStr), 'dd MMM', { locale: es });
 
   const rowBg = isToday_
-    ? 'bg-orange-50 border-l-2 border-l-primary'
-    : 'bg-white';
+    ? 'bg-orange-50'
+    : open ? 'bg-secondary/20' : 'bg-white hover:bg-secondary/10';
+  const rowBorder = isToday_ ? 'border-t-2 border-t-primary' : 'border-t border-t-border';
 
   return (
-    <div className={`border-t-4 border-t-background ${isToday_ ? '' : ''}`}>
+    <div className={rowBorder}>
       <button onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center gap-3 px-4 py-3 ${rowBg} transition-colors hover:bg-opacity-80`}>
+        className={`w-full flex items-center gap-3 px-4 py-3 ${rowBg} transition-colors`}>
         <span className={`text-xs font-semibold w-12 shrink-0 text-left ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
           {label}
         </span>
@@ -501,7 +604,7 @@ export default function Cities() {
 
   const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 30000,
   });
 
