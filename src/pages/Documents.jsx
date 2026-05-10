@@ -1,310 +1,338 @@
-import { createPageUrl } from '@/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, FileText, Eye, EyeOff, Users, Filter } from 'lucide-react';
+import { Plus, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import DocumentForm, { CATEGORY_CONFIG } from '@/components/tickets/DocumentForm';
-import DocumentCard from '@/components/tickets/DocumentCard';
+import { format, isToday, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import DocumentForm from '@/components/tickets/DocumentForm';
+import PDFViewer from '@/components/PDFViewer';
 import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
 
-const VISIBILITY_FILTERS = [
-  { value: 'all',            label: 'Todos',     icon: Filter },
-  { value: 'personal',       label: 'Solo yo',   icon: EyeOff },
-  { value: 'shared',         label: 'Grupo',     icon: Eye },
-  { value: 'selected_users', label: 'Concretos', icon: Users },
+const DOC_ICONS = { flight:'✈️', train:'🚆', hotel:'🏨', event:'🎟️', personal:'🛡️', other:'📄' };
+const DOC_BG = { flight:'bg-blue-50', train:'bg-green-50', hotel:'bg-purple-50', event:'bg-orange-50', personal:'bg-amber-50', other:'bg-secondary' };
+const CAT_TABS = [
+  { key:'all',    icon:'📋', label:'Todos'   },
+  { key:'flight', icon:'✈️', label:'Vuelos'  },
+  { key:'hotel',  icon:'🏨', label:'Hoteles' },
+  { key:'train',  icon:'🚆', label:'Trenes'  },
+  { key:'other',  icon:'📄', label:'Otros'   },
 ];
+const VIS = {
+  personal:       { label:'Solo yo',    icon:'🔒', cls:'bg-secondary text-muted-foreground' },
+  shared:         { label:'Grupo',      icon:'👥', cls:'bg-green-100 text-green-700'       },
+  selected_users: { label:'Compartido', icon:'👤', cls:'bg-blue-100 text-blue-700'         },
+};
 
+// ── Doc row ───────────────────────────────────────────────────────────────────
+function DocRow({ ticket, onEdit, onDelete, onView }) {
+  const [open, setOpen] = useState(false);
+  const cat  = ticket.category || 'other';
+  const icon = DOC_ICONS[cat] || '📄';
+  const bg   = DOC_BG[cat]   || 'bg-secondary';
+  const vis  = VIS[ticket.visibility || 'personal'];
+  const todayDoc = ticket.date && isToday(parseISO(ticket.date));
+  const hasFile  = !!ticket.file_url;
+
+  const displayName = ticket.origin && ticket.destination
+    ? `${ticket.origin} → ${ticket.destination}`
+    : ticket.name;
+
+  const timeLabel = ticket.time
+    ? ticket.time
+    : cat === 'hotel' && ticket.date
+    ? `Check-in ${format(parseISO(ticket.date), 'dd MMM', { locale: es })}`
+    : null;
+
+  return (
+    <div className={`bg-white rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
+      {/* Main row */}
+      <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
+          {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {hasFile && (
+            <button onClick={() => onView(ticket.file_url)}
+              className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center hover:bg-orange-100 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          )}
+          <button onClick={() => setOpen(o => !o)}
+            className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-secondary/50 transition-colors">
+            {open
+              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+              : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            }
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded */}
+      {open && (
+        <div className="border-t border-border">
+          <div className="px-4 py-3 bg-secondary/20 space-y-2">
+            {/* Visibility badge */}
+            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${vis.cls}`}>
+              {vis.icon} {vis.label}
+            </span>
+
+            {/* Fields */}
+            {ticket.origin && ticket.destination && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ruta</span><span className="text-foreground">{ticket.origin} → {ticket.destination}</span></div>
+            )}
+            {ticket.date && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fecha</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: es })}</span></div>
+            )}
+            {ticket.end_date && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fin</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
+            )}
+            {ticket.airline && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Vuelo</span><span className="text-foreground">{ticket.airline}</span></div>
+            )}
+            {ticket.city && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ciudad</span><span className="text-foreground">{ticket.city}</span></div>
+            )}
+            {ticket.notes && (
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Notas</span><span className="text-foreground">{ticket.notes}</span></div>
+            )}
+
+            {/* File */}
+            {hasFile && (
+              <button onClick={() => onView(ticket.file_url)}
+                className="w-full flex items-center gap-3 px-3 py-2 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span className="text-xs font-medium text-foreground flex-1">Ver documento adjunto</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-white">
+            <button onClick={() => onDelete(ticket)}
+              className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
+              <Trash2 className="w-3.5 h-3.5" />Eliminar
+            </button>
+            <button onClick={() => { onEdit(ticket); setOpen(false); }}
+              className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground flex items-center gap-1.5 hover:bg-secondary/50 transition-colors">
+              <Pencil className="w-3 h-3" />Editar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function Documents() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const urlParams = new URLSearchParams(window.location.search);
-  const tripId = urlParams.get('trip_id');
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTicket, setEditingTicket] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [ticketToDelete, setTicketToDelete] = useState(null);
-  const [visFilter, setVisFilter] = useState('all');
-  const [catFilter, setCatFilter] = useState('all');
-
+  const tripId = new URLSearchParams(window.location.search).get('trip_id');
   const queryClient = useQueryClient();
-
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
   const userId = currentUser?.id ?? '';
 
+  const [catFilter, setCatFilter]   = useState('all');
+  const [addOpen, setAddOpen]       = useState(false);
+  const [editDoc, setEditDoc]       = useState(null);
+  const [deleteDoc, setDeleteDoc]   = useState(null);
+  const [viewFile, setViewFile]     = useState(null);
+
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
-    enabled: !!tripId,
-    staleTime: 30000,
+    enabled: !!tripId, staleTime: 30000,
   });
-
   const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
-    enabled: !!tripId,
-    staleTime: 60000,
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
   });
-
   const { data: itineraryDays = [] } = useQuery({
     queryKey: ['itineraryDays', tripId],
-    queryFn: async () => {
-      const days = await base44.entities.ItineraryDay.filter({ trip_id: tripId }, 'date');
-      const cityMap = Object.fromEntries(cities.map(c => [c.id, c.name]));
-      return days.map(d => ({ ...d, cityName: cityMap[d.city_id] || '' }));
-    },
-    enabled: !!tripId && cities.length > 0
+    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }, 'date'),
+    enabled: !!tripId, staleTime: 30000,
   });
-
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId,
-    staleTime: 60000,
+    enabled: !!tripId, staleTime: 60000,
+  });
+  const { data: profiles = [] } = useQuery({
+    queryKey: ['allProfiles'],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 5 * 60 * 1000,
   });
 
-  const members = trip?.members || [];
-
-  // Backfill automático de documentos sin vinculación
+  // Backfill auto-links
   useEffect(() => {
-    if (tickets.length > 0 && itineraryDays.length > 0) {
-      const backfillUpdates = createBackfillMutation(tickets, itineraryDays, cities);
-      const ticketsNeedingUpdate = backfillUpdates.filter(u => Object.keys(u.updates).length > 0);
-      
-      if (ticketsNeedingUpdate.length > 0) {
-        ticketsNeedingUpdate.forEach(({ ticketId, updates }) => {
-          base44.entities.Ticket.update(ticketId, updates);
-        });
-        queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
-      }
+    if (!tickets.length || !itineraryDays.length) return;
+    const updates = createBackfillMutation(tickets, itineraryDays, cities).filter(u => Object.keys(u.updates).length > 0);
+    if (updates.length) {
+      Promise.all(updates.map(({ ticketId, updates }) => base44.entities.Ticket.update(ticketId, updates)))
+        .then(() => queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }));
     }
   }, [tripId, tickets.length, itineraryDays.length]);
 
   const createMutation = useMutation({
-    mutationFn: (formData) => {
-      const enrichedData = enrichTicketDataWithAutoLinks(formData, itineraryDays, formData.city_id);
-      return base44.entities.Ticket.create({ ...enrichedData, trip_id: tripId, user_id: userId });
-    },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDialogOpen(false); }
+    mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setAddOpen(false); },
   });
-
   const updateMutation = useMutation({
-    mutationFn: ({ id, formData }) => {
-      const enrichedData = enrichTicketDataWithAutoLinks(formData, itineraryDays, formData.city_id);
-      return base44.entities.Ticket.update(id, enrichedData);
-    },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditingTicket(null); }
+    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditDoc(null); },
   });
-
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
-      setDeleteDialogOpen(false);
-      setTicketToDelete(null);
-    }
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDeleteDoc(null); },
   });
 
-  const visibleTickets = tickets.filter(t => {
+  // Filter
+  const filtered = useMemo(() => tickets.filter(t => {
     const vis = t.visibility || 'personal';
     if (vis === 'personal' && t.created_by !== currentUserEmail && t.user_id !== userId) return false;
     if (vis === 'selected_users' && t.created_by !== currentUserEmail && !(t.shared_with || []).includes(currentUserEmail)) return false;
-    if (visFilter !== 'all' && vis !== visFilter) return false;
-    if (catFilter !== 'all' && t.category !== catFilter) return false;
+    if (catFilter !== 'all') {
+      if (catFilter === 'other') return !['flight','hotel','train'].includes(t.category);
+      return t.category === catFilter;
+    }
     return true;
-  });
+  }), [tickets, catFilter, currentUserEmail, userId]);
 
-  const grouped = visibleTickets.reduce((acc, t) => {
-    if (!acc[t.category]) acc[t.category] = [];
-    acc[t.category].push(t);
-    return acc;
-  }, {});
+  // Group by date
+  const grouped = useMemo(() => {
+    const todayStr    = format(new Date(), 'yyyy-MM-dd');
+    const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
+    const map = {};
+    [...filtered]
+      .sort((a, b) => ((a.date||'9999') < (b.date||'9999') ? -1 : (a.date||'9999') > (b.date||'9999') ? 1 : (a.time||'99:99').localeCompare(b.time||'99:99')))
+      .forEach(t => { const k = t.date || '__none__'; (map[k] = map[k] || []).push(t); });
+
+    return Object.entries(map).map(([date, items]) => ({
+      date, items,
+      isToday: date === todayStr,
+      label: date === '__none__' ? 'Sin fecha'
+        : date === todayStr    ? `Hoy · ${format(parseISO(date), 'dd MMM', { locale: es })}`
+        : date === tomorrowStr ? `Mañana · ${format(parseISO(date), 'dd MMM', { locale: es })}`
+        : format(parseISO(date), "dd MMM · eeee", { locale: es }),
+    }));
+  }, [filtered]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
+  const members = trip?.members || [];
+
   return (
-    <div className="min-h-screen bg-[#fdf6ee]">
-
-      {/* ── HERO HEADER ─────────────────────────────────────────────────────── */}
-      <div className="bg-orange-700 pt-14 pb-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-orange-200 text-sm font-semibold uppercase tracking-widest mb-2">Tu viaje</p>
-              <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
-          <h1 className="text-white text-4xl font-extrabold leading-tight">Documentos</h1>
-              <p className="text-orange-100/80 mt-2 text-sm">Vuelos, hoteles, trenes y más — todo en un lugar</p>
-            </div>
-            <Button
-              onClick={() => setDialogOpen(true)}
-              className="bg-white text-orange-700 hover:bg-orange-50 font-bold shadow-lg flex-shrink-0 px-4 py-2 rounded-xl mt-1"
-            >
-              <Plus className="w-4 h-4 mr-1.5" />
-              Añadir
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MAIN CONTENT — floats over hero ─────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 -mt-12 pb-20">
-
-        {/* Toolbar card */}
-         <div className="bg-white rounded-2xl shadow-md border border-white/60 p-2 mb-8 -translate-y-2.5">
-           {/* Search */}
-          <div className="relative mb-3">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Buscar documentos..."
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-border rounded-xl bg-white outline-none focus:border-orange-400"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg leading-none">×</button>
-            )}
-          </div>
-
-          {/* Category pills - scrollable row */}
-           <div className="relative">
-           <div className="flex items-center gap-1 overflow-x-auto pb-1 mb-1 border-b border-gray-100 scrollbar-hide">
-
-            <button
-              onClick={() => setCatFilter('all')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${catFilter === 'all' ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
-            >
-              Todos
+    <div className="bg-background min-h-screen">
+      {/* Header */}
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Inicio
+              </button>
+            </Link>
+            <button onClick={() => setAddOpen(true)}
+              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+              <Plus className="w-4 h-4" />Documento
             </button>
-            {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-               const Icon = cfg.icon;
-               const active = catFilter === key;
-               return (
-                 <button
-                   key={key}
-                   onClick={() => setCatFilter(active ? 'all' : key)}
-                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${active ? `${cfg.bg} ${cfg.text} shadow-sm` : 'text-gray-500 hover:bg-gray-100'}`}
-                 >
-                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                   <span>{cfg.label}</span>
-                 </button>
-               );
-             })}
           </div>
-
-           </div>
-           <div className="absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-white pointer-events-none"/>
-           </div>
-          {/* Visibility filters - scrollable row */}
-          <div className="relative"><div className="flex items-center gap-1 overflow-x-auto pt-1 scrollbar-hide">
-            {VISIBILITY_FILTERS.map(f => {
-              const Icon = f.icon;
-              return (
-                <button
-                  key={f.value}
-                  onClick={() => setVisFilter(f.value)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${visFilter === f.value ? 'bg-orange-700 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
-                >
-                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{f.label}</span>
-                </button>
-              );
-            })}
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Documentos</h1>
+          {/* Category tabs */}
+          <div className="flex border-b border-border">
+            {CAT_TABS.map(tab => (
+              <button key={tab.key} onClick={() => setCatFilter(tab.key)}
+                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${catFilter === tab.key ? 'border-primary' : 'border-transparent'}`}>
+                <span className="text-base leading-none">{tab.icon}</span>
+                <span className={`text-xs font-medium leading-none ${catFilter === tab.key ? 'text-primary' : 'text-muted-foreground'}`}>{tab.label}</span>
+              </button>
+            ))}
           </div>
         </div>
-
-        {/* Empty state */}
-        {visibleTickets.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200">
-            <div className="w-20 h-20 bg-orange-100 rounded-3xl flex items-center justify-center mx-auto mb-5">
-              <FileText className="w-10 h-10 text-orange-400" />
-            </div>
-            <p className="text-gray-800 font-bold text-lg mb-1">Sin documentos todavía</p>
-            <p className="text-sm text-gray-400 mb-6">Sube un PDF o imagen y la IA lo identificará automáticamente</p>
-            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 rounded-xl px-6 font-bold shadow">
-              <Plus className="w-4 h-4 mr-2" />
-              Añadir documento
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-10">
-            {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-              const items = grouped[key];
-              if (!items?.length) return null;
-              const Icon = cfg.icon;
-              return (
-                <section key={key}>
-                  {/* Section header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${cfg.bg}`}>
-                      <Icon className={`w-4 h-4 ${cfg.text}`} />
-                    </div>
-                    <h2 className="text-lg font-extrabold text-gray-800">{cfg.label}</h2>
-                    <span className="text-xs bg-orange-100 text-orange-700 font-bold px-2.5 py-0.5 rounded-full">
-                      {items.length}
-                    </span>
-                  </div>
-                  {/* Cards grid */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {items.map(ticket => (
-                      <DocumentCard
-                        key={ticket.id}
-                        ticket={ticket}
-                        onEdit={(t) => setEditingTicket(t)}
-                        onDelete={(t) => { setTicketToDelete(t); setDeleteDialogOpen(true); }}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        )}
       </div>
 
-      {/* ── DIALOGS (sin cambios) ────────────────────────────────────────────── */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-white max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-gray-900 font-extrabold">Añadir documento</DialogTitle>
+      {/* List */}
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
+        {grouped.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-4xl mb-4">📄</p>
+            <p className="text-muted-foreground mb-6">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
+            <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />Añadir documento
+            </Button>
+          </div>
+        ) : grouped.map(({ date, label, items, isToday }) => (
+          <div key={date} className="mb-6">
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-3 px-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>{label}</p>
+            {items.map(t => (
+              <DocRow key={t.id} ticket={t} onEdit={setEditDoc} onDelete={setDeleteDoc} onView={setViewFile} />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Add dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
+          <DialogHeader className="px-5 py-4 border-b border-border">
+            <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
           </DialogHeader>
-          <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members}
-            onSave={(data) => createMutation.mutate(data)} onCancel={() => setDialogOpen(false)} saving={createMutation.isPending} />
+          <div className="px-5 py-4">
+            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles}
+              onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
+          </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!editingTicket} onOpenChange={(open) => { if (!open) setEditingTicket(null); }}>
-        <DialogContent className="bg-white max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-gray-900 font-extrabold">Editar documento</DialogTitle>
+      {/* Edit dialog */}
+      <Dialog open={!!editDoc} onOpenChange={(o) => { if (!o) setEditDoc(null); }}>
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
+          <DialogHeader className="px-5 py-4 border-b border-border">
+            <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
           </DialogHeader>
-          {editingTicket && (
-            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members}
-              initialData={editingTicket} onSave={(data) => updateMutation.mutate({ id: editingTicket.id, formData: data })}
-              onCancel={() => setEditingTicket(null)} saving={updateMutation.isPending} />
+          {editDoc && (
+            <div className="px-5 py-4">
+              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles}
+                initialData={editDoc}
+                onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
+                onCancel={() => setEditDoc(null)} saving={updateMutation.isPending} />
+            </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteDoc} onOpenChange={(o) => { if (!o) setDeleteDoc(null); }}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
-            <AlertDialogDescription>
-              ¿Seguro que quieres eliminar "{ticketToDelete?.name}"? Esta acción no se puede deshacer.
-            </AlertDialogDescription>
+            <AlertDialogDescription>¿Seguro que quieres eliminar "{deleteDoc?.name}"? Esta acción no se puede deshacer.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate(ticketToDelete.id)} className="bg-red-600 hover:bg-red-700">
-              Eliminar
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => deleteMutation.mutate(deleteDoc.id)} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* File viewer */}
+      <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />
     </div>
   );
 }
