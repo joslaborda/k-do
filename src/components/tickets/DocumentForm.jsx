@@ -1,296 +1,287 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plane, Train, Hotel, CalendarDays, FileText, Package, MapPin, Upload, Eye, EyeOff, Users, Loader2, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-export const CATEGORY_CONFIG = {
-  flight:   { label: 'Vuelo',            icon: Plane,        color: 'from-blue-500 to-cyan-500',    bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-200' },
-  train:    { label: 'Tren',             icon: Train,        color: 'from-green-500 to-emerald-500', bg: 'bg-green-50',  text: 'text-green-700',  border: 'border-green-200' },
-  hotel:    { label: 'Hotel',            icon: Hotel,        color: 'from-purple-500 to-pink-500',   bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  event:    { label: 'Evento',           icon: CalendarDays, color: 'from-orange-500 to-red-500',   bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
-  personal: { label: 'Personal',         icon: FileText,     color: 'from-amber-500 to-yellow-500', bg: 'bg-amber-50',  text: 'text-amber-700',  border: 'border-amber-200' },
-  other:    { label: 'Otro',             icon: Package,      color: 'from-slate-500 to-gray-500',   bg: 'bg-slate-50',  text: 'text-slate-700',  border: 'border-slate-200' },
-};
-
-const VISIBILITY_OPTIONS = [
-  { value: 'personal',       label: 'Solo yo',          icon: EyeOff },
-  { value: 'shared',         label: 'Todo el grupo',    icon: Eye },
-  { value: 'selected_users', label: 'Usuarios concretos', icon: Users },
+const CATEGORIES = [
+  { key: 'flight',   icon: '✈️', label: 'Vuelo'   },
+  { key: 'hotel',    icon: '🏨', label: 'Hotel'   },
+  { key: 'train',    icon: '🚆', label: 'Tren'    },
+  { key: 'event',    icon: '🎟️', label: 'Evento'  },
+  { key: 'personal', icon: '🛡️', label: 'Seguro'  },
+  { key: 'other',    icon: '📄', label: 'Otro'    },
 ];
 
-const EMPTY_FORM = {
-  name: '', category: 'flight', date: '', end_date: '', notes: '',
-  file_url: '', origin: '', destination: '', airline: '',
-  city: '', doc_type: '', city_id: '', arrival_city_id: '',
-  itinerary_day_id: '', visibility: 'personal', shared_with: [],
+const VISIBILITY_OPTS = [
+  { key: 'personal',       icon: '🔒', label: 'Solo yo',       desc: 'Nadie más puede verlo'     },
+  { key: 'shared',         icon: '👥', label: 'Todo el grupo', desc: 'Visible para todos'        },
+  { key: 'selected_users', icon: '👤', label: 'Elegir',        desc: 'Selecciona quién lo ve'   },
+];
+
+const SHOW_FIELDS = {
+  flight:   ['name','origin','destination','airline','date','time','end_date','notes'],
+  hotel:    ['name','city','date','time','end_date','notes'],
+  train:    ['name','origin','destination','date','time','notes'],
+  event:    ['name','city','date','time','notes'],
+  personal: ['name','date','end_date','notes'],
+  other:    ['name','city','date','time','notes'],
 };
 
-export default function DocumentForm({ cities = [], itineraryDays = [], members = [], initialData = null, onSave, onCancel, saving = false }) {
-  const [form, setForm] = useState(initialData || EMPTY_FORM);
-  const [uploadingFile, setUploadingFile] = useState(false);
-  const fileInputRef = useRef(null);
+const FIELD_LABELS = {
+  name: 'Nombre', origin: 'Origen', destination: 'Destino',
+  airline: 'Compañía / Nº vuelo', city: 'Ciudad',
+  date: 'Fecha', end_date: 'Fecha fin', time: 'Hora',
+  notes: 'Notas',
+};
 
-  const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
+const FIELD_PLACEHOLDERS = {
+  name: 'Ej. Vuelo Madrid-Tokyo', origin: 'MAD', destination: 'NRT',
+  airline: 'IB-6832', city: 'Tokyo',
+  date: 'yyyy-mm-dd', end_date: 'yyyy-mm-dd', time: '08:45',
+  notes: 'Notas adicionales...',
+};
 
-  // ── File upload ──────────────────────────────────────────────────────────
+export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, onSave, onCancel, saving }) {
+  const [category, setCategory]     = useState(initialData?.category || 'flight');
+  const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
+  const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
+  const [fileUploading, setFileUploading] = useState(false);
+  const [fields, setFields]         = useState({
+    name:        initialData?.name        || '',
+    origin:      initialData?.origin      || '',
+    destination: initialData?.destination || '',
+    airline:     initialData?.airline     || '',
+    city:        initialData?.city        || '',
+    date:        initialData?.date        || '',
+    end_date:    initialData?.end_date    || '',
+    time:        initialData?.time        || '',
+    notes:       initialData?.notes       || '',
+    file_url:    initialData?.file_url    || '',
+    city_id:     initialData?.city_id     || '',
+  });
+
+  const showFields = SHOW_FIELDS[category] || SHOW_FIELDS.other;
+  const hasField   = (f) => showFields.includes(f);
+
+  const setField = (k, v) => setFields(prev => ({ ...prev, [k]: v }));
+
+  const toggleSharedWith = (email) => {
+    setSharedWith(prev => prev.includes(email) ? prev.filter(e => e !== email) : [...prev, email]);
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploadingFile(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    set('file_url', file_url);
-    setUploadingFile(false);
-  };
-
-  // ── Dynamic fields per category ──────────────────────────────────────────
-  const renderCategoryFields = () => {
-    switch (form.category) {
-      case 'flight':
-        return (
-          <>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Origen" placeholder="ej. Madrid" value={form.origin} onChange={v => set('origin', v)} />
-              <Field label="Destino" placeholder="ej. Tokyo" value={form.destination} onChange={v => set('destination', v)} />
-            </div>
-            <Field label="Aerolínea (opcional)" placeholder="ej. Iberia" value={form.airline} onChange={v => set('airline', v)} />
-            <Field label="Fecha" type="date" value={form.date} onChange={v => set('date', v)} />
-          </>
-        );
-      case 'train':
-        return (
-          <>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Origen" placeholder="ej. Kyoto" value={form.origin} onChange={v => set('origin', v)} />
-              <Field label="Destino" placeholder="ej. Osaka" value={form.destination} onChange={v => set('destination', v)} />
-            </div>
-            <Field label="Fecha" type="date" value={form.date} onChange={v => set('date', v)} />
-          </>
-        );
-      case 'hotel':
-        return (
-          <>
-            <Field label="Ciudad" placeholder="ej. Tokyo" value={form.city} onChange={v => set('city', v)} />
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Check-in" type="date" value={form.date} onChange={v => set('date', v)} />
-              <Field label="Check-out" type="date" value={form.end_date} onChange={v => set('end_date', v)} />
-            </div>
-          </>
-        );
-      case 'event':
-        return (
-          <>
-            <Field label="Ciudad" placeholder="ej. Osaka" value={form.city} onChange={v => set('city', v)} />
-            <Field label="Fecha" type="date" value={form.date} onChange={v => set('date', v)} />
-          </>
-        );
-      case 'personal':
-        return (
-          <>
-            <Field label="Tipo de documento" placeholder="ej. Pasaporte, Visado..." value={form.doc_type} onChange={v => set('doc_type', v)} />
-            <Field label="Fecha de expiración" type="date" value={form.date} onChange={v => set('date', v)} />
-          </>
-        );
-      case 'other':
-        return <Field label="Fecha (opcional)" type="date" value={form.date} onChange={v => set('date', v)} />;
-      default:
-        return null;
+    setFileUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setField('file_url', file_url);
+    } catch (err) {
+      console.error('Upload error:', err);
     }
+    setFileUploading(false);
   };
 
-  const canSave = form.name.trim() && !uploadingFile;
+  const handleSave = () => {
+    if (!fields.name.trim()) return;
+    onSave({
+      ...fields,
+      category,
+      visibility,
+      shared_with: visibility === 'selected_users' ? sharedWith : [],
+    });
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-5">
 
-      {/* File upload — first */}
+      {/* Category tabs */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-1.5 block">Archivo</label>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-border rounded-xl p-4 cursor-pointer hover:border-orange-400 hover:bg-orange-50/50 transition-all flex items-center gap-3"
-        >
-          {uploadingFile ? (
-            <Loader2 className="w-5 h-5 text-orange-600 animate-spin" />
-          ) : form.file_url ? (
-            <Check className="w-5 h-5 text-green-600" />
-          ) : (
-            <Upload className="w-5 h-5 text-muted-foreground" />
-          )}
-          <span className="text-sm text-muted-foreground">
-            {uploadingFile ? 'Subiendo...' : form.file_url ? '✓ Archivo subido (haz clic para cambiar)' : 'Haz clic para subir PDF o imagen'}
-          </span>
-        </div>
-        <input ref={fileInputRef} type="file" accept="application/pdf,image/*" className="hidden" onChange={handleFileUpload} />
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className="text-sm font-medium text-foreground mb-1.5 block">Tipo de documento</label>
-        <div className="grid grid-cols-3 gap-2">
-          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-            const Icon = cfg.icon;
-            const active = form.category === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => set('category', key)}
-                className={`flex items-center gap-2 p-2.5 rounded-xl border text-sm font-medium transition-all ${active ? `${cfg.bg} ${cfg.border} ${cfg.text} border-2` : 'border-border text-muted-foreground hover:bg-secondary/50'}`}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">{cfg.label}</span>
-              </button>
-            );
-          })}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo *</p>
+        <div className="flex border-b border-border">
+          {CATEGORIES.map(cat => (
+            <button key={cat.key} onClick={() => setCategory(cat.key)}
+              className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${category === cat.key ? 'border-primary' : 'border-transparent'}`}>
+              <span className="text-base leading-none">{cat.icon}</span>
+              <span className={`text-xs font-medium leading-none ${category === cat.key ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Name */}
-      <Field label="Nombre *" placeholder="ej. Vuelo Madrid → Tokyo" value={form.name} onChange={v => set('name', v)} />
+      <div>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
+        <Input value={fields.name} onChange={e => setField('name', e.target.value)}
+          placeholder={FIELD_PLACEHOLDERS.name} className="h-10 text-sm" />
+      </div>
 
-      {/* Dynamic fields */}
-      {renderCategoryFields()}
-
-      {/* City association */}
-      {cities.length > 0 && (
-        <div>
-          <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5" /> Asociar a ciudad
-          </label>
-
-          <Select value={form.city_id || 'none'} onValueChange={v => set('city_id', v === 'none' ? '' : v)}>
-            <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Sin asignar</SelectItem>
-              {cities.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          {(form.category === 'flight' || form.category === 'train') && (
-            <div className="mt-2">
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Ciudad destino (opcional)</label>
-              <Select value={form.arrival_city_id || 'none'} onValueChange={v => set('arrival_city_id', v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin asignar</SelectItem>
-                  {cities.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
+      {/* Origin / Destination */}
+      {(hasField('origin') || hasField('destination')) && (
+        <div className="grid grid-cols-2 gap-3">
+          {hasField('origin') && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Origen</p>
+              <Input value={fields.origin} onChange={e => setField('origin', e.target.value)}
+                placeholder={FIELD_PLACEHOLDERS.origin} className="h-10 text-sm" />
+            </div>
+          )}
+          {hasField('destination') && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Destino</p>
+              <Input value={fields.destination} onChange={e => setField('destination', e.target.value)}
+                placeholder={FIELD_PLACEHOLDERS.destination} className="h-10 text-sm" />
             </div>
           )}
         </div>
       )}
 
-      {/* Itinerary day association */}
-      {itineraryDays.length > 0 && (
+      {/* Airline */}
+      {hasField('airline') && (
         <div>
-          <label className="text-sm font-medium text-foreground mb-1.5 block flex items-center gap-1.5">
-            <CalendarDays className="w-3.5 h-3.5" /> Asociar a día de itinerario
-          </label>
-
-          <Select value={form.itinerary_day_id || 'none'} onValueChange={v => set('itinerary_day_id', v === 'none' ? '' : v)}>
-            <SelectTrigger><SelectValue placeholder="Sin asignar" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Sin asignar</SelectItem>
-              {itineraryDays.map(d => (
-                <SelectItem key={d.id} value={d.id}>
-                  {d.cityName ? `${d.cityName} — ` : ''}{d.title}{d.date ? ` (${d.date})` : ''}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Compañía / Nº vuelo</p>
+          <Input value={fields.airline} onChange={e => setField('airline', e.target.value)}
+            placeholder={FIELD_PLACEHOLDERS.airline} className="h-10 text-sm" />
         </div>
       )}
 
-      {/* Visibility */}
+      {/* City */}
+      {hasField('city') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Ciudad</p>
+          <Input value={fields.city} onChange={e => setField('city', e.target.value)}
+            placeholder={FIELD_PLACEHOLDERS.city} className="h-10 text-sm" />
+        </div>
+      )}
+
+      {/* Date + Time in same row */}
+      {(hasField('date') || hasField('time')) && (
+        <div className={`grid gap-3 ${hasField('date') && hasField('time') ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          {hasField('date') && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha *</p>
+              <Input type="date" value={fields.date} onChange={e => setField('date', e.target.value)} className="h-10 text-sm" />
+            </div>
+          )}
+          {hasField('time') && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
+              <Input type="time" value={fields.time} onChange={e => setField('time', e.target.value)} className="h-10 text-sm" />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* End date */}
+      {hasField('end_date') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha de salida / fin</p>
+          <Input type="date" value={fields.end_date} onChange={e => setField('end_date', e.target.value)} className="h-10 text-sm" />
+        </div>
+      )}
+
+      {/* Notes */}
+      {hasField('notes') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Notas</p>
+          <Textarea value={fields.notes} onChange={e => setField('notes', e.target.value)}
+            placeholder={FIELD_PLACEHOLDERS.notes} className="text-sm resize-none" rows={2} />
+        </div>
+      )}
+
+      {/* Visibility — stacked with description */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-1.5 block">Visibilidad</label>
-        <div className="flex gap-2">
-          {VISIBILITY_OPTIONS.map(opt => {
-            const Icon = opt.icon;
-            const active = form.visibility === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => set('visibility', opt.value)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition-all flex-1 justify-center ${active ? 'bg-orange-700 text-white border-orange-700' : 'border-border text-muted-foreground hover:bg-secondary/50'}`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline truncate">{opt.label}</span>
-              </button>
-            );
-          })}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
+        <div className="flex flex-col gap-2">
+          {VISIBILITY_OPTS.map(opt => (
+            <button key={opt.key} onClick={() => setVisibility(opt.key)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
+                visibility === opt.key ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:bg-secondary/30'
+              }`}>
+              <span className="text-lg shrink-0">{opt.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-medium ${visibility === opt.key ? 'text-primary' : 'text-foreground'}`}>{opt.label}</p>
+                <p className={`text-xs mt-0.5 ${visibility === opt.key ? 'text-primary/70' : 'text-muted-foreground'}`}>{opt.desc}</p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                visibility === opt.key ? 'bg-primary border-primary' : 'border-border'
+              }`}>
+                {visibility === opt.key && <Check className="w-3 h-3 text-white" />}
+              </div>
+            </button>
+          ))}
         </div>
 
-        {/* Selected users picker */}
-        {form.visibility === 'selected_users' && members.length > 0 && (
-          <div className="mt-2 space-y-1">
-            <p className="text-xs text-muted-foreground">Selecciona quién puede ver este documento:</p>
-            <div className="flex flex-wrap gap-2">
-              {members.map(email => {
-                const selected = (form.shared_with || []).includes(email);
-                return (
-                  <button
-                    key={email}
-                    type="button"
-                    onClick={() => {
-                      const current = form.shared_with || [];
-                      set('shared_with', selected ? current.filter(e => e !== email) : [...current, email]);
-                    }}
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${selected ? 'bg-orange-700 text-white border-orange-700' : 'border-border text-muted-foreground hover:bg-secondary'}`}
-                  >
-                    {email}
-                  </button>
-                );
-              })}
-            </div>
+        {/* User picker when "selected_users" */}
+        {visibility === 'selected_users' && members.length > 0 && (
+          <div className="mt-3 flex flex-col gap-2">
+            {members.map((email, i) => {
+              const profile = profiles?.find(p => p.user_email === email || p.created_by === email);
+              const name = profile?.display_name || email.split('@')[0];
+              const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+              const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+              const selected = sharedWith.includes(email) || i === 0;
+              const isYou = i === 0;
+
+              return (
+                <button key={email}
+                  onClick={() => !isYou && toggleSharedWith(email)}
+                  disabled={isYou}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${
+                    selected ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:bg-secondary/20'
+                  } ${isYou ? 'cursor-default' : ''}`}>
+                  {profile?.avatar_url
+                    ? <img src={profile.avatar_url} alt={name} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                    : <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${colors[i % colors.length]}`}>{initials}</div>
+                  }
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className={`text-sm font-medium truncate ${selected ? 'text-primary' : 'text-foreground'}`}>{name}</p>
+                    {isYou && <p className="text-xs text-muted-foreground">Siempre incluido</p>}
+                  </div>
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                    selected ? 'bg-primary' : 'bg-secondary border border-border'
+                  }`}>
+                    {selected && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Notes */}
+      {/* File upload */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-1.5 block">Notas (opcional)</label>
-        <Textarea
-          placeholder="Notas adicionales..."
-          value={form.notes}
-          onChange={e => set('notes', e.target.value)}
-          rows={2}
-          className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-        />
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Archivo adjunto</p>
+        {fields.file_url ? (
+          <div className="flex items-center gap-3 px-4 py-3 bg-secondary/40 rounded-xl border border-border">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span className="text-sm text-foreground flex-1 truncate">Archivo adjuntado</span>
+            <button onClick={() => setField('file_url', '')} className="text-xs text-muted-foreground hover:text-red-500 transition-colors">Quitar</button>
+          </div>
+        ) : (
+          <label className={`flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-5 cursor-pointer hover:border-primary/40 hover:bg-secondary/20 transition-all ${fileUploading ? 'opacity-50' : ''}`}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground mb-2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p className="text-sm font-medium text-muted-foreground">{fileUploading ? 'Subiendo...' : 'Toca para adjuntar'}</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">PDF, JPG, PNG...</p>
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif" onChange={handleFileUpload} className="hidden" disabled={fileUploading} />
+          </label>
+        )}
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pt-2 border-t border-border">
-        <Button variant="outline" onClick={onCancel} className="border-border text-foreground hover:bg-secondary/50">
-          Cancelar
-        </Button>
-        <Button
-          onClick={() => onSave(form)}
-          className="bg-orange-700 hover:bg-orange-800"
-          disabled={!canSave || saving}
-        >
-          {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : 'Guardar'}
+      <div className="flex gap-3 pt-2">
+        <Button variant="outline" onClick={onCancel} className="flex-1">Cancelar</Button>
+        <Button onClick={handleSave} disabled={!fields.name.trim() || saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
+          {saving ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
-    </div>
-  );
-}
-
-function Field({ label, placeholder, value, onChange, type = 'text' }) {
-  return (
-    <div>
-      <label className="text-sm font-medium text-foreground mb-1.5 block">{label}</label>
-      <Input
-        type={type}
-        placeholder={placeholder}
-        value={value || ''}
-        onChange={e => onChange(e.target.value)}
-        className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-      />
     </div>
   );
 }
