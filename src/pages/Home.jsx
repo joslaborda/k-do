@@ -147,7 +147,7 @@ function DraggableSpotList({ spots, onReorder }) {
 }
 
 // ── Day card ──────────────────────────────────────────────────────────────────
-function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots }) {
+function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr }) {
   const [open, setOpen] = useState(defaultOpen);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
   const hasContent = docs.length > 0 || spots.length > 0;
@@ -160,9 +160,9 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
         <div className="flex items-center gap-3 min-w-0">
           <span className={`text-xs font-bold uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
           <span className="text-sm font-semibold text-foreground truncate">{city?.name}</span>
-          {city?.start_date && (
+          {dateStr && (
             <span className="text-xs text-muted-foreground shrink-0">
-              {format(parseISO(city.start_date), 'dd MMM', { locale: es })}
+              {format(parseISO(dateStr), 'dd MMM', { locale: es })}
             </span>
           )}
         </div>
@@ -217,7 +217,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
 }
 
 // ── Pre-trip tab ──────────────────────────────────────────────────────────────
-function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
+function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite }) {
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
   const [checkedItems, setCheckedItems] = useState(() => {
@@ -351,40 +351,19 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile }) {
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <Link to={createPageUrl('TripDetail') + '?trip_id=' + tripId}
+          <button onClick={() => setInviteOpen(true)}
             className="flex items-center gap-1 text-xs text-primary font-medium">
             <UserPlus className="w-3.5 h-3.5" />Invitar
-          </Link>
+          </button>
         </div>
-        <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
-          {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-            const initials = (email || '').split('@')[0].slice(0,2).toUpperCase();
-            const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
-            return (
-              <div key={email} className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>
-                  {initials}
-                </div>
-                <span className="text-xs text-muted-foreground">{i === 0 ? 'Admin' : email.split('@')[0]}</span>
-              </div>
-            );
-          })}
-          <Link to={createPageUrl('TripDetail') + '?trip_id=' + trip?.id}>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center">
-                <UserPlus className="w-4 h-4 text-muted-foreground/50" />
-              </div>
-              <span className="text-xs text-muted-foreground">Añadir</span>
-            </div>
-          </Link>
-        </div>
+        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
       </div>
     </div>
   );
 }
 
 // ── Today tab ─────────────────────────────────────────────────────────────────
-function TodayTab({ trip, cities, tripId }) {
+function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
   const queryClient = useQueryClient();
   const today = new Date();
   const todayStr = format(today, 'yyyy-MM-dd');
@@ -464,6 +443,7 @@ function TodayTab({ trip, cities, tripId }) {
           itineraryDays={itineraryDays}
           tripId={tripId}
           defaultOpen={true}
+          dateStr={todayStr}
           onReorderSpots={handleReorder}
         />
       )}
@@ -477,6 +457,7 @@ function TodayTab({ trip, cities, tripId }) {
           itineraryDays={itineraryDays}
           tripId={tripId}
           defaultOpen={false}
+          dateStr={tomorrowStr}
           onReorderSpots={handleReorder}
         />
       )}
@@ -486,10 +467,10 @@ function TodayTab({ trip, cities, tripId }) {
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <Link to={createPageUrl('TripDetail') + '?trip_id=' + tripId}
+          <button onClick={() => setInviteOpen(true)}
             className="flex items-center gap-1 text-xs text-primary font-medium">
             <UserPlus className="w-3.5 h-3.5" />Invitar
-          </Link>
+          </button>
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
@@ -737,8 +718,110 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 }
 
 
+
+// ── Member avatar row ─────────────────────────────────────────────────────────
+function MemberAvatarRow({ trip, profiles, onInvite, isToday }) {
+  const members = (trip?.members || [trip?.created_by]).filter(Boolean);
+  const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+
+  return (
+    <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
+      {members.map((email, i) => {
+        const profile = profiles?.find(p => p.user_email === email || p.created_by === email);
+        const initials = (profile?.display_name || email || '').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || (email||'').split('@')[0].slice(0,2).toUpperCase();
+        const name = profile?.display_name || (email||'').split('@')[0];
+        return (
+          <div key={email} className="flex flex-col items-center gap-1">
+            {profile?.avatar_url
+              ? <img src={profile.avatar_url} alt={name} className="w-9 h-9 rounded-full object-cover" />
+              : <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>
+            }
+            <span className="text-xs text-muted-foreground max-w-[48px] truncate text-center">{i === 0 ? (isToday ? 'Tú' : 'Admin') : name}</span>
+          </div>
+        );
+      })}
+      <button onClick={onInvite} className="flex flex-col items-center gap-1">
+        <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center hover:border-primary/40 transition-colors">
+          <UserPlus className="w-4 h-4 text-muted-foreground/50" />
+        </div>
+        <span className="text-xs text-muted-foreground">Añadir</span>
+      </button>
+    </div>
+  );
+}
+
+// ── Invite modal ──────────────────────────────────────────────────────────────
+function InviteModal({ open, onClose, trip, tripId, queryClient }) {
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInvite = async () => {
+    if (!email.trim() || !email.includes('@')) { setError('Introduce un email válido'); return; }
+    setSending(true); setError('');
+    try {
+      const currentMembers = trip?.members || [];
+      if (currentMembers.includes(email.trim())) { setError('Este usuario ya es miembro'); setSending(false); return; }
+      await base44.entities.Trip.update(tripId, { members: [...currentMembers, email.trim()] });
+      queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
+      setDone(true); setEmail('');
+      setTimeout(() => { setDone(false); onClose(); }, 2000);
+    } catch { setError('Error al añadir el usuario. Inténtalo de nuevo.'); }
+    setSending(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
+        <DialogHeader className="px-5 py-4 border-b border-border">
+          <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+            <UserPlus className="w-4 h-4 text-primary" />Invitar al viaje
+          </DialogTitle>
+        </DialogHeader>
+        <div className="px-5 py-4">
+          {done ? (
+            <div className="flex flex-col items-center py-4 gap-3">
+              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <Check className="w-6 h-6 text-green-600" />
+              </div>
+              <p className="text-sm font-medium text-foreground">¡Invitación enviada!</p>
+              <p className="text-xs text-muted-foreground text-center">{email} ha sido añadido al viaje</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground mb-4">Introduce el email de la persona que quieres añadir al viaje.</p>
+              <label className="text-xs font-medium text-foreground mb-1.5 block">Email *</label>
+              <Input
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError(''); }}
+                onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
+                placeholder="nombre@email.com"
+                type="email"
+                className="h-10 text-sm"
+                autoFocus
+              />
+              {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+              <p className="text-xs text-muted-foreground mt-3">El usuario recibirá acceso al viaje con su cuenta de Kōdo.</p>
+            </>
+          )}
+        </div>
+        {!done && (
+          <div className="flex gap-2 px-5 py-3 border-t border-border justify-end">
+            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
+            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
+              onClick={handleInvite} disabled={!email.trim() || sending}>
+              {sending ? 'Añadiendo...' : 'Añadir al viaje'}
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ── Settings Dialog ───────────────────────────────────────────────────────────
-function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved }) {
+function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -1030,11 +1113,10 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
               );
             })}
           </div>
-          <Link to={createPageUrl('TripDetail') + '?trip_id=' + tripId}
-            onClick={onClose}
+          <button onClick={() => { onClose(); setTimeout(() => onInvite?.(), 100); }}
             className="text-xs text-primary flex items-center gap-1 font-medium">
             <UserPlus className="w-3.5 h-3.5" />Invitar
-          </Link>
+          </button>
         </div>
 
         {/* Footer */}
@@ -1068,6 +1150,10 @@ export default function Home() {
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const [tab, setTab] = useState('main');
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteSending, setInviteSending] = useState(false);
+  const [inviteDone, setInviteDone] = useState(false);
   const [chatLastRead, setChatLastRead] = useState(new Date());
 
   const handleTabChange = (key) => {
@@ -1134,6 +1220,7 @@ export default function Home() {
   const { data: documents = [] } = useQuery({ queryKey: ['documents', tripId], queryFn: () => base44.entities.Document.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: allSpots = [] } = useQuery({ queryKey: ['spots', tripId], queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: tripMessages = [] } = useQuery({ queryKey: ['tripMessages', tripId], queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 10000, refetchInterval: 30000 });
+  const { data: profiles = [] } = useQuery({ queryKey: ['allProfilesHome'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 5 * 60 * 1000 });
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', currentUserId],
     queryFn: async () => {
@@ -1342,11 +1429,12 @@ export default function Home() {
           <PreTripTab
             trip={trip} cities={sortedCities}
             packingItems={packingItems} documents={documents}
-            myProfile={myProfile}
+            myProfile={myProfile} profiles={profiles}
+            onInvite={() => setInviteOpen(true)}
           />
         )}
         {tab === 'main' && tripInProgress && (
-          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} />
+          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profiles} onInvite={() => setInviteOpen(true)} />
         )}
         {tab === 'main' && tripFinished && (
           <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />
@@ -1374,6 +1462,7 @@ export default function Home() {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
           queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
         }}
+        onInvite={() => setInviteOpen(true)}
       />
 
             <DeleteTripModal
@@ -1381,6 +1470,14 @@ export default function Home() {
         tripName={trip?.name || ''}
         onConfirm={() => deleteMutation.mutate()}
         isPending={deleteMutation.isPending}
+      />
+
+      <InviteModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        trip={trip}
+        tripId={tripId}
+        queryClient={queryClient}
       />
     </div>
   );
