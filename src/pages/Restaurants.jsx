@@ -1147,7 +1147,7 @@ export default function Restaurants() {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const targetCity = (selectedCity || city).toLowerCase();
     const fromUsers = publicSpots.filter(s =>
-      s.city_name?.toLowerCase() === targetCity
+      !targetCity || s.city_name?.toLowerCase() === targetCity
     );
     // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
