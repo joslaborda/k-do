@@ -417,68 +417,171 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
   );
 }
 
-// ── Community spot card (matches UI from screenshots) ─────────────────────────
-function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
+// ── Community spot detail sheet ───────────────────────────────────────────────
+function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved, userId }) {
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
-  const commentCount = spot._commentCount || 0;
+  const [showComments, setShowComments] = useState(false);
+  const isReal = spot.id && !String(spot.id).startsWith('seed_');
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    enabled: !!spot.id && isReal,
+    staleTime: 30000,
+  });
+
+  const mapsUrl = spot.lat && spot.lng
+    ? `https://www.google.com/maps?q=${spot.lat},${spot.lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.title + (spot.city_name ? ' ' + spot.city_name : ''))}`;
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden">
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
-            {tc.emoji}
+    <>
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+          <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
+                  {tc.emoji}
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+                  <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
+                </div>
+              </div>
+              <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground">{spot.title}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {tc.label}{spot.address ? ' · ' + spot.address : ''}{spot.city_name ? ' · ' + spot.city_name : ''}
-            </p>
-            {spot.notes && <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>}
+
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            {spot.address && (
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>{spot.address}</span>
+              </div>
+            )}
+            {spot.notes && (
+              <div className="bg-secondary/50 rounded-xl p-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Descripción</p>
+                <p className="text-sm text-foreground leading-relaxed">{spot.notes}</p>
+              </div>
+            )}
             {spot.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {spot.tags.slice(0, 4).map(t => (
-                  <span key={t} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full border border-border">#{t}</span>
+              <div className="flex flex-wrap gap-1.5">
+                {spot.tags.map(t => (
+                  <span key={t} className="text-xs bg-accent text-primary px-2.5 py-1 rounded-full border border-orange-200">#{t}</span>
                 ))}
               </div>
+            )}
+            {spot.creator_username && (
+              <p className="text-xs text-muted-foreground">Añadido por <span className="font-medium text-foreground">@{spot.creator_username}</span></p>
+            )}
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors">
+              <Navigation className="w-4 h-4" />Ver en Google Maps
+            </a>
+          </div>
+
+          <div className="flex-shrink-0 px-4 py-3 border-t border-border">
+            <div className="flex items-center gap-4 mb-3">
+              <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm transition-colors">
+                {isLiked
+                  ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                }
+                <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : 'Me gusta'}</span>
+              </button>
+              {isReal && (
+                <button onClick={() => setShowComments(true)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  {comments.length > 0 ? comments.length : 'Comentar'}
+                </button>
+              )}
+            </div>
+            {alreadySaved ? (
+              <div className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Ya guardado en tu viaje
+              </div>
+            ) : (
+              <button onClick={() => { onSave(spot); onClose(); }} disabled={saving}
+                className="w-full py-2.5 rounded-xl bg-primary text-white text-sm font-semibold disabled:opacity-50 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                {saving ? 'Guardando...' : 'Guardar en mi viaje'}
+              </button>
             )}
           </div>
         </div>
       </div>
+      {showComments && <InlineCommentsPopup spot={spot} userId={userId} onClose={() => setShowComments(false)} />}
+    </>
+  );
+}
 
-      {/* Action bar — like, comment, save */}
-      <div className="flex items-center px-4 py-3 border-t border-border gap-4">
-        <button onClick={toggleLike}
-          className="flex items-center gap-1.5 text-sm font-medium transition-colors">
-          {isLiked
-            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          }
-          <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : ''}</span>
-        </button>
+// ── Community spot card (matches UI from screenshots) ─────────────────────────
+function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
+  const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
+  const [showDetail, setShowDetail] = useState(false);
 
-        <button className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          {commentCount > 0 ? commentCount : ''}
-        </button>
+  return (
+    <>
+      <div className="bg-white rounded-2xl border border-border overflow-hidden cursor-pointer hover:shadow-sm transition-shadow"
+        onClick={() => setShowDetail(true)}>
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
+              {tc.emoji}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm text-foreground">{spot.title}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {tc.label}{spot.address ? ' · ' + spot.address : ''}{spot.city_name ? ' · ' + spot.city_name : ''}
+              </p>
+              {spot.notes && <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>}
+              {spot.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {spot.tags.slice(0, 4).map(t => (
+                    <span key={t} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full border border-border">#{t}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
+          </div>
+        </div>
 
-        <div className="flex-1" />
-
-        {alreadySaved ? (
-          <span className="text-xs text-green-700 font-medium flex items-center gap-1">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Guardado
-          </span>
-        ) : (
-          <button onClick={() => onSave(spot)} disabled={saving}
-            className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            Guardar
-          </button>
-        )}
+        <div className="flex items-center px-4 py-3 border-t border-border gap-4" onClick={e => e.stopPropagation()}>
+          <div className="flex-1" />
+          {alreadySaved ? (
+            <span className="text-xs text-green-700 font-medium flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Guardado
+            </span>
+          ) : (
+            <button onClick={e => { e.stopPropagation(); onSave(spot); }} disabled={saving}
+              className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              {saving ? 'Guardando...' : 'Guardar'}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+
+      {showDetail && (
+        <CommunitySpotDetailSheet
+          spot={spot}
+          onClose={() => setShowDetail(false)}
+          onSave={onSave}
+          saving={saving}
+          alreadySaved={alreadySaved}
+          userId={userId}
+        />
+      )}
+    </>
   );
 }
 
@@ -879,6 +982,7 @@ export default function Restaurants() {
   const [toast, setToast] = useState({ visible: false, spot: null });
   const [lastSavedId, setLastSavedId] = useState(null);
   const [selectedSpot, setSelectedSpot] = useState(null);
+  const [mySpotSearch, setMySpotSearch] = useState('');
   const searchTimer = useRef(null);
   const toastTimer = useRef(null);
 
@@ -1000,11 +1104,13 @@ export default function Restaurants() {
     if (!tripId) return;
     const dup = spots.find(s => s.title?.toLowerCase().trim() === spot.title?.toLowerCase().trim());
     if (dup) return;
-    setSavingId(spot.title);
+    const savingKey = spot.id || spot.title;
+    setSavingId(savingKey);
     try {
       const created = await createMutation.mutateAsync(baseData({
         title: spot.title, type: spot.type, address: spot.address||'',
         lat: spot.lat, lng: spot.lng, notes: spot.notes||'',
+        city_name: selectedCity || city, country,
       }));
       setLastSavedId(created?.id);
       showToastFor({ title: spot.title }, selectedCity || city);
@@ -1041,8 +1147,9 @@ export default function Restaurants() {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const targetCity = (selectedCity || city).toLowerCase();
     const fromUsers = publicSpots.filter(s =>
-      (s.city_name?.toLowerCase() === targetCity || !s.city_name || targetCity === '')
+      s.city_name?.toLowerCase() === targetCity
     );
+    // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
     const all = [
       ...fromUsers.map(s => ({ ...s, _source: 'user' })),
@@ -1082,12 +1189,24 @@ export default function Restaurants() {
   // Hashtags
   const hashtags = useMemo(() => buildHashtags(spots, tripCities), [spots, tripCities]);
 
-  // Filtered spots
-  const filteredSpots = useMemo(() => spots.filter(s => {
-    if (stateFilter === 'assigned') return !!s.assigned_date;
-    if (stateFilter === 'unassigned') return !s.assigned_date;
-    return true;
-  }), [spots, stateFilter]);
+  // Filtered spots (by state + local search)
+  const filteredSpots = useMemo(() => {
+    let result = spots.filter(s => {
+      if (stateFilter === 'assigned') return !!s.assigned_date;
+      if (stateFilter === 'unassigned') return !s.assigned_date;
+      return true;
+    });
+    if (mySpotSearch.trim().length >= 1) {
+      const q = mySpotSearch.toLowerCase();
+      result = result.filter(s =>
+        s.title?.toLowerCase().includes(q) ||
+        s.notes?.toLowerCase().includes(q) ||
+        s.address?.toLowerCase().includes(q) ||
+        s.city_name?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [spots, stateFilter, mySpotSearch]);
 
   const isSearchActive = searchQuery.length >= 2;
 
@@ -1275,6 +1394,22 @@ export default function Restaurants() {
         {/* ── MIS SPOTS TAB ── */}
         {tab === 'mis' && (
           <div>
+            {/* Search bar */}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                value={mySpotSearch}
+                onChange={e => setMySpotSearch(e.target.value)}
+                placeholder="Buscar en mis spots..."
+                className="w-full pl-9 pr-9 py-2.5 rounded-xl text-sm outline-none bg-white border border-border focus:border-primary text-foreground"
+              />
+              {mySpotSearch && (
+                <button onClick={() => setMySpotSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
             {/* Filters */}
             <div className="flex gap-2 mb-4">
               {[['all','Todos'],['assigned','Asignados'],['unassigned','Sin asignar']].map(([v,l]) => (
@@ -1287,16 +1422,36 @@ export default function Restaurants() {
               ))}
             </div>
 
-            {filteredSpots.length === 0 ? (
+            {spots.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-4xl mb-4">📍</p>
-                <p className="text-muted-foreground mb-4">
-                  {spots.length === 0 ? 'Aún no tienes spots en este viaje' : 'Sin spots con ese filtro'}
-                </p>
+                <p className="text-muted-foreground mb-4">Aún no tienes spots en este viaje</p>
                 <button onClick={() => setShowCreate(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
                   <Plus className="w-4 h-4" />Crear primer spot
                 </button>
+              </div>
+            ) : filteredSpots.length === 0 && mySpotSearch.trim().length >= 1 ? (
+              /* No local match — show message + seed/OSM suggestions */
+              <div className="space-y-4">
+                <div className="text-center py-6 bg-white rounded-2xl border border-border">
+                  <p className="text-2xl mb-2">🔍</p>
+                  <p className="text-sm font-medium text-foreground mb-1">No tienes ese spot todavía</p>
+                  <p className="text-xs text-muted-foreground">Resultados de la comunidad y búsqueda para <strong>"{mySpotSearch}"</strong></p>
+                </div>
+                {/* Show seed matches as suggestions */}
+                {seedSpots.filter(s => s.title?.toLowerCase().includes(mySpotSearch.toLowerCase())).slice(0, 5).map((p, i) => {
+                  const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.title?.toLowerCase().trim());
+                  return <PlaceResultCard key={`ms-seed-${i}`} place={{ id: `ms-seed-${i}`, name: p.title, type: p.type, address: p.address || '' }} onSave={saveOsmPlace} saving={savingId===`ms-seed-${i}`} isDuplicate={isDuplicate} />;
+                })}
+                <button onClick={() => { setTab('buscar'); setSearchQuery(mySpotSearch); }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border border-dashed border-border rounded-xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors">
+                  <Search className="w-4 h-4" />Buscar "{mySpotSearch}" en el mapa
+                </button>
+              </div>
+            ) : filteredSpots.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-muted-foreground text-sm">Sin spots con ese filtro</p>
               </div>
             ) : (
               <div className="bg-white rounded-2xl border border-border overflow-hidden">
@@ -1368,12 +1523,13 @@ export default function Restaurants() {
               <div className="space-y-3">
                 {communitySpots.slice(0, 15).map((spot, idx) => {
                   const alreadySaved = spots.some(s => s.title?.toLowerCase() === spot.title?.toLowerCase());
+                  const savingKey = spot.id || spot.title;
                   return (
                     <CommunitySpotCard
                       key={spot.id || idx}
                       spot={spot}
                       onSave={saveCommunitySpot}
-                      saving={savingId === spot.title}
+                      saving={savingId === savingKey}
                       alreadySaved={alreadySaved}
                       userId={user?.id}
                     />
