@@ -512,10 +512,97 @@ function useLikeSimple(spotId, userId) {
   return { isLiked, count, toggle: () => isReal && mutation.mutate() };
 }
 
+// ── Simple comments popup (inline, sin depender de SpotCard) ─────────────────
+function InlineCommentsPopup({ spot, userId, onClose }) {
+  const queryClient = useQueryClient();
+  const [text, setText] = useState('');
+  const [thumb, setThumb] = useState(null);
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['myProfile', userId],
+    queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: userId }); return r[0] || null; },
+    enabled: !!userId, staleTime: 60000,
+  });
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    staleTime: 15000,
+  });
+
+  const mutation = useMutation({
+    mutationFn: () => base44.entities.SpotComment.create({
+      spot_id: spot.id, user_id: userId,
+      user_display_name: userProfile?.display_name || '',
+      username: userProfile?.username || '',
+      user_avatar: userProfile?.avatar_url || '',
+      thumb, text: text.trim() || null,
+    }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); setText(''); setThumb(null); },
+  });
+
+  const ups = comments.filter(c => c.thumb === 'up').length;
+  const downs = comments.filter(c => c.thumb === 'down').length;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col max-h-[75vh]" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b border-border flex-shrink-0">
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>
+                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
+              </div>
+            </div>
+            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center"><X className="w-4 h-4 text-muted-foreground" /></button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {comments.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Sin comentarios. ¡Sé el primero!</p>}
+          {comments.map(c => (
+            <div key={c.id} className="flex gap-2">
+              <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                {c.user_display_name?.[0]?.toUpperCase() || '?'}
+              </div>
+              <div className="flex-1 bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-xs font-semibold text-foreground">@{c.username || c.user_display_name}</span>
+                  <span className="text-sm">{c.thumb === 'up' ? '👍' : '👎'}</span>
+                </div>
+                {c.text && <p className="text-sm text-foreground">{c.text}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="p-3 border-t border-border flex-shrink-0 space-y-2">
+          <div className="flex gap-2">
+            {['up','down'].map(t => (
+              <button key={t} onClick={() => setThumb(thumb === t ? null : t)}
+                className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${thumb === t ? (t==='up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-red-50 border-red-300 text-red-700') : 'bg-secondary border-border text-muted-foreground'}`}>
+                {t === 'up' ? '👍' : '👎'}
+              </button>
+            ))}
+            <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Añade un comentario..."
+              className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-primary bg-secondary h-9" />
+            <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
+              className="px-3 py-1.5 rounded-xl bg-primary text-white text-sm disabled:opacity-50">
+              {mutation.isPending ? '...' : '→'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── My spot row (Mis spots tab) ───────────────────────────────────────────────
 function MySpotRow({ spot, onTap, userId }) {
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
+  const [showComments, setShowComments] = useState(false);
 
   const { data: comments = [] } = useQuery({
     queryKey: ['spotComments', spot.id],
@@ -546,7 +633,6 @@ function MySpotRow({ spot, onTap, userId }) {
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {/* State badge */}
           {spot.visited ? (
             <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Visitado</span>
           ) : hasDate ? (
@@ -554,27 +640,26 @@ function MySpotRow({ spot, onTap, userId }) {
           ) : (
             <span className="text-xs text-muted-foreground/60">Sin día</span>
           )}
-          {/* Pencil hint */}
           <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
         </div>
       </button>
 
       {/* Like + comment row */}
       <div className="flex items-center gap-4 px-4 pb-3">
-        <button onClick={toggleLike} className="flex items-center gap-1.5 text-xs transition-colors">
+        <button onClick={e => { e.stopPropagation(); toggleLike(); }} className="flex items-center gap-1.5 text-xs transition-colors">
           {isLiked
             ? <svg width="14" height="14" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           }
-          <span className={`${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
-            {likeCount > 0 ? likeCount : 'Like'}
-          </span>
+          <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : 'Like'}</span>
         </button>
-        <button className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <button onClick={e => { e.stopPropagation(); setShowComments(true); }} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           {comments.length > 0 ? comments.length : 'Comentar'}
         </button>
       </div>
+
+      {showComments && <InlineCommentsPopup spot={spot} userId={userId} onClose={() => setShowComments(false)} />}
     </div>
   );
 }
@@ -677,6 +762,77 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
   );
 }
 
+// ── Assign date modal (shown after saving community spot) ─────────────────────
+function AssignDateModal({ spot, tripCities, onAssign, onSkip }) {
+  const [selectedDate, setSelectedDate] = useState('');
+
+  // Build allowed date range from trip cities
+  const tripDates = useMemo(() => {
+    const dates = new Set();
+    tripCities.forEach(c => {
+      if (c.start_date && c.end_date) {
+        let d = new Date(c.start_date);
+        const end = new Date(c.end_date);
+        while (d <= end) {
+          dates.add(d.toISOString().slice(0, 10));
+          d.setDate(d.getDate() + 1);
+        }
+      }
+    });
+    return dates;
+  }, [tripCities]);
+
+  const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
+  const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
+
+  const isAllowed = (date) => tripDates.size === 0 || tripDates.has(date);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
+      <div className="bg-white w-full max-w-md rounded-t-3xl p-5 pb-8">
+        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground text-sm">¡Guardado!</p>
+            <p className="text-xs text-muted-foreground">{spot.title} · ¿Lo asignas a un día?</p>
+          </div>
+        </div>
+
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Día del viaje</p>
+        <input
+          type="date"
+          value={selectedDate}
+          min={minDate}
+          max={maxDate}
+          onChange={e => setSelectedDate(e.target.value)}
+          className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary mb-1"
+        />
+        {selectedDate && !isAllowed(selectedDate) && (
+          <p className="text-xs text-red-500 mb-2">Esa fecha está fuera del viaje</p>
+        )}
+        {tripDates.size > 0 && (
+          <p className="text-xs text-muted-foreground mb-4">Solo puedes seleccionar fechas dentro del viaje</p>
+        )}
+
+        <div className="flex gap-3 mt-4">
+          <button onClick={onSkip} className="flex-1 py-2.5 border border-border rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary/50">
+            Ahora no
+          </button>
+          <button
+            onClick={() => isAllowed(selectedDate) && selectedDate && onAssign(selectedDate)}
+            disabled={!selectedDate || !isAllowed(selectedDate)}
+            className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40">
+            Asignar día
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ spot, city, onUndo, visible }) {
   if (!visible || !spot) return null;
@@ -717,7 +873,8 @@ export default function Restaurants() {
   const [showCreate, setShowCreate] = useState(false);
   const [savingId, setSavingId] = useState(null);
   const [stateFilter, setStateFilter] = useState('all');
-  const [communitySort, setCommunitySort] = useState('visits');
+  const [communityFilter, setCommunityFilter] = useState('all');
+  const [assignDateSpot, setAssignDateSpot] = useState(null); // spot to assign date after saving
   const [selectedCity, setSelectedCity] = useState('');
   const [toast, setToast] = useState({ visible: false, spot: null });
   const [lastSavedId, setLastSavedId] = useState(null);
@@ -767,6 +924,18 @@ export default function Restaurants() {
     mutationFn: id => base44.entities.Spot.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
   });
+
+  // Seed spots that match the search query (shown alongside OSM results)
+  const seedSearchResults = useMemo(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) return [];
+    const q = searchQuery.toLowerCase().replace('#', '');
+    return seedSpots.filter(s => {
+      const inTitle = s.title?.toLowerCase().includes(q);
+      const inNotes = s.notes?.toLowerCase().includes(q);
+      const inTags = s.tags?.some(t => t.toLowerCase().includes(q));
+      return inTitle || inNotes || inTags;
+    }).slice(0, 6);
+  }, [searchQuery, seedSpots]);
 
   // OSM search
   useEffect(() => {
@@ -848,6 +1017,8 @@ export default function Restaurants() {
       }));
       setLastSavedId(created?.id);
       showToastFor({ title: spot.title }, selectedCity || city);
+      // Ask user if they want to assign a date
+      if (created?.id) setAssignDateSpot(created);
     } finally { setSavingId(null); }
   };
 
@@ -862,31 +1033,56 @@ export default function Restaurants() {
     return getSeedSpotsForCity(country, selectedCity || city);
   }, [country, selectedCity, city]);
 
-  // Community spots
+  // Community spots — include own public spots too (so their likes show)
   const communitySpots = useMemo(() => {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
+    const targetCity = (selectedCity || city).toLowerCase();
     const fromUsers = publicSpots.filter(s =>
-      s.created_by !== user?.email &&
-      (s.city_name?.toLowerCase() === (selectedCity||city).toLowerCase() || !s.city_name)
+      (s.city_name?.toLowerCase() === targetCity || !s.city_name || targetCity === '')
     );
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
     const all = [
       ...fromUsers.map(s => ({ ...s, _source: 'user' })),
       ...fromSeed.map(s => ({ ...s, _source: 'seed', id: `seed_${s.title}` })),
     ];
-    return all.sort((a, b) => {
-      if (communitySort === 'recent') return new Date(b.created_date||0) - new Date(a.created_date||0);
-      return (b.visits||0) - (a.visits||0);
+    // Category filter
+    const COMMUNITY_FILTER_TYPES = {
+      restaurant: ['food'],
+      bar: ['food'],
+      sight: ['sight'],
+      shopping: ['shopping'],
+      activity: ['activity'],
+      custom: ['custom'],
+    };
+    const COMMUNITY_FILTER_KEYWORDS = {
+      restaurant: ['restaurant', 'ramen', 'sushi', 'pizza', 'tapas', 'comida', 'comer', 'food'],
+      bar: ['bar', 'pub', 'nightlife', 'club', 'cocktail', 'cerveza', 'noche', 'fiesta'],
+      nightlife: ['nightlife', 'club', 'disco', 'karaoke', 'bar', 'noche', 'fiesta'],
+      vistas: ['vistas', 'mirador', 'viewpoint', 'panorama', 'torre', 'sky', 'view'],
+      museos: ['museo', 'museum', 'galeria', 'arte', 'history', 'history', 'cultura'],
+      lgtbq: ['lgtbq', 'gay', 'pride', 'queer', 'lgbtq'],
+      naturaleza: ['naturaleza', 'parque', 'park', 'jardín', 'garden', 'bosque', 'playa', 'beach'],
+      templos: ['templo', 'temple', 'shrine', 'iglesia', 'church', 'mezquita', 'catedral'],
+    };
+
+    const filtered = communityFilter === 'all' ? all : all.filter(s => {
+      const kws = COMMUNITY_FILTER_KEYWORDS[communityFilter] || [];
+      const types = COMMUNITY_FILTER_TYPES[communityFilter] || [];
+      const titleLower = (s.title || '').toLowerCase();
+      const notesLower = (s.notes || '').toLowerCase();
+      return types.includes(s.type) || kws.some(k => titleLower.includes(k) || notesLower.includes(k));
     });
-  }, [publicSpots, seedSpots, spots, communitySort, selectedCity, city, user?.email]);
+
+    return filtered.sort((a, b) => (b.visits||0) - (a.visits||0));
+  }, [publicSpots, seedSpots, spots, communityFilter, selectedCity, city]);
 
   // Hashtags
   const hashtags = useMemo(() => buildHashtags(spots, tripCities), [spots, tripCities]);
 
   // Filtered spots
   const filteredSpots = useMemo(() => spots.filter(s => {
-    if (stateFilter === 'pending' && s.visited) return false;
-    if (stateFilter === 'visited' && !s.visited) return false;
+    if (stateFilter === 'assigned') return !!s.assigned_date;
+    if (stateFilter === 'unassigned') return !s.assigned_date;
     return true;
   }), [spots, stateFilter]);
 
@@ -1020,10 +1216,21 @@ export default function Restaurants() {
             {/* Search results */}
             {isSearchActive && (
               <div className="space-y-3">
+                {/* Seed/known spots matching the query */}
+                {seedSearchResults.length > 0 && (
+                  <>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Lugares conocidos</p>
+                    {seedSearchResults.map((p, i) => {
+                      const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.title?.toLowerCase().trim());
+                      return <PlaceResultCard key={`seed-${i}`} place={{ id: `seed-${i}`, name: p.title, type: p.type, address: p.address || '' }} onSave={saveOsmPlace} saving={savingId===`seed-${i}`} isDuplicate={isDuplicate} />;
+                    })}
+                    {osmResults.length > 0 && <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Más resultados</p>}
+                  </>
+                )}
                 {searching && <p className="text-sm text-muted-foreground text-center py-4">Buscando...</p>}
                 {!searching && osmResults.length > 0 && (
                   <>
-                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{osmResults.length} resultados</p>
+                    {seedSearchResults.length === 0 && <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{osmResults.length} resultados</p>}
                     {osmResults.map(p => {
                       const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
                       return <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id} isDuplicate={isDuplicate} />;
@@ -1067,7 +1274,7 @@ export default function Restaurants() {
           <div>
             {/* Filters */}
             <div className="flex gap-2 mb-4">
-              {[['all','Todos'],['pending','Pendientes'],['visited','Visitados']].map(([v,l]) => (
+              {[['all','Todos'],['assigned','Asignados'],['unassigned','Sin asignar']].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                     stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
@@ -1126,14 +1333,25 @@ export default function Restaurants() {
               </div>
             )}
 
-            {/* Sort */}
-            <div className="flex gap-2 mb-4">
-              {[['visits','Más visitados'],['recent','Recientes']].map(([v,l]) => (
-                <button key={v} onClick={() => setCommunitySort(v)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                    communitySort===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+            {/* Category filters */}
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+              {[
+                ['all','Todos','🌍'],
+                ['restaurant','Restaurantes','🍽️'],
+                ['bar','Bares','🍺'],
+                ['nightlife','Nightlife','🎉'],
+                ['vistas','Vistas','🌅'],
+                ['museos','Museos','🏛️'],
+                ['templos','Templos','⛩️'],
+                ['naturaleza','Naturaleza','🌿'],
+                ['lgtbq','LGTBQ+','🏳️‍🌈'],
+                ['shopping','Compras','🛍️'],
+              ].map(([v,l,em]) => (
+                <button key={v} onClick={() => setCommunityFilter(v)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex-shrink-0 flex items-center gap-1 ${
+                    communityFilter===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
                   }`}>
-                  {l}
+                  {em} {l}
                 </button>
               ))}
             </div>
@@ -1184,6 +1402,19 @@ export default function Restaurants() {
           onSave={(id, data) => updateMutation.mutate({ id, data })}
           onDelete={id => deleteMutation.mutate(id)}
           tripId={tripId}
+        />
+      )}
+
+      {/* Assign date modal */}
+      {assignDateSpot && (
+        <AssignDateModal
+          spot={assignDateSpot}
+          tripCities={tripCities}
+          onAssign={async (date) => {
+            await updateMutation.mutateAsync({ id: assignDateSpot.id, data: { assigned_date: date } });
+            setAssignDateSpot(null);
+          }}
+          onSkip={() => setAssignDateSpot(null)}
         />
       )}
 
