@@ -289,11 +289,11 @@ export default function Documents() {
 
       {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
-          <DialogHeader className="px-5 py-4 border-b border-border">
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
+          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
             <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4">
+          <div className="px-5 py-4 overflow-y-auto flex-1">
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
           </div>
@@ -302,12 +302,12 @@ export default function Documents() {
 
       {/* Edit dialog */}
       <Dialog open={!!editDoc} onOpenChange={(o) => { if (!o) setEditDoc(null); }}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] overflow-y-auto p-0 gap-0">
-          <DialogHeader className="px-5 py-4 border-b border-border">
+        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
+          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
             <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
           </DialogHeader>
           {editDoc && (
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 overflow-y-auto flex-1">
               <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
                 initialData={editDoc}
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}

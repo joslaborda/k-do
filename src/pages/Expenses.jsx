@@ -452,12 +452,13 @@ export default function Expenses() {
 
       {/* Expense dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-white border-border max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
-          <DialogHeader>
+        <DialogContent className="bg-white border-border max-w-lg max-h-[90vh] rounded-2xl flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-border flex-shrink-0">
             <DialogTitle className="text-foreground font-bold">
               {editingExpense ? 'Editar gasto' : 'Nuevo gasto'}
             </DialogTitle>
           </DialogHeader>
+          <div className="overflow-y-auto flex-1 px-6 py-4">
           <ExpenseForm
             members={members}
             initialData={editingExpense}
@@ -469,6 +470,7 @@ export default function Expenses() {
             saving={createMutation.isPending || updateMutation.isPending}
             userMap={userMap}
           />
+          </div>
         </DialogContent>
       </Dialog>
     </div>

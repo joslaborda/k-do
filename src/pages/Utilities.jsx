@@ -492,14 +492,18 @@ export default function Utilities() {
             )}
 
             {!loadingEmergency && !aiEmergencyData && infos.length === 0 && (
-              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
-                <Info className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  {country ? `Sin información específica para ${country} todavía` : 'Abre desde un viaje para ver información'}
+              <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+                <Info className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm font-semibold text-foreground mb-1">
+                  {country ? `Sin datos para ${country}` : 'Sin información'}
                 </p>
-                <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
-                  <Plus className="w-4 h-4 mr-2" />Añadir información manual
-                </Button>
+                <p className="text-xs text-muted-foreground mb-4">
+                  {country ? 'Aún no hay datos de emergencias para este país' : 'Abre desde un viaje para ver información'}
+                </p>
+                <button onClick={() => setDialogOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium hover:bg-primary/90 transition-colors">
+                  <Plus className="w-4 h-4" />Añadir nota manual
+                </button>
               </div>
             )}
           </TabsContent>
@@ -509,35 +513,37 @@ export default function Utilities() {
 
       {/* Dialog añadir info */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader><DialogTitle className="text-foreground">Añadir información</DialogTitle></DialogHeader>
-          <div className="space-y-4 pt-4">
+        <DialogContent className="bg-card border-border max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Añadir información</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Título</label>
-              <Input placeholder="ej. Policía local" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Título</label>
+              <Input placeholder="ej. Policía local" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Categoría</label>
               <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>{infoCategories.map((cat) => <SelectItem key={cat.value} value={cat.value}>{cat.icon} {cat.label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Icono</label>
-              <Input placeholder="Emoji" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} maxLength={2} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Icono</label>
+              <Input placeholder="Emoji" value={formData.icon} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} maxLength={2} />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Contenido</label>
-              <Textarea placeholder="Descripción o detalles..." value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={3} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Contenido</label>
+              <Textarea placeholder="Descripción o detalles..." value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={3} />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Enlace (opcional)</label>
-              <Input placeholder="https://..." value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Enlace (opcional)</label>
+              <Input placeholder="https://..." value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={() => createMutation.mutate(formData)} className="bg-green-600 hover:bg-green-700" disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">Cancelar</Button>
+              <Button onClick={() => createMutation.mutate(formData)} className="flex-1 bg-primary hover:bg-primary/90" disabled={!formData.title.trim() || !formData.content.trim() || createMutation.isPending}>
                 {createMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
@@ -547,27 +553,29 @@ export default function Utilities() {
 
       {/* Dialog añadir maleta */}
       <Dialog open={packingDialogOpen} onOpenChange={setPackingDialogOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader><DialogTitle className="text-foreground">Añadir artículo</DialogTitle></DialogHeader>
-          <div className="space-y-4 pt-4">
+        <DialogContent className="bg-card border-border max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Añadir artículo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Artículo</label>
-              <Input placeholder="ej. Camisetas" value={packingFormData.name} onChange={(e) => setPackingFormData({ ...packingFormData, name: e.target.value })} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Artículo</label>
+              <Input placeholder="ej. Camisetas" value={packingFormData.name} onChange={(e) => setPackingFormData({ ...packingFormData, name: e.target.value })} />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Categoría</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Categoría</label>
               <Select value={packingFormData.category} onValueChange={(v) => setPackingFormData({ ...packingFormData, category: v })}>
-                <SelectTrigger className="border-border"><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>{packingCategories.map((cat) => <SelectItem key={cat.value} value={cat.value}>{cat.icon} {cat.label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Cantidad</label>
-              <Input type="number" min="1" value={packingFormData.quantity} onChange={(e) => setPackingFormData({ ...packingFormData, quantity: parseInt(e.target.value) || 1 })} className="border-border" />
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">Cantidad</label>
+              <Input type="number" min="1" value={packingFormData.quantity} onChange={(e) => setPackingFormData({ ...packingFormData, quantity: parseInt(e.target.value) || 1 })} />
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setPackingDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={() => createPackingMutation.mutate(packingFormData)} className="bg-green-600 hover:bg-green-700" disabled={!packingFormData.name.trim() || createPackingMutation.isPending}>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" onClick={() => setPackingDialogOpen(false)} className="flex-1">Cancelar</Button>
+              <Button onClick={() => createPackingMutation.mutate(packingFormData)} className="flex-1 bg-primary hover:bg-primary/90" disabled={!packingFormData.name.trim() || createPackingMutation.isPending}>
                 {createPackingMutation.isPending ? 'Guardando...' : 'Guardar'}
               </Button>
             </div>
