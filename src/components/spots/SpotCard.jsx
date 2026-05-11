@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, Trash2, Heart, Globe, CheckCircle, X, Camera, MessageCircle, ThumbsUp, ThumbsDown, Navigation } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil } from 'lucide-react';
+import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
   food:      { label: 'Restaurante', emoji: '🍽️', color: 'bg-orange-100 text-orange-800' },
@@ -231,7 +232,6 @@ function VisitedRatingPopup({ spot, userId, userProfile, onClose }) {
 
 // ── SpotCard principal ────────────────────────────────────────────────────────
 export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tripId }) {
-  const [showRating, setShowRating] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const queryClient = useQueryClient();
@@ -249,8 +249,12 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
     staleTime: 30000,
   });
 
-  const ups = comments.filter(c => c.thumb === 'up').length;
-  const downs = comments.filter(c => c.thumb === 'down').length;
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLike({
+    targetId: spot.id,
+    targetType: 'spot',
+    userId: user?.id,
+    targetOwnerId: spot.created_by_user_id,
+  });
 
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const canDelete = spot.created_by === currentUserEmail;
@@ -272,37 +276,23 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
   });
 
   const handleMarkVisited = () => {
-    if (!spot.visited) {
-      updateMutation.mutate({ visited: true });
-      setShowRating(true);
-    } else {
-      updateMutation.mutate({ visited: false });
-    }
-  };
-
-  const handleShare = () => {
-    updateMutation.mutate({ visibility: spot.visibility === 'public' ? 'trip_members' : 'public' });
+    updateMutation.mutate({ visited: !spot.visited });
   };
 
   return (
     <>
       <div className={"rounded-2xl border transition-all " + (spot.visited ? 'bg-green-50 border-green-200' : 'bg-white border-border')}>
         <div className="p-4">
-          {/* Atribución */}
-          {(spot.source_username || spot.source_display_name) && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-              <Heart className="w-3 h-3 text-orange-400" />
-              Recomendado por <span className="font-medium text-orange-700">@{spot.source_username || spot.source_display_name}</span>
-            </p>
-          )}
-
           {/* Header */}
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0 mt-0.5">{tc.emoji}</span>
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-foreground text-sm leading-tight">{spot.title}</p>
-                {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">✅ Visitado</span>}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Visitado</span>}
+                  <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
+                </div>
               </div>
               <span className={"inline-block text-xs px-2 py-0.5 rounded-full mt-1 " + tc.color}>{tc.label}</span>
               {spot.address && (
@@ -318,71 +308,51 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
               )}
             </div>
           </div>
-
-          {/* Stats si tiene comentarios */}
-          {(ups + downs) > 0 && (
-            <div className="flex items-center gap-2 mt-3">
-              {ups > 0 && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>}
-              {downs > 0 && <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>}
-              <button onClick={() => setShowComments(true)} className="text-xs text-muted-foreground hover:text-orange-700 ml-1">
-                💬 {comments.length} comentario{comments.length !== 1 ? 's' : ''}
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Acciones */}
-        <div className="border-t border-inherit px-4 py-3 flex gap-2">
-          <button onClick={handleMarkVisited}
-            className={"flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-all " +
-              (spot.visited ? 'bg-green-100 border-green-300' : 'bg-secondary border-border hover:bg-green-50 hover:border-green-200')}>
-            <span className="text-base">✅</span>
-            <span className={"text-xs font-medium " + (spot.visited ? 'text-green-700' : 'text-muted-foreground')}>
-              {spot.visited ? 'Hecho' : 'Marcar hecho'}
+        {/* Action bar — like, comment, visited, maps */}
+        <div className="border-t border-inherit px-4 py-3 flex items-center gap-5">
+          {/* Like */}
+          <button onClick={toggleLike} className="flex items-center gap-1.5 transition-colors">
+            {isLiked
+              ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            }
+            <span className={`text-sm font-medium ${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
+              {likeCount > 0 ? likeCount : ''}
             </span>
           </button>
-          <button onClick={() => setShowComments(true)}
-            className="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border border-border bg-secondary hover:bg-blue-50 hover:border-blue-200 transition-all">
-            <span className="text-base">💬</span>
-            <span className="text-xs font-medium text-muted-foreground">
-              {comments.length > 0 ? `${comments.length} comentarios` : 'Comentar'}
-            </span>
-          </button>
-          <button onClick={handleShare}
-            className={"flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-all " +
-              (spot.visibility === 'public' ? 'bg-blue-50 border-blue-200' : 'bg-secondary border-border hover:bg-blue-50 hover:border-blue-200')}>
-            <span className="text-base">🌍</span>
-            <span className={"text-xs font-medium " + (spot.visibility === 'public' ? 'text-blue-700' : 'text-muted-foreground')}>
-              {spot.visibility === 'public' ? 'Publicado' : 'Compartir'}
-            </span>
-          </button>
-          {canDelete && (
-            <button onClick={() => setShowDeleteConfirm(true)}
-              className="flex flex-col items-center gap-1 py-2 px-3 rounded-xl border border-border bg-secondary hover:bg-red-50 hover:border-red-200 transition-all">
-              <span className="text-base">🗑️</span>
-              <span className="text-xs font-medium text-muted-foreground">Borrar</span>
-            </button>
-          )}
-        </div>
 
-        {/* Link Maps + desmarcar */}
-        <div className="px-4 pb-3 flex items-center gap-3">
+          {/* Comment */}
+          <button onClick={() => setShowComments(true)} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span className="text-sm">{comments.length > 0 ? comments.length : ''}</span>
+          </button>
+
+          <div className="flex-1" />
+
+          {/* Maps */}
           <a href={getMapsUrl(spot)} target="_blank" rel="noopener noreferrer"
-            className="text-xs text-green-700 hover:underline flex items-center gap-1">
-            <Navigation className="w-3 h-3" />Abrir en Maps
+            className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors">
+            <Navigation className="w-3.5 h-3.5" />Maps
           </a>
-          {spot.visited && (
-            <button onClick={() => updateMutation.mutate({ visited: false })}
-              className="text-xs text-muted-foreground hover:text-foreground ml-auto underline underline-offset-2">
-              Desmarcar como visitado
+
+          {/* Visited toggle */}
+          <button onClick={handleMarkVisited}
+            className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
+              spot.visited ? 'bg-green-100 text-green-700 border-green-200' : 'bg-secondary border-border text-muted-foreground hover:border-green-300'
+            }`}>
+            {spot.visited ? '✅ Hecho' : 'Marcar hecho'}
+          </button>
+
+          {canDelete && (
+            <button onClick={() => setShowDeleteConfirm(true)} className="text-xs text-muted-foreground hover:text-red-500 transition-colors">
+              🗑️
             </button>
           )}
         </div>
       </div>
 
-      {showRating && (
-        <RatingPopup spot={spot} userId={user?.id} userProfile={userProfile} onClose={() => setShowRating(false)} />
-      )}
       {showComments && (
         <CommentsPopup spot={spot} userId={user?.id} userProfile={userProfile} onClose={() => setShowComments(false)} />
       )}

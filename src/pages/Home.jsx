@@ -351,7 +351,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <button onClick={() => setInviteOpen(true)}
+          <button onClick={onInvite}
             className="flex items-center gap-1 text-xs text-primary font-medium">
             <UserPlus className="w-3.5 h-3.5" />Invitar
           </button>
@@ -467,7 +467,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <button onClick={() => setInviteOpen(true)}
+          <button onClick={onInvite}
             className="flex items-center gap-1 text-xs text-primary font-medium">
             <UserPlus className="w-3.5 h-3.5" />Invitar
           </button>

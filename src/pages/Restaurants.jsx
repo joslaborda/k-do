@@ -4,21 +4,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useTripContext } from '@/hooks/useTripContext';
-import { getCountryMeta } from '@/lib/countryConfig';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, Camera, ChevronDown, ChevronRight, Mic } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
 // ── OSM helpers ───────────────────────────────────────────────────────────────
 const OSM_MAP = {
-  restaurant:'food',cafe:'food',bar:'food',fast_food:'food',pub:'food',bakery:'food',
-  museum:'sight',monument:'sight',attraction:'sight',viewpoint:'sight',temple:'sight',
-  church:'sight',shrine:'sight',castle:'sight',gallery:'sight',park:'sight',
-  shop:'shopping',mall:'shopping',market:'shopping',
-  bus_station:'transport',train_station:'transport',subway_entrance:'transport',
-  sports_centre:'activity',cinema:'activity',theatre:'activity',
+  restaurant:'food', cafe:'food', bar:'food', fast_food:'food', pub:'food', bakery:'food',
+  museum:'sight', monument:'sight', attraction:'sight', viewpoint:'sight', temple:'sight',
+  church:'sight', shrine:'sight', castle:'sight', gallery:'sight', park:'sight',
+  shop:'shopping', mall:'shopping', market:'shopping',
+  bus_station:'transport', train_station:'transport', subway_entrance:'transport',
+  sports_centre:'activity', cinema:'activity', theatre:'activity',
 };
 function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
 
@@ -54,38 +54,20 @@ async function nearbyPlaces(lat, lng) {
   })).slice(0, 12);
 }
 
-// ── Type config ───────────────────────────────────────────────────────────────
-const TYPE_CONFIG = {
-  food:      { label:'Comer',      emoji:'🍜', color:'bg-orange-100 text-orange-800' },
-  sight:     { label:'Cultura',    emoji:'🏛️', color:'bg-blue-100 text-blue-800' },
-  activity:  { label:'Actividad',  emoji:'⚡',  color:'bg-green-100 text-green-800' },
-  shopping:  { label:'Compras',    emoji:'🛍️', color:'bg-purple-100 text-purple-800' },
-  transport: { label:'Transporte', emoji:'🚆', color:'bg-slate-100 text-slate-800' },
-  custom:    { label:'Otro',       emoji:'📍', color:'bg-yellow-100 text-yellow-800' },
-};
-
-// ── OSM result card ───────────────────────────────────────────────────────────
-function PlaceResultCard({ place, onSave, saving }) {
-  const tc = TYPE_CONFIG[place.type] || TYPE_CONFIG.custom;
-  return (
-    <div className="bg-white rounded-xl border border-border flex overflow-hidden hover:shadow-sm transition-shadow">
-      <div className="w-12 bg-orange-50 flex items-center justify-center flex-shrink-0">
-        <span className="text-xl">{tc.emoji}</span>
-      </div>
-      <div className="flex-1 min-w-0 p-2.5">
-        <p className="font-semibold text-sm text-foreground leading-tight">{place.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{tc.label}{place.address ? ' · ' + place.address : ''}</p>
-        <Button size="sm" onClick={() => onSave(place)} disabled={saving}
-          className="mt-1.5 h-6 text-xs bg-orange-700 hover:bg-orange-800 text-white px-2.5">
-          <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
-        </Button>
-      </div>
-    </div>
-  );
+async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+      { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' }, signal: AbortSignal.timeout(6000) }
+    );
+    const d = await res.json();
+    const a = d.address || {};
+    const road = a.road || a.pedestrian || a.footway || '';
+    const city = a.city || a.town || a.village || a.municipality || '';
+    return [road, city].filter(Boolean).join(', ') || d.display_name?.split(',').slice(0,2).join(',') || '';
+  } catch { return ''; }
 }
 
-// ── Manual form ───────────────────────────────────────────────────────────────
-// ── Leaflet map loader ────────────────────────────────────────────────────────
 async function loadLeaflet() {
   if (window.L) return window.L;
   await new Promise((res, rej) => {
@@ -101,22 +83,51 @@ async function loadLeaflet() {
   return window.L;
 }
 
-async function reverseGeocode(lat, lng) {
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
-      { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' }, signal: AbortSignal.timeout(6000) }
-    );
-    const d = await res.json();
-    const a = d.address || {};
-    const road = a.road || a.pedestrian || a.footway || '';
-    const city = a.city || a.town || a.village || a.municipality || '';
-    return [road, city].filter(Boolean).join(', ') || d.display_name?.split(',').slice(0,2).join(',') || '';
-  } catch { return ''; }
+// ── Type config ───────────────────────────────────────────────────────────────
+const TYPE_CONFIG = {
+  food:      { label:'Comer',      emoji:'🍜', color:'bg-orange-100 text-orange-800' },
+  sight:     { label:'Cultura',    emoji:'🏛️', color:'bg-blue-100 text-blue-800' },
+  activity:  { label:'Actividad',  emoji:'⚡',  color:'bg-green-100 text-green-800' },
+  shopping:  { label:'Compras',    emoji:'🛍️', color:'bg-purple-100 text-purple-800' },
+  transport: { label:'Transporte', emoji:'🚆', color:'bg-slate-100 text-slate-800' },
+  custom:    { label:'Otro',       emoji:'📍', color:'bg-yellow-100 text-yellow-800' },
+};
+
+// ── Country-specific special tags ─────────────────────────────────────────────
+const COUNTRY_SPECIAL_TAGS = {
+  'Japón': ['#templos', '#onsen', '#ramen', '#anime', '#sakura'],
+  'Italia': ['#pizza', '#coliseo', '#arte', '#pasta', '#vino'],
+  'Francia': ['#croissant', '#louvre', '#baguette', '#vino'],
+  'Tailandia': ['#mango', '#templos', '#tukTuk', '#playa'],
+  'México': ['#tacos', '#cenotes', '#mariachi', '#mezcal'],
+  'Marruecos': ['#medina', '#hammam', '#té', '#zoco'],
+  'Turquía': ['#baño', '#bazar', '#kebab', '#mezquita'],
+  'Corea del Sur': ['#kpop', '#bbq', '#hanok', '#kimchi'],
+  'Vietnam': ['#pho', '#banh-mi', '#moto', '#bahia'],
+  'India': ['#curry', '#taj-mahal', '#rickshaw', '#yoga'],
+};
+
+// ── Dynamic hashtags from existing spots ──────────────────────────────────────
+function buildHashtags(spots, tripCities) {
+  const typeTags = {
+    food: '#comida',
+    sight: '#cultura',
+    activity: '#actividades',
+    shopping: '#compras',
+    custom: '#especial',
+  };
+  const typeSet = new Set(spots.map(s => typeTags[s.type]).filter(Boolean));
+  const countryTags = [];
+  const countries = [...new Set(tripCities.map(c => c.country).filter(Boolean))];
+  countries.forEach(c => {
+    const tags = COUNTRY_SPECIAL_TAGS[c] || [];
+    tags.forEach(t => countryTags.push(t));
+  });
+  return [...typeSet, ...countryTags.slice(0, 5)];
 }
 
+// ── Leaflet map ───────────────────────────────────────────────────────────────
 function LeafletMap({ lat, lng, onMove }) {
-  const mapRef = useRef(null);
   const leafletRef = useRef(null);
   const markerRef = useRef(null);
   const containerRef = useRef(null);
@@ -145,13 +156,11 @@ function LeafletMap({ lat, lng, onMove }) {
       });
       leafletRef.current = map;
       markerRef.current = marker;
-      mapRef.current = map;
       setTimeout(() => map.invalidateSize(), 100);
     }).catch(() => {});
     return () => { cancelled = true; if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null; } };
   }, []);
 
-  // Update marker when lat/lng change externally
   useEffect(() => {
     if (markerRef.current && leafletRef.current) {
       markerRef.current.setLatLng([lat, lng]);
@@ -159,31 +168,31 @@ function LeafletMap({ lat, lng, onMove }) {
     }
   }, [lat, lng]);
 
-  return <div ref={containerRef} style={{ height: '200px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
+  return <div ref={containerRef} style={{ height: '180px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
 }
 
-function ManualForm({ onSave, saving, onClose, city, country }) {
+// ── Create spot bottom sheet ──────────────────────────────────────────────────
+function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }) {
   const [title, setTitle] = useState('');
-  const [type, setType] = useState('custom');
+  const [type, setType] = useState('food');
   const [notes, setNotes] = useState('');
   const [address, setAddress] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState([]);
+  const [isPublic, setIsPublic] = useState(true);
   const [pinLat, setPinLat] = useState(null);
   const [pinLng, setPinLng] = useState(null);
-  const [locating, setLocating] = useState(false);
   const [showMap, setShowMap] = useState(false);
-  const [isPublic, setIsPublic] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [duplicate, setDuplicate] = useState(null); // spot that matches
 
-  const addTag = v => { const t=v.trim().toLowerCase(); if(t&&!tags.includes(t)) setTags(p=>[...p,t]); setTagInput(''); };
-
-  const SUGGESTED_TAGS = {
-    food: ['tapas','barato','reservar','terraza','vistas','sin-gluten'],
-    sight: ['amanecer','sunset','gratuito','fotográfico','histórico','mirador'],
-    activity: ['adrenalina','naturaleza','familiar','exterior'],
-    shopping: ['mercadillo','vintage','souvenirs','artesanía'],
-  };
-  const suggested = (SUGGESTED_TAGS[type] || []).filter(t => !tags.includes(t));
+  // A: real-time duplicate check
+  useEffect(() => {
+    if (!title.trim() || title.length < 3) { setDuplicate(null); return; }
+    const match = spots.find(s =>
+      s.title?.toLowerCase().trim() === title.toLowerCase().trim() &&
+      (s.city_name?.toLowerCase() === city?.toLowerCase() || !s.city_name)
+    );
+    setDuplicate(match || null);
+  }, [title, spots, city]);
 
   const handleGPS = () => {
     setLocating(true);
@@ -201,155 +210,421 @@ function ManualForm({ onSave, saving, onClose, city, country }) {
     );
   };
 
-  const handleMapMove = (la, ln, addr) => {
-    setPinLat(la); setPinLng(ln);
-    if (addr) setAddress(addr);
+  const handleSave = () => {
+    // B: block if exact duplicate
+    if (duplicate) return;
+    if (!title.trim()) return;
+    onSave({ title, type, notes, address, lat: pinLat, lng: pinLng, visibility: isPublic ? 'public' : 'trip_members' });
+    // reset
+    setTitle(''); setType('food'); setNotes(''); setAddress('');
+    setPinLat(null); setPinLng(null); setShowMap(false); setIsPublic(true);
   };
 
-  const defaultLat = pinLat || 40.4168;
-  const defaultLng = pinLng || -3.7038;
+  if (!open) return null;
+
+  const defaultLat = pinLat || 35.6762;
+  const defaultLng = pinLng || 139.6503;
 
   return (
-    <div className="bg-white rounded-xl border border-border p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="font-semibold text-sm">Crear spot</p>
-        <button onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
-      </div>
-
-      <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nombre del lugar *" className="h-9 text-sm"/>
-
-      <div>
-        <p className="text-xs text-muted-foreground mb-1.5">Tipo</p>
-        <div className="flex flex-wrap gap-1.5">
-          {Object.entries(TYPE_CONFIG).map(([val, tc]) => (
-            <button key={val} onClick={() => setType(val)}
-              className={"text-xs px-2.5 py-1 rounded-full border transition-colors " +
-                (type===val ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border hover:border-orange-300')}>
-              {tc.emoji} {tc.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className="text-xs text-muted-foreground mb-1.5">Tags sugeridos</p>
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {suggested.slice(0,6).map(t => (
-            <button key={t} onClick={() => setTags(p=>[...p,t])}
-              className="text-xs px-2 py-0.5 rounded-full border border-dashed border-orange-300 text-orange-600 hover:bg-orange-50">
-              + #{t}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-1.5 mb-1.5">
-          {tags.map(t => (
-            <span key={t} className="flex items-center gap-1 text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">
-              #{t}<button onClick={() => setTags(p=>p.filter(x=>x!==t))}><X className="w-2.5 h-2.5"/></button>
-            </span>
-          ))}
-        </div>
-        <Input value={tagInput} onChange={e => setTagInput(e.target.value)}
-          onKeyDown={e => { if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(tagInput);} }}
-          onBlur={() => tagInput && addTag(tagInput)}
-          placeholder="Añade tus propios tags (Enter)" className="h-8 text-xs"/>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <p className="text-xs text-muted-foreground">Ubicación</p>
-          <button onClick={handleGPS} disabled={locating}
-            className="flex items-center gap-1 text-xs text-orange-700 font-medium hover:text-orange-800">
-            <Navigation className="w-3 h-3"/>
-            {locating ? 'Localizando...' : pinLat ? 'Actualizar GPS' : 'Usar mi ubicación'}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-lg rounded-t-3xl p-5 pb-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        {/* Handle + header */}
+        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+        <div className="flex items-center justify-between mb-5">
+          <p className="font-semibold text-foreground text-base">Crear spot</p>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <X className="w-4 h-4" />
           </button>
         </div>
-        <Input value={address} onChange={e => setAddress(e.target.value)}
-          placeholder="Dirección (o usa el GPS)" className="h-8 text-xs mb-2"/>
-        <button onClick={() => { if(!showMap && !pinLat) handleGPS(); else setShowMap(p=>!p); }}
-          className={"flex items-center gap-1.5 text-xs font-medium transition-colors " +
-            (showMap ? 'text-orange-700' : 'text-muted-foreground hover:text-orange-600')}>
-          <MapPin className="w-3.5 h-3.5"/>
-          {showMap ? 'Ocultar mapa' : 'Añadir pin en el mapa'}
-          {pinLat && <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block ml-1"/>}
-        </button>
-        {showMap && (
-          <div className="mt-2 rounded-xl overflow-hidden border border-border">
-            <LeafletMap lat={defaultLat} lng={defaultLng} onMove={handleMapMove}/>
-            <div className="px-3 py-2 bg-secondary">
-              <p className="text-xs text-muted-foreground">
-                {pinLat
-                  ? `📍 ${pinLat.toFixed(5)}, ${pinLng.toFixed(5)} — arrastra el pin o toca el mapa`
-                  : 'Toca el mapa para colocar el pin'}
-              </p>
+
+        {/* Name + duplicate check */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
+          <Input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="ej. Ichiran Ramen Shinjuku"
+            className="h-10 text-sm"
+            autoFocus
+          />
+          {duplicate && (
+            <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-start gap-2">
+              <span className="text-lg shrink-0">⚠️</span>
+              <div>
+                <p className="text-xs font-medium text-amber-800">Ya existe este spot en {city}</p>
+                <p className="text-xs text-amber-700 mt-0.5">"{duplicate.title}" ya está en tu lista. ¿Quieres añadir uno diferente?</p>
+              </div>
             </div>
+          )}
+        </div>
+
+        {/* Type */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo</p>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
+              <button key={val} onClick={() => setType(val)}
+                className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
+                  type === val ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary/40'
+                }`}>
+                {tc.emoji} {tc.label}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* Notes */}
+        <div className="mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nota</p>
+          <textarea
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder="¿Algo que recordar sobre este lugar?"
+            className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary"
+          />
+        </div>
+
+        {/* Location */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ubicación</p>
+            <button onClick={handleGPS} disabled={locating}
+              className="flex items-center gap-1 text-xs text-primary font-medium hover:text-primary/80">
+              <Navigation className="w-3 h-3"/>
+              {locating ? 'Localizando...' : 'Usar mi ubicación'}
+            </button>
+          </div>
+          <Input value={address} onChange={e => setAddress(e.target.value)}
+            placeholder="Dirección (opcional)" className="h-9 text-sm mb-2" />
+          {showMap && (
+            <div className="rounded-xl overflow-hidden border border-border">
+              <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
+            </div>
+          )}
+          {!showMap && (
+            <button onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
+              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />Añadir pin en el mapa
+            </button>
+          )}
+        </div>
+
+        {/* Visibility toggle */}
+        <div className="mb-5">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
+          <div className="flex rounded-xl border border-border overflow-hidden">
+            <button onClick={() => setIsPublic(true)}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+              🌍 Kōdo Community
+            </button>
+            <button onClick={() => setIsPublic(false)}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+              🔒 Solo mi viaje
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1.5 px-1">
+            {isPublic ? 'Otros viajeros podrán descubrirlo y guardarlo' : 'Solo tú y tu grupo lo verán'}
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+          <Button
+            onClick={handleSave}
+            disabled={!title.trim() || saving || !!duplicate}
+            className="flex-1 bg-primary hover:bg-primary/90 text-white">
+            {saving ? 'Guardando...' : 'Guardar spot'}
+          </Button>
+        </div>
       </div>
-
-      <textarea value={notes} onChange={e => setNotes(e.target.value)}
-        placeholder="Notas: mejor hora, qué pedir, por qué mola..."
-        className="w-full text-sm border border-border rounded-xl px-3 py-2 h-20 resize-none outline-none focus:border-orange-400"/>
-
-      <button onClick={() => setIsPublic(p=>!p)}
-        className={"flex items-center gap-2 text-xs px-3 py-2 rounded-xl border transition-colors w-full " +
-          (isPublic ? 'bg-orange-50 border-orange-300 text-orange-700' : 'bg-white border-border text-muted-foreground')}>
-        <span className={"w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 " +
-          (isPublic ? 'bg-orange-700 border-orange-700' : 'border-border')}>
-          {isPublic && <span className="text-white text-xs">✓</span>}
-        </span>
-        Publicar para la comunidad de Kōdo
-      </button>
-
-      <Button onClick={() => onSave({ title, type, notes, address, tags, lat: pinLat, lng: pinLng, visibility: isPublic ? 'public' : 'trip_members' })}
-        disabled={!title.trim()||saving}
-        className="w-full bg-orange-700 hover:bg-orange-800 text-white h-9">
-        {saving ? 'Guardando...' : 'Guardar spot'}
-      </Button>
     </div>
   );
 }
 
-// ── Seed spot card (community) ────────────────────────────────────────────────
-function SeedSpotCard({ spot, onSave, saving, showToast }) {
+// ── OSM result card ───────────────────────────────────────────────────────────
+function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
+  const tc = TYPE_CONFIG[place.type] || TYPE_CONFIG.custom;
+  return (
+    <div className={`bg-white rounded-xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
+      <div className="w-12 bg-orange-50 flex items-center justify-center flex-shrink-0">
+        <span className="text-xl">{tc.emoji}</span>
+      </div>
+      <div className="flex-1 min-w-0 p-3">
+        <p className="font-semibold text-sm text-foreground leading-tight">{place.name}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{tc.label}{place.address ? ' · ' + place.address : ''}</p>
+        {isDuplicate ? (
+          <p className="text-xs text-amber-600 mt-1.5 font-medium">Ya en tu lista</p>
+        ) : (
+          <Button size="sm" onClick={() => onSave(place)} disabled={saving}
+            className="mt-2 h-7 text-xs bg-primary hover:bg-primary/90 text-white px-3">
+            <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Community spot card (matches UI from screenshots) ─────────────────────────
+function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
-  const priceLabel = { low:'💚 Económico', mid:'🟡 Precio medio', high:'🔴 Caro' }[spot.price] || '';
-  const timeLabel = { mañana:'Mejor por la mañana', tarde:'Mejor al atardecer', noche:'Mejor de noche', mediodía:'Mejor al mediodía', 'cualquier hora':'Cualquier hora', comida:'Mejor a mediodía' }[spot.best_time] || '';
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
+  const commentCount = spot._commentCount || 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-sm transition-shadow">
+    <div className="bg-white rounded-2xl border border-border overflow-hidden">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">{tc.emoji}</span>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
+            {tc.emoji}
+          </div>
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm text-foreground">{spot.title}</p>
-            <span className={"text-xs px-2 py-0.5 rounded-full inline-block mt-1 " + tc.color}>{tc.label}</span>
-            {spot.address && <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1"><MapPin className="w-3 h-3 flex-shrink-0"/>{spot.address}</p>}
-            {spot.notes && <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{spot.notes}</p>}
-            <div className="flex flex-wrap gap-1 mt-2">
-              {spot.tags?.slice(0,4).map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
-            </div>
-            <div className="flex items-center gap-3 mt-2">
-              {priceLabel && <span className="text-xs text-muted-foreground">{priceLabel}</span>}
-              {timeLabel && <span className="text-xs text-muted-foreground">🕐 {timeLabel}</span>}
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {spot.visits || 0}</span>
-              <span className="text-xs text-muted-foreground">{spot.visits || 0} visitas</span>
-            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {tc.label}{spot.address ? ' · ' + spot.address : ''}{spot.city_name ? ' · ' + spot.city_name : ''}
+            </p>
+            {spot.notes && <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>}
+            {spot.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {spot.tags.slice(0, 4).map(t => (
+                  <span key={t} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full border border-border">#{t}</span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="border-t border-border px-4 py-3">
-        <Button onClick={() => { onSave(spot); showToast(spot); }} disabled={saving}
-          className="w-full bg-orange-700 hover:bg-orange-800 text-white h-8 text-sm">
-          <Plus className="w-3.5 h-3.5 mr-1.5"/>Guardar en mi viaje
-        </Button>
+
+      {/* Action bar — like, comment, save */}
+      <div className="flex items-center px-4 py-3 border-t border-border gap-4">
+        <button onClick={toggleLike}
+          className="flex items-center gap-1.5 text-sm font-medium transition-colors">
+          {isLiked
+            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          }
+          <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : ''}</span>
+        </button>
+
+        <button className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          {commentCount > 0 ? commentCount : ''}
+        </button>
+
+        <div className="flex-1" />
+
+        {alreadySaved ? (
+          <span className="text-xs text-green-700 font-medium flex items-center gap-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardado
+          </span>
+        ) : (
+          <button onClick={() => onSave(spot)} disabled={saving}
+            className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Guardar
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Toast notification ────────────────────────────────────────────────────────
+// ── Minimal like hook for community cards (spots may be seeds without real ID) ─
+function useLikeSimple(spotId, userId) {
+  const queryClient = useQueryClient();
+  const isReal = spotId && !String(spotId).startsWith('seed_');
+
+  const { data: likes = [] } = useQuery({
+    queryKey: ['likes', 'spot', spotId],
+    queryFn: () => base44.entities.Like.filter({ target_id: spotId, target_type: 'spot' }),
+    enabled: !!spotId && !!userId && isReal,
+    staleTime: 30000,
+  });
+
+  const likeRecord = likes.find(l => l.user_id === userId);
+  const isLiked = !!likeRecord;
+  const count = isReal ? likes.length : 0;
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (isLiked && likeRecord) {
+        await base44.entities.Like.delete(likeRecord.id);
+      } else {
+        await base44.entities.Like.create({ user_id: userId, target_id: spotId, target_type: 'spot' });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['likes', 'spot', spotId] }),
+  });
+
+  return { isLiked, count, toggle: () => isReal && mutation.mutate() };
+}
+
+// ── My spot row (Mis spots tab) ───────────────────────────────────────────────
+function MySpotRow({ spot, onTap, userId }) {
+  const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    staleTime: 60000,
+  });
+
+  const hasDate = !!spot.assigned_date;
+
+  return (
+    <div className="bg-white border-b border-border last:border-0">
+      {/* Main row — clickable to open sheet */}
+      <button onClick={() => onTap(spot)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/20 transition-colors">
+        <span className="text-xl shrink-0">{tc.emoji}</span>
+        <div className="flex-1 min-w-0">
+          <p className={`text-sm font-medium truncate ${spot.visited ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+            {spot.title}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {tc.label}
+            {spot.city_name ? ' · ' + spot.city_name : ''}
+          </p>
+          {hasDate && (
+            <p className="text-xs text-primary mt-0.5 flex items-center gap-1">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              {spot.assigned_date}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* State badge */}
+          {spot.visited ? (
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Visitado</span>
+          ) : hasDate ? (
+            <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full font-medium">Asignado</span>
+          ) : (
+            <span className="text-xs text-muted-foreground/60">Sin día</span>
+          )}
+          {/* Pencil hint */}
+          <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
+        </div>
+      </button>
+
+      {/* Like + comment row */}
+      <div className="flex items-center gap-4 px-4 pb-3">
+        <button onClick={toggleLike} className="flex items-center gap-1.5 text-xs transition-colors">
+          {isLiked
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          }
+          <span className={`${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
+            {likeCount > 0 ? likeCount : 'Like'}
+          </span>
+        </button>
+        <button className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          {comments.length > 0 ? comments.length : 'Comentar'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Spot detail bottom sheet ──────────────────────────────────────────────────
+function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
+  const [notes, setNotes] = useState(spot?.notes || '');
+  const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (spot) {
+      setNotes(spot.notes || '');
+      setAssignedDate(spot.assigned_date || '');
+    }
+  }, [spot?.id]);
+
+  if (!open || !spot) return null;
+
+  const { data: comments = [] } = { data: [] }; // placeholder, SpotCard handles comments
+  const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
+
+  const handleSave = () => {
+    onSave(spot.id, { notes, assigned_date: assignedDate || null });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
+
+        {/* Header */}
+        <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${tc.color}`}>
+              {tc.emoji}
+            </div>
+            <div>
+              <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+              <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="px-5 py-4 space-y-4">
+          {/* Notes */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Mi nota</p>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Cabinas individuales. Reservar para las 20h..."
+              className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary"
+            />
+          </div>
+
+          {/* Date + Time row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Día</p>
+              <input
+                type="date"
+                value={assignedDate}
+                onChange={e => setAssignedDate(e.target.value)}
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
+              <input
+                type="time"
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+                placeholder="--:--"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+            <Button onClick={handleSave} className="flex-1 bg-primary hover:bg-primary/90 text-white">
+              Guardar cambios
+            </Button>
+          </div>
+
+          {/* Delete */}
+          <button onClick={() => { onDelete(spot.id); onClose(); }}
+            className="w-full text-xs text-red-500 hover:text-red-700 transition-colors py-1">
+            Eliminar spot
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ spot, city, onUndo, visible }) {
   if (!visible || !spot) return null;
   return (
@@ -357,7 +632,7 @@ function Toast({ spot, city, onUndo, visible }) {
       <div className="bg-gray-900 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg">
         <span className="text-lg">✅</span>
         <div className="flex-1 min-w-0">
-          <p className="text-white text-sm font-medium truncate">Guardado en {city}</p>
+          <p className="text-white text-sm font-medium truncate">Guardado{city ? ' en ' + city : ''}</p>
           <p className="text-white/60 text-xs truncate">{spot.title}</p>
         </div>
         <button onClick={onUndo} className="text-amber-400 text-xs font-medium flex-shrink-0">Deshacer</button>
@@ -366,39 +641,7 @@ function Toast({ spot, city, onUndo, visible }) {
   );
 }
 
-// ── City group (spots agrupados) ──────────────────────────────────────────────
-function CityGroup({ cityName, spots, currentUserEmail, userId, userProfile, tripId, onUpdate, onDelete }) {
-  const [open, setOpen] = useState(true);
-  const visited = spots.filter(s => s.visited).length;
-  return (
-    <div className="rounded-2xl border border-border overflow-hidden mb-3">
-      <button onClick={() => setOpen(o=>!o)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-border/50 transition-colors">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-sm text-foreground">{cityName}</span>
-          <span className="text-xs text-muted-foreground">{spots.length} spot{spots.length!==1?'s':''} · {visited} visitado{visited!==1?'s':''}</span>
-        </div>
-        {open ? <ChevronDown className="w-4 h-4 text-muted-foreground"/> : <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
-      </button>
-      {open && (
-        <div className="divide-y divide-border">
-          {spots.map(spot => (
-            <div key={spot.id} className="p-1">
-              <SpotCard
-                spot={spot}
-                currentUserEmail={currentUserEmail}
-                cityId={spot.city_id}
-                tripId={tripId}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function Restaurants() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
@@ -411,30 +654,26 @@ export default function Restaurants() {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  // State
-  const [mode, setMode] = useState('list'); // 'list' | 'discover' | 'search'
+  const [tab, setTab] = useState('buscar'); // 'buscar' | 'mis' | 'comunidad'
   const [searchQuery, setSearchQuery] = useState('');
   const [osmResults, setOsmResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [nearbyResults, setNearbyResults] = useState([]);
   const [loadingNearby, setLoadingNearby] = useState(false);
-  const [showManual, setShowManual] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
   const [savingId, setSavingId] = useState(null);
-  const [stateFilter, setStateFilter] = useState('all'); // all | pending | visited
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [communitySort, setCommunitySort] = useState('visits'); // visits | likes | recent
-  // Ciudad activa inteligente: usa activeCity (ya calcula por fecha en useTripContext)
+  const [stateFilter, setStateFilter] = useState('all');
+  const [communitySort, setCommunitySort] = useState('visits');
   const [selectedCity, setSelectedCity] = useState('');
-  // Sync selectedCity with activeCity whenever it resolves
-  useEffect(() => {
-    if (activeCity?.name && !selectedCity) {
-      setSelectedCity(activeCity.name);
-    }
-  }, [activeCity?.name]);
   const [toast, setToast] = useState({ visible: false, spot: null });
   const [lastSavedId, setLastSavedId] = useState(null);
+  const [selectedSpot, setSelectedSpot] = useState(null);
   const searchTimer = useRef(null);
   const toastTimer = useRef(null);
+
+  useEffect(() => {
+    if (activeCity?.name && !selectedCity) setSelectedCity(activeCity.name);
+  }, [activeCity?.name]);
 
   // Queries
   const { data: spots = [] } = useQuery({
@@ -450,20 +689,24 @@ export default function Restaurants() {
   });
 
   const { data: publicSpots = [] } = useQuery({
-    queryKey: ['publicSpots', country, city],
+    queryKey: ['publicSpots', country],
     queryFn: () => base44.entities.Spot.filter({ visibility: 'public', country }),
     enabled: !!country, staleTime: 5*60*1000,
   });
 
-  const { data: spotComments = [] } = useQuery({
-    queryKey: ['allComments', tripId],
-    queryFn: () => base44.entities.SpotComment.list(),
-    staleTime: 5*60*1000,
+  const { data: tripCities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
   });
 
   // Mutations
   const createMutation = useMutation({
     mutationFn: d => base44.entities.Spot.create(d),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Spot.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
   });
   const deleteMutation = useMutation({
@@ -502,39 +745,8 @@ export default function Restaurants() {
     visibility: 'trip_members', visited: false,
     created_by: user?.email, created_by_user_id: user?.id,
     creator_username: myProfile?.username||'',
-    creator_display_name: myProfile?.display_name||user?.full_name||'',
     ...extra,
   });
-
-  const saveOsmPlace = async place => {
-    setSavingId(place.id);
-    try {
-      const created = await createMutation.mutateAsync(baseData({ title:place.name, type:place.type||'sight', address:place.address||'', lat:place.lat, lng:place.lng, tags:[] }));
-      setOsmResults([]); setNearbyResults([]); setSearchQuery('');
-      showToastFor({ title: place.name, id: place.id }, place.address);
-    } finally { setSavingId(null); }
-  };
-
-  const saveManual = async form => {
-    setSavingId('manual');
-    try {
-      await createMutation.mutateAsync(baseData({ title:form.title, type:form.type, notes:form.notes, address:form.address, tags:form.tags||[] }));
-      setShowManual(false);
-      showToastFor({ title: form.title, id: 'manual' }, city);
-    } finally { setSavingId(null); }
-  };
-
-  const saveSeedSpot = async spot => {
-    setSavingId(spot.title);
-    try {
-      const created = await createMutation.mutateAsync(baseData({
-        title: spot.title, type: spot.type, address: spot.address||'',
-        lat: spot.lat, lng: spot.lng, notes: spot.notes||'',
-        tags: spot.tags||[], visits_count: spot.visits||0,
-      }));
-      setLastSavedId(created?.id);
-    } finally { setSavingId(null); }
-  };
 
   const showToastFor = (spot, cityName) => {
     setToast({ visible: true, spot, city: cityName || city });
@@ -542,21 +754,59 @@ export default function Restaurants() {
     toastTimer.current = setTimeout(() => setToast({ visible: false, spot: null }), 3000);
   };
 
+  const saveOsmPlace = async place => {
+    // duplicate check (B)
+    const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim() && (s.city_name?.toLowerCase() === city?.toLowerCase() || !s.city_name));
+    if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
+    setSavingId(place.id);
+    try {
+      const created = await createMutation.mutateAsync(baseData({ title:place.name, type:place.type||'sight', address:place.address||'', lat:place.lat, lng:place.lng }));
+      setLastSavedId(created?.id);
+      setOsmResults([]); setNearbyResults([]); setSearchQuery('');
+      showToastFor({ title: place.name }, city);
+    } finally { setSavingId(null); }
+  };
+
+  const saveManualSpot = async form => {
+    setSavingId('manual');
+    try {
+      const created = await createMutation.mutateAsync(baseData({
+        title: form.title, type: form.type, notes: form.notes,
+        address: form.address, lat: form.lat, lng: form.lng,
+        visibility: form.visibility,
+      }));
+      setLastSavedId(created?.id);
+      setShowCreate(false);
+      showToastFor({ title: form.title }, city);
+    } finally { setSavingId(null); }
+  };
+
+  const saveCommunitySpot = async spot => {
+    const dup = spots.find(s => s.title?.toLowerCase().trim() === spot.title?.toLowerCase().trim());
+    if (dup) return;
+    setSavingId(spot.title);
+    try {
+      const created = await createMutation.mutateAsync(baseData({
+        title: spot.title, type: spot.type, address: spot.address||'',
+        lat: spot.lat, lng: spot.lng, notes: spot.notes||'',
+      }));
+      setLastSavedId(created?.id);
+      showToastFor({ title: spot.title }, selectedCity || city);
+    } finally { setSavingId(null); }
+  };
+
   const undoSave = async () => {
-    if (lastSavedId) {
-      await deleteMutation.mutateAsync(lastSavedId);
-      setLastSavedId(null);
-    }
+    if (lastSavedId) { await deleteMutation.mutateAsync(lastSavedId); setLastSavedId(null); }
     setToast({ visible: false, spot: null });
   };
 
-  // Seed spots for community section
+  // Seed spots
   const seedSpots = useMemo(() => {
     if (!country || !city) return [];
     return getSeedSpotsForCity(country, selectedCity || city);
   }, [country, selectedCity, city]);
 
-  // Community spots (public from other users + seed)
+  // Community spots
   const communitySpots = useMemo(() => {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const fromUsers = publicSpots.filter(s =>
@@ -568,241 +818,289 @@ export default function Restaurants() {
       ...fromUsers.map(s => ({ ...s, _source: 'user' })),
       ...fromSeed.map(s => ({ ...s, _source: 'seed', id: `seed_${s.title}` })),
     ];
-    const upsMap = new Map();
-    spotComments.forEach(c => {
-      if (c.thumb === 'up') upsMap.set(c.spot_id, (upsMap.get(c.spot_id)||0)+1);
-    });
     return all.sort((a, b) => {
-      if (communitySort === 'likes') return (upsMap.get(b.id)||b.visits||0) - (upsMap.get(a.id)||a.visits||0);
       if (communitySort === 'recent') return new Date(b.created_date||0) - new Date(a.created_date||0);
       return (b.visits||0) - (a.visits||0);
     });
-  }, [publicSpots, seedSpots, spots, communitySort, selectedCity, city, user?.email, spotComments]);
+  }, [publicSpots, seedSpots, spots, communitySort, selectedCity, city, user?.email]);
 
-  // My spots filtered + grouped by city
-  const filteredSpots = useMemo(() => {
-    return spots.filter(s => {
-      if (stateFilter === 'pending' && s.visited) return false;
-      if (stateFilter === 'visited' && !s.visited) return false;
-      if (typeFilter !== 'all' && s.type !== typeFilter) return false;
-      return true;
-    });
-  }, [spots, stateFilter, typeFilter]);
+  // Hashtags
+  const hashtags = useMemo(() => buildHashtags(spots, tripCities), [spots, tripCities]);
 
-  const spotsByCity = useMemo(() => {
-    const groups = {};
-    filteredSpots.forEach(s => {
-      const k = s.city_name || city || 'Sin ciudad';
-      if (!groups[k]) groups[k] = [];
-      groups[k].push(s);
-    });
-    return groups;
-  }, [filteredSpots, city]);
+  // Filtered spots
+  const filteredSpots = useMemo(() => spots.filter(s => {
+    if (stateFilter === 'pending' && s.visited) return false;
+    if (stateFilter === 'visited' && !s.visited) return false;
+    return true;
+  }), [spots, stateFilter]);
 
-  // Trip cities for discover chips
-  const { data: tripCities = [] } = useQuery({
-    queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 60000,
-  });
-
-  const isSearching = searchQuery.length >= 2;
+  const isSearchActive = searchQuery.length >= 2;
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="bg-orange-700 pt-12 pb-5 px-4">
-        <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
-        <h1 className="text-white text-3xl font-bold mb-4">Spots</h1>
-
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
-          <input
-            value={searchQuery}
-            onChange={e => { setSearchQuery(e.target.value); if(e.target.value.length >= 2) setMode('search'); else if(!e.target.value) setMode('list'); }}
-            onFocus={() => !searchQuery && setMode('discover')}
-            placeholder="Busca spots, tags, usuarios..."
-            className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-white text-foreground"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-            {searchQuery ? (
-              <button onClick={() => { setSearchQuery(''); setOsmResults([]); setMode('list'); }} className="text-gray-400 p-1"><X className="w-4 h-4"/></button>
-            ) : (
-              <button onClick={handleNearby} className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-lg font-medium">
-                <Navigation className="w-3 h-3"/>Cerca
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+                <ArrowRight className="w-4 h-4 rotate-180" />Inicio
               </button>
-            )}
+            </Link>
+            <button onClick={() => setShowCreate(true)}
+              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+              <Plus className="w-4 h-4" />Crear
+            </button>
           </div>
-        </div>
 
-        {/* City chips for discover */}
-        {mode === 'discover' && tripCities.length > 0 && (
-          <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-            {tripCities.map(c => (
-              <button key={c.id} onClick={() => setSelectedCity(c.name)}
-                className={"text-xs px-3 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors " +
-                  (selectedCity === c.name ? 'bg-white text-orange-700 border-white' : 'bg-white/15 text-white border-white/30')}>
-                {c.name}
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Spots</h1>
+
+          {/* Tabs */}
+          <div className="flex border-b border-border">
+            {[['buscar','Buscar'],['mis','Mis spots'],['comunidad','Comunidad']].map(([k,l]) => (
+              <button key={k} onClick={() => setTab(k)}
+                className={`flex-1 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                  tab === k ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
+                }`}>
+                {l}
               </button>
             ))}
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
+      {/* Content */}
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
 
-        {/* MODE: SEARCH — OSM results */}
-        {mode === 'search' && (
-          <div className="space-y-3">
-            {searching && <p className="text-sm text-muted-foreground text-center py-4">Buscando...</p>}
-            {!searching && osmResults.length > 0 && (
-              <>
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{osmResults.length} resultados</p>
-                {osmResults.map(p => <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id}/>)}
-              </>
+        {/* ── BUSCAR TAB ── */}
+        {tab === 'buscar' && (
+          <div className="space-y-4">
+            {/* Search input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Buscar lugares, hashtags..."
+                className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-white border border-border focus:border-primary text-foreground"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                {searchQuery ? (
+                  <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
+                ) : (
+                  <button onClick={handleNearby} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium">
+                    <Navigation className="w-3 h-3"/>Cerca
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* City chips */}
+            {!isSearchActive && tripCities.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ciudades del viaje</p>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {tripCities.map(c => (
+                    <button key={c.id} onClick={() => setSelectedCity(c.name)}
+                      className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors ${
+                        selectedCity === c.name
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-white border-border text-foreground hover:border-primary/40'
+                      }`}>
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
-            {!searching && searchQuery.length >= 2 && osmResults.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">Sin resultados — prueba en inglés o simplifica el nombre</p>
+
+            {/* Hashtags */}
+            {!isSearchActive && hashtags.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Explorar por tema</p>
+                <div className="flex flex-wrap gap-2">
+                  {hashtags.map(tag => (
+                    <button key={tag} onClick={() => setSearchQuery(tag.replace('#', ''))}
+                      className="text-sm px-3 py-1.5 rounded-full border border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search results */}
+            {isSearchActive && (
+              <div className="space-y-3">
+                {searching && <p className="text-sm text-muted-foreground text-center py-4">Buscando...</p>}
+                {!searching && osmResults.length > 0 && (
+                  <>
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{osmResults.length} resultados</p>
+                    {osmResults.map(p => {
+                      const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
+                      return <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id} isDuplicate={isDuplicate} />;
+                    })}
+                    {/* Manual creation option at bottom */}
+                    <button onClick={() => { setShowCreate(true); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
+                      <Plus className="w-4 h-4" />
+                      Crear "{searchQuery}" manualmente
+                    </button>
+                  </>
+                )}
+                {!searching && searchQuery.length >= 2 && osmResults.length === 0 && !loadingNearby && (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground mb-3">Sin resultados para "{searchQuery}"</p>
+                    <button onClick={() => setShowCreate(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
+                      <Plus className="w-4 h-4" />Crear manualmente
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Nearby results */}
+            {nearbyResults.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{nearbyResults.length} lugares cerca</p>
+                {nearbyResults.map(p => {
+                  const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
+                  return <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id} isDuplicate={isDuplicate} />;
+                })}
+              </div>
+            )}
+            {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">Obteniendo tu ubicación...</p>}
+          </div>
+        )}
+
+        {/* ── MIS SPOTS TAB ── */}
+        {tab === 'mis' && (
+          <div>
+            {/* Filters */}
+            <div className="flex gap-2 mb-4">
+              {[['all','Todos'],['pending','Pendientes'],['visited','Visitados']].map(([v,l]) => (
+                <button key={v} onClick={() => setStateFilter(v)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                  }`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {filteredSpots.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-4xl mb-4">📍</p>
+                <p className="text-muted-foreground mb-4">
+                  {spots.length === 0 ? 'Aún no tienes spots en este viaje' : 'Sin spots con ese filtro'}
+                </p>
+                <button onClick={() => setShowCreate(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
+                  <Plus className="w-4 h-4" />Crear primer spot
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-border overflow-hidden">
+                {filteredSpots.map(spot => (
+                  <MySpotRow
+                    key={spot.id}
+                    spot={spot}
+                    onTap={setSelectedSpot}
+                    userId={user?.id}
+                  />
+                ))}
+              </div>
             )}
           </div>
         )}
 
-        {/* Nearby results */}
-        {nearbyResults.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{nearbyResults.length} lugares cerca</p>
-            {nearbyResults.map(p => <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id}/>)}
+        {/* ── COMUNIDAD TAB ── */}
+        {tab === 'comunidad' && (
+          <div>
+            {/* City chips */}
+            {tripCities.length > 0 && (
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+                {tripCities.map(c => {
+                  const isActive = (selectedCity || activeCity?.name) === c.name;
+                  const today = new Date().toISOString().slice(0,10);
+                  const isCurrent = c.start_date && c.end_date && today >= c.start_date && today <= c.end_date;
+                  return (
+                    <button key={c.id} onClick={() => setSelectedCity(c.name)}
+                      className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors flex items-center gap-1.5 ${
+                        isActive ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                      }`}>
+                      {c.name}
+                      {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Sort */}
+            <div className="flex gap-2 mb-4">
+              {[['visits','Más visitados'],['recent','Recientes']].map(([v,l]) => (
+                <button key={v} onClick={() => setCommunitySort(v)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    communitySort===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                  }`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {communitySpots.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-4xl mb-4">🌍</p>
+                <p className="text-muted-foreground">Sin spots de la comunidad para {selectedCity || city} todavía</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {communitySpots.slice(0, 15).map((spot, idx) => {
+                  const alreadySaved = spots.some(s => s.title?.toLowerCase() === spot.title?.toLowerCase());
+                  return (
+                    <CommunitySpotCard
+                      key={spot.id || idx}
+                      spot={spot}
+                      onSave={saveCommunitySpot}
+                      saving={savingId === spot.title}
+                      alreadySaved={alreadySaved}
+                      userId={user?.id}
+                    />
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
-        {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">Obteniendo tu ubicación...</p>}
-
-        {/* Manual form */}
-        {showManual && (
-          <ManualForm onSave={saveManual} saving={savingId==='manual'} onClose={() => setShowManual(false)} city={city} country={country}/>
-        )}
-
-        {/* MODE: LIST — Mis spots */}
-        {(mode === 'list' || mode === 'discover') && (
-          <>
-            {/* Mis spots section */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold text-foreground">Mis spots</h2>
-                <div className="flex gap-2">
-                  <button onClick={() => setShowManual(!showManual)}
-                    className={"flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border transition-colors " +
-                      (showManual ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
-                    <Plus className="w-3.5 h-3.5"/>Crear
-                  </button>
-                </div>
-              </div>
-
-              {/* State filters */}
-              <div className="flex gap-2 mb-2">
-                {[['all','Todos'],['pending','Pendientes'],['visited','Visitados']].map(([v,l]) => (
-                  <button key={v} onClick={() => setStateFilter(v)}
-                    className={"text-xs px-3 py-1.5 rounded-full border transition-colors " +
-                      (stateFilter===v ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-
-              {/* Type filters */}
-              <div className="flex gap-1.5 flex-wrap mb-3">
-                {[['all','Todo'],['food','🍜 Comer'],['sight','🏛️ Cultura'],['activity','⚡ Activ.'],['shopping','🛍️ Compras'],['custom','📍 Otro']].map(([v,l]) => (
-                  <button key={v} onClick={() => setTypeFilter(v)}
-                    className={"text-xs px-2.5 py-1 rounded-full border transition-colors " +
-                      (typeFilter===v ? 'bg-orange-100 text-orange-800 border-orange-300' : 'bg-white border-border text-muted-foreground hover:border-orange-200')}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-
-              {spots.length === 0 ? (
-                <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-white">
-                  <p className="text-2xl mb-2">📍</p>
-                  <p className="text-sm text-muted-foreground mb-1">Aún no tienes spots en este viaje</p>
-                  <p className="text-xs text-muted-foreground">Busca lugares arriba o explora la comunidad abajo</p>
-                </div>
-              ) : filteredSpots.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6">Sin spots con ese filtro</p>
-              ) : Object.keys(spotsByCity).length === 1 ? (
-                <div className="space-y-3">
-                  {filteredSpots.map(spot => <SpotCard key={spot.id} spot={spot} currentUserEmail={user?.email} cityId={cityId} tripId={tripId}/>)}
-                </div>
-              ) : (
-                Object.entries(spotsByCity).map(([cityName, citySpots]) => (
-                  <CityGroup key={cityName} cityName={cityName} spots={citySpots}
-                    currentUserEmail={user?.email} userId={user?.id} userProfile={myProfile}
-                    tripId={tripId}/>
-                ))
-              )}
-            </div>
-
-            {/* Comunidad section */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold text-foreground">Kōdo Community</h2>
-              </div>
-
-              {/* City chips — smart active city by trip dates */}
-              {tripCities.length > 0 && (
-                <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
-                  {tripCities.map(c => {
-                    const isActive = (selectedCity || activeCity?.name) === c.name;
-                    const today = new Date().toISOString().slice(0,10);
-                    const isCurrent = c.start_date && c.end_date && today >= c.start_date && today <= c.end_date;
-                    return (
-                      <button key={c.id} onClick={() => setSelectedCity(c.name)}
-                        className={"text-xs px-3 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors flex items-center gap-1 " +
-                          (isActive ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
-                        {c.name}
-                        {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Sort tabs */}
-              <div className="flex gap-2 mb-3">
-                {[['visits','Más visitados'],['likes','Más gustados'],['recent','Recientes']].map(([v,l]) => (
-                  <button key={v} onClick={() => setCommunitySort(v)}
-                    className={"text-xs px-3 py-1.5 rounded-full border transition-colors " +
-                      (communitySort===v ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
-                    {l}
-                  </button>
-                ))}
-              </div>
-
-              {communitySpots.length === 0 ? (
-                <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-white">
-                  <p className="text-2xl mb-2">🌍</p>
-                  <p className="text-sm text-muted-foreground">Sin spots de la comunidad para {selectedCity || city} todavía</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {communitySpots.slice(0, 10).map((spot, idx) => {
-                    const alreadySaved = spots.some(s => s.title?.toLowerCase() === spot.title?.toLowerCase());
-                    if (alreadySaved) return null;
-                    return (
-                      <SeedSpotCard key={spot.id || idx} spot={spot}
-                        onSave={s => saveSeedSpot(s)}
-                        saving={savingId === spot.title}
-                        showToast={s => showToastFor(s, selectedCity || city)}/>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </>
-        )}
       </div>
+
+      {/* Create sheet */}
+      <CreateSpotSheet
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        onSave={saveManualSpot}
+        saving={savingId === 'manual'}
+        spots={spots}
+        city={city}
+        country={country}
+      />
+
+      {/* Spot detail sheet */}
+      {selectedSpot && (
+        <SpotDetailSheet
+          spot={selectedSpot}
+          open={!!selectedSpot}
+          onClose={() => setSelectedSpot(null)}
+          onSave={(id, data) => updateMutation.mutate({ id, data })}
+          onDelete={id => deleteMutation.mutate(id)}
+          tripId={tripId}
+        />
+      )}
 
       {/* Toast */}
-      <Toast spot={toast.spot} city={toast.city} visible={toast.visible} onUndo={undoSave}/>
+      <Toast spot={toast.spot} city={toast.city} visible={toast.visible} onUndo={undoSave} />
     </div>
   );
 }
