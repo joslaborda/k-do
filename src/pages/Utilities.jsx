@@ -233,116 +233,127 @@ export default function Utilities() {
   const packingProgress = totalPackingItems > 0 ? Math.round(packedCount / totalPackingItems * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      <div className="bg-orange-700 pt-12 pb-20">
-         <div className="max-w-5xl mx-auto px-6">
-           <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
-          <h1 className="text-white text-4xl font-bold">Utilidades 🔧</h1>
-           <p className="text-white/90 mt-2">
-             {trip?.name ? `${trip.name} ${countryConfig.flag}` : 'Información útil para tu viaje'}
-           </p>
-           {trip && (
-             <p className="text-white/70 text-sm mt-1">
-               {country && `Moneda principal: ${baseCurrency}`}
-             </p>
-           )}
-         </div>
-       </div>
+    <div className="bg-background min-h-screen">
+      {/* Header */}
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <a href={createPageUrl('Home') + (tripId ? `?trip_id=${tripId}` : '')}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Inicio
+            </a>
+            <button onClick={() => setDialogOpen(true)}
+              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+              <Plus className="w-4 h-4" />Añadir
+            </button>
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Utilidades</h1>
+          {/* Tabs */}
+          <div className="flex border-b border-border">
+            {[
+              ['weather', 'Clima', '☁️'],
+              ['packing', 'Maleta', '🧳'],
+              ['info', 'Emergencias', '🚨'],
+            ].map(([k, l, em]) => (
+              <button key={k} onClick={() => setActiveTab(k)}
+                className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors flex flex-col items-center gap-0.5 ${
+                  activeTab === k ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
+                }`}>
+                <span className="text-lg">{em}</span>
+                <span className="text-xs">{l}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0 h-auto justify-start">
-            <TabsTrigger value="weather" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">☁️ Clima</TabsTrigger>
-            <TabsTrigger value="packing" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🧳 Maleta</TabsTrigger>
-            <TabsTrigger value="info" className="bg-white border border-border data-[state=active]:bg-orange-700 data-[state=active]:text-white data-[state=active]:border-orange-700">🚨 Emergencias</TabsTrigger>
-          </TabsList>
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="hidden" />
 
           {/* CLIMA */}
-          <TabsContent value="weather" className="space-y-6">
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Clima actual</h2>
-              <p className="text-muted-foreground">Pronóstico del tiempo en tiempo real</p>
-            </div>
+          <TabsContent value="weather" className="space-y-4 mt-5">
             {cities.length === 0 ? (
-              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
-                <p className="text-muted-foreground">Añade ciudades primero en la sección Ruta</p>
+              <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+                <p className="text-4xl mb-3">☁️</p>
+                <p className="text-sm font-semibold text-foreground mb-1">Sin ciudades</p>
+                <p className="text-xs text-muted-foreground">Añade ciudades en la sección Ruta para ver el clima</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-4">
                 {cities.map((city) => <WeatherCard key={city.id} city={city} tripCountry={trip?.country} />)}
               </div>
             )}
           </TabsContent>
 
           {/* MALETA */}
-          <TabsContent value="packing" className="space-y-6">
-            <div className="flex items-center justify-between mb-6">
+          <TabsContent value="packing" className="space-y-4 mt-5">
+            <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Checklist de equipaje 🧳</h2>
-                <p className="text-muted-foreground">{packedCount} de {totalPackingItems} artículos listos</p>
+                <p className="text-sm text-muted-foreground">{packedCount} de {totalPackingItems} artículos listos</p>
               </div>
-              <Button onClick={() => setPackingDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
-                <Plus className="w-4 h-4 mr-2" />Añadir
-              </Button>
+              <button onClick={() => setPackingDialogOpen(true)}
+                className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+                <Plus className="w-4 h-4" />Añadir
+              </button>
             </div>
 
             {totalPackingItems > 0 && (
-              <div className="bg-gradient-to-br from-primary to-orange-600 rounded-2xl p-6 text-white mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium opacity-90">Progreso total</span>
-                  <span className="text-4xl font-bold">{packingProgress}%</span>
+              <div className="bg-white rounded-2xl border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Progreso total</span>
+                  <span className="text-lg font-bold text-primary">{packingProgress}%</span>
                 </div>
-                <div className="h-4 bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full bg-white transition-all duration-500 rounded-full" style={{ width: `${packingProgress}%` }} />
+                <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-primary transition-all duration-500 rounded-full" style={{ width: `${packingProgress}%` }} />
                 </div>
               </div>
             )}
 
             {totalPackingItems === 0 ? (
-              <div className="text-center py-24 border-2 border-dashed border-border rounded-3xl">
-                <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Empieza añadiendo artículos a tu maleta</p>
+              <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm font-semibold text-foreground mb-1">Maleta vacía</p>
+                <p className="text-xs text-muted-foreground mb-4">Empieza añadiendo artículos a tu equipaje</p>
+                <button onClick={() => setPackingDialogOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium hover:bg-primary/90 transition-colors">
+                  <Plus className="w-4 h-4" />Añadir artículo
+                </button>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-4">
                 {packingCategories.map((cat) => {
                   const categoryItems = groupedPackingItems[cat.value] || [];
                   const packedCategoryCount = categoryItems.filter((i) => i.packed).length;
                   const categoryProgress = categoryItems.length > 0 ? Math.round(packedCategoryCount / categoryItems.length * 100) : 0;
                   return (
-                    <div key={cat.value} className="border-2 border-border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
-                      <div className={`bg-gradient-to-r ${cat.color} p-6 text-white`}>
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="text-4xl">{cat.icon}</span>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-bold">{cat.label}</h3>
-                            <p className="text-sm opacity-90">{packedCategoryCount}/{categoryItems.length} completo</p>
-                          </div>
-                          <div className="text-3xl font-bold">{categoryProgress}%</div>
+                    <div key={cat.value} className="bg-white rounded-2xl border border-border overflow-hidden">
+                      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{cat.icon}</span>
+                          <span className="text-sm font-semibold text-foreground">{cat.label}</span>
                         </div>
-                        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                          <div className="h-full bg-white transition-all duration-500 rounded-full" style={{ width: `${categoryProgress}%` }} />
-                        </div>
+                        <span className="text-xs text-muted-foreground">{packedCategoryCount}/{categoryItems.length}</span>
                       </div>
-                      <div className="bg-white p-4 space-y-2">
+                      <div className="p-3 space-y-1.5">
                         {categoryItems.length === 0 ? (
-                          <p className="text-center text-muted-foreground py-8 text-sm">Sin artículos</p>
+                          <p className="text-center text-muted-foreground py-4 text-xs">Sin artículos</p>
                         ) : categoryItems.map((item) => (
-                          <div key={item.id} className="bg-slate-100 p-3 rounded-xl group flex items-center gap-3 hover:bg-secondary transition-all">
-                            <Checkbox checked={item.packed} onCheckedChange={(checked) => togglePackedMutation.mutate({ id: item.id, packed: checked })} className="h-5 w-5" />
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-medium truncate ${item.packed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                                {item.name}{item.quantity > 1 && <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>}
-                              </p>
-                            </div>
-                            <Button variant="ghost" size="icon" onClick={() => deletePackingMutation.mutate(item.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive h-7 w-7">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                          <div key={item.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-secondary/50 group transition-colors">
+                            <Checkbox checked={item.packed} onCheckedChange={(checked) => togglePackedMutation.mutate({ id: item.id, packed: checked })} className="h-4 w-4" />
+                            <p className={`flex-1 text-sm truncate ${item.packed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                              {item.name}{item.quantity > 1 && <span className="ml-1 text-xs text-muted-foreground">×{item.quantity}</span>}
+                            </p>
+                            <button onClick={() => deletePackingMutation.mutate(item.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         ))}
-                        <Button variant="outline" size="sm" onClick={() => { setPackingFormData({ ...packingFormData, category: cat.value }); setPackingDialogOpen(true); }} className="w-full border-dashed mt-2">
-                          <Plus className="w-4 h-4 mr-2" />Añadir a {cat.label}
-                        </Button>
+                        <button onClick={() => { setPackingFormData({ ...packingFormData, category: cat.value }); setPackingDialogOpen(true); }}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-muted-foreground hover:text-primary border border-dashed border-border rounded-xl mt-1 transition-colors">
+                          <Plus className="w-3.5 h-3.5" />Añadir
+                        </button>
                       </div>
                     </div>
                   );
@@ -352,17 +363,15 @@ export default function Utilities() {
           </TabsContent>
 
           {/* EMERGENCIAS */}
-          <TabsContent value="info" className="space-y-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-1">Emergencias {countryConfig.flag}</h2>
-                <p className="text-muted-foreground">
-                  {country ? `Información esencial para tu viaje a ${country}` : 'Abre desde un viaje para ver info del país'}
-                </p>
-              </div>
-              <Button onClick={() => setDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
-                <Plus className="w-4 h-4 mr-2" />Añadir
-              </Button>
+          <TabsContent value="info" className="space-y-4 mt-5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {country ? `${country} ${countryConfig.flag}` : 'Abre desde un viaje para ver info'}
+              </p>
+              <button onClick={() => setDialogOpen(true)}
+                className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+                <Plus className="w-4 h-4" />Añadir nota
+              </button>
             </div>
 
             {/* Info generada por IA */}
