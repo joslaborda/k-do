@@ -925,18 +925,6 @@ export default function Restaurants() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
   });
 
-  // Seed spots that match the search query (shown alongside OSM results)
-  const seedSearchResults = useMemo(() => {
-    if (!searchQuery.trim() || searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase().replace('#', '');
-    return seedSpots.filter(s => {
-      const inTitle = s.title?.toLowerCase().includes(q);
-      const inNotes = s.notes?.toLowerCase().includes(q);
-      const inTags = s.tags?.some(t => t.toLowerCase().includes(q));
-      return inTitle || inNotes || inTags;
-    }).slice(0, 6);
-  }, [searchQuery, seedSpots]);
-
   // OSM search
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.length < 2) { setOsmResults([]); return; }
@@ -1032,6 +1020,18 @@ export default function Restaurants() {
     if (!country || !city) return [];
     return getSeedSpotsForCity(country, selectedCity || city);
   }, [country, selectedCity, city]);
+
+  // Seed spots that match the search query (shown alongside OSM results)
+  const seedSearchResults = useMemo(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) return [];
+    const q = searchQuery.toLowerCase().replace('#', '');
+    return seedSpots.filter(s => {
+      const inTitle = s.title?.toLowerCase().includes(q);
+      const inNotes = s.notes?.toLowerCase().includes(q);
+      const inTags = s.tags?.some(t => t.toLowerCase().includes(q));
+      return inTitle || inNotes || inTags;
+    }).slice(0, 6);
+  }, [searchQuery, seedSpots]);
 
   // Community spots — include own public spots too (so their likes show)
   const communitySpots = useMemo(() => {
