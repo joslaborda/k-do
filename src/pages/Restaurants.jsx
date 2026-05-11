@@ -95,35 +95,81 @@ const TYPE_CONFIG = {
 
 // ── Country-specific special tags ─────────────────────────────────────────────
 const COUNTRY_SPECIAL_TAGS = {
-  'Japón': ['#templos', '#onsen', '#ramen', '#anime', '#sakura'],
-  'Italia': ['#pizza', '#coliseo', '#arte', '#pasta', '#vino'],
-  'Francia': ['#croissant', '#louvre', '#baguette', '#vino'],
-  'Tailandia': ['#mango', '#templos', '#tukTuk', '#playa'],
-  'México': ['#tacos', '#cenotes', '#mariachi', '#mezcal'],
-  'Marruecos': ['#medina', '#hammam', '#té', '#zoco'],
-  'Turquía': ['#baño', '#bazar', '#kebab', '#mezquita'],
-  'Corea del Sur': ['#kpop', '#bbq', '#hanok', '#kimchi'],
-  'Vietnam': ['#pho', '#banh-mi', '#moto', '#bahia'],
-  'India': ['#curry', '#taj-mahal', '#rickshaw', '#yoga'],
+  'Japón': ['#templos', '#onsen', '#ramen', '#anime', '#sakura', '#naturaleza', '#museos', '#nightlife'],
+  'Italia': ['#pizza', '#coliseo', '#arte', '#pasta', '#vino', '#museos', '#arquitectura', '#gelato'],
+  'Francia': ['#croissant', '#louvre', '#baguette', '#vino', '#museos', '#moda', '#arte'],
+  'Tailandia': ['#mango', '#templos', '#tukTuk', '#playa', '#naturaleza', '#streetfood', '#nightlife'],
+  'México': ['#tacos', '#cenotes', '#mariachi', '#mezcal', '#arqueología', '#playa', '#mercados'],
+  'Marruecos': ['#medina', '#hammam', '#té', '#zoco', '#desierto', '#arquitectura', '#especias'],
+  'Turquía': ['#baño', '#bazar', '#kebab', '#mezquita', '#arqueología', '#mar', '#historia'],
+  'Corea del Sur': ['#kpop', '#bbq', '#hanok', '#kimchi', '#palacio', '#skincare', '#streetfood'],
+  'Vietnam': ['#pho', '#banh-mi', '#moto', '#bahia', '#arrozales', '#historia', '#streetfood'],
+  'India': ['#curry', '#taj-mahal', '#rickshaw', '#yoga', '#templos', '#especias', '#mercados'],
+  'España': ['#tapas', '#flamenco', '#catedral', '#playa', '#vino', '#museos', '#nightlife'],
+  'Portugal': ['#pastelde-nata', '#fado', '#azulejos', '#surf', '#vino', '#historia'],
+  'Grecia': ['#acropolis', '#islas', '#souvlaki', '#mar', '#historia', '#vino', '#arqueología'],
+  'Alemania': ['#cerveza', '#castillos', '#mercadillos', '#museos', '#historia', '#selva-negra'],
+  'Países Bajos': ['#bicicleta', '#tulipanes', '#museos', '#canales', '#queso', '#arte'],
+  'Reino Unido': ['#pubs', '#museos', '#historia', '#teatros', '#highlands', '#castillos'],
+  'Estados Unidos': ['#parques', '#jazz', '#hamburguesas', '#museos', '#naturaleza', '#roadtrip'],
+  'Perú': ['#machupichu', '#ceviche', '#inca', '#naturaleza', '#titicaca', '#aventura'],
+  'Argentina': ['#asado', '#tango', '#patagonia', '#vino', '#glaciares', '#fútbol'],
+  'Colombia': ['#café', '#cartajena', '#naturaleza', '#salsa', '#flores', '#aventura'],
+  'Chile': ['#atacama', '#patagonia', '#vino', '#mar', '#naturaleza', '#aventura'],
+  'Brasil': ['#samba', '#playa', '#amazonia', '#carnaval', '#naturaleza', '#caipirinha'],
+  'Indonesia': ['#bali', '#templos', '#surf', '#arrozales', '#naturaleza', '#buceo'],
+  'Filipinas': ['#islas', '#mar', '#buceo', '#playa', '#naturaleza', '#streetfood'],
+  'Singapur': ['#hawker', '#jardines', '#rascacielos', '#museos', '#streetfood', '#marina'],
+  'Camboya': ['#angkorwat', '#templos', '#historia', '#naturaleza', '#streetfood'],
+  'Nepal': ['#himalaya', '#trekking', '#budismo', '#naturaleza', '#aventura'],
+  'Egipto': ['#piramides', '#faraonico', '#desierto', '#nilo', '#historia', '#arqueología'],
+  'Sudáfrica': ['#safari', '#naturaleza', '#vinos', '#playas', '#aventura', '#wildlife'],
+  'Kenia': ['#safari', '#masai-mara', '#wildlife', '#naturaleza', '#aventura'],
+  'Australia': ['#koalas', '#surf', '#outback', '#barrera-coral', '#naturaleza', '#bbq'],
+  'Nueva Zelanda': ['#hobbit', '#aventura', '#naturaleza', '#fiordos', '#senderismo'],
+  'Canadá': ['#aurora', '#naturaleza', '#lagos', '#montañas', '#maple', '#cascadas'],
+  'Cuba': ['#son', '#habana', '#coches-clásicos', '#mojito', '#historia', '#playa'],
+  'Costa Rica': ['#naturaleza', '#surf', '#biodiversidad', '#aventura', '#volcanes'],
+  'Islandia': ['#aurora', '#cascadas', '#glaciares', '#géiseres', '#naturaleza', '#yoga'],
+  'Noruega': ['#fiordos', '#aurora', '#naturaleza', '#senderismo', '#vikingos'],
+  'Suecia': ['#diseño', '#naturaleza', '#aurora', '#museos', '#midsommar'],
 };
 
 // ── Dynamic hashtags from existing spots ──────────────────────────────────────
 function buildHashtags(spots, tripCities) {
   const typeTags = {
     food: '#comida',
-    sight: '#cultura',
-    activity: '#actividades',
+    sight: '#museos',
+    activity: '#aventura',
     shopping: '#compras',
     custom: '#especial',
   };
   const typeSet = new Set(spots.map(s => typeTags[s.type]).filter(Boolean));
+  // Always add a few generic travel tags
+  const genericTags = ['#naturaleza', '#nightlife', '#streetfood', '#vistas', '#barato'];
   const countryTags = [];
   const countries = [...new Set(tripCities.map(c => c.country).filter(Boolean))];
   countries.forEach(c => {
     const tags = COUNTRY_SPECIAL_TAGS[c] || [];
     tags.forEach(t => countryTags.push(t));
   });
-  return [...typeSet, ...countryTags.slice(0, 5)];
+  // Combine: type tags + country-specific + generic, deduplicated
+  const all = [...typeSet, ...countryTags, ...genericTags];
+  return [...new Set(all)].slice(0, 12);
+}
+
+// ── Recent searches (localStorage) ───────────────────────────────────────────
+const RECENT_SEARCHES_KEY = 'kodo_recent_searches';
+function getRecentSearches() {
+  try { return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]'); } catch { return []; }
+}
+function addRecentSearch(query) {
+  const searches = getRecentSearches().filter(s => s.query !== query);
+  searches.unshift({ query, date: new Date().toISOString() });
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches.slice(0, 8)));
+}
+function clearRecentSearches() {
+  localStorage.removeItem(RECENT_SEARCHES_KEY);
 }
 
 // ── Leaflet map ───────────────────────────────────────────────────────────────
@@ -227,108 +273,113 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl p-5 pb-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        {/* Handle + header */}
-        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
-        <div className="flex items-center justify-between mb-5">
-          <p className="font-semibold text-foreground text-base">Crear spot</p>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Name + duplicate check */}
-        <div className="mb-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
-          <Input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="ej. Ichiran Ramen Shinjuku"
-            className="h-10 text-sm"
-            autoFocus
-          />
-          {duplicate && (
-            <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-start gap-2">
-              <span className="text-lg shrink-0">⚠️</span>
-              <div>
-                <p className="text-xs font-medium text-amber-800">Ya existe este spot en {city}</p>
-                <p className="text-xs text-amber-700 mt-0.5">"{duplicate.title}" ya está en tu lista. ¿Quieres añadir uno diferente?</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Type */}
-        <div className="mb-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo</p>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
-              <button key={val} onClick={() => setType(val)}
-                className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
-                  type === val ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary/40'
-                }`}>
-                {tc.emoji} {tc.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Notes */}
-        <div className="mb-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nota</p>
-          <textarea
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="¿Algo que recordar sobre este lugar?"
-            className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary"
-          />
-        </div>
-
-        {/* Location */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-1.5">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ubicación</p>
-            <button onClick={handleGPS} disabled={locating}
-              className="flex items-center gap-1 text-xs text-primary font-medium hover:text-primary/80">
-              <Navigation className="w-3 h-3"/>
-              {locating ? 'Localizando...' : 'Usar mi ubicación'}
+      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
+        {/* Handle + header — fixed */}
+        <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+          <div className="flex items-center justify-between">
+            <p className="font-semibold text-foreground text-base">Crear spot</p>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              <X className="w-4 h-4" />
             </button>
           </div>
-          <Input value={address} onChange={e => setAddress(e.target.value)}
-            placeholder="Dirección (opcional)" className="h-9 text-sm mb-2" />
-          {showMap && (
-            <div className="rounded-xl overflow-hidden border border-border">
-              <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+
+          {/* Location FIRST (map at top) */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Ubicación</p>
+            {/* Map placeholder / real map */}
+            <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: '#f0f4f8', position: 'relative' }}>
+              {showMap
+                ? <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
+                : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                    <MapPin className="w-8 h-8 text-muted-foreground/40" />
+                    <p className="text-xs">Toca para añadir ubicación</p>
+                  </div>
+                )
+              }
             </div>
-          )}
-          {!showMap && (
             <button onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
-              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" />Añadir pin en el mapa
+              className="w-full flex items-center justify-between px-4 py-2.5 border border-border rounded-xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors mb-2">
+              <span className="flex items-center gap-2"><Navigation className="w-4 h-4"/>{locating ? 'Localizando...' : 'Usar mi ubicación actual'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
-          )}
-        </div>
-
-        {/* Visibility toggle */}
-        <div className="mb-5">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
-          <div className="flex rounded-xl border border-border overflow-hidden">
-            <button onClick={() => setIsPublic(true)}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
-              🌍 Kōdo Community
-            </button>
-            <button onClick={() => setIsPublic(false)}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
-              🔒 Solo mi viaje
-            </button>
+            <Input value={address} onChange={e => setAddress(e.target.value)}
+              placeholder="o escribe la dirección..." className="h-9 text-sm" />
           </div>
-          <p className="text-xs text-muted-foreground mt-1.5 px-1">
-            {isPublic ? 'Otros viajeros podrán descubrirlo y guardarlo' : 'Solo tú y tu grupo lo verán'}
-          </p>
+
+          {/* Name + duplicate check */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
+            <Input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="ej. Ichiran Ramen Shinjuku"
+              className="h-10 text-sm"
+              autoFocus
+            />
+            {duplicate && (
+              <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-start gap-2">
+                <span className="text-lg shrink-0">⚠️</span>
+                <div>
+                  <p className="text-xs font-medium text-amber-800">Ya existe este spot en {city}</p>
+                  <p className="text-xs text-amber-700 mt-0.5">"{duplicate.title}" ya está en tu lista.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Type */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo</p>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
+                <button key={val} onClick={() => setType(val)}
+                  className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
+                    type === val ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary/40'
+                  }`}>
+                  {tc.emoji} {tc.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nota</p>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="¿Algo que recordar sobre este lugar?"
+              className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary"
+            />
+          </div>
+
+          {/* Visibility toggle */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
+            <div className="flex rounded-xl border border-border overflow-hidden">
+              <button onClick={() => setIsPublic(true)}
+                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                🌍 Kōdo Community
+              </button>
+              <button onClick={() => setIsPublic(false)}
+                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                🔒 Solo mi viaje
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5 px-1">
+              {isPublic ? 'Otros viajeros podrán descubrirlo y guardarlo' : 'Solo tú y tu grupo lo verán'}
+            </p>
+          </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
+        {/* Sticky footer buttons */}
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           <Button
             onClick={handleSave}
@@ -553,26 +604,28 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
-
-        {/* Header */}
-        <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${tc.color}`}>
-              {tc.emoji}
+      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+        {/* Handle + Header — fixed */}
+        <div className="flex-shrink-0">
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
+          <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${tc.color}`}>
+                {tc.emoji}
+              </div>
+              <div>
+                <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+                <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-foreground text-sm">{spot.title}</p>
-              <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
-            </div>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-            <X className="w-4 h-4 text-muted-foreground" />
-          </button>
         </div>
 
-        <div className="px-5 py-4 space-y-4">
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {/* Notes */}
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Mi nota</p>
@@ -605,19 +658,19 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
-            <Button onClick={handleSave} className="flex-1 bg-primary hover:bg-primary/90 text-white">
-              Guardar cambios
-            </Button>
-          </div>
-
           {/* Delete */}
           <button onClick={() => { onDelete(spot.id); onClose(); }}
-            className="w-full text-xs text-red-500 hover:text-red-700 transition-colors py-1">
+            className="w-full text-xs text-red-500 hover:text-red-700 transition-colors py-2 text-center">
             Eliminar spot
           </button>
+        </div>
+
+        {/* Sticky footer buttons */}
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
+          <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+          <Button onClick={handleSave} className="flex-1 bg-primary hover:bg-primary/90 text-white">
+            Guardar cambios
+          </Button>
         </div>
       </div>
     </div>
@@ -656,6 +709,7 @@ export default function Restaurants() {
 
   const [tab, setTab] = useState('buscar'); // 'buscar' | 'mis' | 'comunidad'
   const [searchQuery, setSearchQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState(() => getRecentSearches());
   const [osmResults, setOsmResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [nearbyResults, setNearbyResults] = useState([]);
@@ -689,9 +743,9 @@ export default function Restaurants() {
   });
 
   const { data: publicSpots = [] } = useQuery({
-    queryKey: ['publicSpots', country],
-    queryFn: () => base44.entities.Spot.filter({ visibility: 'public', country }),
-    enabled: !!country, staleTime: 5*60*1000,
+    queryKey: ['publicSpots'],
+    queryFn: () => base44.entities.Spot.filter({ visibility: 'public' }),
+    staleTime: 5*60*1000,
   });
 
   const { data: tripCities = [] } = useQuery({
@@ -720,6 +774,8 @@ export default function Restaurants() {
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(async () => {
       setSearching(true);
+      addRecentSearch(searchQuery.trim());
+      setRecentSearches(getRecentSearches());
       try { setOsmResults(await searchPlaces(searchQuery, city, country)); }
       catch { setOsmResults([]); }
       finally { setSearching(false); }
@@ -857,12 +913,17 @@ export default function Restaurants() {
 
           {/* Tabs */}
           <div className="flex border-b border-border">
-            {[['buscar','Buscar'],['mis','Mis spots'],['comunidad','Comunidad']].map(([k,l]) => (
+            {[
+              ['buscar', 'Buscar', '🔍'],
+              ['mis', 'Mis spots', '📍'],
+              ['comunidad', 'Comunidad', '🌍'],
+            ].map(([k, l, emoji]) => (
               <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors flex flex-col items-center gap-0.5 ${
                   tab === k ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
                 }`}>
-                {l}
+                <span className="text-lg">{emoji}</span>
+                <span className="text-xs">{l}</span>
               </button>
             ))}
           </div>
@@ -925,6 +986,33 @@ export default function Restaurants() {
                       {tag}
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recent searches */}
+            {!isSearchActive && recentSearches.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Búsquedas recientes</p>
+                  <button onClick={() => { clearRecentSearches(); setRecentSearches([]); }}
+                    className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
+                </div>
+                <div className="space-y-1">
+                  {recentSearches.map((s, i) => {
+                    const now = new Date();
+                    const date = new Date(s.date);
+                    const diffDays = Math.floor((now - date) / 86400000);
+                    const label = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Ayer' : `Hace ${diffDays}d`;
+                    return (
+                      <button key={i} onClick={() => setSearchQuery(s.query)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/50 transition-colors text-left">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground flex-shrink-0"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+                        <span className="flex-1 text-sm text-foreground truncate">{s.query}</span>
+                        <span className="text-xs text-muted-foreground flex-shrink-0">{label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
