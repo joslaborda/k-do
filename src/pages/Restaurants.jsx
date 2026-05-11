@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
 import SpotCard from '@/components/spots/SpotCard';
 
 // ── OSM helpers ───────────────────────────────────────────────────────────────
@@ -613,7 +612,7 @@ function useLikeSimple(spotId, userId) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['likes', 'spot', spotId] }),
   });
 
-  return { isLiked, count, toggle: () => isReal && mutation.mutate() };
+  return { isLiked, count, toggle: () => { if (isReal && userId) mutation.mutate(); } };
 }
 
 // ── Simple comments popup (inline, sin depender de SpotCard) ─────────────────
@@ -1073,21 +1072,23 @@ export default function Restaurants() {
   };
 
   const saveOsmPlace = async place => {
-    if (!tripId) return;
-    // duplicate check (B)
-    const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim() && (s.city_name?.toLowerCase() === city?.toLowerCase() || !s.city_name));
+    if (!tripId) { alert('No hay viaje seleccionado'); return; }
+    const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim());
     if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
     setSavingId(place.id);
     try {
-      const created = await createMutation.mutateAsync(baseData({ title:place.name, type:place.type||'sight', address:place.address||'', lat:place.lat, lng:place.lng }));
+      const created = await createMutation.mutateAsync(baseData({ title: place.name, type: place.type || 'sight', address: place.address || '', lat: place.lat, lng: place.lng }));
       setLastSavedId(created?.id);
       setOsmResults([]); setNearbyResults([]); setSearchQuery('');
       showToastFor({ title: place.name }, city);
+      if (created?.id) setAssignDateSpot(created);
+    } catch(e) {
+      alert('Error al guardar: ' + e.message);
     } finally { setSavingId(null); }
   };
 
   const saveManualSpot = async form => {
-    if (!tripId) return;
+    if (!tripId) { alert('No hay viaje seleccionado'); return; }
     setSavingId('manual');
     try {
       const created = await createMutation.mutateAsync(baseData({
@@ -1098,6 +1099,7 @@ export default function Restaurants() {
       setLastSavedId(created?.id);
       setShowCreate(false);
       showToastFor({ title: form.title }, city);
+      if (created?.id) setAssignDateSpot(created);
     } finally { setSavingId(null); }
   };
 
