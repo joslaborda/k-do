@@ -954,7 +954,7 @@ export default function Restaurants() {
   };
 
   const baseData = extra => ({
-    trip_id: tripId, city_id: cityId||undefined, city_name: city, country,
+    trip_id: tripId || undefined, city_id: cityId||undefined, city_name: city, country,
     visibility: 'trip_members', visited: false,
     created_by: user?.email, created_by_user_id: user?.id,
     creator_username: myProfile?.username||'',
@@ -968,6 +968,7 @@ export default function Restaurants() {
   };
 
   const saveOsmPlace = async place => {
+    if (!tripId) return;
     // duplicate check (B)
     const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim() && (s.city_name?.toLowerCase() === city?.toLowerCase() || !s.city_name));
     if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
@@ -981,6 +982,7 @@ export default function Restaurants() {
   };
 
   const saveManualSpot = async form => {
+    if (!tripId) return;
     setSavingId('manual');
     try {
       const created = await createMutation.mutateAsync(baseData({
@@ -995,6 +997,7 @@ export default function Restaurants() {
   };
 
   const saveCommunitySpot = async spot => {
+    if (!tripId) return;
     const dup = spots.find(s => s.title?.toLowerCase().trim() === spot.title?.toLowerCase().trim());
     if (dup) return;
     setSavingId(spot.title);
