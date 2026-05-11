@@ -615,11 +615,10 @@ function useLikeSimple(spotId, userId) {
   return { isLiked, count, toggle: () => { if (isReal && userId) mutation.mutate(); } };
 }
 
-// ── Simple comments popup (inline, sin depender de SpotCard) ─────────────────
+// ── Simple comments popup ─────────────────────────────────────────────────────
 function InlineCommentsPopup({ spot, userId, onClose }) {
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
-  const [thumb, setThumb] = useState(null);
 
   const { data: userProfile } = useQuery({
     queryKey: ['myProfile', userId],
@@ -639,60 +638,69 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
       user_display_name: userProfile?.display_name || '',
       username: userProfile?.username || '',
       user_avatar: userProfile?.avatar_url || '',
-      thumb, text: text.trim() || null,
+      thumb: 'up',
+      text: text.trim() || null,
     }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); setText(''); setThumb(null); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); setText(''); },
   });
 
-  const ups = comments.filter(c => c.thumb === 'up').length;
-  const downs = comments.filter(c => c.thumb === 'down').length;
+  const handleSubmit = () => {
+    if (!text.trim()) return;
+    mutation.mutate();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col max-h-[75vh]" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-border flex-shrink-0">
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
           <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-foreground text-sm">{spot.title}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>
-                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
-              </div>
-            </div>
-            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center"><X className="w-4 h-4 text-muted-foreground" /></button>
+            <p className="font-semibold text-foreground text-sm">{spot.title}</p>
+            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
           </div>
         </div>
+
+        {/* Comments list */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {comments.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Sin comentarios. ¡Sé el primero!</p>}
+          {comments.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-6">Sin comentarios. ¡Sé el primero!</p>
+          )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-2">
               <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
                 {c.user_display_name?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="flex-1 bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-xs font-semibold text-foreground">@{c.username || c.user_display_name}</span>
-                  <span className="text-sm">{c.thumb === 'up' ? '👍' : '👎'}</span>
-                </div>
-                {c.text && <p className="text-sm text-foreground">{c.text}</p>}
+                <span className="text-xs font-semibold text-foreground">@{c.username || c.user_display_name}</span>
+                {c.text && <p className="text-sm text-foreground mt-0.5">{c.text}</p>}
               </div>
             </div>
           ))}
         </div>
-        <div className="p-3 border-t border-border flex-shrink-0 space-y-2">
-          <div className="flex gap-2">
-            {['up','down'].map(t => (
-              <button key={t} onClick={() => setThumb(thumb === t ? null : t)}
-                className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${thumb === t ? (t==='up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-red-50 border-red-300 text-red-700') : 'bg-secondary border-border text-muted-foreground'}`}>
-                {t === 'up' ? '👍' : '👎'}
-              </button>
-            ))}
-            <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Añade un comentario..."
-              className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-primary bg-secondary h-9" />
-            <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
-              className="px-3 py-1.5 rounded-xl bg-primary text-white text-sm disabled:opacity-50">
-              {mutation.isPending ? '...' : '→'}
+
+        {/* Input area */}
+        <div className="px-4 py-3 border-t border-border flex-shrink-0">
+          <div className="flex gap-2 items-end">
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+              placeholder="Escribe un comentario..."
+              className="flex-1 text-sm border border-border rounded-2xl px-3 py-2.5 resize-none outline-none focus:border-primary bg-secondary min-h-[40px] max-h-24"
+              rows={1}
+            />
+            <button
+              onClick={handleSubmit}
+              disabled={!text.trim() || mutation.isPending}
+              className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-40 flex-shrink-0 transition-opacity"
+            >
+              {mutation.isPending
+                ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              }
             </button>
           </div>
         </div>
@@ -865,11 +873,10 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
   );
 }
 
-// ── Assign date modal (shown after saving community spot) ─────────────────────
-function AssignDateModal({ spot, tripCities, onAssign, onSkip }) {
+// ── Assign date modal (shown after saving a spot) ─────────────────────────────
+function AssignDateModal({ spot, tripCities, onAssign, onSkip, onUndo }) {
   const [selectedDate, setSelectedDate] = useState('');
 
-  // Build allowed date range from trip cities
   const tripDates = useMemo(() => {
     const dates = new Set();
     tripCities.forEach(c => {
@@ -887,48 +894,59 @@ function AssignDateModal({ spot, tripCities, onAssign, onSkip }) {
 
   const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
   const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
-
   const isAllowed = (date) => tripDates.size === 0 || tripDates.has(date);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-      <div className="bg-white w-full max-w-md rounded-t-3xl p-5 pb-8">
-        <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40">
+      <div className="bg-white w-full max-w-md rounded-t-3xl flex flex-col" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
+        <div className="p-5">
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+
+          {/* Saved confirmation */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p className="font-semibold text-foreground text-sm">¡Guardado!</p>
+              <p className="text-xs text-muted-foreground truncate max-w-[220px]">{spot.title}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold text-foreground text-sm">¡Guardado!</p>
-            <p className="text-xs text-muted-foreground">{spot.title} · ¿Lo asignas a un día?</p>
-          </div>
+
+          {/* Date picker */}
+          <p className="text-sm font-semibold text-foreground mb-2">¿Cuándo quieres visitar este spot?</p>
+          <input
+            type="date"
+            value={selectedDate}
+            min={minDate}
+            max={maxDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary mb-1"
+          />
+          {selectedDate && !isAllowed(selectedDate) && (
+            <p className="text-xs text-red-500 mt-1">Esa fecha está fuera del viaje</p>
+          )}
         </div>
 
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Día del viaje</p>
-        <input
-          type="date"
-          value={selectedDate}
-          min={minDate}
-          max={maxDate}
-          onChange={e => setSelectedDate(e.target.value)}
-          className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary mb-1"
-        />
-        {selectedDate && !isAllowed(selectedDate) && (
-          <p className="text-xs text-red-500 mb-2">Esa fecha está fuera del viaje</p>
-        )}
-        {tripDates.size > 0 && (
-          <p className="text-xs text-muted-foreground mb-4">Solo puedes seleccionar fechas dentro del viaje</p>
-        )}
-
-        <div className="flex gap-3 mt-4">
-          <button onClick={onSkip} className="flex-1 py-2.5 border border-border rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary/50">
-            Ahora no
+        {/* Buttons — always visible */}
+        <div className="flex gap-3 px-5 pb-5">
+          <button
+            onClick={onUndo}
+            className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+          >
+            Deshacer
           </button>
           <button
-            onClick={() => isAllowed(selectedDate) && selectedDate && onAssign(selectedDate)}
-            disabled={!selectedDate || !isAllowed(selectedDate)}
-            className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40">
-            Asignar día
+            onClick={() => {
+              if (selectedDate && isAllowed(selectedDate)) {
+                onAssign(selectedDate);
+              } else {
+                onSkip();
+              }
+            }}
+            className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold transition-colors"
+          >
+            {selectedDate && isAllowed(selectedDate) ? 'Confirmar' : 'Ahora no'}
           </button>
         </div>
       </div>
@@ -1577,6 +1595,10 @@ export default function Restaurants() {
             setAssignDateSpot(null);
           }}
           onSkip={() => setAssignDateSpot(null)}
+          onUndo={async () => {
+            if (assignDateSpot?.id) await deleteMutation.mutateAsync(assignDateSpot.id);
+            setAssignDateSpot(null);
+          }}
         />
       )}
 
