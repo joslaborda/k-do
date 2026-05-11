@@ -898,9 +898,17 @@ function AssignDateModal({ spot, tripCities, onAssign, onSkip, onUndo }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40">
-      <div className="bg-white w-full max-w-md rounded-t-3xl flex flex-col" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
+      <div className="bg-white w-full max-w-md rounded-t-3xl flex flex-col relative" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
         <div className="p-5">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+
+          {/* Close button */}
+          <button
+            onClick={onSkip}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
           {/* Saved confirmation */}
           <div className="flex items-center gap-3 mb-5">
