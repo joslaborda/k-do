@@ -13,8 +13,8 @@ const tripNavItems = [
   { name: 'Docs', page: 'Documents', icon: FileText },
   { name: 'Spots', page: 'Restaurants', icon: Compass },
   { name: 'Gastos', page: 'Expenses', icon: Receipt },
-  { name: 'Útil', page: 'Utilities', icon: Info },
   { name: 'Traducir', page: 'Translator', icon: Languages },
+  { name: 'Útil', page: 'Utilities', icon: Info },
 ];
 
 // Items del nav global (fuera del trip)

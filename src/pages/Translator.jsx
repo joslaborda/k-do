@@ -2,7 +2,7 @@ import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef } from 'react';
 import {
   Languages, ArrowRightLeft, Copy, Check, Volume2, Loader2,
-  ChevronDown, Mic, MicOff, AlertCircle
+  ChevronDown, Mic, MicOff, AlertCircle, ChevronLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getPhrasesForCountry } from '@/lib/phrasesDB';
+import { Link } from 'react-router-dom';
 
 const CAT_ICONS = {
   'Basicas':'👋','Básicas':'👋','Restaurante':'🍽️','Direcciones':'🗺️',
@@ -18,7 +19,6 @@ const CAT_ICONS = {
   'Hoteles':'🏨','Ocio':'🎭','Social':'🥂',
 };
 
-// Idiomas disponibles — todos seleccionables
 const LANGUAGES = [
   { code: 'es', bcp: 'es-ES', label: 'Español', flag: '🇪🇸' },
   { code: 'en', bcp: 'en-US', label: 'Inglés', flag: '🇬🇧' },
@@ -60,9 +60,7 @@ function speakText(text, bcpLang) {
   window.speechSynthesis.speak(utt);
 }
 
-// ── Selector de idioma ────────────────────────────────────────────────────────
 function LangSelector({ value, onChange, label }) {
-  const lang = LANGUAGES.find(l => l.code === value) || LANGUAGES[0];
   return (
     <div className="flex-1 min-w-0">
       <p className="text-xs text-muted-foreground mb-1.5 text-center">{label}</p>
@@ -79,14 +77,12 @@ function LangSelector({ value, onChange, label }) {
   );
 }
 
-// ── Botón de voz ──────────────────────────────────────────────────────────────
 function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, onError, autoSpeak }) {
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
   const recognitionRef = useRef(null);
 
   const handlePress = () => {
-    // Si ya está grabando, parar
     if (isActive && recognitionRef.current) {
       recognitionRef.current.stop();
       recognitionRef.current = null;
@@ -97,7 +93,7 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { onError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.'); return; }
 
-    onError(''); // limpiar error previo
+    onError('');
     const recognition = new SR();
     recognitionRef.current = recognition;
     recognition.lang = fromL.bcp;
@@ -105,20 +101,15 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
     recognition.interimResults = false;
 
     recognition.onstart = () => onActivate(true);
-    recognition.onend = () => {
-      recognitionRef.current = null;
-      onActivate(false);
-    };
-
+    recognition.onend = () => { recognitionRef.current = null; onActivate(false); };
     recognition.onerror = (e) => {
       recognitionRef.current = null;
       onActivate(false);
-      if (e.error === 'not-allowed') onError('Permiso de micrófono denegado. Actívalo en los ajustes del navegador.');
+      if (e.error === 'not-allowed') onError('Permiso de micrófono denegado.');
       else if (e.error === 'no-speech') onError('No se detectó voz. Habla más cerca del micrófono.');
-      else if (e.error === 'aborted') return; // parada manual, no es error
+      else if (e.error === 'aborted') return;
       else onError('Error al grabar. Inténtalo de nuevo.');
     };
-
     recognition.onresult = async (e) => {
       const text = e.results[0][0].transcript;
       try {
@@ -129,13 +120,10 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
         onError('No se pudo traducir. Comprueba tu conexión.');
       }
     };
-
-    try {
-      recognition.start();
-    } catch (e) {
+    try { recognition.start(); } catch {
       recognitionRef.current = null;
       onActivate(false);
-      onError('No se pudo iniciar el micrófono. Inténtalo de nuevo.');
+      onError('No se pudo iniciar el micrófono.');
     }
   };
 
@@ -143,15 +131,11 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
     <button
       onClick={handlePress}
       className={"flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all w-full " +
-        (isActive
-          ? "bg-orange-700 border-orange-600"
-          : "bg-white border-border hover:border-orange-300 hover:bg-orange-50")}
+        (isActive ? "bg-orange-700 border-orange-600" : "bg-white border-border hover:border-orange-300 hover:bg-orange-50")}
     >
       <div className={"w-16 h-16 rounded-full flex items-center justify-center transition-all " +
         (isActive ? "bg-white/20" : "bg-orange-100")}>
-        {isActive
-          ? <MicOff className="w-7 h-7 text-white" />
-          : <Mic className="w-7 h-7 text-orange-700" />}
+        {isActive ? <MicOff className="w-7 h-7 text-white" /> : <Mic className="w-7 h-7 text-orange-700" />}
       </div>
       {isActive ? (
         <div className="flex items-end gap-1 h-6">
@@ -172,19 +156,17 @@ function VoiceButton({ label, fromLang, toLang, isActive, onActivate, onResult, 
   );
 }
 
-// ── Panel principal ───────────────────────────────────────────────────────────
 export function TranslatorPanel({ tripId }) {
   const { trip, activeCity } = useTripContext(tripId);
   const countryRaw = activeCity?.country || trip?.country || '';
   const meta = getCountryMeta(countryRaw);
 
-  // Detectar idioma del país destino
   const tripLangCode = meta.languageCode?.split('-')[0] || 'en';
   const tripLang = LANGUAGES.find(l => l.code === tripLangCode) ? tripLangCode : 'en';
 
   const [fromLang, setFromLang] = useState('es');
   const [toLang, setToLang]     = useState(tripLang);
-  const [activeBtn, setActiveBtn] = useState(null); // null | 'me' | 'them'
+  const [activeBtn, setActiveBtn] = useState(null);
   const [original, setOriginal]   = useState('');
   const [translated, setTranslated] = useState('');
   const [voiceError, setVoiceError] = useState('');
@@ -194,46 +176,30 @@ export function TranslatorPanel({ tripId }) {
   const [copiedId, setCopiedId] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
 
-  // Update toLang when trip destination changes
   useEffect(() => { setToLang(tripLang); }, [tripLang]);
 
   const voiceSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-
   const phrasePack = countryRaw ? getPhrasesForCountry(countryRaw) : null;
   const categories = phrasePack?.categories || [];
   const totalPhrases = categories.reduce((n, c) => n + (c.items?.length || 0), 0);
 
   const handleVoiceResult = (text, translation) => {
-    setVoiceError('');
-    setOriginal(text);
-    setTranslated(translation);
-    setInputText('');
+    setVoiceError(''); setOriginal(text); setTranslated(translation); setInputText('');
   };
 
   const handleSwap = () => {
-    setFromLang(toLang);
-    setToLang(fromLang);
-    setOriginal('');
-    setTranslated('');
-    setInputText('');
-    setTranslateError('');
+    setFromLang(toLang); setToLang(fromLang);
+    setOriginal(''); setTranslated(''); setInputText(''); setTranslateError('');
   };
 
   const handleTranslate = async () => {
     if (!inputText.trim()) return;
-    setIsTranslating(true);
-    setTranslateError('');
-    setOriginal('');
-    setTranslated('');
+    setIsTranslating(true); setTranslateError(''); setOriginal(''); setTranslated('');
     try {
       const result = await translateWithMyMemory(inputText, fromLang, toLang);
-      setOriginal(inputText);
-      setTranslated(result);
-    } catch {
-      setTranslateError('No se pudo traducir. Comprueba tu conexión.');
-    } finally {
-      setIsTranslating(false);
-    }
+      setOriginal(inputText); setTranslated(result);
+    } catch { setTranslateError('No se pudo traducir. Comprueba tu conexión.'); }
+    finally { setIsTranslating(false); }
   };
 
   const copyToClipboard = (text, id) => {
@@ -246,20 +212,18 @@ export function TranslatorPanel({ tripId }) {
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
   return (
-    <Tabs defaultValue="translator" className="space-y-6">
-      <TabsList className="bg-white border border-border p-1">
-        <TabsTrigger value="translator" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+    <Tabs defaultValue="translator" className="space-y-4">
+      <TabsList className="bg-white border border-border p-1 rounded-xl">
+        <TabsTrigger value="translator" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white rounded-lg">
           🔄 Traductor
         </TabsTrigger>
-        <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+        <TabsTrigger value="phrases" className="data-[state=active]:bg-orange-700 data-[state=active]:text-white rounded-lg">
           📖 Frases{totalPhrases > 0 && <span className="ml-1.5 text-xs opacity-70">({totalPhrases})</span>}
         </TabsTrigger>
       </TabsList>
 
       {/* ── TAB TRADUCTOR ── */}
-      <TabsContent value="translator" className="space-y-4">
-
-        {/* Selector de idiomas */}
+      <TabsContent value="translator" className="space-y-4 mt-0">
         <div className="bg-white rounded-2xl border border-border p-4 shadow-sm">
           <div className="flex items-end gap-3">
             <LangSelector value={fromLang} onChange={setFromLang} label="De" />
@@ -271,29 +235,14 @@ export function TranslatorPanel({ tripId }) {
           </div>
         </div>
 
-        {/* Dos micrófonos */}
         {voiceSupported ? (
           <div className="grid grid-cols-2 gap-3">
-            <VoiceButton
-              label="Hablo yo"
-              fromLang={fromLang}
-              toLang={toLang}
-              isActive={activeBtn === 'me'}
-              onActivate={v => setActiveBtn(v ? 'me' : null)}
-              onResult={handleVoiceResult}
-              onError={setVoiceError}
-              autoSpeak={true}
-            />
-            <VoiceButton
-              label="Me hablan"
-              fromLang={toLang}
-              toLang={fromLang}
-              isActive={activeBtn === 'them'}
-              onActivate={v => setActiveBtn(v ? 'them' : null)}
-              onResult={handleVoiceResult}
-              onError={setVoiceError}
-              autoSpeak={false}
-            />
+            <VoiceButton label="Hablo yo" fromLang={fromLang} toLang={toLang}
+              isActive={activeBtn === 'me'} onActivate={v => setActiveBtn(v ? 'me' : null)}
+              onResult={handleVoiceResult} onError={setVoiceError} autoSpeak={true} />
+            <VoiceButton label="Me hablan" fromLang={toLang} toLang={fromLang}
+              isActive={activeBtn === 'them'} onActivate={v => setActiveBtn(v ? 'them' : null)}
+              onResult={handleVoiceResult} onError={setVoiceError} autoSpeak={false} />
           </div>
         ) : (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
@@ -302,16 +251,13 @@ export function TranslatorPanel({ tripId }) {
           </div>
         )}
 
-
-        {/* Aviso PWA iOS */}
         {/iphone|ipad|ipod/i.test(navigator.userAgent) && window.navigator.standalone && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-            <p className="text-xs text-amber-800">Para usar el micrófono, abre Kōdo en <strong>Safari</strong> en lugar de desde el icono del Home Screen.</p>
+            <p className="text-xs text-amber-800">Para usar el micrófono, abre Kōdo en <strong>Safari</strong>.</p>
           </div>
         )}
 
-        {/* Error de voz */}
         {voiceError && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
@@ -319,7 +265,6 @@ export function TranslatorPanel({ tripId }) {
           </div>
         )}
 
-        {/* Resultado */}
         {(original || translated) && (
           <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
             {original && (
@@ -347,7 +292,6 @@ export function TranslatorPanel({ tripId }) {
           </div>
         )}
 
-        {/* Caja de texto */}
         <div className="bg-white rounded-2xl border border-border shadow-sm p-4">
           <p className="text-xs text-muted-foreground mb-2">O escribe:</p>
           <div className="relative">
@@ -377,7 +321,7 @@ export function TranslatorPanel({ tripId }) {
       </TabsContent>
 
       {/* ── TAB FRASES ── */}
-      <TabsContent value="phrases" className="space-y-4">
+      <TabsContent value="phrases" className="space-y-4 mt-0">
         {categories.length === 0 ? (
           <div className="bg-white rounded-2xl border border-border p-10 text-center shadow-sm">
             <div className="text-4xl mb-3">🔍</div>
@@ -395,13 +339,13 @@ export function TranslatorPanel({ tripId }) {
                 onOpenChange={() => setExpandedCategories(p => ({ ...p, [category.name]: !p[category.name] }))}
               >
                 <div className="border border-border rounded-2xl overflow-hidden shadow-sm">
-                  <CollapsibleTrigger className="bg-orange-100 px-6 py-4 text-left w-full flex items-center justify-between hover:bg-orange-200/60 transition-colors">
+                  <CollapsibleTrigger className="bg-orange-50 px-5 py-4 text-left w-full flex items-center justify-between hover:bg-orange-100/60 transition-colors">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{CAT_ICONS[category.name] || '💬'}</span>
+                      <span className="text-xl">{CAT_ICONS[category.name] || '💬'}</span>
                       <span className="text-orange-800 font-semibold">{category.name}</span>
-                      <span className="text-orange-600 text-xs">({category.items?.length})</span>
+                      <span className="text-orange-500 text-xs bg-orange-100 px-2 py-0.5 rounded-full">{category.items?.length}</span>
                     </div>
-                    <ChevronDown className={"w-5 h-5 text-orange-600 transition-transform " + (expandedCategories[category.name] !== false ? 'rotate-180' : '')} />
+                    <ChevronDown className={"w-4 h-4 text-orange-600 transition-transform " + (expandedCategories[category.name] !== false ? 'rotate-180' : '')} />
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="divide-y divide-border/50">
@@ -409,20 +353,20 @@ export function TranslatorPanel({ tripId }) {
                         <div key={idx} className="bg-white px-5 py-4 hover:bg-orange-50/50 group">
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-muted-foreground">{phrase.source}</p>
-                              <p className="text-base font-semibold text-foreground mt-0.5">{phrase.target}</p>
+                              <p className="text-xs text-muted-foreground">{phrase.source}</p>
+                              <p className="text-sm font-semibold text-foreground mt-0.5">{phrase.target}</p>
                               {phrase.romanization && (
-                                <p className="text-xs text-orange-600 italic mt-1">{phrase.romanization}</p>
+                                <p className="text-xs text-orange-500 italic mt-0.5">{phrase.romanization}</p>
                               )}
                             </div>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                              <Button variant="ghost" size="icon" onClick={() => speakText(phrase.target, meta.languageCode || 'en')}>
-                                <Volume2 className="w-4 h-4 text-orange-500" />
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => speakText(phrase.target, meta.languageCode || 'en')}>
+                                <Volume2 className="w-3.5 h-3.5 text-orange-500" />
                               </Button>
-                              <Button variant="ghost" size="icon" onClick={() => copyToClipboard(phrase.target, `${category.name}-${idx}`)}>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(phrase.target, `${category.name}-${idx}`)}>
                                 {copiedId === `${category.name}-${idx}`
-                                  ? <Check className="w-4 h-4 text-green-500" />
-                                  : <Copy className="w-4 h-4 text-muted-foreground" />}
+                                  ? <Check className="w-3.5 h-3.5 text-green-500" />
+                                  : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
                               </Button>
                             </div>
                           </div>
@@ -451,18 +395,29 @@ export default function Translator() {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <a href={createPageUrl('TripsList')} className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-3"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Mis viajes</a>
-          <h1 className="text-white text-4xl font-bold">Traductor {meta.flag || '🌍'}</h1>
-          <p className="text-white/90 mt-2">
-            {countryRaw
-              ? `${meta.languageLabel || 'idioma local'} · ${countryRaw}`
-              : 'Habla con cualquier persona en tu viaje'}
-          </p>
+      {/* Sticky header */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+          <Link
+            to={createPageUrl(`Home?trip_id=${tripId}`)}
+            className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Languages className="w-5 h-5 text-orange-700 flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base font-bold text-foreground leading-tight">Traductor {meta.flag || '🌍'}</h1>
+              {countryRaw && (
+                <p className="text-xs text-muted-foreground truncate">{meta.languageLabel || 'idioma local'} · {countryRaw}</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="bg-orange-50 mx-auto px-4 pt-6 pb-12 max-w-2xl -mt-12">
+
+      {/* Content */}
+      <div className="max-w-2xl mx-auto px-4 pt-5 pb-24">
         <TranslatorPanel tripId={tripId} />
       </div>
     </div>
