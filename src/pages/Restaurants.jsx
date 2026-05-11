@@ -776,10 +776,28 @@ function MySpotRow({ spot, onTap, userId }) {
 }
 
 // ── Spot detail bottom sheet ──────────────────────────────────────────────────
-function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
+function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities }) {
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
-  const queryClient = useQueryClient();
+
+  // Build trip day options from cities — must be before early return
+  const tripDayOptions = useMemo(() => {
+    const days = [];
+    const sorted = [...(tripCities || [])].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+    sorted.forEach(c => {
+      if (c.start_date && c.end_date) {
+        let d = new Date(c.start_date);
+        const end = new Date(c.end_date);
+        while (d <= end) {
+          days.push({ date: d.toISOString().slice(0, 10), city: c.name });
+          d.setDate(d.getDate() + 1);
+        }
+      }
+    });
+    return days;
+  }, [tripCities]);
+
+  const hasTripDays = tripDayOptions.length > 0;
 
   useEffect(() => {
     if (spot) {
@@ -790,7 +808,6 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
 
   if (!open || !spot) return null;
 
-  const { data: comments = [] } = { data: [] }; // placeholder, SpotCard handles comments
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
 
   const handleSave = () => {
@@ -833,25 +850,28 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
             />
           </div>
 
-          {/* Date + Time row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Día</p>
+          {/* Day assignment — trip days only */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Día del viaje</p>
+            {hasTripDays ? (
+              <select
+                value={assignedDate}
+                onChange={e => setAssignedDate(e.target.value)}
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+              >
+                <option value="">Sin asignar</option>
+                {tripDayOptions.map(d => (
+                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                ))}
+              </select>
+            ) : (
               <input
                 type="date"
                 value={assignedDate}
                 onChange={e => setAssignedDate(e.target.value)}
                 className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
               />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
-              <input
-                type="time"
-                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
-                placeholder="--:--"
-              />
-            </div>
+            )}
           </div>
 
           {/* Delete */}
@@ -874,7 +894,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId }) {
 }
 
 // ── Assign date modal (shown after saving a spot) ─────────────────────────────
-function AssignDateModal({ spot, tripCities, onAssign, onSkip, onUndo }) {
+function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const [selectedDate, setSelectedDate] = useState('');
 
   const tripDates = useMemo(() => {
@@ -921,18 +941,42 @@ function AssignDateModal({ spot, tripCities, onAssign, onSkip, onUndo }) {
             </div>
           </div>
 
-          {/* Date picker */}
+          {/* Date picker — trip days only */}
           <p className="text-sm font-semibold text-foreground mb-2">¿Cuándo quieres visitar este spot?</p>
-          <input
-            type="date"
-            value={selectedDate}
-            min={minDate}
-            max={maxDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary mb-1"
-          />
-          {selectedDate && !isAllowed(selectedDate) && (
-            <p className="text-xs text-red-500 mt-1">Esa fecha está fuera del viaje</p>
+          {tripDates.size > 0 ? (
+            <select
+              value={selectedDate}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+            >
+              <option value="">Sin asignar</option>
+              {(() => {
+                const days = [];
+                const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+                sorted.forEach(c => {
+                  if (c.start_date && c.end_date) {
+                    let d = new Date(c.start_date);
+                    const end = new Date(c.end_date);
+                    while (d <= end) {
+                      days.push({ date: d.toISOString().slice(0, 10), city: c.name });
+                      d.setDate(d.getDate() + 1);
+                    }
+                  }
+                });
+                return days.map(d => (
+                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                ));
+              })()}
+            </select>
+          ) : (
+            <input
+              type="date"
+              value={selectedDate}
+              min={minDate}
+              max={maxDate}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+            />
           )}
         </div>
 
@@ -1590,6 +1634,7 @@ export default function Restaurants() {
           onSave={(id, data) => updateMutation.mutate({ id, data })}
           onDelete={id => deleteMutation.mutate(id)}
           tripId={tripId}
+          tripCities={tripCities}
         />
       )}
 

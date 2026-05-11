@@ -294,7 +294,7 @@ export default function Documents() {
             <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
           </DialogHeader>
           <div className="px-5 py-4">
-            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles}
+            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
           </div>
         </DialogContent>
@@ -308,7 +308,7 @@ export default function Documents() {
           </DialogHeader>
           {editDoc && (
             <div className="px-5 py-4">
-              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles}
+              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
                 initialData={editDoc}
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
                 onCancel={() => setEditDoc(null)} saving={updateMutation.isPending} />

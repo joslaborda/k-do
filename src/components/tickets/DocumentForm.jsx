@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,7 +54,10 @@ const FIELD_PLACEHOLDERS = {
   notes: 'Notas adicionales...',
 };
 
-export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, onSave, onCancel, saving }) {
+// Personal categories that should NOT restrict to trip dates
+const PERSONAL_CATEGORIES = ['personal'];
+
+export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, onSave, onCancel, saving }) {
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
@@ -72,6 +75,26 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
     file_url:    initialData?.file_url    || '',
     city_id:     initialData?.city_id     || '',
   });
+
+  // Build trip day options from tripCities prop
+  const tripDayOptions = useMemo(() => {
+    const days = [];
+    const sorted = [...(tripCities || [])].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+    sorted.forEach(c => {
+      if (c.start_date && c.end_date) {
+        let d = new Date(c.start_date);
+        const end = new Date(c.end_date);
+        while (d <= end) {
+          days.push({ date: d.toISOString().slice(0, 10), city: c.name });
+          d.setDate(d.getDate() + 1);
+        }
+      }
+    });
+    return days;
+  }, [tripCities]);
+
+  const isPersonalCategory = PERSONAL_CATEGORIES.includes(category);
+  const useTripDays = !isPersonalCategory && tripDayOptions.length > 0;
 
   const showFields = SHOW_FIELDS[category] || SHOW_FIELDS.other;
   const hasField   = (f) => showFields.includes(f);
@@ -173,7 +196,20 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
           {hasField('date') && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha *</p>
-              <Input type="date" value={fields.date} onChange={e => setField('date', e.target.value)} className="h-10 text-sm" />
+              {useTripDays ? (
+                <select
+                  value={fields.date}
+                  onChange={e => setField('date', e.target.value)}
+                  className="w-full h-10 border border-border rounded-md px-3 text-sm outline-none focus:border-primary bg-input"
+                >
+                  <option value="">Seleccionar día</option>
+                  {tripDayOptions.map(d => (
+                    <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                  ))}
+                </select>
+              ) : (
+                <Input type="date" value={fields.date} onChange={e => setField('date', e.target.value)} className="h-10 text-sm" />
+              )}
             </div>
           )}
           {hasField('time') && (
