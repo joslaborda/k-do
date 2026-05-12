@@ -835,6 +835,7 @@ function MySpotRow({ spot, onTap, userId }) {
 
 // ── Spot detail bottom sheet ──────────────────────────────────────────────────
 function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId }) {
+  const queryClient = useQueryClient();
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
   const [assignedTime, setAssignedTime] = useState(spot?.assigned_time || '');
@@ -883,10 +884,17 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave(spot.id, { notes, assigned_date: assignedDate || null, assigned_time: assignedTime || null });
+      await base44.entities.Spot.update(spot.id, {
+        notes,
+        assigned_date: assignedDate || null,
+        assigned_time: assignedTime || null,
+      });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      onClose();
+    } catch (e) {
+      alert('Error al guardar: ' + e.message);
     } finally {
       setSaving(false);
-      onClose();
     }
   };
 
