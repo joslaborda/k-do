@@ -834,10 +834,20 @@ function MySpotRow({ spot, onTap, userId }) {
 }
 
 // ── Spot detail bottom sheet ──────────────────────────────────────────────────
-function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities }) {
+function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId }) {
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
   const [assignedTime, setAssignedTime] = useState(spot?.assigned_time || '');
+  const [saving, setSaving] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId);
+  const isReal = spot?.id && !String(spot?.id || '').startsWith('seed_');
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot?.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    enabled: !!spot?.id && isReal,
+    staleTime: 30000,
+  });
 
   // Build trip day options from cities — must be before early return
   const tripDayOptions = useMemo(() => {
@@ -870,12 +880,18 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
 
-  const handleSave = () => {
-    onSave(spot.id, { notes, assigned_date: assignedDate || null, assigned_time: assignedTime || null });
-    onClose();
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave(spot.id, { notes, assigned_date: assignedDate || null, assigned_time: assignedTime || null });
+    } finally {
+      setSaving(false);
+      onClose();
+    }
   };
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
@@ -953,15 +969,41 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
           </button>
         </div>
 
+        {/* Like / Comentar row */}
+        <div className="flex-shrink-0 flex border-t border-border">
+          <button
+            onClick={e => { e.stopPropagation(); toggleLike(); }}
+            className="flex-1 flex items-center justify-center gap-2 py-3 hover:bg-secondary/30 transition-colors text-sm"
+          >
+            {isLiked
+              ? <svg width="17" height="17" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            }
+            <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>Like{likeCount > 0 ? ` · ${likeCount}` : ''}</span>
+          </button>
+          <div className="w-px bg-border" />
+          {isReal && (
+            <button
+              onClick={e => { e.stopPropagation(); setShowComments(true); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 hover:bg-secondary/30 transition-colors text-sm text-muted-foreground"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Comentar{comments.length > 0 ? ` · ${comments.length}` : ''}
+            </button>
+          )}
+        </div>
+
         {/* Sticky footer buttons */}
         <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
-          <Button onClick={handleSave} className="flex-1 bg-primary hover:bg-primary/90 text-white">
-            Guardar cambios
+          <Button onClick={handleSave} disabled={saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
+            {saving ? 'Guardando...' : 'Guardar cambios'}
           </Button>
         </div>
       </div>
     </div>
+    {showComments && isReal && <InlineCommentsPopup spot={spot} userId={userId} onClose={() => setShowComments(false)} />}
+    </>
   );
 }
 
@@ -1703,10 +1745,11 @@ export default function Restaurants() {
           spot={selectedSpot}
           open={!!selectedSpot}
           onClose={() => setSelectedSpot(null)}
-          onSave={(id, data) => updateMutation.mutate({ id, data })}
+          onSave={(id, data) => updateMutation.mutateAsync({ id, data })}
           onDelete={id => deleteMutation.mutate(id)}
           tripId={tripId}
           tripCities={tripCities}
+          userId={user?.id}
         />
       )}
 
