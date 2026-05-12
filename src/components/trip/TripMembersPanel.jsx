@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPlus, Mail, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { UserPlus, Mail, Clock, CheckCircle, XCircle, Trash2, Phone } from 'lucide-react';
 
 const ROLE_LABELS = { admin: 'Admin', editor: 'Editor', viewer: 'Solo ver' };
 const ROLE_COLORS = { admin: 'bg-orange-100 text-orange-700', editor: 'bg-blue-100 text-blue-700', viewer: 'bg-gray-100 text-gray-600' };
@@ -13,6 +13,8 @@ const STATUS_COLOR = { pending: 'text-yellow-600', accepted: 'text-green-600', d
 
 export default function TripMembersPanel({ trip, currentUserEmail }) {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [inviteMode, setInviteMode] = useState('email'); // 'email' | 'phone'
   const [role, setRole] = useState('viewer');
   const queryClient = useQueryClient();
 
@@ -32,29 +34,45 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
     queryFn: () => base44.entities.User.list(),
   });
 
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['allProfiles'],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 60000,
+  });
+
   const userMap = usersData.reduce((m, u) => { m[u.email] = u.full_name || u.email; return m; }, {});
+  // Map email → avatar via UserProfile
+  const profileByEmail = useMemo(() => {
+    const map = {};
+    usersData.forEach(u => {
+      const profile = allProfiles.find(p => p.user_id === u.id);
+      if (profile) map[u.email] = profile;
+    });
+    return map;
+  }, [usersData, allProfiles]);
 
   const inviteMutation = useMutation({
-    mutationFn: async ({ email: inv_email, role: inv_role }) => {
-      // Check not already member
-      if (members.includes(inv_email)) throw new Error('Ya es miembro');
-      // Check not already invited
-      const existing = invites.find((i) => i.email === inv_email && i.status === 'pending');
-      if (existing) throw new Error('Ya hay una invitación pendiente');
-      // Create invite
-      await base44.entities.TripInvite.create({
-        trip_id: tripId,
-        email: inv_email,
-        role: inv_role,
-        status: 'pending',
-        invited_by: currentUserEmail,
-      });
-      // Also invite via platform
-      await base44.users.inviteUser(inv_email, inv_role === 'admin' ? 'admin' : 'user').catch(() => {});
+    mutationFn: async ({ email: inv_email, phone: inv_phone, role: inv_role, mode }) => {
+      if (mode === 'email') {
+        if (members.includes(inv_email)) throw new Error('Ya es miembro');
+        const existing = invites.find((i) => i.email === inv_email && i.status === 'pending');
+        if (existing) throw new Error('Ya hay una invitación pendiente');
+        await base44.entities.TripInvite.create({
+          trip_id: tripId, email: inv_email, role: inv_role,
+          status: 'pending', invited_by: currentUserEmail,
+        });
+        await base44.users.inviteUser(inv_email, inv_role === 'admin' ? 'admin' : 'user').catch(() => {});
+      } else {
+        // Phone invite — open WhatsApp with trip link
+        const tripUrl = `${window.location.origin}/Restaurants?trip_id=${tripId}`;
+        const msg = encodeURIComponent(`¡Hola! Te invito a unirte a mi viaje en Kōdo 🌍\nEntra aquí: ${tripUrl}`);
+        const cleanPhone = inv_phone.replace(/\s+/g, '').replace(/^00/, '+');
+        window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invites', tripId] });
-      setEmail('');
+      setEmail(''); setPhone('');
     },
   });
 
@@ -87,7 +105,8 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
   });
 
   const pendingInvites = invites.filter((i) => i.status === 'pending');
-  const canInvite = isAdmin && email.trim() && email.includes('@');
+  const canInviteEmail = isAdmin && email.trim() && email.includes('@');
+  const canInvitePhone = isAdmin && phone.trim().length >= 7;
 
   return (
     <div className="space-y-6">
@@ -101,9 +120,13 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
             const isCreator = trip?.created_by === memberEmail;
             return (
               <div key={memberEmail} className="flex items-center gap-3 bg-white rounded-xl p-3 border border-border">
-                <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-bold text-sm">
-                  {(userMap[memberEmail] || memberEmail)[0].toUpperCase()}
-                </div>
+                {profileByEmail[memberEmail]?.avatar_url ? (
+                  <img src={profileByEmail[memberEmail].avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-bold text-sm flex-shrink-0">
+                    {(userMap[memberEmail] || memberEmail)[0].toUpperCase()}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
                     {userMap[memberEmail] || memberEmail}
@@ -169,32 +192,70 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <UserPlus className="w-4 h-4" /> Invitar persona
           </h3>
-          <div className="flex gap-2">
-            <Input
-              placeholder="email@ejemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value.trim())}
-              className="flex-1 bg-white border-border text-sm"
-              onKeyDown={(e) => e.key === 'Enter' && canInvite && inviteMutation.mutate({ email, role })}
-            />
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="w-28 bg-white border-border text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="editor">Editor</SelectItem>
-                <SelectItem value="viewer">Solo ver</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={() => inviteMutation.mutate({ email, role })}
-              disabled={!canInvite || inviteMutation.isPending}
-              className="bg-orange-700 hover:bg-orange-800 text-sm"
+          {/* Mode toggle */}
+          <div className="flex rounded-xl border border-orange-200 overflow-hidden mb-3 bg-white">
+            <button
+              onClick={() => setInviteMode('email')}
+              className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${inviteMode === 'email' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
             >
-              {inviteMutation.isPending ? '...' : 'Invitar'}
-            </Button>
+              <Mail className="w-3.5 h-3.5" /> Email
+            </button>
+            <button
+              onClick={() => setInviteMode('phone')}
+              className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${inviteMode === 'phone' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
+            >
+              <Phone className="w-3.5 h-3.5" /> WhatsApp
+            </button>
           </div>
+
+          {inviteMode === 'email' ? (
+            <div className="flex gap-2">
+              <Input
+                placeholder="email@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim())}
+                className="flex-1 bg-white border-border text-sm"
+                onKeyDown={(e) => e.key === 'Enter' && canInviteEmail && inviteMutation.mutate({ email, role, mode: 'email' })}
+              />
+              <Select value={role} onValueChange={setRole}>
+                <SelectTrigger className="w-24 bg-white border-border text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="viewer">Solo ver</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={() => inviteMutation.mutate({ email, role, mode: 'email' })}
+                disabled={!canInviteEmail || inviteMutation.isPending}
+                className="bg-orange-700 hover:bg-orange-800 text-sm"
+              >
+                {inviteMutation.isPending ? '...' : 'Invitar'}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Input
+                placeholder="+34 612 345 678"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="bg-white border-border text-sm"
+                type="tel"
+              />
+              <p className="text-xs text-muted-foreground">Se abrirá WhatsApp con un mensaje de invitación</p>
+              <Button
+                onClick={() => inviteMutation.mutate({ phone, role, mode: 'phone' })}
+                disabled={!canInvitePhone || inviteMutation.isPending}
+                className="w-full bg-green-600 hover:bg-green-700 text-sm gap-2"
+              >
+                <Phone className="w-3.5 h-3.5" />
+                Enviar por WhatsApp
+              </Button>
+            </div>
+          )}
+
           {inviteMutation.isError && (
             <p className="text-xs text-destructive mt-2">{inviteMutation.error?.message}</p>
           )}
