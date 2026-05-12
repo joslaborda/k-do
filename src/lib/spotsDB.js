@@ -375,6 +375,57 @@ export const SEED_SPOTS = {
     ],
   },
 
+  'Costa Rica': {
+    'San José': [
+      { title:'Mercado Central de San José', type:'food', address:'Av. Central, San José', lat:9.9330, lng:-84.0780, notes:'El mercado más auténtico del centro. Casado, gallo pinto y café costarricense a precios locales.', tags:['mercado','casado','local'], price:'low', best_time:'mediodía', visits:678 },
+      { title:'Barrio Escalante', type:'sight', address:'Barrio Escalante, San José', lat:9.9378, lng:-84.0605, notes:'El barrio más trendy de San José. Cafés de especialidad, galerías de arte y restaurantes modernos.', tags:['barrio','café','restaurantes'], price:'mid', best_time:'tarde', visits:534 },
+      { title:'Museo del Jade', type:'sight', address:'Av. Central 13, San José', lat:9.9347, lng:-84.0783, notes:'La colección de jade precolombino más grande del mundo. Arquitectura espectacular del edificio.', tags:['jade','precolombino','museo'], price:'mid', best_time:'mañana', visits:423 },
+      { title:'Teatro Nacional', type:'sight', address:'Av. 2, Calle 3, San José', lat:9.9322, lng:-84.0787, notes:'El edificio más emblemático de Costa Rica. Visitar la cafetería del siglo XIX es imprescindible.', tags:['teatro','histórico','arquitectura'], price:'low', best_time:'tarde', visits:567 },
+      { title:'Boulangerie Le Monastère', type:'food', address:'Barrio Escalante, San José', lat:9.9383, lng:-84.0598, notes:'La mejor panadería de San José. Croissants y panes artesanales en ambiente tranquilo.', tags:['panadería','croissant','café'], price:'mid', best_time:'mañana', visits:345 },
+      { title:'Museo Nacional de Costa Rica', type:'sight', address:'Calle 17, San José', lat:9.9297, lng:-84.0757, notes:'El museo más importante del país en un antiguo cuartel. El jardín de mariposas es encantador.', tags:['museo','mariposas','histórico'], price:'mid', best_time:'mañana', visits:489 },
+    ],
+    'La Fortuna / Arenal': [
+      { title:'Volcán Arenal', type:'sight', address:'Parque Nacional Volcán Arenal', lat:10.4629, lng:-84.7032, notes:'El volcán más activo de Costa Rica. Las mejores vistas desde el sendero Las Coladas al atardecer.', tags:['volcán','imprescindible','senderismo'], price:'mid', best_time:'tarde', visits:1123 },
+      { title:'Aguas Termales Tabacón', type:'activity', address:'Route 142, Tabacón', lat:10.4780, lng:-84.7312, notes:'Aguas termales al pie del volcán. Los jardines nocturnos con el Arenal de fondo son mágicos.', tags:['termales','volcán','relajante'], price:'high', best_time:'noche', visits:867 },
+      { title:'Cascada La Fortuna', type:'activity', address:'La Fortuna, Alajuela', lat:10.4555, lng:-84.6508, notes:'Cascada de 70m en medio de la selva. Caminata de 30 min. El baño en la poza es refrescante.', tags:['cascada','selva','poza'], price:'low', best_time:'mañana', visits:934 },
+      { title:'Lago Arenal en kayak', type:'activity', address:'Lago Arenal, Alajuela', lat:10.4651, lng:-84.8196, notes:'Kayak en el lago artificial más grande de C.R. con el volcán de fondo. Amanecer increíble.', tags:['kayak','lago','volcán'], price:'mid', best_time:'mañana', visits:567 },
+      { title:'Puentes Colgantes de Arenal', type:'activity', address:'Arenal Hanging Bridges', lat:10.5024, lng:-84.7345, notes:'7 puentes colgantes en el dosel del bosque nuboso. Wildlife impresionante: tucanes, monos y perezosos.', tags:['puentes','dosel','wildlife'], price:'mid', best_time:'mañana', visits:712 },
+      { title:'Observatorio de Wildlife Nocturno', type:'activity', address:'La Fortuna, Alajuela', lat:10.4672, lng:-84.6419, notes:'Tour nocturno para ver ranas venenosas, perezosos y serpientes. Guías locales excelentes.', tags:['nocturno','ranas','wildlife'], price:'mid', best_time:'noche', visits:456 },
+      { title:'Restaurante Soda El Rio', type:'food', address:'La Fortuna, Alajuela', lat:10.4680, lng:-84.6414, notes:'La mejor soda local. Gallo pinto, casado y batidos de fruta tropical por menos de 8$.', tags:['soda','casado','gallo pinto'], price:'low', best_time:'mediodía', visits:423 },
+    ],
+    'Manuel Antonio': [
+      { title:'Parque Nacional Manuel Antonio', type:'activity', address:'Manuel Antonio National Park', lat:9.3888, lng:-84.1406, notes:'El parque más visitado de C.R. Monos cariblancos en la playa. Playa Espadilla Norte es espectacular.', tags:['parque','monos','playa'], price:'mid', best_time:'mañana', visits:1234 },
+      { title:'Playa Biesanz', type:'sight', address:'Playa Biesanz, Manuel Antonio', lat:9.3975, lng:-84.1483, notes:'La playa secreta de Manuel Antonio. Muy tranquila, aguas cristalinas y poca gente.', tags:['playa','secreta','cristalina'], price:'low', best_time:'mañana', visits:567 },
+      { title:'Snorkel en Playa Espadilla', type:'activity', address:'Playa Espadilla, Manuel Antonio', lat:9.3905, lng:-84.1382, notes:'Arrecifes coralinos con tortugas marinas y rayas. El equipo de snorkel se alquila en la playa.', tags:['snorkel','tortugas','coral'], price:'mid', best_time:'mañana', visits:456 },
+      { title:'Mirador del Pacífico', type:'sight', address:'Manuel Antonio, Puntarenas', lat:9.3978, lng:-84.1497, notes:'Vistas del Pacífico y las islas del Parque desde el mirador. El atardecer es espectacular.', tags:['mirador','Pacífico','sunset'], price:'low', best_time:'tarde', visits:612 },
+      { title:'Tarcoles - Cocodrilos', type:'activity', address:'Río Tárcoles, Garabito', lat:9.5733, lng:-84.5942, notes:'El puente donde ver 40+ cocodrilos bajo tus pies. De camino entre San José y Manuel Antonio.', tags:['cocodrilos','puente','wildlife'], price:'low', best_time:'mañana', visits:789 },
+    ],
+    'Monteverde': [
+      { title:'Reserva Biológica Bosque Nuboso', type:'activity', address:'Monteverde Cloud Forest', lat:10.3002, lng:-84.8063, notes:'El bosque nuboso más famoso del mundo. Quetzales, tucanes y orquídeas en 10.500 hectáreas.', tags:['nuboso','quetzal','orquídeas'], price:'high', best_time:'mañana', visits:934 },
+      { title:'Canopy Adventure', type:'activity', address:'Selvatura Park, Monteverde', lat:10.3083, lng:-84.8161, notes:'El mejor circuito de tirolinas de Costa Rica. 15 cables, puentes y rappel sobre el bosque nuboso.', tags:['tirolinas','canopy','adrenalina'], price:'high', best_time:'mañana', visits:812 },
+      { title:'Caminata Nocturna en Monteverde', type:'activity', address:'Monteverde, Puntarenas', lat:10.3002, lng:-84.8063, notes:'Descubrir el bosque nuboso de noche con guía. Perezosos, tapires y serpientes esmeralda.', tags:['nocturno','perezosos','wildlife'], price:'mid', best_time:'noche', visits:534 },
+      { title:'Fábrica de Café Monteverde', type:'activity', address:'Monteverde, Puntarenas', lat:10.2978, lng:-84.8017, notes:'Tour completo del café costarricense, del árbol a la taza. El café de altura de Monteverde es excelente.', tags:['café','tour','degustación'], price:'mid', best_time:'mañana', visits:456 },
+      { title:'Heladería Morpho Café', type:'food', address:'Monteverde, Puntarenas', lat:10.2989, lng:-84.8056, notes:'El café más bonito de Monteverde. Helados artesanales de frutas tropicales y ambiente de montaña.', tags:['helado','café','mariposas'], price:'low', best_time:'tarde', visits:345 },
+    ],
+    'Tortuguero': [
+      { title:'Tour de Desove de Tortugas Marinas', type:'activity', address:'Tortuguero National Park', lat:10.5432, lng:-83.5027, notes:'Ver el desove de tortugas verdes (julio-octubre) de noche con guía certificado. Experiencia única.', tags:['tortugas','desove','nocturno'], price:'mid', best_time:'noche', visits:867 },
+      { title:'Canales de Tortuguero en canoa', type:'activity', address:'Tortuguero, Limón', lat:10.5382, lng:-83.5012, notes:'Navegar los canales selváticos en canoa. Monos, caimanes, tucanes y delfines en su hábitat natural.', tags:['canoa','caimanes','monos'], price:'mid', best_time:'mañana', visits:712 },
+      { title:'Playa Tortuguero', type:'sight', address:'Tortuguero Beach', lat:10.5428, lng:-83.5052, notes:'Playa negra volcánica de 22 km sin carreteras. Solo accesible en barco o avión. Completamente virgen.', tags:['playa','negra','virgen'], price:'low', best_time:'mañana', visits:534 },
+    ],
+    'Puerto Viejo / Caribe': [
+      { title:'Playa Punta Uva', type:'sight', address:'Punta Uva, Limón', lat:9.6232, lng:-82.7156, notes:'La playa más hermosa del Caribe costarricense. Aguas turquesas, coral y palmeras. Poco concurrida.', tags:['playa','turquesa','caribe'], price:'low', best_time:'mañana', visits:834 },
+      { title:'Reserva Gandoca-Manzanillo', type:'activity', address:'Manzanillo, Limón', lat:9.6008, lng:-82.6681, notes:'Snorkel con delfines y arrecifes de coral. El sendero por la selva litoral es impresionante.', tags:['snorkel','delfines','selva'], price:'low', best_time:'mañana', visits:567 },
+      { title:'Puerto Viejo Village', type:'sight', address:'Puerto Viejo de Talamanca', lat:9.6567, lng:-82.7526, notes:'El pueblo más rasta y caribeño de Costa Rica. Surf, reggae y cocina caribeña única.', tags:['rasta','surf','reggae'], price:'low', best_time:'tarde', visits:678 },
+      { title:'Soda Tamara', type:'food', address:'Puerto Viejo, Limón', lat:9.6568, lng:-82.7531, notes:'La mejor comida caribeña. Rice and beans con coco, rondon (sopa caribeña) y patacones.', tags:['caribeño','rice&beans','rondon'], price:'low', best_time:'mediodía', visits:456 },
+    ],
+    'Guanacaste': [
+      { title:'Playa Conchal', type:'sight', address:'Playa Conchal, Guanacaste', lat:10.4192, lng:-85.8342, notes:'La playa más bonita de Guanacaste. Arena de conchas trituradas de color coral. Aguas turquesas.', tags:['conchal','coral','turquesa'], price:'low', best_time:'mañana', visits:934 },
+      { title:'Parque Nacional Rincón de la Vieja', type:'activity', address:'Rincón de la Vieja, Guanacaste', lat:10.7683, lng:-85.3272, notes:'Volcán activo con pozas termales, géiseres y senderos de selva seca. Piscinas termales naturales.', tags:['volcán','termales','géiseres'], price:'mid', best_time:'mañana', visits:712 },
+      { title:'Sunset en Playa Tamarindo', type:'sight', address:'Tamarindo, Guanacaste', lat:10.2999, lng:-85.8412, notes:'El mejor sunset de Guanacaste. Surfistas en el agua, tortugas marinas en temporada.', tags:['sunset','surf','tortugas'], price:'low', best_time:'tarde', visits:867 },
+      { title:'Reserva Santa Rosa', type:'activity', address:'Parque Nacional Santa Rosa', lat:10.8333, lng:-85.6167, notes:'El parque más antiguo de Costa Rica. La playa Naranjo solo accesible en 4x4. Caimanes y monos congo.', tags:['selva seca','caimanes','4x4'], price:'low', best_time:'mañana', visits:445 },
+    ],
+  },
+
   'India': {
     'Delhi': [
       { title:'Chandni Chowk al amanecer', type:'sight', address:'Chandni Chowk, Old Delhi', lat:28.6562, lng:77.2300, notes:'El mercado más caótico y fascinante de India. Al amanecer antes de las multitudes.', tags:['mercado','caótico','auténtico'], price:'low', best_time:'mañana', visits:567 },

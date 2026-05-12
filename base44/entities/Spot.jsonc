@@ -106,6 +106,10 @@
       "format": "date",
       "description": "Fecha asignada del spot en el itinerario del viaje"
     },
+    "assigned_time": {
+      "type": "string",
+      "description": "Hora asignada del spot (HH:MM)"
+    },
     "day_order": {
       "type": "number",
       "description": "Orden del spot dentro del d\u00eda para el itinerario"

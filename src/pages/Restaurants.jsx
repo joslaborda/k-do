@@ -526,6 +526,17 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
 function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const [showDetail, setShowDetail] = useState(false);
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
+
+  const isReal = spot.id && !String(spot.id).startsWith('seed_');
+  const { data: comments = [] } = useQuery({
+    queryKey: ['spotComments', spot.id],
+    queryFn: () => base44.entities.SpotComment.filter({ spot_id: spot.id }),
+    enabled: !!spot.id && isReal,
+    staleTime: 60000,
+  });
+
+  const displayVisits = spot.visits || likeCount || 0;
 
   return (
     <>
@@ -533,39 +544,64 @@ function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
         onClick={() => setShowDetail(true)}>
         <div className="p-4">
           <div className="flex items-start gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${tc.color}`}>
               {tc.emoji}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-foreground">{spot.title}</p>
+              <p className="font-semibold text-sm text-foreground leading-tight">{spot.title}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {tc.label}{spot.address ? ' · ' + spot.address : ''}{spot.city_name ? ' · ' + spot.city_name : ''}
+                {tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}
               </p>
-              {spot.notes && <p className="text-xs text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>}
+              {spot.notes && <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>}
               {spot.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {spot.tags.slice(0, 4).map(t => (
-                    <span key={t} className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full border border-border">#{t}</span>
+                    <span key={t} className="text-xs bg-orange-50 text-orange-600 px-2.5 py-0.5 rounded-full border border-orange-100">#{t}</span>
                   ))}
                 </div>
               )}
             </div>
-            <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1" />
           </div>
         </div>
 
-        <div className="flex items-center px-4 py-3 border-t border-border gap-4" onClick={e => e.stopPropagation()}>
-          <div className="flex-1" />
-          {alreadySaved ? (
-            <span className="text-xs text-green-700 font-medium flex items-center gap-1">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Guardado
+        {/* Footer: like · comentar · guardar */}
+        <div className="flex items-center px-4 py-2.5 border-t border-border gap-0" onClick={e => e.stopPropagation()}>
+          {/* Like */}
+          <button onClick={e => { e.stopPropagation(); toggleLike(); }}
+            className="flex items-center gap-1.5 text-sm flex-1 transition-colors py-1">
+            {isLiked
+              ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            }
+            <span className={`${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
+              {displayVisits > 0 ? displayVisits : ''}
             </span>
+          </button>
+
+          {/* Divider */}
+          <div className="w-px h-5 bg-border mx-1" />
+
+          {/* Comentar */}
+          <button onClick={e => { e.stopPropagation(); setShowDetail(true); }}
+            className="flex items-center gap-1.5 text-sm flex-1 justify-center text-muted-foreground hover:text-foreground transition-colors py-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>{comments.length > 0 ? comments.length : ''}</span>
+          </button>
+
+          {/* Divider */}
+          <div className="w-px h-5 bg-border mx-1" />
+
+          {/* Guardar */}
+          {alreadySaved ? (
+            <div className="flex items-center gap-1.5 text-sm flex-1 justify-end text-green-600 font-semibold py-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Guardado
+            </div>
           ) : (
             <button onClick={e => { e.stopPropagation(); onSave(spot); }} disabled={saving}
-              className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50">
+              className="flex items-center gap-1.5 text-sm flex-1 justify-end font-semibold text-primary hover:text-primary/80 transition-colors disabled:opacity-50 py-1">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-              {saving ? 'Guardando...' : 'Guardar'}
+              {saving ? '...' : 'Guardar'}
             </button>
           )}
         </div>
@@ -779,6 +815,7 @@ function MySpotRow({ spot, onTap, userId }) {
 function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities }) {
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
+  const [assignedTime, setAssignedTime] = useState(spot?.assigned_time || '');
 
   // Build trip day options from cities — must be before early return
   const tripDayOptions = useMemo(() => {
@@ -803,6 +840,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
     if (spot) {
       setNotes(spot.notes || '');
       setAssignedDate(spot.assigned_date || '');
+      setAssignedTime(spot.assigned_time || '');
     }
   }, [spot?.id]);
 
@@ -811,7 +849,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
 
   const handleSave = () => {
-    onSave(spot.id, { notes, assigned_date: assignedDate || null });
+    onSave(spot.id, { notes, assigned_date: assignedDate || null, assigned_time: assignedTime || null });
     onClose();
   };
 
@@ -850,28 +888,40 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
             />
           </div>
 
-          {/* Day assignment — trip days only */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Día del viaje</p>
-            {hasTripDays ? (
-              <select
-                value={assignedDate}
-                onChange={e => setAssignedDate(e.target.value)}
-                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
-              >
-                <option value="">Sin asignar</option>
-                {tripDayOptions.map(d => (
-                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
-                ))}
-              </select>
-            ) : (
+          {/* Day + Hour assignment */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Día</p>
+              {hasTripDays ? (
+                <select
+                  value={assignedDate}
+                  onChange={e => setAssignedDate(e.target.value)}
+                  className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+                >
+                  <option value="">Sin asignar</option>
+                  {tripDayOptions.map(d => (
+                    <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="date"
+                  value={assignedDate}
+                  onChange={e => setAssignedDate(e.target.value)}
+                  className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+                />
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
               <input
-                type="date"
-                value={assignedDate}
-                onChange={e => setAssignedDate(e.target.value)}
+                type="time"
+                value={assignedTime}
+                onChange={e => setAssignedTime(e.target.value)}
                 className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+                placeholder="--:--"
               />
-            )}
+            </div>
           </div>
 
           {/* Delete */}

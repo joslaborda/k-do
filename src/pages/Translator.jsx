@@ -179,6 +179,7 @@ function TranslatorContent({ tripId }) {
 
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
+  const sameLanguage = fromLang === toLang;
 
   return (
     <>
@@ -203,6 +204,16 @@ function TranslatorContent({ tripId }) {
         {/* ── TAB TRADUCTOR ── */}
         {tab === 'traductor' && (
           <>
+            {/* Aviso mismo idioma */}
+            {sameLanguage && (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+                <span className="text-2xl">😄</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">¡Ya hablas ese idioma!</p>
+                  <p className="text-xs text-amber-700 mt-0.5">Parece que origen y destino son el mismo. Cambia uno de los idiomas para traducir.</p>
+                </div>
+              </div>
+            )}
             {/* Selector de idiomas */}
             <div className="bg-white rounded-2xl border border-border p-4">
               <div className="flex items-end gap-2">
