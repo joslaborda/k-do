@@ -28,7 +28,7 @@ async function nearbyPlaces(lat,lng){
   const res=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:query,signal:AbortSignal.timeout(12000)});
   if(!res.ok)throw new Error('overpass failed');
   const data=await res.json();
-  return (data.elements||[]).filter(el=>el.tags?.name).map(el=>({id:el.id?.toString(),name:el.tags.name,address:[el.tags['addr:street'],el.tags['addr:housenumber']].filter(Boolean).join(' '),lat:el.lat,lng:el.lon,type:osmToType(el.tags.amenity||el.tags.tourism||','')})).slice(0,12);
+  return (data.elements||[]).filter(el=>el.tags?.name).map(el=>({id:el.id?.toString(),name:el.tags.name,address:[el.tags['addr:street'],el.tags['addr:housenumber']].filter(Boolean).join(' '),lat:el.lat,lng:el.lon,type:osmToType(el.tags.amenity||el.tags.tourism||'','')})).slice(0,12);
 }
 
 async function reverseGeocode(lat,lng){
