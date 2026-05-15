@@ -252,13 +252,22 @@ export default function Packing() {
                               : 'bg-secondary/50 hover:bg-secondary'
                           }`}
                         >
-                          <Checkbox
-                            checked={item.packed}
-                            onCheckedChange={(checked) =>
-                              togglePackedMutation.mutate({ id: item.id, packed: checked })
-                            }
-                            className="h-5 w-5"
-                          />
+                          {item.essential ? (
+                            <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                              {item.packed
+                                ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                              }
+                            </div>
+                          ) : (
+                            <Checkbox
+                              checked={item.packed}
+                              onCheckedChange={(checked) =>
+                                togglePackedMutation.mutate({ id: item.id, packed: checked })
+                              }
+                              className="h-5 w-5"
+                            />
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className={`font-medium truncate ${
                               item.packed 
@@ -270,16 +279,21 @@ export default function Packing() {
                                 <span className="ml-2 text-sm text-muted-foreground">×{item.quantity}</span>
                               )}
                             </p>
+                            {item.essential && !item.packed && (
+                              <p className="text-xs text-primary font-medium mt-0.5">Obligatorio</p>
+                            )}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteMutation.mutate(item.id)}
-                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity"
-                            aria-label="Eliminar"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          {!item.essential && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteMutation.mutate(item.id)}
+                              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-secondary transition-opacity"
+                              aria-label="Eliminar"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       ))
                     )}
