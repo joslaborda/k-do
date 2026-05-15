@@ -517,11 +517,11 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
 
 // ── Expense detail sheet ──────────────────────────────────────────────────────
 function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose, onEdit, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   if (!expense) return null;
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
   const isSame = expense.currency === baseCurrency || !expense.currency;
   const s = sym(baseCurrency);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <>

@@ -217,9 +217,8 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           </Link>
         </div>
       )}
-    </div>
-
       {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
+    </div>
   );
 }
 
