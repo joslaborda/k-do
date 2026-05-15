@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import PDFViewer from '@/components/PDFViewer';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -149,6 +150,7 @@ function DraggableSpotList({ spots, onReorder }) {
 // ── Day card ──────────────────────────────────────────────────────────────────
 function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr }) {
   const [open, setOpen] = useState(defaultOpen);
+  const [viewFile, setViewFile] = useState(null);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
   const hasContent = docs.length > 0 || spots.length > 0;
   const isToday_ = defaultOpen;
@@ -174,15 +176,18 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
       {open && (
         <div>
           {[...docs].sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99')).map(doc => (
-            <Link key={doc.id} to={createPageUrl('Documents') + '?trip_id=' + tripId}
-              className="flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
+            <button key={doc.id}
+              onClick={() => doc.file_url ? setViewFile(doc.file_url) : null}
+              className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
               <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
                 {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            </Link>
+              {doc.file_url
+                ? <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                : <span className="text-xs text-muted-foreground shrink-0">Sin archivo</span>}
+            </button>
           ))}
 
           {spots.length > 0 && (
@@ -213,6 +218,8 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
         </div>
       )}
     </div>
+
+      {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
   );
 }
 
