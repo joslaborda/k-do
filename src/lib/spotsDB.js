@@ -441,6 +441,37 @@ export const SEED_SPOTS = {
       { title:'Amer Fort', type:'sight', address:'Devisinghpura, Amer, Jaipur', lat:26.9855, lng:75.8513, notes:'La fortaleza más bella del Rajastán. Los espejos del Sheesh Mahal son increíbles.', tags:['fuerte','espejos','Rajastán'], price:'mid', best_time:'mañana', visits:867 },
     ],
   },
+  'Egipto': {
+    'El Cairo': [
+      { title:'Pirámides de Guiza al amanecer', type:'sight', address:'Al Haram, Guiza', lat:29.9792, lng:31.1342, notes:'Las únicas Maravillas del Mundo Antiguo que quedan. Llega a las 8h para evitar grupos. El camello frente a las tres pirámides es la foto icónica.', tags:['pirámides','maravilla','amanecer'], price:'mid', best_time:'mañana', visits:2345 },
+      { title:'Gran Esfinge', type:'sight', address:'Al Haram, Guiza', lat:29.9753, lng:31.1376, notes:'Frente a las pirámides. La luz de la tarde la ilumina mejor. Su tamaño real sorprende.', tags:['esfinge','faraónico','imprescindible'], price:'mid', best_time:'tarde', visits:1987 },
+      { title:'Museo Egipcio de El Cairo', type:'sight', address:'Tahrir Square, El Cairo', lat:30.0478, lng:31.2336, notes:'La colección de Tutankamón — la máscara funeraria de oro de cerca es impactante. Llega temprano.', tags:['faraónico','tutankamón','museo'], price:'mid', best_time:'mañana', visits:1754 },
+      { title:'Gran Museo Egipcio (GEM)', type:'sight', address:'Al Remaya Square, Guiza', lat:29.9875, lng:31.1128, notes:'El museo más grande del mundo sobre el Antiguo Egipto, inaugurado en 2023.', tags:['nuevo','tutankamón','colecciones'], price:'high', best_time:'mañana', visits:1234 },
+      { title:'Khan el-Khalili', type:'shopping', address:'El-Azhar Rd, El Cairo', lat:30.0478, lng:31.2628, notes:'El zoco más famoso de Egipto desde el siglo XIV. Especias, lámparas, papiro y perfumes. Negocia siempre.', tags:['zoco','especias','negociar'], price:'low', best_time:'tarde', visits:1567 },
+      { title:'Ciudadela de Saladino', type:'sight', address:'Salah El Din, El Cairo', lat:30.0286, lng:31.2598, notes:'La fortaleza medieval con la Mezquita de Alabastro. Las vistas de El Cairo desde la muralla son las mejores.', tags:['ciudadela','mezquita','vistas'], price:'low', best_time:'tarde', visits:1123 },
+      { title:'Mezquita de Al-Azhar', type:'sight', address:'Al-Azhar Square, El Cairo', lat:30.0461, lng:31.2623, notes:'Una de las mezquitas más antiguas del mundo (970 d.C.). Ropa respetuosa obligatoria.', tags:['mezquita','histórica','islámica'], price:'low', best_time:'mañana', visits:987 },
+      { title:'Barrio Copto (Old Cairo)', type:'sight', address:'Coptic Cairo, El Cairo', lat:30.0048, lng:31.2296, notes:'El Cairo más antiguo. La Iglesia Suspendida, el Museo Copto y la Sinagoga Ben Ezra.', tags:['copto','antiguo','iglesia'], price:'low', best_time:'mañana', visits:756 },
+      { title:'Crucero nocturno por el Nilo', type:'activity', address:'Corniche El Nil, El Cairo', lat:30.0561, lng:31.2272, notes:'Cena con show de danza del vientre y música árabe mientras navegas el Nilo de noche.', tags:['Nilo','cena','danza del vientre'], price:'mid', best_time:'noche', visits:1234 },
+      { title:'Koshary El Tahrir', type:'food', address:'Midan Tahrir, El Cairo', lat:30.0445, lng:31.2357, notes:'El plato nacional egipcio: arroz, lentejas, pasta, salsa de tomate picante y cebolla frita. Por 1-2 USD.', tags:['koshari','local','barato'], price:'low', best_time:'mediodía', visits:834 },
+      { title:'Calle Al-Moez', type:'sight', address:'El Moez Street, El Cairo', lat:30.0482, lng:31.2613, notes:'La calle más antigua del mundo aún viva. Mezquitas, madrasas y artesanos. La luz dorada de la tarde.', tags:['histórica','Al-Moez','artesanos'], price:'low', best_time:'tarde', visits:698 },
+      { title:'Saqqara — Pirámide Escalonada', type:'sight', address:'Saqqara, Guiza', lat:29.8714, lng:31.2165, notes:'La pirámide más antigua del mundo (2650 a.C.). A 30 km de El Cairo. Mucho menos turistas que Guiza.', tags:['pirámide','escalonada','antigua'], price:'mid', best_time:'mañana', visits:567 },
+    ],
+    'Luxor': [
+      { title:'Valle de los Reyes', type:'sight', address:'West Bank, Luxor', lat:25.7402, lng:32.6014, notes:'Las tumbas de los faraones del Imperio Nuevo. La de Tutankamón es la más famosa. La entrada incluye 3 tumbas.', tags:['tumbas','faraones','Tutankamón'], price:'mid', best_time:'mañana', visits:1876 },
+      { title:'Templo de Karnak', type:'sight', address:'Karnak, Luxor', lat:25.7188, lng:32.6573, notes:'El complejo religioso más grande del mundo antiguo. La sala hipóstila con 134 columnas de 23m.', tags:['karnak','columnas','faraónico'], price:'mid', best_time:'mañana', visits:1654 },
+      { title:'Templo de Luxor de noche', type:'sight', address:'Luxor City Centre', lat:25.6996, lng:32.6391, notes:'El templo iluminado por la noche es uno de los espectáculos más impresionantes de Egipto.', tags:['luxor','nocturno','iluminado'], price:'mid', best_time:'noche', visits:1345 },
+      { title:'Paseo en feluca al atardecer', type:'activity', address:'Corniche El Nilo, Luxor', lat:25.6881, lng:32.6458, notes:'El barco de vela tradicional egipcio. Al atardecer con las montañas de la ribera occidental.', tags:['feluca','Nilo','sunset'], price:'low', best_time:'tarde', visits:1123 },
+      { title:'Templo de Hatshepsut', type:'sight', address:'Deir el-Bahari, Luxor', lat:25.7380, lng:32.6073, notes:'El templo de la faraona mujer, tallado directamente en los acantilados. Arquitectura única.', tags:['hatshepsut','faraona','acantilados'], price:'mid', best_time:'mañana', visits:987 },
+      { title:'Colosos de Memnón', type:'sight', address:'West Bank, Luxor', lat:25.7206, lng:32.6100, notes:'Las dos estatuas de 18m de Amenhotep III. Gratis. Primera parada al cruzar a la ribera oeste.', tags:['colosos','estatuas','gratis'], price:'low', best_time:'mañana', visits:834 },
+    ],
+    'Asuán': [
+      { title:'Abu Simbel', type:'sight', address:'Abu Simbel, Asuán', lat:22.3372, lng:31.6258, notes:'Los dos templos de Ramsés II, trasladados piedra a piedra por la UNESCO en 1968. Vuelo de 45 min desde Asuán.', tags:['abu simbel','Ramsés','UNESCO'], price:'high', best_time:'mañana', visits:1543 },
+      { title:'Templo de Filae', type:'sight', address:'Isla de Filae, Asuán', lat:24.0244, lng:32.8882, notes:'El templo de la diosa Isis en una isla del Nilo. Acceso solo en barca.', tags:['filae','isis','isla'], price:'mid', best_time:'tarde', visits:1123 },
+      { title:'Mercado de Asuán', type:'shopping', address:'Aswan Souk, Asuán', lat:24.0889, lng:32.8998, notes:'El zoco más auténtico de Egipto, menos turístico que El Cairo. Especias nubias y aceites.', tags:['zoco','nubio','especias'], price:'low', best_time:'tarde', visits:756 },
+      { title:'Aldea Nubia', type:'sight', address:'Gharb Soheil, Asuán', lat:24.0514, lng:32.8600, notes:'Casas de colores a orillas del Nilo. La cultura nubia es completamente diferente al Egipto árabe.', tags:['nubia','colores','cocodrilo'], price:'low', best_time:'tarde', visits:834 },
+    ],
+  },
+
 };
 
 // ─── Helper functions ──────────────────────────────────────────────────────
