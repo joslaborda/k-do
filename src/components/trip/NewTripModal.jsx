@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, X, Shuffle } from 'lucide-react';
-import CountryInput from '@/components/trip/CountryInput';
-import CityInput from '@/components/trip/CityInput';
-import TripTemplates from '@/components/trip/TripTemplates';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { Plus, X, Shuffle, ChevronDown, Loader2 } from 'lucide-react';
+import { getCountryMeta, getTopCities } from '@/lib/countryConfig';
+import { getAllCountries, canonicalizeCountry } from '@/lib/countryCatalog';
+import { useEffect, useMemo } from 'react';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
 const CURRENCY_OPTIONS = [
@@ -30,27 +29,24 @@ const CURRENCY_OPTIONS = [
   { value: 'COP', label: 'COP ($)' }, { value: 'PEN', label: 'PEN (S/)' },
   { value: 'AED', label: 'AED (د.إ)' }, { value: 'SAR', label: 'SAR (﷼)' },
   { value: 'EGP', label: 'EGP (£)' }, { value: 'RUB', label: 'RUB (₽)' },
+  { value: 'CRC', label: 'CRC (₡)' }, { value: 'COP', label: 'COP ($)' },
 ];
 
 function currencySymbol(code) {
   const map = { EUR:'€', USD:'$', GBP:'£', JPY:'¥', CHF:'Fr', THB:'฿', KRW:'₩', CNY:'¥', VND:'₫', MAD:'DH',
     TRY:'₺', BRL:'R$', IDR:'Rp', INR:'₹', PHP:'₱', MYR:'RM', ZAR:'R', CLP:'$', PEN:'S/', AED:'د.إ',
-    NOK:'kr', SEK:'kr', DKK:'kr', PLN:'zł', CZK:'Kč', HUF:'Ft', RUB:'₽' };
+    NOK:'kr', SEK:'kr', DKK:'kr', PLN:'zł', CZK:'Kč', HUF:'Ft', RUB:'₽', CRC:'₡', COP:'$' };
   return map[code] || '$';
 }
 
-// ─── Date helpers ─────────────────────────────────────────────────────────────
 function addDays(dateStr, n) {
   const d = new Date(dateStr);
   d.setDate(d.getDate() + n);
   return d.toISOString().slice(0, 10);
 }
-
 function daysBetween(a, b) {
   return Math.round((new Date(b) - new Date(a)) / 86400000);
 }
-
-// Given an array of nights and a start date, compute sequential date ranges
 function computeNightsDates(startDateStr, nightsArr) {
   if (!startDateStr) return [];
   const result = [];
@@ -64,8 +60,6 @@ function computeNightsDates(startDateStr, nightsArr) {
   }
   return result;
 }
-
-// Equitable distribution of total days across N stops
 function autoDistribute(startDateStr, endDateStr, count) {
   if (!startDateStr || !endDateStr || count <= 0) return [];
   const total = daysBetween(startDateStr, endDateStr) + 1;
@@ -83,70 +77,186 @@ function autoDistribute(startDateStr, endDateStr, count) {
   return result;
 }
 
-// ─── Default state ────────────────────────────────────────────────────────────
 const DEFAULT_FORM = {
   name: '', start_date: '', end_date: '',
-  description: '', cover_image: '',
+  description: '',
   currency: 'EUR', currency_symbol: '€',
   language: 'Español', language_code: 'es-ES',
 };
 
 function defaultStops(mode) {
-  return mode === 'single' ? [{ city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]
-    : [{ city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } },
-       { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }];
+  return mode === 'single'
+    ? [{ city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]
+    : [
+        { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } },
+        { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } },
+      ];
 }
 
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
+// ─── Inline country autocomplete (free-text + suggestions from catalog) ───────
+function CountryField({ value, onChange, hasError, ref: externalRef }) {
+  const countries = useMemo(() => {
+    try { return getAllCountries('es-ES'); } catch { return []; }
+  }, []);
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState(value || '');
+  const containerRef = useRef(null);
+
+  useEffect(() => { setQ(value || ''); }, [value]);
+
+  useEffect(() => {
+    const handler = e => { if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    if (!q || q.length < 1) return [];
+    const lower = q.toLowerCase();
+    return countries.filter(c => c.label.toLowerCase().startsWith(lower)).slice(0, 8);
+  }, [q, countries]);
+
+  const handleInput = e => {
+    const v = e.target.value;
+    setQ(v);
+    onChange(v);
+    setOpen(true);
+  };
+
+  const handleSelect = c => {
+    setQ(c.label);
+    onChange(c.label);
+    setOpen(false);
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      if (!containerRef.current?.contains(document.activeElement)) {
+        // try to canonicalize on blur
+        if (q.trim()) {
+          try {
+            const exact = countries.find(c => c.label.toLowerCase() === q.toLowerCase());
+            if (exact) { setQ(exact.label); onChange(exact.label); }
+          } catch {}
+        }
+        setOpen(false);
+      }
+    }, 150);
+  };
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <input
+        ref={externalRef}
+        value={q}
+        onChange={handleInput}
+        onFocus={() => setOpen(true)}
+        onBlur={handleBlur}
+        placeholder="País *"
+        autoComplete="off"
+        className={`w-full h-9 border rounded-xl px-3 text-sm outline-none transition-colors ${
+          hasError ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+        }`}
+      />
+      {open && suggestions.length > 0 && (
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
+          {suggestions.map(c => (
+            <li key={c.code} onMouseDown={() => handleSelect(c)}
+              className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-primary transition-colors flex items-center gap-2">
+              <span>{c.label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ─── Inline city autocomplete ─────────────────────────────────────────────────
+function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
+  const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState(value || '');
+  const containerRef = useRef(null);
+
+  useEffect(() => { setQ(value || ''); }, [value]);
+
+  useEffect(() => {
+    if (!country) { setCities([]); return; }
+    setCities([]);
+    setLoading(true);
+    getTopCities(country)
+      .then(c => setCities(c))
+      .catch(() => setCities([]))
+      .finally(() => setLoading(false));
+  }, [country]);
+
+  useEffect(() => {
+    const handler = e => { if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = q ? cities.filter(c => c.toLowerCase().includes(q.toLowerCase())) : cities;
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div className="relative">
+        <input
+          value={q}
+          onChange={e => { setQ(e.target.value); onChange(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          placeholder={loading ? 'Cargando...' : placeholder}
+          autoComplete="off"
+          className="w-full h-9 border border-border rounded-xl px-3 pr-7 text-sm outline-none focus:border-primary bg-white"
+        />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+        </div>
+      </div>
+      {open && filtered.length > 0 && (
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
+          {filtered.map(city => (
+            <li key={city} onMouseDown={() => { setQ(city); onChange(city); setOpen(false); }}
+              className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-primary transition-colors">
+              {city}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }) {
   const [formData, setFormData] = useState({ ...DEFAULT_FORM });
-  const [mode, setMode] = useState('multi'); // 'single' | 'multi'
-  const [dateMode, setDateMode] = useState('nights'); // 'nights' | 'manual'
+  const [mode, setMode] = useState('multi');
+  const [dateMode, setDateMode] = useState('nights');
   const [stops, setStops] = useState(defaultStops('multi'));
   const [currencyTouched, setCurrencyTouched] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [attempted, setAttempted] = useState(false); // for validation red highlight
 
-  // ── helpers ──────────────────────────────────────────────────────────────
-  const validStops = stops.filter((s) => s.city.trim());
+  // Refs for scroll-to-error
+  const nameRef = useRef(null);
+  const startDateRef = useRef(null);
+  const firstCountryRef = useRef(null);
 
-  // Nights mode: total nights entered
+  const validStops = stops.filter(s => s.city.trim());
   const totalNightsEntered = stops.reduce((sum, s) => sum + (parseInt(s.nights) || 0), 0);
-
-  // Trip total days (from dates)
   const tripTotalDays = formData.start_date && formData.end_date
     ? daysBetween(formData.start_date, formData.end_date) + 1
     : null;
-
-  // Computed date allocations for preview
   const nightsAllocations = formData.start_date
-    ? computeNightsDates(formData.start_date, stops.map((s) => s.nights || 0))
+    ? computeNightsDates(formData.start_date, stops.map(s => s.nights || 0))
     : [];
 
-  // Nights overflow/underflow
   let nightsError = null;
-  if (formData.start_date && formData.end_date && stops.some((s) => s.nights)) {
+  if (formData.start_date && formData.end_date && stops.some(s => s.nights)) {
     const diff = totalNightsEntered - tripTotalDays;
-    if (diff > 0) nightsError = `Sobran ${diff} noche${diff !== 1 ? 's' : ''} respecto al rango del viaje`;
+    if (diff > 0) nightsError = `Sobran ${diff} noche${diff !== 1 ? 's' : ''} respecto al rango`;
     else if (diff < 0) nightsError = `Faltan ${Math.abs(diff)} noche${Math.abs(diff) !== 1 ? 's' : ''} para completar el viaje`;
-  }
-
-  // Manual date validation
-  const manualErrors = [];
-  if (dateMode === 'manual') {
-    for (let i = 0; i < stops.length; i++) {
-      const { start_date, end_date } = stops[i].manual;
-      if (!start_date || !end_date) continue;
-      if (end_date < start_date) manualErrors.push(`Parada ${i + 1}: fin < inicio`);
-      if (formData.start_date && start_date < formData.start_date)
-        manualErrors.push(`Parada ${i + 1}: inicio antes del viaje (${formData.start_date})`);
-      if (formData.end_date && end_date > formData.end_date)
-        manualErrors.push(`Parada ${i + 1}: fin después del viaje (${formData.end_date})`);
-      if (i > 0) {
-        const prevEnd = stops[i - 1].manual.end_date;
-        if (prevEnd && start_date < prevEnd)
-          manualErrors.push(`Parada ${i + 1}: solape con parada anterior`);
-      }
-    }
   }
 
   const canCreate =
@@ -155,16 +265,14 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     formData.start_date &&
     (!formData.end_date || formData.end_date >= formData.start_date) &&
     validStops.length > 0 &&
-    (dateMode !== 'manual' || manualErrors.length === 0) &&
     !isPending;
 
-  // ── event handlers ────────────────────────────────────────────────────────
-  // When first stop's country changes, update trip-level currency/language
+  // ── helpers ──────────────────────────────────────────────────────────────
   function applyStopCountry(idx, country) {
     updateStop(idx, { city: '', country });
     if (idx === 0 && !currencyTouched) {
       const meta = getCountryMeta(country);
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         currency: meta.currency,
         currency_symbol: meta.symbol,
@@ -174,28 +282,12 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     }
   }
 
-  function setMode_(m) {
-    setMode(m);
-    setStops(defaultStops(m));
-  }
+  function setMode_(m) { setMode(m); setStops(defaultStops(m)); }
+  function updateStop(idx, patch) { setStops(prev => prev.map((s, i) => i === idx ? { ...s, ...patch } : s)); }
+  function updateStopManual(idx, patch) { setStops(prev => prev.map((s, i) => i === idx ? { ...s, manual: { ...s.manual, ...patch } } : s)); }
+  function addStop() { setStops(prev => [...prev, { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]); }
+  function removeStop(idx) { setStops(prev => prev.filter((_, i) => i !== idx)); }
 
-  function updateStop(idx, patch) {
-    setStops((prev) => prev.map((s, i) => i === idx ? { ...s, ...patch } : s));
-  }
-
-  function updateStopManual(idx, patch) {
-    setStops((prev) => prev.map((s, i) => i === idx ? { ...s, manual: { ...s.manual, ...patch } } : s));
-  }
-
-  function addStop() {
-    setStops((prev) => [...prev, { city: '', country: '', nights: '', manual: { start_date: '', end_date: '' } }]);
-  }
-
-  function removeStop(idx) {
-    setStops((prev) => prev.filter((_, i) => i !== idx));
-  }
-
-  // Auto-distribute
   function autoDistributeNights() {
     if (!formData.start_date) return;
     const count = stops.length;
@@ -203,46 +295,45 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
       const total = daysBetween(formData.start_date, formData.end_date) + 1;
       const base = Math.floor(total / count);
       const extra = total % count;
-      setStops((prev) => prev.map((s, i) => ({ ...s, nights: String(base + (i < extra ? 1 : 0)) })));
+      setStops(prev => prev.map((s, i) => ({ ...s, nights: String(base + (i < extra ? 1 : 0)) })));
     } else {
-      // Default to 3 nights each if no end date
-      setStops((prev) => prev.map((s) => ({ ...s, nights: s.nights || '3' })));
+      setStops(prev => prev.map(s => ({ ...s, nights: s.nights || '3' })));
     }
   }
 
   function autoDistributeManual() {
     if (!formData.start_date || !formData.end_date) return;
     const allocs = autoDistribute(formData.start_date, formData.end_date, stops.length);
-    setStops((prev) => prev.map((s, i) => ({
-      ...s,
-      manual: { start_date: allocs[i]?.start_date || '', end_date: allocs[i]?.end_date || '' },
-    })));
+    setStops(prev => prev.map((s, i) => ({ ...s, manual: { start_date: allocs[i]?.start_date || '', end_date: allocs[i]?.end_date || '' } })));
   }
 
-  // Compute final end date for trip (when no end_date set, use nights total)
   function computedTripEndDate() {
     if (formData.end_date) return formData.end_date;
-    if (formData.start_date && totalNightsEntered > 0) {
-      return addDays(formData.start_date, totalNightsEntered - 1);
-    }
+    if (formData.start_date && totalNightsEntered > 0) return addDays(formData.start_date, totalNightsEntered - 1);
     return '';
   }
 
   function handleSubmit() {
+    setAttempted(true);
+
+    // Scroll to first error
+    if (!formData.name.trim()) { nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); nameRef.current?.focus(); return; }
+    if (!formData.start_date) { startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); startDateRef.current?.focus(); return; }
+    if (!stops[0]?.country?.trim()) { firstCountryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstCountryRef.current?.focus(); return; }
+    if (validStops.length === 0) return;
+
     const tripCities = validStops;
     let allocations = [];
-
     if (mode === 'single') {
       const endDate = computedTripEndDate();
       allocations = [{ start_date: formData.start_date, end_date: endDate }];
     } else if (dateMode === 'nights') {
-      allocations = computeNightsDates(formData.start_date, tripCities.map((s) => s.nights || 1));
+      allocations = computeNightsDates(formData.start_date, tripCities.map(s => s.nights || 1));
     } else {
-      allocations = tripCities.map((s) => s.manual);
+      allocations = tripCities.map(s => s.manual);
     }
 
     const finalEndDate = computedTripEndDate();
-    // Country of first stop is the trip's main country
     const firstCountry = tripCities[0]?.country || '';
     const firstMeta = getCountryMeta(firstCountry);
     onSubmit({
@@ -250,7 +341,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
         ...formData,
         end_date: finalEndDate,
         country: firstCountry,
-        destination: tripCities.map((s) => s.city).join(' → '),
+        destination: tripCities.map(s => s.city).join(' → '),
         ...(!currencyTouched ? {
           currency: firstMeta.currency,
           currency_symbol: firstMeta.symbol,
@@ -258,184 +349,190 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
           language_code: firstMeta.languageCode,
         } : {}),
       },
-      stops: tripCities.map((s) => s.city),
-      stopCountries: tripCities.map((s) => s.country || firstCountry),
+      stops: tripCities.map(s => s.city),
+      stopCountries: tripCities.map(s => s.country || firstCountry),
       allocations,
-      selectedTemplate,
+      selectedTemplate: null,
     });
   }
 
   function handleClose() {
     onOpenChange(false);
-    // Reset
     setFormData({ ...DEFAULT_FORM });
     setMode('multi');
     setDateMode('nights');
     setStops(defaultStops('multi'));
     setCurrencyTouched(false);
-    setSelectedTemplate(null);
+    setAttempted(false);
   }
+
+  const missingName = attempted && !formData.name.trim();
+  const missingStart = attempted && !formData.start_date;
+  const missingCountry = attempted && !stops[0]?.country?.trim();
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground text-2xl">✈️ Nuevo Viaje</DialogTitle>
+          <DialogTitle className="text-foreground text-2xl">✈️ Nuevo viaje</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
 
-          {/* ── 1. Nombre ── */}
+          {/* 1. Nombre */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre del viaje *</label>
-            <Input
+            <label className="text-sm font-medium text-foreground mb-1.5 block">
+              Nombre del viaje <span className="text-primary">*</span>
+            </label>
+            <input
+              ref={nameRef}
               placeholder="ej. Mamma mía 2026"
               value={formData.name}
-              onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+              onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+              className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${
+                missingName ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+              }`}
             />
+            {missingName && <p className="text-xs text-red-500 mt-1">El nombre es obligatorio</p>}
           </div>
 
-          {/* ── 2. Modo ── */}
+          {/* 2. Modo */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Modo</label>
-            <div className="grid grid-cols-2 gap-2 max-w-xs">
-              <Button type="button" variant={mode === 'single' ? 'default' : 'outline'}
-                className={mode === 'single' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                onClick={() => setMode_('single')}>1 parada</Button>
-              <Button type="button" variant={mode === 'multi' ? 'default' : 'outline'}
-                className={mode === 'multi' ? 'bg-orange-700 hover:bg-orange-800' : ''}
-                onClick={() => setMode_('multi')}>Multi-ciudad</Button>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">Tipo de viaje</label>
+            <div className="flex rounded-xl border border-border overflow-hidden max-w-xs">
+              {[['single','1 destino'],['multi','Multi-ciudad']].map(([v,l]) => (
+                <button key={v} type="button" onClick={() => setMode_(v)}
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${mode === v ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                  {l}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* ── 3. Fechas del viaje ── */}
+          {/* 3. Fechas */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha inicio *</label>
-              <Input type="date" value={formData.start_date}
-                onChange={(e) => setFormData((p) => ({ ...p, start_date: e.target.value }))} />
+              <label className="text-sm font-medium text-foreground mb-1.5 block">
+                Fecha inicio <span className="text-primary">*</span>
+              </label>
+              <input
+                ref={startDateRef}
+                type="date"
+                value={formData.start_date}
+                onChange={e => setFormData(p => ({ ...p, start_date: e.target.value }))}
+                className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${
+                  missingStart ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+                }`}
+              />
+              {missingStart && <p className="text-xs text-red-500 mt-1">La fecha de inicio es obligatoria</p>}
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Fecha fin <span className="text-muted-foreground font-normal">(o se calcula por noches)</span>
+                Fecha fin <span className="text-muted-foreground font-normal text-xs">(o se calcula por noches)</span>
               </label>
-              <Input type="date" value={formData.end_date}
+              <input
+                type="date"
+                value={formData.end_date}
                 min={formData.start_date || undefined}
-                onChange={(e) => setFormData((p) => ({ ...p, end_date: e.target.value }))} />
+                onChange={e => setFormData(p => ({ ...p, end_date: e.target.value }))}
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-white"
+              />
             </div>
           </div>
 
-          {/* ── 4. Paradas ── */}
+          {/* 4. Paradas */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-foreground">
-                Destino{mode === 'multi' ? 's' : ''} *
+                Destino{mode === 'multi' ? 's' : ''} <span className="text-primary">*</span>
               </label>
               <div className="flex items-center gap-2">
-                {/* Date mode toggle (only multi) */}
                 {mode === 'multi' && formData.start_date && (
                   <div className="flex gap-1">
-                    {[{ v: 'nights', l: 'Noches' }, { v: 'manual', l: 'Manual' }].map(({ v, l }) => (
+                    {[{v:'nights',l:'Noches'},{v:'manual',l:'Manual'}].map(({v,l}) => (
                       <button key={v} type="button" onClick={() => setDateMode(v)}
                         className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
-                          dateMode === v ? 'bg-orange-700 text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                          dateMode === v ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                         }`}>{l}</button>
                     ))}
                   </div>
                 )}
                 {mode === 'multi' && (
-                  <Button type="button" variant="outline" size="sm" onClick={addStop}>
-                    <Plus className="w-3.5 h-3.5 mr-1" />Añadir ciudad
-                  </Button>
+                  <button type="button" onClick={addStop}
+                    className="flex items-center gap-1 text-xs text-primary font-medium border border-border px-2.5 py-1 rounded-full hover:bg-orange-50 transition-colors">
+                    <Plus className="w-3 h-3" />Añadir parada
+                  </button>
                 )}
               </div>
             </div>
 
-            {/* Auto-repartir */}
             {mode === 'multi' && formData.start_date && stops.length > 1 && (
-              <Button type="button" variant="ghost" size="sm"
-                className="text-orange-700 hover:text-orange-800 hover:bg-orange-50 -mt-1"
-                onClick={dateMode === 'nights' ? autoDistributeNights : autoDistributeManual}>
-                <Shuffle className="w-3.5 h-3.5 mr-1.5" />Auto-repartir noches
-              </Button>
+              <button type="button" onClick={dateMode === 'nights' ? autoDistributeNights : autoDistributeManual}
+                className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors -mt-1">
+                <Shuffle className="w-3.5 h-3.5" />Auto-repartir
+              </button>
             )}
 
-            {/* Stop rows */}
             <div className="space-y-2">
               {stops.map((stop, idx) => (
-                <div key={idx} className="bg-white border border-border rounded-xl p-3 space-y-2">
-                  {/* Country + City + remove */}
+                <div key={idx} className={`bg-white border rounded-xl p-3 space-y-2 ${idx === 0 && missingCountry ? 'border-red-300' : 'border-border'}`}>
                   <div className="flex items-center gap-2">
                     <div className="w-40 flex-shrink-0">
-                      <CountryInput
+                      <CountryField
+                        ref={idx === 0 ? firstCountryRef : null}
                         value={stop.country}
-                        onChange={(v) => applyStopCountry(idx, v)}
-                        placeholder="País..."
+                        onChange={v => applyStopCountry(idx, v)}
+                        hasError={idx === 0 && missingCountry}
                       />
                     </div>
                     <div className="flex-1">
-                      <CityInput
+                      <CityField
                         key={stop.country}
                         country={stop.country}
                         value={stop.city}
-                        onChange={(v) => updateStop(idx, { city: v })}
+                        onChange={v => updateStop(idx, { city: v })}
                         placeholder={`Ciudad ${idx + 1}...`}
                       />
                     </div>
                     {mode === 'multi' && stops.length > 1 && (
-                      <Button type="button" variant="ghost" size="icon"
-                        onClick={() => removeStop(idx)}
-                        className="text-muted-foreground hover:text-destructive flex-shrink-0">
+                      <button type="button" onClick={() => removeStop(idx)} className="text-muted-foreground hover:text-destructive flex-shrink-0 p-1">
                         <X className="w-4 h-4" />
-                      </Button>
+                      </button>
                     )}
                   </div>
 
-                  {/* Date assignment inline (only if start_date set and multi, or single) */}
-                  {formData.start_date && (mode === 'multi' || mode === 'single') && (
+                  {formData.start_date && (
                     <>
-                      {/* SINGLE mode: just show computed dates, no input needed */}
                       {mode === 'single' ? (
                         computedTripEndDate() ? (
-                          <p className="text-xs text-orange-600 font-medium pl-1">
-                            📅 {formData.start_date} → {computedTripEndDate()}
-                          </p>
+                          <p className="text-xs text-primary font-medium pl-1">📅 {formData.start_date} → {computedTripEndDate()}</p>
                         ) : null
                       ) : dateMode === 'nights' ? (
-                        /* MULTI + nights */
                         <div className="flex items-center gap-2 pl-1">
-                          <Input
-                            type="number" min="1" placeholder="noches"
+                          <input type="number" min="1" placeholder="noches"
                             value={stop.nights}
-                            onChange={(e) => updateStop(idx, { nights: e.target.value })}
-                            className="w-20 h-8 text-sm"
+                            onChange={e => updateStop(idx, { nights: e.target.value })}
+                            className="w-20 h-8 border border-border rounded-lg px-2 text-sm outline-none focus:border-primary bg-secondary"
                           />
                           <span className="text-xs text-muted-foreground">noches</span>
                           {stop.nights && nightsAllocations[idx] && (
-                            <span className="text-xs text-orange-600 font-medium">
+                            <span className="text-xs text-primary font-medium">
                               {nightsAllocations[idx].start_date} → {nightsAllocations[idx].end_date}
                             </span>
                           )}
                         </div>
                       ) : (
-                        /* MULTI + manual */
                         <div className="flex items-center gap-2 pl-1 flex-wrap">
-                          <Input
-                            type="date"
-                            value={stop.manual.start_date}
-                            min={formData.start_date || undefined}
-                            max={formData.end_date || undefined}
-                            onChange={(e) => updateStopManual(idx, { start_date: e.target.value })}
-                            className="w-36 h-8 text-xs"
+                          <input type="date" value={stop.manual.start_date}
+                            min={formData.start_date || undefined} max={formData.end_date || undefined}
+                            onChange={e => updateStopManual(idx, { start_date: e.target.value })}
+                            className="w-36 h-8 border border-border rounded-lg px-2 text-xs outline-none focus:border-primary bg-secondary"
                           />
                           <span className="text-xs text-muted-foreground">→</span>
-                          <Input
-                            type="date"
-                            value={stop.manual.end_date}
-                            min={stop.manual.start_date || formData.start_date || undefined}
-                            max={formData.end_date || undefined}
-                            onChange={(e) => updateStopManual(idx, { end_date: e.target.value })}
-                            className="w-36 h-8 text-xs"
+                          <input type="date" value={stop.manual.end_date}
+                            min={stop.manual.start_date || formData.start_date || undefined} max={formData.end_date || undefined}
+                            onChange={e => updateStopManual(idx, { end_date: e.target.value })}
+                            className="w-36 h-8 border border-border rounded-lg px-2 text-xs outline-none focus:border-primary bg-secondary"
                           />
                         </div>
                       )}
@@ -445,95 +542,64 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               ))}
             </div>
 
-            {/* Nights summary / errors */}
+            {missingCountry && <p className="text-xs text-red-500">El país de la primera parada es obligatorio</p>}
+
             {mode === 'multi' && dateMode === 'nights' && formData.start_date && (
               <div className="pl-1 space-y-1">
                 {nightsError ? (
                   <p className="text-xs text-destructive font-medium">⚠️ {nightsError}</p>
                 ) : totalNightsEntered > 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Total: <span className="font-semibold text-foreground">{totalNightsEntered} noches</span>
-                    {' '}· Fin calculado:{' '}
-                    <span className="font-semibold text-orange-600">
-                      {addDays(formData.start_date, totalNightsEntered - 1)}
-                    </span>
+                    Total: <span className="font-medium text-foreground">{totalNightsEntered} noches</span>
+                    {' '}· Fin: <span className="font-medium text-primary">{addDays(formData.start_date, totalNightsEntered - 1)}</span>
                   </p>
                 )}
               </div>
             )}
-
-            {/* Manual errors */}
-            {mode === 'multi' && dateMode === 'manual' && manualErrors.length > 0 && (
-              <div className="space-y-0.5 pl-1">
-                {manualErrors.map((err, i) => (
-                  <p key={i} className="text-xs text-destructive">⚠️ {err}</p>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* ── 5. Moneda + idioma ── */}
+          {/* 5. Moneda */}
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda</label>
-              <Select value={formData.currency} onValueChange={(v) => {
+              <Select value={formData.currency} onValueChange={v => {
                 setCurrencyTouched(true);
-                setFormData((p) => ({ ...p, currency: v, currency_symbol: currencySymbol(v) }));
+                setFormData(p => ({ ...p, currency: v, currency_symbol: currencySymbol(v) }));
               }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {CURRENCY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  {CURRENCY_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma destino</label>
-              <div className="bg-white border border-border rounded-md px-3 py-2 text-sm">
-                <div className="font-semibold">{formData.language}</div>
+              <div className="bg-white border border-border rounded-xl px-3 py-2.5 text-sm">
+                <div className="font-medium">{formData.language}</div>
                 <div className="text-xs text-muted-foreground">{formData.language_code}</div>
               </div>
             </div>
           </div>
 
-          {/* ── 6. Descripción + imagen ── */}
+          {/* 6. Descripción */}
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
             <Textarea placeholder="Describe tu viaje..." value={formData.description} rows={2}
-              onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
+              onChange={e => setFormData(p => ({ ...p, description: e.target.value }))} />
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
-            {formData.cover_image && (
-              <div className="mb-2 rounded-lg overflow-hidden h-24 bg-muted">
-                <img src={formData.cover_image} alt="preview" className="w-full h-full object-cover"
-                  onError={(e) => (e.currentTarget.style.display = 'none')} />
-              </div>
-            )}
-            <Input placeholder="https://images.unsplash.com/..." value={formData.cover_image}
-              onChange={(e) => setFormData((p) => ({ ...p, cover_image: e.target.value }))} />
-          </div>
-
-          {/* ── 7. Plantillas ── */}
-          <div className="pt-2 border-t border-border">
-            <TripTemplates onSelect={setSelectedTemplate} />
-            {selectedTemplate && (
-              <div className="mt-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
-                <p className="text-sm text-primary">{selectedTemplate.emoji} Plantilla "{selectedTemplate.name}" seleccionada</p>
-              </div>
-            )}
-          </div>
-
-          {/* ── Actions ── */}
+          {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button type="button" onClick={handleSubmit}
-              className="bg-orange-700 hover:bg-orange-800 text-white"
-              disabled={!canCreate}>
-              {isPending ? 'Creando...' : 'Crear Viaje'}
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              className="bg-primary hover:bg-primary/90 text-white"
+              disabled={isPending}
+            >
+              {isPending ? 'Creando...' : 'Crear viaje'}
             </Button>
           </div>
-
         </div>
       </DialogContent>
     </Dialog>
