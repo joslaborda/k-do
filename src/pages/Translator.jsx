@@ -1,60 +1,46 @@
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef } from 'react';
-import {
-  ArrowRight, ArrowRightLeft, Copy, Check, Volume2, Loader2,
-  ChevronDown, Mic, MicOff, AlertCircle, Camera
-} from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ArrowRight, ArrowRightLeft, Copy, Check, Volume2, Loader2, Mic, MicOff, AlertCircle, Camera } from 'lucide-react';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
-import { getPhrasesForCountry } from '@/lib/phrasesDB';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 
-const CAT_ICONS = {
-  'Basicas':'👋','Básicas':'👋','Restaurante':'🍽️','Direcciones':'🗺️',
-  'Transporte':'🚆','Emergencias':'🆘','Compras':'🛍️',
-  'Hoteles':'🏨','Ocio':'🎭','Social':'🥂',
-};
-
 const LANGUAGES = [
-  { code: 'es', bcp: 'es-ES', label: 'Español', flag: '🇪🇸' },
-  { code: 'en', bcp: 'en-US', label: 'Inglés', flag: '🇬🇧' },
-  { code: 'ja', bcp: 'ja-JP', label: 'Japonés', flag: '🇯🇵' },
-  { code: 'fr', bcp: 'fr-FR', label: 'Francés', flag: '🇫🇷' },
-  { code: 'pt', bcp: 'pt-BR', label: 'Portugués', flag: '🇧🇷' },
-  { code: 'de', bcp: 'de-DE', label: 'Alemán', flag: '🇩🇪' },
-  { code: 'it', bcp: 'it-IT', label: 'Italiano', flag: '🇮🇹' },
-  { code: 'zh', bcp: 'zh-CN', label: 'Chino', flag: '🇨🇳' },
-  { code: 'ko', bcp: 'ko-KR', label: 'Coreano', flag: '🇰🇷' },
-  { code: 'ar', bcp: 'ar-SA', label: 'Árabe', flag: '🇸🇦' },
-  { code: 'th', bcp: 'th-TH', label: 'Tailandés', flag: '🇹🇭' },
-  { code: 'vi', bcp: 'vi-VN', label: 'Vietnamita', flag: '🇻🇳' },
-  { code: 'id', bcp: 'id-ID', label: 'Indonesio', flag: '🇮🇩' },
-  { code: 'tr', bcp: 'tr-TR', label: 'Turco', flag: '🇹🇷' },
-  { code: 'ru', bcp: 'ru-RU', label: 'Ruso', flag: '🇷🇺' },
-  { code: 'nl', bcp: 'nl-NL', label: 'Neerlandés', flag: '🇳🇱' },
-  { code: 'pl', bcp: 'pl-PL', label: 'Polaco', flag: '🇵🇱' },
-  { code: 'hi', bcp: 'hi-IN', label: 'Hindi', flag: '🇮🇳' },
-  { code: 'el', bcp: 'el-GR', label: 'Griego', flag: '🇬🇷' },
-  { code: 'he', bcp: 'he-IL', label: 'Hebreo', flag: '🇮🇱' },
-  { code: 'cs', bcp: 'cs-CZ', label: 'Checo', flag: '🇨🇿' },
-  { code: 'hu', bcp: 'hu-HU', label: 'Húngaro', flag: '🇭🇺' },
-  { code: 'ro', bcp: 'ro-RO', label: 'Rumano', flag: '🇷🇴' },
-  { code: 'uk', bcp: 'uk-UA', label: 'Ucraniano', flag: '🇺🇦' },
-  { code: 'sv', bcp: 'sv-SE', label: 'Sueco', flag: '🇸🇪' },
-  { code: 'nb', bcp: 'nb-NO', label: 'Noruego', flag: '🇳🇴' },
-  { code: 'da', bcp: 'da-DK', label: 'Danés', flag: '🇩🇰' },
-  { code: 'fi', bcp: 'fi-FI', label: 'Finlandés', flag: '🇫🇮' },
-  { code: 'ms', bcp: 'ms-MY', label: 'Malayo', flag: '🇲🇾' },
-  { code: 'tl', bcp: 'tl-PH', label: 'Filipino', flag: '🇵🇭' },
+  { code:'es', bcp:'es-ES', label:'Español',    flag:'🇪🇸' },
+  { code:'en', bcp:'en-US', label:'Inglés',     flag:'🇬🇧' },
+  { code:'ja', bcp:'ja-JP', label:'Japonés',    flag:'🇯🇵' },
+  { code:'fr', bcp:'fr-FR', label:'Francés',    flag:'🇫🇷' },
+  { code:'pt', bcp:'pt-BR', label:'Portugués',  flag:'🇧🇷' },
+  { code:'de', bcp:'de-DE', label:'Alemán',     flag:'🇩🇪' },
+  { code:'it', bcp:'it-IT', label:'Italiano',   flag:'🇮🇹' },
+  { code:'zh', bcp:'zh-CN', label:'Chino',      flag:'🇨🇳' },
+  { code:'ko', bcp:'ko-KR', label:'Coreano',    flag:'🇰🇷' },
+  { code:'ar', bcp:'ar-SA', label:'Árabe',      flag:'🇸🇦' },
+  { code:'th', bcp:'th-TH', label:'Tailandés',  flag:'🇹🇭' },
+  { code:'vi', bcp:'vi-VN', label:'Vietnamita', flag:'🇻🇳' },
+  { code:'id', bcp:'id-ID', label:'Indonesio',  flag:'🇮🇩' },
+  { code:'tr', bcp:'tr-TR', label:'Turco',      flag:'🇹🇷' },
+  { code:'ru', bcp:'ru-RU', label:'Ruso',       flag:'🇷🇺' },
+  { code:'nl', bcp:'nl-NL', label:'Neerlandés', flag:'🇳🇱' },
+  { code:'pl', bcp:'pl-PL', label:'Polaco',     flag:'🇵🇱' },
+  { code:'hi', bcp:'hi-IN', label:'Hindi',      flag:'🇮🇳' },
+  { code:'el', bcp:'el-GR', label:'Griego',     flag:'🇬🇷' },
+  { code:'he', bcp:'he-IL', label:'Hebreo',     flag:'🇮🇱' },
+  { code:'cs', bcp:'cs-CZ', label:'Checo',      flag:'🇨🇿' },
+  { code:'hu', bcp:'hu-HU', label:'Húngaro',    flag:'🇭🇺' },
+  { code:'sv', bcp:'sv-SE', label:'Sueco',      flag:'🇸🇪' },
+  { code:'nb', bcp:'nb-NO', label:'Noruego',    flag:'🇳🇴' },
+  { code:'da', bcp:'da-DK', label:'Danés',      flag:'🇩🇰' },
+  { code:'fi', bcp:'fi-FI', label:'Finlandés',  flag:'🇫🇮' },
+  { code:'ms', bcp:'ms-MY', label:'Malayo',     flag:'🇲🇾' },
+  { code:'tl', bcp:'tl-PH', label:'Filipino',   flag:'🇵🇭' },
 ];
 
-// ─── Translation API ──────────────────────────────────────────────────────────
 async function translateText(text, fromCode, toCode) {
-  if (fromCode === toCode) return text; // same language → return as-is
+  if (fromCode === toCode) return text;
   const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromCode}|${toCode}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error('Network error');
@@ -67,32 +53,22 @@ function speakText(text, bcpLang) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = bcpLang;
-  utt.rate = 0.85;
+  utt.lang = bcpLang; utt.rate = 0.85;
   window.speechSynthesis.speak(utt);
 }
 
-// ─── Language selector — clean pill with dropdown ─────────────────────────────
 function LangSelect({ value, onChange, label }) {
-  const lang = LANGUAGES.find(l => l.code === value) || LANGUAGES[0];
   return (
     <div className="flex-1">
       {label && <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{label}</p>}
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className="w-full h-11 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
-        style={{ backgroundImage: 'none' }}
-      >
-        {LANGUAGES.map(l => (
-          <option key={l.code} value={l.code}>{l.flag} {l.label}</option>
-        ))}
+      <select value={value} onChange={e => onChange(e.target.value)}
+        className="w-full h-11 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none">
+        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
       </select>
     </div>
   );
 }
 
-// ─── Mic / Voice button ───────────────────────────────────────────────────────
 function VoiceButton({ fromLang, toLang, isActive, onActivate, onResult, onError }) {
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
@@ -100,19 +76,14 @@ function VoiceButton({ fromLang, toLang, isActive, onActivate, onResult, onError
 
   const handlePress = () => {
     if (isActive && recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-      onActivate(false);
-      return;
+      recognitionRef.current.stop(); recognitionRef.current = null; onActivate(false); return;
     }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { onError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.'); return; }
     onError('');
     const recognition = new SR();
     recognitionRef.current = recognition;
-    recognition.lang = fromL.bcp;
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.lang = fromL.bcp; recognition.continuous = false; recognition.interimResults = false;
     recognition.onstart = () => onActivate(true);
     recognition.onend = () => { recognitionRef.current = null; onActivate(false); };
     recognition.onerror = e => {
@@ -125,9 +96,8 @@ function VoiceButton({ fromLang, toLang, isActive, onActivate, onResult, onError
     recognition.onresult = async e => {
       const text = e.results[0][0].transcript;
       try {
-        if (fromLang === toLang) {
-          onResult(text, text);
-        } else {
+        if (fromLang === toLang) { onResult(text, text); }
+        else {
           const translation = await translateText(text, fromL.code, toL.code);
           onResult(text, translation);
           if (translation) speakText(translation, toL.bcp);
@@ -139,23 +109,18 @@ function VoiceButton({ fromLang, toLang, isActive, onActivate, onResult, onError
   };
 
   return (
-    <div
-      onClick={handlePress}
+    <div onClick={handlePress}
       className={`rounded-2xl border-2 p-6 flex flex-col items-center gap-3 cursor-pointer transition-all select-none ${
         isActive ? 'bg-primary border-primary' : 'bg-white border-border hover:border-primary/40'
-      }`}
-    >
+      }`}>
       <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${isActive ? 'bg-white/20' : 'bg-orange-50'}`}>
-        {isActive
-          ? <MicOff className="w-7 h-7 text-white" />
-          : <Mic className="w-7 h-7 text-primary" />
-        }
+        {isActive ? <MicOff className="w-7 h-7 text-white" /> : <Mic className="w-7 h-7 text-primary" />}
       </div>
       {isActive ? (
         <>
           <div className="flex items-end gap-1 h-5">
             {[4,7,10,7,4].map((h,i) => (
-              <div key={i} className="w-1 bg-white rounded-full" style={{height:h+'px',animation:`pulse 0.6s ease-in-out ${i*0.1}s infinite alternate`}} />
+              <div key={i} className="w-1 bg-white rounded-full" style={{height:h+'px',animation:`pulse 0.6s ease-in-out ${i*0.1}s infinite alternate`}}/>
             ))}
           </div>
           <p className="text-xs text-white/80 font-medium">Toca para parar</p>
@@ -171,42 +136,11 @@ function VoiceButton({ fromLang, toLang, isActive, onActivate, onResult, onError
   );
 }
 
-// ─── Horizontal chips with scroll shadow hint ─────────────────────────────────
-function ScrollableChips({ children }) {
-  const ref = useRef(null);
-  const [showRight, setShowRight] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const check = () => setShowRight(el.scrollWidth > el.clientWidth + el.scrollLeft + 4);
-    check();
-    el.addEventListener('scroll', check);
-    window.addEventListener('resize', check);
-    return () => { el.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
-  }, []);
-  return (
-    <div className="relative">
-      <div ref={ref} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-        {children}
-      </div>
-      {showRight && (
-        <div className="absolute right-0 top-0 bottom-1 w-8 pointer-events-none bg-gradient-to-l from-background to-transparent" />
-      )}
-    </div>
-  );
-}
-
-// ─── Translation result card ──────────────────────────────────────────────────
 function ResultCard({ original, translated, fromLang, toLang, onClear }) {
   const [copiedId, setCopiedId] = useState(null);
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
-
-  const copy = (text, id) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
+  const copy = (text, id) => { navigator.clipboard.writeText(text); setCopiedId(id); setTimeout(()=>setCopiedId(null),2000); };
 
   return (
     <div className="bg-white rounded-2xl border border-border overflow-hidden">
@@ -227,9 +161,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear }) {
             </button>
             <button onClick={() => copy(translated, 'trans')}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors">
-              {copiedId === 'trans'
-                ? <><Check className="w-3.5 h-3.5 text-green-500" />Copiado</>
-                : <><Copy className="w-3.5 h-3.5" />Copiar</>}
+              {copiedId === 'trans' ? <><Check className="w-3.5 h-3.5 text-green-500" />Copiado</> : <><Copy className="w-3.5 h-3.5" />Copiar</>}
             </button>
             <button onClick={onClear}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors ml-auto">
@@ -242,7 +174,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear }) {
   );
 }
 
-// ─── Main content ─────────────────────────────────────────────────────────────
+// ── Main content (shared between standalone + panel) ──────────────────────────
 function TranslatorContent({ tripId }) {
   const { user } = useAuth();
   const { trip, activeCity } = useTripContext(tripId);
@@ -251,7 +183,6 @@ function TranslatorContent({ tripId }) {
   const tripLangCode = meta.languageCode?.split('-')[0] || 'en';
   const tripLang = LANGUAGES.find(l => l.code === tripLangCode) ? tripLangCode : 'en';
 
-  // Get user's home language from profile
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', user?.id],
     queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: user.id }); return r[0] || null; },
@@ -267,42 +198,33 @@ function TranslatorContent({ tripId }) {
   const [toLang, setToLang] = useState(tripLang);
   const [sameLanguageDismissed, setSameLanguageDismissed] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
-  const [voiceResult, setVoiceResult] = useState({ original: '', translated: '' });
+  const [voiceResult, setVoiceResult] = useState({ original:'', translated:'' });
   const [voiceError, setVoiceError] = useState('');
   const [inputText, setInputText] = useState('');
-  const [writeResult, setWriteResult] = useState({ original: '', translated: '' });
+  const [writeResult, setWriteResult] = useState({ original:'', translated:'' });
   const [isTranslating, setIsTranslating] = useState(false);
   const [writeError, setWriteError] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState({ 'Básicas': true, 'Restaurante': true });
-  const [copiedId, setCopiedId] = useState(null);
 
   useEffect(() => { setToLang(tripLang); }, [tripLang]);
   useEffect(() => { setFromLang(userLang); }, [userLang]);
 
   const voiceSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-  const phrasePack = countryRaw ? getPhrasesForCountry(countryRaw) : null;
-  const categories = phrasePack?.categories || [];
-  const totalPhrases = categories.reduce((n, c) => n + (c.items?.length || 0), 0);
-
-  // Same language detection: user home lang === trip lang
   const isSameLanguage = homeLangCode === tripLangCode;
   const showSameLanguageBanner = isSameLanguage && !sameLanguageDismissed;
 
   const handleSwap = () => {
     setFromLang(toLang); setToLang(fromLang);
-    setVoiceResult({ original: '', translated: '' });
-    setWriteResult({ original: '', translated: '' });
+    setVoiceResult({ original:'', translated:'' });
+    setWriteResult({ original:'', translated:'' });
     setInputText('');
   };
 
   const handleWriteTranslate = async () => {
     if (!inputText.trim()) return;
-    setIsTranslating(true); setWriteError('');
-    setWriteResult({ original: '', translated: '' });
+    setIsTranslating(true); setWriteError(''); setWriteResult({ original:'', translated:'' });
     try {
-      if (fromLang === toLang) {
-        setWriteResult({ original: inputText, translated: inputText });
-      } else {
+      if (fromLang === toLang) { setWriteResult({ original: inputText, translated: inputText }); }
+      else {
         const result = await translateText(inputText, fromLang, toLang);
         setWriteResult({ original: inputText, translated: result });
       }
@@ -313,26 +235,19 @@ function TranslatorContent({ tripId }) {
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
-  const copyPhrase = (text, id) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  // Lang selector row (shared between Hablada & Escrita)
   const LangRow = () => (
     <div className="flex items-end gap-2 bg-white rounded-2xl border border-border p-4">
-      <LangSelect value={fromLang} onChange={v => { setFromLang(v); setVoiceResult({ original:'',translated:'' }); setWriteResult({ original:'',translated:'' }); }} label="De" />
+      <LangSelect value={fromLang} onChange={v => { setFromLang(v); setVoiceResult({original:'',translated:''}); setWriteResult({original:'',translated:''}); }} label="De" />
       <button onClick={handleSwap} className="mb-0.5 p-2.5 rounded-xl border border-border bg-secondary hover:bg-orange-50 hover:border-primary/30 transition-colors flex-shrink-0">
         <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
       </button>
-      <LangSelect value={toLang} onChange={v => { setToLang(v); setVoiceResult({ original:'',translated:'' }); setWriteResult({ original:'',translated:'' }); }} label="A" />
+      <LangSelect value={toLang} onChange={v => { setToLang(v); setVoiceResult({original:'',translated:''}); setWriteResult({original:'',translated:''}); }} label="A" />
     </div>
   );
 
   return (
     <>
-      {/* Same-language banner — shown above tabs, no "open anyway" button (translator is already open) */}
+      {/* Same-language banner — no "abrir igualmente" button since translator is already open */}
       {showSameLanguageBanner && (
         <div className="mt-5 bg-green-50 border border-green-200 rounded-2xl p-4">
           <div className="flex items-start gap-3">
@@ -340,48 +255,46 @@ function TranslatorContent({ tripId }) {
             <div className="flex-1">
               <p className="text-sm font-medium text-green-900">¡Enhorabuena, habláis el mismo idioma!</p>
               <p className="text-sm text-green-700 mt-1 leading-relaxed">
-                En {meta.flag} <strong>{countryRaw}</strong> hablan <strong>{meta.languageLabel}</strong>, igual que tú. No necesitarás traductor para el día a día.
+                En {meta.flag} <strong>{countryRaw}</strong> hablan <strong>{meta.languageLabel}</strong>, igual que tú.
+                No necesitarás traductor para el día a día.
               </p>
             </div>
-            <button onClick={() => setSameLanguageDismissed(true)} className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors mt-0.5">
+            <button onClick={() => setSameLanguageDismissed(true)}
+              className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs — 3 only, no Frases */}
       <div className={`flex border-b border-border ${showSameLanguageBanner ? 'mt-4' : 'mt-5'}`}>
         {[
           ['hablada', '🎙️', 'Hablada'],
-          ['escrita', '✍️', 'Escrita'],
-          ['imagen', '📷', 'Imagen'],
-          ['frases', '📖', `Frases${totalPhrases > 0 ? ` (${totalPhrases})` : ''}`],
+          ['escrita',  '✍️', 'Escrita'],
+          ['imagen',   '📷', 'Imagen'],
         ].map(([k, emoji, label]) => (
           <button key={k} onClick={() => setTab(k)}
-            className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors flex flex-col items-center gap-0.5 ${
-              tab === k ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
+            className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${
+              tab === k ? 'border-primary' : 'border-transparent'
             }`}>
-            <span className="text-base">{emoji}</span>
-            <span className="text-xs">{label}</span>
+            <span className="text-base leading-none">{emoji}</span>
+            <span className={`text-xs font-medium leading-none ${tab === k ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
           </button>
         ))}
       </div>
 
       <div className="py-5 space-y-4">
 
-        {/* ── TAB: HABLADA ─────────────────────────────────────────────────── */}
+        {/* ── HABLADA ───────────────────────────────────────────────────── */}
         {tab === 'hablada' && (
           <>
             <LangRow />
             {voiceSupported ? (
-              <VoiceButton
-                fromLang={fromLang} toLang={toLang}
-                isActive={voiceActive}
+              <VoiceButton fromLang={fromLang} toLang={toLang} isActive={voiceActive}
                 onActivate={v => setVoiceActive(v)}
                 onResult={(original, translated) => { setVoiceError(''); setVoiceResult({ original, translated }); }}
-                onError={setVoiceError}
-              />
+                onError={setVoiceError} />
             ) : (
               <div className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
@@ -395,17 +308,14 @@ function TranslatorContent({ tripId }) {
               </div>
             )}
             {(voiceResult.original || voiceResult.translated) && (
-              <ResultCard
-                original={voiceResult.original}
-                translated={voiceResult.translated}
+              <ResultCard original={voiceResult.original} translated={voiceResult.translated}
                 fromLang={fromLang} toLang={toLang}
-                onClear={() => setVoiceResult({ original: '', translated: '' })}
-              />
+                onClear={() => setVoiceResult({ original:'', translated:'' })} />
             )}
           </>
         )}
 
-        {/* ── TAB: ESCRITA ─────────────────────────────────────────────────── */}
+        {/* ── ESCRITA ───────────────────────────────────────────────────── */}
         {tab === 'escrita' && (
           <>
             <LangRow />
@@ -415,16 +325,16 @@ function TranslatorContent({ tripId }) {
                 <textarea
                   placeholder={`Escribe en ${fromL.label}...`}
                   value={inputText}
-                  onChange={e => { setInputText(e.target.value); setWriteResult({ original: '', translated: '' }); setWriteError(''); }}
+                  onChange={e => { setInputText(e.target.value); setWriteResult({ original:'', translated:'' }); setWriteError(''); }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleWriteTranslate(); } }}
                   rows={4}
                   className="w-full text-sm resize-none outline-none text-foreground bg-transparent"
                 />
               </div>
               <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-secondary/30">
-                {inputText ? (
-                  <button onClick={() => { setInputText(''); setWriteResult({ original:'',translated:'' }); }} className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
-                ) : <span />}
+                {inputText
+                  ? <button onClick={() => { setInputText(''); setWriteResult({original:'',translated:''}); }} className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
+                  : <span />}
                 <div className="flex items-center gap-2">
                   <button onClick={() => speakText(inputText, fromL.bcp)} disabled={!inputText.trim()}
                     className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors">
@@ -445,113 +355,43 @@ function TranslatorContent({ tripId }) {
               </div>
             )}
             {(writeResult.original || writeResult.translated) && (
-              <ResultCard
-                original={writeResult.original}
-                translated={writeResult.translated}
+              <ResultCard original={writeResult.original} translated={writeResult.translated}
                 fromLang={fromLang} toLang={toLang}
-                onClear={() => setWriteResult({ original: '', translated: '' })}
-              />
+                onClear={() => setWriteResult({ original:'', translated:'' })} />
             )}
           </>
         )}
 
-        {/* ── TAB: IMAGEN ──────────────────────────────────────────────────── */}
+        {/* ── IMAGEN ────────────────────────────────────────────────────── */}
         {tab === 'imagen' && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-5">
               <Camera className="w-8 h-8 text-muted-foreground/50" />
             </div>
             <p className="text-base font-medium text-foreground mb-2">Traducción de imagen</p>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-5">
               Apunta la cámara a un menú, cartel o texto y tradúcelo al instante.
             </p>
-            <div className="mt-5 inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-primary text-xs font-medium px-4 py-2 rounded-full">
+            <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-primary text-xs font-medium px-4 py-2 rounded-full">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               Próximamente
             </div>
-            <p className="text-xs text-muted-foreground mt-3 leading-relaxed max-w-xs">
+            <p className="text-xs text-muted-foreground mt-3 max-w-xs">
               Esta función requiere visión por IA. La añadiremos en una próxima actualización.
             </p>
           </div>
-        )}
-
-        {/* ── TAB: FRASES ──────────────────────────────────────────────────── */}
-        {tab === 'frases' && (
-          <>
-            {categories.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
-                <p className="text-4xl mb-3">🔍</p>
-                <p className="text-sm font-medium text-foreground mb-1">Sin frases disponibles</p>
-                <p className="text-xs text-muted-foreground">
-                  No tenemos frases para <strong>{countryRaw || 'este destino'}</strong> todavía.
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className="text-xs text-muted-foreground px-1">
-                  {totalPhrases} frases · Español → {meta.languageLabel || 'local'} {meta.flag}
-                </p>
-                {categories.map(category => (
-                  <Collapsible
-                    key={category.name}
-                    open={expandedCategories[category.name] !== false}
-                    onOpenChange={() => setExpandedCategories(p => ({ ...p, [category.name]: !p[category.name] }))}
-                  >
-                    <div className="bg-white rounded-2xl border border-border overflow-hidden">
-                      <CollapsibleTrigger className="w-full flex items-center justify-between px-4 py-3 border-b border-border hover:bg-secondary/30 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">{CAT_ICONS[category.name] || '💬'}</span>
-                          <span className="text-sm font-medium text-foreground">{category.name}</span>
-                          <span className="text-xs text-muted-foreground">{category.items?.length}</span>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedCategories[category.name] !== false ? 'rotate-180' : ''}`} />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div>
-                          {category.items?.map((phrase, idx) => (
-                            <div key={idx}
-                              className={`flex items-start justify-between gap-3 px-4 py-3 group hover:bg-secondary/20 transition-colors ${idx > 0 ? 'border-t border-border' : ''}`}>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-muted-foreground">{phrase.source}</p>
-                                <p className="text-sm font-medium text-foreground mt-0.5">{phrase.target}</p>
-                                {phrase.romanization && (
-                                  <p className="text-xs text-primary italic mt-0.5">{phrase.romanization}</p>
-                                )}
-                              </div>
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5">
-                                <button onClick={() => speakText(phrase.target, meta.languageCode || 'en')}
-                                  className="w-7 h-7 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-secondary/50 transition-colors">
-                                  <Volume2 className="w-3.5 h-3.5 text-muted-foreground" />
-                                </button>
-                                <button onClick={() => copyPhrase(phrase.target, `${category.name}-${idx}`)}
-                                  className="w-7 h-7 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-secondary/50 transition-colors">
-                                  {copiedId === `${category.name}-${idx}`
-                                    ? <Check className="w-3.5 h-3.5 text-green-500" />
-                                    : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CollapsibleContent>
-                    </div>
-                  </Collapsible>
-                ))}
-              </>
-            )}
-          </>
         )}
       </div>
     </>
   );
 }
 
-// ── Export for Utilities ──────────────────────────────────────────────────────
+// Export for Utilities embed
 export function TranslatorPanel({ tripId }) {
   return <TranslatorContent tripId={tripId} />;
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// Standalone page
 export default function Translator() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
@@ -563,19 +403,21 @@ export default function Translator() {
 
   return (
     <div className="bg-background min-h-screen">
+      {/* Header — same pattern as Documents */}
       <div className="bg-background border-b border-border sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-                <ArrowRight className="w-4 h-4 rotate-180" />Inicio
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Inicio
               </button>
             </Link>
             {countryRaw && (
               <span className="text-sm text-muted-foreground">{meta.flag} {countryRaw}</span>
             )}
           </div>
-          <h1 className="text-2xl font-medium text-foreground mb-4">Traductor</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Traductor</h1>
         </div>
       </div>
       <div className="max-w-3xl mx-auto px-5 pb-24">
