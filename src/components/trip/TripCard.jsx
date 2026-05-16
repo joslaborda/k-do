@@ -1,119 +1,148 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Users } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getTripCoverImage } from '@/lib/tripImage';
+import { getCountryMeta } from '@/lib/countryConfig';
 
-function getTripStatus(trip) {
+export function getTripStatus(trip) {
   if (!trip.start_date) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const start = new Date(trip.start_date);
-  const end = trip.end_date ? new Date(trip.end_date) : null;
-
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(trip.start_date + 'T00:00:00');
+  const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
   if (today < start) {
     const days = differenceInDays(start, today);
-    return { label: `En ${days} día${days !== 1 ? 's' : ''}`, type: 'upcoming' };
+    return { label:`En ${days} día${days!==1?'s':''}`, days, type:'upcoming' };
   }
-  if (end && today > end) {
-    return { label: 'Finalizado', type: 'past' };
+  if (end && today > end) return { label:'Finalizado', type:'past' };
+  if (end) {
+    const dayNum = differenceInDays(today, start) + 1;
+    const total  = differenceInDays(end, start) + 1;
+    return { label:'En curso', dayNum, total, type:'active' };
   }
-  return { label: 'En curso', type: 'active' };
+  return { label:'En curso', type:'active' };
 }
 
 function getTripDuration(trip) {
   if (!trip.start_date || !trip.end_date) return null;
-  const days = differenceInDays(new Date(trip.end_date), new Date(trip.start_date)) + 1;
-  return days;
+  return differenceInDays(new Date(trip.end_date), new Date(trip.start_date)) + 1;
 }
 
 function formatDateRange(trip) {
   if (!trip.start_date) return null;
-  const start = format(new Date(trip.start_date), 'd MMM', { locale: es });
-  if (!trip.end_date) return start;
-  const end = format(new Date(trip.end_date), 'd MMM', { locale: es });
-  return `${start} – ${end}`;
+  const s = format(new Date(trip.start_date+'T12:00:00'), 'd MMM', { locale:es });
+  if (!trip.end_date) return s;
+  return `${s} – ${format(new Date(trip.end_date+'T12:00:00'), 'd MMM', { locale:es })}`;
 }
 
 function getRouteSubtitle(trip, cities) {
-  if (cities.length > 0) {
-    const sorted = [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    return sorted.map(c => c.name).join(' → ');
-  }
+  if (cities.length > 0)
+    return [...cities].sort((a,b)=>(a.order??0)-(b.order??0)).map(c=>c.name).join(' · ');
   return trip.country || trip.destination || '';
 }
 
-const statusStyles = {
-  upcoming: 'bg-orange-100 text-orange-700',
-  active: 'bg-green-100 text-green-700',
-  past: 'bg-gray-100 text-gray-500',
-};
+function getFlag(trip, cities) {
+  const country = cities[0]?.country || trip.country || trip.destination || '';
+  return getCountryMeta(country)?.flag || '🌍';
+}
 
-export default function TripCard({ trip, cities = [] }) {
+// ── Hero card ─────────────────────────────────────────────────────────────────
+export function HeroTripCard({ trip, cities = [] }) {
   const coverImage = getTripCoverImage(trip, cities);
-  const status = getTripStatus(trip);
-  const duration = getTripDuration(trip);
-  const dateRange = formatDateRange(trip);
-  const subtitle = getRouteSubtitle(trip, cities);
+  const status     = getTripStatus(trip);
+  const dateRange  = formatDateRange(trip);
+  const subtitle   = getRouteSubtitle(trip, cities);
+  const duration   = getTripDuration(trip);
+
+  const badgeCls = status?.type==='active'
+    ? 'bg-green-50/90 text-green-700 border border-green-200'
+    : status?.type==='upcoming'
+      ? 'bg-orange-50/90 text-primary border border-orange-200'
+      : 'bg-gray-100/90 text-gray-500 border border-gray-200';
+
+  const topLeft = status?.type==='active' && status.dayNum
+    ? `Día ${status.dayNum} de ${status.total}`
+    : status?.type==='upcoming'
+      ? `Faltan ${status.days} días`
+      : null;
 
   return (
     <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
-      <div className="bg-white border border-border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
-        {/* Cover Image */}
-        <div className="h-44 relative overflow-hidden bg-gradient-to-br from-orange-400 to-orange-700">
-          <img
-            src={coverImage}
-            alt={trip.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-          {/* Status badge */}
+      <div className="rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-shadow">
+        <div className="h-44 relative overflow-hidden bg-stone-800">
+          <img src={coverImage} alt={trip.name}
+            className="w-full h-full object-cover opacity-85"
+            onError={e=>{e.currentTarget.style.display='none'}}/>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent"/>
           {status && (
-            <div className="absolute top-3 right-3">
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyles[status.type]}`}>
-                {status.label}
-              </span>
+            <div className={`absolute top-2.5 right-2.5 text-xs font-medium px-2.5 py-1 rounded-full ${badgeCls}`}>
+              {status.label}
             </div>
           )}
-
-          {/* Title + subtitle over image */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-xl font-bold text-white drop-shadow leading-tight mb-0.5">{trip.name}</h3>
-            {subtitle && (
-              <p className="text-white/80 text-xs font-medium truncate">{subtitle}</p>
-            )}
+          {topLeft && (
+            <div className="absolute top-2.5 left-2.5 bg-black/35 rounded-lg px-2.5 py-1">
+              <p className="text-xs font-medium text-white leading-none">{topLeft}</p>
+            </div>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
+            <p className="text-base font-medium text-white mb-1">{trip.name}</p>
+            {subtitle && <p className="text-xs text-white/70 truncate mb-2">{subtitle}</p>}
+            <div className="flex gap-1.5">
+              {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">📅 {duration} días</div>}
+              {trip.members?.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">👥 {trip.members.length}</div>}
+              {cities.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">📍 {cities[0].name}</div>}
+            </div>
           </div>
         </div>
-
-        {/* Info row */}
-        <div className="px-4 py-3 flex items-center justify-between gap-3">
-          {/* Dates + duration */}
-          <div className="min-w-0">
-            {dateRange ? (
-              <p className="text-sm font-medium text-foreground truncate">
-                {dateRange}{duration ? <span className="text-muted-foreground font-normal"> · {duration} días</span> : ''}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground">Sin fechas</p>
-            )}
-          </div>
-
-          {/* Travelers + currency */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Users className="w-3.5 h-3.5" />
-              {trip.members?.length || 1}
-            </span>
-            {trip.currency && (
-              <span className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-full font-medium">
-                {trip.currency}
-              </span>
-            )}
-          </div>
+        <div className="bg-white px-3 py-2.5 flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">{dateRange || 'Sin fechas'}</p>
+          <p className="text-xs text-primary font-medium">Abrir →</p>
         </div>
+      </div>
+    </Link>
+  );
+}
+
+// ── Compact card ──────────────────────────────────────────────────────────────
+export default function TripCard({ trip, cities = [] }) {
+  const coverImage = getTripCoverImage(trip, cities);
+  const status     = getTripStatus(trip);
+  const dateRange  = formatDateRange(trip);
+  const subtitle   = getRouteSubtitle(trip, cities);
+  const flag       = getFlag(trip, cities);
+  const isPast     = status?.type === 'past';
+
+  const badgeCls = isPast
+    ? 'bg-gray-100 text-gray-500 border border-gray-200'
+    : 'bg-orange-50 text-primary border border-orange-200';
+
+  const badgeLabel = isPast ? 'Finalizado'
+    : status?.days != null ? `${status.days} días`
+    : status?.label;
+
+  return (
+    <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
+      <div className={`bg-white border border-border rounded-2xl p-3 flex items-center gap-3 hover:shadow-md transition-shadow relative ${isPast ? 'opacity-65' : ''}`}>
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-secondary flex items-center justify-center text-2xl">
+          <img src={coverImage} alt={trip.name}
+            className={`w-full h-full object-cover ${isPast?'grayscale-[30%]':''}`}
+            onError={e=>{
+              e.currentTarget.style.display='none';
+              if (e.currentTarget.parentElement) e.currentTarget.parentElement.innerHTML=`<span style="font-size:26px">${flag}</span>`;
+            }}/>
+        </div>
+        <div className="flex-1 min-w-0 pr-16">
+          <p className="text-sm font-medium text-foreground truncate mb-1">{trip.name}</p>
+          {subtitle && <p className="text-xs text-muted-foreground truncate mb-1">{subtitle}</p>}
+          <p className="text-xs text-muted-foreground">
+            {dateRange || 'Sin fechas'}{trip.members?.length > 0 ? ` · 👥 ${trip.members.length}` : ''}
+          </p>
+        </div>
+        {status && (
+          <div className={`absolute top-2.5 right-2.5 text-xs font-medium px-2 py-0.5 rounded-full ${badgeCls}`}>
+            {badgeLabel}
+          </div>
+        )}
       </div>
     </Link>
   );
