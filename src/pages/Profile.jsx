@@ -1,112 +1,132 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ArrowLeft, Settings, MapPin, Globe, ChevronDown, ChevronRight, BookmarkCheck, Pencil, Share2 } from 'lucide-react';
+import { Plus, Search, X, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { getCountryMeta } from '@/lib/countryConfig';
 
-const COUNTRIES = [
-  { name: 'España', flag: '🇪🇸', currency: 'EUR' },
-  { name: 'México', flag: '🇲🇽', currency: 'MXN' },
-  { name: 'Colombia', flag: '🇨🇴', currency: 'COP' },
-  { name: 'Argentina', flag: '🇦🇷', currency: 'ARS' },
-  { name: 'Perú', flag: '🇵🇪', currency: 'PEN' },
-  { name: 'Chile', flag: '🇨🇱', currency: 'CLP' },
-  { name: 'Venezuela', flag: '🇻🇪', currency: 'VES' },
-  { name: 'Ecuador', flag: '🇪🇨', currency: 'USD' },
-  { name: 'Estados Unidos', flag: '🇺🇸', currency: 'USD' },
-  { name: 'Brasil', flag: '🇧🇷', currency: 'BRL' },
-  { name: 'Reino Unido', flag: '🇬🇧', currency: 'GBP' },
-  { name: 'Francia', flag: '🇫🇷', currency: 'EUR' },
-  { name: 'Alemania', flag: '🇩🇪', currency: 'EUR' },
-  { name: 'Italia', flag: '🇮🇹', currency: 'EUR' },
-  { name: 'Otro', flag: '🌍', currency: 'USD' },
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────────────────────
+const TYPE_EMOJI  = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍', other:'📍' };
+const TYPE_LABEL  = { food:'Comida', sight:'Sights', activity:'Actividades', shopping:'Compras', custom:'Otro' };
+const TYPE_FILTERS = [
+  { key:'all',      label:'Todos' },
+  { key:'food',     label:'🍜 Comida' },
+  { key:'sight',    label:'🏛️ Sights' },
+  { key:'activity', label:'⚡ Actividades' },
+  { key:'shopping', label:'🛍️ Compras' },
 ];
 
-const TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
-
-// Agrupa spots por país → ciudad
-function groupByCountryCity(spots) {
-  const groups = {};
+// ─────────────────────────────────────────────────────────────────────────────
+// Group spots by country → city
+// ─────────────────────────────────────────────────────────────────────────────
+function groupByCountry(spots) {
+  const g = {};
   spots.forEach(s => {
     const country = s.country || 'Otros';
-    const city = s.city_name || s.city || '—';
-    if (!groups[country]) groups[country] = {};
-    if (!groups[country][city]) groups[country][city] = [];
-    groups[country][city].push(s);
+    if (!g[country]) g[country] = [];
+    g[country].push(s);
   });
-  return groups;
+  return Object.entries(g).sort((a, b) => b[1].length - a[1].length);
 }
 
-function SpotMiniCard({ spot }) {
+function countryFlag(country) {
+  return getCountryMeta(country)?.flag || '🌍';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Spot row — used in both tabs and search results
+// ─────────────────────────────────────────────────────────────────────────────
+function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
   const emoji = TYPE_EMOJI[spot.type] || '📍';
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
-      <span className="text-lg flex-shrink-0">{emoji}</span>
+    <div className="flex items-center gap-2.5 px-3 py-2.5">
+      <span className="text-base flex-shrink-0">{emoji}</span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
-        {spot.notes && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{spot.notes}</p>}
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {spot.city_name || spot.city || ''}
+          {showLikes && spot.likes_count ? ` · ${spot.likes_count} likes` : ''}
+        </p>
       </div>
-      <div className="flex items-center gap-1 flex-shrink-0">
-        {spot.visited && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">✅</span>}
-      </div>
+      {showVisibility && (
+        <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
+          spot.visibility === 'public'
+            ? 'bg-orange-50 text-primary border border-orange-200'
+            : 'bg-gray-100 text-gray-500 border border-gray-200'
+        }`}>
+          {spot.visibility === 'public' ? 'Público' : 'Privado'}
+        </span>
+      )}
+      {onSave && !isSaved && (
+        <button onClick={() => onSave(spot)}
+          className="w-7 h-7 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 hover:bg-orange-100 transition-colors">
+          <Plus className="w-3.5 h-3.5 text-primary" />
+        </button>
+      )}
+      {onSave && isSaved && (
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
+          ✓ Guardado
+        </span>
+      )}
     </div>
   );
 }
 
-function CountryCityAccordion({ groups }) {
-  const [openCountries, setOpenCountries] = useState({});
-  const [openCities, setOpenCities] = useState({});
-  const countries = Object.keys(groups);
-  if (!countries.length) return (
-    <div className="text-center py-8">
-      <p className="text-2xl mb-2">📍</p>
-      <p className="text-sm text-muted-foreground">Nada aquí todavía</p>
+// ─────────────────────────────────────────────────────────────────────────────
+// Spot collection grouped by country
+// ─────────────────────────────────────────────────────────────────────────────
+function SpotCollection({ spots, showLikes = false, showVisibility = false }) {
+  const [expanded, setExpanded] = useState({});
+  const [showAll, setShowAll] = useState({});
+
+  if (!spots.length) return (
+    <div className="text-center py-10 px-4">
+      <p className="text-3xl mb-2">📍</p>
+      <p className="text-sm font-medium text-foreground mb-1">Nada aquí todavía</p>
+      <p className="text-xs text-muted-foreground">Usa el buscador para descubrir spots y guardarlos</p>
     </div>
   );
+
+  const groups = groupByCountry(spots);
+
   return (
-    <div className="space-y-2">
-      {countries.map(country => {
-        const cities = groups[country];
-        const totalSpots = Object.values(cities).flat().length;
-        const isOpen = openCountries[country] !== false; // open by default
+    <div>
+      {groups.map(([country, cSpots], gi) => {
+        const isExp = expanded[country] !== false;
+        const previewCount = 2;
+        const visible = isExp ? (showAll[country] ? cSpots : cSpots.slice(0, previewCount)) : [];
+        const flag = countryFlag(country);
+
         return (
-          <div key={country} className="rounded-xl border border-border overflow-hidden">
-            <button onClick={() => setOpenCountries(p => ({ ...p, [country]: !isOpen }))}
-              className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-border/40 transition-colors">
+          <div key={country} className={gi > 0 ? 'border-t border-border' : ''}>
+            <button onClick={() => setExpanded(p => ({ ...p, [country]: !isExp }))}
+              className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-secondary/30 transition-colors">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm">{country}</span>
-                <span className="text-xs text-muted-foreground">{totalSpots} spot{totalSpots !== 1 ? 's' : ''}</span>
+                <span className="text-sm">{flag}</span>
+                <span className="text-sm font-medium text-foreground">{country}</span>
+                <span className="text-xs text-muted-foreground">· {cSpots.length} spot{cSpots.length !== 1 ? 's' : ''}</span>
               </div>
-              {isOpen ? <ChevronDown className="w-4 h-4 text-muted-foreground"/> : <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                className={`text-muted-foreground transition-transform ${isExp ? 'rotate-90' : ''}`}>
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
             </button>
-            {isOpen && (
-              <div className="divide-y divide-border">
-                {Object.entries(cities).map(([city, spots]) => {
-                  const cityKey = country + city;
-                  const cityOpen = openCities[cityKey] !== false;
-                  return (
-                    <div key={city}>
-                      <button onClick={() => setOpenCities(p => ({ ...p, [cityKey]: !cityOpen }))}
-                        className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-secondary/50 transition-colors">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-foreground">{city}</span>
-                          <span className="text-xs text-muted-foreground">{spots.length}</span>
-                        </div>
-                        {cityOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground"/> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground"/>}
-                      </button>
-                      {cityOpen && (
-                        <div className="px-4 pb-2">
-                          {spots.map((s, i) => <SpotMiniCard key={s.id || i} spot={s} />)}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+
+            {isExp && visible.map(spot => (
+              <div key={spot.id} className="border-t border-border">
+                <SpotRow spot={spot} showLikes={showLikes} showVisibility={showVisibility} />
               </div>
+            ))}
+
+            {isExp && !showAll[country] && cSpots.length > previewCount && (
+              <button onClick={() => setShowAll(p => ({ ...p, [country]: true }))}
+                className="w-full text-left px-3 py-2 text-xs text-primary font-medium border-t border-border hover:bg-secondary/20 transition-colors">
+                Ver {cSpots.length - previewCount} más →
+              </button>
             )}
           </div>
         );
@@ -115,16 +135,137 @@ function CountryCityAccordion({ groups }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Spot search panel
+// ─────────────────────────────────────────────────────────────────────────────
+function SpotSearchPanel({ savedSpotIds, onSave }) {
+  const [query, setQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [toastMsg, setToastMsg] = useState(null);
+  const inputRef = useRef(null);
+
+  const { data: allPublicSpots = [], isLoading } = useQuery({
+    queryKey: ['publicSpots'],
+    queryFn: async () => {
+      const spots = await base44.entities.Spot.filter({ visibility: 'public' });
+      return spots;
+    },
+    staleTime: 60000,
+  });
+
+  const results = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.toLowerCase();
+    return allPublicSpots.filter(s => {
+      const matchesText =
+        s.title?.toLowerCase().includes(q) ||
+        s.city_name?.toLowerCase().includes(q) ||
+        s.country?.toLowerCase().includes(q) ||
+        s.tags?.some(t => t.toLowerCase().includes(q));
+      const matchesType = typeFilter === 'all' || s.type === typeFilter;
+      return matchesText && matchesType;
+    }).slice(0, 20);
+  }, [query, typeFilter, allPublicSpots]);
+
+  const handleSave = async (spot) => {
+    await onSave(spot);
+    setToastMsg(`${spot.title} guardado · Añadido a tu carpeta ${spot.country || ''}`);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  return (
+    <div className="space-y-2">
+      {/* Search input */}
+      <div className={`bg-white border rounded-2xl px-3 py-2.5 flex items-center gap-2 transition-colors ${
+        query ? 'border-primary' : 'border-border'
+      }`}>
+        <Search className={`w-4 h-4 flex-shrink-0 ${query ? 'text-primary' : 'text-muted-foreground'}`} />
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Buscar spots para guardar..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder-muted-foreground"
+        />
+        {query && (
+          <button onClick={() => setQuery('')} className="flex-shrink-0 text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Toast */}
+      {toastMsg && (
+        <div className="bg-foreground rounded-2xl px-4 py-3 flex items-center gap-2.5">
+          <span className="text-base">✓</span>
+          <p className="text-xs font-medium text-white">{toastMsg}</p>
+        </div>
+      )}
+
+      {/* Results */}
+      {query.trim() && (
+        <>
+          {/* Type filters */}
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {TYPE_FILTERS.map(f => (
+              <button key={f.key} onClick={() => setTypeFilter(f.key)}
+                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  typeFilter === f.key
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white border-border text-muted-foreground'
+                }`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {isLoading ? (
+            <div className="text-center py-6">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mx-auto" />
+            </div>
+          ) : results.length === 0 ? (
+            <div className="bg-white border border-border rounded-2xl text-center py-8">
+              <p className="text-2xl mb-2">🔍</p>
+              <p className="text-sm text-muted-foreground">Sin resultados para "{query}"</p>
+            </div>
+          ) : (
+            <div className="bg-white border border-border rounded-2xl overflow-hidden">
+              <p className="text-xs text-muted-foreground px-3 pt-3 pb-1">
+                {results.length} resultado{results.length !== 1 ? 's' : ''} para "{query}"
+              </p>
+              {results.map((spot, i) => {
+                const isSaved = savedSpotIds.has(spot.id);
+                return (
+                  <div key={spot.id} className={i > 0 ? 'border-t border-border' : ''}>
+                    <SpotRow
+                      spot={spot}
+                      isSaved={isSaved}
+                      onSave={isSaved ? null : handleSave}
+                      showLikes
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN
+// ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({});
-  const [spotsTab, setSpotsTab] = useState('saved'); // saved | created | shared
+  const [tab, setTab] = useState('guardados');
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
     queryFn: async () => {
       const r = await base44.entities.UserProfile.filter({ user_id: user.id });
@@ -134,211 +275,154 @@ export default function Profile() {
     staleTime: 30000,
   });
 
-  // Todos los spots del usuario
-  const { data: allSpots = [] } = useQuery({
-    queryKey: ['allUserSpots', user?.email],
-    queryFn: () => base44.entities.Spot.list(),
+  // All spots created by the user
+  const { data: mySpots = [] } = useQuery({
+    queryKey: ['mySpots', user?.email],
+    queryFn: () => base44.entities.Spot.filter({ created_by: user.email }),
     enabled: !!user?.email,
     staleTime: 60000,
   });
 
-  useEffect(() => {
-    if (profile) {
-      setForm({
-        display_name: profile.display_name || '',
-        username: profile.username || '',
-        home_country: profile.home_country || 'España',
-        home_currency: profile.home_currency || 'EUR',
-        avatar_url: profile.avatar_url || '',
-      });
-    }
-  }, [profile]);
-
-  const updateMutation = useMutation({
-    mutationFn: data => base44.entities.UserProfile.update(profile.id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
-      setEditing(false);
+  // Saved spots: spots created by user that are in a trip (saved to library)
+  // We use a separate query for saved spots without trip_id filter
+  const { data: savedSpots = [] } = useQuery({
+    queryKey: ['savedSpots', user?.email],
+    queryFn: async () => {
+      // Saved = spots user explicitly saved from community (not created themselves)
+      const all = await base44.entities.Spot.list();
+      return all.filter(s => s.created_by !== user.email && s.saved_by?.includes(user.email));
     },
+    enabled: !!user?.email,
+    staleTime: 60000,
   });
 
-  // Clasificar spots
-  const savedSpots = useMemo(() =>
-    allSpots.filter(s => s.created_by !== user?.email && s.trip_id),
-    [allSpots, user?.email]
-  );
+  const savedSpotIds = useMemo(() => new Set(savedSpots.map(s => s.id)), [savedSpots]);
 
-  const createdSpots = useMemo(() =>
-    allSpots.filter(s => s.created_by === user?.email),
-    [allSpots, user?.email]
-  );
+  // Count unique countries visited
+  const countriesCount = useMemo(() => {
+    const countries = new Set(mySpots.map(s => s.country).filter(Boolean));
+    return countries.size;
+  }, [mySpots]);
 
-  const sharedSpots = useMemo(() =>
-    allSpots.filter(s => s.created_by === user?.email && s.visibility === 'public'),
-    [allSpots, user?.email]
-  );
+  // Save a spot to library
+  const saveMutation = useMutation({
+    mutationFn: async (spot) => {
+      const existing = await base44.entities.Spot.filter({ id: spot.id });
+      if (existing[0]) {
+        const savedBy = existing[0].saved_by || [];
+        if (!savedBy.includes(user.email)) {
+          await base44.entities.Spot.update(spot.id, { saved_by: [...savedBy, user.email] });
+        }
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', user?.email] }),
+  });
 
-  const savedGroups = useMemo(() => groupByCountryCity(savedSpots), [savedSpots]);
-  const createdGroups = useMemo(() => groupByCountryCity(createdSpots), [createdSpots]);
-  const sharedGroups = useMemo(() => groupByCountryCity(sharedSpots), [sharedSpots]);
-
-  const activeGroups = spotsTab === 'saved' ? savedGroups : spotsTab === 'created' ? createdGroups : sharedGroups;
-  const activeCount = spotsTab === 'saved' ? savedSpots.length : spotsTab === 'created' ? createdSpots.length : sharedSpots.length;
-
-  if (isLoading) return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-orange-700 border-t-transparent rounded-full animate-spin"/>
+  if (profileLoading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
   );
 
+  const displayName = profile?.display_name || user?.full_name || 'Usuario';
+  const initials = displayName[0]?.toUpperCase() || '?';
+  const countryMeta = getCountryMeta(profile?.home_country || '');
+
   return (
-    <div className="min-h-screen bg-orange-50 pb-10">
-      <div className="bg-orange-700 pt-12 pb-20">
-        <div className="max-w-lg mx-auto px-5 flex items-center justify-between">
-          <Link to={createPageUrl('TripsList')}>
-            <button className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium">
-              <ArrowLeft className="w-4 h-4"/>Mis viajes
-            </button>
-          </Link>
-          <button onClick={() => setEditing(!editing)}
-            className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium">
-            <Settings className="w-4 h-4"/>{editing ? 'Cancelar' : 'Editar'}
-          </button>
+    <div className="bg-background min-h-screen">
+
+      {/* ── Header ── */}
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('TripsList')}
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+              </svg>
+              Mis viajes
+            </Link>
+            <Link to={createPageUrl('Settings')}
+              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              Configuración
+            </Link>
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Perfil</h1>
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-5 -mt-12 space-y-4">
-        {/* Avatar + nombre */}
-        <div className="bg-white rounded-2xl border border-border shadow-sm p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="w-20 h-20 rounded-full bg-orange-100 border-4 border-white shadow flex items-center justify-center overflow-hidden flex-shrink-0">
-              {(profile?.avatar_url) ? (
-                <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" onError={e => e.currentTarget.style.display='none'}/>
-              ) : (
-                <span className="text-2xl font-bold text-orange-700">
-                  {(profile?.display_name || user?.full_name || '?')[0]?.toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-lg text-foreground truncate">{profile?.display_name || user?.full_name}</p>
-              {profile?.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
-              <p className="text-xs text-muted-foreground mt-0.5">{user?.email}</p>
-              {profile?.home_country && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
-                  <MapPin className="w-3 h-3"/>
-                  <span>{COUNTRIES.find(c => c.name === profile.home_country)?.flag} {profile.home_country}</span>
-                  <span>·</span>
-                  <Globe className="w-3 h-3"/>
-                  <span>{profile.home_currency}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="max-w-2xl mx-auto px-5 py-5 pb-24 space-y-4">
 
-        {/* Formulario de edición */}
-        {editing && (
-          <div className="bg-white rounded-2xl border border-border shadow-sm p-5 space-y-4">
-            <p className="font-semibold text-sm">Editar perfil</p>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">Nombre visible</label>
-              <Input value={form.display_name} onChange={e => setForm(p => ({ ...p, display_name: e.target.value }))} placeholder="Tu nombre"/>
+        {/* ── Identity card ── */}
+        <div className="bg-white border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-border flex-shrink-0 flex items-center justify-center bg-primary text-white text-xl font-medium">
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display='none'; }}/>
+                : initials
+              }
             </div>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">URL de avatar (opcional)</label>
-              <Input value={form.avatar_url} onChange={e => setForm(p => ({ ...p, avatar_url: e.target.value }))} placeholder="https://..."/>
+              <p className="text-base font-medium text-foreground">{displayName}</p>
+              <p className="text-sm text-muted-foreground">
+                {profile?.username ? `@${profile.username}` : ''}
+                {profile?.username && profile?.home_country ? ' · ' : ''}
+                {profile?.home_country ? `${countryMeta.flag} ${profile.home_country}` : ''}
+              </p>
             </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">País de origen</label>
-              <select value={form.home_country}
-                onChange={e => {
-                  const c = COUNTRIES.find(x => x.name === e.target.value) || COUNTRIES[0];
-                  setForm(p => ({ ...p, home_country: c.name, home_currency: c.currency }));
-                }}
-                className="w-full border border-border rounded-xl px-3 py-2 text-sm bg-secondary outline-none focus:border-orange-400">
-                {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">Moneda base</label>
-              <select value={form.home_currency}
-                onChange={e => setForm(p => ({ ...p, home_currency: e.target.value }))}
-                className="w-full border border-border rounded-xl px-3 py-2 text-sm bg-secondary outline-none focus:border-orange-400">
-                {['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL'].map(cur => (
-                  <option key={cur} value={cur}>{cur}</option>
-                ))}
-              </select>
-            </div>
-            <Button onClick={() => updateMutation.mutate(form)} disabled={updateMutation.isPending}
-              className="w-full bg-orange-700 hover:bg-orange-800 text-white">
-              {updateMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
-            </Button>
           </div>
-        )}
 
-        {/* Biblioteca de Spots */}
-        <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-          <div className="px-4 pt-4 pb-3 border-b border-border">
-            <p className="font-semibold text-sm text-foreground mb-3">Mi biblioteca de spots</p>
-            <div className="flex gap-1">
-              {[
-                { key:'saved', icon:<BookmarkCheck className="w-3.5 h-3.5"/>, label:'Guardados', count:savedSpots.length },
-                { key:'created', icon:<Pencil className="w-3.5 h-3.5"/>, label:'Mis creados', count:createdSpots.length },
-                { key:'shared', icon:<Share2 className="w-3.5 h-3.5"/>, label:'Compartidos', count:sharedSpots.length },
-              ].map(tab => (
-                <button key={tab.key} onClick={() => setSpotsTab(tab.key)}
-                  className={"flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors " +
-                    (spotsTab === tab.key ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border text-muted-foreground hover:border-orange-300')}>
-                  {tab.icon}{tab.label}
-                  {tab.count > 0 && <span className={"text-xs px-1.5 py-0.5 rounded-full " + (spotsTab === tab.key ? 'bg-white/20' : 'bg-secondary')}>{tab.count}</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-4">
-            {spotsTab === 'saved' && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-3">Spots que has guardado de la comunidad, organizados por destino</p>
-                <CountryCityAccordion groups={savedGroups}/>
-              </div>
-            )}
-            {spotsTab === 'created' && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-3">Spots que has creado — incluye los que has visitado y valorado</p>
-                <CountryCityAccordion groups={createdGroups}/>
-              </div>
-            )}
-            {spotsTab === 'shared' && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-3">Spots que has publicado para la comunidad de Kōdo</p>
-                <CountryCityAccordion groups={sharedGroups}/>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Cuenta */}
-        <div className="bg-white rounded-2xl border border-border shadow-sm p-5">
-          <p className="font-semibold text-sm text-foreground mb-3">Cuenta</p>
-          <div className="space-y-2">
+          {/* Stats */}
+          <div className="flex border-t border-border pt-3">
             {[
-              { label:'Email', value: user?.email },
-              { label:'Username', value: profile?.username ? '@' + profile.username : '—' },
-              { label:'País', value: (COUNTRIES.find(c => c.name === profile?.home_country)?.flag || '') + ' ' + (profile?.home_country || '—') },
-              { label:'Moneda', value: profile?.home_currency || '—' },
-            ].map(row => (
-              <div key={row.label} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                <span className="text-sm text-muted-foreground">{row.label}</span>
-                <span className="text-sm font-medium text-foreground">{row.value}</span>
+              { value: 0, label: 'Viajes' },
+              { value: mySpots.length, label: 'Creados' },
+              { value: countriesCount, label: 'Países' },
+            ].map((stat, i) => (
+              <div key={stat.label} className={`flex-1 text-center ${i > 0 ? 'border-l border-border' : ''}`}>
+                <p className="text-lg font-medium text-foreground">{stat.value}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
               </div>
             ))}
           </div>
-          <button onClick={() => base44.auth.logout()}
-            className="w-full mt-4 py-2.5 rounded-xl border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors">
-            Cerrar sesión
-          </button>
         </div>
+
+        {/* ── Search ── */}
+        <SpotSearchPanel
+          savedSpotIds={savedSpotIds}
+          onSave={spot => saveMutation.mutateAsync(spot)}
+        />
+
+        {/* ── Tabs ── */}
+        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+          <div className="flex border-b border-border">
+            {[
+              ['guardados', '🗂️', 'Guardados'],
+              ['creados',   '✏️', 'Creados'],
+            ].map(([k, em, l]) => (
+              <button key={k} onClick={() => setTab(k)}
+                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${
+                  tab === k ? 'border-primary' : 'border-transparent'
+                }`}>
+                <span className="text-base leading-none">{em}</span>
+                <span className={`text-xs font-medium leading-none ${tab === k ? 'text-primary' : 'text-muted-foreground'}`}>{l}</span>
+              </button>
+            ))}
+          </div>
+
+          {tab === 'guardados' && (
+            <SpotCollection spots={savedSpots} />
+          )}
+
+          {tab === 'creados' && (
+            <SpotCollection spots={mySpots} showLikes showVisibility />
+          )}
+        </div>
+
       </div>
     </div>
   );
