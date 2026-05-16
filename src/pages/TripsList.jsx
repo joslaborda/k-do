@@ -1,141 +1,56 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Plus, User, LogOut, Settings, Compass } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { toast } from '@/components/ui/use-toast';
-import TripCard from '@/components/trip/TripCard';
+import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
-import TemplatesFeedTabs from '@/components/social/TemplatesFeedTabs';
 import { createPageUrl } from '@/utils';
 
-function UserMenu({ user, profile }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef();
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 13) return 'Buenos días';
+  if (h < 21) return 'Buenas tardes';
+  return 'Buenas noches';
+}
 
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const initials = profile?.display_name?.[0]?.toUpperCase()
-    || user?.full_name?.[0]?.toUpperCase()
-    || <User className="w-4 h-4" />;
-
+// ── Empty state ───────────────────────────────────────────────────────────────
+function EmptyState({ onCreateTrip }) {
   return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/40 hover:border-white/70 transition-colors flex items-center justify-center bg-white/20 text-white font-bold text-sm"
-      >
-        {profile?.avatar_url
-          ? <img src={profile.avatar_url} className="w-full h-full object-cover" alt="avatar" />
-          : initials}
+    <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-white">
+      <p className="text-4xl mb-3">✈️</p>
+      <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
+      <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
+      <button onClick={onCreateTrip}
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm rounded-xl font-medium hover:bg-primary/90 transition-colors">
+        <Plus className="w-4 h-4" />Nuevo viaje
       </button>
-      {open && (
-        <div className="absolute right-0 top-12 bg-white border border-border rounded-xl shadow-xl w-48 z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold truncate">{profile?.display_name || user?.full_name || 'Usuario'}</p>
-            {profile?.username && <p className="text-xs text-muted-foreground font-mono">@{profile.username}</p>}
-          </div>
-          <Link to={createPageUrl('Profile')} onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors">
-            <User className="w-4 h-4 text-muted-foreground" /> Perfil
-          </Link>
-          <Link to={createPageUrl('Settings')} onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors">
-            <Settings className="w-4 h-4 text-muted-foreground" /> Ajustes
-          </Link>
-          <button
-            onClick={() => base44.auth.logout()}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm text-destructive hover:bg-red-50 transition-colors w-full text-left border-t border-border"
-          >
-            <LogOut className="w-4 h-4" /> Cerrar sesión
-          </button>
-        </div>
-      )}
     </div>
   );
 }
 
-// ── Onboarding empty state ──────────────────────────────────────────────────
-function EmptyState({ userName, onCreateTrip }) {
-  const steps = [
-    {
-      emoji: '🗺️',
-      title: 'Planifica tu viaje',
-      description: 'Crea itinerarios día a día, gestiona documentos, gastos y maleta en un solo lugar.',
-    },
-    {
-      emoji: '👥',
-      title: 'Viaja en equipo',
-      description: 'Invita a tus compañeros de viaje. Cada uno puede ver y editar según su rol.',
-    },
-    {
-      emoji: '✨',
-      title: 'Descubre y comparte',
-      description: 'Inspírate con itinerarios de la comunidad y publica los tuyos para que otros los disfruten.',
-    },
-  ];
-
-  return (
-    <div className="py-12">
-      {/* Bienvenida */}
-      <div className="text-center mb-10">
-        <div className="text-6xl mb-4">✈️</div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          {userName ? `¡Bienvenido a Kōdo, ${userName.split(' ')[0]}!` : '¡Bienvenido a Kōdo!'}
-        </h2>
-        <p className="text-muted-foreground max-w-sm mx-auto">
-          Tu espacio para planificar viajes increíbles. Empieza creando tu primer viaje.
-        </p>
-      </div>
-
-      {/* Pasos */}
-      <div className="grid md:grid-cols-3 gap-4 mb-10 max-w-3xl mx-auto">
-        {steps.map((step, i) => (
-          <div key={i} className="bg-white border border-border rounded-2xl p-5 text-center hover:shadow-md transition-shadow">
-            <div className="text-4xl mb-3">{step.emoji}</div>
-            <h3 className="font-semibold text-foreground mb-1">{step.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* CTAs */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Button
-          onClick={onCreateTrip}
-          className="bg-orange-700 hover:bg-orange-800 text-white px-8 py-6 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Crear mi primer viaje
-        </Button>
-
-      </div>
-    </div>
-  );
-}
-
-// ── Main ────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function TripsList() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('viajes');
+  const [showPast, setShowPast] = useState(false);
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(u => { setUser(u); setUserLoading(false); }).catch(() => setUserLoading(false));
+    base44.auth.me()
+      .then(u => { setUser(u); setUserLoading(false); })
+      .catch(() => setUserLoading(false));
   }, []);
 
   const { data: myProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
     queryFn: async () => {
-      const results = await base44.entities.UserProfile.filter({ user_id: user.id });
-      return results[0] || null;
+      const r = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return r[0] || null;
     },
     enabled: !!user?.id && user?.is_verified === true,
     staleTime: 60000,
@@ -145,15 +60,12 @@ export default function TripsList() {
     queryKey: ['trips', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      // Primero busca por created_by (forma nativa de base44)
       let myTrips = [];
       try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch {}
-      // Si no hay resultados, carga todos y filtra (fallback para viajes antiguos)
       if (myTrips.length === 0) {
         const all = await base44.entities.Trip.list('-created_date');
         myTrips = all.filter(t => t.created_by === user.email);
       }
-      // Añadir viajes donde el usuario es miembro invitado
       let memberTrips = [];
       try {
         const all = await base44.entities.Trip.list('-created_date');
@@ -164,7 +76,7 @@ export default function TripsList() {
       } catch {}
       const seen = new Set(myTrips.map(t => t.id));
       return [...myTrips, ...memberTrips.filter(t => !seen.has(t.id))]
-        .sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
+        .sort((a,b) => new Date(b.created_date||0) - new Date(a.created_date||0));
     },
     staleTime: 30000,
   });
@@ -175,213 +87,186 @@ export default function TripsList() {
     staleTime: 60000,
   });
 
-  const tripCards = useMemo(() => {
-    return trips.map((trip) => {
-      const tripCities = allCities.filter((c) => c.trip_id === trip.id);
-      return <TripCard key={trip.id} trip={trip} cities={tripCities} />;
-    });
-  }, [trips, allCities]);
-
-  const [spotSuggestion, setSpotSuggestion] = useState(null); // { tripId, cityName, spots[] }
-  const [dismissedSuggestion, setDismissedSuggestion] = useState(false);
-
   const createMutation = useMutation({
-    mutationFn: async ({ formData, stops, stopCountries = [], allocations, selectedTemplate }) => {
+    mutationFn: async ({ formData, stops, stopCountries = [], allocations }) => {
       const email = user?.email;
-      const userId = user?.id;
-      const roles = email ? { [email]: 'admin' } : {};
-      const members = email ? [email] : [];
-
       const trip = await base44.entities.Trip.create({
         ...formData,
-        members,
-        roles,
+        members: email ? [email] : [],
+        roles: email ? { [email]: 'admin' } : {},
       });
-
       for (let i = 0; i < stops.length; i++) {
         const dates = allocations[i] || { start_date: formData.start_date, end_date: formData.end_date };
         await base44.entities.City.create({
-          trip_id: trip.id,
-          name: stops[i],
+          trip_id: trip.id, name: stops[i],
           country: stopCountries[i] || formData.country || '',
           order: i,
-          start_date: dates.start_date,
-          end_date: dates.end_date,
+          start_date: dates.start_date, end_date: dates.end_date,
         });
       }
-
-      if (selectedTemplate?.packingItems?.length) {
-        await Promise.all(
-          selectedTemplate.packingItems.map((item) =>
-            base44.entities.PackingItem.create({ ...item, trip_id: trip.id, user_id: userId, packed: false })
-          )
-        );
-        toast({
-          title: 'Viaje creado! 🎉',
-          description: `${selectedTemplate.packingItems.length} artículos añadidos a tu maleta`,
-        });
-      }
-
       return trip;
     },
-    onSuccess: async (trip) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
       setDialogOpen(false);
-      setDismissedSuggestion(false);
-
-      // Check for saved spots matching the new trip's cities
-      try {
-        const savedSpots = await base44.entities.Spot.filter({ created_by: user?.email });
-        const newCities = await base44.entities.City.filter({ trip_id: trip.id });
-        const savedWithoutTrip = savedSpots.filter(s => !s.trip_id || s.trip_id !== trip.id);
-        if (savedWithoutTrip.length > 0 && newCities.length > 0) {
-          // Find spots matching any new city
-          const matchingSpots = savedWithoutTrip.filter(s =>
-            newCities.some(nc =>
-              nc.name?.toLowerCase() === s.city_name?.toLowerCase() ||
-              nc.country?.toLowerCase() === s.country?.toLowerCase()
-            )
-          );
-          if (matchingSpots.length > 0) {
-            setSpotSuggestion({ tripId: trip.id, spots: matchingSpots, cities: newCities });
-          }
-        }
-      } catch {}
     },
   });
 
-  const addSuggestedSpots = async () => {
-    if (!spotSuggestion) return;
-    try {
-      await Promise.all(spotSuggestion.spots.map(s =>
-        base44.entities.Spot.update(s.id, { trip_id: spotSuggestion.tripId })
-      ));
-      queryClient.invalidateQueries({ queryKey: ['spots', spotSuggestion.tripId] });
-    } catch {}
-    setSpotSuggestion(null);
-  };
+  // Classify trips
+  const { heroTrip, heroCities, upcomingTrips, pastTrips } = useMemo(() => {
+    const withStatus = trips.map(t => ({
+      t,
+      cities: allCities.filter(c => c.trip_id === t.id),
+      status: getTripStatus(t),
+    }));
+
+    const active   = withStatus.filter(x => x.status?.type === 'active');
+    const upcoming = withStatus.filter(x => x.status?.type === 'upcoming')
+      .sort((a,b) => a.status.days - b.status.days);
+    const past     = withStatus.filter(x => x.status?.type === 'past' || !x.status);
+
+    // Hero priority: active → soonest upcoming → most recent past
+    let hero = null;
+    if (active.length > 0) hero = active[0];
+    else if (upcoming.length > 0) hero = upcoming[0];
+    else if (past.length > 0) hero = past[0];
+
+    // Remove hero from upcoming list
+    const heroId = hero?.t?.id;
+    const upcomingRest = upcoming.filter(x => x.t.id !== heroId);
+
+    return {
+      heroTrip:     hero?.t || null,
+      heroCities:   hero?.cities || [],
+      upcomingTrips: upcomingRest,
+      pastTrips:    past,
+    };
+  }, [trips, allCities]);
 
   const needsOnboarding = user?.is_verified === true && !profileLoading && myProfile === null;
-  const displayName = myProfile?.display_name || user?.full_name || '';
+  const firstName = myProfile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || '';
 
-  if (isLoading || userLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">✈️</div>
-          <p className="text-muted-foreground">Cargando viajes...</p>
-        </div>
+  // Loading
+  if (isLoading || userLoading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-5xl mb-4">✈️</p>
+        <p className="text-sm text-muted-foreground">Cargando viajes...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (user && user.is_verified === false) {
-    return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center shadow-sm">
-          <div className="text-5xl mb-4">📧</div>
-          <h2 className="text-xl font-bold mb-2">Verifica tu email</h2>
-          <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada y confirma tu email para continuar.</p>
-          <Button
-            className="w-full bg-orange-700 hover:bg-orange-800 text-white"
-            onClick={() => base44.auth.me().then(u => setUser(u)).catch(() => {})}
-          >
-            Ya verifiqué ✓
-          </Button>
-          <button onClick={() => base44.auth.logout()} className="mt-3 text-xs text-muted-foreground hover:underline block mx-auto">Cerrar sesión</button>
-        </div>
+  // Email verification
+  if (user && user.is_verified === false) return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center">
+        <p className="text-5xl mb-4">📧</p>
+        <p className="text-lg font-medium mb-2">Verifica tu email</p>
+        <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
+        <button className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-medium"
+          onClick={() => base44.auth.me().then(setUser).catch(()=>{})}>
+          Ya verifiqué ✓
+        </button>
+        <button onClick={() => base44.auth.logout()}
+          className="mt-3 text-xs text-muted-foreground hover:underline block mx-auto">
+          Cerrar sesión
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+
+  const pastCount = pastTrips.length;
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-background">
       {needsOnboarding && <CreateProfileModal user={user} open={true} />}
 
-      {/* Spot suggestion banner */}
-      {spotSuggestion && !dismissedSuggestion && (
-        <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
-          <div className="bg-gray-900 rounded-2xl p-4 shadow-xl border border-white/10">
-            <div className="flex items-start gap-3 mb-3">
-              <span className="text-2xl flex-shrink-0">📍</span>
-              <div>
-                <p className="text-white text-sm font-semibold">¡Tienes spots guardados para este destino!</p>
-                <p className="text-white/60 text-xs mt-0.5">{spotSuggestion.spots.length} spot{spotSuggestion.spots.length !== 1 ? 's' : ''} guardados que coinciden con tu nuevo viaje</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={addSuggestedSpots}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium py-2 rounded-xl transition-colors">
-                Añadir al viaje
-              </button>
-              <button onClick={() => setDismissedSuggestion(true)}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white text-xs font-medium py-2 rounded-xl transition-colors">
-                Ahora no
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="bg-orange-700 px-5 pt-12 pb-5">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
+      {/* ── Header ── */}
+      <div className="bg-background border-b border-border sticky top-0 z-10">
+        <div className="max-w-2xl mx-auto px-5 pt-12 pb-4">
+          <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-white text-3xl font-black tracking-tight">Kōdo</h1>
-              <p className="text-white/80 text-sm mt-0.5">Travel your way</p>
-              {myProfile?.username && <p className="text-white/60 text-xs font-mono mt-0.5">@{myProfile.username}</p>}
+              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">Kōdo</h1>
+              <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
+              {firstName && (
+                <p className="text-sm text-muted-foreground mt-2">{getGreeting()}, {firstName}</p>
+              )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-1">
               {user?.id && <NotificationBell userId={user.id} />}
-              <UserMenu user={user} profile={myProfile} />
+              {/* Avatar → directo a perfil */}
+              <Link to={createPageUrl('Profile')}>
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-sm font-medium flex-shrink-0">
+                  {myProfile?.avatar_url
+                    ? <img src={myProfile.avatar_url} alt="avatar" className="w-full h-full object-cover"/>
+                    : (firstName?.[0]?.toUpperCase() || '?')
+                  }
+                </div>
+              </Link>
             </div>
           </div>
-
-
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* TAB: MIS VIAJES */}
-        {activeTab === 'viajes' && (
+      {/* ── Content ── */}
+      <div className="max-w-2xl mx-auto px-4 py-5 pb-24 space-y-4">
+
+        {trips.length === 0 ? (
+          <EmptyState onCreateTrip={() => setDialogOpen(true)} />
+        ) : (
           <>
-            <button
-              onClick={() => setDialogOpen(true)}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-dashed border-orange-300 text-orange-700 font-semibold text-sm hover:bg-orange-50 transition-colors mb-5 bg-white">
-              <Plus className="w-5 h-5" />Crear nuevo viaje
+            {/* Hero — always shown */}
+            {heroTrip && <HeroTripCard trip={heroTrip} cities={heroCities} />}
+
+            {/* Upcoming (excluding hero) */}
+            {upcomingTrips.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Próximos</p>
+                {upcomingTrips.map(({ t, cities }) => (
+                  <TripCard key={t.id} trip={t} cities={cities} />
+                ))}
+              </div>
+            )}
+
+            {/* New trip button */}
+            <button onClick={() => setDialogOpen(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-white hover:bg-orange-50 transition-colors">
+              <Plus className="w-4 h-4" />Nuevo viaje
             </button>
 
-            {trips.length === 0 ? (
-              <EmptyState userName={displayName} onCreateTrip={() => setDialogOpen(true)} />
-            ) : (
-              <div className="space-y-4">{tripCards}</div>
+            {/* Past trips — collapsible */}
+            {pastCount > 0 && (
+              <div>
+                <button
+                  onClick={() => setShowPast(p => !p)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white border border-border rounded-2xl text-sm text-muted-foreground hover:bg-secondary/30 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🗂️</span>
+                    <span>{pastCount} viaje{pastCount !== 1 ? 's' : ''} finalizado{pastCount !== 1 ? 's' : ''}</span>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                    className={`transition-transform ${showPast ? 'rotate-90' : ''}`}>
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </button>
+                {showPast && (
+                  <div className="mt-3 space-y-3">
+                    {pastTrips.map(({ t, cities }) => (
+                      <TripCard key={t.id} trip={t} cities={cities} />
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </>
-        )}
-
-        {/* TAB: COMUNIDAD */}
-        {activeTab === 'social' && user?.is_verified && myProfile && (
-          <TemplatesFeedTabs
-            currentUserId={user.id}
-            currentUserEmail={user.email}
-            myProfile={myProfile}
-          />
-        )}
-        {activeTab === 'social' && (!user?.is_verified || !myProfile) && (
-          <div className="text-center py-16">
-            <div className="text-5xl mb-4">🌍</div>
-            <p className="font-semibold text-foreground mb-2">Únete a la comunidad</p>
-            <p className="text-sm text-muted-foreground">Completa tu perfil para ver y compartir itinerarios</p>
-          </div>
         )}
       </div>
 
       <NewTripModal
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onSubmit={(data) => createMutation.mutate(data)}
+        onSubmit={data => createMutation.mutate(data)}
         isPending={createMutation.isPending}
       />
     </div>
