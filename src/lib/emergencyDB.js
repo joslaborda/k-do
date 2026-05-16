@@ -755,13 +755,38 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España')
 
   if (!data) return null;
 
-  // Seleccionar embajada según país de origen
+  // Seleccionar embajada según país de origen — cubre todos los hispanohablantes
   let embassy = null;
   const homeNorm = (homeCountry || 'España').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  if (homeNorm.includes('mexic')) embassy = data.embassy_MX || data.embassy_ES;
-  else if (homeNorm.includes('argentin')) embassy = data.embassy_AR || data.embassy_ES;
-  else if (homeNorm.includes('colombi')) embassy = data.embassy_CO || data.embassy_ES;
-  else embassy = data.embassy_ES;
+
+  // Mapeo país origen → clave de embajada en orden de prioridad
+  const embassyKey = (() => {
+    if (homeNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
+    if (homeNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
+    if (homeNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
+    if (homeNorm.includes('peru') || homeNorm.includes('peru')) return ['embassy_PE', 'embassy_ES'];
+    if (homeNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
+    if (homeNorm.includes('venezuel')) return ['embassy_VE', 'embassy_ES'];
+    if (homeNorm.includes('ecuad'))   return ['embassy_EC', 'embassy_ES'];
+    if (homeNorm.includes('boliv'))   return ['embassy_BO', 'embassy_ES'];
+    if (homeNorm.includes('paragua')) return ['embassy_PY', 'embassy_ES'];
+    if (homeNorm.includes('urugua'))  return ['embassy_UY', 'embassy_ES'];
+    if (homeNorm.includes('costa ric')) return ['embassy_CR', 'embassy_ES'];
+    if (homeNorm.includes('guatemal')) return ['embassy_GT', 'embassy_ES'];
+    if (homeNorm.includes('hondur'))  return ['embassy_HN', 'embassy_ES'];
+    if (homeNorm.includes('el salv') || homeNorm.includes('salvador')) return ['embassy_SV', 'embassy_ES'];
+    if (homeNorm.includes('nicarag'))  return ['embassy_NI', 'embassy_ES'];
+    if (homeNorm.includes('panam'))   return ['embassy_PA', 'embassy_ES'];
+    if (homeNorm.includes('rep.*dom') || homeNorm.includes('dominican')) return ['embassy_DO', 'embassy_ES'];
+    if (homeNorm.includes('cuba'))    return ['embassy_CU', 'embassy_ES'];
+    if (homeNorm.includes('puert'))   return ['embassy_PR', 'embassy_ES'];
+    if (homeNorm.includes('espana') || homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
+    return ['embassy_ES']; // fallback España
+  })();
+
+  for (const key of embassyKey) {
+    if (data[key]) { embassy = data[key]; break; }
+  }
 
   return {
     emergency_general: data.emergency_general,
