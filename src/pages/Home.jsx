@@ -231,9 +231,17 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
   });
 
   const allCountries = useMemo(() => {
+    const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const seen = {};
     const s = new Set();
-    if (trip?.country) s.add(trip.country);
-    cities.forEach(c => { if (c.country) s.add(c.country); });
+    // Prefer Spanish names: Japón over Japan
+    const all = [];
+    if (trip?.country) all.push(trip.country);
+    cities.forEach(c => { if (c.country) all.push(c.country); });
+    all.forEach(c => {
+      const key = norm(c);
+      if (!seen[key]) { seen[key] = c; s.add(c); }
+    });
     return [...s];
   }, [trip, cities]);
 
@@ -528,11 +536,16 @@ function FinishedTab({ trip, cities, expenses, spots }) {
     [cities]
   );
 
-  const countriesLabel = cities.length === 1
-    ? (sortedCities[0]?.name || trip?.destination || '')
-    : allCountries.size > 1
-      ? [...allCountries].join(' y ')
-      : ([...allCountries][0] || trip?.destination || '');
+  const countriesLabel = (() => {
+    if (cities.length === 0) return trip?.destination || '';
+    if (cities.length === 1) return sortedCities[0]?.name || trip?.destination || '';
+    // Multiple cities: show unique countries joined with ' y '
+    const countries = [...allCountries];
+    if (countries.length === 0) return trip?.destination || '';
+    if (countries.length === 1) return countries[0];
+    if (countries.length === 2) return countries.join(' y ');
+    return countries.slice(0, -1).join(', ') + ' y ' + countries[countries.length - 1];
+  })();
 
   return (
     <div className="space-y-3">
