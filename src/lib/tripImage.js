@@ -17,7 +17,7 @@ const COUNTRY_IMAGES = {
   'thailand':'photo-1508009603885-50cf7c579365','tailandia':'photo-1508009603885-50cf7c579365','south korea':'photo-1517154421773-0529f29ea451','corea del sur':'photo-1517154421773-0529f29ea451','indonesia':'photo-1518548419970-58e3b4079ab2','vietnam':'photo-1557750255-c76072a7aad1','china':'photo-1474181487882-5abf3f0ba6c2','singapore':'photo-1525625293386-3f8f99389edd','singapur':'photo-1525625293386-3f8f99389edd','india':'photo-1587474260584-136574528ed5','malaysia':'photo-1596422846543-75c6fc197f07','malasia':'photo-1596422846543-75c6fc197f07','nepal':'photo-1544735716-392fe2489ffa','sri lanka':'photo-1546708770-599a3abdf230','cambodia':'photo-1560791941-e3b4c5b26d6c','camboya':'photo-1560791941-e3b4c5b26d6c','philippines':'photo-1551244072-5d12893278bc','filipinas':'photo-1551244072-5d12893278bc',
   'uae':'photo-1512453979798-5ea266f8880c','emiratos arabes':'photo-1512453979798-5ea266f8880c','jordan':'photo-1579606032821-4d6ea1cf3ea8','jordania':'photo-1579606032821-4d6ea1cf3ea8','israel':'photo-1548519651-4611aa4a8f6a',
   'egypt':'photo-1539650116574-75c0c6d73f6e','egipto':'photo-1539650116574-75c0c6d73f6e','morocco':'photo-1539020140153-e479b8c22e70','marruecos':'photo-1539020140153-e479b8c22e70','kenya':'photo-1611348586804-61bf6c080437','south africa':'photo-1580060839134-75a5edca2e99','sudafrica':'photo-1580060839134-75a5edca2e99','tanzania':'photo-1516026672322-bc52d61a55d5',
-  'usa':'photo-1496442226666-8d4d0e62e6e9','united states':'photo-1496442226666-8d4d0e62e6e9','estados unidos':'photo-1496442226666-8d4d0e62e6e9','mexico':'photo-1552074284-5e88ef1aef18','cuba':'photo-1500759285222-a95626b934cb','colombia':'photo-1558618666-fcd25c85cd64','peru':'photo-1526392060635-9d6019884377','brazil':'photo-1483729558449-99ef09a8c325','brasil':'photo-1483729558449-99ef09a8c325','argentina':'photo-1589909202802-8f4aadce1849','chile':'photo-1501854140801-50d01698950b','ecuador':'photo-1531968455001-5c5272a41129','bolivia':'photo-1531968455001-5c5272a41129','paraguay':'photo-1589909202802-8f4aadce1849','uruguay':'photo-1580060839134-75a5edca2e99','venezuela':'photo-1580060839134-75a5edca2e99','costa rica':'photo-1518181835702-6be7e1ad7f05','panama':'photo-1512813195386-6cf811ad3542','guatemala':'photo-1547558840-b8561d2d1b07','honduras':'photo-1547558840-b8561d2d1b07','nicaragua':'photo-1547558840-b8561d2d1b07','el salvador':'photo-1547558840-b8561d2d1b07','dominican republic':'photo-1552074284-5e88ef1aef18','republica dominicana':'photo-1552074284-5e88ef1aef18','canada':'photo-1517090504586-fde19ea6a9d2','australia':'photo-1506905925346-21bda4d32df4','nueva zelanda':'photo-1507699622108-4be3abd695ad','new zealand':'photo-1507699622108-4be3abd695ad',
+  'usa':'photo-1496442226666-8d4d0e62e6e9','united states':'photo-1496442226666-8d4d0e62e6e9','estados unidos':'photo-1496442226666-8d4d0e62e6e9','mexico':'photo-1552074284-5e88ef1aef18','cuba':'photo-1500759285222-a95626b934cb','saint-martin':'photo-1533106497176-45ae19e68ba2','saint martin':'photo-1533106497176-45ae19e68ba2','sint maarten':'photo-1533106497176-45ae19e68ba2','martinica':'photo-1533106497176-45ae19e68ba2','guadalupe':'photo-1533106497176-45ae19e68ba2','colombia':'photo-1617526738882-1ea945ce3c12','peru':'photo-1526392060635-9d6019884377','brazil':'photo-1483729558449-99ef09a8c325','brasil':'photo-1483729558449-99ef09a8c325','argentina':'photo-1589909202802-8f4aadce1849','chile':'photo-1501854140801-50d01698950b','ecuador':'photo-1531968455001-5c5272a41129','bolivia':'photo-1531968455001-5c5272a41129','paraguay':'photo-1589909202802-8f4aadce1849','uruguay':'photo-1580060839134-75a5edca2e99','venezuela':'photo-1580060839134-75a5edca2e99','costa rica':'photo-1518181835702-6be7e1ad7f05','panama':'photo-1512813195386-6cf811ad3542','guatemala':'photo-1547558840-b8561d2d1b07','honduras':'photo-1547558840-b8561d2d1b07','nicaragua':'photo-1547558840-b8561d2d1b07','el salvador':'photo-1547558840-b8561d2d1b07','dominican republic':'photo-1552074284-5e88ef1aef18','republica dominicana':'photo-1552074284-5e88ef1aef18','canada':'photo-1517090504586-fde19ea6a9d2','australia':'photo-1506905925346-21bda4d32df4','nueva zelanda':'photo-1507699622108-4be3abd695ad','new zealand':'photo-1507699622108-4be3abd695ad',
 };
 
 const FALLBACK_IMAGES = [
@@ -39,9 +39,12 @@ function normalize(str = '') {
 function lookupCity(cityName) {
   if (!cityName) return null;
   const key = normalize(cityName);
+  // Exact match
   if (CITY_IMAGES[key]) return unsplashUrl(CITY_IMAGES[key]);
+  // Partial: only if key length >= 4 to avoid false positives
   for (const [k, v] of Object.entries(CITY_IMAGES)) {
-    if (key.includes(k) || k.includes(key)) return unsplashUrl(v);
+    if (k.length >= 4 && key === k) return unsplashUrl(v);
+    if (k.length >= 5 && key.startsWith(k)) return unsplashUrl(v);
   }
   return null;
 }
@@ -49,9 +52,17 @@ function lookupCity(cityName) {
 function lookupCountry(countryName) {
   if (!countryName) return null;
   const key = normalize(countryName);
+  // Exact match first — prevents 'india' matching inside 'indonesia' or 'colombia'
   if (COUNTRY_IMAGES[key]) return unsplashUrl(COUNTRY_IMAGES[key]);
-  for (const [k, v] of Object.entries(COUNTRY_IMAGES)) {
-    if (key.includes(k) || k.includes(key)) return unsplashUrl(v);
+  // Only allow partial if key is 5+ chars to avoid false positives
+  if (key.length >= 5) {
+    for (const [k, v] of Object.entries(COUNTRY_IMAGES)) {
+      if (k.length >= 5 && key === k) return unsplashUrl(v);
+    }
+    // Last resort: key starts with dict key (e.g. 'costa rica' starts with 'costa')
+    for (const [k, v] of Object.entries(COUNTRY_IMAGES)) {
+      if (k.length >= 6 && key.startsWith(k)) return unsplashUrl(v);
+    }
   }
   return null;
 }
