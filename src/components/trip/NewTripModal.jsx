@@ -592,8 +592,6 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             )}
           </div>
 
-          </div>
-
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={handleClose}>Cancelar</Button>

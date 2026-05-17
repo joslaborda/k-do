@@ -302,14 +302,14 @@ function PackingTab({ tripId, country }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-function EmergencyTab({ country, homeCountry, meta }) {
+function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
   useEffect(() => {
     if (!country) { setData(null); setLoading(false); return; }
     setLoading(true);
-    const d = getHardcodedEmergencyInfo(country, homeCountry, myProfile?.second_nationality || null);
+    const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
   }, [country, homeCountry]);
@@ -532,7 +532,7 @@ export default function Utilities() {
 
         {/* EMERGENCIAS */}
         {activeTab === 'emergencias' && (
-          <EmergencyTab country={country} homeCountry={homeCountry} meta={meta} />
+          <EmergencyTab country={country} homeCountry={homeCountry} secondNationality={myProfile?.second_nationality} meta={meta} />
         )}
       </div>
     </div>

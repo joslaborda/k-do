@@ -168,6 +168,7 @@ export default function Settings() {
   const [usernameAvailable, setUsernameAvailable] = useState(null);
 
   // Notifications prefs (stored in profile)
+  const [secondNationality, setSecondNationality] = useState('');
   const [notifInvites,  setNotifInvites]  = useState(true);
   const [notifExpenses, setNotifExpenses] = useState(true);
   const [notifComments, setNotifComments] = useState(false);

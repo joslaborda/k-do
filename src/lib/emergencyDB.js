@@ -738,7 +738,7 @@ const EMERGENCY_DB = {
  * Obtiene datos de emergencia hardcodeados para un país.
  * Compatible con la interfaz que espera Utilities.jsx.
  */
-export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España') {
+export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España', secondNationality = null) {
   if (!countryLabel) return null;
 
   // Exact match
