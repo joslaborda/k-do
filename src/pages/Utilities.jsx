@@ -309,7 +309,7 @@ function EmergencyTab({ country, homeCountry, meta }) {
   useEffect(() => {
     if (!country) { setData(null); setLoading(false); return; }
     setLoading(true);
-    const d = getHardcodedEmergencyInfo(country, homeCountry);
+    const d = getHardcodedEmergencyInfo(country, homeCountry, myProfile?.second_nationality || null);
     setData(d);
     setLoading(false);
   }, [country, homeCountry]);
@@ -379,6 +379,22 @@ function EmergencyTab({ country, homeCountry, meta }) {
           {data.embassy.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {data.embassy.hours}</p>}
           {data.embassy.web && (
             <a href={data.embassy.web} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
+              <ExternalLink className="w-3.5 h-3.5" />Web oficial
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Second nationality embassy */}
+      {data.secondEmbassy && (
+        <div className="bg-white rounded-2xl border border-border p-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu segunda embajada</p>
+          {data.secondEmbassy.address && <p className="text-sm text-foreground mb-2">📍 {data.secondEmbassy.address}</p>}
+          {data.secondEmbassy.phone && <p className="text-sm text-foreground mb-2">📞 <span className="font-medium">{data.secondEmbassy.phone}</span></p>}
+          {data.secondEmbassy.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {data.secondEmbassy.hours}</p>}
+          {data.secondEmbassy.web && (
+            <a href={data.secondEmbassy.web} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
               <ExternalLink className="w-3.5 h-3.5" />Web oficial
             </a>
