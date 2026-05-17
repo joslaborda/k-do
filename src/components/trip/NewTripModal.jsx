@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Shuffle, ChevronDown, Loader2 } from 'lucide-react';
 import { getCountryMeta, getTopCities } from '@/lib/countryConfig';
-import { getCountryMeta } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
