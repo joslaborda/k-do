@@ -1,480 +1,819 @@
 /**
- * countryConfig.js — Sistema global multi-país
- * Fuente de verdad para moneda, idioma, bandera, ciudades top y emergencias.
- * Soporta búsqueda por label (español) y por código ISO-3166.
+ * emergencyDB.js — Números de emergencia y datos de embajadas hardcodeados
+ * Estructura por país destino. La embajada varía según país origen del usuario.
+ *
+ * emergency_general: número único de emergencias
+ * police / ambulance / fire: números específicos si difieren
+ * embassy_ES: embajada española en ese país
+ * embassy_MX / embassy_AR / embassy_CO: otras embajadas hispanohablantes frecuentes
+ * useful_apps: apps recomendadas para ese país
+ * safety_tips: consejos de seguridad básicos
  */
 
-import { base44 } from '@/api/base44Client';
+const EMERGENCY_DB = {
 
-// ─── STATIC KNOWN METADATA ───────────────────────────────────────────────────
-const KNOWN_META = {
-  // ── Europa occidental ──────────────────────────────────────────────────────
-  'España':             { currency: 'EUR', symbol: '€',    languageCode: 'es-ES', languageLabel: 'Español',      flag: '🇪🇸', iso: 'ES' },
-  'Italia':             { currency: 'EUR', symbol: '€',    languageCode: 'it-IT', languageLabel: 'Italiano',     flag: '🇮🇹', iso: 'IT' },
-  'Francia':            { currency: 'EUR', symbol: '€',    languageCode: 'fr-FR', languageLabel: 'Français',     flag: '🇫🇷', iso: 'FR' },
-  'Portugal':           { currency: 'EUR', symbol: '€',    languageCode: 'pt-PT', languageLabel: 'Português',    flag: '🇵🇹', iso: 'PT' },
-  'Alemania':           { currency: 'EUR', symbol: '€',    languageCode: 'de-DE', languageLabel: 'Deutsch',      flag: '🇩🇪', iso: 'DE' },
-  'Grecia':             { currency: 'EUR', symbol: '€',    languageCode: 'el-GR', languageLabel: 'Ελληνικά',     flag: '🇬🇷', iso: 'GR' },
-  'Países Bajos':       { currency: 'EUR', symbol: '€',    languageCode: 'nl-NL', languageLabel: 'Nederlands',   flag: '🇳🇱', iso: 'NL' },
-  'Bélgica':            { currency: 'EUR', symbol: '€',    languageCode: 'fr-BE', languageLabel: 'Français',     flag: '🇧🇪', iso: 'BE' },
-  'Austria':            { currency: 'EUR', symbol: '€',    languageCode: 'de-AT', languageLabel: 'Deutsch',      flag: '🇦🇹', iso: 'AT' },
-  'Irlanda':            { currency: 'EUR', symbol: '€',    languageCode: 'en-IE', languageLabel: 'English',      flag: '🇮🇪', iso: 'IE' },
-  'Finlandia':          { currency: 'EUR', symbol: '€',    languageCode: 'fi-FI', languageLabel: 'Suomi',        flag: '🇫🇮', iso: 'FI' },
-  'Croacia':            { currency: 'EUR', symbol: '€',    languageCode: 'hr-HR', languageLabel: 'Hrvatski',     flag: '🇭🇷', iso: 'HR' },
-  'Eslovenia':          { currency: 'EUR', symbol: '€',    languageCode: 'sl-SI', languageLabel: 'Slovenščina',  flag: '🇸🇮', iso: 'SI' },
-  'Eslovaquia':         { currency: 'EUR', symbol: '€',    languageCode: 'sk-SK', languageLabel: 'Slovenčina',   flag: '🇸🇰', iso: 'SK' },
-  'Luxemburgo':         { currency: 'EUR', symbol: '€',    languageCode: 'fr-LU', languageLabel: 'Français',     flag: '🇱🇺', iso: 'LU' },
-  'Malta':              { currency: 'EUR', symbol: '€',    languageCode: 'mt-MT', languageLabel: 'Malti',        flag: '🇲🇹', iso: 'MT' },
-  'Chipre':             { currency: 'EUR', symbol: '€',    languageCode: 'el-CY', languageLabel: 'Ελληνικά',     flag: '🇨🇾', iso: 'CY' },
-  'Reino Unido':        { currency: 'GBP', symbol: '£',    languageCode: 'en-GB', languageLabel: 'English',      flag: '🇬🇧', iso: 'GB' },
-  'Suiza':              { currency: 'CHF', symbol: 'Fr',   languageCode: 'de-CH', languageLabel: 'Deutsch',      flag: '🇨🇭', iso: 'CH' },
-  'Mónaco':             { currency: 'EUR', symbol: '€',    languageCode: 'fr-MC', languageLabel: 'Français',     flag: '🇲🇨', iso: 'MC' },
-  'Andorra':            { currency: 'EUR', symbol: '€',    languageCode: 'ca-AD', languageLabel: 'Català',       flag: '🇦🇩', iso: 'AD' },
+  // ── EUROPA ────────────────────────────────────────────────────────────────
 
-  // ── Europa nórdica ─────────────────────────────────────────────────────────
-  'Noruega':            { currency: 'NOK', symbol: 'kr',   languageCode: 'nb-NO', languageLabel: 'Norsk',        flag: '🇳🇴', iso: 'NO' },
-  'Suecia':             { currency: 'SEK', symbol: 'kr',   languageCode: 'sv-SE', languageLabel: 'Svenska',      flag: '🇸🇪', iso: 'SE' },
-  'Dinamarca':          { currency: 'DKK', symbol: 'kr',   languageCode: 'da-DK', languageLabel: 'Dansk',        flag: '🇩🇰', iso: 'DK' },
-  'Islandia':           { currency: 'ISK', symbol: 'kr',   languageCode: 'is-IS', languageLabel: 'Íslenska',     flag: '🇮🇸', iso: 'IS' },
+  'España': {
+    emergency_general: '112',
+    police: '091',
+    ambulance: '061',
+    fire: '080',
+    embassy_ES: null, // Estás en España
+    useful_apps: [
+      { name: 'AlertCops', icon: '🚨', description: 'App oficial de la Policía Nacional para alertas de seguridad.' },
+      { name: 'Emergencias 112', icon: '🆘', description: 'App oficial del 112 con geolocalización automática.' },
+    ],
+    safety_tips: [
+      'Cuidado con los carteristas en zonas turísticas como Las Ramblas (Barcelona) o el Metro de Madrid.',
+      'El 112 atiende en múltiples idiomas.',
+      'En caso de accidente, la cobertura sanitaria pública es universal.',
+    ],
+  },
 
-  // ── Europa del Este ────────────────────────────────────────────────────────
-  'Polonia':            { currency: 'PLN', symbol: 'zł',   languageCode: 'pl-PL', languageLabel: 'Polski',       flag: '🇵🇱', iso: 'PL' },
-  'República Checa':    { currency: 'CZK', symbol: 'Kč',   languageCode: 'cs-CZ', languageLabel: 'Čeština',      flag: '🇨🇿', iso: 'CZ' },
-  'Hungría':            { currency: 'HUF', symbol: 'Ft',   languageCode: 'hu-HU', languageLabel: 'Magyar',       flag: '🇭🇺', iso: 'HU' },
-  'Rumanía':            { currency: 'RON', symbol: 'lei',  languageCode: 'ro-RO', languageLabel: 'Română',       flag: '🇷🇴', iso: 'RO' },
-  'Bulgaria':           { currency: 'BGN', symbol: 'лв',   languageCode: 'bg-BG', languageLabel: 'Български',    flag: '🇧🇬', iso: 'BG' },
-  'Serbia':             { currency: 'RSD', symbol: 'din',  languageCode: 'sr-RS', languageLabel: 'Srpski',       flag: '🇷🇸', iso: 'RS' },
-  'Albania':            { currency: 'ALL', symbol: 'L',    languageCode: 'sq-AL', languageLabel: 'Shqip',        flag: '🇦🇱', iso: 'AL' },
-  'Macedonia del Norte':{ currency: 'MKD', symbol: 'ден', languageCode: 'mk-MK', languageLabel: 'Македонски',   flag: '🇲🇰', iso: 'MK' },
-  'Bosnia':             { currency: 'BAM', symbol: 'KM',   languageCode: 'bs-BA', languageLabel: 'Bosanski',     flag: '🇧🇦', iso: 'BA' },
-  'Montenegro':         { currency: 'EUR', symbol: '€',    languageCode: 'sr-ME', languageLabel: 'Crnogorski',   flag: '🇲🇪', iso: 'ME' },
-  'Estonia':            { currency: 'EUR', symbol: '€',    languageCode: 'et-EE', languageLabel: 'Eesti',        flag: '🇪🇪', iso: 'EE' },
-  'Letonia':            { currency: 'EUR', symbol: '€',    languageCode: 'lv-LV', languageLabel: 'Latviešu',     flag: '🇱🇻', iso: 'LV' },
-  'Lituania':           { currency: 'EUR', symbol: '€',    languageCode: 'lt-LT', languageLabel: 'Lietuvių',     flag: '🇱🇹', iso: 'LT' },
-  'Ucrania':            { currency: 'UAH', symbol: '₴',    languageCode: 'uk-UA', languageLabel: 'Українська',   flag: '🇺🇦', iso: 'UA' },
-  'Rusia':              { currency: 'RUB', symbol: '₽',    languageCode: 'ru-RU', languageLabel: 'Русский',      flag: '🇷🇺', iso: 'RU' },
-  'Georgia':            { currency: 'GEL', symbol: '₾',    languageCode: 'ka-GE', languageLabel: 'ქართული',      flag: '🇬🇪', iso: 'GE' },
-  'Armenia':            { currency: 'AMD', symbol: '֏',    languageCode: 'hy-AM', languageLabel: 'Հայերեն',      flag: '🇦🇲', iso: 'AM' },
-  'Azerbaiyán':         { currency: 'AZN', symbol: '₼',    languageCode: 'az-AZ', languageLabel: 'Azərbaycan',   flag: '🇦🇿', iso: 'AZ' },
-  'Kosovo':             { currency: 'EUR', symbol: '€',    languageCode: 'sq-XK', languageLabel: 'Shqip',        flag: '🇽🇰', iso: 'XK' },
-  'Moldova':            { currency: 'MDL', symbol: 'L',    languageCode: 'ro-MD', languageLabel: 'Română',       flag: '🇲🇩', iso: 'MD' },
-  'Bielorrusia':        { currency: 'BYN', symbol: 'Br',   languageCode: 'be-BY', languageLabel: 'Беларуская',   flag: '🇧🇾', iso: 'BY' },
+  'Francia': {
+    emergency_general: '112',
+    police: '17',
+    ambulance: '15',
+    fire: '18',
+    embassy_ES: {
+      address: '22 Avenue Marceau, 75008 París',
+      phone: '+33 1 44 43 18 00',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/paris',
+    },
+    embassy_MX: { address: '9 Rue de Longchamp, 75116 París', phone: '+33 1 53 70 27 70', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/francia' },
+    useful_apps: [
+      { name: 'SNCF Connect', icon: '🚄', description: 'Billetes de tren TGV e Intercités.' },
+      { name: 'Doctolib', icon: '🏥', description: 'Reserva cita médica online con médicos franceses.' },
+      { name: 'Citymapper', icon: '🗺️', description: 'Transporte público en París y otras ciudades.' },
+    ],
+    safety_tips: [
+      'Guarda el número de la embajada española (+33 1 44 43 18 00) en el móvil antes de salir.',
+      'En el metro de París, cuidado con los grupos que distraen para robar.',
+      'El SAMU (15) es la ambulancia; el SMUR atiende emergencias graves.',
+      'La tarjeta sanitaria europea cubre atención en hospitales públicos.',
+    ],
+  },
 
-  // ── Norteamérica ───────────────────────────────────────────────────────────
-  'Estados Unidos':     { currency: 'USD', symbol: '$',    languageCode: 'en-US', languageLabel: 'English',      flag: '🇺🇸', iso: 'US' },
-  'Canadá':             { currency: 'CAD', symbol: '$',    languageCode: 'en-CA', languageLabel: 'English',      flag: '🇨🇦', iso: 'CA' },
-  'México':             { currency: 'MXN', symbol: '$',    languageCode: 'es-MX', languageLabel: 'Español',      flag: '🇲🇽', iso: 'MX' },
-  'Cuba':               { currency: 'CUP', symbol: '$',    languageCode: 'es-CU', languageLabel: 'Español',      flag: '🇨🇺', iso: 'CU' },
-  'Costa Rica':         { currency: 'CRC', symbol: '₡',    languageCode: 'es-CR', languageLabel: 'Español',      flag: '🇨🇷', iso: 'CR' },
-  'Panamá':             { currency: 'PAB', symbol: 'B/.',  languageCode: 'es-PA', languageLabel: 'Español',      flag: '🇵🇦', iso: 'PA' },
-  'Guatemala':          { currency: 'GTQ', symbol: 'Q',    languageCode: 'es-GT', languageLabel: 'Español',      flag: '🇬🇹', iso: 'GT' },
-  'Honduras':           { currency: 'HNL', symbol: 'L',    languageCode: 'es-HN', languageLabel: 'Español',      flag: '🇭🇳', iso: 'HN' },
-  'El Salvador':        { currency: 'USD', symbol: '$',    languageCode: 'es-SV', languageLabel: 'Español',      flag: '🇸🇻', iso: 'SV' },
-  'Nicaragua':          { currency: 'NIO', symbol: 'C$',   languageCode: 'es-NI', languageLabel: 'Español',      flag: '🇳🇮', iso: 'NI' },
-  'República Dominicana':{ currency: 'DOP', symbol: 'RD$', languageCode: 'es-DO', languageLabel: 'Español',     flag: '🇩🇴', iso: 'DO' },
-  'Jamaica':            { currency: 'JMD', symbol: '$',    languageCode: 'en-JM', languageLabel: 'English',      flag: '🇯🇲', iso: 'JM' },
-  'Trinidad y Tobago':  { currency: 'TTD', symbol: '$',    languageCode: 'en-TT', languageLabel: 'English',      flag: '🇹🇹', iso: 'TT' },
-  'Barbados':           { currency: 'BBD', symbol: '$',    languageCode: 'en-BB', languageLabel: 'English',      flag: '🇧🇧', iso: 'BB' },
-  'Bahamas':            { currency: 'BSD', symbol: '$',    languageCode: 'en-BS', languageLabel: 'English',      flag: '🇧🇸', iso: 'BS' },
-  'Haití':              { currency: 'HTG', symbol: 'G',    languageCode: 'fr-HT', languageLabel: 'Français',     flag: '🇭🇹', iso: 'HT' },
-  'Saint-Martin':       { currency: 'EUR', symbol: '€',    languageCode: 'fr-MF', languageLabel: 'Français',     flag: '🇲🇫', iso: 'MF' },
-  'Saint Martin':       { currency: 'EUR', symbol: '€',    languageCode: 'fr-MF', languageLabel: 'Français',     flag: '🇲🇫', iso: 'MF' },
-  'Sint Maarten':       { currency: 'ANG', symbol: 'ƒ',    languageCode: 'nl-SX', languageLabel: 'Nederlands',   flag: '🇸🇽', iso: 'SX' },
-  'Martinica':          { currency: 'EUR', symbol: '€',    languageCode: 'fr-MQ', languageLabel: 'Français',     flag: '🇲🇶', iso: 'MQ' },
-  'Guadalupe':          { currency: 'EUR', symbol: '€',    languageCode: 'fr-GP', languageLabel: 'Français',     flag: '🇬🇵', iso: 'GP' },
-  'Puerto Rico':        { currency: 'USD', symbol: '$',    languageCode: 'es-PR', languageLabel: 'Español',      flag: '🇵🇷', iso: 'PR' },
-  'Bermudas':           { currency: 'BMD', symbol: '$',    languageCode: 'en-BM', languageLabel: 'English',      flag: '🇧🇲', iso: 'BM' },
-  'Aruba':              { currency: 'AWG', symbol: 'ƒ',    languageCode: 'nl-AW', languageLabel: 'Papiamento',   flag: '🇦🇼', iso: 'AW' },
-  'Curazao':            { currency: 'ANG', symbol: 'ƒ',    languageCode: 'nl-CW', languageLabel: 'Papiamento',   flag: '🇨🇼', iso: 'CW' },
-  'Antigua y Barbuda':  { currency: 'XCD', symbol: '$',    languageCode: 'en-AG', languageLabel: 'English',      flag: '🇦🇬', iso: 'AG' },
-  'Santa Lucía':        { currency: 'XCD', symbol: '$',    languageCode: 'en-LC', languageLabel: 'English',      flag: '🇱🇨', iso: 'LC' },
-  'San Vicente':        { currency: 'XCD', symbol: '$',    languageCode: 'en-VC', languageLabel: 'English',      flag: '🇻🇨', iso: 'VC' },
-  'Granada':            { currency: 'XCD', symbol: '$',    languageCode: 'en-GD', languageLabel: 'English',      flag: '🇬🇩', iso: 'GD' },
-  'Dominica':           { currency: 'XCD', symbol: '$',    languageCode: 'en-DM', languageLabel: 'English',      flag: '🇩🇲', iso: 'DM' },
+  'Italia': {
+    emergency_general: '112',
+    police: '113',
+    ambulance: '118',
+    fire: '115',
+    embassy_ES: {
+      address: 'Palazzo Borghese, Largo della Fontanella di Borghese 19, Roma',
+      phone: '+39 06 684 0401',
+      hours: 'Lun-Vie 8:30-14:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/roma',
+    },
+    embassy_MX: { address: 'Via Lazzaro Spallanzani 16, 00161 Roma', phone: '+39 06 4416 5830', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/italia' },
+    useful_apps: [
+      { name: 'Trenitalia', icon: '🚂', description: 'Billetes de tren oficiales por toda Italia.' },
+      { name: 'Italo', icon: '🚄', description: 'Tren de alta velocidad alternativo, a veces más barato.' },
+      { name: 'MySOS', icon: '🆘', description: 'App de emergencias con geolocalización para extranjeros.' },
+    ],
+    safety_tips: [
+      'En Roma y Nápoles, cuidado con los carteristas en el transporte público.',
+      'Si te roban, denuncia en la Questura (policía) para el seguro de viaje.',
+      'Guarda el número del consulado más cercano (Roma, Milán, Barcelona depende de zona).',
+    ],
+  },
 
-  // ── Sudamérica ─────────────────────────────────────────────────────────────
-  'Argentina':          { currency: 'ARS', symbol: '$',    languageCode: 'es-AR', languageLabel: 'Español',      flag: '🇦🇷', iso: 'AR' },
-  'Brasil':             { currency: 'BRL', symbol: 'R$',   languageCode: 'pt-BR', languageLabel: 'Português',    flag: '🇧🇷', iso: 'BR' },
-  'Chile':              { currency: 'CLP', symbol: '$',    languageCode: 'es-CL', languageLabel: 'Español',      flag: '🇨🇱', iso: 'CL' },
-  'Colombia':           { currency: 'COP', symbol: '$',    languageCode: 'es-CO', languageLabel: 'Español',      flag: '🇨🇴', iso: 'CO' },
-  'Perú':               { currency: 'PEN', symbol: 'S/',   languageCode: 'es-PE', languageLabel: 'Español',      flag: '🇵🇪', iso: 'PE' },
-  'Uruguay':            { currency: 'UYU', symbol: '$',    languageCode: 'es-UY', languageLabel: 'Español',      flag: '🇺🇾', iso: 'UY' },
-  'Bolivia':            { currency: 'BOB', symbol: 'Bs.',  languageCode: 'es-BO', languageLabel: 'Español',      flag: '🇧🇴', iso: 'BO' },
-  'Ecuador':            { currency: 'USD', symbol: '$',    languageCode: 'es-EC', languageLabel: 'Español',      flag: '🇪🇨', iso: 'EC' },
-  'Venezuela':          { currency: 'VES', symbol: 'Bs.S', languageCode: 'es-VE', languageLabel: 'Español',      flag: '🇻🇪', iso: 'VE' },
-  'Paraguay':           { currency: 'PYG', symbol: '₲',    languageCode: 'es-PY', languageLabel: 'Español',      flag: '🇵🇾', iso: 'PY' },
-  'Guyana':             { currency: 'GYD', symbol: '$',    languageCode: 'en-GY', languageLabel: 'English',      flag: '🇬🇾', iso: 'GY' },
-  'Surinam':            { currency: 'SRD', symbol: '$',    languageCode: 'nl-SR', languageLabel: 'Nederlands',   flag: '🇸🇷', iso: 'SR' },
+  'Portugal': {
+    emergency_general: '112',
+    police: '213 421 634',
+    ambulance: '112',
+    fire: '112',
+    embassy_ES: {
+      address: 'Rua do Salitre 1, 1269-052 Lisboa',
+      phone: '+351 21 347 2381',
+      hours: 'Lun-Vie 9:00-14:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/lisboa',
+    },
+    useful_apps: [
+      { name: 'CP (Comboios de Portugal)', icon: '🚂', description: 'Trenes por todo Portugal.' },
+      { name: 'Bolt', icon: '🚗', description: 'Taxi y VTC en Lisboa y Porto, más barato que Uber.' },
+    ],
+    safety_tips: [
+      'Lisboa y Porto son ciudades seguras pero cuidado con carteristas en tranvías turísticos (especialmente el 28).',
+      'En verano, zona de Alfama tiene mucha actividad turística — vigila pertenencias.',
+    ],
+  },
 
-  // ── Asia Oriental ──────────────────────────────────────────────────────────
-  'Japón':              { currency: 'JPY', symbol: '¥',    languageCode: 'ja-JP', languageLabel: 'Japanese',     flag: '🇯🇵', iso: 'JP' },
-  'Japan':              { currency: 'JPY', symbol: '¥',    languageCode: 'ja-JP', languageLabel: 'Japanese',     flag: '🇯🇵', iso: 'JP' },
-  'China':              { currency: 'CNY', symbol: '¥',    languageCode: 'zh-CN', languageLabel: 'Chinese',      flag: '🇨🇳', iso: 'CN' },
-  'Corea del Sur':      { currency: 'KRW', symbol: '₩',    languageCode: 'ko-KR', languageLabel: 'Korean',       flag: '🇰🇷', iso: 'KR' },
-  'Taiwan':             { currency: 'TWD', symbol: 'NT$',  languageCode: 'zh-TW', languageLabel: 'Chinese',      flag: '🇹🇼', iso: 'TW' },
-  'Mongolia':           { currency: 'MNT', symbol: '₮',    languageCode: 'mn-MN', languageLabel: 'Mongolian',    flag: '🇲🇳', iso: 'MN' },
+  'Alemania': {
+    emergency_general: '112',
+    police: '110',
+    ambulance: '112',
+    fire: '112',
+    embassy_ES: {
+      address: 'Lichtensteinallee 1, 10787 Berlín',
+      phone: '+49 30 254 007 0',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/berlin',
+    },
+    useful_apps: [
+      { name: 'DB Navigator', icon: '🚂', description: 'Billetes y horarios de Deutsche Bahn, esencial en Alemania.' },
+      { name: 'BVG / MVV', icon: '🚇', description: 'Transporte público en Berlín / Múnich respectivamente.' },
+    ],
+    safety_tips: [
+      'Alemania es muy segura. En grandes estaciones (Hauptbahnhof) hay presencia de pickpockets en eventos masivos.',
+      'La ambulancia (Rettungsdienst) es de pago — asegúrate de tener seguro médico de viaje.',
+    ],
+  },
 
-  // ── Asia Sudoriental ───────────────────────────────────────────────────────
-  'Tailandia':          { currency: 'THB', symbol: '฿',    languageCode: 'th-TH', languageLabel: 'Thai',         flag: '🇹🇭', iso: 'TH' },
-  'Vietnam':            { currency: 'VND', symbol: '₫',    languageCode: 'vi-VN', languageLabel: 'Vietnamese',   flag: '🇻🇳', iso: 'VN' },
-  'Camboya':            { currency: 'KHR', symbol: '៛',    languageCode: 'km-KH', languageLabel: 'Khmer',        flag: '🇰🇭', iso: 'KH' },
-  'Laos':               { currency: 'LAK', symbol: '₭',    languageCode: 'lo-LA', languageLabel: 'Lao',          flag: '🇱🇦', iso: 'LA' },
-  'Myanmar':            { currency: 'MMK', symbol: 'K',    languageCode: 'my-MM', languageLabel: 'Burmese',      flag: '🇲🇲', iso: 'MM' },
-  'Indonesia':          { currency: 'IDR', symbol: 'Rp',   languageCode: 'id-ID', languageLabel: 'Indonesian',   flag: '🇮🇩', iso: 'ID' },
-  'Singapur':           { currency: 'SGD', symbol: '$',    languageCode: 'en-SG', languageLabel: 'English',      flag: '🇸🇬', iso: 'SG' },
-  'Malasia':            { currency: 'MYR', symbol: 'RM',   languageCode: 'ms-MY', languageLabel: 'Malay',        flag: '🇲🇾', iso: 'MY' },
-  'Filipinas':          { currency: 'PHP', symbol: '₱',    languageCode: 'fil-PH', languageLabel: 'Filipino',    flag: '🇵🇭', iso: 'PH' },
-  'Brunéi':             { currency: 'BND', symbol: '$',    languageCode: 'ms-BN', languageLabel: 'Malay',        flag: '🇧🇳', iso: 'BN' },
-  'Timor Oriental':     { currency: 'USD', symbol: '$',    languageCode: 'pt-TL', languageLabel: 'Português',    flag: '🇹🇱', iso: 'TL' },
+  'Reino Unido': {
+    emergency_general: '999',
+    police: '101 (no urgencias) / 999',
+    ambulance: '999',
+    fire: '999',
+    embassy_ES: {
+      address: '39 Chesham Place, London SW1X 8SB',
+      phone: '+44 20 7235 5555',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/londres',
+    },
+    useful_apps: [
+      { name: 'Citymapper', icon: '🚇', description: 'El mejor para navegar el metro y buses de Londres.' },
+      { name: 'NHS App', icon: '🏥', description: 'Servicios de salud del NHS, incluyendo urgencias y médicos.' },
+    ],
+    safety_tips: [
+      'El número de emergencias en UK es 999, no 112 (aunque 112 también funciona).',
+      'Con tarjeta sanitaria europea (EHIC) o el nuevo GHIC post-Brexit tienes cobertura básica.',
+      'En zonas como Brixton o Hackney en Londres, precaución nocturna como en cualquier capital.',
+    ],
+  },
 
-  // ── Asia del Sur ───────────────────────────────────────────────────────────
-  'India':              { currency: 'INR', symbol: '₹',    languageCode: 'hi-IN', languageLabel: 'Hindi',        flag: '🇮🇳', iso: 'IN' },
-  'Nepal':              { currency: 'NPR', symbol: '₨',    languageCode: 'ne-NP', languageLabel: 'Nepali',       flag: '🇳🇵', iso: 'NP' },
-  'Sri Lanka':          { currency: 'LKR', symbol: '₨',    languageCode: 'si-LK', languageLabel: 'Sinhala',      flag: '🇱🇰', iso: 'LK' },
-  'Maldivas':           { currency: 'MVR', symbol: 'Rf',   languageCode: 'dv-MV', languageLabel: 'Dhivehi',      flag: '🇲🇻', iso: 'MV' },
-  'Bután':              { currency: 'BTN', symbol: 'Nu',   languageCode: 'dz-BT', languageLabel: 'Dzongkha',     flag: '🇧🇹', iso: 'BT' },
-  'Pakistán':           { currency: 'PKR', symbol: '₨',    languageCode: 'ur-PK', languageLabel: 'Urdu',         flag: '🇵🇰', iso: 'PK' },
-  'Bangladés':          { currency: 'BDT', symbol: '৳',    languageCode: 'bn-BD', languageLabel: 'Bengali',      flag: '🇧🇩', iso: 'BD' },
+  'Países Bajos': {
+    emergency_general: '112',
+    police: '0900-8844',
+    ambulance: '112',
+    fire: '112',
+    embassy_ES: {
+      address: 'Lange Voorhout 50, 2514 EG La Haya',
+      phone: '+31 70 302 4999',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/lahaya',
+    },
+    useful_apps: [
+      { name: '9292', icon: '🚲', description: 'Transporte público en Países Bajos — trenes, bus, tranvía.' },
+      { name: 'NS (Nederlandse Spoorwegen)', icon: '🚂', description: 'Trenes nacionales holandeses.' },
+    ],
+    safety_tips: [
+      'Amsterdam tiene alta incidencia de robos de bicicletas y carteristas en el barrio rojo.',
+      'Ten cuidado con los ciclistas — tienen prioridad sobre los peatones en los carriles bici.',
+    ],
+  },
 
-  // ── Asia Central ───────────────────────────────────────────────────────────
-  'Uzbekistán':         { currency: 'UZS', symbol: 'soʻm', languageCode: 'uz-UZ', languageLabel: 'Uzbek',        flag: '🇺🇿', iso: 'UZ' },
-  'Kazajistán':         { currency: 'KZT', symbol: '₸',    languageCode: 'kk-KZ', languageLabel: 'Kazakh',       flag: '🇰🇿', iso: 'KZ' },
-  'Kirguistán':         { currency: 'KGS', symbol: 'som',  languageCode: 'ky-KG', languageLabel: 'Kyrgyz',       flag: '🇰🇬', iso: 'KG' },
+  'Suiza': {
+    emergency_general: '112',
+    police: '117',
+    ambulance: '144',
+    fire: '118',
+    embassy_ES: {
+      address: 'Kalcheggweg 24, 3006 Berna',
+      phone: '+41 31 352 0412',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/berna',
+    },
+    useful_apps: [
+      { name: 'SBB Mobile', icon: '🚂', description: 'Ferrocarriles suizos — compra y validación de billetes.' },
+      { name: 'MeteoSwiss', icon: '🏔️', description: 'Meteorología oficial suiza, esencial en montaña.' },
+    ],
+    safety_tips: [
+      'Suiza es muy segura. La asistencia sanitaria es excelente pero cara — seguro de viaje imprescindible.',
+      'En montaña, avisa siempre de tu ruta y lleva ropa adecuada. El rescate alpino (Rega) es muy eficiente.',
+    ],
+  },
 
-  // ── Oriente Medio ──────────────────────────────────────────────────────────
-  'Turquía':            { currency: 'TRY', symbol: '₺',    languageCode: 'tr-TR', languageLabel: 'Türkçe',       flag: '🇹🇷', iso: 'TR' },
-  'Emiratos Árabes':    { currency: 'AED', symbol: 'د.إ',  languageCode: 'ar-AE', languageLabel: 'Arabic',       flag: '🇦🇪', iso: 'AE' },
-  'Arabia Saudí':       { currency: 'SAR', symbol: '﷼',    languageCode: 'ar-SA', languageLabel: 'Arabic',       flag: '🇸🇦', iso: 'SA' },
-  'Israel':             { currency: 'ILS', symbol: '₪',    languageCode: 'he-IL', languageLabel: 'Hebrew',       flag: '🇮🇱', iso: 'IL' },
-  'Jordania':           { currency: 'JOD', symbol: 'JD',   languageCode: 'ar-JO', languageLabel: 'Arabic',       flag: '🇯🇴', iso: 'JO' },
-  'Líbano':             { currency: 'LBP', symbol: 'ل.ل',  languageCode: 'ar-LB', languageLabel: 'Arabic',       flag: '🇱🇧', iso: 'LB' },
-  'Omán':               { currency: 'OMR', symbol: '﷼',    languageCode: 'ar-OM', languageLabel: 'Arabic',       flag: '🇴🇲', iso: 'OM' },
-  'Qatar':              { currency: 'QAR', symbol: '﷼',    languageCode: 'ar-QA', languageLabel: 'Arabic',       flag: '🇶🇦', iso: 'QA' },
-  'Kuwait':             { currency: 'KWD', symbol: 'KD',   languageCode: 'ar-KW', languageLabel: 'Arabic',       flag: '🇰🇼', iso: 'KW' },
-  'Bahréin':            { currency: 'BHD', symbol: 'BD',   languageCode: 'ar-BH', languageLabel: 'Arabic',       flag: '🇧🇭', iso: 'BH' },
-  'Irán':               { currency: 'IRR', symbol: '﷼',    languageCode: 'fa-IR', languageLabel: 'Farsi',        flag: '🇮🇷', iso: 'IR' },
+  'Austria': {
+    emergency_general: '112',
+    police: '133',
+    ambulance: '144',
+    fire: '122',
+    embassy_ES: {
+      address: 'Argentinierstrasse 34, 1040 Viena',
+      phone: '+43 1 505 57 88',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/viena',
+    },
+    useful_apps: [
+      { name: 'WienMobil', icon: '🚇', description: 'Transporte público en Viena.' },
+      { name: 'ÖBB Tickets', icon: '🚂', description: 'Trenes austriacos.' },
+    ],
+    safety_tips: ['Viena es muy segura, considerada una de las ciudades más seguras de Europa.'],
+  },
 
-  // ── África del Norte ───────────────────────────────────────────────────────
-  'Marruecos':          { currency: 'MAD', symbol: 'DH',   languageCode: 'ar-MA', languageLabel: 'Arabic',       flag: '🇲🇦', iso: 'MA' },
-  'Egipto':             { currency: 'EGP', symbol: '£',    languageCode: 'ar-EG', languageLabel: 'Arabic',       flag: '🇪🇬', iso: 'EG' },
-  'Túnez':              { currency: 'TND', symbol: 'DT',   languageCode: 'ar-TN', languageLabel: 'Arabic',       flag: '🇹🇳', iso: 'TN' },
-  'Argelia':            { currency: 'DZD', symbol: 'دج',   languageCode: 'ar-DZ', languageLabel: 'Arabic',       flag: '🇩🇿', iso: 'DZ' },
-  'Libia':              { currency: 'LYD', symbol: 'LD',   languageCode: 'ar-LY', languageLabel: 'Arabic',       flag: '🇱🇾', iso: 'LY' },
-  'Sudán':              { currency: 'SDG', symbol: '£',    languageCode: 'ar-SD', languageLabel: 'Arabic',       flag: '🇸🇩', iso: 'SD' },
+  'Grecia': {
+    emergency_general: '112',
+    police: '100',
+    ambulance: '166',
+    fire: '199',
+    embassy_ES: {
+      address: 'Dionysiou Areopagitou 21, 117 42 Atenas',
+      phone: '+30 210 921 3123',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/atenas',
+    },
+    useful_apps: [
+      { name: 'OASA Telematics', icon: '🚌', description: 'Transporte público de Atenas en tiempo real.' },
+      { name: 'Beat (FreeNow)', icon: '🚗', description: 'Taxi en Atenas — mejor que intentar parar uno en la calle.' },
+    ],
+    safety_tips: [
+      'En Atenas, el barrio de Omonia puede ser inseguro de noche. Exarchia también requiere precaución.',
+      'En las islas, cuidado con los alquileres de moto/quad sin seguro — los accidentes son frecuentes.',
+      'El agua del grifo en las islas puede no ser potable — beber agua embotellada.',
+    ],
+  },
 
-  // ── África Subsahariana ────────────────────────────────────────────────────
-  'Sudáfrica':          { currency: 'ZAR', symbol: 'R',    languageCode: 'en-ZA', languageLabel: 'English',      flag: '🇿🇦', iso: 'ZA' },
-  'Kenia':              { currency: 'KES', symbol: 'KSh',  languageCode: 'sw-KE', languageLabel: 'Swahili',      flag: '🇰🇪', iso: 'KE' },
-  'Tanzania':           { currency: 'TZS', symbol: 'TSh',  languageCode: 'sw-TZ', languageLabel: 'Swahili',      flag: '🇹🇿', iso: 'TZ' },
-  'Uganda':             { currency: 'UGX', symbol: 'USh',  languageCode: 'sw-UG', languageLabel: 'Swahili',      flag: '🇺🇬', iso: 'UG' },
-  'Ruanda':             { currency: 'RWF', symbol: 'RF',   languageCode: 'rw-RW', languageLabel: 'Kinyarwanda',  flag: '🇷🇼', iso: 'RW' },
-  'Rwanda':             { currency: 'RWF', symbol: 'RF',   languageCode: 'rw-RW', languageLabel: 'Kinyarwanda',  flag: '🇷🇼', iso: 'RW' },
-  'Etiopía':            { currency: 'ETB', symbol: 'Br',   languageCode: 'am-ET', languageLabel: 'Amharic',      flag: '🇪🇹', iso: 'ET' },
-  'Ghana':              { currency: 'GHS', symbol: '₵',    languageCode: 'en-GH', languageLabel: 'English',      flag: '🇬🇭', iso: 'GH' },
-  'Nigeria':            { currency: 'NGN', symbol: '₦',    languageCode: 'en-NG', languageLabel: 'English',      flag: '🇳🇬', iso: 'NG' },
-  'Senegal':            { currency: 'XOF', symbol: 'CFA',  languageCode: 'fr-SN', languageLabel: 'Français',     flag: '🇸🇳', iso: 'SN' },
-  'Camerún':            { currency: 'XAF', symbol: 'CFA',  languageCode: 'fr-CM', languageLabel: 'Français',     flag: '🇨🇲', iso: 'CM' },
-  'Angola':             { currency: 'AOA', symbol: 'Kz',   languageCode: 'pt-AO', languageLabel: 'Português',    flag: '🇦🇴', iso: 'AO' },
-  'Mozambique':         { currency: 'MZN', symbol: 'MT',   languageCode: 'pt-MZ', languageLabel: 'Português',    flag: '🇲🇿', iso: 'MZ' },
-  'Zambia':             { currency: 'ZMW', symbol: 'ZK',   languageCode: 'en-ZM', languageLabel: 'English',      flag: '🇿🇲', iso: 'ZM' },
-  'Zimbabue':           { currency: 'ZWL', symbol: '$',    languageCode: 'en-ZW', languageLabel: 'English',      flag: '🇿🇼', iso: 'ZW' },
-  'Botsuana':           { currency: 'BWP', symbol: 'P',    languageCode: 'en-BW', languageLabel: 'English',      flag: '🇧🇼', iso: 'BW' },
-  'Namibia':            { currency: 'NAD', symbol: '$',    languageCode: 'en-NA', languageLabel: 'English',      flag: '🇳🇦', iso: 'NA' },
-  'Madagascar':         { currency: 'MGA', symbol: 'Ar',   languageCode: 'mg-MG', languageLabel: 'Malagasy',     flag: '🇲🇬', iso: 'MG' },
+  'Turquía': {
+    emergency_general: '112',
+    police: '155',
+    ambulance: '112',
+    fire: '110',
+    embassy_ES: {
+      address: 'Çankaya, Abdullah Cevdet Sokak No:22, 06690 Ankara',
+      phone: '+90 312 438 0392',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/ankara',
+    },
+    useful_apps: [
+      { name: 'BiTaksi', icon: '🚕', description: 'App oficial de taxis en Turquía — más seguro que taxis en calle.' },
+      { name: 'Trafi', icon: '🚇', description: 'Metro y transporte público en Estambul.' },
+    ],
+    safety_tips: [
+      'Estambul es generalmente segura para turistas. Cuidado con las estafas en el Gran Bazar.',
+      'Evita protestas o manifestaciones — pueden volverse impredecibles.',
+      'Lleva siempre una copia del pasaporte — la ley turca exige identificación en todo momento.',
+    ],
+  },
 
-  // ── Oceanía ────────────────────────────────────────────────────────────────
-  'Australia':          { currency: 'AUD', symbol: '$',    languageCode: 'en-AU', languageLabel: 'English',      flag: '🇦🇺', iso: 'AU' },
-  'Nueva Zelanda':      { currency: 'NZD', symbol: '$',    languageCode: 'en-NZ', languageLabel: 'English',      flag: '🇳🇿', iso: 'NZ' },
-  'Fiyi':               { currency: 'FJD', symbol: '$',    languageCode: 'en-FJ', languageLabel: 'English',      flag: '🇫🇯', iso: 'FJ' },
+  'República Checa': {
+    emergency_general: '112',
+    police: '158',
+    ambulance: '155',
+    fire: '150',
+    embassy_ES: {
+      address: 'Pevnostní 9, 162 01 Praga 6',
+      phone: '+420 233 097 211',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/praga',
+    },
+    useful_apps: [
+      { name: 'PID Lítačka', icon: '🚇', description: 'Transporte público de Praga — billete y validación.' },
+      { name: 'Bolt', icon: '🚗', description: 'VTC en Praga, más barato que taxis convencionales.' },
+    ],
+    safety_tips: [
+      'En el Barrio Viejo y Puente de Carlos hay carteristas frecuentes en temporada alta.',
+      'Los taxis sin taxímetro en Praga son una estafa habitual para turistas — usa siempre apps.',
+    ],
+  },
 
-  // ── Caribe completo ────────────────────────────────────────────────────────
-  'San Cristóbal y Nieves':    { currency: 'XCD', symbol: '$',   languageCode: 'en-KN', languageLabel: 'English',    flag: '🇰🇳', iso: 'KN' },
-  'Saint Kitts':               { currency: 'XCD', symbol: '$',   languageCode: 'en-KN', languageLabel: 'English',    flag: '🇰🇳', iso: 'KN' },
-  'Montserrat':                { currency: 'XCD', symbol: '$',   languageCode: 'en-MS', languageLabel: 'English',    flag: '🇲🇸', iso: 'MS' },
-  'Anguila':                   { currency: 'XCD', symbol: '$',   languageCode: 'en-AI', languageLabel: 'English',    flag: '🇦🇮', iso: 'AI' },
-  'Islas Vírgenes Británicas': { currency: 'USD', symbol: '$',   languageCode: 'en-VG', languageLabel: 'English',    flag: '🇻🇬', iso: 'VG' },
-  'Islas Vírgenes EEUU':       { currency: 'USD', symbol: '$',   languageCode: 'en-VI', languageLabel: 'English',    flag: '🇻🇮', iso: 'VI' },
-  'Islas Turcos y Caicos':     { currency: 'USD', symbol: '$',   languageCode: 'en-TC', languageLabel: 'English',    flag: '🇹🇨', iso: 'TC' },
-  'Islas Caimán':              { currency: 'KYD', symbol: '$',   languageCode: 'en-KY', languageLabel: 'English',    flag: '🇰🇾', iso: 'KY' },
-  'Martinica':                 { currency: 'EUR', symbol: '€',   languageCode: 'fr-MQ', languageLabel: 'Français',   flag: '🇲🇶', iso: 'MQ' },
-  'Guadalupe':                 { currency: 'EUR', symbol: '€',   languageCode: 'fr-GP', languageLabel: 'Français',   flag: '🇬🇵', iso: 'GP' },
-  'San Bartolomé':             { currency: 'EUR', symbol: '€',   languageCode: 'fr-BL', languageLabel: 'Français',   flag: '🇧🇱', iso: 'BL' },
-  'Saint Martin':              { currency: 'EUR', symbol: '€',   languageCode: 'fr-MF', languageLabel: 'Français',   flag: '🇲🇫', iso: 'MF' },
-  'Bonaire':                   { currency: 'USD', symbol: '$',   languageCode: 'nl-BQ', languageLabel: 'Papiamento', flag: '🇧🇶', iso: 'BQ' },
-  'Saba':                      { currency: 'USD', symbol: '$',   languageCode: 'en-BQ', languageLabel: 'English',    flag: '🇧🇶', iso: 'BQ' },
-  'Sint Eustatius':            { currency: 'USD', symbol: '$',   languageCode: 'nl-BQ', languageLabel: 'Nederlands', flag: '🇧🇶', iso: 'BQ' },
-  'Bermudas':                  { currency: 'BMD', symbol: '$',   languageCode: 'en-BM', languageLabel: 'English',    flag: '🇧🇲', iso: 'BM' },
-  'Haití':                     { currency: 'HTG', symbol: 'G',   languageCode: 'fr-HT', languageLabel: 'Français',   flag: '🇭🇹', iso: 'HT' },
-  'Guyana Francesa':           { currency: 'EUR', symbol: '€',   languageCode: 'fr-GF', languageLabel: 'Français',   flag: '🇬🇫', iso: 'GF' },
-  'Surinam':                   { currency: 'SRD', symbol: '$',   languageCode: 'nl-SR', languageLabel: 'Nederlands', flag: '🇸🇷', iso: 'SR' },
-  'Guyana':                    { currency: 'GYD', symbol: '$',   languageCode: 'en-GY', languageLabel: 'English',    flag: '🇬🇾', iso: 'GY' },
+  'Hungría': {
+    emergency_general: '112',
+    police: '107',
+    ambulance: '104',
+    fire: '105',
+    embassy_ES: {
+      address: 'Eötvös utca 11-B, 1067 Budapest',
+      phone: '+36 1 202 4006',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/budapest',
+    },
+    useful_apps: [
+      { name: 'BKK Futár', icon: '🚇', description: 'Transporte público de Budapest en tiempo real.' },
+      { name: 'Bolt', icon: '🚗', description: 'VTC en Budapest.' },
+    ],
+    safety_tips: [
+      'Hay bares en el centro de Budapest conocidos como "ruin bars" — cuidado con bebidas adulteradas en algunos locales.',
+      'Las tarjetas de crédito se aceptan ampliamente pero el forint (HUF) es necesario en algunos sitios pequeños.',
+    ],
+  },
 
-  // ── Oceanía completa ───────────────────────────────────────────────────────
-  'Papúa Nueva Guinea':        { currency: 'PGK', symbol: 'K',   languageCode: 'en-PG', languageLabel: 'English',    flag: '🇵🇬', iso: 'PG' },
-  'Islas Salomón':             { currency: 'SBD', symbol: '$',   languageCode: 'en-SB', languageLabel: 'English',    flag: '🇸🇧', iso: 'SB' },
-  'Vanuatu':                   { currency: 'VUV', symbol: 'Vt',  languageCode: 'bi-VU', languageLabel: 'Bislama',    flag: '🇻🇺', iso: 'VU' },
-  'Samoa':                     { currency: 'WST', symbol: 'T',   languageCode: 'sm-WS', languageLabel: 'Samoan',     flag: '🇼🇸', iso: 'WS' },
-  'Samoa Americana':           { currency: 'USD', symbol: '$',   languageCode: 'sm-AS', languageLabel: 'Samoan',     flag: '🇦🇸', iso: 'AS' },
-  'Tonga':                     { currency: 'TOP', symbol: 'T$',  languageCode: 'to-TO', languageLabel: 'Tongan',     flag: '🇹🇴', iso: 'TO' },
-  'Kiribati':                  { currency: 'AUD', symbol: '$',   languageCode: 'en-KI', languageLabel: 'English',    flag: '🇰🇮', iso: 'KI' },
-  'Tuvalu':                    { currency: 'AUD', symbol: '$',   languageCode: 'en-TV', languageLabel: 'English',    flag: '🇹🇻', iso: 'TV' },
-  'Nauru':                     { currency: 'AUD', symbol: '$',   languageCode: 'en-NR', languageLabel: 'English',    flag: '🇳🇷', iso: 'NR' },
-  'Palaos':                    { currency: 'USD', symbol: '$',   languageCode: 'en-PW', languageLabel: 'English',    flag: '🇵🇼', iso: 'PW' },
-  'Micronesia':                { currency: 'USD', symbol: '$',   languageCode: 'en-FM', languageLabel: 'English',    flag: '🇫🇲', iso: 'FM' },
-  'Islas Marshall':            { currency: 'USD', symbol: '$',   languageCode: 'en-MH', languageLabel: 'English',    flag: '🇲🇭', iso: 'MH' },
-  'Islas Marianas del Norte':  { currency: 'USD', symbol: '$',   languageCode: 'en-MP', languageLabel: 'English',    flag: '🇲🇵', iso: 'MP' },
-  'Guam':                      { currency: 'USD', symbol: '$',   languageCode: 'en-GU', languageLabel: 'English',    flag: '🇬🇺', iso: 'GU' },
-  'Polinesia Francesa':        { currency: 'XPF', symbol: 'F',   languageCode: 'fr-PF', languageLabel: 'Français',   flag: '🇵🇫', iso: 'PF' },
-  'Tahití':                    { currency: 'XPF', symbol: 'F',   languageCode: 'fr-PF', languageLabel: 'Français',   flag: '🇵🇫', iso: 'PF' },
-  'Nueva Caledonia':           { currency: 'XPF', symbol: 'F',   languageCode: 'fr-NC', languageLabel: 'Français',   flag: '🇳🇨', iso: 'NC' },
-  'Wallis y Futuna':           { currency: 'XPF', symbol: 'F',   languageCode: 'fr-WF', languageLabel: 'Français',   flag: '🇼🇫', iso: 'WF' },
-  'Islas Cook':                { currency: 'NZD', symbol: '$',   languageCode: 'en-CK', languageLabel: 'English',    flag: '🇨🇰', iso: 'CK' },
-  'Niue':                      { currency: 'NZD', symbol: '$',   languageCode: 'en-NU', languageLabel: 'English',    flag: '🇳🇺', iso: 'NU' },
-  'Tokelau':                   { currency: 'NZD', symbol: '$',   languageCode: 'en-TK', languageLabel: 'English',    flag: '🇹🇰', iso: 'TK' },
-  'Isla de Navidad':           { currency: 'AUD', symbol: '$',   languageCode: 'en-CX', languageLabel: 'English',    flag: '🇨🇽', iso: 'CX' },
-  'Islas Cocos':               { currency: 'AUD', symbol: '$',   languageCode: 'en-CC', languageLabel: 'English',    flag: '🇨🇨', iso: 'CC' },
-  'Islas Norfolk':             { currency: 'AUD', symbol: '$',   languageCode: 'en-NF', languageLabel: 'English',    flag: '🇳🇫', iso: 'NF' },
-  'Islas Pitcairn':            { currency: 'NZD', symbol: '$',   languageCode: 'en-PN', languageLabel: 'English',    flag: '🇵🇳', iso: 'PN' },
-  'Hawái':                     { currency: 'USD', symbol: '$',   languageCode: 'en-US', languageLabel: 'English',    flag: '🇺🇸', iso: 'US' },
+  'Polonia': {
+    emergency_general: '112',
+    police: '997',
+    ambulance: '999',
+    fire: '998',
+    embassy_ES: {
+      address: 'ulica Mysia 5, 00-496 Varsovia',
+      phone: '+48 22 583 4000',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/varsovia',
+    },
+    useful_apps: [
+      { name: 'Bolt', icon: '🚗', description: 'VTC en las principales ciudades polacas.' },
+      { name: 'KOLEO', icon: '🚂', description: 'Billetes de tren en Polonia.' },
+    ],
+    safety_tips: ['Polonia es segura para los turistas. Cracovia y Varsovia son ciudades tranquilas.'],
+  },
 
-  // ── África completa ────────────────────────────────────────────────────────
-  'Cabo Verde':                { currency: 'CVE', symbol: '$',   languageCode: 'pt-CV', languageLabel: 'Português',  flag: '🇨🇻', iso: 'CV' },
-  'Santo Tomé y Príncipe':     { currency: 'STN', symbol: 'Db',  languageCode: 'pt-ST', languageLabel: 'Português',  flag: '🇸🇹', iso: 'ST' },
-  'Guinea-Bisáu':              { currency: 'XOF', symbol: 'CFA', languageCode: 'pt-GW', languageLabel: 'Português',  flag: '🇬🇼', iso: 'GW' },
-  'Guinea':                    { currency: 'GNF', symbol: 'Fr',  languageCode: 'fr-GN', languageLabel: 'Français',   flag: '🇬🇳', iso: 'GN' },
-  'Guinea Ecuatorial':         { currency: 'XAF', symbol: 'CFA', languageCode: 'es-GQ', languageLabel: 'Español',    flag: '🇬🇶', iso: 'GQ' },
-  'Gambia':                    { currency: 'GMD', symbol: 'D',   languageCode: 'en-GM', languageLabel: 'English',    flag: '🇬🇲', iso: 'GM' },
-  'Sierra Leona':              { currency: 'SLL', symbol: 'Le',  languageCode: 'en-SL', languageLabel: 'English',    flag: '🇸🇱', iso: 'SL' },
-  'Liberia':                   { currency: 'LRD', symbol: '$',   languageCode: 'en-LR', languageLabel: 'English',    flag: '🇱🇷', iso: 'LR' },
-  'Costa de Marfil':           { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-CI', languageLabel: 'Français',   flag: '🇨🇮', iso: 'CI' },
-  'Burkina Faso':              { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-BF', languageLabel: 'Français',   flag: '🇧🇫', iso: 'BF' },
-  'Malí':                      { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-ML', languageLabel: 'Français',   flag: '🇲🇱', iso: 'ML' },
-  'Mauritania':                { currency: 'MRU', symbol: 'UM',  languageCode: 'ar-MR', languageLabel: 'Arabic',     flag: '🇲🇷', iso: 'MR' },
-  'Níger':                     { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-NE', languageLabel: 'Français',   flag: '🇳🇪', iso: 'NE' },
-  'Chad':                      { currency: 'XAF', symbol: 'CFA', languageCode: 'fr-TD', languageLabel: 'Français',   flag: '🇹🇩', iso: 'TD' },
-  'República Centroafricana':  { currency: 'XAF', symbol: 'CFA', languageCode: 'fr-CF', languageLabel: 'Français',   flag: '🇨🇫', iso: 'CF' },
-  'República del Congo':       { currency: 'XAF', symbol: 'CFA', languageCode: 'fr-CG', languageLabel: 'Français',   flag: '🇨🇬', iso: 'CG' },
-  'República Democrática del Congo': { currency: 'CDF', symbol: 'FC', languageCode: 'fr-CD', languageLabel: 'Français', flag: '🇨🇩', iso: 'CD' },
-  'Congo':                     { currency: 'XAF', symbol: 'CFA', languageCode: 'fr-CG', languageLabel: 'Français',   flag: '🇨🇬', iso: 'CG' },
-  'Gabón':                     { currency: 'XAF', symbol: 'CFA', languageCode: 'fr-GA', languageLabel: 'Français',   flag: '🇬🇦', iso: 'GA' },
-  'Togo':                      { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-TG', languageLabel: 'Français',   flag: '🇹🇬', iso: 'TG' },
-  'Benín':                     { currency: 'XOF', symbol: 'CFA', languageCode: 'fr-BJ', languageLabel: 'Français',   flag: '🇧🇯', iso: 'BJ' },
-  'Eritrea':                   { currency: 'ERN', symbol: 'Nfk', languageCode: 'ti-ER', languageLabel: 'Tigrinya',   flag: '🇪🇷', iso: 'ER' },
-  'Yibuti':                    { currency: 'DJF', symbol: 'Fdj', languageCode: 'fr-DJ', languageLabel: 'Français',   flag: '🇩🇯', iso: 'DJ' },
-  'Somalia':                   { currency: 'SOS', symbol: 'Sh',  languageCode: 'so-SO', languageLabel: 'Somali',     flag: '🇸🇴', iso: 'SO' },
-  'Sudán del Sur':             { currency: 'SSP', symbol: '£',   languageCode: 'en-SS', languageLabel: 'English',    flag: '🇸🇸', iso: 'SS' },
-  'Burundi':                   { currency: 'BIF', symbol: 'Fr',  languageCode: 'fr-BI', languageLabel: 'Français',   flag: '🇧🇮', iso: 'BI' },
-  'Malaui':                    { currency: 'MWK', symbol: 'MK',  languageCode: 'en-MW', languageLabel: 'English',    flag: '🇲🇼', iso: 'MW' },
-  'Lesoto':                    { currency: 'LSL', symbol: 'L',   languageCode: 'st-LS', languageLabel: 'Sesotho',    flag: '🇱🇸', iso: 'LS' },
-  'Suazilandia':               { currency: 'SZL', symbol: 'L',   languageCode: 'ss-SZ', languageLabel: 'Swati',      flag: '🇸🇿', iso: 'SZ' },
-  'Esuatini':                  { currency: 'SZL', symbol: 'L',   languageCode: 'ss-SZ', languageLabel: 'Swati',      flag: '🇸🇿', iso: 'SZ' },
-  'Comoras':                   { currency: 'KMF', symbol: 'Fr',  languageCode: 'ar-KM', languageLabel: 'Arabic',     flag: '🇰🇲', iso: 'KM' },
-  'Seychelles':                { currency: 'SCR', symbol: '₨',   languageCode: 'fr-SC', languageLabel: 'Français',   flag: '🇸🇨', iso: 'SC' },
-  'Mauricio':                  { currency: 'MUR', symbol: '₨',   languageCode: 'en-MU', languageLabel: 'English',    flag: '🇲🇺', iso: 'MU' },
-  'Reunión':                   { currency: 'EUR', symbol: '€',   languageCode: 'fr-RE', languageLabel: 'Français',   flag: '🇷🇪', iso: 'RE' },
-  'Mayotte':                   { currency: 'EUR', symbol: '€',   languageCode: 'fr-YT', languageLabel: 'Français',   flag: '🇾🇹', iso: 'YT' },
-  'Isla de Santa Elena':       { currency: 'SHP', symbol: '£',   languageCode: 'en-SH', languageLabel: 'English',    flag: '🇸🇭', iso: 'SH' },
-  'Sahara Occidental':         { currency: 'MAD', symbol: 'DH',  languageCode: 'ar-EH', languageLabel: 'Arabic',     flag: '🇪🇭', iso: 'EH' },
+  // ── ASIA ──────────────────────────────────────────────────────────────────
 
-  // ── Asia completa + territorios ────────────────────────────────────────────
-  'Hong Kong':                 { currency: 'HKD', symbol: '$',   languageCode: 'zh-HK', languageLabel: 'Cantonese',  flag: '🇭🇰', iso: 'HK' },
-  'Macao':                     { currency: 'MOP', symbol: 'P',   languageCode: 'zh-MO', languageLabel: 'Cantonese',  flag: '🇲🇴', iso: 'MO' },
-  'Corea del Norte':           { currency: 'KPW', symbol: '₩',   languageCode: 'ko-KP', languageLabel: 'Korean',     flag: '🇰🇵', iso: 'KP' },
-  'Afganistán':                { currency: 'AFN', symbol: '؋',   languageCode: 'ps-AF', languageLabel: 'Pashto',     flag: '🇦🇫', iso: 'AF' },
-  'Tayikistán':                { currency: 'TJS', symbol: 'SM',  languageCode: 'tg-TJ', languageLabel: 'Tajik',      flag: '🇹🇯', iso: 'TJ' },
-  'Turkmenistán':              { currency: 'TMT', symbol: 'T',   languageCode: 'tk-TM', languageLabel: 'Turkmen',    flag: '🇹🇲', iso: 'TM' },
-  'Yemén':                     { currency: 'YER', symbol: '﷼',   languageCode: 'ar-YE', languageLabel: 'Arabic',     flag: '🇾🇪', iso: 'YE' },
-  'Siria':                     { currency: 'SYP', symbol: '£',   languageCode: 'ar-SY', languageLabel: 'Arabic',     flag: '🇸🇾', iso: 'SY' },
-  'Irak':                      { currency: 'IQD', symbol: 'ع.د', languageCode: 'ar-IQ', languageLabel: 'Arabic',     flag: '🇮🇶', iso: 'IQ' },
-  'Palestina':                 { currency: 'ILS', symbol: '₪',   languageCode: 'ar-PS', languageLabel: 'Arabic',     flag: '🇵🇸', iso: 'PS' },
-  'Chipre del Norte':          { currency: 'TRY', symbol: '₺',   languageCode: 'tr-CY', languageLabel: 'Türkçe',     flag: '🇨🇾', iso: 'CY' },
-  'Isla de Man':               { currency: 'GBP', symbol: '£',   languageCode: 'en-IM', languageLabel: 'English',    flag: '🇮🇲', iso: 'IM' },
-  'Islas del Canal':           { currency: 'GBP', symbol: '£',   languageCode: 'en-GG', languageLabel: 'English',    flag: '🇬🇬', iso: 'GG' },
-  'Guernsey':                  { currency: 'GBP', symbol: '£',   languageCode: 'en-GG', languageLabel: 'English',    flag: '🇬🇬', iso: 'GG' },
-  'Jersey':                    { currency: 'GBP', symbol: '£',   languageCode: 'en-JE', languageLabel: 'English',    flag: '🇯🇪', iso: 'JE' },
-  'Gibraltar':                 { currency: 'GIP', symbol: '£',   languageCode: 'es-GI', languageLabel: 'Español',    flag: '🇬🇮', iso: 'GI' },
-  'Liechtenstein':             { currency: 'CHF', symbol: 'Fr',  languageCode: 'de-LI', languageLabel: 'Deutsch',    flag: '🇱🇮', iso: 'LI' },
-  'San Marino':                { currency: 'EUR', symbol: '€',   languageCode: 'it-SM', languageLabel: 'Italiano',   flag: '🇸🇲', iso: 'SM' },
-  'Ciudad del Vaticano':       { currency: 'EUR', symbol: '€',   languageCode: 'it-VA', languageLabel: 'Italiano',   flag: '🇻🇦', iso: 'VA' },
-  'Escocia':                   { currency: 'GBP', symbol: '£',   languageCode: 'en-GB', languageLabel: 'English',    flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', iso: 'GB' },
-  'Gales':                     { currency: 'GBP', symbol: '£',   languageCode: 'cy-GB', languageLabel: 'Welsh',      flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', iso: 'GB' },
-  'Irlanda del Norte':         { currency: 'GBP', symbol: '£',   languageCode: 'en-GB', languageLabel: 'English',    flag: '🇬🇧', iso: 'GB' },
-  'Islas Feroe':               { currency: 'DKK', symbol: 'kr',  languageCode: 'fo-FO', languageLabel: 'Faroese',    flag: '🇫🇴', iso: 'FO' },
-  'Groenlandia':               { currency: 'DKK', symbol: 'kr',  languageCode: 'kl-GL', languageLabel: 'Kalaallisut',flag: '🇬🇱', iso: 'GL' },
-  'Svalbard':                  { currency: 'NOK', symbol: 'kr',  languageCode: 'nb-NO', languageLabel: 'Norsk',      flag: '🇸🇯', iso: 'SJ' },
-  'Åland':                     { currency: 'EUR', symbol: '€',   languageCode: 'sv-AX', languageLabel: 'Svenska',    flag: '🇦🇽', iso: 'AX' },
-  'Macedonia':                 { currency: 'MKD', symbol: 'ден', languageCode: 'mk-MK', languageLabel: 'Macedonski', flag: '🇲🇰', iso: 'MK' },
+  'Japón': {
+    emergency_general: '110 (policía) / 119 (bomberos y ambulancia)',
+    police: '110',
+    ambulance: '119',
+    fire: '119',
+    embassy_ES: {
+      address: '1-3-29 Roppongi, Minato-ku, Tokio 106-0032',
+      phone: '+81 3 3583 8531',
+      hours: 'Lun-Vie 9:00-13:00 y 14:00-17:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/tokio',
+    },
+    embassy_MX: { address: '2-15-1 Nagata-cho, Chiyoda-ku, Tokio', phone: '+81 3 3581 1131', hours: 'Lun-Vie 9:30-13:00', web: 'https://embamex.sre.gob.mx/japon' },
+    useful_apps: [
+      { name: 'Google Translate + cámara', icon: '📷', description: 'Traduce menús y señales con la cámara en tiempo real.' },
+      { name: 'Suica / PASMO', icon: '💳', description: 'Tarjeta de transporte recargable para metro y trenes.' },
+      { name: 'Hyperdia', icon: '🚄', description: 'Rutas en Shinkansen y transporte local con horarios exactos.' },
+      { name: 'LINE', icon: '💬', description: 'La app de mensajería principal en Japón.' },
+    ],
+    safety_tips: [
+      'Japón es uno de los países más seguros del mundo — tasa de criminalidad mínima.',
+      'En caso de terremoto: protégete bajo una mesa sólida, aléjate de ventanas. No uses ascensores.',
+      'El servicio de urgencias (119) puede tener operadores sin inglés — lleva escrito tu dirección en japonés.',
+      'Los hospitales requieren pago por adelantado sin seguro — lleva seguro médico de viaje obligatoriamente.',
+    ],
+  },
 
-  // ── Américas completo ──────────────────────────────────────────────────────
-  'Belice':                    { currency: 'BZD', symbol: '$',   languageCode: 'en-BZ', languageLabel: 'English',    flag: '🇧🇿', iso: 'BZ' },
-  'Islas Malvinas':            { currency: 'FKP', symbol: '£',   languageCode: 'en-FK', languageLabel: 'English',    flag: '🇫🇰', iso: 'FK' },
-  'Islas Georgias del Sur':    { currency: 'SHP', symbol: '£',   languageCode: 'en-GS', languageLabel: 'English',    flag: '🇬🇸', iso: 'GS' },
-  'Territorios Antárticos':    { currency: 'GBP', symbol: '£',   languageCode: 'en-AQ', languageLabel: 'English',    flag: '🇦🇶', iso: 'AQ' },
-  'Alaska':                    { currency: 'USD', symbol: '$',   languageCode: 'en-US', languageLabel: 'English',    flag: '🇺🇸', iso: 'US' },
-  'Islas Vírgenes de EE.UU':  { currency: 'USD', symbol: '$',   languageCode: 'en-VI', languageLabel: 'English',    flag: '🇻🇮', iso: 'VI' },
-  'Isla Reunión':              { currency: 'EUR', symbol: '€',   languageCode: 'fr-RE', languageLabel: 'Français',   flag: '🇷🇪', iso: 'RE' },
+  'Tailandia': {
+    emergency_general: '191 (policía) / 1669 (ambulancia)',
+    police: '191',
+    ambulance: '1669',
+    fire: '199',
+    embassy_ES: {
+      address: '23F, Lake Rajada Office Complex, 193/126-130 New Rajadapisek Rd., Bangkok',
+      phone: '+66 2 661 8284',
+      hours: 'Lun-Vie 9:00-12:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/bangkok',
+    },
+    embassy_MX: { address: '20/69-70 Twin Towers, Rama IX Rd, Bangkok', phone: '+66 2 300 0435', hours: 'Lun-Vie 9:00-13:00', web: null },
+    useful_apps: [
+      { name: 'Grab', icon: '🛵', description: 'El Uber de Asia — taxis, motos y comida a domicilio en toda Tailandia.' },
+      { name: 'LINE MAN', icon: '🍜', description: 'Delivery de comida tailandesa a domicilio.' },
+      { name: 'Google Translate', icon: '🔤', description: 'El tailandés tiene alfabeto propio — imprescindible para menús y señales.' },
+    ],
+    safety_tips: [
+      'Los "tuk-tuk estafa" son habituales en Bangkok: te llevan a tiendas de amigos antes del destino.',
+      'Los escúter en islas: muchos turistas tienen accidentes sin casco. Seguro específico obligatorio.',
+      'Las drogas tienen penas severísimas en Tailandia, incluyendo pena de muerte para tráfico.',
+      'En zonas de manifestaciones políticas o alrededor del palacio real, mucho cuidado con comentarios sobre la monarquía.',
+    ],
+  },
 
-  // ── Oriente Medio completo ─────────────────────────────────────────────────
-  'Uzbekistán':                { currency: 'UZS', symbol: 'soʻm',languageCode: 'uz-UZ', languageLabel: 'Uzbek',      flag: '🇺🇿', iso: 'UZ' },
-  'Kazajistán':                { currency: 'KZT', symbol: '₸',   languageCode: 'kk-KZ', languageLabel: 'Kazakh',     flag: '🇰🇿', iso: 'KZ' },
-  'Kirguistán':                { currency: 'KGS', symbol: 'som', languageCode: 'ky-KG', languageLabel: 'Kyrgyz',     flag: '🇰🇬', iso: 'KG' },
+  'Vietnam': {
+    emergency_general: '113 (policía) / 115 (ambulancia)',
+    police: '113',
+    ambulance: '115',
+    fire: '114',
+    embassy_ES: {
+      address: 'Edificio Horizon Towers, 40 Cat Linh Street, Hanói',
+      phone: '+84 24 3771 5207',
+      hours: 'Lun-Vie 8:30-12:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/hanoi',
+    },
+    useful_apps: [
+      { name: 'Grab', icon: '🛵', description: 'Moto-taxi, taxi y comida en toda Vietnam — esencial.' },
+      { name: 'Google Maps', icon: '🗺️', description: 'Funciona bien en Vietnam, mejor que Maps de Apple.' },
+    ],
+    safety_tips: [
+      'Al cruzar la calle en Hanói/Ho Chi Minh: camina lento y constante, los vehículos esquivarán.',
+      'Cuidado con los "xe ôm" (moto-taxi informales) — usa siempre Grab para precio fijo.',
+      'Los cambios de dinero en la calle pueden darte billetes falsos — usa bancos o cajeros.',
+    ],
+  },
 
-  // ── Pacífico EEUU ──────────────────────────────────────────────────────────
-  'Islas Marianas':            { currency: 'USD', symbol: '$',   languageCode: 'en-MP', languageLabel: 'English',    flag: '🇲🇵', iso: 'MP' },
-  'Islas Wake':                { currency: 'USD', symbol: '$',   languageCode: 'en-UM', languageLabel: 'English',    flag: '🇺🇲', iso: 'UM' },
+  'India': {
+    emergency_general: '112',
+    police: '100',
+    ambulance: '102',
+    fire: '101',
+    embassy_ES: {
+      address: '12 Prithviraj Road, Nueva Delhi 110011',
+      phone: '+91 11 4129 3000',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/nuevadelhi',
+    },
+    useful_apps: [
+      { name: 'Ola / Uber', icon: '🚖', description: 'Las dos apps de taxi más usadas en India — siempre precio cerrado.' },
+      { name: 'IRCTC Rail Connect', icon: '🚂', description: 'Reservas de tren oficial en India — necesita registro previo.' },
+      { name: 'MakeMyTrip', icon: '✈️', description: 'Vuelos y hoteles internos — los internos en India son baratos.' },
+    ],
+    safety_tips: [
+      'Bebe siempre agua embotellada, nunca del grifo. Cuidado con el hielo en bebidas de puestos callejeros.',
+      'Las mujeres deben evitar viajar solas de noche en algunas zonas, especialmente en transporte.',
+      'El "estómago del viajero" es frecuente — lleva loperamida y sales de rehidratación.',
+      'El regateo es esperable y parte de la cultura en mercados y con rickshaws.',
+    ],
+  },
+
+  'China': {
+    emergency_general: '110 (policía) / 120 (ambulancia)',
+    police: '110',
+    ambulance: '120',
+    fire: '119',
+    embassy_ES: {
+      address: 'Sanlitun Lu 9, Chaoyang District, Pekín 100600',
+      phone: '+86 10 6532 3629',
+      hours: 'Lun-Vie 9:00-12:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/pekin',
+    },
+    useful_apps: [
+      { name: 'DiDi', icon: '🚖', description: 'El Uber chino — taxi con conductor profesional.' },
+      { name: 'WeChat Pay / AliPay', icon: '💳', description: 'Pago móvil esencial en China — muchos sitios no aceptan efectivo.' },
+      { name: 'VPN (configurar antes de llegar)', icon: '🔐', description: 'Google, WhatsApp e Instagram están bloqueados en China.' },
+    ],
+    safety_tips: [
+      'Instala una VPN fiable ANTES de llegar a China — después es difícil descargarla.',
+      'WhatsApp y Google Maps no funcionan sin VPN. Descarga WeChat y Baidu Maps como alternativa.',
+      'Registra tu alojamiento en la policía local (hoteles lo hacen automáticamente, pisos turísticos no siempre).',
+    ],
+  },
+
+  'Corea del Sur': {
+    emergency_general: '112 (policía) / 119 (bomberos y ambulancia)',
+    police: '112',
+    ambulance: '119',
+    fire: '119',
+    embassy_ES: {
+      address: 'Hannam-daero 16-gil 29, Yongsan-gu, Seúl',
+      phone: '+82 2 794 3581',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/seul',
+    },
+    useful_apps: [
+      { name: 'Kakao T', icon: '🚕', description: 'La app de taxi oficial de Corea del Sur.' },
+      { name: 'Naver Maps', icon: '🗺️', description: 'Mejor que Google Maps en Corea para transporte público.' },
+      { name: 'T-money', icon: '💳', description: 'Tarjeta de transporte recargable para metro y bus.' },
+    ],
+    safety_tips: [
+      'Corea del Sur es extremadamente segura — una de las más seguras de Asia.',
+      'Los hospitales surcoreanos son de alta calidad y asequibles comparado con Europa.',
+      'El metro de Seúl tiene pantallas en inglés — es fácil de usar para extranjeros.',
+    ],
+  },
+
+  'Singapur': {
+    emergency_general: '999 (policía) / 995 (ambulancia)',
+    police: '999',
+    ambulance: '995',
+    fire: '995',
+    embassy_ES: {
+      address: '60 North Bridge Road, #08-02 Mapletree Business City, Singapur',
+      phone: '+65 6732 9555',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/singapur',
+    },
+    useful_apps: [
+      { name: 'Grab', icon: '🚗', description: 'Taxis y VTC en Singapur.' },
+      { name: 'MyTransport.SG', icon: '🚇', description: 'Transporte público oficial de Singapur.' },
+    ],
+    safety_tips: [
+      'Singapur tiene leyes muy estrictas: mascar chicle, fumar en lugares no permitidos y arrojar basura tienen multas elevadas.',
+      'La pena de muerte existe para tráfico de drogas — tolerancia cero absoluta.',
+      'Es la ciudad más segura de Asia para turistas.',
+    ],
+  },
+
+  'Indonesia': {
+    emergency_general: '112',
+    police: '110',
+    ambulance: '118',
+    fire: '113',
+    embassy_ES: {
+      address: 'Jl. H.R. Rasuna Said Kav. X Kav. 1-2, Kuningan, Yakarta',
+      phone: '+62 21 2553 6000',
+      hours: 'Lun-Vie 8:00-12:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/yakarta',
+    },
+    useful_apps: [
+      { name: 'Gojek', icon: '🛵', description: 'El Grab indonesio — mototaxi, taxi y delivery en Indonesia.' },
+      { name: 'Traveloka', icon: '✈️', description: 'Vuelos y hoteles para destinos internos en Indonesia.' },
+    ],
+    safety_tips: [
+      'En Bali, los "money changers" en la calle pueden estafar con técnicas de desviar atención — usa bancos.',
+      'Beber agua embotellada siempre. El agua del grifo no es potable.',
+      'El volcán Agung en Bali está activo — consulta alertas volcánicas antes de visitar el área.',
+    ],
+  },
+
+  // ── AMERICA ───────────────────────────────────────────────────────────────
+
+  'México': {
+    emergency_general: '911',
+    police: '911',
+    ambulance: '911',
+    fire: '911',
+    embassy_ES: {
+      address: 'Galileo 114, Colonia Polanco, 11560 Ciudad de México',
+      phone: '+52 55 5282 2977',
+      hours: 'Lun-Vie 9:00-14:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/mexico',
+    },
+    useful_apps: [
+      { name: 'Uber / DiDi', icon: '🚗', description: 'Siempre usa taxi con app en CDMX — nunca taxis de calle.' },
+      { name: 'CDMX app', icon: '🌆', description: 'App oficial de Ciudad de México con emergencias, metro y servicios.' },
+      { name: 'Google Maps', icon: '🗺️', description: 'Funciona muy bien en México para transporte público.' },
+    ],
+    safety_tips: [
+      'En CDMX y ciudades grandes, usa siempre Uber o DiDi — los "taxis piratas" son peligrosos.',
+      'El Metro de CDMX tiene bolsillos en hora punta — usa mochila en el pecho.',
+      'Consulta el mapa de zonas de seguridad antes de aventurarte por barrios desconocidos.',
+      'Nunca saques el móvil en la calle en colonias de bajo nivel turístico.',
+    ],
+  },
+
+  'Argentina': {
+    emergency_general: '911',
+    police: '101',
+    ambulance: '107',
+    fire: '100',
+    embassy_ES: {
+      address: 'Mariscal Ramón Castilla 2720, 1425 Buenos Aires',
+      phone: '+54 11 4802 0444',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/buenosaires',
+    },
+    useful_apps: [
+      { name: 'Cabify / Uber', icon: '🚗', description: 'VTC en Buenos Aires — los taxis regulares también son seguros pero usa apps.' },
+      { name: 'Mercado Libre', icon: '💳', description: 'Para pagos con QR en muchos comercios.' },
+    ],
+    safety_tips: [
+      'Buenos Aires tiene zonas turísticas muy seguras (Palermo, Recoleta) y otras que requieren más cautela (La Boca de noche).',
+      'El "express kidnapping" (secuestro express) existe aunque es poco frecuente — no exhibas aparatos caros.',
+      'Los cajeros automáticos: usa los de dentro de bancos, nunca los de la calle solos.',
+    ],
+  },
+
+  'Colombia': {
+    emergency_general: '123',
+    police: '112',
+    ambulance: '125',
+    fire: '119',
+    embassy_ES: {
+      address: 'Calle 94 No. 11A-34, Bogotá',
+      phone: '+57 1 700 0900',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/bogota',
+    },
+    useful_apps: [
+      { name: 'Uber / InDriver', icon: '🚗', description: 'VTC en Colombia — más seguro que taxis en la calle.' },
+      { name: 'Rappi', icon: '🍔', description: 'Delivery de comida y supermercado en Colombia.' },
+    ],
+    safety_tips: [
+      'Colombia ha mejorado mucho en seguridad — Medellín y Cartagena son muy turísticas y relativamente seguras.',
+      'La "burundanga" (escopolamina) es un riesgo real — nunca aceptes bebidas de desconocidos.',
+      'El "paseo millonario" (taxi secuestro) existe — usa siempre apps de transporte.',
+      'No exhibas joyas, móviles caros ni cámara de forma llamativa en la calle.',
+    ],
+  },
+
+  'Perú': {
+    emergency_general: '105 (policía) / 116 (bomberos)',
+    police: '105',
+    ambulance: '117',
+    fire: '116',
+    embassy_ES: {
+      address: 'Calle Los Pinos 490, Av. El Rosario, San Isidro, Lima',
+      phone: '+51 1 212 1200',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/lima',
+    },
+    useful_apps: [
+      { name: 'Uber / Cabify', icon: '🚗', description: 'VTC disponible en Lima y Cusco.' },
+      { name: 'Machu Picchu Tickets', icon: '🏔️', description: 'Reserva de entradas a Machu Picchu con antelación — es obligatorio reservar.' },
+    ],
+    safety_tips: [
+      'Machu Picchu requiere entrada con fecha y hora fijadas — resérvala con semanas o meses de antelación.',
+      'El mal de altura (soroche) en Cusco (3400m) es real — descansa el primer día, bebe mucha agua y consume hoja de coca.',
+      'En Lima, el Miraflores y Barranco son seguros para turistas; el Centro Histórico requiere más atención.',
+    ],
+  },
+
+  'Chile': {
+    emergency_general: '133 (policía) / 131 (ambulancia)',
+    police: '133',
+    ambulance: '131',
+    fire: '132',
+    embassy_ES: {
+      address: 'Avda. Andrés Bello 1895, Providencia, Santiago',
+      phone: '+56 2 2235 2755',
+      hours: 'Lun-Vie 9:00-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/santiago',
+    },
+    useful_apps: [
+      { name: 'Cabify / Uber', icon: '🚗', description: 'VTC en Santiago.' },
+      { name: 'Bip! (Metro de Santiago)', icon: '🚇', description: 'App del metro de Santiago.' },
+    ],
+    safety_tips: [
+      'Chile es el país más seguro de Sudamérica para turistas.',
+      'En el norte (Atacama), el sol es extremadamente intenso incluso con frío — usa factor 50 y sombrero.',
+      'La carretera Austral puede tener tramos sin cobertura — informa a alguien de tu ruta antes de ir.',
+    ],
+  },
+
+  'Brasil': {
+    emergency_general: '190 (policía) / 192 (ambulancia)',
+    police: '190',
+    ambulance: '192',
+    fire: '193',
+    embassy_ES: {
+      address: 'SES Av. das Nações Qd. 811, Lote 44, Brasília',
+      phone: '+55 61 3345 2300',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/brasilia',
+    },
+    useful_apps: [
+      { name: '99 / Uber', icon: '🚗', description: '99 es el Uber brasileño — más usado en Rio y São Paulo.' },
+      { name: 'iFood', icon: '🍔', description: 'Delivery de comida en Brasil.' },
+    ],
+    safety_tips: [
+      'Brasil tiene zonas muy seguras (Ipanema, Leblon en Rio) y otras que requieren máxima precaución (favelas sin tour guiado).',
+      'Nunca salgas con el móvil caro a la vista en calles con poca gente — el "arrastão" (robo en grupo) existe.',
+      'En playas, deja lo mínimo en la toalla — hay robos frecuentes.',
+      'El Carnaval es espectacular pero los robos se multiplican — lleva solo efectivo mínimo.',
+    ],
+  },
+
+  // ── AFRICA Y ORIENTE MEDIO ────────────────────────────────────────────────
+
+  'Marruecos': {
+    emergency_general: '19 (policía urbana) / 15 (SAMU)',
+    police: '19',
+    ambulance: '15',
+    fire: '15',
+    embassy_ES: {
+      address: 'Rue Ain Khalouiya, km 5,3 Route des Zaers, Rabat',
+      phone: '+212 537 63 39 00',
+      hours: 'Lun-Vie 8:30-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/rabat',
+    },
+    useful_apps: [
+      { name: 'Careem / inDrive', icon: '🚗', description: 'VTC en Casablanca y Marrakech — mucho más seguro que taxis informales.' },
+      { name: 'WhatsApp', icon: '💬', description: 'La comunicación principal en Marruecos — todo el mundo lo usa.' },
+    ],
+    safety_tips: [
+      'Los "falsos guías" en Marrakech son muy persistentes — di firmemente "non merci" y camina con decisión.',
+      'En la medina, es normal perderse — lleva descargado el mapa offline de la medina.',
+      'El regateo es obligatorio en souks — el precio inicial puede ser 5-10x el precio real.',
+      'Las mujeres solas deben ser cautelosas especialmente de noche en medinas pequeñas.',
+    ],
+  },
+
+  'Egipto': {
+    emergency_general: '123 (policía) / 123 (ambulancia)',
+    police: '122',
+    ambulance: '123',
+    fire: '180',
+    embassy_ES: {
+      address: '41 Ismail Mohamed Street, Zamalek, El Cairo',
+      phone: '+20 2 2735 6535',
+      hours: 'Lun-Vie 9:00-12:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/elcairo',
+    },
+    useful_apps: [
+      { name: 'Uber / Careem', icon: '🚗', description: 'VTC en El Cairo — imprescindible para moverse con seguridad.' },
+      { name: 'WhatsApp', icon: '💬', description: 'Principal comunicación en Egipto.' },
+    ],
+    safety_tips: [
+      'El tráfico en El Cairo es caótico — usa siempre VTC, nunca cruces calles sin mirar en todas direcciones.',
+      'Los vendedores en las pirámides son muy insistentes — di un "la shukran" (no gracias) firme.',
+      'Bebe solo agua embotellada — evita el hielo en bebidas fuera de hoteles de calidad.',
+      'En la zona de Luxor y Asuán, la policía turística es visible y el entorno es seguro.',
+    ],
+  },
+
+  'Emiratos Árabes': {
+    emergency_general: '999',
+    police: '999',
+    ambulance: '998',
+    fire: '997',
+    embassy_ES: {
+      address: 'Embajada en Abu Dabi: Villa 1, al lado de la embajada de Bahrein, Abu Dabi',
+      phone: '+971 2 6272 544',
+      hours: 'Lun-Vie 8:30-13:30',
+      web: 'https://www.exteriores.gob.es/Embajadas/abudabi',
+    },
+    useful_apps: [
+      { name: 'Careem / Uber', icon: '🚗', description: 'VTC en Dubai y Abu Dabi — muy eficiente y económico.' },
+      { name: 'Dubai Metro', icon: '🚇', description: 'Metro de Dubai muy moderno, con app oficial de la RTA.' },
+    ],
+    safety_tips: [
+      'Los EAU tienen leyes muy estrictas: las relaciones homosexuales están prohibidas.',
+      'Beber alcohol en la calle o conducir con alcohol está penado con cárcel.',
+      'Durante el Ramadán, comer, beber o fumar en público durante el día puede conllevar arresto.',
+      'Es uno de los países más seguros del mundo en términos de criminalidad ordinaria.',
+    ],
+  },
+
+  // ── OCEANIA ───────────────────────────────────────────────────────────────
+
+  'Australia': {
+    emergency_general: '000',
+    police: '000',
+    ambulance: '000',
+    fire: '000',
+    embassy_ES: {
+      address: '15 Arkana Street, Yarralumla, Canberra ACT 2600',
+      phone: '+61 2 6273 3555',
+      hours: 'Lun-Vie 9:00-13:00',
+      web: 'https://www.exteriores.gob.es/Embajadas/canberra',
+    },
+    useful_apps: [
+      { name: 'Emergency+ (112)', icon: '🆘', description: 'App oficial australiana de emergencias con GPS automático.' },
+      { name: 'GovReady', icon: '🏛️', description: 'Alertas de desastres naturales y emergencias.' },
+      { name: 'Uber / Ola', icon: '🚗', description: 'VTC en las ciudades australianas.' },
+    ],
+    safety_tips: [
+      'La fauna australiana puede ser peligrosa: respeta distancias con cocodrilos (norte), medusas "box jellyfish" y serpientes.',
+      'El sol es extremadamente intenso — factor 50, sombrero y evita exposición entre 11h-15h.',
+      'Nada siempre entre las banderas en playas supervisadas — las corrientes pueden ser letales.',
+      'El número de emergencias es 000, no 112 (aunque 112 funciona desde móvil).',
+    ],
+  },
+
 };
 
-// Build reverse lookup: ISO code → meta
-const ISO_TO_META = {};
-for (const [label, meta] of Object.entries(KNOWN_META)) {
-  if (meta.iso && !ISO_TO_META[meta.iso]) {
-    ISO_TO_META[meta.iso] = { ...meta, label };
-  }
-}
-
-const DEFAULT_META = { currency: 'USD', symbol: '$', languageCode: 'en-US', languageLabel: 'English', flag: '🌍', iso: null };
-
-// ─── COUNTRY LIST ─────────────────────────────────────────────────────────────
-export function getCountries(locale = 'es-ES') {
-  try {
-    const regions = Intl.supportedValuesOf('region');
-    const dn = new Intl.DisplayNames([locale], { type: 'region' });
-    return regions
-      .map((code) => ({ code, label: dn.of(code) }))
-      .filter((c) => c.label && c.label !== c.code)
-      .sort((a, b) => a.label.localeCompare(b.label, locale));
-  } catch {
-    return Object.keys(KNOWN_META).map((label) => ({ code: label, label }));
-  }
-}
-
-export function normalizeText(str = '') {
-  return str.toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
-
-// ─── COUNTRY META — supports both label (e.g. "Japón") and ISO code (e.g. "JP")
-export function getCountryMeta(countryLabelOrCode) {
-  if (!countryLabelOrCode) return { ...DEFAULT_META };
-
-  // Try ISO code first (2-char uppercase)
-  if (countryLabelOrCode.length === 2) {
-    const byIso = ISO_TO_META[countryLabelOrCode.toUpperCase()];
-    if (byIso) return { ...byIso };
-  }
-
-  // Exact label match
-  const exact = KNOWN_META[countryLabelOrCode];
-  if (exact) return { ...exact };
-
-  // Case-insensitive
-  const n = normalizeText(countryLabelOrCode);
-  const ci = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
-  if (ci) return { ...KNOWN_META[ci] };
-
-  // Partial
-  const partial = Object.keys(KNOWN_META).find(
-    (k) => normalizeText(k).includes(n) || n.includes(normalizeText(k))
-  );
-  if (partial) return { ...KNOWN_META[partial] };
-
-  return { ...DEFAULT_META };
-}
-
-export function normalizeCountry(input) {
-  if (!input) return '';
-  const n = normalizeText(input);
-  const found = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
-  return found || input.trim();
-}
-
-// ─── TOP CITIES ───────────────────────────────────────────────────────────────
-const LS_CITIES_PREFIX = 'topCities_v2_';
-
-export async function getTopCities(countryLabel) {
-  if (!countryLabel) return [];
-  const lsKey = LS_CITIES_PREFIX + normalizeText(countryLabel);
-
-  try {
-    const ls = localStorage.getItem(lsKey);
-    if (ls) {
-      const parsed = JSON.parse(ls);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {}
-
-  try {
-    const rows = await base44.entities.CountryInfo.filter({ country_label: countryLabel });
-    if (rows.length > 0 && rows[0].top_cities?.length > 0) {
-      const cities = rows[0].top_cities;
-      localStorage.setItem(lsKey, JSON.stringify(cities));
-      return cities;
-    }
-  } catch {}
-
-  return [];
-}
-
-// ─── EMERGENCY INFO ────────────────────────────────────────────────────────────
-const LS_EMERGENCY_PREFIX = 'emergency_v2_';
-
-export async function getEmergencyInfo(countryLabel, homeCountry = 'España') {
+/**
+ * Obtiene datos de emergencia hardcodeados para un país.
+ * Compatible con la interfaz que espera Utilities.jsx.
+ */
+export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España') {
   if (!countryLabel) return null;
-  const lsKey = LS_EMERGENCY_PREFIX + normalizeText(countryLabel) + '_' + normalizeText(homeCountry);
 
-  try {
-    const ls = localStorage.getItem(lsKey);
-    if (ls) return JSON.parse(ls);
-  } catch {}
+  // Exact match
+  let data = EMERGENCY_DB[countryLabel];
 
-  try {
-    const rows = await base44.entities.CountryInfo.filter({ country_label: countryLabel });
-    if (rows.length > 0 && rows[0].emergency_info) {
-      localStorage.setItem(lsKey, JSON.stringify(rows[0].emergency_info));
-      return rows[0].emergency_info;
-    }
-  } catch {}
+  // Case-insensitive fallback
+  if (!data) {
+    const norm = countryLabel.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const key = Object.keys(EMERGENCY_DB).find(
+      k => k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === norm
+    );
+    if (key) data = EMERGENCY_DB[key];
+  }
 
-  return null;
-}
+  if (!data) return null;
 
-// ─── EXCHANGE RATE (simple, for display converters) ────────────────────────────
-const LS_RATE_PREFIX = 'rate_EUR_';
+  // Seleccionar embajada según país de origen — cubre todos los hispanohablantes
+  let embassy = null;
+  const homeNorm = (homeCountry || 'España').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-export async function getExchangeRate(toCurrency) {
-  if (!toCurrency || toCurrency === 'EUR') return 1;
-  const lsKey = LS_RATE_PREFIX + toCurrency;
-  try {
-    const ls = sessionStorage.getItem(lsKey);
-    if (ls) return parseFloat(ls);
-  } catch {}
+  // Mapeo país origen → clave de embajada en orden de prioridad
+  const embassyKey = (() => {
+    if (homeNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
+    if (homeNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
+    if (homeNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
+    if (homeNorm.includes('peru') || homeNorm.includes('peru')) return ['embassy_PE', 'embassy_ES'];
+    if (homeNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
+    if (homeNorm.includes('venezuel')) return ['embassy_VE', 'embassy_ES'];
+    if (homeNorm.includes('ecuad'))   return ['embassy_EC', 'embassy_ES'];
+    if (homeNorm.includes('boliv'))   return ['embassy_BO', 'embassy_ES'];
+    if (homeNorm.includes('paragua')) return ['embassy_PY', 'embassy_ES'];
+    if (homeNorm.includes('urugua'))  return ['embassy_UY', 'embassy_ES'];
+    if (homeNorm.includes('costa ric')) return ['embassy_CR', 'embassy_ES'];
+    if (homeNorm.includes('guatemal')) return ['embassy_GT', 'embassy_ES'];
+    if (homeNorm.includes('hondur'))  return ['embassy_HN', 'embassy_ES'];
+    if (homeNorm.includes('el salv') || homeNorm.includes('salvador')) return ['embassy_SV', 'embassy_ES'];
+    if (homeNorm.includes('nicarag'))  return ['embassy_NI', 'embassy_ES'];
+    if (homeNorm.includes('panam'))   return ['embassy_PA', 'embassy_ES'];
+    if (homeNorm.includes('rep.*dom') || homeNorm.includes('dominican')) return ['embassy_DO', 'embassy_ES'];
+    if (homeNorm.includes('cuba'))    return ['embassy_CU', 'embassy_ES'];
+    if (homeNorm.includes('puert'))   return ['embassy_PR', 'embassy_ES'];
+    if (homeNorm.includes('espana') || homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
+    return ['embassy_ES']; // fallback España
+  })();
 
-  // Try Frankfurter first
-  try {
-    const res = await fetch(`https://api.frankfurter.app/latest?from=EUR&to=${toCurrency}`, {
-      signal: AbortSignal.timeout(4000),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      const rate = data?.rates?.[toCurrency];
-      if (rate) {
-        sessionStorage.setItem(lsKey, String(rate));
-        return rate;
-      }
-    }
-  } catch {}
+  for (const key of embassyKey) {
+    if (data[key]) { embassy = data[key]; break; }
+  }
 
-  return 1;
-}
-
-// ─── AVAILABLE CURRENCIES for a trip ─────────────────────────────────────────
-export function computeAvailableCurrencies(cities = [], baseCurrency = 'EUR') {
-  const set = new Set([baseCurrency]);
-  for (const city of cities) {
-    const key = city.country_code || city.country || '';
-    if (key) {
-      const meta = getCountryMeta(key);
-      if (meta.currency) set.add(meta.currency);
+  // Second nationality embassy — shown as alternative in Emergencies
+  let secondEmbassy = null;
+  if (secondNationality && secondNationality !== homeCountry) {
+    const sNorm = (secondNationality).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const keys2 = (() => {
+      if (sNorm.includes('espana') || sNorm.includes('spain')) return ['embassy_ES'];
+      if (sNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
+      if (sNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
+      if (sNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
+      if (sNorm.includes('peru'))    return ['embassy_PE', 'embassy_ES'];
+      if (sNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
+      return ['embassy_ES'];
+    })();
+    for (const key of keys2) {
+      if (data[key]) { secondEmbassy = data[key]; break; }
     }
   }
-  return Array.from(set);
+
+  return {
+    emergency_general: data.emergency_general,
+    police: data.police,
+    ambulance: data.ambulance,
+    fire: data.fire,
+    embassy,
+    secondEmbassy,
+    useful_apps: data.useful_apps || [],
+    safety_tips: data.safety_tips || [],
+  };
 }
