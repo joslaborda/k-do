@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Shuffle, ChevronDown, Loader2 } from 'lucide-react';
 import { getCountryMeta, getTopCities } from '@/lib/countryConfig';
-import { getAllCountries, canonicalizeCountry } from '@/lib/countryCatalog';
+import { getCountryMeta } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
@@ -96,7 +96,40 @@ function defaultStops(mode) {
 // ─── Inline country autocomplete (free-text + suggestions from catalog) ───────
 function CountryField({ value, onChange, hasError, ref: externalRef }) {
   const countries = useMemo(() => {
-    try { return getAllCountries('es-ES'); } catch { return []; }
+    // All countries from our curated list — guaranteed to work everywhere
+    const list = [
+      'Afganistán','Albania','Alemania','Andorra','Angola','Antigua y Barbuda','Arabia Saudí',
+      'Argelia','Argentina','Armenia','Aruba','Australia','Austria','Azerbaiyán',
+      'Bahamas','Bahréin','Bangladés','Barbados','Bélgica','Belice','Benín','Bielorrusia',
+      'Bolivia','Bosnia','Botsuana','Brasil','Brunéi','Bulgaria','Burkina Faso','Burundi',
+      'Bután','Cabo Verde','Camboya','Camerún','Canadá','Chad','Chile','China',
+      'Chipre','Colombia','Comoras','Congo','Corea del Norte','Corea del Sur',
+      'Costa de Marfil','Costa Rica','Croacia','Cuba','Curazao',
+      'Dinamarca','Dominica','Ecuador','Egipto','El Salvador','Emiratos Árabes',
+      'Eritrea','Eslovaquia','Eslovenia','España','Estados Unidos','Estonia','Etiopía',
+      'Filipinas','Finlandia','Fiyi','Francia','Gabón','Gambia','Georgia','Ghana',
+      'Gibraltar','Granada','Grecia','Guatemala','Guinea','Guinea Ecuatorial','Guinea-Bisáu',
+      'Guyana','Haití','Honduras','Hungría','India','Indonesia','Irak','Irán','Irlanda',
+      'Islandia','Israel','Italia','Jamaica','Japón','Jordania','Kazajistán','Kenia',
+      'Kirguistán','Kiribati','Kosovo','Kuwait','Laos','Lesoto','Letonia','Líbano',
+      'Liberia','Libia','Liechtenstein','Lituania','Luxemburgo','Madagascar','Malaui',
+      'Malasia','Maldivas','Malí','Malta','Marruecos','Martinica','Mauritania','Mauricio',
+      'México','Micronesia','Moldova','Mónaco','Mongolia','Montenegro','Mozambique',
+      'Myanmar','Namibia','Nepal','Nicaragua','Níger','Nigeria','Noruega',
+      'Nueva Zelanda','Omán','Pakistán','Palaos','Panamá','Papúa Nueva Guinea',
+      'Paraguay','Países Bajos','Perú','Polonia','Portugal','Puerto Rico',
+      'Qatar','Reino Unido','República Centroafricana','República Checa',
+      'República del Congo','República Democrática del Congo','República Dominicana',
+      'Ruanda','Rumanía','Rusia','Sahara Occidental','Saint-Martin','San Cristóbal y Nieves',
+      'San Marino','San Vicente','Santa Lucía','Santo Tomé y Príncipe','Senegal','Serbia',
+      'Seychelles','Sierra Leona','Singapur','Sint Maarten','Siria','Somalia',
+      'Sri Lanka','Sudáfrica','Sudán','Sudán del Sur','Suecia','Suiza','Surinam',
+      'Svalbard','Tailandia','Taiwan','Tayikistán','Tanzania','Timor Oriental','Togo',
+      'Tonga','Trinidad y Tobago','Túnez','Turkmenistán','Turquía','Tuvalu',
+      'Ucrania','Uganda','Uruguay','Uzbekistán','Vanuatu','Venezuela','Vietnam',
+      'Yemen','Yibuti','Zambia','Zimbabue',
+    ];
+    return list.map(l => ({ code: l, label: l }));
   }, []);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState(value || '');
@@ -457,12 +490,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                     ))}
                   </div>
                 )}
-                {mode === 'multi' && (
-                  <button type="button" onClick={addStop}
-                    className="flex items-center gap-1 text-xs text-primary font-medium border border-border px-2.5 py-1 rounded-full hover:bg-orange-50 transition-colors">
-                    <Plus className="w-3 h-3" />Añadir parada
-                  </button>
-                )}
+
               </div>
             </div>
 
@@ -542,6 +570,13 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               ))}
             </div>
 
+            {mode === 'multi' && (
+              <button type="button" onClick={addStop}
+                className="w-full flex items-center justify-center gap-1.5 text-sm text-primary font-medium border border-dashed border-primary/40 rounded-xl py-2.5 hover:bg-orange-50 transition-colors">
+                <Plus className="w-4 h-4" />Añadir parada
+              </button>
+            )}
+
             {missingCountry && <p className="text-xs text-red-500">El país de la primera parada es obligatorio</p>}
 
             {mode === 'multi' && dateMode === 'nights' && formData.start_date && (
@@ -558,34 +593,6 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             )}
           </div>
 
-          {/* 5. Moneda */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Moneda</label>
-              <Select value={formData.currency} onValueChange={v => {
-                setCurrencyTouched(true);
-                setFormData(p => ({ ...p, currency: v, currency_symbol: currencySymbol(v) }));
-              }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {CURRENCY_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Idioma destino</label>
-              <div className="bg-white border border-border rounded-xl px-3 py-2.5 text-sm">
-                <div className="font-medium">{formData.language}</div>
-                <div className="text-xs text-muted-foreground">{formData.language_code}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* 6. Descripción */}
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Descripción</label>
-            <Textarea placeholder="Describe tu viaje..." value={formData.description} rows={2}
-              onChange={e => setFormData(p => ({ ...p, description: e.target.value }))} />
           </div>
 
           {/* Actions */}
