@@ -190,6 +190,7 @@ export default function Settings() {
       setDisplayName(profile.display_name || '');
       setUsername(profile.username || '');
       setHomeCountry(profile.home_country || 'España');
+      setSecondNationality(profile.second_nationality || '');
       setHomeCurrency(profile.home_currency || 'EUR');
       setNotifInvites(profile.notif_invites !== false);
       setNotifExpenses(profile.notif_expenses !== false);
@@ -230,6 +231,7 @@ export default function Settings() {
         username,
         username_normalized: username.toLowerCase(),
         home_country: homeCountry,
+        second_nationality: secondNationality || null,
         home_currency: homeCurrency,
         notif_invites: notifInvites,
         notif_expenses: notifExpenses,
@@ -347,6 +349,17 @@ export default function Settings() {
             }} className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
               {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
             </select>
+          </div>
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-xs text-muted-foreground mb-1.5">Segunda nacionalidad <span className="text-muted-foreground/60">· Opcional</span></p>
+            <select value={secondNationality} onChange={e => setSecondNationality(e.target.value)}
+              className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
+              <option value="">Sin segunda nacionalidad</option>
+              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
+            </select>
+            {secondNationality && (
+              <p className="text-xs text-muted-foreground mt-1.5">En emergencias Kōdo mostrará también la embajada de {secondNationality}</p>
+            )}
           </div>
           <div className="px-4 py-3">
             <p className="text-xs text-muted-foreground mb-1.5">Moneda base <span className="text-muted-foreground/60">· Gastos y conversiones</span></p>
