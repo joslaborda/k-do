@@ -788,12 +788,31 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España')
     if (data[key]) { embassy = data[key]; break; }
   }
 
+  // Second nationality embassy — shown as alternative in Emergencies
+  let secondEmbassy = null;
+  if (secondNationality && secondNationality !== homeCountry) {
+    const sNorm = (secondNationality).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const keys2 = (() => {
+      if (sNorm.includes('espana') || sNorm.includes('spain')) return ['embassy_ES'];
+      if (sNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
+      if (sNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
+      if (sNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
+      if (sNorm.includes('peru'))    return ['embassy_PE', 'embassy_ES'];
+      if (sNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
+      return ['embassy_ES'];
+    })();
+    for (const key of keys2) {
+      if (data[key]) { secondEmbassy = data[key]; break; }
+    }
+  }
+
   return {
     emergency_general: data.emergency_general,
     police: data.police,
     ambulance: data.ambulance,
     fire: data.fire,
     embassy,
+    secondEmbassy,
     useful_apps: data.useful_apps || [],
     safety_tips: data.safety_tips || [],
   };
