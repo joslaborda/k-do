@@ -175,7 +175,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear }) {
 }
 
 // ── Main content (shared between standalone + panel) ──────────────────────────
-function TranslatorContent({ tripId }) {
+function TranslatorContent({ tripId, inPage = false }) {
   const { user } = useAuth();
   const { trip, activeCity } = useTripContext(tripId);
   const countryRaw = activeCity?.country || trip?.country || '';
@@ -268,7 +268,7 @@ function TranslatorContent({ tripId }) {
       )}
 
       {/* Tabs — 3 only, no Frases */}
-      <div className={`flex border-b border-border ${showSameLanguageBanner ? 'mt-4' : 'mt-5'}`}>
+      <div className={`flex border-b border-border ${inPage ? (showSameLanguageBanner ? 'mt-4' : '') : (showSameLanguageBanner ? 'mt-4' : 'mt-5')}`}>
         {[
           ['hablada', '🎙️', 'Hablada'],
           ['escrita',  '✍️', 'Escrita'],
@@ -421,9 +421,8 @@ export default function Translator() {
         </div>
       </div>
       <div className="max-w-3xl mx-auto px-5 pb-24">
-        <TranslatorContent tripId={tripId} />
+        <TranslatorContent tripId={tripId} inPage={true} />
       </div>
     </div>
   );
 }
-
