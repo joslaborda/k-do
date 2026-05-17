@@ -90,8 +90,21 @@ export default function TripsList() {
   const createMutation = useMutation({
     mutationFn: async ({ formData, stops, stopCountries = [], allocations }) => {
       const email = user?.email;
+
+      // Auto-detect best base currency from creator's home_currency
+      let baseCurrency = formData.currency || 'EUR';
+      try {
+        const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+        const myProfile = profiles[0];
+        if (myProfile?.home_currency && !formData.currencyTouched) {
+          baseCurrency = myProfile.home_currency;
+        }
+      } catch {}
+
       const trip = await base44.entities.Trip.create({
         ...formData,
+        currency: baseCurrency,
+        base_currency: baseCurrency,
         members: email ? [email] : [],
         roles: email ? { [email]: 'admin' } : {},
       });
