@@ -18,6 +18,67 @@ const COUNTRY_IMAGES = {
   'uae':'photo-1512453979798-5ea266f8880c','emiratos arabes':'photo-1512453979798-5ea266f8880c','jordan':'photo-1579606032821-4d6ea1cf3ea8','jordania':'photo-1579606032821-4d6ea1cf3ea8','israel':'photo-1548519651-4611aa4a8f6a',
   'egypt':'photo-1539650116574-75c0c6d73f6e','egipto':'photo-1539650116574-75c0c6d73f6e','morocco':'photo-1539020140153-e479b8c22e70','marruecos':'photo-1539020140153-e479b8c22e70','kenya':'photo-1611348586804-61bf6c080437','south africa':'photo-1580060839134-75a5edca2e99','sudafrica':'photo-1580060839134-75a5edca2e99','tanzania':'photo-1516026672322-bc52d61a55d5',
   'usa':'photo-1496442226666-8d4d0e62e6e9','united states':'photo-1496442226666-8d4d0e62e6e9','estados unidos':'photo-1496442226666-8d4d0e62e6e9','mexico':'photo-1552074284-5e88ef1aef18','cuba':'photo-1500759285222-a95626b934cb','saint-martin':'photo-1533106497176-45ae19e68ba2','saint martin':'photo-1533106497176-45ae19e68ba2','sint maarten':'photo-1533106497176-45ae19e68ba2','martinica':'photo-1533106497176-45ae19e68ba2','guadalupe':'photo-1533106497176-45ae19e68ba2','colombia':'photo-1617526738882-1ea945ce3c12','peru':'photo-1526392060635-9d6019884377','brazil':'photo-1483729558449-99ef09a8c325','brasil':'photo-1483729558449-99ef09a8c325','argentina':'photo-1589909202802-8f4aadce1849','chile':'photo-1501854140801-50d01698950b','ecuador':'photo-1531968455001-5c5272a41129','bolivia':'photo-1531968455001-5c5272a41129','paraguay':'photo-1589909202802-8f4aadce1849','uruguay':'photo-1580060839134-75a5edca2e99','venezuela':'photo-1580060839134-75a5edca2e99','costa rica':'photo-1518181835702-6be7e1ad7f05','panama':'photo-1512813195386-6cf811ad3542','guatemala':'photo-1547558840-b8561d2d1b07','honduras':'photo-1547558840-b8561d2d1b07','nicaragua':'photo-1547558840-b8561d2d1b07','el salvador':'photo-1547558840-b8561d2d1b07','dominican republic':'photo-1552074284-5e88ef1aef18','republica dominicana':'photo-1552074284-5e88ef1aef18','canada':'photo-1517090504586-fde19ea6a9d2','australia':'photo-1506905925346-21bda4d32df4','nueva zelanda':'photo-1507699622108-4be3abd695ad','new zealand':'photo-1507699622108-4be3abd695ad',
+  // ── Caribe completo ────────────────────────────────────────────────────────
+  'martinica':'photo-1533106497176-45ae19e68ba2','guadalupe':'photo-1533106497176-45ae19e68ba2',
+  'saint-martin':'photo-1533106497176-45ae19e68ba2','saint martin':'photo-1533106497176-45ae19e68ba2',
+  'sint maarten':'photo-1533106497176-45ae19e68ba2','san bartolome':'photo-1533106497176-45ae19e68ba2',
+  'bermudas':'photo-1533106497176-45ae19e68ba2','aruba':'photo-1526481280693-3bfa7568e0f3',
+  'curazao':'photo-1526481280693-3bfa7568e0f3','bonaire':'photo-1526481280693-3bfa7568e0f3',
+  'puerto rico':'photo-1579026996658-3a57b6b5f03b','trinidad y tobago':'photo-1527430253228-e93688616381',
+  'barbados':'photo-1533104316073-15749504f4a8','bahamas':'photo-1548574505-5e239809ee19',
+  'jamaica':'photo-1538332576228-eb5b4c4de6f5','haiti':'photo-1574843716311-c5a68d4c7b57',
+  'republica dominicana':'photo-1506929562872-bb421503ef21','dominican republic':'photo-1506929562872-bb421503ef21',
+  'santa lucia':'photo-1542314831-068cd1dbfeeb','san vicente':'photo-1542314831-068cd1dbfeeb',
+  'antigua y barbuda':'photo-1576085898323-f9fc8a8b3b03','granada':'photo-1596706312369-5fc8c69c2b41',
+  'dominica':'photo-1578894381163-e72c17f2d45f','san cristobal y nieves':'photo-1576085898323-f9fc8a8b3b03',
+  'islas caiman':'photo-1548574505-5e239809ee19','islas turcos y caicos':'photo-1548574505-5e239809ee19',
+  'islas virgenes':'photo-1548574505-5e239809ee19','guyana':'photo-1558618047-3c9e9b2dc4f6',
+  'guyana francesa':'photo-1558618047-3c9e9b2dc4f6','surinam':'photo-1558618047-3c9e9b2dc4f6',
+
+  // ── Oceanía completa ───────────────────────────────────────────────────────
+  'papua nueva guinea':'photo-1577717903315-1691ae25ab3f','islas salomon':'photo-1541840031508-a3b1c44c9a79',
+  'vanuatu':'photo-1540202404-d0c7fe46a087','samoa':'photo-1530870110042-98b2cb110834',
+  'tonga':'photo-1575999502951-4ab25b5ca889','kiribati':'photo-1559827260-dc66d52bef19',
+  'polinesia francesa':'photo-1559827260-dc66d52bef19','tahiti':'photo-1559827260-dc66d52bef19',
+  'nueva caledonia':'photo-1559827260-dc66d52bef19','palaos':'photo-1559827260-dc66d52bef19',
+  'micronesia':'photo-1517057983537-e8cae6a36b57','islas marshall':'photo-1517057983537-e8cae6a36b57',
+  'guam':'photo-1596452006208-6e41d1e2f7da','islas cook':'photo-1496080174650-637e3f22fa03',
+  'fiji':'photo-1589553090991-2e5c2f2e01a2','fiyi':'photo-1589553090991-2e5c2f2e01a2',
+
+  // ── África completa ────────────────────────────────────────────────────────
+  'cabo verde':'photo-1580060839134-75a5edca2e99','seychelles':'photo-1573843981267-be1480eca5b4',
+  'mauricio':'photo-1571406252241-db0280bd38db','reunion':'photo-1617869623861-56e028bca0b8',
+  'ghana':'photo-1534430480872-3498386e7856','nigeria':'photo-1577083288073-40892c0860a4',
+  'senegal':'photo-1576426863848-c21f53c60b19','camaron':'photo-1558618666-fcd25c85cd64',
+  'angola':'photo-1558618047-3c9e9b2dc4f6','mozambique':'photo-1489493585363-d69421e0edd3',
+  'zambia':'photo-1516026672322-bc52d61a55d5','zimbabue':'photo-1516026672322-bc52d61a55d5',
+  'botswana':'photo-1516026672322-bc52d61a55d5','botsuana':'photo-1516026672322-bc52d61a55d5',
+  'namibia':'photo-1565965194565-59e87d3bf07e','madagascar':'photo-1562802378-063ec186a863',
+  'costa de marfil':'photo-1576426863848-c21f53c60b19','mali':'photo-1504432842672-1a79f78e4084',
+  'guinea ecuatorial':'photo-1558618666-fcd25c85cd64','comoras':'photo-1573843981267-be1480eca5b4',
+  'etiopia':'photo-1523805009345-7448845a9e53','eritrea':'photo-1523805009345-7448845a9e53',
+  'yibuti':'photo-1523805009345-7448845a9e53','somalia':'photo-1523805009345-7448845a9e53',
+  'uganda':'photo-1516026672322-bc52d61a55d5','burundi':'photo-1516026672322-bc52d61a55d5',
+  'malawi':'photo-1516026672322-bc52d61a55d5','malaui':'photo-1516026672322-bc52d61a55d5',
+  'lesoto':'photo-1580060839134-75a5edca2e99','esuatini':'photo-1580060839134-75a5edca2e99',
+
+  // ── Asia completa ──────────────────────────────────────────────────────────
+  'hong kong':'photo-1518509562904-e7ef99cdcc86','macao':'photo-1503925802536-c9451dcd87b9',
+  'taiwan':'photo-1470229722913-7c0e2dbbafd3','mongolia':'photo-1573040186-28ade2e2c4c5',
+  'afganistan':'photo-1558618047-3c9e9b2dc4f6','tayikistan':'photo-1558618047-3c9e9b2dc4f6',
+  'turkmenistan':'photo-1558618047-3c9e9b2dc4f6','uzbekistan':'photo-1558618047-3c9e9b2dc4f6',
+
+  // ── Europa territorios ─────────────────────────────────────────────────────
+  'gibraltar':'photo-1558370781-d6196949e317','liechtenstein':'photo-1515488764276-beab7607c1e6',
+  'san marino':'photo-1558370781-d6196949e317','ciudad del vaticano':'photo-1558370781-d6196949e317',
+  'islas feroe':'photo-1531168556467-80aace0d0144','groenlandia':'photo-1531168556467-80aace0d0144',
+  'isla de man':'photo-1513635269975-59663e0ac1ad','jersey':'photo-1513635269975-59663e0ac1ad',
+  'guernsey':'photo-1513635269975-59663e0ac1ad','svalbard':'photo-1531168556467-80aace0d0144',
+  'aland':'photo-1565843708714-52ecf69ab81f',
+
+  // ── Américas territorios ───────────────────────────────────────────────────
+  'belice':'photo-1552074284-5e88ef1aef18','islas malvinas':'photo-1580060839134-75a5edca2e99',
+  'groenlandia':'photo-1531168556467-80aace0d0144',
 };
 
 const FALLBACK_IMAGES = [
