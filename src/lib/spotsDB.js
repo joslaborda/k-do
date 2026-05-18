@@ -478,15 +478,21 @@ export const SEED_SPOTS = {
 
 export function getSeedSpotsForCity(country, city) {
   if (!country || !city) return [];
-  const countryData = SEED_SPOTS[country];
+  const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  // Find country (normalize to handle Japón/Japan etc)
+  const countryKey = Object.keys(SEED_SPOTS).find(k => norm(k) === norm(country));
+  const countryData = countryKey ? SEED_SPOTS[countryKey] : null;
   if (!countryData) return [];
+  // Find city (normalize to handle Osaka/osaka, accents, etc)
   if (countryData[city]) return countryData[city];
-  const key = Object.keys(countryData).find(k => k.toLowerCase() === city.toLowerCase());
-  return key ? countryData[key] : [];
+  const cityKey = Object.keys(countryData).find(k => norm(k) === norm(city));
+  return cityKey ? countryData[cityKey] : [];
 }
 
 export function getSeedSpotsForCountry(country) {
-  const countryData = SEED_SPOTS[country] || {};
+  const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const countryKey = Object.keys(SEED_SPOTS).find(k => norm(k) === norm(country));
+  const countryData = countryKey ? SEED_SPOTS[countryKey] : {};
   return Object.entries(countryData).flatMap(([city, spots]) =>
     spots.map(s => ({ ...s, city_name: city, country }))
   );
