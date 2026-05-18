@@ -11,7 +11,6 @@ import {
   Edit2, Trash2, Save, MapPin, RefreshCw, Hotel
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { generateDaysForCity, regenerateDay, loadPreferences, updateVisitedPlaces } from '@/lib/itineraryAI';
 import CitySettingsModal from '@/components/cities/CitySettingsModal';
 import DayDocuments from '@/components/tickets/DayDocuments';
 import UnlinkedCityDocuments from '@/components/tickets/UnlinkedCityDocuments';
@@ -338,8 +337,7 @@ export default function CityDetail() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dayToDelete, setDayToDelete] = useState(null);
   const [formData, setFormData] = useState({ title: '', date: '', content: '' });
-  const [regeneratingCity, setRegeneratingCity] = useState(false);
-  const [regeneratingDayId, setRegeneratingDayId] = useState(null);
+
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -434,79 +432,7 @@ export default function CityDetail() {
     setDialogOpen(true);
   };
 
-  const handleRegenerateCity = async () => {
-    if (!city || !trip) return;
-    setRegeneratingCity(true);
-
-    const [allDays, allCities] = await Promise.all([
-      base44.entities.ItineraryDay.filter({ trip_id: tripId }),
-      base44.entities.City.filter({ trip_id: tripId }, 'order'),
-    ]);
-    const preferences = await loadPreferences(tripId, trip);
-
-    // Delete existing days for this city
-    for (const day of days) {
-      await base44.entities.ItineraryDay.delete(day.id);
-    }
-
-    const newDays = await generateDaysForCity({
-      city,
-      trip,
-      existingDays: allDays.filter(d => d.city_id !== city.id),
-      preferences,
-      allCities: allCities.filter(c => c.id !== city.id),
-    });
-
-    for (let j = 0; j < newDays.length; j++) {
-      await base44.entities.ItineraryDay.create({
-        ...newDays[j],
-        trip_id: tripId,
-        city_id: cityId,
-        order: j,
-      });
-    }
-
-    // Update visited_places in the trip
-    await updateVisitedPlaces(trip, newDays);
-
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
-    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-    setRegeneratingCity(false);
-    toast({ title: `${city.name} regenerado 🎌`, description: 'El itinerario de esta ciudad ha sido actualizado.' });
-  };
-
-  const handleRegenerateDay = async (day) => {
-    if (!city || !trip) return;
-    setRegeneratingDayId(day.id);
-
-    const [allDays, preferences] = await Promise.all([
-      base44.entities.ItineraryDay.filter({ trip_id: tripId }),
-      loadPreferences(tripId, trip),
-    ]);
-
-    const result = await regenerateDay({
-      day,
-      city,
-      trip,
-      allDays,
-      preferences,
-    });
-
-    await base44.entities.ItineraryDay.update(day.id, {
-      title: result.title,
-      content: result.content,
-    });
-
-    // Update visited_places
-    await updateVisitedPlaces(trip, [{ title: result.title, content: result.content }]);
-
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
-    queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-    setRegeneratingDayId(null);
-    toast({ title: 'Día regenerado ✨', description: `"${result.title}" listo.` });
-  };
-
-  const handleSave = () => {
+      const handleSave = () => {
     if (editingDay) {
       updateMutation.mutate({ 
         id: editingDay.id, 
@@ -589,20 +515,7 @@ export default function CityDetail() {
          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
            <h2 className="text-xl font-semibold text-foreground">Itinerario</h2>
            <div className="flex items-center gap-2 flex-wrap">
-             {city?.start_date && city?.end_date && (
-               <Button
-                 variant="outline"
-                 size="sm"
-                 onClick={handleRegenerateCity}
-                 disabled={regeneratingCity}
-                 className="text-orange-600 border-orange-200 hover:bg-orange-50"
-               >
-                 {regeneratingCity
-                   ? <><div className="w-3.5 h-3.5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mr-1.5" />Regenerando...</>
-                   : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />Regenerar ciudad</>
-                 }
-               </Button>
-             )}
+
              <Button onClick={openNewDialog} className="bg-orange-700 hover:bg-orange-800">
                <Plus className="w-4 h-4 mr-2" />
                Añadir Día
@@ -651,23 +564,7 @@ export default function CityDetail() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-orange-500 hover:text-orange-700 hover:bg-orange-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRegenerateDay(day);
-                          }}
-                          disabled={regeneratingDayId === day.id}
-                          aria-label="Regenerar día con IA"
-                          title="Regenerar día con IA"
-                        >
-                          {regeneratingDayId === day.id
-                            ? <div className="w-3.5 h-3.5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-                            : <RefreshCw className="w-3.5 h-3.5" />
-                          }
-                        </Button>
+                        
                         <Button
                           variant="ghost"
                           size="icon"
