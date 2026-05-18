@@ -129,7 +129,8 @@ function lookupCountry(countryName) {
 }
 
 export function getTripCoverImage(trip, cities = []) {
-  if (trip?.cover_image) return trip.cover_image;
+  // Skip cover_image — it may be stale from when the lookup bug existed
+  // Always compute from cities/country for correctness
   if (cities.length > 0) {
     const sorted = [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const city of sorted) {
