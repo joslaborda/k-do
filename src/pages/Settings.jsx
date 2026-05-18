@@ -6,40 +6,16 @@ import { createPageUrl } from '@/utils';
 import { Loader2, Camera } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, getAllCountries } from '@/lib/countryConfig';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
 // ─────────────────────────────────────────────────────────────────────────────
-const COUNTRIES = [
-  { name:'España', flag:'🇪🇸', currency:'EUR' },
-  { name:'México', flag:'🇲🇽', currency:'MXN' },
-  { name:'Colombia', flag:'🇨🇴', currency:'COP' },
-  { name:'Argentina', flag:'🇦🇷', currency:'ARS' },
-  { name:'Perú', flag:'🇵🇪', currency:'PEN' },
-  { name:'Chile', flag:'🇨🇱', currency:'CLP' },
-  { name:'Venezuela', flag:'🇻🇪', currency:'VES' },
-  { name:'Ecuador', flag:'🇪🇨', currency:'USD' },
-  { name:'Bolivia', flag:'🇧🇴', currency:'BOB' },
-  { name:'Uruguay', flag:'🇺🇾', currency:'UYU' },
-  { name:'Paraguay', flag:'🇵🇾', currency:'PYG' },
-  { name:'Costa Rica', flag:'🇨🇷', currency:'CRC' },
-  { name:'Panamá', flag:'🇵🇦', currency:'USD' },
-  { name:'Guatemala', flag:'🇬🇹', currency:'GTQ' },
-  { name:'Honduras', flag:'🇭🇳', currency:'HNL' },
-  { name:'El Salvador', flag:'🇸🇻', currency:'USD' },
-  { name:'Nicaragua', flag:'🇳🇮', currency:'NIO' },
-  { name:'República Dominicana', flag:'🇩🇴', currency:'DOP' },
-  { name:'Cuba', flag:'🇨🇺', currency:'CUP' },
-  { name:'Estados Unidos', flag:'🇺🇸', currency:'USD' },
-  { name:'Brasil', flag:'🇧🇷', currency:'BRL' },
-  { name:'Reino Unido', flag:'🇬🇧', currency:'GBP' },
-  { name:'Francia', flag:'🇫🇷', currency:'EUR' },
-  { name:'Alemania', flag:'🇩🇪', currency:'EUR' },
-  { name:'Italia', flag:'🇮🇹', currency:'EUR' },
-  { name:'Portugal', flag:'🇵🇹', currency:'EUR' },
-  { name:'Otro', flag:'🌍', currency:'USD' },
-];
+// All countries from countryConfig — single source of truth
+const COUNTRIES = getAllCountries().map(c => {
+  const meta = getCountryMeta(c.label);
+  return { name: c.label, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+});
 
 const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'];
 
