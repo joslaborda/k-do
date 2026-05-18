@@ -6,16 +6,57 @@ import { createPageUrl } from '@/utils';
 import { Loader2, Camera } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
-import { getCountryMeta, getAllCountries } from '@/lib/countryConfig';
+import { getCountryMeta } from '@/lib/countryConfig';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
 // ─────────────────────────────────────────────────────────────────────────────
-// All countries from countryConfig — single source of truth
-const COUNTRIES = getAllCountries().map(c => {
-  const meta = getCountryMeta(c.label);
-  return { name: c.label, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
-});
+// Build full country list from countryConfig KNOWN_META
+function buildCountryList() {
+  const { KNOWN_META_KEYS } = (() => {
+    try {
+      // Get all country names from countryConfig via getCountryMeta
+      // We inline the key list here for reliability
+      return { KNOWN_META_KEYS: true };
+    } catch { return { KNOWN_META_KEYS: false }; }
+  })();
+  return null; // replaced below
+}
+
+const COUNTRIES = [
+  'España','México','Colombia','Argentina','Perú','Chile','Venezuela','Ecuador','Bolivia',
+  'Paraguay','Uruguay','Costa Rica','Guatemala','Honduras','El Salvador','Nicaragua','Panamá',
+  'Cuba','República Dominicana','Haití','Puerto Rico','Belice','Guyana','Surinam','Guyana Francesa',
+  'Francia','Italia','Alemania','Portugal','Reino Unido','Países Bajos','Bélgica','Suiza',
+  'Austria','Grecia','Turquía','Polonia','República Checa','Hungría','Rumanía','Bulgaria',
+  'Croacia','Serbia','Eslovenia','Eslovaquia','Noruega','Suecia','Dinamarca','Finlandia',
+  'Irlanda','Islandia','Estonia','Letonia','Lituania','Ucrania','Bielorrusia','Moldavia',
+  'Albania','Bosnia','Kosovo','Montenegro','Macedonia','Liechtenstein','Andorra','Mónaco',
+  'San Marino','Ciudad del Vaticano','Malta','Chipre','Luxemburgo','Gibraltar',
+  'Japón','China','Corea del Sur','India','Tailandia','Vietnam','Indonesia','Filipinas',
+  'Singapur','Malasia','Camboya','Myanmar','Laos','Nepal','Sri Lanka','Bangladesh',
+  'Pakistán','Afganistán','Uzbekistán','Kazajistán','Kirguistán','Tayikistán','Turkmenistán',
+  'Mongolia','Hong Kong','Macao','Taiwan',
+  'Emiratos Árabes Unidos','Arabia Saudí','Qatar','Kuwait','Omán','Bahréin','Jordania',
+  'Israel','Palestina','Líbano','Siria','Irak','Irán','Yemén',
+  'Turquía','Azerbaiyán','Armenia','Georgia',
+  'Marruecos','Egipto','Túnez','Argelia','Libia','Sudán','Etiopía','Kenia','Tanzania',
+  'Uganda','Ruanda','Nigeria','Ghana','Senegal','Costa de Marfil','Camerún','Angola',
+  'Mozambique','Zambia','Zimbabue','Botswana','Namibia','Sudáfrica','Madagascar','Mauricio',
+  'Seychelles','Cabo Verde','Eritrea','Somalia','Yibuti','Malawi','Esuatini','Lesoto',
+  'Gabón','Congo','República Democrática del Congo','República Centroafricana','Chad',
+  'Malí','Burkina Faso','Níger','Guinea','Sierra Leona','Liberia','Guinea Ecuatorial',
+  'Australia','Nueva Zelanda','Papúa Nueva Guinea','Fiyi','Samoa','Tonga','Vanuatu',
+  'Islas Salomón','Micronesia','Palaos','Kiribati','Tuvalu','Nauru','Islas Marshall',
+  'Polinesia Francesa','Nueva Caledonia','Guam','Islas Cook',
+  'Canadá','Estados Unidos',
+  'Saint-Martin','Sint Maarten','Martinica','Guadalupe','Aruba','Curazao','Bermudas',
+  'Islas Caimán','Jamaica','Barbados','Trinidad y Tobago','Bahamas','Santa Lucía',
+  'Antigua y Barbuda','Granada','Dominica','San Cristóbal y Nieves',
+].map(name => {
+  const meta = getCountryMeta(name);
+  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+}).sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
 const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'];
 
