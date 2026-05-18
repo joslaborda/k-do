@@ -1341,8 +1341,9 @@ export default function Restaurants() {
   const communitySpots = useMemo(() => {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const targetCity = (selectedCity || city).toLowerCase();
+    const normStr = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
     const fromUsers = publicSpots.filter(s =>
-      !targetCity || s.city_name?.toLowerCase() === targetCity
+      !targetCity || normStr(s.city_name) === normStr(targetCity)
     );
     // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
