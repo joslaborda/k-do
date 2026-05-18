@@ -525,10 +525,13 @@ function FinishedTab({ trip, cities, expenses, spots }) {
   const members = trip?.members?.length || 1;
 
   const allCountries = useMemo(() => {
-    const s = new Set();
-    if (trip?.country) s.add(trip.country);
-    cities.forEach(c => { if (c.country) s.add(c.country); });
-    return [...s];
+    const norm = (c) => (c || '').trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const seen = {};
+    const all = [];
+    if (trip?.country) all.push(trip.country);
+    cities.forEach(c => { if (c.country) all.push(c.country); });
+    all.forEach(c => { const key = norm(c); if (!seen[key]) { seen[key] = c; } });
+    return Object.values(seen);
   }, [trip, cities]);
 
   const sortedCities = useMemo(() =>
@@ -539,8 +542,7 @@ function FinishedTab({ trip, cities, expenses, spots }) {
   const countriesLabel = (() => {
     if (cities.length === 0) return trip?.destination || '';
     if (cities.length === 1) return sortedCities[0]?.name || trip?.destination || '';
-    // Multiple cities: show unique countries joined with ' y '
-    const countries = [...allCountries];
+    const countries = allCountries;
     if (countries.length === 0) return trip?.destination || '';
     if (countries.length === 1) return countries[0];
     if (countries.length === 2) return countries.join(' y ');
