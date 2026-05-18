@@ -21,6 +21,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
+import { getVisaInfo } from '@/lib/visaMatrix';
+import { getCountryMeta } from '@/lib/countryConfig';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡', health:'🏥' };
@@ -28,17 +30,39 @@ const DOC_ICONS = { flight:'✈️', hotel:'🏨', train:'🚆', bus:'🚌', car
 const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
 
 // ── Requirements builder ──────────────────────────────────────────────────────
-function buildRequirements(countries, originCountry) {
+function buildRequirements(countries, originCountry, secondNationality = null) {
   const reqs = [];
+  const originMeta = getCountryMeta(originCountry || 'España');
+  const originISO = originMeta?.iso || 'ES';
+  const secondISO = secondNationality ? (getCountryMeta(secondNationality)?.iso || null) : null;
+
   countries.forEach(country => {
     const data = COUNTRY_REQUIREMENTS[country];
-    if (!data) return;
-    if (data.visa) reqs.push({
-      id: `${country}-visa`, type: 'visa', country,
-      title: data.visa.needed ? 'Visado requerido' : 'Sin visado necesario',
-      description: data.visa.info,
-      level: data.visa.needed ? 'required' : 'ok'
-    });
+    const dMeta = getCountryMeta(country);
+    const destISO = dMeta?.iso;
+
+    // Visa — real per-passport data from visaMatrix
+    const visaInfo = destISO ? getVisaInfo(destISO, originISO, secondISO) : null;
+    if (visaInfo && visaInfo.needed !== null) {
+      reqs.push({
+        id: `${country}-visa`, type: 'visa', country,
+        title: visaInfo.needed
+          ? (visaInfo.eVisa ? 'E-visa necesaria' : 'Visado necesario')
+          : 'Sin visado necesario',
+        description: visaInfo.info
+          + (visaInfo.cost ? ` Coste: ${visaInfo.cost}.` : '')
+          + (visaInfo.url ? ` Tramitar en: ${visaInfo.url}` : ''),
+        level: visaInfo.needed ? 'required' : 'ok',
+      });
+    } else if (data?.visa) {
+      reqs.push({
+        id: `${country}-visa`, type: 'visa', country,
+        title: data.visa.needed ? 'Visado requerido' : 'Sin visado necesario',
+        description: data.visa.info,
+        level: data.visa.needed ? 'required' : 'ok',
+      });
+    }
+    if (false) { // placeholder to avoid removing next block
     if (data.adapter?.needed) reqs.push({
       id: `${country}-adapter`, type: 'tech', country,
       title: `Adaptador ${data.adapter.type || ''}`,
@@ -148,156 +172,24 @@ function DraggableSpotList({ spots, onReorder }) {
 }
 
 // ── Day card ──────────────────────────────────────────────────────────────────
-// ── Item detail pop-up ────────────────────────────────────────────────────────
-function ItemDetailSheet({ item, onClose, onSaveTime }) {
-  const [editingTime, setEditingTime] = useState(false);
-  const [time, setTime] = useState(item?.time || '');
-  const [saving, setSaving] = useState(false);
-
-  if (!item) return null;
-  const isDoc = item._kind === 'doc';
-  const isSpot = item._kind === 'spot';
-  const emoji = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : (SPOT_ICONS[item.type] || '📍');
-  const bg = isDoc ? 'bg-orange-50' : 'bg-secondary';
-
-  const handleSaveTime = async () => {
-    setSaving(true);
-    await onSaveTime(item, time);
-    setSaving(false);
-    setEditingTime(false);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="pt-3 pb-1 flex justify-center">
-          <div className="w-9 h-1 bg-border rounded-full" />
-        </div>
-        {/* Header */}
-        <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
-          <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center text-2xl shrink-0`}>{emoji}</div>
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-foreground">{item.title || item.name}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {isDoc ? item.type : (SPOT_ICONS[item.type] ? item.type : 'spot')}
-              {item.time && <span className="text-primary font-medium"> · {item.time}</span>}
-            </p>
-          </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
-            <X className="w-4 h-4 text-muted-foreground" />
-          </button>
-        </div>
-
-        <div className="px-5 py-4 space-y-4">
-          {/* Time edit */}
-          <div className="flex items-center justify-between">
-            {editingTime ? (
-              <div className="flex items-center gap-2 flex-1">
-                <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                  className="h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
-                <button onClick={handleSaveTime} disabled={saving}
-                  className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg font-medium disabled:opacity-50">
-                  {saving ? '...' : 'Guardar'}
-                </button>
-                <button onClick={() => setEditingTime(false)} className="text-xs text-muted-foreground">Cancelar</button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">{item.time ? `Hora: ${item.time}` : 'Sin hora asignada'}</span>
-                <button onClick={() => setEditingTime(true)}
-                  className="text-xs text-primary font-medium">Editar</button>
-              </div>
-            )}
-          </div>
-
-          {/* Notes (spots) */}
-          {isSpot && item.notes && (
-            <div className="bg-secondary rounded-xl p-3">
-              <p className="text-xs text-foreground leading-relaxed">{item.notes}</p>
-            </div>
-          )}
-
-          {/* Doc info */}
-          {isDoc && (
-            <div className="grid grid-cols-2 gap-2">
-              {item.time && (
-                <div className="bg-secondary rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Hora</p>
-                  <p className="text-sm font-medium text-primary">{item.time}</p>
-                </div>
-              )}
-              <div className="bg-secondary rounded-xl p-3">
-                <p className="text-xs text-muted-foreground mb-1">Tipo</p>
-                <p className="text-sm font-medium text-foreground capitalize">{item.type}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3 px-5 pb-8 pt-0">
-          {isDoc && item.file_url && (
-            <button onClick={() => { onClose(); setTimeout(() => window._openPdf?.(item.file_url), 100); }}
-              className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
-              Ver documento
-            </button>
-          )}
-          {isSpot && item.lat && item.lng && (
-            <a href={`https://maps.google.com/?q=${item.lat},${item.lng}`} target="_blank" rel="noopener noreferrer"
-              className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium text-center">
-              Ver en mapa
-            </a>
-          )}
-          <button onClick={onClose}
-            className="flex-1 py-2.5 bg-secondary border border-border rounded-xl text-sm text-muted-foreground">
-            Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── DayCard — timeline view ────────────────────────────────────────────────────
-function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime }) {
+function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr }) {
   const [open, setOpen] = useState(defaultOpen);
   const [viewFile, setViewFile] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
+  const hasContent = docs.length > 0 || spots.length > 0;
   const isToday_ = defaultOpen;
-
-  // Merge docs + spots into unified timeline, sorted by time
-  const timelineItems = useMemo(() => {
-    const docItems = docs.map(d => ({ ...d, _kind: 'doc' }));
-    const spotItems = spots.map(s => ({ ...s, _kind: 'spot' }));
-    const all = [...docItems, ...spotItems];
-    const withTime = all.filter(i => i.time).sort((a, b) => a.time.localeCompare(b.time));
-    const noTime = all.filter(i => !i.time);
-    return [...withTime, ...noTime];
-  }, [docs, spots]);
-
-  const hasContent = timelineItems.length > 0;
-
-  // Register PDF opener globally so ItemDetailSheet can trigger it
-  useEffect(() => {
-    window._openPdf = (url) => setViewFile(url);
-    return () => { delete window._openPdf; };
-  }, []);
 
   return (
     <div className={`bg-white rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
       <button onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}>
         <div className="flex items-center gap-3 min-w-0">
-          <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
-          <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
+          <span className={`text-xs font-bold uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
+          <span className="text-sm font-semibold text-foreground truncate">{city?.name}</span>
           {dateStr && (
             <span className="text-xs text-muted-foreground shrink-0">
               {format(parseISO(dateStr), 'dd MMM', { locale: es })}
             </span>
-          )}
-          {hasContent && (
-            <span className="text-xs text-muted-foreground shrink-0">· {timelineItems.length} items</span>
           )}
         </div>
         {open
@@ -307,44 +199,34 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
 
       {open && (
         <div>
-          {timelineItems.length > 0 ? (
-            timelineItems.map((item, idx) => {
-              const isDoc = item._kind === 'doc';
-              const emoji = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : (SPOT_ICONS[item.type] || '📍');
-              const isLast = idx === timelineItems.length - 1;
-              return (
-                <button key={item.id || idx} onClick={() => setSelectedItem(item)}
-                  className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-                  {/* Time column */}
-                  <div className="w-10 shrink-0 flex flex-col items-center">
-                    {item.time
-                      ? <span className="text-xs font-medium text-primary leading-none">{item.time}</span>
-                      : <div className="w-2 h-2 rounded-full bg-border mt-1" />
-                    }
-                    {!isLast && <div className="w-px flex-1 bg-border mt-1" style={{height:'12px'}} />}
-                  </div>
-                  {/* Icon */}
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 ${isDoc ? 'bg-orange-50' : 'bg-secondary'}`}>
-                    {emoji}
-                  </div>
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{item.title || item.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                      {isDoc ? (item.time ? '' : 'Sin hora') : (item.notes ? item.notes.slice(0, 40) + '…' : '')}
-                    </p>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                </button>
-              );
-            })
-          ) : (
+          {[...docs].sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99')).map(doc => (
+            <button key={doc.id}
+              onClick={() => doc.file_url ? setViewFile(doc.file_url) : null}
+              className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
+              <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
+                {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
+              </div>
+              {doc.file_url
+                ? <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                : <span className="text-xs text-muted-foreground shrink-0">Sin archivo</span>}
+            </button>
+          ))}
+
+          {spots.length > 0 && (
+            <DraggableSpotList spots={spots} onReorder={onReorderSpots} />
+          )}
+
+          {!hasContent && (
             <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-              className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-secondary/30 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0 text-lg">📍</div>
+              className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-accent/30 transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                <span className="text-lg">📍</span>
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Añade lugares a tu día</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Guarda y asigna lugares para hoy</p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
@@ -359,19 +241,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           </Link>
         </div>
       )}
-
       {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
-
-      {selectedItem && (
-        <ItemDetailSheet
-          item={selectedItem}
-          onClose={() => setSelectedItem(null)}
-          onSaveTime={async (item, time) => {
-            if (onUpdateItemTime) await onUpdateItemTime(item, time);
-            setSelectedItem(prev => prev ? { ...prev, time } : null);
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -400,7 +270,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
   }, [trip, cities]);
 
   const requirements = useMemo(() =>
-    buildRequirements([...allCountries], originCountry),
+    buildRequirements([...allCountries], originCountry, myProfile?.second_nationality || null),
     [allCountries, originCountry]
   );
 
@@ -613,17 +483,6 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           defaultOpen={true}
           dateStr={todayStr}
           onReorderSpots={handleReorder}
-          onUpdateItemTime={async (item, time) => {
-            try {
-              if (item._kind === 'doc') {
-                await base44.entities.Document.update(item.id, { time });
-                queryClient.invalidateQueries({ queryKey: ['documents', tripId] });
-              } else {
-                await base44.entities.Spot.update(item.id, { time });
-                queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-              }
-            } catch {}
-          }}
         />
       )}
 
@@ -1502,7 +1361,7 @@ export default function Home() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header — light option D */}
-      <div className="bg-background border-b border-border sticky top-0 z-20">
+      <div className="bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
 
           {/* Top row */}
