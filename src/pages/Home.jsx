@@ -62,25 +62,26 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
         level: data.visa.needed ? 'required' : 'ok',
       });
     }
-    if (data?.adapter?.needed) reqs.push({
+    if (false) { // placeholder to avoid removing next block
+    if (data.adapter?.needed) reqs.push({
       id: `${country}-adapter`, type: 'tech', country,
       title: `Adaptador ${data.adapter.type || ''}`,
       description: data.adapter.info,
       level: 'required'
     });
-    if (data?.currency?.info) reqs.push({
+    if (data.currency?.info) reqs.push({
       id: `${country}-currency`, type: 'money', country,
       title: 'Moneda y pagos',
       description: data.currency.info,
       level: 'info'
     });
-    (data?.vaccines || []).forEach((v, i) => reqs.push({
+    (data.vaccines || []).forEach((v, i) => reqs.push({
       id: `${country}-vax-${i}`, type: 'vaccine', country,
       title: `Vacuna: ${v.name}`,
       description: v.priority,
       level: v.priority?.includes('requer') ? 'required' : 'recommended'
     }));
-    (data?.tips || []).forEach((tip, i) => reqs.push({
+    (data.tips || []).forEach((tip, i) => reqs.push({
       id: `${country}-tip-${i}`, type: 'safety', country,
       title: tip, description: '', level: 'info'
     }));
