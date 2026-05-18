@@ -62,28 +62,24 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
         level: data.visa.needed ? 'required' : 'ok',
       });
     }
-    // Adapter
     if (data?.adapter?.needed) reqs.push({
       id: `${country}-adapter`, type: 'tech', country,
       title: `Adaptador ${data.adapter.type || ''}`,
       description: data.adapter.info,
       level: 'required'
     });
-    // Currency
     if (data?.currency?.info) reqs.push({
       id: `${country}-currency`, type: 'money', country,
       title: 'Moneda y pagos',
       description: data.currency.info,
       level: 'info'
     });
-    // Vaccines
     (data?.vaccines || []).forEach((v, i) => reqs.push({
       id: `${country}-vax-${i}`, type: 'vaccine', country,
       title: `Vacuna: ${v.name}`,
       description: v.priority,
       level: v.priority?.includes('requer') ? 'required' : 'recommended'
     }));
-    // Tips
     (data?.tips || []).forEach((tip, i) => reqs.push({
       id: `${country}-tip-${i}`, type: 'safety', country,
       title: tip, description: '', level: 'info'
@@ -552,10 +548,13 @@ function FinishedTab({ trip, cities, expenses, spots }) {
   const members = trip?.members?.length || 1;
 
   const allCountries = useMemo(() => {
-    const s = new Set();
-    if (trip?.country) s.add(trip.country);
-    cities.forEach(c => { if (c.country) s.add(c.country); });
-    return [...s];
+    const _norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const _seen = {};
+    const _all = [];
+    if (trip?.country) _all.push(trip.country);
+    cities.forEach(c => { if (c.country) _all.push(c.country); });
+    _all.forEach(c => { const key = _norm(c); if (!_seen[key]) _seen[key] = c; });
+    return Object.values(_seen);
   }, [trip, cities]);
 
   const sortedCities = useMemo(() =>
@@ -1364,7 +1363,7 @@ export default function Home() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header — light option D */}
-      <div className="bg-background border-b border-border">
+      <div className="bg-background border-b border-border sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
 
           {/* Top row */}
