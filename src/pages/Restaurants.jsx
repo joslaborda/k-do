@@ -41,16 +41,22 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng) {
-  const d = 0.012;
-  const query = `[out:json][timeout:10];(node["amenity"](${lat-d},${lng-d},${lat+d},${lng+d});node["tourism"](${lat-d},${lng-d},${lat+d},${lng+d}););out 15;`;
-  const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:query, signal: AbortSignal.timeout(12000) });
-  if (!res.ok) throw new Error('overpass failed');
+  // Use Nominatim reverse + search (OSM, in allowlist)
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&limit=15&addressdetails=1` +
+    `&viewbox=${lng-0.015},${lat+0.015},${lng+0.015},${lat-0.015}&bounded=1` +
+    `&q=restaurant+OR+cafe+OR+museum+OR+hotel+OR+bar`,
+    { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' },
+      signal: AbortSignal.timeout(10000) }
+  );
+  if (!res.ok) throw new Error('nominatim failed');
   const data = await res.json();
-  return (data.elements||[]).filter(el => el.tags?.name).map(el => ({
-    id: el.id?.toString(), name: el.tags.name,
-    address: [el.tags['addr:street'], el.tags['addr:housenumber']].filter(Boolean).join(' '),
-    lat: el.lat, lng: el.lon,
-    type: osmToType(el.tags.amenity||el.tags.tourism||'', ''),
+  return data.filter(el => el.display_name).map(el => ({
+    id: el.place_id?.toString(),
+    name: el.name || el.display_name?.split(',')[0],
+    address: el.display_name?.split(',').slice(1, 3).join(',').trim() || '',
+    lat: parseFloat(el.lat), lng: parseFloat(el.lon),
+    type: osmToType(el.type || el.class || '', ''),
   })).slice(0, 12);
 }
 
@@ -1244,7 +1250,11 @@ export default function Restaurants() {
         catch {}
         finally { setLoadingNearby(false); }
       },
-      () => setLoadingNearby(false),
+      () => {
+        setLoadingNearby(false);
+        // Show user-friendly message
+        setNearbyResults([{ id: 'error', name: 'No se pudo obtener tu ubicación', address: 'Activa el permiso de ubicación en tu navegador', type: 'custom', _error: true }]);
+      },
       { timeout: 10000, enableHighAccuracy: true }
     );
   };
@@ -1341,10 +1351,16 @@ export default function Restaurants() {
   const communitySpots = useMemo(() => {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const targetCity = (selectedCity || city).toLowerCase();
-    const normStr = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-    const fromUsers = publicSpots.filter(s =>
-      !targetCity || normStr(s.city_name) === normStr(targetCity)
-    );
+    const normStr = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const normCountry = (c) => (c || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const fromUsers = publicSpots.filter(s => {
+      if (!targetCity) return true;
+      // Match by city name
+      if (normStr(s.city_name) === normStr(targetCity)) return true;
+      // Fallback: match by country if city not set
+      if (!s.city_name && s.country && normCountry(s.country) === normCountry(country)) return true;
+      return false;
+    });
     // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
     const all = [
