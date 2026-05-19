@@ -11,7 +11,7 @@ import { es } from 'date-fns/locale';
 import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
-  Send, UserPlus, Check, X, GripVertical
+  Send, UserPlus, Check, X, GripVertical, Clock
 } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
@@ -170,69 +170,285 @@ function DraggableSpotList({ spots, onReorder }) {
   );
 }
 
+
+// ── Item detail sheet ─────────────────────────────────────────────────────────
+function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
+  const [editingTime, setEditingTime] = useState(false);
+  const [time, setTime] = useState(item?.time || '');
+  const [saving, setSaving] = useState(false);
+
+  if (!item) return null;
+
+  const isDoc  = item._kind === 'doc';
+  const emoji  = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : (SPOT_ICONS[item.type] || '📍');
+  const title  = item.title || item.name || 'Sin título';
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSaveTime(item, time);
+    setSaving(false);
+    setEditingTime(false);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Handle */}
+        <div className="pt-3 pb-1 flex justify-center">
+          <div className="w-9 h-1 rounded-full bg-border" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ${isDoc ? 'bg-orange-50' : 'bg-secondary'}`}>
+            {emoji}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-medium text-foreground leading-snug">{title}</p>
+            <p className="text-xs text-muted-foreground mt-0.5 capitalize">
+              {isDoc ? (item.type || 'documento') : (item.type || 'spot')}
+              {item.time && <span className="text-primary font-medium"> · {item.time}</span>}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0"
+          >
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="px-5 py-4 space-y-4">
+          {/* Time editor */}
+          <div>
+            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Hora</p>
+            {editingTime ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="time"
+                  value={time}
+                  onChange={e => setTime(e.target.value)}
+                  className="h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+                />
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-4 py-1.5 bg-primary text-white text-sm rounded-xl font-medium disabled:opacity-50"
+                >
+                  {saving ? '...' : 'Guardar'}
+                </button>
+                <button
+                  onClick={() => { setEditingTime(false); setTime(item?.time || ''); }}
+                  className="text-sm text-muted-foreground"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-sm text-foreground">
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                  {item.time ? (
+                    <span className="text-primary font-medium">{item.time}</span>
+                  ) : (
+                    <span className="text-muted-foreground">Sin hora asignada</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setEditingTime(true)}
+                  className="text-xs text-primary font-medium underline underline-offset-2"
+                >
+                  {item.time ? 'Editar' : 'Añadir hora'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Notes (spots) */}
+          {!isDoc && item.notes && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Nota</p>
+              <div className="bg-secondary rounded-xl p-3">
+                <p className="text-sm text-foreground leading-relaxed">{item.notes}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Doc extra info */}
+          {isDoc && item.type && (
+            <div className="flex gap-2">
+              {item.type && (
+                <div className="bg-secondary rounded-xl p-3 flex-1">
+                  <p className="text-xs text-muted-foreground mb-1">Tipo</p>
+                  <p className="text-sm font-medium text-foreground capitalize">{item.type}</p>
+                </div>
+              )}
+              {!item.file_url && (
+                <div className="bg-secondary rounded-xl p-3 flex-1">
+                  <p className="text-xs text-muted-foreground mb-1">Archivo</p>
+                  <p className="text-sm text-muted-foreground">Sin archivo</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 px-5 pb-8 pt-0">
+          {isDoc && item.file_url && (
+            <button
+              onClick={() => { onClose(); setTimeout(() => onOpenPdf(item.file_url), 50); }}
+              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-medium"
+            >
+              Ver documento
+            </button>
+          )}
+          {!isDoc && item.lat && item.lng && (
+            <a
+              href={`https://maps.google.com/?q=${item.lat},${item.lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-medium text-center"
+            >
+              Ver en mapa
+            </a>
+          )}
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Day card ──────────────────────────────────────────────────────────────────
-function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const [viewFile, setViewFile] = useState(null);
+function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime }) {
+  const [open, setOpen]           = useState(defaultOpen);
+  const [viewFile, setViewFile]   = useState(null);
+  const [selected, setSelected]   = useState(null);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
-  const hasContent = docs.length > 0 || spots.length > 0;
   const isToday_ = defaultOpen;
+
+  // Merge docs + spots into one timeline sorted by time
+  const timeline = useMemo(() => {
+    const docItems  = docs.map(d  => ({ ...d,  _kind: 'doc'  }));
+    const spotItems = spots.map(s => ({ ...s,  _kind: 'spot' }));
+    const all = [...docItems, ...spotItems];
+    const withTime    = all.filter(i => i.time).sort((a, b) => a.time.localeCompare(b.time));
+    const withoutTime = all.filter(i => !i.time);
+    return [...withTime, ...withoutTime];
+  }, [docs, spots]);
+
+  const hasContent = timeline.length > 0;
+
+  const handleSaveTime = async (item, time) => {
+    if (onUpdateItemTime) await onUpdateItemTime(item, time);
+    setSelected(prev => prev ? { ...prev, time } : null);
+  };
 
   return (
     <div className={`bg-white rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
-      <button onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}>
+      {/* Header row */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}
+      >
         <div className="flex items-center gap-3 min-w-0">
-          <span className={`text-xs font-bold uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
-          <span className="text-sm font-semibold text-foreground truncate">{city?.name}</span>
+          <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
+            {label}
+          </span>
+          <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
           {dateStr && (
             <span className="text-xs text-muted-foreground shrink-0">
               {format(parseISO(dateStr), 'dd MMM', { locale: es })}
             </span>
           )}
+          {hasContent && (
+            <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>
+          )}
         </div>
         {open
-          ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
+          ? <ChevronUp   className="w-4 h-4 text-muted-foreground shrink-0" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
       </button>
 
       {open && (
         <div>
-          {[...docs].sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99')).map(doc => (
-            <button key={doc.id}
-              onClick={() => doc.file_url ? setViewFile(doc.file_url) : null}
-              className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-              <span className="text-xl shrink-0">{DOC_ICONS[doc.type] || DOC_ICONS.other}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{doc.title || doc.name}</p>
-                {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
-              </div>
-              {doc.file_url
-                ? <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                : <span className="text-xs text-muted-foreground shrink-0">Sin archivo</span>}
-            </button>
-          ))}
+          {hasContent ? (
+            timeline.map((item, idx) => {
+              const isDoc   = item._kind === 'doc';
+              const emoji   = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : (SPOT_ICONS[item.type] || '📍');
+              const isLast  = idx === timeline.length - 1;
+              const hasTime = !!item.time;
 
-          {spots.length > 0 && (
-            <DraggableSpotList spots={spots} onReorder={onReorderSpots} />
-          )}
+              return (
+                <button
+                  key={item.id || idx}
+                  onClick={() => setSelected(item)}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left"
+                >
+                  {/* Time column */}
+                  <div className="w-11 shrink-0 flex flex-col items-center self-stretch justify-start pt-0.5">
+                    {hasTime ? (
+                      <span className="text-[11px] font-medium text-primary leading-none whitespace-nowrap">{item.time}</span>
+                    ) : (
+                      <div className="w-2 h-2 rounded-full bg-border mt-1" />
+                    )}
+                    {!isLast && (
+                      <div className="w-px flex-1 bg-border/60 mt-1.5" />
+                    )}
+                  </div>
 
-          {!hasContent && (
-            <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-              className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-accent/30 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
-                <span className="text-lg">📍</span>
-              </div>
+                  {/* Icon */}
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 ${isDoc ? 'bg-orange-50' : 'bg-secondary'}`}>
+                    {emoji}
+                  </div>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {item.title || item.name || 'Sin título'}
+                    </p>
+                    {!isDoc && item.notes && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.notes}</p>
+                    )}
+                    {isDoc && !hasTime && (
+                      <p className="text-xs text-muted-foreground mt-0.5">Sin hora · toca para añadir</p>
+                    )}
+                  </div>
+
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
+              );
+            })
+          ) : (
+            <Link
+              to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+              className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-secondary/30 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0 text-lg">📍</div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Guarda y asigna lugares para hoy</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Añade lugares a tu día</p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
           )}
 
-          <Link to={createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId}
-            className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
+          <Link
+            to={createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId}
+            className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors"
+          >
             <span className="text-xs font-medium text-primary">
               {hasItinerary ? `Ver itinerario de ${city?.name}` : `Abrir ${city?.name}`}
             </span>
@@ -240,10 +456,23 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           </Link>
         </div>
       )}
+
+      {/* PDF viewer */}
       {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
+
+      {/* Item detail sheet */}
+      {selected && (
+        <ItemDetailSheet
+          item={selected}
+          onClose={() => setSelected(null)}
+          onSaveTime={handleSaveTime}
+          onOpenPdf={(url) => setViewFile(url)}
+        />
+      )}
     </div>
   );
 }
+
 
 // ── Pre-trip tab ──────────────────────────────────────────────────────────────
 function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite }) {
@@ -482,6 +711,17 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           defaultOpen={true}
           dateStr={todayStr}
           onReorderSpots={handleReorder}
+          onUpdateItemTime={async (item, time) => {
+            try {
+              if (item._kind === 'doc') {
+                await base44.entities.Document.update(item.id, { time });
+                queryClient.invalidateQueries({ queryKey: ['documents', tripId] });
+              } else {
+                await base44.entities.Spot.update(item.id, { time });
+                queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+              }
+            } catch {}
+          }}
         />
       )}
 
