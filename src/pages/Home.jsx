@@ -31,25 +31,7 @@ const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'�
 
 // ── Mini weather ──────────────────────────────────────────────────────────────
 const WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'🌨️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
-function useMiniWeather(cityName, country) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    if (!cityName) return;
-    const key = `mini_wx:${cityName}`;
-    const cached = sessionStorage.getItem(key);
-    if (cached) { try { setData(JSON.parse(cached)); return; } catch {} }
-    (async () => {
-      try {
-        const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=es&format=json`,{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
-        const loc = geo.results?.[0]; if (!loc) return;
-        const wx = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weathercode&timezone=${encodeURIComponent(loc.timezone||'auto')}&forecast_days=1`,{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
-        const result = { temp: Math.round(wx.current.temperature_2m), code: wx.current.weathercode };
-        setData(result); sessionStorage.setItem(key, JSON.stringify(result));
-      } catch {}
-    })();
-  }, [cityName]);
-  return data;
-}
+// weather fetched inline in DayCard
 
 // ── Requirements builder ──────────────────────────────────────────────────────
 function buildRequirements(countries, originCountry, secondNationality = null) {
@@ -360,7 +342,24 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   const [selected, setSelected]   = useState(null);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
   const isToday_ = defaultOpen;
-  const weather = useMiniWeather(isToday_ ? city?.name : null, city?.country);
+  const [weather, setWeather] = useState(null);
+  useEffect(() => {
+    if (!isToday_ || !city?.name) return;
+    const key = 'mini_wx:' + city.name;
+    const hit = sessionStorage.getItem(key);
+    if (hit) { try { setWeather(JSON.parse(hit)); return; } catch {} }
+    (async () => {
+      try {
+        const geo = await fetch('https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(city.name) + '&count=1&language=es&format=json').then(r => r.json());
+        const loc = geo.results?.[0];
+        if (!loc) return;
+        const wx = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + loc.latitude + '&longitude=' + loc.longitude + '&current=temperature_2m,weathercode&timezone=' + encodeURIComponent(loc.timezone || 'auto') + '&forecast_days=1').then(r => r.json());
+        const result = { temp: Math.round(wx.current.temperature_2m), code: wx.current.weathercode };
+        setWeather(result);
+        sessionStorage.setItem(key, JSON.stringify(result));
+      } catch {}
+    })();
+  }, [isToday_, city?.name]);
 
   // Merge docs + spots into one timeline sorted by time
   const timeline = useMemo(() => {
@@ -516,11 +515,8 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
     const all = [];
     if (trip?.country) all.push(trip.country);
     cities.forEach(c => { if (c.country) all.push(c.country); });
-    all.forEach(c => {
-      const key = norm(c);
-      if (!seen[key]) { seen[key] = c; s.add(c); }
-    });
-    return [...s];
+    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
+    return Object.values(seen);
   }, [trip, cities]);
 
   const requirements = useMemo(() =>
