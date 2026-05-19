@@ -41,22 +41,16 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng) {
-  // Use Nominatim reverse + search (OSM, in allowlist)
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&limit=15&addressdetails=1` +
-    `&viewbox=${lng-0.015},${lat+0.015},${lng+0.015},${lat-0.015}&bounded=1` +
-    `&q=restaurant+OR+cafe+OR+museum+OR+hotel+OR+bar`,
-    { headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' },
-      signal: AbortSignal.timeout(10000) }
-  );
-  if (!res.ok) throw new Error('nominatim failed');
+  const d = 0.012;
+  const query = `[out:json][timeout:10];(node["amenity"](${lat-d},${lng-d},${lat+d},${lng+d});node["tourism"](${lat-d},${lng-d},${lat+d},${lng+d}););out 15;`;
+  const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:query, signal: AbortSignal.timeout(12000) });
+  if (!res.ok) throw new Error('overpass failed');
   const data = await res.json();
-  return data.filter(el => el.display_name).map(el => ({
-    id: el.place_id?.toString(),
-    name: el.name || el.display_name?.split(',')[0],
-    address: el.display_name?.split(',').slice(1, 3).join(',').trim() || '',
-    lat: parseFloat(el.lat), lng: parseFloat(el.lon),
-    type: osmToType(el.type || el.class || '', ''),
+  return (data.elements||[]).filter(el => el.tags?.name).map(el => ({
+    id: el.id?.toString(), name: el.tags.name,
+    address: [el.tags['addr:street'], el.tags['addr:housenumber']].filter(Boolean).join(' '),
+    lat: el.lat, lng: el.lon,
+    type: osmToType(el.tags.amenity||el.tags.tourism||'', ''),
   })).slice(0, 12);
 }
 
@@ -444,7 +438,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: "calc(85vh - 76px)" }} onClick={e => e.stopPropagation()}>
+        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
           <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
             <div className="flex items-start justify-between">
@@ -715,7 +709,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: "calc(75vh - 76px)" }} onClick={e => e.stopPropagation()}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: 'calc(75vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
@@ -907,7 +901,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   return (
     <>
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col " onClick={e => e.stopPropagation()}>
+      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
         <div className="flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
@@ -1007,8 +1001,8 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
           )}
         </div>
 
-        {/* Save/Cancel — always visible, above like row */}
-        <div className="flex-shrink-0 flex gap-3 px-5 py-3 border-t border-border bg-white">
+        {/* Sticky footer buttons */}
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           <Button onClick={handleSave} disabled={saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
             {saving ? 'Guardando...' : 'Guardar cambios'}
@@ -1250,11 +1244,7 @@ export default function Restaurants() {
         catch {}
         finally { setLoadingNearby(false); }
       },
-      () => {
-        setLoadingNearby(false);
-        // Show user-friendly message
-        setNearbyResults([{ id: 'error', name: 'No se pudo obtener tu ubicación', address: 'Activa el permiso de ubicación en tu navegador', type: 'custom', _error: true }]);
-      },
+      () => setLoadingNearby(false),
       { timeout: 10000, enableHighAccuracy: true }
     );
   };
@@ -1351,16 +1341,10 @@ export default function Restaurants() {
   const communitySpots = useMemo(() => {
     const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
     const targetCity = (selectedCity || city).toLowerCase();
-    const normStr = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-    const normCountry = (c) => (c || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-    const fromUsers = publicSpots.filter(s => {
-      if (!targetCity) return true;
-      // Match by city name
-      if (normStr(s.city_name) === normStr(targetCity)) return true;
-      // Fallback: match by country if city not set
-      if (!s.city_name && s.country && normCountry(s.country) === normCountry(country)) return true;
-      return false;
-    });
+    const normStr = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    const fromUsers = publicSpots.filter(s =>
+      !targetCity || normStr(s.city_name) === normStr(targetCity)
+    );
     // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
     const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
     const all = [
