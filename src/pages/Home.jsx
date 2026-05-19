@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
+import WeatherCard from '@/components/WeatherCard';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta } from '@/lib/countryConfig';
@@ -485,16 +486,11 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
   const allCountries = useMemo(() => {
     const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const seen = {};
-    const s = new Set();
-    // Prefer Spanish names: Japón over Japan
     const all = [];
     if (trip?.country) all.push(trip.country);
     cities.forEach(c => { if (c.country) all.push(c.country); });
-    all.forEach(c => {
-      const key = norm(c);
-      if (!seen[key]) { seen[key] = c; s.add(c); }
-    });
-    return [...s];
+    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
+    return Object.values(seen);
   }, [trip, cities]);
 
   const requirements = useMemo(() =>
@@ -698,6 +694,10 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
             Ver ruta completa →
           </Link>
         </div>
+      )}
+
+      {todayCity && (
+        <WeatherCard city={todayCity} tripCountry={trip?.country} />
       )}
 
       {todayCity && (
