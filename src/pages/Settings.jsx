@@ -58,7 +58,10 @@ const COUNTRIES = [
   return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
 }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
-const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'];
+const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'].map(name => {
+  const meta = getCountryMeta(name);
+  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+}).sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Toggle switch
