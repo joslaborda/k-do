@@ -444,7 +444,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: "calc(85vh - 76px)" }} onClick={e => e.stopPropagation()}>
           <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
             <div className="flex items-start justify-between">
@@ -715,7 +715,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col max-h-[75vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: "calc(75vh - 76px)" }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
@@ -907,7 +907,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   return (
     <>
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col " onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
         <div className="flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
@@ -1007,8 +1007,8 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
           )}
         </div>
 
-        {/* Sticky footer buttons */}
-        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
+        {/* Save/Cancel — always visible, above like row */}
+        <div className="flex-shrink-0 flex gap-3 px-5 py-3 border-t border-border bg-white">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           <Button onClick={handleSave} disabled={saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
             {saving ? 'Guardando...' : 'Guardar cambios'}
