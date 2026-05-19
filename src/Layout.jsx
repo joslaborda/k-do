@@ -33,7 +33,11 @@ const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restauran
                          'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary', 'Calendar'];
 
 export default function Layout({ children, currentPageName }) {
-  const [tripId, setTripId]       = useState(null);
+  const getTripId = () => {
+    const p = new URLSearchParams(window.location.search);
+    return p.get('trip_id') || p.get('id') || null;
+  };
+  const [tripId, setTripId]       = useState(() => getTripId());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
 
@@ -54,9 +58,7 @@ export default function Layout({ children, currentPageName }) {
   }, [currentPageName]);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('trip_id') || urlParams.get('id');
-    setTripId(id || null);
+    setTripId(getTripId());
   }, [currentPageName]);
 
   // Close drawer on outside tap
