@@ -20,7 +20,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
-import WeatherCard from '@/components/WeatherCard';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta } from '@/lib/countryConfig';
@@ -29,6 +28,28 @@ import { getCountryMeta } from '@/lib/countryConfig';
 const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡', health:'🏥' };
 const DOC_ICONS = { flight:'✈️', hotel:'🏨', train:'🚆', bus:'🚌', car:'🚗', ticket:'🎟️', insurance:'🛡️', other:'📄' };
 const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
+
+// ── Mini weather ──────────────────────────────────────────────────────────────
+const WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'🌨️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
+function useMiniWeather(cityName, country) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (!cityName) return;
+    const key = `mini_wx:${cityName}`;
+    const cached = sessionStorage.getItem(key);
+    if (cached) { try { setData(JSON.parse(cached)); return; } catch {} }
+    (async () => {
+      try {
+        const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=es&format=json`,{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
+        const loc = geo.results?.[0]; if (!loc) return;
+        const wx = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weathercode&timezone=${encodeURIComponent(loc.timezone||'auto')}&forecast_days=1`,{signal:AbortSignal.timeout(5000)}).then(r=>r.json());
+        const result = { temp: Math.round(wx.current.temperature_2m), code: wx.current.weathercode };
+        setData(result); sessionStorage.setItem(key, JSON.stringify(result));
+      } catch {}
+    })();
+  }, [cityName]);
+  return data;
+}
 
 // ── Requirements builder ──────────────────────────────────────────────────────
 function buildRequirements(countries, originCountry, secondNationality = null) {
@@ -339,6 +360,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   const [selected, setSelected]   = useState(null);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
   const isToday_ = defaultOpen;
+  const weather = useMiniWeather(isToday_ ? city?.name : null, city?.country);
 
   // Merge docs + spots into one timeline sorted by time
   const timeline = useMemo(() => {
@@ -378,6 +400,9 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
             <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>
           )}
         </div>
+        {isToday_ && weather && (
+          <span className="text-sm shrink-0 mr-1">{WMO_EMOJI[weather.code] || '🌡️'} <span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>
+        )}
         {open
           ? <ChevronUp   className="w-4 h-4 text-muted-foreground shrink-0" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
@@ -486,11 +511,16 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
   const allCountries = useMemo(() => {
     const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const seen = {};
+    const s = new Set();
+    // Prefer Spanish names: Japón over Japan
     const all = [];
     if (trip?.country) all.push(trip.country);
     cities.forEach(c => { if (c.country) all.push(c.country); });
-    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
-    return Object.values(seen);
+    all.forEach(c => {
+      const key = norm(c);
+      if (!seen[key]) { seen[key] = c; s.add(c); }
+    });
+    return [...s];
   }, [trip, cities]);
 
   const requirements = useMemo(() =>
@@ -694,10 +724,6 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
             Ver ruta completa →
           </Link>
         </div>
-      )}
-
-      {todayCity && (
-        <WeatherCard city={todayCity} tripCountry={trip?.country} />
       )}
 
       {todayCity && (
