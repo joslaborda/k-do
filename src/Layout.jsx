@@ -33,10 +33,7 @@ const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restauran
                          'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary', 'Calendar'];
 
 export default function Layout({ children, currentPageName }) {
-  const getTripId = () => {
-    const p = new URLSearchParams(window.location.search);
-    return p.get('trip_id') || p.get('id') || null;
-  };
+  const getTripId = () => { const p = new URLSearchParams(window.location.search); return p.get('trip_id') || p.get('id') || null; };
   const [tripId, setTripId]       = useState(() => getTripId());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
