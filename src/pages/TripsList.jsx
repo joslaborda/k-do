@@ -9,6 +9,8 @@ import NewTripModal from '@/components/trip/NewTripModal';
 import { Link } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
+import { getSeedSpotsForCountry } from '@/lib/spotsDB';
+import { normalizeCountry } from '@/lib/countryConfig';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -33,8 +35,96 @@ function EmptyState({ onCreateTrip }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
+// ── Trip summary share sheet ──────────────────────────────────────────────────
+function TripSummarySheet({ trip, cities, onClose }) {
+  if (!trip) return null;
+  const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const endDate   = trip.end_date   ? new Date(trip.end_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const days = trip.start_date && trip.end_date
+    ? Math.round((new Date(trip.end_date) - new Date(trip.start_date)) / 86400000) + 1
+    : null;
+  const countryList = [...new Set([trip.country, ...(cities || []).map(c => c.country)].filter(Boolean))];
+
+  const shareText = [
+    `✈️ ${trip.name || trip.destination || 'Mi viaje'}`,
+    countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
+    days ? `📅 ${days} días · ${startDate}` : '',
+    trip.destination ? `🗺️ ${trip.destination}` : '',
+    `
+¡Organizado con Kōdo! 🌸`,
+  ].filter(Boolean).join('
+');
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: trip.name || 'Mi viaje en Kōdo', text: shareText }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(shareText).then(() => {});
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-[80px]"
+      onClick={onClose}>
+      <div className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+        onClick={e => e.stopPropagation()}>
+        <div className="pt-3 pb-0 flex justify-center">
+          <div className="w-9 h-1 rounded-full bg-border" />
+        </div>
+        <div className="px-5 py-5">
+          <p className="text-xl font-semibold text-foreground mb-1">{trip.name || trip.destination || 'Mi viaje'}</p>
+          <p className="text-sm text-muted-foreground mb-5">Resumen del viaje</p>
+
+          <div className="space-y-3 mb-6">
+            {countryList.length > 0 && (
+              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
+                <span className="text-xl">🌍</span>
+                <div>
+                  <p className="text-xs text-muted-foreground">Destinos</p>
+                  <p className="text-sm font-medium">{countryList.join(' · ')}</p>
+                </div>
+              </div>
+            )}
+            {days && (
+              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
+                <span className="text-xl">📅</span>
+                <div>
+                  <p className="text-xs text-muted-foreground">Fechas</p>
+                  <p className="text-sm font-medium">{days} días · {startDate}</p>
+                </div>
+              </div>
+            )}
+            {trip.destination && (
+              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
+                <span className="text-xl">🗺️</span>
+                <div>
+                  <p className="text-xs text-muted-foreground">Ruta</p>
+                  <p className="text-sm font-medium">{trip.destination}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-3">
+            <button onClick={onClose}
+              className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground">
+              Cerrar
+            </button>
+            <button onClick={handleShare}
+              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold">
+              Compartir ✈️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TripsList() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen]           = useState(false);
+  const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
+  const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -112,17 +202,26 @@ export default function TripsList() {
         const dates = allocations[i] || { start_date: formData.start_date, end_date: formData.end_date };
         await base44.entities.City.create({
           trip_id: trip.id, name: stops[i],
-          country: normalizeCountry(stopCountries[i] || formData.country || ''),
+          country: stopCountries[i] || formData.country || '',
           order: i,
           start_date: dates.start_date, end_date: dates.end_date,
         });
       }
       return trip;
     },
-    onSuccess: () => {
+    onSuccess: (trip) => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
       setDialogOpen(false);
+      // Show spot discovery popup if we have seed spots for this destination
+      const country = normalizeCountry(trip.country || '');
+      if (country) {
+        const seeds = getSeedSpotsForCountry(country);
+        const spotCount = Object.values(seeds).flat().length;
+        if (spotCount > 0) {
+          setNewTripPopup({ trip, spotCount, country });
+        }
+      }
     },
   });
 
@@ -266,7 +365,15 @@ export default function TripsList() {
                 {showPast && (
                   <div className="mt-3 space-y-3">
                     {pastTrips.map(({ t, cities }) => (
-                      <TripCard key={t.id} trip={t} cities={cities} />
+                      <div key={t.id}>
+                        <TripCard trip={t} cities={cities} />
+                        <button
+                          onClick={() => setSummaryTrip({ trip: t, cities })}
+                          className="w-full mt-1 mb-2 py-2 text-xs text-muted-foreground hover:text-primary transition-colors font-medium"
+                        >
+                          Ver resumen y compartir →
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -282,6 +389,52 @@ export default function TripsList() {
         onSubmit={data => createMutation.mutate(data)}
         isPending={createMutation.isPending}
       />
+    </div>
+      {/* ── Trip summary sheet ───────────────────────────────────────── */}
+      {summaryTrip && (
+        <TripSummarySheet
+          trip={summaryTrip.trip}
+          cities={summaryTrip.cities}
+          onClose={() => setSummaryTrip(null)}
+        />
+      )}
+
+      {/* ── Post-creation spot discovery popup ─────────────────────── */}
+      {newTripPopup && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-[80px]"
+          onClick={() => setNewTripPopup(null)}>
+          <div className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+            onClick={e => e.stopPropagation()}>
+            <div className="pt-3 pb-0 flex justify-center">
+              <div className="w-9 h-1 rounded-full bg-border" />
+            </div>
+            <div className="px-5 py-5">
+              <p className="text-2xl mb-2">🗺️</p>
+              <p className="text-base font-medium text-foreground mb-1">
+                ¡Hay {newTripPopup.spotCount} spots en {newTripPopup.country}!
+              </p>
+              <p className="text-sm text-muted-foreground mb-5">
+                Tenemos spots recomendados para este destino. ¿Los exploramos ahora en Kōdo?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setNewTripPopup(null)}
+                  className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground"
+                >
+                  Ahora no
+                </button>
+                <Link
+                  to={createPageUrl('Restaurants') + '?trip_id=' + newTripPopup.trip.id}
+                  onClick={() => setNewTripPopup(null)}
+                  className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold text-center"
+                >
+                  Ver spots →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
