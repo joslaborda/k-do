@@ -50,10 +50,8 @@ function TripSummarySheet({ trip, cities, onClose }) {
     countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
     days ? `📅 ${days} días · ${startDate}` : '',
     trip.destination ? `🗺️ ${trip.destination}` : '',
-    `
-¡Organizado con Kōdo! 🌸`,
-  ].filter(Boolean).join('
-');
+    '\n¡Organizado con Kodo! Viaja con nosotros.',
+  ].filter(Boolean).join('\n');
 
   const handleShare = () => {
     if (navigator.share) {
