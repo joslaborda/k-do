@@ -247,7 +247,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
         </div>
       </div>
-      {open && filtered.length > 0 && (
+      {open && !loading && filtered.length > 0 && (
         <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
           {filtered.map(city => (
             <li key={city} onMouseDown={() => { setQ(city); onChange(city); setOpen(false); }}
@@ -256,6 +256,20 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
             </li>
           ))}
         </ul>
+      )}
+      {open && !loading && filtered.length === 0 && q.length > 0 && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-lg px-3 py-2.5">
+          <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
+          <button onMouseDown={() => { onChange(q); setOpen(false); }}
+            className="mt-1.5 text-sm text-primary font-medium">
+            Usar &ldquo;{q}&rdquo; →
+          </button>
+        </div>
+      )}
+      {open && !loading && cities.length === 0 && q.length === 0 && country && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-lg px-3 py-2.5">
+          <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
+        </div>
       )}
     </div>
   );
