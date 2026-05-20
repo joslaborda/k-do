@@ -50,7 +50,7 @@
 import Documents from './pages/Documents';
 import Cities from './pages/Cities';
 import CityDetail from './pages/CityDetail';
-import Diary from './pages/Diary';
+
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
 import MigrateData from './pages/MigrateData';
@@ -73,7 +73,7 @@ export const PAGES = {
     "Documents": Documents,
     "Cities": Cities,
     "CityDetail": CityDetail,
-    "Diary": Diary,
+
     "Expenses": Expenses,
     "Home": Home,
     "MigrateData": MigrateData,
