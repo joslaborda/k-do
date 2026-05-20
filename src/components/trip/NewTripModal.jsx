@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Shuffle, ChevronDown, Loader2 } from 'lucide-react';
-import { getCountryMeta, getTopCities } from '@/lib/countryConfig';
+import { getCountryMeta, getTopCities, normalizeCountry } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
@@ -386,7 +386,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
       formData: {
         ...formData,
         end_date: finalEndDate,
-        country: firstCountry,
+        country: normalizeCountry(firstCountry),
         destination: tripCities.map(s => s.city).join(' → '),
         ...(!currencyTouched ? {
           currency: firstMeta.currency,
@@ -396,7 +396,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
         } : {}),
       },
       stops: tripCities.map(s => s.city),
-      stopCountries: tripCities.map(s => s.country || firstCountry),
+      stopCountries: tripCities.map(s => normalizeCountry(s.country || firstCountry)),
       allocations,
       selectedTemplate: null,
     });
