@@ -372,6 +372,10 @@ export default function Profile() {
                 {profile?.username ? `@${profile.username}` : ''}
                 {profile?.username && profile?.home_country ? ' · ' : ''}
                 {profile?.home_country ? `${countryMeta.flag} ${profile.home_country}` : ''}
+                {profile?.second_nationality ? (() => {
+                  const m2 = getCountryMeta(profile.second_nationality);
+                  return ` · ${m2.flag} ${profile.second_nationality}`;
+                })() : ''}
               </p>
             </div>
           </div>
