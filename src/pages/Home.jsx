@@ -398,10 +398,10 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           {hasContent && (
             <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>
           )}
+          {isToday_ && weather && (
+            <span className="text-xs text-muted-foreground shrink-0 ml-1">{WMO_EMOJI[weather.code] || '🌡️'} {weather.temp}°</span>
+          )}
         </div>
-        {isToday_ && weather && (
-          <span className="text-sm shrink-0 mr-1">{WMO_EMOJI[weather.code] || '🌡️'} <span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>
-        )}
         {open
           ? <ChevronUp   className="w-4 h-4 text-muted-foreground shrink-0" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
@@ -603,33 +603,44 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
               </span>
             ) : null}
           </div>
-          {actionableReqs.map(req => (
-            <button key={req.id} onClick={() => toggleCheck(req.id)}
-              className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors text-left">
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
-                checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'
-              }`}>
-                {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
-              </div>
-              <span className="text-lg shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium leading-tight ${
-                  checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'
-                }`}>
-                  {req.title}
-                  {allCountries.size > 1 && (
-                    <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>
-                  )}
-                </p>
-                {req.description && (
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>
-                )}
-              </div>
-              {req.level === 'required' && !checkedItems[req.id] && (
-                <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full shrink-0 font-medium">!</span>
-              )}
-            </button>
-          ))}
+          {(() => {
+            const GROUPS = [
+              { key: 'visa',    label: 'Visados',      types: ['visa'] },
+              { key: 'health',  label: 'Salud',        types: ['vaccine'] },
+              { key: 'tech',    label: 'Equipamiento', types: ['tech'] },
+              { key: 'money',   label: 'Dinero',       types: ['money'] },
+              { key: 'safety',  label: 'Consejos',     types: ['safety'] },
+              { key: 'other',   label: 'Otros',        types: ['ok', 'custom'] },
+            ];
+            return GROUPS.map(group => {
+              const items = actionableReqs.filter(r => group.types.includes(r.type));
+              if (!items.length) return null;
+              return (
+                <div key={group.key}>
+                  <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider bg-secondary/40 border-b border-border">{group.label}</p>
+                  {items.map(req => (
+                    <button key={req.id} onClick={() => toggleCheck(req.id)}
+                      className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors text-left">
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                        {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className="text-lg shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                          {req.title}
+                          {allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
+                        </p>
+                        {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                      </div>
+                      {req.level === 'required' && !checkedItems[req.id] && (
+                        <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full shrink-0 font-medium">!</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              );
+            });
+          })()}
         </div>
       )}
 
