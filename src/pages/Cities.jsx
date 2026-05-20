@@ -256,6 +256,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
       });
     }
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+    queryClient.invalidateQueries({ queryKey: ['allCities'] });
     setNotesChanged(false);
   };
 
@@ -269,6 +270,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
       });
     }
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+    queryClient.invalidateQueries({ queryKey: ['allCities'] });
     setTitleEditing(false);
   };
 
