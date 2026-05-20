@@ -6,43 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle2, XCircle, Globe, Info } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
+import { getCountryMeta } from '@/lib/countryConfig';
 
-// Países hispanohablantes primero, luego resto del mundo
-const COUNTRIES = [
-  // Hispanohablantes
-  { name: 'España', flag: '🇪🇸', currency: 'EUR' },
-  { name: 'México', flag: '🇲🇽', currency: 'MXN' },
-  { name: 'Colombia', flag: '🇨🇴', currency: 'COP' },
-  { name: 'Argentina', flag: '🇦🇷', currency: 'ARS' },
-  { name: 'Perú', flag: '🇵🇪', currency: 'PEN' },
-  { name: 'Venezuela', flag: '🇻🇪', currency: 'VES' },
-  { name: 'Chile', flag: '🇨🇱', currency: 'CLP' },
-  { name: 'Ecuador', flag: '🇪🇨', currency: 'USD' },
-  { name: 'Guatemala', flag: '🇬🇹', currency: 'GTQ' },
-  { name: 'Cuba', flag: '🇨🇺', currency: 'CUP' },
-  { name: 'Bolivia', flag: '🇧🇴', currency: 'BOB' },
-  { name: 'República Dominicana', flag: '🇩🇴', currency: 'DOP' },
-  { name: 'Honduras', flag: '🇭🇳', currency: 'HNL' },
-  { name: 'Paraguay', flag: '🇵🇾', currency: 'PYG' },
-  { name: 'El Salvador', flag: '🇸🇻', currency: 'USD' },
-  { name: 'Nicaragua', flag: '🇳🇮', currency: 'NIO' },
-  { name: 'Costa Rica', flag: '🇨🇷', currency: 'CRC' },
-  { name: 'Panamá', flag: '🇵🇦', currency: 'USD' },
-  { name: 'Uruguay', flag: '🇺🇾', currency: 'UYU' },
-  { name: 'Puerto Rico', flag: '🇵🇷', currency: 'USD' },
-  { name: 'Guinea Ecuatorial', flag: '🇬🇶', currency: 'XAF' },
-  // Resto del mundo
-  { name: 'Estados Unidos', flag: '🇺🇸', currency: 'USD' },
-  { name: 'Brasil', flag: '🇧🇷', currency: 'BRL' },
-  { name: 'Reino Unido', flag: '🇬🇧', currency: 'GBP' },
-  { name: 'Francia', flag: '🇫🇷', currency: 'EUR' },
-  { name: 'Alemania', flag: '🇩🇪', currency: 'EUR' },
-  { name: 'Italia', flag: '🇮🇹', currency: 'EUR' },
-  { name: 'Portugal', flag: '🇵🇹', currency: 'EUR' },
-  { name: 'Japón', flag: '🇯🇵', currency: 'JPY' },
-  { name: 'China', flag: '🇨🇳', currency: 'CNY' },
-  { name: 'Otro', flag: '🌍', currency: 'USD' },
+// Todos los países desde countryConfig — con hispanohablantes primero
+const HISPANO_FIRST = ['España','México','Colombia','Argentina','Perú','Venezuela','Chile','Ecuador','Guatemala','Cuba','Bolivia','República Dominicana','Honduras','Paraguay','El Salvador','Nicaragua','Costa Rica','Panamá','Uruguay','Puerto Rico','Guinea Ecuatorial'];
+const ALL_COUNTRIES_RAW = [
+  'Afganistán','Albania','Alemania','Andorra','Angola','Antigua y Barbuda','Arabia Saudí','Argelia','Argentina','Armenia','Aruba','Australia','Austria','Azerbaiyán','Bahamas','Bahréin','Bangladés','Barbados','Bélgica','Belice','Benín','Bielorrusia','Bolivia','Bosnia y Herzegovina','Botswana','Brasil','Brunéi','Bulgaria','Burkina Faso','Burundi','Bután','Cabo Verde','Camboya','Camerún','Canadá','Chad','Chile','China','Chipre','Colombia','Comoras','Congo','Corea del Norte','Corea del Sur','Costa Rica','Costa de Marfil','Croacia','Cuba','Curazao','Dinamarca','Dominica','Ecuador','Egipto','El Salvador','Emiratos Árabes Unidos','Eritrea','Eslovaquia','Eslovenia','España','Estados Unidos','Estonia','Etiopía','Filipinas','Finlandia','Fiyi','Francia','Gabón','Gambia','Georgia','Ghana','Gibraltar','Granada','Grecia','Guatemala','Guinea','Guinea Ecuatorial','Guinea-Bisáu','Guyana','Guyana Francesa','Haití','Honduras','Hungría','India','Indonesia','Irak','Irán','Irlanda','Islandia','Israel','Italia','Jamaica','Japón','Jordania','Kazajistán','Kenia','Kirguistán','Kiribati','Kosovo','Kuwait','Laos','Lesoto','Letonia','Líbano','Liberia','Libia','Liechtenstein','Lituania','Luxemburgo','Madagascar','Malaui','Malasia','Maldivas','Malí','Malta','Marruecos','Martinica','Mauritania','Mauricio','México','Micronesia','Moldavia','Mónaco','Mongolia','Montenegro','Mozambique','Myanmar','Namibia','Nepal','Nicaragua','Níger','Nigeria','Noruega','Nueva Zelanda','Omán','Pakistán','Palaos','Panamá','Papúa Nueva Guinea','Paraguay','Países Bajos','Perú','Polonia','Portugal','Puerto Rico','Qatar','Reino Unido','República Centroafricana','República Checa','República del Congo','República Dominicana','Ruanda','Rumanía','Rusia','Saint-Martin','Samoa','San Cristóbal y Nieves','San Marino','San Vicente','Santa Lucía','Santo Tomé y Príncipe','Senegal','Serbia','Seychelles','Sierra Leona','Singapur','Sint Maarten','Somalia','Sri Lanka','Sudáfrica','Sudán','Sudán del Sur','Suecia','Suiza','Surinam','Tailandia','Taiwan','Tayikistán','Tanzania','Timor Oriental','Togo','Tonga','Trinidad y Tobago','Túnez','Turkmenistán','Turquía','Tuvalu','Ucrania','Uganda','Uruguay','Uzbekistán','Vanuatu','Venezuela','Vietnam','Yemen','Yibuti','Zambia','Zimbabue','Esuatini',
 ];
+const SORTED_COUNTRIES = [
+  ...HISPANO_FIRST,
+  ...ALL_COUNTRIES_RAW.filter(n => !HISPANO_FIRST.includes(n)).sort((a,b) => a.localeCompare(b, 'es')),
+];
+const COUNTRIES = SORTED_COUNTRIES.map(name => {
+  const meta = getCountryMeta(name);
+  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+});
 
 const STEPS = ['perfil', 'origen', 'listo'];
 
@@ -53,6 +31,7 @@ export default function CreateProfileModal({ user, open }) {
   const [homeCountry, setHomeCountry] = useState('España');
   const [homeCurrency, setHomeCurrency] = useState('EUR');
   const [nationality, setNationality] = useState('España');
+  const [secondNationality, setSecondNationality] = useState('');
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null);
   const [usernameError, setUsernameError] = useState('');
@@ -94,6 +73,7 @@ export default function CreateProfileModal({ user, open }) {
         home_country: homeCountry,
         home_currency: homeCurrency,
         nationality,
+        second_nationality: secondNationality || null,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
     } catch (e) {
@@ -186,6 +166,15 @@ export default function CreateProfileModal({ user, open }) {
                   {homeCountry === country.name && <CheckCircle2 className="w-4 h-4 text-orange-600 flex-shrink-0" />}
                 </button>
               ))}
+            </div>
+
+            <div className="px-1 pt-2">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Segunda nacionalidad (opcional)</p>
+              <select value={secondNationality} onChange={e => setSecondNationality(e.target.value)}
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm bg-secondary outline-none focus:border-primary appearance-none">
+                <option value="">Sin segunda nacionalidad</option>
+                {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
+              </select>
             </div>
 
             <div className="flex gap-2 pt-1">
