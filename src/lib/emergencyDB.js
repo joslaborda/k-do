@@ -322,6 +322,10 @@ const EMERGENCY_DB = {
       web: 'https://www.exteriores.gob.es/Embajadas/tokio',
     },
     embassy_MX: { address: '2-15-1 Nagata-cho, Chiyoda-ku, Tokio', phone: '+81 3 3581 1131', hours: 'Lun-Vie 9:30-13:00', web: 'https://embamex.sre.gob.mx/japon' },
+    embassy_FR: { address: '4-11-44 Minami-Azabu, Minato-ku, Tokio', phone: '+81 3 5798 6000', hours: 'Lun-Vie 9:30-12:30', web: 'https://jp.ambafrance.org' },
+    embassy_DE: { address: '4-5-10 Minami-Azabu, Minato-ku, Tokio', phone: '+81 3 5791 7700', hours: 'Lun-Vie 9:00-12:00', web: 'https://japan.diplo.de' },
+    embassy_IT: { address: '2-5-4 Mita, Minato-ku, Tokio', phone: '+81 3 3453 5291', hours: 'Lun-Vie 9:00-13:00', web: 'https://ambtokyo.esteri.it' },
+    embassy_BR: { address: '2-11-12 Kita-Aoyama, Minato-ku, Tokio', phone: '+81 3 3404 5211', hours: 'Lun-Vie 9:00-13:00', web: 'https://tokio.itamaraty.gov.br' },
     useful_apps: [
       { name: 'Google Translate + cámara', icon: '📷', description: 'Traduce menús y señales con la cámara en tiempo real.' },
       { name: 'Suica / PASMO', icon: '💳', description: 'Tarjeta de transporte recargable para metro y trenes.' },
@@ -348,6 +352,10 @@ const EMERGENCY_DB = {
       web: 'https://www.exteriores.gob.es/Embajadas/bangkok',
     },
     embassy_MX: { address: '20/69-70 Twin Towers, Rama IX Rd, Bangkok', phone: '+66 2 300 0435', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_FR: { address: '35 Customs House Lane, Bangrak, Bangkok', phone: '+66 2 657 5100', hours: 'Lun-Vie 8:30-12:00', web: 'https://th.ambafrance.org' },
+    embassy_DE: { address: '9 South Sathorn Road, Bangkok', phone: '+66 2 287 9000', hours: 'Lun-Vie 8:00-11:30', web: 'https://bangkok.diplo.de' },
+    embassy_BR: { address: '34th Floor, Abdulrahim Place, 990 Rama IV Road, Bangkok', phone: '+66 2 266 6659', hours: 'Lun-Vie 9:00-12:00', web: 'https://bangkok.itamaraty.gov.br' },
+    embassy_IT: { address: '399 Nang Linchi Road, Yan Nawa, Bangkok', phone: '+66 2 285 4090', hours: 'Lun-Vie 8:30-12:30', web: 'https://ambangkok.esteri.it' },
     useful_apps: [
       { name: 'Grab', icon: '🛵', description: 'El Uber de Asia — taxis, motos y comida a domicilio en toda Tailandia.' },
       { name: 'LINE MAN', icon: '🍜', description: 'Delivery de comida tailandesa a domicilio.' },
@@ -648,6 +656,10 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 8:30-13:30',
       web: 'https://www.exteriores.gob.es/Embajadas/rabat',
     },
+    embassy_FR: { address: '3 Rue Sahnoun, Agdal, Rabat', phone: '+212 5 37 68 97 00', hours: 'Lun-Vie 9:00-12:30', web: 'https://ma.ambafrance.org' },
+    embassy_DE: { address: '7 Zankat Madnine, Rabat', phone: '+212 5 37 21 00 22', hours: 'Lun-Vie 8:30-11:30', web: 'https://rabat.diplo.de' },
+    embassy_IT: { address: '2 Rue Idriss Al Azhar, Rabat', phone: '+212 5 37 72 68 07', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambrabat.esteri.it' },
+    embassy_BR: { address: '3 Rue Thami Lamdawar, Souissi, Rabat', phone: '+212 5 37 65 04 56', hours: 'Lun-Vie 9:00-12:00', web: 'https://rabat.itamaraty.gov.br' },
     useful_apps: [
       { name: 'Careem / inDrive', icon: '🚗', description: 'VTC en Casablanca y Marrakech — mucho más seguro que taxis informales.' },
       { name: 'WhatsApp', icon: '💬', description: 'La comunicación principal en Marruecos — todo el mundo lo usa.' },
@@ -671,6 +683,11 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-12:00',
       web: 'https://www.exteriores.gob.es/Embajadas/elcairo',
     },
+    embassy_FR: { address: '29 Avenue Charles de Gaulle, Giza, El Cairo', phone: '+20 2 3567 3200', hours: 'Lun-Vie 9:00-12:00', web: 'https://eg.ambafrance.org' },
+    embassy_DE: { address: '2 El Shaikh Mohamed Mahran St, Giza, El Cairo', phone: '+20 2 3748 8440', hours: 'Lun-Vie 8:30-11:30', web: 'https://kairo.diplo.de' },
+    embassy_IT: { address: '15 Abd El Rahman Fahmy St, Garden City, El Cairo', phone: '+20 2 2794 3194', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambcairo.esteri.it' },
+    embassy_BR: { address: '1 El Shaikh Mohamed Mahran St, Giza, El Cairo', phone: '+20 2 3748 7960', hours: 'Lun-Vie 9:00-12:00', web: 'https://cairo.itamaraty.gov.br' },
+    embassy_PE: { address: 'El Cairo — Embajada del Perú: 34 Soliman Abaza, Mohandessin', phone: '+20 2 3748 8040', hours: 'Lun-Vie 9:00-13:00', web: 'https://www.embajadaperu.com.eg' },
     useful_apps: [
       { name: 'Uber / Careem', icon: '🚗', description: 'VTC en El Cairo — imprescindible para moverse con seguridad.' },
       { name: 'WhatsApp', icon: '💬', description: 'Principal comunicación en Egipto.' },
@@ -694,6 +711,10 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 8:30-13:30',
       web: 'https://www.exteriores.gob.es/Embajadas/abudabi',
     },
+    embassy_FR: { address: 'Abu Dabi: Corniche Road West, Abu Dabi', phone: '+971 2 443 5100', hours: 'Lun-Vie 8:30-12:30', web: 'https://ae.ambafrance.org' },
+    embassy_DE: { address: 'Abu Dabi: PO Box 2591, Abu Dabi', phone: '+971 2 644 0700', hours: 'Lun-Vie 7:30-12:00', web: 'https://abudhabi.diplo.de' },
+    embassy_IT: { address: 'Abu Dabi: Villa 3-7, Zone A, Abu Dabi', phone: '+971 2 443 5622', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambaboudhabi.esteri.it' },
+    embassy_BR: { address: 'Abu Dabi: Khalidiyah, Abu Dabi', phone: '+971 2 674 4008', hours: 'Lun-Vie 9:00-12:00', web: 'https://abudhabi.itamaraty.gov.br' },
     useful_apps: [
       { name: 'Careem / Uber', icon: '🚗', description: 'VTC en Dubai y Abu Dabi — muy eficiente y económico.' },
       { name: 'Dubai Metro', icon: '🚇', description: 'Metro de Dubai muy moderno, con app oficial de la RTA.' },
@@ -794,11 +815,20 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
     const sNorm = (secondNationality).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const keys2 = (() => {
       if (sNorm.includes('espana') || sNorm.includes('spain')) return ['embassy_ES'];
+      if (sNorm.includes('franc') || sNorm.includes('france')) return ['embassy_FR', 'embassy_ES'];
+      if (sNorm.includes('aleman') || sNorm.includes('german') || sNorm.includes('deutsch')) return ['embassy_DE', 'embassy_ES'];
+      if (sNorm.includes('ital'))   return ['embassy_IT', 'embassy_ES'];
+      if (sNorm.includes('portug')) return ['embassy_PT', 'embassy_ES'];
+      if (sNorm.includes('brasil') || sNorm.includes('brazil')) return ['embassy_BR', 'embassy_ES'];
       if (sNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
       if (sNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
       if (sNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
       if (sNorm.includes('peru'))    return ['embassy_PE', 'embassy_ES'];
       if (sNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
+      if (sNorm.includes('venezuel')) return ['embassy_VE', 'embassy_ES'];
+      if (sNorm.includes('ecuad'))  return ['embassy_EC', 'embassy_ES'];
+      if (sNorm.includes('reino unido') || sNorm.includes('united kingdom') || sNorm.includes('britain')) return ['embassy_GB', 'embassy_ES'];
+      if (sNorm.includes('estados unidos') || sNorm.includes('united states')) return ['embassy_US', 'embassy_ES'];
       return ['embassy_ES'];
     })();
     for (const key of keys2) {
