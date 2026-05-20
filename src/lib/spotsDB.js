@@ -135,6 +135,35 @@ export const SEED_SPOTS = {
       { title:'Tsutenkaku Tower', type:'sight', address:'1-18-6 Ebisuhigashi, Naniwa', lat:34.6525, lng:135.5063, notes:'La torre retro de Osaka en Shinsekai. El Billiken (dios de la suerte) vive aquí.', tags:['torre','retro','Billiken'], price:'mid', best_time:'tarde', visits:534 },
       { title:'Hozenji Yokocho', type:'sight', address:'Hozenji, Chuo', lat:34.6676, lng:135.5040, notes:'El callejón de piedra con el Templo Hozenji cubierto de musgo. Una escena muy bonita de Osaka.', tags:['callejón','musgo','tradición'], price:'mid', best_time:'noche', visits:423 },
     ],
+
+    'Osaka': [
+      { title:'Dotonbori de noche', type:'sight', address:'Dotonbori, Namba, Osaka', lat:34.6687, lng:135.5010, notes:'El corazón brillante de Osaka. El cartel del Glico corriendo es icónico. Come takoyaki mientras caminas.', tags:['nocturno','neón','takoyaki'], price:'low', best_time:'noche', visits:1345 },
+      { title:'Nishiki-koji (Osaka)', type:'food', address:'Shinsaibashi, Osaka', lat:34.6721, lng:135.5024, notes:'El mercado cubierto más popular de Osaka. Comida callejera en cada puesto. 600m de sabores.', tags:['mercado','callejero','cubierto'], price:'low', best_time:'mediodía', visits:876 },
+      { title:'Castillo de Osaka', type:'sight', address:'1-1 Osakajo, Chuo-ku', lat:34.6873, lng:135.5262, notes:'El castillo más famoso de Japón. Las vistas desde la torre son espectaculares. En primavera con cerezos.', tags:['castillo','historia','sakura'], price:'mid', best_time:'mañana', visits:1123 },
+      { title:'Kuromon Ichiba Market', type:'food', address:'2-4-1 Nipponbashi, Naniwa', lat:34.6647, lng:135.5060, notes:'El mercado de los cocineros de Osaka. Marisco fresco, wagyu y frutas de temporada. Abre a las 9h.', tags:['mercado','wagyu','marisco'], price:'mid', best_time:'mañana', visits:789 },
+      { title:'Shinsekai y Tsutenkaku', type:'sight', address:'Shinsekai, Naniwa-ku', lat:34.6521, lng:135.5060, notes:'El barrio retro de Osaka. La torre Tsutenkaku y los kushikatsu (brochetas fritas) son inseparables.', tags:['retro','kushikatsu','torre'], price:'low', best_time:'tarde', visits:678 },
+      { title:'Amerikamura', type:'shopping', address:'Shinsaibashi, Chuo-ku', lat:34.6741, lng:135.4986, notes:'El barrio de la moda alternativa. Tiendas de ropa vintage y cultura hip-hop japonesa.', tags:['moda','vintage','alternativo'], price:'mid', best_time:'tarde', visits:534 },
+      { title:'Umeda Sky Building', type:'sight', address:'1-1-88 Oyodonaka, Kita-ku', lat:34.7054, lng:135.4900, notes:'El observatorio flotante más espectacular de Japón. La pasarela entre dos torres es única. Al atardecer.', tags:['observatorio','sunset','arquitectura'], price:'mid', best_time:'tarde', visits:712 },
+      { title:'Izakaya en Hozenji Yokocho', type:'food', address:'Namba, Chuo-ku', lat:34.6681, lng:135.5031, notes:'Callejón de izakayas junto al templo de musgo. La atmósfera de farolillos de papel es irresistible.', tags:['izakaya','sake','auténtico'], price:'mid', best_time:'noche', visits:623 },
+    ],
+
+    'Kioto': [
+      { title:'Fushimi Inari al amanecer', type:'sight', address:'68 Fukakusa Yabunouchicho, Fushimi', lat:34.9671, lng:135.7727, notes:'Los miles de torii naranjas son más mágicos sin turistas. Sube antes de las 6h. Lleva linterna.', tags:['torii','amanecer','espiritual'], price:'low', best_time:'mañana', visits:1456 },
+      { title:'Arashiyama Bamboo Grove', type:'sight', address:'Sagaogurayama, Ukyo-ku', lat:35.0172, lng:135.6715, notes:'El bosque de bambú más famoso del mundo. Llega al abrir (amanecer) o ve al atardecer. Con niebla es mágico.', tags:['bambú','amanecer','zen'], price:'low', best_time:'mañana', visits:1234 },
+      { title:'Gion al atardecer', type:'sight', address:'Gion, Higashiyama-ku', lat:35.0036, lng:135.7750, notes:'El barrio de las geishas. Hanamikoji Street al atardecer. Si ves una geiko, no la fotografíes sin permiso.', tags:['geishas','tradicional','Hanamikoji'], price:'low', best_time:'tarde', visits:1123 },
+      { title:'Kinkaku-ji (Pabellón de Oro)', type:'sight', address:'1 Kinkakujicho, Kita-ku', lat:35.0394, lng:135.7292, notes:'El templo dorado más fotografiado de Japón. Llega a las 9h cuando abre. El reflejo en el lago es perfecto.', tags:['dorado','templo','lago'], price:'mid', best_time:'mañana', visits:1389 },
+      { title:'Nishiki Market', type:'food', address:'Nishiki Market, Nakagyo-ku', lat:35.0050, lng:135.7647, notes:'La cocina de Kioto. 100 puestos de tsukemono, tofu, mochi y wagashi. El mercado cubierto más delicioso.', tags:['mercado','tsukemono','wagashi'], price:'low', best_time:'mediodía', visits:934 },
+      { title:'Ryoan-ji Garden', type:'sight', address:'13 Ryoanjigoranokacho, Ukyo-ku', lat:35.0345, lng:135.7182, notes:'El jardín zen de piedra más famoso del mundo. 15 piedras de las que nunca puedes ver todas a la vez.', tags:['zen','piedras','meditación'], price:'mid', best_time:'mañana', visits:789 },
+      { title:'Kaiseki dinner en Pontocho', type:'food', address:'Pontocho, Nakagyo-ku', lat:35.0063, lng:135.7700, notes:'El callejón de restaurantes a orillas del río Kamo. La cocina kaiseki de temporada es la cumbre japonesa.', tags:['kaiseki','pontocho','río'], price:'high', best_time:'noche', visits:567 },
+      { title:'Philosopher\'s Path', type:'sight', address:'Tetsugaku-no-michi, Sakyo-ku', lat:35.0267, lng:135.7933, notes:'El camino del filósofo junto al canal. En primavera con los cerezos en flor es el lugar más bonito del mundo.', tags:['canal','sakura','filosofía'], price:'low', best_time:'mañana', visits:867 },
+    ],
+
+    'Hiroshima': [
+      { title:'Parque y Museo de la Paz', type:'sight', address:'1-2 Nakajimacho, Naka-ku', lat:34.3955, lng:132.4534, notes:'El lugar más importante para entender el mundo moderno. El museo es desgarrador y necesario.', tags:['paz','historia','museo'], price:'low', best_time:'mañana', visits:1234 },
+      { title:'Cúpula de la Bomba Atómica', type:'sight', address:'1-10 Otemachi, Naka-ku', lat:34.3955, lng:132.4534, notes:'El único edificio que sobrevivió al epicentro. UNESCO. El símbolo más poderoso del siglo XX.', tags:['UNESCO','historia','epicentro'], price:'low', best_time:'tarde', visits:1456 },
+      { title:'Isla de Miyajima', type:'sight', address:'Miyajimacho, Hatsukaichi', lat:34.2996, lng:132.3197, notes:'El torii flotante en el agua es una de las imágenes más bonitas de Japón. Con la marea alta es mágico.', tags:['torii','isla','flotante'], price:'mid', best_time:'tarde', visits:1123 },
+      { title:'Okonomiyaki en Okonomi-mura', type:'food', address:'9-6 Shintenchi, Naka-ku', lat:34.3965, lng:132.4562, notes:'El edificio de 3 plantas dedicado al okonomiyaki de Hiroshima. La versión local (con fideos soba) es la mejor.', tags:['okonomiyaki','local','soba'], price:'low', best_time:'mediodía', visits:789 },
+    ],
   },
 
   'Colombia': {
@@ -171,6 +200,25 @@ export const SEED_SPOTS = {
       { title:'Playa Cabo San Juan', type:'sight', address:'Parque Tayrona, Magdalena', lat:11.3278, lng:-74.0447, notes:'La playa más impresionante del Caribe colombiano. 2h de caminata. Las palmas sobre el agua son icónicas.', tags:['playa','caribe','palmas'], price:'low', best_time:'mañana', visits:878 },
       { title:'Sendero Pueblito Chairama', type:'activity', address:'Parque Tayrona, Magdalena', lat:11.3283, lng:-74.0372, notes:'El sendero a las ruinas taironas en la selva. 4h ida y vuelta.', tags:['ruinas','selva','taironas'], price:'low', best_time:'mañana', visits:567 },
       { title:'Playa Cristal', type:'sight', address:'Parque Tayrona, Magdalena', lat:11.3192, lng:-74.0575, notes:'La playa más cristalina del parque. Solo accesible en lancha. Agua turquesa y coral vivo.', tags:['cristalina','turquesa','lancha'], price:'mid', best_time:'mañana', visits:389 },
+    ],
+
+    'Bogotá': [
+      { title:'Monserrate al amanecer', type:'sight', address:'Cerro de Monserrate, Bogotá', lat:4.6053, lng:-74.0557, notes:'El cerro tutelar de Bogotá. Teleférico o funicular. Las vistas de la sabana son impresionantes.', tags:['teleférico','vistas','cerro'], price:'mid', best_time:'mañana', visits:934 },
+      { title:'La Candelaria', type:'sight', address:'La Candelaria, Bogotá', lat:4.5971, lng:-74.0752, notes:'El centro histórico colonial. El Museo del Oro y la Plaza de Bolívar. Los murales de las calles son art.', tags:['colonial','murales','historia'], price:'low', best_time:'mañana', visits:789 },
+      { title:'Museo del Oro', type:'sight', address:'Cra. 6 #15-88, La Candelaria', lat:4.6009, lng:-74.0737, notes:'La colección de oro precolombino más grande del mundo. La sala central con el Muisca es alucinante.', tags:['oro','precolombino','muisca'], price:'low', best_time:'mañana', visits:867 },
+      { title:'Usaquén', type:'sight', address:'Usaquén, Bogotá', lat:4.6964, lng:-74.0313, notes:'El barrio colonial más bonito. El mercado de pulgas los domingos es perfecto.', tags:['colonial','mercado','domingo'], price:'mid', best_time:'tarde', visits:678 },
+      { title:'Andres Carne de Res', type:'food', address:'Cra. 3 #11A-56, Chía', lat:4.8676, lng:-74.0308, notes:'El restaurante/discoteca más famoso de Colombia. El concepto de comida+fiesta más loco que verás.', tags:['discoteca','comida','experiencia'], price:'mid', best_time:'noche', visits:756 },
+      { title:'Zona Rosa / Parque 93', type:'sight', address:'Zona Rosa, Bogotá', lat:4.6640, lng:-74.0536, notes:'El centro gastronómico y de ocio. Los mejores restaurantes de la ciudad se concentran aquí.', tags:['gastronomía','restaurantes','ocio'], price:'high', best_time:'noche', visits:589 },
+      { title:'Mercado de Paloquemao', type:'food', address:'Cra. 25 #16-60, Bogotá', lat:4.6203, lng:-74.0916, notes:'El mercado más auténtico de Bogotá. Frutas tropicales que no conocías y desayunos a 2€.', tags:['mercado','frutas','local'], price:'low', best_time:'mañana', visits:534 },
+    ],
+
+    'Cartagena': [
+      { title:'Ciudad Amurallada al atardecer', type:'sight', address:'Centro Histórico, Cartagena', lat:10.4236, lng:-75.5498, notes:'Las murallas del siglo XVI al atardecer con el sol naranja sobre el Caribe. Imagen perfecta.', tags:['murallas','sunset','colonial'], price:'low', best_time:'tarde', visits:1234 },
+      { title:'Getsemaní', type:'sight', address:'Getsemaní, Cartagena', lat:10.4261, lng:-75.5548, notes:'El barrio más auténtico y colorido. Los murales de las calles son arte de primer nivel. De día y de noche.', tags:['murales','colorido','barrio'], price:'low', best_time:'tarde', visits:934 },
+      { title:'Islas del Rosario en barco', type:'activity', address:'Embarcadero turístico, Cartagena', lat:10.4169, lng:-75.5567, notes:'El archipiélago de coral más bonito del Caribe colombiano. Día de playa y snorkel a 1h en barco.', tags:['islas','snorkel','caribe'], price:'mid', best_time:'mañana', visits:867 },
+      { title:'Castillo de San Felipe de Barajas', type:'sight', address:'Manga, Cartagena', lat:10.4214, lng:-75.5380, notes:'La fortaleza española más imponente de América. Los túneles subterráneos son fascinantes.', tags:['fortaleza','historia','túneles'], price:'mid', best_time:'mañana', visits:789 },
+      { title:'Palenque de San Basilio', type:'activity', address:'Palenque, Mahates (30min de Cartagena)', lat:10.2380, lng:-75.2540, notes:'El primer pueblo libre de esclavos de América. La cultura y la música afro-colombiana en estado puro.', tags:['afro','historia','música'], price:'mid', best_time:'tarde', visits:456 },
+      { title:'La Cevichería', type:'food', address:'C. Stuart 7-14, Centro Histórico', lat:10.4237, lng:-75.5499, notes:'El ceviche más famoso de Cartagena. La langosta con leche de tigre es imprescindible.', tags:['ceviche','langosta','famoso'], price:'high', best_time:'mediodía', visits:678 },
     ],
   },
 
@@ -373,6 +421,21 @@ export const SEED_SPOTS = {
       { title:'Hammam tradicional', type:'activity', address:'Medina, Marrakech', lat:31.6290, lng:-7.9890, notes:'El baño árabe tradicional. El hammam del barrio (4-8€) es muy diferente al turístico.', tags:['hammam','baño','tradicional'], price:'low', best_time:'tarde', visits:456 },
       { title:'Palais Bahia', type:'sight', address:'Rue Riad Zitoun el Jadid', lat:31.6193, lng:-7.9836, notes:'El palacio con jardines de naranjos y mosaicos. Una obra preciosa de arquitectura árabe.', tags:['palacio','mosaicos','naranjos'], price:'mid', best_time:'tarde', visits:534 },
     ],
+
+    'Fez': [
+      { title:'Tanneries Chouara', type:'sight', address:'Hay el Andalous, Fez el-Bali', lat:34.0630, lng:-4.9727, notes:'Las tenerías medievales más fotogénicas del mundo. Sube a cualquier tienda de cuero para verlas desde arriba.', tags:['tenerías','cuero','medieval'], price:'low', best_time:'mañana', visits:1023 },
+      { title:'Medina de Fez (Fes el-Bali)', type:'sight', address:'Fes el-Bali, Fez', lat:34.0631, lng:-4.9733, notes:'La medina medieval más grande e intacta del mundo. UNESCO. Perderse por sus 9.000 callejones es el plan.', tags:['UNESCO','medina','laberinto'], price:'low', best_time:'mañana', visits:1234 },
+      { title:'Madrasa Bou Inania', type:'sight', address:'Talaa Kbira, Fes el-Bali', lat:34.0655, lng:-4.9745, notes:'La madrasa más ornamentada de Marruecos. Azulejos, yeso tallado y madera de cedro. Arte islámico puro.', tags:['madrasa','arte islámico','azulejos'], price:'low', best_time:'tarde', visits:789 },
+      { title:'Restaurante Ruined Garden', type:'food', address:'Souiket Ben Safi 15, Fez', lat:34.0619, lng:-4.9729, notes:'El restaurante con terraza en un jardín en ruinas. La mejor pastilla de paloma de Marruecos.', tags:['pastilla','terraza','jardín'], price:'mid', best_time:'mediodía', visits:456 },
+      { title:'Colina Borj Nord al atardecer', type:'sight', address:'Borj Nord, Fez', lat:34.0730, lng:-4.9737, notes:'Las mejores vistas panorámicas de Fez. Los mil minaretes al atardecer. Acceso libre.', tags:['vistas','minaretes','sunset'], price:'low', best_time:'tarde', visits:567 },
+    ],
+
+    'Chefchaouen': [
+      { title:'Barrio azul al amanecer', type:'sight', address:'Medina, Chefchaouen', lat:35.1688, lng:-5.2636, notes:'La ciudad azul más fotogénica del mundo. Las calles azules sin turistas es el mejor plan. Llega antes de las 7h.', tags:['azul','amanecer','fotogénico'], price:'low', best_time:'mañana', visits:1456 },
+      { title:'Plaza Uta el-Hammam', type:'sight', address:'Plaza Uta el-Hammam, Chefchaouen', lat:35.1702, lng:-5.2640, notes:'El corazón de la ciudad. Los cafés de la plaza con vistas a la kasbah y los gatos azules.', tags:['plaza','kasbah','gatos'], price:'low', best_time:'tarde', visits:934 },
+      { title:'Cascada Ras el-Maa', type:'sight', address:'Ras el-Maa, Chefchaouen', lat:35.1741, lng:-5.2591, notes:'La cascada junto al lavadero tradicional. A 10 minutos a pie del centro. Las mujeres lavan ropa aquí.', tags:['cascada','tradicional','lavadero'], price:'low', best_time:'mañana', visits:678 },
+      { title:'Senderismo a la mezquita española', type:'activity', address:'Mezquita Española, Chefchaouen', lat:35.1654, lng:-5.2601, notes:'30 minutos de subida por el bosque de cedros. Las vistas de la ciudad azul desde arriba son únicas.', tags:['senderismo','cedros','vistas'], price:'low', best_time:'tarde', visits:789 },
+    ],
   },
 
   'Costa Rica': {
@@ -469,6 +532,15 @@ export const SEED_SPOTS = {
       { title:'Templo de Filae', type:'sight', address:'Isla de Filae, Asuán', lat:24.0244, lng:32.8882, notes:'El templo de la diosa Isis en una isla del Nilo. Acceso solo en barca.', tags:['filae','isis','isla'], price:'mid', best_time:'tarde', visits:1123 },
       { title:'Mercado de Asuán', type:'shopping', address:'Aswan Souk, Asuán', lat:24.0889, lng:32.8998, notes:'El zoco más auténtico de Egipto, menos turístico que El Cairo. Especias nubias y aceites.', tags:['zoco','nubio','especias'], price:'low', best_time:'tarde', visits:756 },
       { title:'Aldea Nubia', type:'sight', address:'Gharb Soheil, Asuán', lat:24.0514, lng:32.8600, notes:'Casas de colores a orillas del Nilo. La cultura nubia es completamente diferente al Egipto árabe.', tags:['nubia','colores','cocodrilo'], price:'low', best_time:'tarde', visits:834 },
+    ],
+
+    'Luxor': [
+      { title:'Valle de los Reyes', type:'sight', address:'Valle de los Reyes, Luxor', lat:25.7402, lng:32.6014, notes:'Las tumbas de los faraones. La tumba de Tutankamón cuesta extra pero vale mucho. Llega a las 6h antes del calor.', tags:['faraones','tumbas','Tutankamón'], price:'mid', best_time:'mañana', visits:1234 },
+      { title:'Templo de Karnak', type:'sight', address:'Karnak, Luxor', lat:25.7188, lng:32.6573, notes:'El complejo de templos más grande del mundo antiguo. La Avenida de las Esfinges al atardecer es mágica.', tags:['templo','esfinges','faraónico'], price:'mid', best_time:'tarde', visits:1123 },
+      { title:'Templo de Luxor de noche', type:'sight', address:'Corniche el-Nil, Luxor', lat:25.6997, lng:32.6392, notes:'El templo iluminado de noche junto al Nilo es la imagen más bonita de Egipto. Entrada barata por la noche.', tags:['nocturno','iluminado','Nilo'], price:'low', best_time:'noche', visits:934 },
+      { title:'Cruzar el Nilo en faluca', type:'activity', address:'Orilla Este, Luxor', lat:25.6867, lng:32.6392, notes:'La faluca (velero tradicional) al atardecer es la manera más bonita de ver Luxor. Negocia el precio (5-10€).', tags:['Nilo','faluca','atardecer'], price:'low', best_time:'tarde', visits:789 },
+      { title:'Templo de Hatshepsut', type:'sight', address:'Deir el-Bahari, Luxor', lat:25.7380, lng:32.6074, notes:'El templo de la única faraona. La arquitectura de terrazas talladas en la montaña es impresionante.', tags:['Hatshepsut','faraona','terrazas'], price:'mid', best_time:'mañana', visits:867 },
+      { title:'Mercado de Luxor (Souq)', type:'shopping', address:'Souq, Luxor', lat:25.6990, lng:32.6458, notes:'El mercado local donde compran los egipcios. Especias, telas y papiros. Negocia todo a la mitad.', tags:['souq','especias','papiros'], price:'low', best_time:'tarde', visits:534 },
     ],
   },
 
