@@ -136,24 +136,24 @@ function OTabBar({ tabs, activeKey, onChange }) {
 // ── Lang selector row ─────────────────────────────────────────────────────────
 function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
   return (
-    <div className="flex items-center gap-2 bg-white rounded-2xl border border-border p-3">
+    <div className="flex items-center gap-2 py-1">
       <select
         value={fromLang}
         onChange={e => onFromChange(e.target.value)}
-        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-secondary outline-none focus:border-primary appearance-none"
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
       >
         {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
       </select>
       <button
         onClick={onSwap}
-        className="p-2 rounded-xl border border-border bg-secondary hover:bg-orange-50 hover:border-primary/30 transition-colors flex-shrink-0"
+        className="p-2 rounded-xl border border-border bg-white hover:bg-orange-50 hover:border-primary/30 transition-colors flex-shrink-0"
       >
         <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
       </button>
       <select
         value={toLang}
         onChange={e => onToChange(e.target.value)}
-        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-secondary outline-none focus:border-primary appearance-none"
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
       >
         {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
       </select>
@@ -223,24 +223,45 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
 // ── Voice tab ─────────────────────────────────────────────────────────────────
 function VozTab({ fromLang, toLang, onSaveToHistory }) {
   const [recording, setRecording] = useState(false);
+  const [interim, setInterim]     = useState('');
   const [error, setError]         = useState('');
   const [result, setResult]       = useState({ original: '', translated: '' });
   const recognitionRef            = useRef(null);
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
+  const pendingTextRef = useRef('');
+
+  const doTranslate = async (text) => {
+    if (!text.trim()) return;
+    try {
+      if (fromLang === toLang) {
+        setResult({ original: text, translated: text });
+      } else {
+        const translation = await translateText(text, fromL.code, toL.code);
+        setResult({ original: text, translated: translation });
+        if (translation) speakText(translation, toL.bcp);
+      }
+    } catch {
+      setError('No se pudo traducir. Comprueba tu conexión.');
+    }
+  };
+
   const toggleRecording = () => {
-    // If recording → stop
+    // STOP: save what we have and translate
     if (recording) {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
-        recognitionRef.current = null;
       }
-      setRecording(false);
+      // translate whatever we captured (interim or final)
+      if (pendingTextRef.current.trim()) {
+        doTranslate(pendingTextRef.current);
+        pendingTextRef.current = '';
+      }
       return;
     }
 
-    // Start recording
+    // START
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
       setError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.');
@@ -248,11 +269,13 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
     }
     setError('');
     setResult({ original: '', translated: '' });
+    setInterim('');
+    pendingTextRef.current = '';
 
     const recognition = new SR();
     recognitionRef.current = recognition;
     recognition.lang = fromL.bcp;
-    recognition.continuous = true;    // keep listening until user stops
+    recognition.continuous = true;
     recognition.interimResults = true;
 
     recognition.onstart = () => setRecording(true);
@@ -265,28 +288,24 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
     recognition.onerror = e => {
       recognitionRef.current = null;
       setRecording(false);
-      if (e.error === 'not-allowed') setError('Permiso de micrófono denegado. Actívalo en la configuración del navegador.');
+      if (e.error === 'not-allowed') setError('Permiso de micrófono denegado.');
       else if (e.error === 'no-speech') setError('No se detectó voz. Inténtalo de nuevo.');
       else if (e.error === 'aborted') return;
       else setError('Error al grabar. Inténtalo de nuevo.');
     };
 
-    recognition.onresult = async e => {
-      const results = Array.from(e.results);
-      const lastResult = results[results.length - 1];
-      if (!lastResult.isFinal) return;
-      const text = lastResult[0].transcript;
-      try {
-        if (fromLang === toLang) {
-          setResult({ original: text, translated: text });
-        } else {
-          const translation = await translateText(text, fromL.code, toL.code);
-          setResult({ original: text, translated: translation });
-          if (translation) speakText(translation, toL.bcp);
-        }
-      } catch {
-        setError('No se pudo traducir. Comprueba tu conexión.');
+    recognition.onresult = e => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t;
+        else interim += t;
       }
+      // accumulate finals
+      if (final) pendingTextRef.current += ' ' + final;
+      // show live what is being said
+      setInterim(pendingTextRef.current + interim);
     };
 
     try { recognition.start(); }
@@ -335,6 +354,9 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
               <div className="w-6 h-6 bg-white rounded-md" />
             </div>
             <p className="text-sm font-medium text-white">Grabando · pulsa para parar</p>
+            {interim && (
+              <p className="text-xs text-white/80 text-center max-w-xs leading-relaxed">{interim}</p>
+            )}
           </>
         ) : (
           <>
