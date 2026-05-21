@@ -66,24 +66,36 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
         level: data.visa.needed ? 'required' : 'ok',
       });
     }
-    if (data?.adapter?.needed) reqs.push({
-      id: `${country}-adapter`, type: 'tech', country,
-      title: `Adaptador ${data.adapter.type || ''}`,
-      description: data.adapter.info,
-      level: 'required'
-    });
+    // Adapter: compare home plug type vs destination plug type
+    if (data?.adapter?.needed) {
+      const homePacking = COUNTRY_REQUIREMENTS[originCountry] || COUNTRY_REQUIREMENTS['España'] || {};
+      const homeAdapterNeeded = homePacking?.adapter?.needed !== false;
+      // If home country also needs adapter (i.e. same incompatibility situation), or home uses same standard
+      // Key insight: if home.adapter.needed === false, home uses EU standard (C/F)
+      // If dest.adapter.needed === true, dest uses different standard — user needs one
+      // Exception: if home.adapter.needed === true, user is already from non-EU → may already have adapters
+      reqs.push({
+        id: `${country}-adapter`, type: 'tech', country,
+        title: `Adaptador ${data.adapter.type || ''}`,
+        description: data.adapter.info,
+        level: 'required'
+      });
+    }
     if (data?.currency?.info) reqs.push({
       id: `${country}-currency`, type: 'money', country,
       title: 'Moneda y pagos',
       description: data.currency.info,
       level: 'info'
     });
-    (data?.vaccines || []).forEach((v, i) => reqs.push({
-      id: `${country}-vax-${i}`, type: 'vaccine', country,
-      title: `Vacuna: ${v.name}`,
-      description: v.priority,
-      level: v.priority?.includes('requer') ? 'required' : 'recommended'
-    }));
+    (data?.vaccines || []).forEach((v, i) => {
+      const isRequired = v.priority?.includes('requer');
+      reqs.push({
+        id: `${country}-vax-${i}`, type: 'vaccine', country,
+        title: `${v.name}`,
+        description: v.priority,
+        level: isRequired ? 'required' : 'info', // recommended = info only, not checkable
+      });
+    });
     (data?.tips || []).forEach((tip, i) => reqs.push({
       id: `${country}-tip-${i}`, type: 'safety', country,
       title: tip, description: '', level: 'info'
@@ -398,10 +410,10 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           {hasContent && (
             <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>
           )}
-          {isToday_ && weather && (
-            <span className="text-xs text-muted-foreground shrink-0 ml-1">{WMO_EMOJI[weather.code] || '🌡️'} {weather.temp}°</span>
-          )}
         </div>
+        {isToday_ && weather && (
+          <span className="text-sm shrink-0 mr-1">{WMO_EMOJI[weather.code] || '🌡️'} <span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>
+        )}
         {open
           ? <ChevronUp   className="w-4 h-4 text-muted-foreground shrink-0" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
@@ -606,37 +618,56 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           {(() => {
             const GROUPS = [
               { key: 'visa',    label: 'Visados',      types: ['visa'] },
-              { key: 'health',  label: 'Salud',        types: ['vaccine'] },
+              { key: 'vaccine', label: 'Salud',        types: ['vaccine'] },
               { key: 'tech',    label: 'Equipamiento', types: ['tech'] },
               { key: 'money',   label: 'Dinero',       types: ['money'] },
-              { key: 'safety',  label: 'Consejos',     types: ['safety'] },
-              { key: 'other',   label: 'Otros',        types: ['ok', 'custom'] },
+              { key: 'safety',  label: 'Consejos',     types: ['safety', 'info'] },
             ];
             return GROUPS.map(group => {
               const items = actionableReqs.filter(r => group.types.includes(r.type));
               if (!items.length) return null;
               return (
                 <div key={group.key}>
-                  <p className="px-4 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider bg-secondary/40 border-b border-border">{group.label}</p>
-                  {items.map(req => (
-                    <button key={req.id} onClick={() => toggleCheck(req.id)}
-                      className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/30 transition-colors text-left">
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                        {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+                  {/* Ō category header */}
+                  <div className="flex flex-col gap-1 px-4 py-2 bg-secondary/30 border-b border-border">
+                    <div style={{height:2.5,width:24,background:'#c2410c',borderRadius:2}} />
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                  </div>
+                  {items.map(req => {
+                    const isInfo = req.level === 'info';
+                    const isCheckable = !isInfo;
+                    return isCheckable ? (
+                      <button key={req.id} onClick={() => toggleCheck(req.id)}
+                        className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                          checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'
+                        }`}>
+                          {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                        <span className="text-base shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                            {req.title}{allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
+                          </p>
+                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                        </div>
+                        {req.level === 'required' && !checkedItems[req.id] && (
+                          <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium shrink-0">!</span>
+                        )}
+                      </button>
+                    ) : (
+                      <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
+                        <span className="text-base shrink-0 mt-0.5">{REQ_ICONS[req.type] || 'ℹ️'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground leading-tight">{req.title}
+                            {allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
+                          </p>
+                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                        </div>
+                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">recomendado</span>
                       </div>
-                      <span className="text-lg shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                          {req.title}
-                          {allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
-                        </p>
-                        {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
-                      </div>
-                      {req.level === 'required' && !checkedItems[req.id] && (
-                        <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full shrink-0 font-medium">!</span>
-                      )}
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               );
             });
@@ -1636,7 +1667,7 @@ export default function Home() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header — light option D */}
-      <div className="bg-background border-b border-border sticky top-0 z-20">
+      <div className="bg-background sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
 
           {/* Top row */}
