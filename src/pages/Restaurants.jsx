@@ -41,24 +41,34 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng) {
-  const params = new URLSearchParams({
-    format: 'json', limit: 15, addressdetails: 1,
-    viewbox: `${lng-0.015},${lat+0.015},${lng+0.015},${lat-0.015}`,
-    bounded: 1, q: 'restaurant cafe bar museum attraction hotel'
-  });
-  const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
-    headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' },
-    signal: AbortSignal.timeout(10000)
-  });
-  if (!res.ok) throw new Error('nominatim failed');
-  const data = await res.json();
-  return data.filter(el => el.display_name).map(el => ({
-    id: el.place_id?.toString(),
-    name: el.name || el.display_name?.split(',')[0],
-    address: el.display_name?.split(',').slice(1, 3).join(',').trim() || '',
-    lat: parseFloat(el.lat), lng: parseFloat(el.lon),
-    type: osmToType(el.type || el.class || '', ''),
-  })).slice(0, 12);
+  const viewbox = `${lng-0.02},${lat+0.02},${lng+0.02},${lat-0.02}`;
+  const categories = ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction'];
+  const seen = new Set();
+  const results = [];
+  await Promise.all(categories.map(async cat => {
+    try {
+      const params = new URLSearchParams({ format:'json', limit:5, addressdetails:1, namedetails:1, viewbox, bounded:1, q:cat });
+      const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
+        headers: { 'Accept-Language':'es,en', 'User-Agent':'KodoTravelApp/1.0' },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      data.forEach(el => {
+        const name = el.namedetails?.name || el.name || el.display_name?.split(',')[0];
+        if (!name || seen.has(el.place_id)) return;
+        seen.add(el.place_id);
+        results.push({
+          id: el.place_id?.toString(), name,
+          address: [el.address?.road, el.address?.city || el.address?.town || el.address?.suburb].filter(Boolean).join(', ') || '',
+          lat: parseFloat(el.lat), lng: parseFloat(el.lon),
+          type: osmToType(el.type || el.class || cat, cat),
+        });
+      });
+    } catch {}
+  }));
+  if (results.length === 0) throw new Error('no results nearby');
+  return results.slice(0, 15);
 }
 
 async function reverseGeocode(lat, lng) {
@@ -279,7 +289,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
   const defaultLng = pinLng || 139.6503;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
         {/* Handle + header — fixed */}
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
@@ -444,7 +454,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
+      <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
         <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
           <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
@@ -715,7 +725,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: 'calc(75vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
@@ -907,7 +917,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
   return (
     <>
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
         <div className="flex-shrink-0">
@@ -1419,7 +1429,7 @@ export default function Restaurants() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
+      <div className="bg-background sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
@@ -1436,16 +1446,12 @@ export default function Restaurants() {
           <h1 className="text-2xl font-semibold text-foreground mb-4">Spots</h1>
           <div className="flex border-b border-border">
             {[
-              ['buscar', 'Buscar', '🔍'],
-              ['mis', 'Mis spots', '📍'],
-              ['comunidad', 'Comunidad', '🌍'],
-            ].map(([k, l, emoji]) => (
+              ['buscar','Buscar'],['mis','Mis spots'],['comunidad','Comunidad'],
+            ].map(([k,l]) => (
               <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${
-                  tab === k ? 'border-primary' : 'border-transparent'
-                }`}>
-                <span className="text-base leading-none">{emoji}</span>
-                <span className={`text-xs font-medium leading-none ${tab === k ? 'text-primary' : 'text-muted-foreground'}`}>{l}</span>
+                className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
+                <div style={{height:3,borderRadius:2,background:tab===k?'#c2410c':'transparent',width:tab===k?Math.min(l.length*7,60):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
+                <span style={{fontSize:12,fontWeight:500,color:tab===k?'#1a1714':'#a09890',transition:'color .2s'}}>{l}</span>
               </button>
             ))}
           </div>
