@@ -778,7 +778,7 @@ export default function Expenses() {
   return (
     <div className="bg-background min-h-screen">
       {/* ── Header — same pattern as Restaurants/Translator/Documents ── */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
+      <div className="bg-background sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
@@ -792,14 +792,12 @@ export default function Expenses() {
             </button>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
-          <div className="flex border-b border-border">
-            {[['gastos','💸','Gastos'],['balances','⚖️','Balances'],['stats','📊','Stats']].map(([k, em, l]) => (
+          <div className="flex">
+            {[['gastos','Gastos'],['balances','Balances'],['stats','Stats']].map(([k,l]) => (
               <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${
-                  tab === k ? 'border-primary' : 'border-transparent'
-                }`}>
-                <span className="text-base leading-none">{em}</span>
-                <span className={`text-xs font-medium leading-none ${tab === k ? 'text-primary' : 'text-muted-foreground'}`}>{l}</span>
+                className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
+                <div style={{height:3,borderRadius:2,background:tab===k?'#c2410c':'transparent',width:tab===k?Math.min(l.length*8,64):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
+                <span style={{fontSize:12,fontWeight:500,color:tab===k?'#1a1714':'#a09890',transition:'color .2s'}}>{l}</span>
               </button>
             ))}
           </div>
