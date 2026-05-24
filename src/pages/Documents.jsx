@@ -333,8 +333,6 @@ export default function Documents() {
               activeKey={catFilter}
               onChange={setCatFilter}
             />
-          </div>
-        </div>
       </div>
 
       {/* List */}
