@@ -129,19 +129,22 @@ function lookupCountry(countryName) {
 }
 
 export function getTripCoverImage(trip, cities = []) {
-  // cover_image skipped — may be stale. Always compute from cities/country.
+  // 1. Cities (sorted by order) — try city image and city's country
   if (cities.length > 0) {
     const sorted = [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const city of sorted) {
       if (city.image_url) return city.image_url;
-      const img = lookupCity(city.name);
+      const img = lookupCity(city.name) || lookupCountry(city.country);
       if (img) return img;
     }
   }
+  // 2. Trip country field
   const countryImg = lookupCountry(trip?.country) || lookupCountry(trip?.destination);
   if (countryImg) return countryImg;
-  const destImg = lookupCity(trip?.destination);
-  if (destImg) return destImg;
+  // 3. Trip name or destination as city/country lookup
+  const nameImg = lookupCity(trip?.name) || lookupCountry(trip?.name) || lookupCity(trip?.destination);
+  if (nameImg) return nameImg;
+  // 4. Deterministic fallback from trip id
   if (trip?.id) {
     const idx = trip.id.charCodeAt(0) % FALLBACK_IMAGES.length;
     return unsplashUrl(FALLBACK_IMAGES[idx]);
