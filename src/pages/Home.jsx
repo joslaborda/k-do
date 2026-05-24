@@ -24,7 +24,7 @@ import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
-function OTabBar({ tabs, activeKey, onChange }) {
+function OTabBar({ tabs, activeKey, onChange, chatBadge }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
   const [mounted, setMounted] = useState(false);
@@ -85,9 +85,17 @@ function OTabBar({ tabs, activeKey, onChange }) {
                 color: isOn ? '#1a1714' : '#a09890',
                 transition: 'color 0.2s',
                 lineHeight: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
               }}
             >
               {tab.label}
+              {tab.key === 'chat' && chatBadge > 0 && (
+                <span style={{width:16,height:16,borderRadius:'50%',background:'#ef4444',color:'white',fontSize:9,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  {chatBadge > 9 ? '9+' : chatBadge}
+                </span>
+              )}
             </span>
           </button>
         );
@@ -464,15 +472,16 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   };
 
   return (
-    <div className={`bg-white rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
+    <div className={`bg-white rounded-2xl border overflow-hidden ${'border-border'}`}>
       {/* Header row */}
       <button
         onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}
+        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50/60 hover:bg-orange-50' : 'bg-secondary/30 hover:bg-secondary/50'}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
-            {label}
+          <span className="shrink-0 flex flex-col items-start gap-0.5">
+            {isToday_ && <div style={{height:2.5,width:20,background:'#c2410c',borderRadius:2}} />}
+            <span className={`text-xs font-medium uppercase tracking-wider ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
           </span>
           <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
           {dateStr && (
