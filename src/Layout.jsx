@@ -150,26 +150,22 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
           <div className="mx-3 mb-3">
-            <nav className="bg-[#1a1714] rounded-[20px] px-2 py-1.5 flex items-center justify-around">
+            <nav className="bg-white border border-[#e8e3dc] rounded-2xl px-1 flex items-center justify-around shadow-sm">
               {showTripNav && mainNavItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 return (
                   <Link
                     key={item.page}
                     to={tripUrl(item.page)}
-                    className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl transition-colors flex-1 ${
-                      isActive ? 'bg-white/10' : ''
-                    }`}
+                    className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
                   >
+                    <div style={{height:3,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                     <item.icon
-                      className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                        isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'
-                      }`}
-                      strokeWidth={isActive ? 2.5 : 2}
+                      className="w-5 h-5 flex-shrink-0 transition-colors"
+                      style={{color: isActive ? '#1a1714' : '#a09890'}}
+                      strokeWidth={isActive ? 2 : 1.75}
                     />
-                    <span className={`text-[9px] font-medium transition-colors ${
-                      isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'
-                    }`}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#1a1714' : '#a09890'}}>
                       {item.name}
                     </span>
                   </Link>
@@ -180,19 +176,15 @@ export default function Layout({ children, currentPageName }) {
               {showTripNav && (
                 <button
                   onClick={() => setDrawerOpen(o => !o)}
-                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl transition-colors flex-1 ${
-                    drawerOpen || isDrawerPageActive ? 'bg-white/10' : ''
-                  }`}
+                  className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
                 >
+                  <div style={{height:3,borderRadius:2,background:(drawerOpen||isDrawerPageActive)?'#c2410c':'transparent',width:(drawerOpen||isDrawerPageActive)?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   <MoreHorizontal
-                    className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                      drawerOpen || isDrawerPageActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'
-                    }`}
-                    strokeWidth={drawerOpen || isDrawerPageActive ? 2.5 : 2}
+                    className="w-5 h-5 flex-shrink-0 transition-colors"
+                    style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}
+                    strokeWidth={1.75}
                   />
-                  <span className={`text-[9px] font-medium transition-colors ${
-                    drawerOpen || isDrawerPageActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'
-                  }`}>
+                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}>
                     Más
                   </span>
                 </button>
@@ -205,15 +197,15 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.page}
                     to={createPageUrl(item.page)}
-                    className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-2xl transition-colors flex-1 ${
-                      isActive ? 'bg-white/10' : ''
-                    }`}
+                    className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
                   >
+                    <div style={{height:3,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                     <item.icon
-                      className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}
-                      strokeWidth={isActive ? 2.5 : 2}
+                      className="w-5 h-5 flex-shrink-0"
+                      style={{color: isActive ? '#1a1714' : '#a09890'}}
+                      strokeWidth={isActive ? 2 : 1.75}
                     />
-                    <span className={`text-[9px] font-medium ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#1a1714' : '#a09890'}}>
                       {item.name}
                     </span>
                   </Link>
@@ -226,7 +218,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* ── Side Navigation Desktop ──────────────────────────────────────── */}
       {showNav && (showTripNav || showGlobalNav) && (
-        <nav className="fixed left-0 top-0 bottom-0 w-16 bg-[#1a1714] hidden md:flex flex-col items-center py-8 z-50">
+        <nav className="fixed left-0 top-0 bottom-0 w-16 bg-white border-r border-[#e8e3dc] hidden md:flex flex-col items-center py-8 z-50">
           <Link
             to={createPageUrl('TripsList')}
             className="text-2xl mb-8 hover:scale-110 transition-transform"
