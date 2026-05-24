@@ -12,6 +12,79 @@ import { createNotification } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 
+function OTabBar({ tabs, activeKey, onChange }) {
+  const containerRef = useRef(null);
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  const updateLine = useCallback(() => {
+    if (!containerRef.current) return;
+    const idx = tabs.findIndex(t => t.key === activeKey);
+    const buttons = containerRef.current.querySelectorAll('button');
+    const btn = buttons[idx];
+    if (!btn) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const labelEl = btn.querySelector('.tab-label');
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    setLineStyle({
+      left: labelRect.left - containerRect.left,
+      width: labelRect.width,
+    });
+  }, [activeKey, tabs]);
+
+  useEffect(() => {
+    updateLine();
+    if (!mounted) setTimeout(() => setMounted(true), 50);
+  }, [updateLine, mounted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex border-b border-border bg-white"
+      style={{ position: 'relative' }}
+    >
+      {/* Animated sliding line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: lineStyle.left,
+          width: lineStyle.width,
+          height: 3,
+          background: '#c2410c',
+          borderRadius: 2,
+          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
+        }}
+      />
+      {tabs.map(tab => {
+        const isOn = tab.key === activeKey;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
+          >
+            <span
+              className="tab-label"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isOn ? '#1a1714' : '#a09890',
+                transition: 'color 0.2s',
+                lineHeight: 1,
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+
 // ── Category config ───────────────────────────────────────────────────────────
 const CAT_CONFIG = {
   food:          { label: 'Comida',      emoji: '🍜' },
@@ -792,15 +865,11 @@ export default function Expenses() {
             </button>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
-          <div className="flex">
-            {[['gastos','Gastos'],['balances','Balances'],['stats','Stats']].map(([k,l]) => (
-              <button key={k} onClick={() => setTab(k)}
-                className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
-                <div style={{height:3,borderRadius:2,background:tab===k?'#c2410c':'transparent',width:tab===k?Math.min(l.length*8,64):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
-                <span style={{fontSize:12,fontWeight:500,color:tab===k?'#1a1714':'#a09890',transition:'color .2s'}}>{l}</span>
-              </button>
-            ))}
-          </div>
+          <OTabBar
+            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},{key:'stats',label:'Stats'}]}
+            activeKey={tab}
+            onChange={setTab}
+          />
         </div>
       </div>
 
