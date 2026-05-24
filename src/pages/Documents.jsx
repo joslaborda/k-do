@@ -334,6 +334,7 @@ export default function Documents() {
               onChange={setCatFilter}
             />
       </div>
+      </div>
 
       {/* List */}
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
