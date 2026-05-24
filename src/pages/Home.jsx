@@ -881,8 +881,8 @@ function FinishedTab({ trip, cities, expenses, spots }) {
     <div className="space-y-3">
       <div className="bg-white rounded-2xl border border-orange-200 p-6 text-center">
         <p className="text-4xl mb-3">🌸</p>
-        <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
-        <p className="text-2xl font-semibold text-primary">{countriesLabel}</p>
+        <p className="text-sm text-muted-foreground mb-1">Viaje completado</p>
+        <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
         {trip?.start_date && trip?.end_date && (
           <p className="text-xs text-muted-foreground mt-2">
             {format(parseISO(trip.start_date), 'dd MMM', { locale: es })} – {format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}
@@ -1746,24 +1746,22 @@ export default function Home() {
             )}
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b border-border">
-            <button onClick={() => handleTabChange('main')}
-              className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${
-                tab === 'main' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
-              }`}>
-              {mainTabLabel}
+          {/* Tabs — Ō system */}
+          <div className="flex">
+            <button onClick={() => handleTabChange('main')} className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
+              <div style={{height:3,borderRadius:2,background:tab==='main'?'#c2410c':'transparent',width:tab==='main'?Math.min(mainTabLabel.length*8,72):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
+              <span style={{fontSize:13,fontWeight:500,color:tab==='main'?'#1a1714':'#a09890',transition:'color .2s'}}>{mainTabLabel}</span>
             </button>
-            <button onClick={() => handleTabChange('chat')}
-              className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 flex items-center justify-center gap-2 ${
-                tab === 'chat' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'
-              }`}>
-              Chat
-              {unreadMessages > 0 && (
-                <span className="w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center leading-none">
-                  {unreadMessages > 9 ? '9+' : unreadMessages}
-                </span>
-              )}
+            <button onClick={() => handleTabChange('chat')} className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
+              <div style={{height:3,borderRadius:2,background:tab==='chat'?'#c2410c':'transparent',width:tab==='chat'?32:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
+              <span className="flex items-center gap-1.5" style={{fontSize:13,fontWeight:500,color:tab==='chat'?'#1a1714':'#a09890',transition:'color .2s'}}>
+                Chat
+                {unreadMessages > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
+                    {unreadMessages > 9 ? '9+' : unreadMessages}
+                  </span>
+                )}
+              </span>
             </button>
           </div>
         </div>
