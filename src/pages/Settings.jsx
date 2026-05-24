@@ -53,10 +53,11 @@ const COUNTRIES = [
   'Saint-Martin','Sint Maarten','Martinica','Guadalupe','Aruba','Curazao','Bermudas',
   'Islas Caimán','Jamaica','Barbados','Trinidad y Tobago','Bahamas','Santa Lucía',
   'Antigua y Barbuda','Granada','Dominica','San Cristóbal y Nieves',
-].map(name => {
-  const m = getCountryMeta(name);
-  return { name, flag: m.flag || '🌍', currency: m.currency || 'USD' };
-}).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(name => {
+].map(n => ({
+  name: String(n),
+  flag: (getCountryMeta(n) || {}).flag || '🌍',
+  currency: (getCountryMeta(n) || {}).currency || 'USD',
+})).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(name => {
   const meta = getCountryMeta(name);
   return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
 }).sort((a, b) => a.name.localeCompare(b.name, 'es'));
