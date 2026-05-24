@@ -239,7 +239,7 @@ export default function Documents() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
+      <div className="bg-background sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
@@ -255,12 +255,12 @@ export default function Documents() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Documentos</h1>
           {/* Category tabs */}
-          <div className="flex border-b border-border">
+          <div className="flex">
             {CAT_TABS.map(tab => (
               <button key={tab.key} onClick={() => setCatFilter(tab.key)}
-                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${catFilter === tab.key ? 'border-primary' : 'border-transparent'}`}>
-                <span className="text-base leading-none">{tab.icon}</span>
-                <span className={`text-xs font-medium leading-none ${catFilter === tab.key ? 'text-primary' : 'text-muted-foreground'}`}>{tab.label}</span>
+                className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
+                <div style={{height:3,borderRadius:2,background:catFilter===tab.key?'#c2410c':'transparent',width:catFilter===tab.key?Math.min(tab.label.length*8,64):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
+                <span style={{fontSize:12,fontWeight:500,color:catFilter===tab.key?'#1a1714':'#a09890',transition:'color .2s'}}>{tab.label}</span>
               </button>
             ))}
           </div>
