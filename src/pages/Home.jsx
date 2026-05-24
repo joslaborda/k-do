@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import PDFViewer from '@/components/PDFViewer';
@@ -23,6 +23,79 @@ import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+
+function OTabBar({ tabs, activeKey, onChange }) {
+  const containerRef = useRef(null);
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  const updateLine = useCallback(() => {
+    if (!containerRef.current) return;
+    const idx = tabs.findIndex(t => t.key === activeKey);
+    const buttons = containerRef.current.querySelectorAll('button');
+    const btn = buttons[idx];
+    if (!btn) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const labelEl = btn.querySelector('.tab-label');
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    setLineStyle({
+      left: labelRect.left - containerRect.left,
+      width: labelRect.width,
+    });
+  }, [activeKey, tabs]);
+
+  useEffect(() => {
+    updateLine();
+    if (!mounted) setTimeout(() => setMounted(true), 50);
+  }, [updateLine, mounted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex border-b border-border bg-white"
+      style={{ position: 'relative' }}
+    >
+      {/* Animated sliding line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: lineStyle.left,
+          width: lineStyle.width,
+          height: 3,
+          background: '#c2410c',
+          borderRadius: 2,
+          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
+        }}
+      />
+      {tabs.map(tab => {
+        const isOn = tab.key === activeKey;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
+          >
+            <span
+              className="tab-label"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isOn ? '#1a1714' : '#a09890',
+                transition: 'color 0.2s',
+                lineHeight: 1,
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡', health:'🏥' };
@@ -1747,23 +1820,15 @@ export default function Home() {
           </div>
 
           {/* Tabs — Ō system */}
-          <div className="flex">
-            <button onClick={() => handleTabChange('main')} className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
-              <div style={{height:3,borderRadius:2,background:tab==='main'?'#c2410c':'transparent',width:tab==='main'?Math.min(mainTabLabel.length*8,72):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
-              <span style={{fontSize:13,fontWeight:500,color:tab==='main'?'#1a1714':'#a09890',transition:'color .2s'}}>{mainTabLabel}</span>
-            </button>
-            <button onClick={() => handleTabChange('chat')} className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
-              <div style={{height:3,borderRadius:2,background:tab==='chat'?'#c2410c':'transparent',width:tab==='chat'?32:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
-              <span className="flex items-center gap-1.5" style={{fontSize:13,fontWeight:500,color:tab==='chat'?'#1a1714':'#a09890',transition:'color .2s'}}>
-                Chat
-                {unreadMessages > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                    {unreadMessages > 9 ? '9+' : unreadMessages}
-                  </span>
-                )}
-              </span>
-            </button>
-          </div>
+          {(() => {
+            const homeTabs = [{key:'main',label:mainTabLabel},{key:'chat',label:'Chat'}];
+            return <OTabBar
+              tabs={homeTabs}
+              activeKey={tab}
+              onChange={handleTabChange}
+              chatBadge={unreadMessages > 0 ? unreadMessages : null}
+            />;
+          })()}
         </div>
       </div>
 
