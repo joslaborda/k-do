@@ -90,7 +90,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex border-b border-border bg-white"
+      className="relative flex bg-white"
       style={{ position: 'relative' }}
     >
       {/* Animated sliding line */}
@@ -703,7 +703,7 @@ export default function Translator() {
   return (
     <div className="bg-background min-h-screen">
       {/* Header — unchanged */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
+      <div className="bg-background sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
