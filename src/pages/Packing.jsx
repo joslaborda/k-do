@@ -16,7 +16,7 @@ const categories = [
   { value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
   { value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
   { value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
-  { value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-amber-500 to-orange-500' },
+  { value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-[#c2410c] to-[#c2410c]/80' },
   { value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' },
 ];
 
@@ -75,9 +75,9 @@ export default function Packing() {
   const progress = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-background">
       {/* Header con caja naranja */}
-      <div className="bg-orange-700 pt-12 pb-20">
+      <div className="bg-background pt-12 pb-6">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -90,7 +90,7 @@ export default function Packing() {
             </div>
             <Button
               onClick={() => setDialogOpen(true)}
-              className="bg-white text-orange-700 hover:bg-white/90"
+              className="bg-secondary text-foreground hover:bg-border"
             >
               <Plus className="w-4 h-4 mr-2" />
               Añadir
@@ -179,7 +179,7 @@ export default function Packing() {
       </div>
 
       {/* Content */}
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-5xl -mt-12">
+      <div className="mx-auto px-5 pt-4 pb-12 max-w-5xl">
         {totalItems === 0 ? (
             <div className="text-center py-12 glass border-2 border-dashed border-border rounded-3xl">
               <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -196,7 +196,7 @@ export default function Packing() {
                     }
                     queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] });
                   }}
-                  className="bg-orange-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-orange-800 transition-colors flex items-center gap-2 mx-auto">
+                  className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 mx-auto">
                   <Sparkles className="w-4 h-4"/>
                   Generar lista para {country}
                 </button>
