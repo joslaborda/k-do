@@ -90,7 +90,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex bg-white"
+      className="relative flex"
       style={{ position: 'relative' }}
     >
       {/* Animated sliding line */}
