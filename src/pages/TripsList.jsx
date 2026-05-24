@@ -293,7 +293,7 @@ export default function TripsList() {
       {needsOnboarding && <CreateProfileModal user={user} open={true} />}
 
       {/* ── Header ── */}
-      <div className="bg-background border-b border-border sticky top-0 z-10">
+      <div className="bg-background sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
