@@ -1,19 +1,66 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2, Pencil } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { format, isToday, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import DocumentForm from '@/components/tickets/DocumentForm';
-import PDFViewer from '@/components/PDFViewer';
-import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { ArrowRightLeft, Copy, Check, Volume2, Loader2, AlertCircle } from 'lucide-react';
+import { getCountryMeta } from '@/lib/countryConfig';
+import { useTripContext } from '@/hooks/useTripContext';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { Link } from 'react-router-dom';
 
+// ── Languages ─────────────────────────────────────────────────────────────────
+const LANGUAGES = [
+  { code:'es', bcp:'es-ES', label:'Español',    flag:'🇪🇸' },
+  { code:'en', bcp:'en-US', label:'Inglés',     flag:'🇬🇧' },
+  { code:'ja', bcp:'ja-JP', label:'Japonés',    flag:'🇯🇵' },
+  { code:'fr', bcp:'fr-FR', label:'Francés',    flag:'🇫🇷' },
+  { code:'pt', bcp:'pt-BR', label:'Portugués',  flag:'🇧🇷' },
+  { code:'de', bcp:'de-DE', label:'Alemán',     flag:'🇩🇪' },
+  { code:'it', bcp:'it-IT', label:'Italiano',   flag:'🇮🇹' },
+  { code:'zh', bcp:'zh-CN', label:'Chino',      flag:'🇨🇳' },
+  { code:'ko', bcp:'ko-KR', label:'Coreano',    flag:'🇰🇷' },
+  { code:'ar', bcp:'ar-SA', label:'Árabe',      flag:'🇸🇦' },
+  { code:'th', bcp:'th-TH', label:'Tailandés',  flag:'🇹🇭' },
+  { code:'vi', bcp:'vi-VN', label:'Vietnamita', flag:'🇻🇳' },
+  { code:'id', bcp:'id-ID', label:'Indonesio',  flag:'🇮🇩' },
+  { code:'tr', bcp:'tr-TR', label:'Turco',      flag:'🇹🇷' },
+  { code:'ru', bcp:'ru-RU', label:'Ruso',       flag:'🇷🇺' },
+  { code:'nl', bcp:'nl-NL', label:'Neerlandés', flag:'🇳🇱' },
+  { code:'pl', bcp:'pl-PL', label:'Polaco',     flag:'🇵🇱' },
+  { code:'hi', bcp:'hi-IN', label:'Hindi',      flag:'🇮🇳' },
+  { code:'el', bcp:'el-GR', label:'Griego',     flag:'🇬🇷' },
+  { code:'he', bcp:'he-IL', label:'Hebreo',     flag:'🇮🇱' },
+  { code:'ms', bcp:'ms-MY', label:'Malayo',     flag:'🇲🇾' },
+  { code:'tl', bcp:'tl-PH', label:'Filipino',   flag:'🇵🇭' },
+];
+
+const TABS = [
+  { key: 'voz',      label: 'Voz' },
+  { key: 'texto',    label: 'Texto' },
+  { key: 'historial', label: 'Historial' },
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+async function translateText(text, fromCode, toCode) {
+  if (fromCode === toCode) return text;
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromCode}|${toCode}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error('Network error');
+  const data = await res.json();
+  if (data.responseStatus !== 200) throw new Error(data.responseDetails || 'Error');
+  return data.responseData.translatedText;
+}
+
+function speakText(text, bcpLang) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = bcpLang;
+  utt.rate = 0.85;
+  window.speechSynthesis.speak(utt);
+}
+
+// ── Animated Ō Tab Bar ────────────────────────────────────────────────────────
 function OTabBar({ tabs, activeKey, onChange }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
@@ -43,7 +90,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex border-b border-border bg-white"
+      className="relative flex"
       style={{ position: 'relative' }}
     >
       {/* Animated sliding line */}
@@ -86,123 +133,85 @@ function OTabBar({ tabs, activeKey, onChange }) {
   );
 }
 
+// ── Lang selector row ─────────────────────────────────────────────────────────
+function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
+  return (
+    <div className="flex items-center gap-2 py-1">
+      <select
+        value={fromLang}
+        onChange={e => onFromChange(e.target.value)}
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
+      >
+        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
+      </select>
+      <button
+        onClick={onSwap}
+        className="p-2 rounded-xl border border-border bg-white hover:bg-orange-50 hover:border-primary/30 transition-colors flex-shrink-0"
+      >
+        <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
+      </button>
+      <select
+        value={toLang}
+        onChange={e => onToChange(e.target.value)}
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
+      >
+        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
+      </select>
+    </div>
+  );
+}
 
-const DOC_ICONS = { flight:'✈️', train:'🚆', hotel:'🏨', event:'🎟️', personal:'🛡️', other:'📄' };
-const DOC_BG = { flight:'bg-blue-50', train:'bg-green-50', hotel:'bg-purple-50', event:'bg-orange-50', personal:'bg-amber-50', other:'bg-secondary' };
-const CAT_TABS = [
-  { key:'all',    icon:'📋', label:'Todos'   },
-  { key:'flight', icon:'✈️', label:'Vuelos'  },
-  { key:'hotel',  icon:'🏨', label:'Hoteles' },
-  { key:'train',  icon:'🚆', label:'Trenes'  },
-  { key:'other',  icon:'📄', label:'Otros'   },
-];
-const VIS = {
-  personal:       { label:'Solo yo',    icon:'🔒', cls:'bg-secondary text-muted-foreground' },
-  shared:         { label:'Grupo',      icon:'👥', cls:'bg-green-100 text-green-700'       },
-  selected_users: { label:'Compartido', icon:'👤', cls:'bg-blue-100 text-blue-700'         },
-};
+// ── Result card ───────────────────────────────────────────────────────────────
+function ResultCard({ original, translated, fromLang, toLang, onClear, onSave }) {
+  const [copied, setCopied] = useState(false);
+  const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
+  const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
-// ── Doc row ───────────────────────────────────────────────────────────────────
-function DocRow({ ticket, onEdit, onDelete, onView }) {
-  const [open, setOpen] = useState(false);
-  const cat  = ticket.category || 'other';
-  const icon = DOC_ICONS[cat] || '📄';
-  const bg   = DOC_BG[cat]   || 'bg-secondary';
-  const vis  = VIS[ticket.visibility || 'personal'];
-  const todayDoc = ticket.date && isToday(parseISO(ticket.date));
-  const hasFile  = !!ticket.file_url;
-
-  const displayName = ticket.origin && ticket.destination
-    ? `${ticket.origin} → ${ticket.destination}`
-    : ticket.name;
-
-  const timeLabel = ticket.time
-    ? ticket.time
-    : cat === 'hotel' && ticket.date
-    ? `Check-in ${format(parseISO(ticket.date), 'dd MMM', { locale: es })}`
-    : null;
+  const copy = () => {
+    navigator.clipboard?.writeText(translated);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className={`bg-white rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
-      {/* Main row */}
-      <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
-          {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
+    <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      {original && (
+        <div className="px-4 py-3 border-b border-border">
+          <p className="text-xs text-muted-foreground mb-1">{fromL.flag} Original</p>
+          <p className="text-sm text-foreground">{original}</p>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          {hasFile && (
-            <button onClick={() => onView(ticket.file_url)}
-              className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center hover:bg-orange-100 transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
+      )}
+      {translated && (
+        <div className="px-4 py-3">
+          <p className="text-xs text-muted-foreground mb-1">{toL.flag} Traducción</p>
+          <p className="text-base font-medium text-foreground">{translated}</p>
+          <div className="flex gap-2 mt-3 flex-wrap">
+            <button
+              onClick={() => speakText(translated, toL.bcp)}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
+            >
+              <Volume2 className="w-3.5 h-3.5" />Leer
             </button>
-          )}
-          <button onClick={() => setOpen(o => !o)}
-            className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-secondary/50 transition-colors">
-            {open
-              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-              : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-            }
-          </button>
-        </div>
-      </div>
-
-      {/* Expanded */}
-      {open && (
-        <div className="border-t border-border">
-          <div className="px-4 py-3 bg-secondary/20 space-y-2">
-            {/* Visibility badge */}
-            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${vis.cls}`}>
-              {vis.icon} {vis.label}
-            </span>
-
-            {/* Fields */}
-            {ticket.origin && ticket.destination && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ruta</span><span className="text-foreground">{ticket.origin} → {ticket.destination}</span></div>
-            )}
-            {ticket.date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fecha</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: es })}</span></div>
-            )}
-            {ticket.end_date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fin</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
-            )}
-            {ticket.airline && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Vuelo</span><span className="text-foreground">{ticket.airline}</span></div>
-            )}
-            {ticket.city && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ciudad</span><span className="text-foreground">{ticket.city}</span></div>
-            )}
-            {ticket.notes && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Notas</span><span className="text-foreground">{ticket.notes}</span></div>
-            )}
-
-            {/* File */}
-            {hasFile && (
-              <button onClick={() => onView(ticket.file_url)}
-                className="w-full flex items-center gap-3 px-3 py-2 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                </svg>
-                <span className="text-xs font-medium text-foreground flex-1">Ver documento adjunto</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
+            <button
+              onClick={copy}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
+            >
+              {copied ? <><Check className="w-3.5 h-3.5 text-green-500" />Copiado</> : <><Copy className="w-3.5 h-3.5" />Copiar</>}
+            </button>
+            {onSave && (
+              <button
+                onClick={onSave}
+                className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-lg border border-orange-200 bg-orange-50 transition-colors ml-auto"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                Guardar
               </button>
             )}
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-white">
-            <button onClick={() => onDelete(ticket)}
-              className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
-              <Trash2 className="w-3.5 h-3.5" />Eliminar
-            </button>
-            <button onClick={() => { onEdit(ticket); setOpen(false); }}
-              className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground flex items-center gap-1.5 hover:bg-secondary/50 transition-colors">
-              <Pencil className="w-3 h-3" />Editar
+            <button
+              onClick={onClear}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
+            >
+              Limpiar
             </button>
           </div>
         </div>
@@ -211,197 +220,510 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
-export default function Documents() {
-  const tripId = new URLSearchParams(window.location.search).get('trip_id');
-  const queryClient = useQueryClient();
-  const { user: currentUser } = useAuth();
-  const currentUserEmail = currentUser?.email ?? '';
-  const userId = currentUser?.id ?? '';
+// ── Voice tab ─────────────────────────────────────────────────────────────────
+function VozTab({ fromLang, toLang, onSaveToHistory }) {
+  const [recording, setRecording] = useState(false);
+  const [interim, setInterim]     = useState('');
+  const [error, setError]         = useState('');
+  const [result, setResult]       = useState({ original: '', translated: '' });
+  const recognitionRef            = useRef(null);
+  const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
+  const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
-  const [catFilter, setCatFilter]   = useState('all');
-  const [addOpen, setAddOpen]       = useState(false);
-  const [editDoc, setEditDoc]       = useState(null);
-  const [deleteDoc, setDeleteDoc]   = useState(null);
-  const [viewFile, setViewFile]     = useState(null);
+  const pendingTextRef = useRef('');
 
-  const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets', tripId],
-    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
-    enabled: !!tripId, staleTime: 30000,
-  });
-  const { data: cities = [] } = useQuery({
-    queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 60000,
-  });
-  const { data: itineraryDays = [] } = useQuery({
-    queryKey: ['itineraryDays', tripId],
-    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }, 'date'),
-    enabled: !!tripId, staleTime: 30000,
-  });
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: () => base44.entities.Trip.get(tripId),
-    enabled: !!tripId, staleTime: 60000,
-  });
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
-    staleTime: 5 * 60 * 1000,
-  });
+  const doTranslate = async (text) => {
+    if (!text.trim()) return;
+    try {
+      if (fromLang === toLang) {
+        setResult({ original: text, translated: text });
+      } else {
+        const translation = await translateText(text, fromL.code, toL.code);
+        setResult({ original: text, translated: translation });
+        if (translation) speakText(translation, toL.bcp);
+      }
+    } catch {
+      setError('No se pudo traducir. Comprueba tu conexión.');
+    }
+  };
 
-  // Backfill auto-links
+  const toggleRecording = () => {
+    // STOP: save what we have and translate
+    if (recording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      // translate whatever we captured (interim or final)
+      if (pendingTextRef.current.trim()) {
+        doTranslate(pendingTextRef.current);
+        pendingTextRef.current = '';
+      }
+      return;
+    }
+
+    // START
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      setError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.');
+      return;
+    }
+    setError('');
+    setResult({ original: '', translated: '' });
+    setInterim('');
+    pendingTextRef.current = '';
+
+    const recognition = new SR();
+    recognitionRef.current = recognition;
+    recognition.lang = fromL.bcp;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => setRecording(true);
+
+    recognition.onend = () => {
+      recognitionRef.current = null;
+      setRecording(false);
+    };
+
+    recognition.onerror = e => {
+      recognitionRef.current = null;
+      setRecording(false);
+      if (e.error === 'not-allowed') setError('Permiso de micrófono denegado.');
+      else if (e.error === 'no-speech') setError('No se detectó voz. Inténtalo de nuevo.');
+      else if (e.error === 'aborted') return;
+      else setError('Error al grabar. Inténtalo de nuevo.');
+    };
+
+    recognition.onresult = e => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t;
+        else interim += t;
+      }
+      // accumulate finals
+      if (final) pendingTextRef.current += ' ' + final;
+      // show live what is being said
+      setInterim(pendingTextRef.current + interim);
+    };
+
+    try { recognition.start(); }
+    catch {
+      recognitionRef.current = null;
+      setRecording(false);
+      setError('No se pudo iniciar el micrófono.');
+    }
+  };
+
+  // Cleanup on unmount
   useEffect(() => {
-    if (!tickets.length || !itineraryDays.length) return;
-    const updates = createBackfillMutation(tickets, itineraryDays, cities).filter(u => Object.keys(u.updates).length > 0);
-    if (updates.length) {
-      Promise.all(updates.map(({ ticketId, updates }) => base44.entities.Ticket.update(ticketId, updates)))
-        .then(() => queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }));
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+    };
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {/* Mic button */}
+      <div
+        onClick={toggleRecording}
+        className={`rounded-2xl border-2 p-6 flex flex-col items-center gap-3 cursor-pointer select-none transition-all ${
+          recording
+            ? 'bg-primary border-primary'
+            : 'bg-white border-border hover:border-primary/40'
+        }`}
+      >
+        {recording ? (
+          <>
+            {/* Waveform */}
+            <div className="flex items-end gap-1 h-6">
+              {[5,9,14,9,5,12,8].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 bg-white rounded-full"
+                  style={{ height: h, animation: `wave 0.7s ease-in-out ${i * 0.08}s infinite alternate` }}
+                />
+              ))}
+            </div>
+            {/* Stop icon */}
+            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+              <div className="w-6 h-6 bg-white rounded-md" />
+            </div>
+            <p className="text-sm font-medium text-white">Grabando · pulsa para parar</p>
+            {interim && (
+              <p className="text-xs text-white/80 text-center max-w-xs leading-relaxed">{interim}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-foreground">Pulsa el micrófono y habla</p>
+            <p className="text-xs text-muted-foreground">{fromL.flag} → {toL.flag} · Lee la traducción en voz alta</p>
+          </>
+        )}
+        <style>{`@keyframes wave{from{opacity:.3}to{opacity:1}}`}</style>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
+      {(result.original || result.translated) && (
+        <ResultCard
+          original={result.original}
+          translated={result.translated}
+          fromLang={fromLang}
+          toLang={toLang}
+          onClear={() => setResult({ original: '', translated: '' })}
+          onSave={() => onSaveToHistory({ original: result.original, translated: result.translated, fromLang, toLang })}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Texto tab ─────────────────────────────────────────────────────────────────
+function TextoTab({ fromLang, toLang, onSaveToHistory }) {
+  const [input, setInput]       = useState('');
+  const [result, setResult]     = useState({ original: '', translated: '' });
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
+  const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
+
+  const translate = async () => {
+    if (!input.trim()) return;
+    setLoading(true); setError(''); setResult({ original: '', translated: '' });
+    try {
+      const t = fromLang === toLang ? input : await translateText(input, fromLang, toLang);
+      setResult({ original: input, translated: t });
+    } catch {
+      setError('No se pudo traducir. Comprueba tu conexión.');
+    } finally {
+      setLoading(false);
     }
-  }, [tripId, tickets.length, itineraryDays.length]);
+  };
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setAddOpen(false); },
+  return (
+    <div className="space-y-4">
+      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="px-4 pt-3 pb-1">
+          <p className="text-xs text-muted-foreground mb-1.5">{fromL.flag} {fromL.label}</p>
+          <textarea
+            placeholder={`Escribe en ${fromL.label}...`}
+            value={input}
+            onChange={e => { setInput(e.target.value); setResult({ original: '', translated: '' }); setError(''); }}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); translate(); } }}
+            rows={4}
+            className="w-full text-sm resize-none outline-none text-foreground bg-transparent"
+          />
+        </div>
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-secondary/30">
+          {input
+            ? <button onClick={() => { setInput(''); setResult({ original: '', translated: '' }); }} className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
+            : <span />
+          }
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => speakText(input, fromL.bcp)}
+              disabled={!input.trim()}
+              className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={translate}
+              disabled={!input.trim() || loading}
+              className="h-8 px-4 rounded-full bg-primary text-white text-xs font-medium disabled:opacity-40 hover:bg-primary/90 flex items-center gap-1.5 transition-colors"
+            >
+              {loading && <Loader2 className="w-3 h-3 animate-spin" />}
+              Traducir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
+      {(result.original || result.translated) && (
+        <ResultCard
+          original={result.original}
+          translated={result.translated}
+          fromLang={fromLang}
+          toLang={toLang}
+          onClear={() => setResult({ original: '', translated: '' })}
+          onSave={() => onSaveToHistory({ original: result.original, translated: result.translated, fromLang, toLang })}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Historial tab ─────────────────────────────────────────────────────────────
+const HIST_KEY = 'kodo_translator_history';
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+}
+function saveHistory(h) {
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, 50))); } catch {}
+}
+
+function HistorialTab() {
+  const [history, setHistory] = useState(() => loadHistory());
+
+  const toggle = (id) => {
+    const next = history.map(h => h.id === id ? { ...h, saved: !h.saved } : h);
+    setHistory(next); saveHistory(next);
+  };
+
+  const clearAll = () => { setHistory([]); saveHistory([]); };
+
+  const saved   = history.filter(h => h.saved);
+  const recent  = history.filter(h => !h.saved);
+
+  const BookmarkIcon = ({ filled }) => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? '#c2410c' : 'none'} stroke={filled ? '#c2410c' : '#d4cfc8'} strokeWidth="2">
+      <path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/>
+    </svg>
+  );
+
+  const HistItem = ({ item }) => {
+    const fromL = LANGUAGES.find(l => l.code === item.fromLang) || LANGUAGES[0];
+    const toL   = LANGUAGES.find(l => l.code === item.toLang)   || LANGUAGES[1];
+    return (
+      <div className="flex gap-3 items-start py-3 border-b border-border last:border-0">
+        <button onClick={() => toggle(item.id)} className="flex-shrink-0 mt-0.5">
+          <BookmarkIcon filled={item.saved} />
+        </button>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground leading-snug mb-1">{item.original}</p>
+          <p className="text-sm font-medium leading-snug" style={{ color: '#c2410c' }}>{item.translated}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{fromL.flag} → {toL.flag} · {item.timeLabel}</p>
+        </div>
+        <button
+          onClick={() => speakText(item.translated, toL.bcp)}
+          className="flex-shrink-0 mt-0.5 text-muted-foreground hover:text-foreground"
+        >
+          <Volume2 className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  };
+
+  if (history.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/50">
+            <path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/>
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-foreground mb-1">Sin traducciones aún</p>
+        <p className="text-xs text-muted-foreground">Tus traducciones aparecerán aquí. Guarda las que más uses.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {saved.length > 0 && (
+        <div className="bg-white rounded-2xl border border-border overflow-hidden mb-4">
+          <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
+            <div>
+              <div style={{ height: 3, width: 48, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
+              <p className="text-sm font-medium text-foreground">Guardadas</p>
+            </div>
+          </div>
+          <div className="px-4">
+            {saved.map(item => <HistItem key={item.id} item={item} />)}
+          </div>
+        </div>
+      )}
+
+      {recent.length > 0 && (
+        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
+            <div>
+              <div style={{ height: 3, width: 30, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
+              <p className="text-sm font-medium text-foreground">Recientes</p>
+            </div>
+            <button onClick={clearAll} className="text-xs" style={{ color: '#c2410c' }}>Borrar todo</button>
+          </div>
+          <div className="px-4">
+            {recent.map(item => <HistItem key={item.id} item={item} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main content ──────────────────────────────────────────────────────────────
+function TranslatorContent({ tripId, inPage = false }) {
+  const { user } = useAuth();
+  const { trip, activeCity } = useTripContext(tripId);
+  const countryRaw = activeCity?.country || trip?.country || '';
+  const meta = getCountryMeta(countryRaw);
+  const tripLangCode = meta.languageCode?.split('-')[0] || 'en';
+  const tripLang = LANGUAGES.find(l => l.code === tripLangCode) ? tripLangCode : 'en';
+
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', user?.id],
+    queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: user.id }); return r[0] || null; },
+    enabled: !!user?.id, staleTime: 60000,
   });
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditDoc(null); },
-  });
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Ticket.delete(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDeleteDoc(null); },
-  });
 
-  // Filter
-  const filtered = useMemo(() => tickets.filter(t => {
-    const vis = t.visibility || 'personal';
-    if (vis === 'personal' && t.created_by !== currentUserEmail && t.user_id !== userId) return false;
-    if (vis === 'selected_users' && t.created_by !== currentUserEmail && !(t.shared_with || []).includes(currentUserEmail)) return false;
-    if (catFilter !== 'all') {
-      if (catFilter === 'other') return !['flight','hotel','train'].includes(t.category);
-      return t.category === catFilter;
-    }
-    return true;
-  }), [tickets, catFilter, currentUserEmail, userId]);
+  const homeCountry = myProfile?.home_country || 'España';
+  const homeMeta = getCountryMeta(homeCountry);
+  const homeLangCode = homeMeta.languageCode?.split('-')[0] || 'es';
+  const userLang = LANGUAGES.find(l => l.code === homeLangCode) ? homeLangCode : 'es';
 
-  // Group by date
-  const grouped = useMemo(() => {
-    const todayStr    = format(new Date(), 'yyyy-MM-dd');
-    const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
-    const map = {};
-    [...filtered]
-      .sort((a, b) => ((a.date||'9999') < (b.date||'9999') ? -1 : (a.date||'9999') > (b.date||'9999') ? 1 : (a.time||'99:99').localeCompare(b.time||'99:99')))
-      .forEach(t => { const k = t.date || '__none__'; (map[k] = map[k] || []).push(t); });
+  const [tab, setTab]         = useState('voz');
+  const [fromLang, setFromLang] = useState(userLang);
+  const [toLang, setToLang]   = useState(tripLang);
+  const [dismissed, setDismissed] = useState(false);
 
-    return Object.entries(map).map(([date, items]) => ({
-      date, items,
-      isToday: date === todayStr,
-      label: date === '__none__' ? 'Sin fecha'
-        : date === todayStr    ? `Hoy · ${format(parseISO(date), 'dd MMM', { locale: es })}`
-        : date === tomorrowStr ? `Mañana · ${format(parseISO(date), 'dd MMM', { locale: es })}`
-        : format(parseISO(date), "dd MMM · eeee", { locale: es }),
-    }));
-  }, [filtered]);
+  useEffect(() => { setToLang(tripLang); }, [tripLang]);
+  useEffect(() => { setFromLang(userLang); }, [userLang]);
+
+  const isSameLang = homeLangCode === tripLangCode;
+
+  const handleSwap = () => { setFromLang(toLang); setToLang(fromLang); };
+
+  const handleSaveToHistory = useCallback(({ original, translated, fromLang: fl, toLang: tl }) => {
+    const fromL = LANGUAGES.find(l => l.code === fl) || LANGUAGES[0];
+    const toL   = LANGUAGES.find(l => l.code === tl) || LANGUAGES[1];
+    const history = loadHistory();
+    const entry = {
+      id: Date.now().toString(),
+      original, translated,
+      fromLang: fl, toLang: tl,
+      saved: false,
+      timeLabel: 'ahora',
+    };
+    const next = [entry, ...history];
+    saveHistory(next);
+  }, []);
+
+  return (
+    <>
+      {isSameLang && !dismissed && (
+        <div className={`${inPage ? 'mt-4' : 'mt-5'} bg-green-50 border border-green-200 rounded-2xl p-4`}>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">🤝</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-green-900">¡Habláis el mismo idioma!</p>
+              <p className="text-sm text-green-700 mt-1 leading-relaxed">
+                En {meta.flag} <strong>{countryRaw}</strong> hablan <strong>{meta.languageLabel}</strong>.
+              </p>
+            </div>
+            <button
+              onClick={() => setDismissed(true)}
+              className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={isSameLang && !dismissed ? 'mt-4' : inPage ? '' : 'mt-5'}>
+        <OTabBar tabs={TABS} activeKey={tab} onChange={setTab} />
+      </div>
+
+      <div className="py-5 space-y-4">
+        {/* Lang row for Voz and Texto tabs */}
+        {(tab === 'voz' || tab === 'texto') && (
+          <LangRow
+            fromLang={fromLang}
+            toLang={toLang}
+            onFromChange={setFromLang}
+            onToChange={setToLang}
+            onSwap={handleSwap}
+          />
+        )}
+
+        {tab === 'voz' && (
+          <VozTab
+            fromLang={fromLang}
+            toLang={toLang}
+            onSaveToHistory={handleSaveToHistory}
+          />
+        )}
+
+        {tab === 'texto' && (
+          <TextoTab
+            fromLang={fromLang}
+            toLang={toLang}
+            onSaveToHistory={handleSaveToHistory}
+          />
+        )}
+
+        {tab === 'historial' && <HistorialTab />}
+      </div>
+    </>
+  );
+}
+
+// Export for Utilities embed
+export function TranslatorPanel({ tripId }) {
+  return <TranslatorContent tripId={tripId} />;
+}
+
+// Standalone page
+export default function Translator() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get('trip_id');
+  const { trip, activeCity } = useTripContext(tripId);
+  const countryRaw = activeCity?.country || trip?.country || '';
+  const meta = getCountryMeta(countryRaw);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  const members = trip?.members || [];
-
   return (
     <div className="bg-background min-h-screen">
-      {/* Header */}
+      {/* Header — unchanged */}
       <div className="bg-background sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
                 Inicio
               </button>
             </Link>
-            <button onClick={() => setAddOpen(true)}
-              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
-              <Plus className="w-4 h-4" />Documento
-            </button>
+            {countryRaw && (
+              <span className="text-sm text-muted-foreground">{meta.flag} {countryRaw}</span>
+            )}
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Documentos</h1>
-          {/* Category tabs */}
-          <OTabBar
-              tabs={CAT_TABS.map(t => ({key:t.key,label:t.label}))}
-              activeKey={catFilter}
-              onChange={setCatFilter}
-            />
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Traductor</h1>
+        </div>
       </div>
+      <div className="max-w-3xl mx-auto px-5 pb-24">
+        <TranslatorContent tripId={tripId} inPage={true} />
       </div>
-
-      {/* List */}
-      <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
-        {grouped.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-4xl mb-4">📄</p>
-            <p className="text-muted-foreground mb-6">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
-            <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
-              <Plus className="w-4 h-4 mr-2" />Añadir documento
-            </Button>
-          </div>
-        ) : grouped.map(({ date, label, items, isToday }) => (
-          <div key={date} className="mb-6">
-            <p className={`text-xs font-semibold uppercase tracking-wide mb-3 px-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>{label}</p>
-            {items.map(t => (
-              <DocRow key={t.id} ticket={t} onEdit={setEditDoc} onDelete={setDeleteDoc} onView={setViewFile} />
-            ))}
-          </div>
-        ))}
-      </div>
-
-      {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
-          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-            <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
-          </DialogHeader>
-          <div className="px-5 py-4 overflow-y-auto flex-1">
-            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
-              onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit dialog */}
-      <Dialog open={!!editDoc} onOpenChange={(o) => { if (!o) setEditDoc(null); }}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
-          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-            <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
-          </DialogHeader>
-          {editDoc && (
-            <div className="px-5 py-4 overflow-y-auto flex-1">
-              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
-                initialData={editDoc}
-                onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
-                onCancel={() => setEditDoc(null)} saving={updateMutation.isPending} />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirmation */}
-      <AlertDialog open={!!deleteDoc} onOpenChange={(o) => { if (!o) setDeleteDoc(null); }}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
-            <AlertDialogDescription>¿Seguro que quieres eliminar "{deleteDoc?.name}"? Esta acción no se puede deshacer.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate(deleteDoc.id)} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* File viewer */}
-      <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />
     </div>
   );
 }
