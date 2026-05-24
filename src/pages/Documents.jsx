@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,6 +13,79 @@ import { createPageUrl } from '@/utils';
 import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
 import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
+
+function OTabBar({ tabs, activeKey, onChange }) {
+  const containerRef = useRef(null);
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  const updateLine = useCallback(() => {
+    if (!containerRef.current) return;
+    const idx = tabs.findIndex(t => t.key === activeKey);
+    const buttons = containerRef.current.querySelectorAll('button');
+    const btn = buttons[idx];
+    if (!btn) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const labelEl = btn.querySelector('.tab-label');
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    setLineStyle({
+      left: labelRect.left - containerRect.left,
+      width: labelRect.width,
+    });
+  }, [activeKey, tabs]);
+
+  useEffect(() => {
+    updateLine();
+    if (!mounted) setTimeout(() => setMounted(true), 50);
+  }, [updateLine, mounted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex border-b border-border bg-white"
+      style={{ position: 'relative' }}
+    >
+      {/* Animated sliding line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: lineStyle.left,
+          width: lineStyle.width,
+          height: 3,
+          background: '#c2410c',
+          borderRadius: 2,
+          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
+        }}
+      />
+      {tabs.map(tab => {
+        const isOn = tab.key === activeKey;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
+          >
+            <span
+              className="tab-label"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isOn ? '#1a1714' : '#a09890',
+                transition: 'color 0.2s',
+                lineHeight: 1,
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 const DOC_ICONS = { flight:'✈️', train:'🚆', hotel:'🏨', event:'🎟️', personal:'🛡️', other:'📄' };
 const DOC_BG = { flight:'bg-blue-50', train:'bg-green-50', hotel:'bg-purple-50', event:'bg-orange-50', personal:'bg-amber-50', other:'bg-secondary' };
@@ -255,14 +328,11 @@ export default function Documents() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Documentos</h1>
           {/* Category tabs */}
-          <div className="flex">
-            {CAT_TABS.map(tab => (
-              <button key={tab.key} onClick={() => setCatFilter(tab.key)}
-                className="flex-1 flex flex-col items-center pt-2.5 pb-2 gap-1.5">
-                <div style={{height:3,borderRadius:2,background:catFilter===tab.key?'#c2410c':'transparent',width:catFilter===tab.key?Math.min(tab.label.length*8,64):0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',alignSelf:'center'}} />
-                <span style={{fontSize:12,fontWeight:500,color:catFilter===tab.key?'#1a1714':'#a09890',transition:'color .2s'}}>{tab.label}</span>
-              </button>
-            ))}
+          <OTabBar
+              tabs={CAT_TABS.map(t => ({key:t.key,label:t.label}))}
+              activeKey={catFilter}
+              onChange={setCatFilter}
+            />
           </div>
         </div>
       </div>
