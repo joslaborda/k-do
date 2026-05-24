@@ -362,7 +362,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
   const defaultLng = pinLng || 139.6503;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
         {/* Handle + header — fixed */}
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
@@ -527,7 +527,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
 
   return (
     <>
-      <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
+      <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
         <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
           <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
@@ -798,7 +798,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: 'calc(75vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
@@ -990,7 +990,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
   return (
     <>
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px] pb-[80px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
       <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
         <div className="flex-shrink-0">
