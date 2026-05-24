@@ -24,231 +24,68 @@ function buildCountryList() {
 }
 
 const COUNTRIES = [
-  'España',
-  'México',
-  'Colombia',
-  'Argentina',
-  'Perú',
-  'Chile',
-  'Venezuela',
-  'Ecuador',
-  'Bolivia',
-  'Paraguay',
-  'Uruguay',
-  'Costa Rica',
-  'Guatemala',
-  'Honduras',
-  'El Salvador',
-  'Nicaragua',
-  'Panamá',
-  'Cuba',
-  'República Dominicana',
-  'Haití',
-  'Puerto Rico',
-  'Belice',
-  'Guyana',
-  'Surinam',
-  'Guyana Francesa',
-  'Francia',
-  'Italia',
-  'Alemania',
-  'Portugal',
-  'Reino Unido',
-  'Países Bajos',
-  'Bélgica',
-  'Suiza',
-  'Austria',
-  'Grecia',
-  'Turquía',
-  'Polonia',
-  'República Checa',
-  'Hungría',
-  'Rumanía',
-  'Bulgaria',
-  'Croacia',
-  'Serbia',
-  'Eslovenia',
-  'Eslovaquia',
-  'Noruega',
-  'Suecia',
-  'Dinamarca',
-  'Finlandia',
-  'Irlanda',
-  'Islandia',
-  'Estonia',
-  'Letonia',
-  'Lituania',
-  'Ucrania',
-  'Bielorrusia',
-  'Moldavia',
-  'Albania',
-  'Bosnia',
-  'Kosovo',
-  'Montenegro',
-  'Macedonia',
-  'Liechtenstein',
-  'Andorra',
-  'Mónaco',
-  'San Marino',
-  'Ciudad del Vaticano',
-  'Malta',
-  'Chipre',
-  'Luxemburgo',
-  'Gibraltar',
-  'Japón',
-  'China',
-  'Corea del Sur',
-  'India',
-  'Tailandia',
-  'Vietnam',
-  'Indonesia',
-  'Filipinas',
-  'Singapur',
-  'Malasia',
-  'Camboya',
-  'Myanmar',
-  'Laos',
-  'Nepal',
-  'Sri Lanka',
-  'Bangladesh',
-  'Pakistán',
-  'Afganistán',
-  'Uzbekistán',
-  'Kazajistán',
-  'Kirguistán',
-  'Tayikistán',
-  'Turkmenistán',
-  'Mongolia',
-  'Hong Kong',
-  'Macao',
-  'Taiwan',
-  'Emiratos Árabes Unidos',
-  'Arabia Saudí',
-  'Qatar',
-  'Kuwait',
-  'Omán',
-  'Bahréin',
-  'Jordania',
-  'Israel',
-  'Palestina',
-  'Líbano',
-  'Siria',
-  'Irak',
-  'Irán',
-  'Yemén',
-  'Turquía',
-  'Azerbaiyán',
-  'Armenia',
-  'Georgia',
-  'Marruecos',
-  'Egipto',
-  'Túnez',
-  'Argelia',
-  'Libia',
-  'Sudán',
-  'Etiopía',
-  'Kenia',
-  'Tanzania',
-  'Uganda',
-  'Ruanda',
-  'Nigeria',
-  'Ghana',
-  'Senegal',
-  'Costa de Marfil',
-  'Camerún',
-  'Angola',
-  'Mozambique',
-  'Zambia',
-  'Zimbabue',
-  'Botswana',
-  'Namibia',
-  'Sudáfrica',
-  'Madagascar',
-  'Mauricio',
-  'Seychelles',
-  'Cabo Verde',
-  'Eritrea',
-  'Somalia',
-  'Yibuti',
-  'Malawi',
-  'Esuatini',
-  'Lesoto',
-  'Gabón',
-  'Congo',
-  'República Democrática del Congo',
-  'República Centroafricana',
-  'Chad',
-  'Malí',
-  'Burkina Faso',
-  'Níger',
-  'Guinea',
-  'Sierra Leona',
-  'Liberia',
-  'Guinea Ecuatorial',
-  'Australia',
-  'Nueva Zelanda',
-  'Papúa Nueva Guinea',
-  'Fiyi',
-  'Samoa',
-  'Tonga',
-  'Vanuatu',
-  'Islas Salomón',
-  'Micronesia',
-  'Palaos',
-  'Kiribati',
-  'Tuvalu',
-  'Nauru',
-  'Islas Marshall',
-  'Polinesia Francesa',
-  'Nueva Caledonia',
-  'Guam',
-  'Islas Cook',
-  'Canadá',
-  'Estados Unidos',
-  'Saint-Martin',
-  'Sint Maarten',
-  'Martinica',
-  'Guadalupe',
-  'Aruba',
-  'Curazao',
-  'Bermudas',
-  'Islas Caimán',
-  'Jamaica',
-  'Barbados',
-  'Trinidad y Tobago',
-  'Bahamas',
-  'Santa Lucía',
-  'Antigua y Barbuda',
-  'Granada',
-  'Dominica',
-  'San Cristóbal y Nieves',
-  '🌍',
-  'USD',
-  'es',
-  'EUR',
-  'USD',
-  'MXN',
-  'COP',
-  'ARS',
-  'CLP',
-  'GBP',
-  'JPY',
-  'BRL',
-  'PEN',
-  'CHF',
-  'AUD',
-  'CAD',
-  '🌍',
-  'USD',
-  'es',
-  'bg-primary',
-  'bg-border',
-  'left-5',
-  'left-1',
-  'border-b border-border',
-  '} ${onClick ? ',
-  ' : ',
-  '}`}
+  'España','México','Colombia','Argentina','Perú','Chile','Venezuela','Ecuador','Bolivia',
+  'Paraguay','Uruguay','Costa Rica','Guatemala','Honduras','El Salvador','Nicaragua','Panamá',
+  'Cuba','República Dominicana','Haití','Puerto Rico','Belice','Guyana','Surinam','Guyana Francesa',
+  'Francia','Italia','Alemania','Portugal','Reino Unido','Países Bajos','Bélgica','Suiza',
+  'Austria','Grecia','Turquía','Polonia','República Checa','Hungría','Rumanía','Bulgaria',
+  'Croacia','Serbia','Eslovenia','Eslovaquia','Noruega','Suecia','Dinamarca','Finlandia',
+  'Irlanda','Islandia','Estonia','Letonia','Lituania','Ucrania','Bielorrusia','Moldavia',
+  'Albania','Bosnia','Kosovo','Montenegro','Macedonia','Liechtenstein','Andorra','Mónaco',
+  'San Marino','Ciudad del Vaticano','Malta','Chipre','Luxemburgo','Gibraltar',
+  'Japón','China','Corea del Sur','India','Tailandia','Vietnam','Indonesia','Filipinas',
+  'Singapur','Malasia','Camboya','Myanmar','Laos','Nepal','Sri Lanka','Bangladesh',
+  'Pakistán','Afganistán','Uzbekistán','Kazajistán','Kirguistán','Tayikistán','Turkmenistán',
+  'Mongolia','Hong Kong','Macao','Taiwan',
+  'Emiratos Árabes Unidos','Arabia Saudí','Qatar','Kuwait','Omán','Bahréin','Jordania',
+  'Israel','Palestina','Líbano','Siria','Irak','Irán','Yemén',
+  'Turquía','Azerbaiyán','Armenia','Georgia',
+  'Marruecos','Egipto','Túnez','Argelia','Libia','Sudán','Etiopía','Kenia','Tanzania',
+  'Uganda','Ruanda','Nigeria','Ghana','Senegal','Costa de Marfil','Camerún','Angola',
+  'Mozambique','Zambia','Zimbabue','Botswana','Namibia','Sudáfrica','Madagascar','Mauricio',
+  'Seychelles','Cabo Verde','Eritrea','Somalia','Yibuti','Malawi','Esuatini','Lesoto',
+  'Gabón','Congo','República Democrática del Congo','República Centroafricana','Chad',
+  'Malí','Burkina Faso','Níger','Guinea','Sierra Leona','Liberia','Guinea Ecuatorial',
+  'Australia','Nueva Zelanda','Papúa Nueva Guinea','Fiyi','Samoa','Tonga','Vanuatu',
+  'Islas Salomón','Micronesia','Palaos','Kiribati','Tuvalu','Nauru','Islas Marshall',
+  'Polinesia Francesa','Nueva Caledonia','Guam','Islas Cook',
+  'Canadá','Estados Unidos',
+  'Saint-Martin','Sint Maarten','Martinica','Guadalupe','Aruba','Curazao','Bermudas',
+  'Islas Caimán','Jamaica','Barbados','Trinidad y Tobago','Bahamas','Santa Lucía',
+  'Antigua y Barbuda','Granada','Dominica','San Cristóbal y Nieves',
+].map(name => {
+  const m = getCountryMeta(name);
+  return { name, flag: m.flag || '🌍', currency: m.currency || 'USD' };
+}).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(name => {
+  const meta = getCountryMeta(name);
+  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+}).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'].map(name => {
+  const meta = getCountryMeta(name);
+  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+}).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Toggle switch
+// ─────────────────────────────────────────────────────────────────────────────
+function Toggle({ value, onChange }) {
+  return (
+    <button
+      onClick={() => onChange(!value)}
+      className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${value ? 'bg-primary' : 'bg-border'}`}
+    >
+      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${value ? 'left-5' : 'left-1'}`} />
+    </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Row components
+// ─────────────────────────────────────────────────────────────────────────────
+function SettingRow({ label, sublabel, right, onClick, isLast = false }) {
+  const inner = (
+    <div className={`flex items-center justify-between px-4 py-3.5 ${!isLast ? 'border-b border-border' : ''} ${onClick ? 'hover:bg-secondary/30 transition-colors cursor-pointer' : ''}`}
       onClick={onClick}>
       <div className="flex-1 min-w-0 mr-3">
         <p className="text-sm text-foreground">{label}</p>
@@ -265,40 +102,24 @@ const COUNTRIES = [
 // ─────────────────────────────────────────────────────────────────────────────
 function PasswordSection({ user }) {
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState(',
-  ');
-  const [next, setNext] = useState(',
-  ');
-  const [repeat, setRepeat] = useState(',
-  ');
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [repeat, setRepeat] = useState('');
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
 
   const handleSave = async () => {
-    if (!current || !next || !repeat) { setMsg({ type:',
-  ', text:',
-  ' }); return; }
-    if (next !== repeat) { setMsg({ type:',
-  ', text:',
-  ' }); return; }
-    if (next.length < 8) { setMsg({ type:',
-  ', text:',
-  ' }); return; }
+    if (!current || !next || !repeat) { setMsg({ type:'error', text:'Rellena todos los campos' }); return; }
+    if (next !== repeat) { setMsg({ type:'error', text:'Las contraseñas no coinciden' }); return; }
+    if (next.length < 8) { setMsg({ type:'error', text:'Mínimo 8 caracteres' }); return; }
     setSaving(true);
     try {
       await base44.auth.changePassword({ currentPassword: current, newPassword: next });
-      setMsg({ type:',
-  ', text:',
-  ' });
-      setCurrent(',
-  '); setNext(',
-  '); setRepeat(',
-  ');
+      setMsg({ type:'ok', text:'Contraseña actualizada' });
+      setCurrent(''); setNext(''); setRepeat('');
       setTimeout(() => { setOpen(false); setMsg(null); }, 1500);
     } catch {
-      setMsg({ type:',
-  ', text:',
-  ' });
+      setMsg({ type:'error', text:'Contraseña actual incorrecta' });
     } finally { setSaving(false); }
   };
 
@@ -311,10 +132,7 @@ function PasswordSection({ user }) {
   return (
     <div className="border-t border-border">
       <div className="px-4 py-3 space-y-3">
-        {[',
-  ', ',
-  ', ',
-  '].map((label, i) => {
+        {['Contraseña actual', 'Nueva contraseña', 'Repetir nueva'].map((label, i) => {
           const val = i === 0 ? current : i === 1 ? next : repeat;
           const setVal = i === 0 ? setCurrent : i === 1 ? setNext : setRepeat;
           return (
@@ -325,16 +143,12 @@ function PasswordSection({ user }) {
             </div>
           );
         })}
-        {msg && <p className={`text-xs ${msg.type === ',
-  ' ? ',
-  ' : ',
-  '}`}>{msg.text}</p>}
+        {msg && <p className={`text-xs ${msg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{msg.text}</p>}
         <div className="flex gap-2">
           <button onClick={() => setOpen(false)} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
           <button onClick={handleSave} disabled={saving}
             className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : ',
-  '}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar'}
           </button>
         </div>
       </div>
@@ -368,21 +182,16 @@ export default function Settings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const [displayName, setDisplayName] = useState(',
-  ');
-  const [username, setUsername]       = useState(',
-  ');
-  const [homeCountry, setHomeCountry] = useState(',
-  ');
-  const [homeCurrency, setHomeCurrency] = useState(',
-  ');
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername]       = useState('');
+  const [homeCountry, setHomeCountry] = useState('España');
+  const [homeCurrency, setHomeCurrency] = useState('EUR');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState(null);
   const [usernameAvailable, setUsernameAvailable] = useState(null);
 
   // Notifications prefs (stored in profile)
-  const [secondNationality, setSecondNationality] = useState(',
-  ');
+  const [secondNationality, setSecondNationality] = useState('');
   const [notifInvites,  setNotifInvites]  = useState(true);
   const [notifExpenses, setNotifExpenses] = useState(true);
   const [notifComments, setNotifComments] = useState(false);
@@ -391,8 +200,7 @@ export default function Settings() {
   const avatarInputRef = useRef(null);
 
   const { data: profile } = useQuery({
-    queryKey: [',
-  ', user?.id],
+    queryKey: ['myProfile', user?.id],
     queryFn: async () => {
       const r = await base44.entities.UserProfile.filter({ user_id: user.id });
       return r[0] || null;
@@ -403,16 +211,11 @@ export default function Settings() {
 
   useEffect(() => {
     if (profile) {
-      setDisplayName(profile.display_name || ',
-  ');
-      setUsername(profile.username || ',
-  ');
-      setHomeCountry(profile.home_country || ',
-  ');
-      setSecondNationality(profile.second_nationality || ',
-  ');
-      setHomeCurrency(profile.home_currency || ',
-  ');
+      setDisplayName(profile.display_name || '');
+      setUsername(profile.username || '');
+      setHomeCountry(profile.home_country || 'España');
+      setSecondNationality(profile.second_nationality || '');
+      setHomeCurrency(profile.home_currency || 'EUR');
       setNotifInvites(profile.notif_invites !== false);
       setNotifExpenses(profile.notif_expenses !== false);
       setNotifComments(profile.notif_comments === true);
@@ -437,20 +240,14 @@ export default function Settings() {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
-      queryClient.invalidateQueries({ queryKey: [',
-  ', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
     } catch {}
   };
 
   const handleSave = async () => {
-    if (!displayName.trim()) { setSaveMsg({ type:',
-  ', text:',
-  ' }); return; }
-    if (username && validateUsername(username)) { setSaveMsg({ type:',
-  ', text: validateUsername(username) }); return; }
-    if (usernameAvailable === false) { setSaveMsg({ type:',
-  ', text:',
-  ' }); return; }
+    if (!displayName.trim()) { setSaveMsg({ type:'error', text:'El nombre no puede estar vacío' }); return; }
+    if (username && validateUsername(username)) { setSaveMsg({ type:'error', text: validateUsername(username) }); return; }
+    if (usernameAvailable === false) { setSaveMsg({ type:'error', text:'Username no disponible' }); return; }
     setSaving(true);
     try {
       await base44.entities.UserProfile.update(profile.id, {
@@ -465,16 +262,11 @@ export default function Settings() {
         notif_comments: notifComments,
         spots_public_default: spotsPublic,
       });
-      queryClient.invalidateQueries({ queryKey: [',
-  ', user?.id] });
-      setSaveMsg({ type:',
-  ', text:',
-  ' });
+      queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
+      setSaveMsg({ type:'ok', text:'Guardado ✓' });
       setTimeout(() => setSaveMsg(null), 2000);
     } catch {
-      setSaveMsg({ type:',
-  ', text:',
-  ' });
+      setSaveMsg({ type:'error', text:'Error al guardar' });
     } finally { setSaving(false); }
   };
 
@@ -495,8 +287,7 @@ export default function Settings() {
       <div className="bg-background sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
-            <Link to={createPageUrl(',
-  ')}
+            <Link to={createPageUrl('Profile')}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -520,8 +311,7 @@ export default function Settings() {
               <div className="w-14 h-14 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-lg font-medium">
                 {profile.avatar_url
                   ? <img src={profile.avatar_url} alt={displayName} className="w-full h-full object-cover"/>
-                  : displayName[0]?.toUpperCase() || ',
-  '
+                  : displayName[0]?.toUpperCase() || '?'
                 }
               </div>
               <button onClick={() => avatarInputRef.current?.click()}
@@ -554,9 +344,7 @@ export default function Settings() {
                 className="w-full h-10 border border-border rounded-xl pl-7 pr-9 text-sm outline-none focus:border-primary bg-secondary" />
               {username && username !== profile.username && usernameAvailable !== null && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-                  {usernameAvailable ? ',
-  ' : ',
-  '}
+                  {usernameAvailable ? '✓' : '✗'}
                 </span>
               )}
             </div>
@@ -565,15 +353,22 @@ export default function Settings() {
           {/* Save button */}
           <div className="px-4 py-3">
             {saveMsg && (
-              <p className={`text-xs mb-2 ${saveMsg.type === ',
-  ' ? ',
-  ' : ',
-  '}`}>{saveMsg.text}</p>
+              <p className={`text-xs mb-2 ${saveMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{saveMsg.text}</p>
             )}
             <button onClick={handleSave} disabled={saving}
               className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : '
-].map(name => ({ name, ...getCountryMeta(name) })).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+              {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar cambios'}
+            </button>
+          </div>
+        </div>
+
+        {/* ── PREFERENCIAS ── */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Preferencias</p>
+        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-xs text-muted-foreground mb-1.5">País de origen <span className="text-muted-foreground/60">· Embajadas y emergencias</span></p>
+            <select value={homeCountry} onChange={e => {
+              const c = COUNTRIES.find(x => x.name === e.target.value) || COUNTRIES[0];
               setHomeCountry(c.name); setHomeCurrency(c.currency);
             }} className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
               {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
