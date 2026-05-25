@@ -29,6 +29,7 @@ export default function Packing() {
   const { items: suggestedItems, requirements } = getSmartPackingList(country);
   const [showSmartPanel, setShowSmartPanel] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('all');
   const [formData, setFormData] = useState({
     name: '',
     category: 'personal',
@@ -157,6 +158,7 @@ export default function Packing() {
                 </div>
               )}
             </div>
+            </>
           )}
 
           {/* Progress */}
@@ -203,8 +205,27 @@ export default function Packing() {
               )}
             </div>
           ) : (
+            <>
+              {/* Category filter chips */}
+              <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    activeCategory === 'all' ? 'bg-primary text-white' : 'bg-secondary text-foreground hover:bg-border'
+                  }`}
+                >Todo</button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.value}
+                    onClick={() => setActiveCategory(cat.value)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      activeCategory === cat.value ? 'bg-primary text-white' : 'bg-secondary text-foreground hover:bg-border'
+                    }`}
+                  >{cat.icon} {cat.label}</button>
+                ))}
+              </div>
             <div className="grid md:grid-cols-2 gap-6">
-              {categories.map((cat) => {
+              {categories.filter(cat => activeCategory === 'all' || cat.value === activeCategory).map((cat) => {
                 const categoryItems = groupedItems[cat.value] || [];
                 const packedCount = categoryItems.filter(i => i.packed).length;
                 const categoryProgress = categoryItems.length > 0 
