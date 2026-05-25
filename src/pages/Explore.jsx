@@ -15,7 +15,7 @@ import { useLike } from '@/hooks/useLike';
 
 const SPOT_TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
 const TYPE_COLORS = {
-  food:'bg-orange-100 text-orange-700', sight:'bg-blue-100 text-blue-700',
+  food:'bg-orange-50 text-primary', sight:'bg-blue-100 text-blue-700',
   activity:'bg-green-100 text-green-700', shopping:'bg-purple-100 text-purple-700',
   transport:'bg-slate-100 text-slate-700', custom:'bg-yellow-100 text-yellow-700',
 };
@@ -24,7 +24,7 @@ function Avatar({ profile, size }) {
   const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
   const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
   if (profile?.avatar_url) return <img src={profile.avatar_url} className={cls + ' rounded-full object-cover flex-shrink-0'} alt={initials}/>;
-  return <div className={cls + ' rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold flex-shrink-0'}>{initials}</div>;
+  return <div className={cls + ' rounded-full bg-orange-50 text-primary flex items-center justify-center font-bold flex-shrink-0'}>{initials}</div>;
 }
 
 function LikeButton({ targetId, targetType, userId, targetOwnerId }) {
@@ -79,7 +79,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
         {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
         {spot.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
-            {spot.tags.slice(0,4).map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
+            {spot.tags.slice(0,4).map(t => <span key={t} className="text-xs bg-secondary text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
           </div>
         )}
         <div className="flex items-center gap-3 mt-3">
@@ -176,7 +176,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
             return (
               <div key={spot.id} className="bg-white border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-shadow">
                 <div className={"w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 " +
-                  (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-slate-100 text-slate-600' : idx === 2 ? 'bg-orange-100 text-orange-700' : 'bg-secondary text-muted-foreground')}>
+                  (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-slate-100 text-slate-600' : idx === 2 ? 'bg-orange-50 text-primary' : 'bg-secondary text-muted-foreground')}>
                   {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
                 </div>
                 <div className="flex-1 min-w-0">
