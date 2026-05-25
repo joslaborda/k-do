@@ -78,15 +78,15 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
 
         <textarea value={text} onChange={e => setText(e.target.value)}
           placeholder="Cuéntanos qué tal... (opcional)"
-          className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-orange-400 bg-secondary mb-3" />
+          className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary mb-3" />
 
         {showImageField ? (
           <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
             placeholder="URL de la foto..."
-            className="w-full text-sm border border-border rounded-xl px-3 py-2.5 outline-none focus:border-orange-400 bg-secondary mb-3" />
+            className="w-full text-sm border border-border rounded-xl px-3 py-2.5 outline-none focus:border-primary bg-secondary mb-3" />
         ) : (
           <button onClick={() => setShowImageField(true)}
-            className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-orange-300 hover:text-orange-600 transition-colors mb-3">
+            className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors mb-3">
             <Camera className="w-4 h-4" />Añadir una foto
           </button>
         )}
@@ -157,7 +157,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs flex-shrink-0">
                 {c.user_display_name?.[0]?.toUpperCase() || '?'}
               </div>
               <div className="flex-1 min-w-0">
@@ -186,19 +186,19 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
             </button>
             <textarea value={text} onChange={e => setText(e.target.value)}
               placeholder="Añade un comentario..."
-              className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-orange-400 bg-secondary h-9" />
+              className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-primary bg-secondary h-9" />
           </div>
           <div className="flex gap-2">
             {showImageField ? (
               <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
-                placeholder="URL de la foto..." className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 outline-none focus:border-orange-400 bg-secondary" />
+                placeholder="URL de la foto..." className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 outline-none focus:border-primary bg-secondary" />
             ) : (
               <button onClick={() => setShowImageField(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-orange-600 px-2 py-1.5 border border-dashed border-border rounded-xl flex-1 justify-center">
                 <Camera className="w-3.5 h-3.5" />Foto
               </button>
             )}
             <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
-              className="px-4 py-1.5 rounded-xl bg-orange-700 text-white text-sm font-medium disabled:opacity-50 hover:bg-orange-800 transition-colors">
+              className="px-4 py-1.5 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors">
               {mutation.isPending ? '...' : 'Publicar'}
             </button>
           </div>
@@ -319,7 +319,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
               : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             }
             <span className={`text-sm font-medium ${isLiked ? 'text-primary' : 'text-muted-foreground'}`}>
-              {likeCount > 0 ? likeCount : ''}
+              {(likeCount || spot.visits) > 0 ? (likeCount || spot.visits) : ''}
             </span>
           </button>
 
