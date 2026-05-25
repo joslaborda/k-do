@@ -157,15 +157,15 @@ export default function Invites() {
   if (token) {
     if (inviteLoading || tripLoading) {
       return (
-        <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-          <Loader2 className="w-12 h-12 animate-spin text-orange-700" />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
         </div>
       );
     }
 
     if (inviteError || !invite || !trip) {
       return (
-        <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
           <Card className="max-w-md w-full border-red-200 bg-red-50">
             <div className="p-6 text-center">
               <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -175,7 +175,7 @@ export default function Invites() {
               </p>
               <Button
                 onClick={() => navigate(createPageUrl('TripsList'))}
-                className="w-full bg-orange-700 hover:bg-orange-800"
+                className="w-full bg-primary hover:bg-primary/90"
               >
                 Ir a mis viajes
               </Button>
@@ -186,8 +186,8 @@ export default function Invites() {
     }
 
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6 py-12">
-        <Card className="max-w-md w-full border-orange-200 bg-white shadow-lg">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 py-12">
+        <Card className="max-w-md w-full border-primary/20 bg-white shadow-lg">
           <div className="p-8">
             {/* Header */}
             <div className="text-center mb-6">
@@ -197,7 +197,7 @@ export default function Invites() {
             </div>
 
             {/* Trip Info */}
-            <div className="bg-orange-50 rounded-xl p-4 mb-6 space-y-3 border border-orange-200">
+            <div className="bg-orange-50 rounded-xl p-4 mb-6 space-y-3 border border-primary/20">
               <h2 className="font-bold text-lg text-foreground">{trip.name}</h2>
 
               {trip.destination && (
@@ -215,7 +215,7 @@ export default function Invites() {
               )}
 
               {/* Rol */}
-              <div className="flex items-center gap-2 pt-2 border-t border-orange-200">
+              <div className="flex items-center gap-2 pt-2 border-t border-primary/20">
                 <span className="text-sm text-muted-foreground">Rol asignado:</span>
                 <Badge className="bg-blue-100 text-blue-700 border-blue-200 border">
                   {invite.role === 'admin'
@@ -264,9 +264,9 @@ export default function Invites() {
 
   // Sin token (list view)
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-orange-700 pt-12 pb-8">
+      <div className="bg-primary pt-12 pb-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-white text-4xl font-bold mb-2">Invitaciones 📬</h1>
           <p className="text-white/90">
@@ -288,7 +288,7 @@ export default function Invites() {
             </p>
             <Button
               onClick={() => navigate(createPageUrl('TripsList'))}
-              className="bg-orange-700 hover:bg-orange-800"
+              className="bg-primary hover:bg-primary/90"
             >
               <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
               Mis viajes
@@ -301,7 +301,7 @@ export default function Invites() {
               return (
                 <Card
                   key={invite.id}
-                  className="border-orange-200 bg-white hover:shadow-lg transition-all"
+                  className="border-primary/20 bg-white hover:shadow-lg transition-all"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between gap-4 mb-4">
