@@ -13,7 +13,9 @@ import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList } from '@/lib/packingDB';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 
+import { Link } from 'react-router-dom';
+
+
 function OTabBar({ tabs, activeKey, onChange }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
@@ -85,8 +87,6 @@ function OTabBar({ tabs, activeKey, onChange }) {
     </div>
   );
 }
-
-'react-router-dom';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
