@@ -50,8 +50,10 @@ function TripSummarySheet({ trip, cities, onClose }) {
     countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
     days ? `📅 ${days} días · ${startDate}` : '',
     trip.destination ? `🗺️ ${trip.destination}` : '',
-    '\n¡Organizado con Kodo! Viaja con nosotros.',
-  ].filter(Boolean).join('\n');
+    `
+¡Organizado con Kōdo! 🌸`,
+  ].filter(Boolean).join('
+');
 
   const handleShare = () => {
     if (navigator.share) {
@@ -293,7 +295,7 @@ export default function TripsList() {
       {needsOnboarding && <CreateProfileModal user={user} open={true} />}
 
       {/* ── Header ── */}
-      <div className="bg-background sticky top-0 z-10">
+      <div className="bg-background border-b border-border sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
@@ -387,7 +389,7 @@ export default function TripsList() {
         onSubmit={data => createMutation.mutate(data)}
         isPending={createMutation.isPending}
       />
-
+    </div>
       {/* ── Trip summary sheet ───────────────────────────────────────── */}
       {summaryTrip && (
         <TripSummarySheet
