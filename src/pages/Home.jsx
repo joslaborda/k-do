@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import CountryInput from '@/components/trip/CountryInput';
 import PDFViewer from '@/components/PDFViewer';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -475,9 +476,8 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
         className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <span className="shrink-0 flex flex-col items-start gap-0.5">
-            {isToday_ && <div style={{height:2.5,width:20,background:'#c2410c',borderRadius:2}} />}
-            <span className={`text-xs font-medium uppercase tracking-wider ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
+          <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
+            {label}
           </span>
           <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
           {dateStr && (
@@ -1436,7 +1436,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">País</p>
-                    <Input value={cityDraft.country || ''} onChange={e => setCityDraft(p => ({ ...p, country: e.target.value }))} className="h-8 text-sm" placeholder="País" />
+                    <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder="País" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -1488,7 +1488,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">País</p>
-                <Input value={cityDraft.country || ''} onChange={e => setCityDraft(p => ({ ...p, country: e.target.value }))} className="h-8 text-sm" placeholder="País" />
+                <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder="País" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
