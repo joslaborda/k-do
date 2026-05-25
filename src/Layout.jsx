@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X } from 'lucide-react';
+import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X , CalendarDays } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
@@ -17,6 +17,7 @@ const mainNavItems = [
 // ── Drawer: el resto de páginas del viaje ─────────────────────────────────────
 const drawerItems = [
   { name: 'Ruta',      page: 'Cities',     icon: MapPin,   sub: 'Ciudades e itinerario' },
+  { name: 'Calendario',page: 'Calendar',   icon: CalendarDays, sub: 'Itinerario visual'  },
   { name: 'Traducir',  page: 'Translator', icon: Languages, sub: 'Voz, texto e imagen'  },
   { name: 'Utilidades',page: 'Utilities',  icon: Info,     sub: 'Embajadas, emergencias'},
 ];
@@ -118,14 +119,14 @@ export default function Layout({ children, currentPageName }) {
                   to={tripUrl(item.page)}
                   onClick={() => setDrawerOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0 transition-colors ${
-                    isActive ? 'bg-orange-50' : 'hover:bg-secondary/40'
+                    isActive ? 'bg-primary/5' : 'hover:bg-secondary/40'
                   }`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isActive ? 'bg-primary' : 'bg-secondary'
+                    isActive ? 'bg-primary/10' : 'bg-secondary'
                   }`}>
                     <item.icon
-                      className={`w-4.5 h-4.5 ${isActive ? 'text-white' : 'text-muted-foreground'}`}
+                      className={`w-4.5 h-4.5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                       style={{ width: '18px', height: '18px' }}
                       strokeWidth={isActive ? 2.5 : 2}
                     />
@@ -236,15 +237,15 @@ export default function Layout({ children, currentPageName }) {
                   key={item.page}
                   to={linkUrl}
                   className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-full ${
-                    isActive ? 'bg-white/15' : 'hover:bg-white/8'
+                    isActive ? 'bg-primary/10' : 'hover:bg-secondary/40'
                   }`}
                   style={{ '--tw-bg-opacity': 1 }}
                 >
                   <item.icon
-                    className={`w-5 h-5 ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}
+                    className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                     strokeWidth={isActive ? 2.5 : 2}
                   />
-                  <span className={`text-[9px] font-medium ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}>
+                  <span className={`text-[9px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                     {item.name}
                   </span>
                 </Link>
@@ -262,14 +263,14 @@ export default function Layout({ children, currentPageName }) {
                       key={item.page}
                       to={tripUrl(item.page)}
                       className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-full ${
-                        isActive ? 'bg-white/15' : 'hover:bg-white/8'
+                        isActive ? 'bg-primary/10' : 'hover:bg-secondary/40'
                       }`}
                     >
                       <item.icon
-                        className={`w-5 h-5 ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}
+                        className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                         strokeWidth={isActive ? 2.5 : 2}
                       />
-                      <span className={`text-[9px] font-medium ${isActive ? 'text-[#f8f6f3]' : 'text-[#6b6460]'}`}>
+                      <span className={`text-[9px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                         {item.name}
                       </span>
                     </Link>
