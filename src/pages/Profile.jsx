@@ -5,7 +5,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { Plus, Search, X, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { getCountryMeta } from '@/lib/coun
+import { getCountryMeta } from '@/lib/countryConfig';
+
+
 function OTabBar({ tabs, activeKey, onChange }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
@@ -77,8 +79,6 @@ function OTabBar({ tabs, activeKey, onChange }) {
     </div>
   );
 }
-
-tryConfig';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
