@@ -381,7 +381,6 @@ export default function TripsList() {
         onSubmit={data => createMutation.mutate(data)}
         isPending={createMutation.isPending}
       />
-    </div>
       {/* ── Trip summary sheet ───────────────────────────────────────── */}
       {summaryTrip && (
         <TripSummarySheet
