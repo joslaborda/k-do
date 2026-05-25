@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import NotificationBell from '@/components/notifications/NotificationBell';
