@@ -449,14 +449,14 @@ export default function CityDetail() {
 
   if (!city) {
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-gray-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img 
@@ -469,7 +469,7 @@ export default function CityDetail() {
         <div className="absolute top-6 left-6">
            <Link
              to={createPageUrl(`Cities?trip_id=${tripId}`)}
-             className="inline-flex items-center gap-2 px-4 py-2 bg-orange-700 rounded-full text-white text-sm font-semibold hover:bg-white hover:text-orange-700 transition-all duration-200 border border-orange-700"
+             className="inline-flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-white text-sm font-semibold hover:bg-primary/90 transition-all duration-200"
            >
              <ArrowLeft className="w-4 h-4" />
              Ruta
@@ -516,7 +516,7 @@ export default function CityDetail() {
            <h2 className="text-xl font-semibold text-foreground">Itinerario</h2>
            <div className="flex items-center gap-2 flex-wrap">
 
-             <Button onClick={openNewDialog} className="bg-orange-700 hover:bg-orange-800">
+             <Button onClick={openNewDialog} className="bg-primary hover:bg-primary/90">
                <Plus className="w-4 h-4 mr-2" />
                Añadir Día
              </Button>
@@ -534,7 +534,7 @@ export default function CityDetail() {
              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
              <h3 className="text-lg font-medium text-foreground mb-2">Sin itinerario todavía</h3>
              <p className="text-muted-foreground mb-4">Empieza a planificar tus días en {city.name}</p>
-             <Button onClick={openNewDialog} className="bg-orange-700 hover:bg-orange-800">
+             <Button onClick={openNewDialog} className="bg-primary hover:bg-primary/90">
                <Plus className="w-4 h-4 mr-2" />
                Añadir primer día
              </Button>
@@ -669,7 +669,7 @@ export default function CityDetail() {
               </Button>
               <Button 
                 onClick={handleSave}
-                className="bg-orange-700 hover:bg-orange-800"
+                className="bg-primary hover:bg-primary/90"
                   disabled={!formData.title.trim() || updateMutation.isPending || createMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-2" />
