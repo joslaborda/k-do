@@ -57,15 +57,7 @@ const COUNTRIES = [
   var name = String(n);
   var m = getCountryMeta(name) || {};
   return { name: name, flag: m.flag || '🌍', currency: m.currency || 'USD' };
-}).sort(function(a, b) {
-  return String(a.name).localeCompare(String(b.name), 'es');
-}).map(name => {
-  const m = getCountryMeta(name);
-  return { name, flag: m.flag || '🌍', currency: m.currency || 'USD' };
-}).sort((a, b) => a.name.localeCompare(b.name, 'es')).map(name => {
-  const meta = getCountryMeta(name);
-  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
-}).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+}).sort(function(a, b) { return String(a.name).localeCompare(String(b.name), 'es'); });
 
 const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'].map(name => {
   const meta = getCountryMeta(name);
