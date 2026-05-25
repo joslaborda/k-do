@@ -51,7 +51,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
           <Avatar profile={profile} size="sm"/>
           <div className="flex-1 min-w-0">
             <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id}
-              className="text-xs font-semibold text-foreground hover:text-orange-700 truncate block">
+              className="text-xs font-semibold text-foreground hover:text-primary truncate block">
               {profile?.display_name || 'Viajero'}{profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
             </Link>
             {(spot.city_name || spot.country) && (
@@ -79,13 +79,13 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
         {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
         {spot.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
-            {spot.tags.slice(0,4).map(t => <span key={t} className="text-xs bg-secondary text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
+            {spot.tags.slice(0,4).map(t => <span key={t} className="text-xs bg-secondary text-primary px-1.5 py-0.5 rounded-full">#{t}</span>)}
           </div>
         )}
         <div className="flex items-center gap-3 mt-3">
           <LikeButton targetId={spot.id} targetType="spot" userId={currentUser?.id} targetOwnerId={spot.created_by_user_id}/>
           {!isOwn && currentUser && (
-            <button onClick={() => onSave(spot)} disabled={saving} className="flex items-center gap-1.5 text-xs text-orange-700 font-medium hover:text-orange-800">
+            <button onClick={() => onSave(spot)} disabled={saving} className="flex items-center gap-1.5 text-xs text-primary font-medium hover:text-orange-800">
               <Bookmark className="w-3.5 h-3.5"/>{saving ? 'Guardando...' : 'Guardar'}
             </button>
           )}
@@ -103,7 +103,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
     <div className="bg-white border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
       <Avatar profile={profile}/>
       <div className="flex-1 min-w-0">
-        <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-orange-700 block truncate">
+        <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-primary block truncate">
           {profile.display_name || 'Viajero'}
         </Link>
         {profile.username && <p className="text-xs text-muted-foreground font-mono">@{profile.username}</p>}
@@ -111,7 +111,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
       </div>
       {!isOwn && currentUser && (
         <Button size="sm" onClick={() => onFollow(profile, followRecord)}
-          className={isFollowing ? 'border border-orange-200 text-orange-700 bg-white hover:bg-orange-50' : 'bg-orange-700 hover:bg-orange-800 text-white'}>
+          className={isFollowing ? 'border border-primary/30 text-primary bg-white hover:bg-orange-50' : 'bg-primary hover:bg-primary/90 text-white'}>
           {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1"/>Siguiendo</> : <><UserPlus className="w-3.5 h-3.5 mr-1"/>Seguir</>}
         </Button>
       )}
@@ -196,7 +196,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
                   </div>
                   {!isOwn && currentUser && (
                     <button onClick={() => onSave(spot)} disabled={savingSpotId === spot.id}
-                      className="mt-2 text-xs text-orange-700 font-medium hover:underline flex items-center gap-1">
+                      className="mt-2 text-xs text-primary font-medium hover:underline flex items-center gap-1">
                       <Bookmark className="w-3 h-3"/>{savingSpotId === spot.id ? 'Guardando...' : 'Guardar'}
                     </button>
                   )}
@@ -349,8 +349,8 @@ export default function Explore() {
   const activeFilters = [spotSearch, spotCity, spotTag].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-orange-50 pb-24">
-      <div className="bg-orange-700 pt-12 pb-6 px-6">
+    <div className="min-h-screen bg-background pb-24">
+      <div className="bg-background pt-12 pb-6 px-6">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-white text-4xl font-bold mb-1">Explorar</h1>
           <p className="text-white/80 text-sm mb-4">Descubre spots, viajes y viajeros</p>
@@ -365,19 +365,19 @@ export default function Explore() {
       <div className="max-w-2xl mx-auto px-4 py-4">
         <Tabs defaultValue="explorar">
           <TabsList className="w-full mb-5 bg-white border border-border">
-            <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+            <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Globe className="w-4 h-4 mr-1"/>Explorar
             </TabsTrigger>
-            <TabsTrigger value="siguiendo" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+            <TabsTrigger value="siguiendo" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Heart className="w-4 h-4 mr-1"/>Siguiendo
               {(siguiendoSpots.length + siguiendoTemplates.length) > 0 && (
                 <Badge variant="secondary" className="ml-1">{siguiendoSpots.length + siguiendoTemplates.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+            <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Users className="w-4 h-4 mr-1"/>Personas
             </TabsTrigger>
-            <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-orange-700 data-[state=active]:text-white">
+            <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               ⭐ Top
             </TabsTrigger>
           </TabsList>
@@ -390,7 +390,7 @@ export default function Explore() {
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtrar spots</p>
                 {activeFilters > 0 && (
                   <button onClick={() => { setSpotSearch(''); setSpotCity(''); setSpotTag(''); }}
-                    className="text-xs text-orange-700 hover:underline flex items-center gap-1">
+                    className="text-xs text-primary hover:underline flex items-center gap-1">
                     <X className="w-3 h-3"/>Limpiar
                   </button>
                 )}
@@ -417,7 +417,7 @@ export default function Explore() {
             {/* Spots */}
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
-                <Compass className="w-4 h-4 text-orange-700"/>
+                <Compass className="w-4 h-4 text-primary"/>
                 <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">Spots</h2>
                 <Badge variant="secondary" className="ml-auto">{filteredSpots.length}</Badge>
               </div>
@@ -438,7 +438,7 @@ export default function Explore() {
             {/* Itinerarios */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Globe className="w-4 h-4 text-orange-700"/>
+                <Globe className="w-4 h-4 text-primary"/>
                 <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">Itinerarios</h2>
                 <Badge variant="secondary" className="ml-auto">{publicTemplates.length}</Badge>
               </div>
@@ -465,7 +465,7 @@ export default function Explore() {
                 {siguiendoSpots.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <Compass className="w-4 h-4 text-orange-700"/>
+                      <Compass className="w-4 h-4 text-primary"/>
                       <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">Spots</h2>
                       <Badge variant="secondary" className="ml-auto">{siguiendoSpots.length}</Badge>
                     </div>
@@ -480,7 +480,7 @@ export default function Explore() {
                 {siguiendoTemplates.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <Globe className="w-4 h-4 text-orange-700"/>
+                      <Globe className="w-4 h-4 text-primary"/>
                       <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">Itinerarios</h2>
                       <Badge variant="secondary" className="ml-auto">{siguiendoTemplates.length}</Badge>
                     </div>
