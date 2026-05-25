@@ -121,23 +121,23 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-orange-700 pt-12 pb-20">
+      <div className="bg-background pt-12 pb-6">
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-white text-4xl font-bold">Documentos ✈️</h1>
-          <p className="text-white/90 mt-1">Inteligente, contextual y colaborativo</p>
+          <p className="text-foreground/90 mt-1">Inteligente, contextual y colaborativo</p>
         </div>
       </div>
 
-      <div className="bg-orange-50 mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-6xl -mt-12">
+      <div className="mx-auto px-6 pt-6 pb-12 md:pb-6 max-w-6xl -mt-12">
         {/* Toolbar */}
         <div className="bg-white rounded-2xl border border-border p-4 mb-6 flex flex-wrap items-center gap-3">
           {/* Category filter */}
           <div className="flex items-center gap-1.5 flex-wrap flex-1">
             <button
               onClick={() => setCatFilter('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === 'all' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${catFilter === 'all' ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-secondary'}`}
             >
               Todos
             </button>
@@ -165,7 +165,7 @@ export default function Calendar() {
                   key={f.value}
                   onClick={() => setVisFilter(f.value)}
                   title={f.label}
-                  className={`p-1.5 rounded-lg transition-all ${visFilter === f.value ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-secondary'}`}
+                  className={`p-1.5 rounded-lg transition-all ${visFilter === f.value ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-secondary'}`}
                 >
                   <Icon className="w-4 h-4" />
                 </button>
@@ -173,7 +173,7 @@ export default function Calendar() {
             })}
           </div>
 
-          <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800 flex-shrink-0">
+          <Button onClick={() => setDialogOpen(true)} className="bg-primary hover:bg-primary/90 flex-shrink-0">
             <Plus className="w-4 h-4 mr-2" />
             Añadir
           </Button>
@@ -185,7 +185,7 @@ export default function Calendar() {
             <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <p className="text-foreground font-medium mb-1">Sin documentos todavía</p>
             <p className="text-sm text-muted-foreground mb-5">Sube un PDF o imagen y la IA lo identificará automáticamente</p>
-            <Button onClick={() => setDialogOpen(true)} className="bg-orange-700 hover:bg-orange-800">
+            <Button onClick={() => setDialogOpen(true)} className="bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               Añadir documento
             </Button>
@@ -203,7 +203,7 @@ export default function Calendar() {
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <h2 className="text-xl font-bold text-foreground">{cfg.label}</h2>
-                    <span className="text-xs bg-orange-200 text-orange-800 font-semibold px-2 py-0.5 rounded-full">{items.length}</span>
+                    <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">{items.length}</span>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     {items.map(ticket => (
