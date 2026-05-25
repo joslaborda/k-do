@@ -25,20 +25,20 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center shadow-sm">
-        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Mail className="w-8 h-8 text-orange-700" />
+        <div className="w-16 h-16 bg-orange-50/60 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Mail className="w-8 h-8 text-primary" />
         </div>
         <h2 className="text-xl font-bold mb-2">Verifica tu email</h2>
         <p className="text-sm text-muted-foreground mb-6">
           Te hemos enviado un correo de verificación. Ábrelo y confirma tu cuenta para continuar usando Kōdo.
         </p>
         {msg && (
-          <p className="text-sm mb-4 text-orange-700 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">{msg}</p>
+          <p className="text-sm mb-4 text-primary bg-secondary border border-border rounded-lg px-3 py-2">{msg}</p>
         )}
         <Button
-          className="w-full bg-orange-700 hover:bg-orange-800 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-white"
           onClick={handleCheck}
           disabled={checking}
         >
