@@ -50,10 +50,8 @@ function TripSummarySheet({ trip, cities, onClose }) {
     countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
     days ? `📅 ${days} días · ${startDate}` : '',
     trip.destination ? `🗺️ ${trip.destination}` : '',
-    `
-¡Organizado con Kōdo! 🌸`,
-  ].filter(Boolean).join('
-');
+    '\nOrganizado con Kodo. Planifica tu viaje en kodo.app',
+  ].filter(Boolean).join('\n');
 
   const handleShare = () => {
     if (navigator.share) {
@@ -126,15 +124,9 @@ export default function TripsList() {
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
   const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userLoading, setUserLoading] = useState(true);
+  const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    base44.auth.me()
-      .then(u => { setUser(u); setUserLoading(false); })
-      .catch(() => setUserLoading(false));
-  }, []);
 
   const { data: myProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
@@ -277,7 +269,7 @@ export default function TripsList() {
         <p className="text-lg font-medium mb-2">Verifica tu email</p>
         <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
         <button className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-medium"
-          onClick={() => base44.auth.me().then(setUser).catch(()=>{})}>
+          onClick={() => window.location.reload()}>
           Ya verifiqué ✓
         </button>
         <button onClick={() => base44.auth.logout()}
