@@ -475,8 +475,9 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
         className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${isToday_ ? 'bg-orange-50 hover:bg-orange-100/50' : 'bg-secondary/30 hover:bg-secondary/50'}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
-            {label}
+          <span className="shrink-0 flex flex-col items-start gap-0.5">
+            {isToday_ && <div style={{height:2.5,width:20,background:'#c2410c',borderRadius:2}} />}
+            <span className={`text-xs font-medium uppercase tracking-wider ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
           </span>
           <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
           {dateStr && (
