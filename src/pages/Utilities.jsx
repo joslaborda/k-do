@@ -1,5 +1,5 @@
 import { createPageUrl } from '@/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,7 +13,80 @@ import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList } from '@/lib/packingDB';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link } from 
+function OTabBar({ tabs, activeKey, onChange }) {
+  const containerRef = useRef(null);
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  const updateLine = useCallback(() => {
+    if (!containerRef.current) return;
+    const idx = tabs.findIndex(t => t.key === activeKey);
+    const buttons = containerRef.current.querySelectorAll('button');
+    const btn = buttons[idx];
+    if (!btn) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const labelEl = btn.querySelector('.tab-label');
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    setLineStyle({
+      left: labelRect.left - containerRect.left,
+      width: labelRect.width,
+    });
+  }, [activeKey, tabs]);
+
+  useEffect(() => {
+    updateLine();
+    if (!mounted) setTimeout(() => setMounted(true), 50);
+  }, [updateLine, mounted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex"
+      style={{ position: 'relative' }}
+    >
+      {/* Animated sliding line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: lineStyle.left,
+          width: lineStyle.width,
+          height: 3,
+          background: '#c2410c',
+          borderRadius: 2,
+          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
+        }}
+      />
+      {tabs.map(tab => {
+        const isOn = tab.key === activeKey;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
+          >
+            <span
+              className="tab-label"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isOn ? '#1a1714' : '#a09890',
+                transition: 'color 0.2s',
+                lineHeight: 1,
+              }}
+            >
+              {tab.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+'react-router-dom';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -489,17 +562,11 @@ export default function Utilities() {
             </a>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Utilidades</h1>
-          <div className="flex border-b border-border">
-            {TABS.map(([k, em, l]) => (
-              <button key={k} onClick={() => setActiveTab(k)}
-                className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${
-                  activeTab === k ? 'border-primary' : 'border-transparent'
-                }`}>
-                <span className="text-base leading-none">{em}</span>
-                <span className={`text-xs font-medium leading-none ${activeTab === k ? 'text-primary' : 'text-muted-foreground'}`}>{l}</span>
-              </button>
-            ))}
-          </div>
+          <OTabBar
+            tabs={TABS.map(([k,_em,l]) => ({key:k,label:l}))}
+            activeKey={activeTab}
+            onChange={setActiveTab}
+          />
         </div>
       </div>
 
