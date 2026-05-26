@@ -250,13 +250,15 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
   const toggleRecording = () => {
     // STOP: save what we have and translate
     if (recording) {
+      const textToTranslate = (pendingTextRef.current || interimRef.current || '').trim();
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
-      // translate whatever we captured (interim or final)
-      if (pendingTextRef.current.trim()) {
-        doTranslate(pendingTextRef.current);
+      if (textToTranslate) {
+        doTranslate(textToTranslate);
         pendingTextRef.current = '';
+      } else {
+        setError('No se detectó texto. Intenta hablar más claro.');
       }
       return;
     }
@@ -305,7 +307,9 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
       // accumulate finals
       if (final) pendingTextRef.current += ' ' + final;
       // show live what is being said
-      setInterim(pendingTextRef.current + interim);
+      const liveText = pendingTextRef.current + interim;
+      interimRef.current = liveText;
+      setInterim(liveText);
     };
 
     try { recognition.start(); }
