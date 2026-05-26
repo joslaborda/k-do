@@ -1588,13 +1588,21 @@ export default function Restaurants() {
             {!isSearchActive && hashtags.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Explorar por tema</p>
-                <div className="flex flex-wrap gap-2">
-                  {hashtags.map(tag => (
-                    <button key={tag} onClick={() => setSearchQuery(tag.replace('#', ''))}
-                      className="text-sm px-3 py-1.5 rounded-full border border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
-                      {tag}
-                    </button>
-                  ))}
+                <div className="relative">
+                  {/* fade derecha */}
+                  <div style={{
+                    position:'absolute',top:0,right:0,width:32,height:'100%',zIndex:1,
+                    background:'linear-gradient(to right, transparent, #f8f6f3)',
+                    pointerEvents:'none',
+                  }}/>
+                  <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none',msOverflowStyle:'none'}}>
+                    {hashtags.map(tag => (
+                      <button key={tag} onClick={() => setSearchQuery(tag.replace('#', ''))}
+                        className="text-sm px-3 py-1.5 rounded-full border border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex-shrink-0">
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
