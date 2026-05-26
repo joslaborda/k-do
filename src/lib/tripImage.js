@@ -133,7 +133,6 @@ export function getTripCoverImage(trip, cities = []) {
   if (cities.length > 0) {
     const sorted = [...cities].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     for (const city of sorted) {
-      if (city.image_url) return city.image_url;
       const img = lookupCity(city.name) || lookupCountry(city.country);
       if (img) return img;
     }
