@@ -23,6 +23,17 @@ function getMapsUrl(spot) {
 }
 
 // ── Popup de valoración ───────────────────────────────────────────────────────
+// ── Upload helper ─────────────────────────────────────────────────────────────
+async function uploadPhoto(file) {
+  try {
+    const { file_url } = await base44.storage.uploadFile(file);
+    return file_url;
+  } catch {
+    return null;
+  }
+}
+
+
 function RatingPopup({ spot, userId, userProfile, onClose }) {
   const queryClient = useQueryClient();
   const [thumb, setThumb] = useState(null);
@@ -81,9 +92,19 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
           className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary mb-3" />
 
         {showImageField ? (
-          <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
-            placeholder="URL de la foto..."
-            className="w-full text-sm border border-border rounded-xl px-3 py-2.5 outline-none focus:border-primary bg-secondary mb-3" />
+          <label className="w-full cursor-pointer block mb-3">
+            <input type="file" accept="image/*" capture="environment" className="hidden"
+              onChange={async e => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const url = await uploadPhoto(file);
+                if (url) setImageUrl(url);
+              }} />
+            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-orange-50 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
+              <Camera className="w-4 h-4" />
+              {imageUrl ? 'Foto seleccionada ✓' : 'Subir foto'}
+            </div>
+          </label>
         ) : (
           <button onClick={() => setShowImageField(true)}
             className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors mb-3">
@@ -190,8 +211,19 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           </div>
           <div className="flex gap-2">
             {showImageField ? (
-              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)}
-                placeholder="URL de la foto..." className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 outline-none focus:border-primary bg-secondary" />
+              <label className="cursor-pointer">
+                <input type="file" accept="image/*" capture="environment" className="hidden"
+                  onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const url = await uploadPhoto(file);
+                    if (url) setImageUrl(url);
+                  }} />
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-orange-50 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
+                  <Camera className="w-3.5 h-3.5" />
+                  {imageUrl ? '✓' : 'Foto'}
+                </div>
+              </label>
             ) : (
               <button onClick={() => setShowImageField(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-orange-600 px-2 py-1.5 border border-dashed border-border rounded-xl flex-1 justify-center">
                 <Camera className="w-3.5 h-3.5" />Foto
