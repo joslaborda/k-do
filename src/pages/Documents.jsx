@@ -339,12 +339,14 @@ export default function Documents() {
       {/* List */}
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
         {grouped.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-4xl mb-4">📄</p>
-            <p className="text-muted-foreground mb-6">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
-            <Button onClick={() => setAddOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
-              <Plus className="w-4 h-4 mr-2" />Añadir documento
-            </Button>
+          <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+            <p className="text-4xl mb-3">📄</p>
+            <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
+            <p className="text-xs text-muted-foreground mb-5">Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano</p>
+            <button onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors">
+              <Plus className="w-4 h-4" />Añadir documento
+            </button>
           </div>
         ) : grouped.map(({ date, label, items, isToday }) => (
           <div key={date} className="mb-6">
