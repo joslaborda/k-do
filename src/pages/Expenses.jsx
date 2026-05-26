@@ -734,56 +734,64 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
 // ── Tab: Conversión de divisa ─────────────────────────────────────────────────
 function ConversionTab({ cities, baseCurrency, activeCity }) {
   const [amount, setAmount] = useState('1');
+  const [fromCurrency, setFromCurrency] = useState(baseCurrency);
   const [rates, setRates] = useState({});
   const [loadingRates, setLoadingRates] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);
 
-  // Get all destination currencies
-  const destCurrencies = useMemo(() => {
-    const set = new Set();
+  // Collect ALL currencies from trip cities, always include baseCurrency
+  const allCurrencies = useMemo(() => {
+    const set = new Set([baseCurrency]);
     cities.forEach(c => {
       const meta = getCountryMeta(c.country_code || c.country || '');
-      if (meta?.currency && meta.currency !== baseCurrency) set.add(meta.currency);
+      if (meta?.currency) set.add(meta.currency);
     });
+    // Always show at least EUR and USD if trip has no countries yet
+    if (set.size < 2) { set.add('EUR'); set.add('USD'); }
     return Array.from(set);
   }, [cities, baseCurrency]);
 
-  // Active city currency for highlight
   const activeMeta = getCountryMeta(activeCity?.country_code || activeCity?.country || '');
   const activeCurrency = activeMeta?.currency;
 
+  // Currencies to convert TO (everything except fromCurrency)
+  const targetCurrencies = allCurrencies.filter(c => c !== fromCurrency);
+
   useEffect(() => {
-    if (destCurrencies.length === 0) return;
+    if (targetCurrencies.length === 0) return;
     setLoadingRates(true);
-    Promise.all(destCurrencies.map(to => getFxRate(baseCurrency, to).then(r => [to, r.rate])))
+    Promise.all(targetCurrencies.map(to => getFxRate(fromCurrency, to).then(r => [to, r.rate])))
       .then(pairs => {
         const obj = {};
-        pairs.forEach(([k, v]) => obj[k] = v);
+        pairs.forEach(([k, v]) => { obj[k] = v; });
         setRates(obj);
         setLastFetch(new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }));
       })
       .catch(() => {})
       .finally(() => setLoadingRates(false));
-  }, [baseCurrency, destCurrencies.join(',')]);
+  }, [fromCurrency, targetCurrencies.join(',')]);
+
+  // Reset fromCurrency if baseCurrency changes
+  useEffect(() => { setFromCurrency(baseCurrency); }, [baseCurrency]);
 
   const numeric = parseFloat(amount) || 0;
 
-  if (destCurrencies.length === 0) return (
-    <div className="bg-white rounded-2xl border border-border text-center py-10 px-4">
-      <p className="text-3xl mb-2">💱</p>
-      <p className="text-sm font-medium text-foreground mb-1">Sin divisas que convertir</p>
-      <p className="text-xs text-muted-foreground">Añade países al viaje para ver la conversión</p>
-    </div>
-  );
-
   return (
     <div className="space-y-3">
-      {/* Amount input */}
+      {/* Amount + from currency */}
       <div className="bg-white rounded-2xl border border-border p-4">
-        <p className="text-xs text-muted-foreground mb-2">Importe a convertir</p>
+        <p className="text-xs text-muted-foreground mb-2">Convertir desde</p>
         <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center gap-2 h-12 border border-border rounded-xl px-3 focus-within:border-primary transition-colors">
-            <span className="text-sm font-medium text-muted-foreground">{baseCurrency}</span>
+          <select
+            value={fromCurrency}
+            onChange={e => { setFromCurrency(e.target.value); setRates({}); }}
+            className="h-12 border border-border rounded-xl px-3 text-sm font-medium text-foreground outline-none focus:border-primary bg-secondary appearance-none"
+          >
+            {allCurrencies.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <div className="flex-1 flex items-center h-12 border border-border rounded-xl px-3 focus-within:border-primary transition-colors">
             <input
               type="number"
               value={amount}
@@ -799,25 +807,26 @@ function ConversionTab({ cities, baseCurrency, activeCity }) {
         )}
       </div>
 
-      {/* Conversion results */}
+      {/* Results */}
       <div className="bg-white rounded-2xl border border-border overflow-hidden">
         {loadingRates ? (
           <div className="py-8 text-center">
             <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
           </div>
         ) : (
-          destCurrencies.map((currency, i) => {
+          targetCurrencies.map((currency, i) => {
             const rate = rates[currency];
             const converted = rate ? (numeric * rate).toFixed(2) : '—';
             const isActive = currency === activeCurrency;
             return (
-              <div key={currency} className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40' : ''}`}>
+              <div key={currency}
+                className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40' : ''}`}>
                 <div className="flex items-center gap-2.5">
                   <span className="text-lg">{getCountryMeta(currency)?.flag || '💱'}</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{currency}</p>
                     {isActive && <p className="text-xs text-primary font-medium">Ciudad actual</p>}
-                    {rate && <p className="text-xs text-muted-foreground">1 {baseCurrency} = {rate.toFixed(4)} {currency}</p>}
+                    {rate && <p className="text-xs text-muted-foreground">1 {fromCurrency} = {rate.toFixed(4)} {currency}</p>}
                   </div>
                 </div>
                 <p className="text-lg font-semibold text-foreground">{converted}</p>
@@ -859,7 +868,22 @@ export default function Expenses() {
   });
 
   const { cities, activeCity } = useTripContext(tripId);
-  const baseCurrency = trip?.base_currency || trip?.currency || 'EUR';
+
+  // Fetch user profile to get home currency as fallback
+  const { data: myProfile_ } = useQuery({
+    queryKey: ['myProfile_exp', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const r = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return r[0] || null;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // baseCurrency: trip field > user home currency > EUR
+  const baseCurrency = trip?.base_currency || trip?.currency ||
+    myProfile_?.home_currency || 'EUR';
   const activeMeta = getCountryMeta(activeCity?.country_code || activeCity?.country || '');
   const activeLocalCurrency = activeMeta?.currency;
   const availableCurrencies = computeAvailableCurrencies(cities, baseCurrency);
