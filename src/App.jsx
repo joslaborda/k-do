@@ -72,8 +72,8 @@ const AuthenticatedApp = () => {
         />
       ))}
       {/* Explicit routes for Explore & TemplateDetail (not in pagesConfig) */}
-      <Route path="/Explore" element={<Explore />} />
-      <Route path="/TemplateDetail" element={<TemplateDetail />} />
+      <Route path="/Explore" element={<LayoutWrapper currentPageName="Explore"><Explore /></LayoutWrapper>} />
+      <Route path="/TemplateDetail" element={<LayoutWrapper currentPageName="TemplateDetail"><TemplateDetail /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
