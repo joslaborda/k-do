@@ -1050,13 +1050,19 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
-              <input
-                type="time"
-                value={assignedTime}
+              <select
+                value={assignedTime || ''}
                 onChange={e => setAssignedTime(e.target.value)}
-                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
-                placeholder="--:--"
-              />
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none"
+              >
+                <option value="">-- Sin hora --</option>
+                {Array.from({ length: 24 * 4 }, (_, i) => {
+                  const h = Math.floor(i / 4).toString().padStart(2, '0');
+                  const m = ((i % 4) * 15).toString().padStart(2, '0');
+                  const val = `${h}:${m}`;
+                  return <option key={val} value={val}>{val}</option>;
+                })}
+              </select>
             </div>
           </div>
 
