@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
+import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil } from 'lucide-react';
@@ -1349,7 +1350,7 @@ export default function Restaurants() {
   };
 
   const baseData = extra => ({
-    trip_id: tripId || undefined, city_id: cityId||undefined, city_name: city, country,
+    trip_id: tripId || undefined, city_id: cityId||undefined, city_name: city, country: normalizeCountry(country),
     visibility: 'trip_members', visited: false,
     created_by: user?.email, created_by_user_id: user?.id,
     creator_username: myProfile?.username||'',
@@ -1404,7 +1405,7 @@ export default function Restaurants() {
       // Save community spot WITHOUT overriding created_by — preserve original author
       const created = await createMutation.mutateAsync({
         trip_id: tripId || undefined, city_id: cityId || undefined,
-        city_name: selectedCity || city, country,
+        city_name: selectedCity || city, country: normalizeCountry(country),
         title: spot.title, type: spot.type, address: spot.address || '',
         lat: spot.lat, lng: spot.lng, notes: spot.notes || '',
         visibility: 'trip_members', visited: false,
