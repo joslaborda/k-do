@@ -387,7 +387,7 @@ export default function Settings() {
             <p className="text-xs text-muted-foreground mb-1.5">Moneda base <span className="text-muted-foreground/60">· Gastos y conversiones</span></p>
             <select value={homeCurrency} onChange={e => setHomeCurrency(e.target.value)}
               className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
-              {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+              {CURRENCIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
             </select>
           </div>
         </div>
