@@ -652,7 +652,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
 
       {/* Quick status */}
       <div className="grid grid-cols-2 gap-3">
-        <Link to={createPageUrl('Packing') + '?trip_id=' + tripId}>
+        <Link to={createPageUrl('Utilities') + '?trip_id=' + tripId + '&tab=maleta'}>
           <div className="bg-white rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
             <p className="text-xs text-muted-foreground mb-1">Maleta</p>
             <p className="text-2xl font-semibold text-foreground">{packedPct}%</p>
