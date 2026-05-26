@@ -904,14 +904,12 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
               </div>
             );
           })}
-          <Link to={createPageUrl('TripDetail') + '?trip_id=' + trip?.id}>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center">
-                <UserPlus className="w-4 h-4 text-muted-foreground/50" />
-              </div>
-              <span className="text-xs text-muted-foreground">Añadir</span>
+          <button onClick={onInvite} className="flex flex-col items-center gap-1">
+            <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center hover:border-primary/40 transition-colors">
+              <UserPlus className="w-4 h-4 text-muted-foreground/50" />
             </div>
-          </Link>
+            <span className="text-xs text-muted-foreground">Añadir</span>
+          </button>
         </div>
       </div>
     </div>
