@@ -158,17 +158,17 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.page}
                     to={tripUrl(item.page)}
-                    className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
+                    className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                   >
-                    <div style={{height:3,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0 transition-colors"
-                      style={{color: isActive ? '#1a1714' : '#a09890'}}
-                      strokeWidth={isActive ? 2 : 1.75}
+                      style={{color: isActive ? '#c2410c' : '#a09890'}}
+                      strokeWidth={isActive ? 2.5 : 1.75}
                     />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#1a1714' : '#a09890'}}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : '#a09890'}}>
                       {item.name}
                     </span>
+                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
@@ -198,17 +198,17 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.page}
                     to={createPageUrl(item.page)}
-                    className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
+                    className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                   >
-                    <div style={{height:3,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0"
-                      style={{color: isActive ? '#1a1714' : '#a09890'}}
-                      strokeWidth={isActive ? 2 : 1.75}
+                      style={{color: isActive ? '#c2410c' : '#a09890'}}
+                      strokeWidth={isActive ? 2.5 : 1.75}
                     />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#1a1714' : '#a09890'}}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : '#a09890'}}>
                       {item.name}
                     </span>
+                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
