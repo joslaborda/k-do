@@ -186,22 +186,7 @@ export default function Packing() {
               <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <p className="text-foreground font-semibold mb-1">Tu maleta está vacía</p>
               <p className="text-muted-foreground text-sm mb-5">Añade items manualmente o usa la lista inteligente</p>
-              {country && suggestedItems.length > 0 && (
-                <button
-                  onClick={async () => {
-                    for (const item of suggestedItems) {
-                      await base44.entities.PackingItem.create({
-                        trip_id: tripId, name: item.name,
-                        category: item.category, packed: false,
-                      });
-                    }
-                    queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] });
-                  }}
-                  className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 mx-auto">
-                  <Sparkles className="w-4 h-4"/>
-                  Generar lista para {country}
-                </button>
-              )}
+
             </div>
           ) : (
             <>
