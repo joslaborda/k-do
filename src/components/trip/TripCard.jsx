@@ -72,7 +72,15 @@ export function HeroTripCard({ trip, cities = [] }) {
         <div className="h-44 relative overflow-hidden bg-stone-800">
           <img src={coverImage} alt={trip.name}
             className="w-full h-full object-cover opacity-85"
-            onError={e=>{e.currentTarget.style.display='none'}}/>
+            onError={e=>{
+              // Try Colombia Pexels fallback, then hide
+              if (!e.currentTarget.dataset.fallback) {
+                e.currentTarget.dataset.fallback = '1';
+                e.currentTarget.src = 'https://images.pexels.com/photos/3601425/pexels-photo-3601425.jpeg?auto=compress&cs=tinysrgb&w=800';
+              } else {
+                e.currentTarget.style.display='none';
+              }
+            }}/>
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent"/>
           {status && (
             <div className={`absolute top-2.5 right-2.5 text-xs font-medium px-2.5 py-1 rounded-full ${badgeCls}`}>
