@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useUndo } from '@/components/hooks/useUndo';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
+import { getFxRate } from '@/lib/fxRates';
 import { createNotification } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
@@ -730,6 +731,110 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
 }
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
+// ── Tab: Conversión de divisa ─────────────────────────────────────────────────
+function ConversionTab({ cities, baseCurrency, activeCity }) {
+  const [amount, setAmount] = useState('1');
+  const [rates, setRates] = useState({});
+  const [loadingRates, setLoadingRates] = useState(false);
+  const [lastFetch, setLastFetch] = useState(null);
+
+  // Get all destination currencies
+  const destCurrencies = useMemo(() => {
+    const set = new Set();
+    cities.forEach(c => {
+      const meta = getCountryMeta(c.country_code || c.country || '');
+      if (meta?.currency && meta.currency !== baseCurrency) set.add(meta.currency);
+    });
+    return Array.from(set);
+  }, [cities, baseCurrency]);
+
+  // Active city currency for highlight
+  const activeMeta = getCountryMeta(activeCity?.country_code || activeCity?.country || '');
+  const activeCurrency = activeMeta?.currency;
+
+  useEffect(() => {
+    if (destCurrencies.length === 0) return;
+    setLoadingRates(true);
+    Promise.all(destCurrencies.map(to => getFxRate(baseCurrency, to).then(r => [to, r.rate])))
+      .then(pairs => {
+        const obj = {};
+        pairs.forEach(([k, v]) => obj[k] = v);
+        setRates(obj);
+        setLastFetch(new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }));
+      })
+      .catch(() => {})
+      .finally(() => setLoadingRates(false));
+  }, [baseCurrency, destCurrencies.join(',')]);
+
+  const numeric = parseFloat(amount) || 0;
+
+  if (destCurrencies.length === 0) return (
+    <div className="bg-white rounded-2xl border border-border text-center py-10 px-4">
+      <p className="text-3xl mb-2">💱</p>
+      <p className="text-sm font-medium text-foreground mb-1">Sin divisas que convertir</p>
+      <p className="text-xs text-muted-foreground">Añade países al viaje para ver la conversión</p>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      {/* Amount input */}
+      <div className="bg-white rounded-2xl border border-border p-4">
+        <p className="text-xs text-muted-foreground mb-2">Importe a convertir</p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 h-12 border border-border rounded-xl px-3 focus-within:border-primary transition-colors">
+            <span className="text-sm font-medium text-muted-foreground">{baseCurrency}</span>
+            <input
+              type="number"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              className="flex-1 text-lg font-semibold text-foreground outline-none bg-transparent"
+              placeholder="0"
+              min="0"
+            />
+          </div>
+        </div>
+        {lastFetch && (
+          <p className="text-xs text-muted-foreground mt-2">Tasas actualizadas a las {lastFetch}</p>
+        )}
+      </div>
+
+      {/* Conversion results */}
+      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        {loadingRates ? (
+          <div className="py-8 text-center">
+            <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          </div>
+        ) : (
+          destCurrencies.map((currency, i) => {
+            const rate = rates[currency];
+            const converted = rate ? (numeric * rate).toFixed(2) : '—';
+            const isActive = currency === activeCurrency;
+            return (
+              <div key={currency} className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40' : ''}`}>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-lg">{getCountryMeta(currency)?.flag || '💱'}</span>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{currency}</p>
+                    {isActive && <p className="text-xs text-primary font-medium">Ciudad actual</p>}
+                    {rate && <p className="text-xs text-muted-foreground">1 {baseCurrency} = {rate.toFixed(4)} {currency}</p>}
+                  </div>
+                </div>
+                <p className="text-lg font-semibold text-foreground">{converted}</p>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center px-4">
+        Fuente: Banco Central Europeo · Solo orientativo
+      </p>
+    </div>
+  );
+}
+
+
 export default function Expenses() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -866,7 +971,7 @@ export default function Expenses() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
           <OTabBar
-            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},{key:'stats',label:'Stats'}]}
+            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},{key:'conversión',label:'Conversión'},{key:'stats',label:'Stats'}]}
             activeKey={tab}
             onChange={setTab}
           />
@@ -916,6 +1021,14 @@ export default function Expenses() {
             baseCurrency={baseCurrency}
             currentUserEmail={currentUser?.email}
             cities={cities}
+          />
+        )}
+
+        {tab === 'conversión' && (
+          <ConversionTab
+            cities={cities}
+            baseCurrency={baseCurrency}
+            activeCity={activeCity}
           />
         )}
       </div>
