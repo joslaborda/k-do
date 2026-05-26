@@ -12,6 +12,7 @@ export function getTripStatus(trip) {
   const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
   if (today < start) {
     const days = differenceInDays(start, today);
+    if (days === 0) return { label:'¡Hoy empieza!', days: 0, type:'upcoming' };
     return { label:`En ${days} día${days!==1?'s':''}`, days, type:'upcoming' };
   }
   if (end && today > end) return { label:'Finalizado', type:'past' };
@@ -63,7 +64,7 @@ export function HeroTripCard({ trip, cities = [] }) {
   const topLeft = status?.type==='active' && status.dayNum
     ? `Día ${status.dayNum} de ${status.total}`
     : status?.type==='upcoming'
-      ? `Faltan ${status.days} días`
+      ? (status.days === 0 ? '¡Hoy empieza!' : `Faltan ${status.days} días`)
       : null;
 
   return (
