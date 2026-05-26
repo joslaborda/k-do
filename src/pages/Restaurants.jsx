@@ -1401,14 +1401,22 @@ export default function Restaurants() {
     const savingKey = spot.id || spot.title;
     setSavingId(savingKey);
     try {
-      const created = await createMutation.mutateAsync(baseData({
-        title: spot.title, type: spot.type, address: spot.address||'',
-        lat: spot.lat, lng: spot.lng, notes: spot.notes||'',
+      // Save community spot WITHOUT overriding created_by — preserve original author
+      const created = await createMutation.mutateAsync({
+        trip_id: tripId || undefined, city_id: cityId || undefined,
         city_name: selectedCity || city, country,
-      }));
+        title: spot.title, type: spot.type, address: spot.address || '',
+        lat: spot.lat, lng: spot.lng, notes: spot.notes || '',
+        visibility: 'trip_members', visited: false,
+        // Keep original authorship — this spot was created by someone else
+        created_by: spot.created_by || spot.created_by_user_id ? spot.created_by : user?.email,
+        created_by_user_id: spot.created_by_user_id || user?.id,
+        creator_username: spot.creator_username || myProfile?.username || '',
+        // Tag as saved (not created) by current user
+        saved_by: [user?.email].filter(Boolean),
+      });
       setLastSavedId(created?.id);
       showToastFor({ title: spot.title }, selectedCity || city);
-      // Ask user if they want to assign a date
       if (created?.id) setAssignDateSpot(created);
     } finally { setSavingId(null); }
   };
