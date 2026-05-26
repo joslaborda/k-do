@@ -12,7 +12,6 @@ import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList } from '@/lib/packingDB';
 import { useTripContext } from '@/hooks/useTripContext';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Link, useSearchParams } from 'react-router-dom';
 
 
@@ -200,11 +199,44 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
 // ─────────────────────────────────────────────────────────────────────────────
 // Packing tab
 // ─────────────────────────────────────────────────────────────────────────────
-function PackingTab({ tripId, country }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared checkbox — cuadrado, borde naranja pendiente, relleno naranja + check al marcar
+// ─────────────────────────────────────────────────────────────────────────────
+function KodoCheck({ checked, onChange, essential = false }) {
+  return (
+    <button
+      onClick={() => onChange(!checked)}
+      style={{
+        width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+        border: checked ? 'none' : `1.5px solid ${essential ? '#c2410c' : '#d4cfc8'}`,
+        background: checked ? '#c2410c' : essential ? '#fff3ee' : 'white',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'all 0.15s',
+      }}
+    >
+      {checked && (
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      )}
+      {!checked && essential && (
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#c2410c' }} />
+      )}
+    </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Packing tab
+// ─────────────────────────────────────────────────────────────────────────────
+function PackingTab({ tripId, country, tripInProgress }) {
   const queryClient = useQueryClient();
-  const { items: suggestedItems } = getSmartPackingList(country);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetCategory, setSheetCategory] = useState('personal');
+  const [collapsed, setCollapsed] = useState({});
+  const [adding, setAdding] = useState(null); // category key or 'souvenir'
+  const [newName, setNewName] = useState('');
+  const [newEssential, setNewEssential] = useState(false);
+  const [activeInnerTab, setActiveInnerTab] = useState('maleta');
+  const addInputRef = useRef(null);
 
   const { data: items = [] } = useQuery({
     queryKey: ['packingItems', tripId],
@@ -214,7 +246,7 @@ function PackingTab({ tripId, country }) {
 
   const createMutation = useMutation({
     mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }); setSheetOpen(false); },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
   });
 
   const toggleMutation = useMutation({
@@ -227,145 +259,256 @@ function PackingTab({ tripId, country }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
   });
 
-  const totalItems = items.length;
-  const packedCount = items.filter(i => i.packed).length;
-  const progress = totalItems > 0 ? Math.round(packedCount / totalItems * 100) : 0;
+  const packingItems  = items.filter(i => i.category !== 'souvenir');
+  const souvenirItems = items.filter(i => i.category === 'souvenir');
 
-  const groupedItems = items.reduce((acc, item) => {
-    if (!acc[item.category]) acc[item.category] = [];
-    acc[item.category].push(item);
+  const totalItems  = packingItems.length;
+  const packedCount = packingItems.filter(i => i.packed).length;
+  const progress    = totalItems > 0 ? Math.round(packedCount / totalItems * 100) : 0;
+
+  const grouped = PACKING_CATEGORIES.reduce((acc, cat) => {
+    acc[cat.value] = packingItems.filter(i => i.category === cat.value);
     return acc;
   }, {});
 
-  const handleGenerateSuggested = async () => {
-    for (const item of suggestedItems) {
-      await base44.entities.PackingItem.create({
-        trip_id: tripId, name: item.name,
-        category: item.category, packed: false,
-        essential: item.essential || false,
-      });
-    }
-    queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] });
+  const openAdding = (key) => {
+    setAdding(key);
+    setNewName('');
+    setNewEssential(false);
+    setTimeout(() => addInputRef.current?.focus(), 80);
   };
 
-  if (totalItems === 0) return (
-    <>
-      <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
-        <p className="text-4xl mb-3">🧳</p>
-        <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
-        <p className="text-xs text-muted-foreground mb-5">Añade los artículos que vas a necesitar en {country || 'tu viaje'}</p>
-        <div className="flex flex-col gap-2">
+  const commitAdd = async () => {
+    if (!newName.trim()) { setAdding(null); return; }
+    if (adding === 'souvenir') {
+      await createMutation.mutateAsync({ name: newName.trim(), category: 'souvenir', packed: false, essential: false });
+    } else {
+      await createMutation.mutateAsync({ name: newName.trim(), category: adding, packed: false, essential: newEssential });
+    }
+    setNewName('');
+    setNewEssential(false);
+    setAdding(null);
+  };
 
-          <button onClick={() => setSheetOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-border text-sm rounded-xl text-muted-foreground">
-            <Plus className="w-4 h-4" />Añadir manualmente
-          </button>
-        </div>
-      </div>
-      <AddPackingSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        defaultCategory={sheetCategory}
-        onSave={d => createMutation.mutate(d)}
-        saving={createMutation.isPending}
-      />
-    </>
-  );
+  const toggleCollapsed = (key) => setCollapsed(p => ({ ...p, [key]: !p[key] }));
+
+  // Inner tab bar (Maleta / Souvenirs) — Ō style
+  const innerTabs = [
+    { key: 'maleta', label: 'Maleta' },
+    ...(tripInProgress ? [{ key: 'souvenirs', label: 'Souvenirs' }] : []),
+  ];
 
   return (
-    <>
-      {/* Progress */}
-      <div className="bg-white rounded-2xl border border-border p-4">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-foreground">Progreso total</p>
-          <p className="text-base font-medium text-primary">{progress}%</p>
+    <div className="space-y-3">
+      {/* Inner tabs */}
+      {tripInProgress && (
+        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="flex">
+            {innerTabs.map(t => (
+              <button key={t.key} onClick={() => setActiveInnerTab(t.key)}
+                className="flex-1 flex flex-col items-center py-3 gap-1.5">
+                <div style={{
+                  height: 3, borderRadius: 2, width: 18,
+                  background: activeInnerTab === t.key ? '#c2410c' : 'transparent',
+                  marginBottom: 2,
+                }} />
+                <span style={{
+                  fontSize: 13, fontWeight: 500,
+                  color: activeInnerTab === t.key ? '#1a1714' : '#a09890',
+                }}>{t.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-          <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
-        </div>
-        <p className="text-xs text-muted-foreground mt-2">{packedCount} de {totalItems} artículos listos</p>
-      </div>
+      )}
 
-      {/* Category cards */}
-      {PACKING_CATEGORIES.map(cat => {
-        const catItems = groupedItems[cat.value] || [];
-        const catPacked = catItems.filter(i => i.packed).length;
-        return (
-          <div key={cat.value} className="bg-white rounded-2xl border border-border overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{cat.icon}</span>
-                <span className="text-sm font-medium text-foreground">{cat.label}</span>
-              </div>
-              <span className="text-xs text-muted-foreground">{catPacked}/{catItems.length}</span>
+      {/* ── MALETA ── */}
+      {activeInnerTab === 'maleta' && (
+        <>
+          {totalItems === 0 ? (
+            <div className="bg-white rounded-2xl border border-border text-center py-14 px-6">
+              <p className="text-4xl mb-3">🧳</p>
+              <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
+              <p className="text-xs text-muted-foreground mb-5">
+                Añade los artículos que vas a necesitar{country ? ` en ${country}` : ''}
+              </p>
+              <button onClick={() => openAdding(PACKING_CATEGORIES[0].value)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
+                <Plus className="w-4 h-4" />Añadir artículo
+              </button>
             </div>
+          ) : (
+            <>
+              {/* Progress */}
+              <div className="bg-white rounded-2xl border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-foreground">Progreso total</p>
+                  <p className="text-sm font-medium text-primary">{progress}%</p>
+                </div>
+                <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-1.5">
+                  <div className="h-full bg-primary rounded-full transition-all duration-500"
+                    style={{ width: `${progress}%` }} />
+                </div>
+                <p className="text-xs text-muted-foreground">{packedCount} de {totalItems} artículos listos</p>
+              </div>
 
-            <div className="p-3 space-y-1">
-              {catItems.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-3">Sin artículos</p>
-              )}
-              {catItems.map(item => {
-                const isRequired = item.essential === true;
+              {/* Categories */}
+              {PACKING_CATEGORIES.map(cat => {
+                const catItems = grouped[cat.value] || [];
+                const catPacked = catItems.filter(i => i.packed).length;
+                const allDone = catItems.length > 0 && catPacked === catItems.length;
+                const isCollapsed = collapsed[cat.value] ?? allDone;
+                const essentialCount = catItems.filter(i => i.essential && !i.packed).length;
+                const isAddingHere = adding === cat.value;
+
                 return (
-                  <div key={item.id} className={`flex items-center gap-3 px-3 py-2 rounded-xl group transition-colors ${
-                    item.packed ? 'opacity-60' : 'hover:bg-secondary/50'
-                  }`}>
-                    {isRequired ? (
-                      // Required — no checkbox, alert icon, can still be "checked" by tapping
-                      <button
-                        onClick={() => !item.packed && toggleMutation.mutate({ id: item.id, packed: true })}
-                        className="w-4 h-4 flex items-center justify-center flex-shrink-0"
-                      >
-                        {item.packed
-                          ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        }
-                      </button>
-                    ) : (
-                      <Checkbox
-                        checked={item.packed}
-                        onCheckedChange={checked => toggleMutation.mutate({ id: item.id, packed: checked })}
-                        className="h-4 w-4 flex-shrink-0"
-                      />
-                    )}
-                    <p className={`flex-1 text-sm truncate ${item.packed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                      {item.name}
-                      {item.quantity > 1 && <span className="ml-1 text-xs text-muted-foreground">×{item.quantity}</span>}
-                    </p>
-                    {!isRequired && (
-                      <button
-                        onClick={() => deleteMutation.mutate(item.id)}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all flex-shrink-0"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                  <div key={cat.value} className="bg-white rounded-2xl border border-border overflow-hidden">
+                    {/* Category header */}
+                    <button onClick={() => toggleCollapsed(cat.value)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/20 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{cat.icon}</span>
+                        <span className="text-sm font-medium text-foreground">{cat.label}</span>
+                        {essentialCount > 0 && (
+                          <span className="text-xs font-medium text-primary bg-orange-50 px-1.5 py-0.5 rounded-full">
+                            {essentialCount} esencial{essentialCount > 1 ? 'es' : ''}
+                          </span>
+                        )}
+                        {allDone && catItems.length > 0 && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{catPacked}/{catItems.length}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                          className={`text-muted-foreground transition-transform ${isCollapsed ? '' : 'rotate-180'}`}>
+                          <polyline points="18 15 12 9 6 15"/>
+                        </svg>
+                      </div>
+                    </button>
+
+                    {!isCollapsed && (
+                      <>
+                        {catItems.length === 0 && !isAddingHere && (
+                          <p className="text-xs text-muted-foreground text-center py-4 border-t border-border">Sin artículos</p>
+                        )}
+                        {catItems.map(item => (
+                          <div key={item.id}
+                            className={`flex items-center gap-3 px-4 py-2.5 border-t border-border group transition-colors ${item.packed ? 'opacity-55' : 'hover:bg-secondary/20'}`}>
+                            <KodoCheck
+                              checked={item.packed}
+                              onChange={v => toggleMutation.mutate({ id: item.id, packed: v })}
+                              essential={item.essential}
+                            />
+                            <p className={`flex-1 text-sm truncate ${item.packed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                              {item.name}
+                            </p>
+                            {!item.essential && (
+                              <button onClick={() => deleteMutation.mutate(item.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+
+                        {/* Inline add */}
+                        {isAddingHere ? (
+                          <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border">
+                            <input
+                              ref={addInputRef}
+                              value={newName}
+                              onChange={e => setNewName(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') commitAdd(); if (e.key === 'Escape') setAdding(null); }}
+                              placeholder="Nombre del artículo..."
+                              className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
+                            />
+                            <button onClick={() => setNewEssential(v => !v)}
+                              className={`text-xs px-2 py-1 rounded-lg border transition-colors ${newEssential ? 'bg-orange-50 border-primary text-primary' : 'border-border text-muted-foreground'}`}>
+                              esencial
+                            </button>
+                            <button onClick={commitAdd}
+                              className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <button onClick={() => openAdding(cat.value)}
+                            className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-border text-xs text-primary font-medium hover:bg-orange-50/50 transition-colors">
+                            <Plus className="w-3.5 h-3.5" />Añadir artículo
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 );
               })}
+            </>
+          )}
+        </>
+      )}
 
-              {/* Inline add button per category */}
-              <button
-                onClick={() => { setSheetCategory(cat.value); setSheetOpen(true); }}
-                className="w-full flex items-center justify-center gap-1.5 py-2 text-xs text-muted-foreground hover:text-primary border border-dashed border-border rounded-xl mt-1 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />Añadir artículo
+      {/* ── SOUVENIRS ── */}
+      {activeInnerTab === 'souvenirs' && (
+        <div className="space-y-3">
+          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+            {souvenirItems.length === 0 && adding !== 'souvenir' && (
+              <div className="text-center py-12 px-6">
+                <p className="text-3xl mb-2">🛍️</p>
+                <p className="text-sm font-medium text-foreground mb-1">Lista vacía</p>
+                <p className="text-xs text-muted-foreground mb-5">Anota lo que quieres comprar en el viaje</p>
+                <button onClick={() => openAdding('souvenir')}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
+                  <Plus className="w-4 h-4" />Añadir
+                </button>
+              </div>
+            )}
+
+            {souvenirItems.map((item, i) => (
+              <div key={item.id}
+                className={`flex items-center gap-3 px-4 py-3 group transition-colors ${i > 0 ? 'border-t border-border' : ''} ${item.packed ? 'opacity-55' : 'hover:bg-secondary/20'}`}>
+                <KodoCheck
+                  checked={item.packed}
+                  onChange={v => toggleMutation.mutate({ id: item.id, packed: v })}
+                />
+                <p className={`flex-1 text-sm truncate ${item.packed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                  {item.name}
+                </p>
+                <button onClick={() => deleteMutation.mutate(item.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+
+            {adding === 'souvenir' ? (
+              <div className={`flex items-center gap-2 px-4 py-2.5 ${souvenirItems.length > 0 ? 'border-t border-border' : ''}`}>
+                <input
+                  ref={addInputRef}
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') commitAdd(); if (e.key === 'Escape') setAdding(null); }}
+                  placeholder="¿Qué quieres comprar?"
+                  className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
+                />
+                <button onClick={commitAdd}
+                  className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </div>
+            ) : souvenirItems.length > 0 ? (
+              <button onClick={() => openAdding('souvenir')}
+                className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-border text-xs text-primary font-medium hover:bg-orange-50/50 transition-colors">
+                <Plus className="w-3.5 h-3.5" />Añadir
               </button>
-            </div>
+            ) : null}
           </div>
-        );
-      })}
-
-      <AddPackingSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        defaultCategory={sheetCategory}
-        onSave={d => createMutation.mutate(d)}
-        saving={createMutation.isPending}
-      />
-    </>
+        </div>
+      )}
+    </div>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
@@ -591,7 +734,14 @@ export default function Utilities() {
 
         {/* MALETA */}
         {activeTab === 'maleta' && (
-          <PackingTab tripId={tripId} country={country} />
+          <PackingTab
+            tripId={tripId}
+            country={country}
+            tripInProgress={!!(trip?.start_date && trip?.end_date && (() => {
+              const today = new Date().toISOString().slice(0,10);
+              return today >= trip.start_date && today <= trip.end_date;
+            })())}
+          />
         )}
 
         {/* EMERGENCIAS */}
