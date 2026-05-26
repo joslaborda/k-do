@@ -253,14 +253,9 @@ function PackingTab({ tripId, country }) {
       <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
         <p className="text-4xl mb-3">🧳</p>
         <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
-        <p className="text-xs text-muted-foreground mb-5">Añade artículos manualmente o usa la lista sugerida para {country || 'tu destino'}</p>
+        <p className="text-xs text-muted-foreground mb-5">Añade los artículos que vas a necesitar en {country || 'tu viaje'}</p>
         <div className="flex flex-col gap-2">
-          {country && suggestedItems.length > 0 && (
-            <button onClick={handleGenerateSuggested}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
-              ✨ Generar lista para {country}
-            </button>
-          )}
+
           <button onClick={() => setSheetOpen(true)}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-border text-sm rounded-xl text-muted-foreground">
             <Plus className="w-4 h-4" />Añadir manualmente
