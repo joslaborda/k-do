@@ -13,7 +13,7 @@ import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList } from '@/lib/packingDB';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 
 function OTabBar({ tabs, activeKey, onChange }) {
@@ -510,7 +510,9 @@ export default function Utilities() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [activeTab, setActiveTab] = useState('clima');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'clima';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [tripId, setTripId] = useState(null);
 
   useEffect(() => {
