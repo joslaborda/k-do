@@ -81,7 +81,7 @@ export function HeroTripCard({ trip, cities = [] }) {
                 e.currentTarget.style.display='none';
               }
             }}/>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent"/>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"/>
           {status && (
             <div className={`absolute top-2.5 right-2.5 text-xs font-medium px-2.5 py-1 rounded-full ${badgeCls}`}>
               {status.label}
