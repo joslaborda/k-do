@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Plus, Search, X, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
 
 function OTabBar({ tabs, activeKey, onChange }) {
@@ -99,7 +99,7 @@ const TYPE_FILTERS = [
 function groupByCountry(spots) {
   const g = {};
   spots.forEach(s => {
-    const country = s.country || 'Otros';
+    const country = normalizeCountry(s.country || '') || 'Otros';
     if (!g[country]) g[country] = [];
     g[country].push(s);
   });
