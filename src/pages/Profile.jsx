@@ -369,6 +369,20 @@ export default function Profile() {
     staleTime: 60000,
   });
 
+  // All trips for the user — to count finished ones
+  const { data: myTrips = [] } = useQuery({
+    queryKey: ['myTrips', user?.id],
+    queryFn: async () => {
+      // Get trips where user is creator or member
+      const created = await base44.entities.Trip.filter({ created_by: user.id });
+      return created;
+    },
+    enabled: !!user?.id,
+    staleTime: 60000,
+  });
+
+  const tripsCount = myTrips.length;
+
   const savedSpotIds = useMemo(() => new Set(savedSpots.map(s => s.id)), [savedSpots]);
 
   // Count unique countries visited
@@ -456,7 +470,7 @@ export default function Profile() {
           {/* Stats */}
           <div className="flex border-t border-border pt-3">
             {[
-              { value: 0, label: 'Viajes' },
+              { value: tripsCount, label: 'Viajes' },
               { value: mySpots.length, label: 'Creados' },
               { value: countriesCount, label: 'Países' },
             ].map((stat, i) => (
