@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Check, UserPlus, Bookmark, Mail, MapPin, X } from 'lucide-react';
+import { Bell, Check, UserPlus, Bookmark, Mail, MapPin, X, FileText, Receipt, MessageCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
@@ -12,6 +12,12 @@ const TYPE_CONFIG = {
   template_save:  { icon: Bookmark,  color: 'text-orange-500', bg: 'bg-orange-50', label: 'ha guardado tu itinerario' },
   trip_invite:    { icon: Mail,      color: 'text-green-500',  bg: 'bg-green-50',  label: 'te ha invitado a un viaje' },
   trip_update:    { icon: MapPin,    color: 'text-purple-500', bg: 'bg-purple-50', label: 'actualizó el viaje' },
+  spot_added:     { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'añadió un spot' },
+  spot_time:      { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'modificó la hora de un spot' },
+  doc_added:      { icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
+  expense_added:  { icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50',  label: 'añadió un gasto' },
+  expense_settled:{ icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50',  label: 'liquidó una deuda contigo' },
+  chat_message:   { icon: MessageCircle, color: 'text-purple-500', bg: 'bg-purple-50', label: 'escribió en el chat' },
 };
 
 function NotificationItem({ notif, onRead }) {
