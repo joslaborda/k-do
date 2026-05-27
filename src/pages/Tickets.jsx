@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Plane, Train, Hotel, Shield, FileText, Upload, Loader2, CheckSquare, Square, X } from 'lucide-react';
+import { Plus, Train, Hotel, Shield, FileText, Upload, Loader2, CheckSquare, Square, X } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,7 +24,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import TicketCard from '@/components/tickets/TicketCard';
 
 const categories = [
-  { value: 'flight', label: 'Vuelos', icon: Plane },
+  { value: 'flight', label: 'Vuelos', icon: PlaneIcon },
   { value: 'train', label: 'Trenes', icon: Train },
   { value: 'hotel', label: 'Hoteles', icon: Hotel },
   { value: 'freetour', label: 'Free Tours', icon: FileText },
