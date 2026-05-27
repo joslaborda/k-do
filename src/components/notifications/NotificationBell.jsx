@@ -8,16 +8,16 @@ import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 
 const TYPE_CONFIG = {
-  follow:         { icon: UserPlus,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'te ha seguido' },
-  template_save:  { icon: Bookmark,  color: 'text-orange-500', bg: 'bg-orange-50', label: 'ha guardado tu itinerario' },
-  trip_invite:    { icon: Mail,      color: 'text-green-500',  bg: 'bg-green-50',  label: 'te ha invitado a un viaje' },
-  trip_update:    { icon: MapPin,    color: 'text-purple-500', bg: 'bg-purple-50', label: 'actualizó el viaje' },
-  spot_added:     { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'añadió un spot' },
-  spot_time:      { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'modificó la hora de un spot' },
-  doc_added:      { icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
-  expense_added:  { icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50',  label: 'añadió un gasto' },
-  expense_settled:{ icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50',  label: 'liquidó una deuda contigo' },
-  chat_message:   { icon: MessageCircle, color: 'text-purple-500', bg: 'bg-purple-50', label: 'escribió en el chat' },
+  follow:         { icon: UserPlus,  color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   label: 'te ha seguido' },
+  template_save:  { icon: Bookmark,  color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/30', label: 'ha guardado tu itinerario' },
+  trip_invite:    { icon: Mail,      color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'te ha invitado a un viaje' },
+  trip_update:    { icon: MapPin,    color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', label: 'actualizó el viaje' },
+  spot_added:     { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/30', label: 'añadió un spot' },
+  spot_time:      { icon: MapPin,    color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/30', label: 'modificó la hora de un spot' },
+  doc_added:      { icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   label: 'subió un documento' },
+  expense_added:  { icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'añadió un gasto' },
+  expense_settled:{ icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'liquidó una deuda contigo' },
+  chat_message:   { icon: MessageCircle, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', label: 'escribió en el chat' },
 };
 
 function NotificationItem({ notif, onRead }) {
