@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import DarkModeToggle from '@/components/DarkModeToggle';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -301,7 +302,7 @@ export default function Settings() {
 
         {/* ── PERFIL ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Perfil</p>
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
 
           {/* Avatar */}
           <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
@@ -348,7 +349,18 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Save button */}
+          {/* Apariencia */}
+      <div className="bg-white dark:bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-4">
+          <div>
+            <p className="text-sm font-medium text-foreground">Modo oscuro</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Cambia entre tema claro y oscuro</p>
+          </div>
+          <DarkModeToggle />
+        </div>
+      </div>
+
+      {/* Save button */}
           <div className="px-4 py-3">
             {saveMsg && (
               <p className={`text-xs mb-2 ${saveMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{saveMsg.text}</p>
@@ -362,7 +374,7 @@ export default function Settings() {
 
         {/* ── PREFERENCIAS ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Preferencias</p>
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs text-muted-foreground mb-1.5">País de origen <span className="text-muted-foreground/60">· Embajadas y emergencias</span></p>
             <select value={homeCountry} onChange={e => {
@@ -394,7 +406,7 @@ export default function Settings() {
 
         {/* ── NOTIFICACIONES ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Notificaciones</p>
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
             label="Invitaciones a viajes"
             right={<Toggle value={notifInvites} onChange={setNotifInvites} />}
@@ -413,7 +425,7 @@ export default function Settings() {
 
         {/* ── PRIVACIDAD ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Privacidad</p>
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
             label="Spots públicos por defecto"
             sublabel="Los spots que crees serán visibles para la comunidad"
@@ -424,7 +436,7 @@ export default function Settings() {
 
         {/* ── CUENTA ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Cuenta</p>
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
             label="Email"
             right={<span className="text-xs text-muted-foreground">{user.email}</span>}
