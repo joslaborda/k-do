@@ -6,6 +6,7 @@ import { Plus, Search, X, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+import { getTripCoverImage } from '@/lib/tripImage';
 
 
 function OTabBar({ tabs, activeKey, onChange }) {
@@ -115,9 +116,19 @@ function countryFlag(country) {
 // ─────────────────────────────────────────────────────────────────────────────
 function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
   const emoji = TYPE_EMOJI[spot.type] || '📍';
+  const coverImg = spot.image_url || (spot.city_name || spot.country
+    ? getTripCoverImage(spot.city_name, spot.country)
+    : null);
   return (
     <div className="flex items-center gap-2.5 px-3 py-2.5">
-      <span className="text-base flex-shrink-0">{emoji}</span>
+      {coverImg ? (
+        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-secondary">
+          <img src={coverImg} alt={spot.title} className="w-full h-full object-cover"
+            onError={e => { e.currentTarget.style.display='none'; }} />
+        </div>
+      ) : (
+        <span className="text-base flex-shrink-0">{emoji}</span>
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
