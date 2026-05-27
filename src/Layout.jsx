@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X , CalendarDays } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
+import DarkModeToggle from '@/components/DarkModeToggle';
 import SyncIndicator from '@/components/SyncIndicator';
 
 // ── Nav principal del viaje — los 4 que más se usan ──────────────────────────
@@ -80,6 +81,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-[#f8f6f3] text-foreground overflow-x-hidden">
       <OfflineIndicator />
+      <DarkModeToggle />
       <SyncIndicator />
       <KeyboardShortcuts />
       {children}
