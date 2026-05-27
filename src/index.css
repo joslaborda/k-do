@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* â”€â”€ Fix overflow global â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Fix overflow global Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
 html, body {
   overflow-x: hidden;
   max-width: 100vw;
@@ -19,14 +19,14 @@ button, a {
 
 @layer base {
   :root {
-    /* â”€â”€ KÅdo warm palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* Ã¢â€â‚¬Ã¢â€â‚¬ KÃ…Âdo warm palette Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
     --background: 36 20% 97%;          /* #f8f6f3 crema muy suave */
-    --foreground: 20 10% 10%;          /* #1a1714 casi negro cÃ¡lido */
+    --foreground: 20 10% 10%;          /* #1a1714 casi negro cÃƒÂ¡lido */
     --card: 0 0% 100%;                 /* blanco puro */
     --card-foreground: 20 10% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 10% 10%;
-    --primary: 16 75% 45%;             /* #c2410c naranja KÅdo */
+    --primary: 16 75% 45%;             /* #c2410c naranja KÃ…Âdo */
     --primary-foreground: 0 0% 100%;
     --secondary: 36 18% 94%;           /* #f0ebe4 beige claro */
     --secondary-foreground: 20 10% 25%;
@@ -57,6 +57,23 @@ button, a {
     --sidebar-accent-foreground: 20 10% 25%;
     --sidebar-border: 36 15% 88%;
     --sidebar-ring: 16 75% 45%;
+    /* â”€â”€ KÅdo semantic tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    --kodo-text-active: #1a1714;
+    --kodo-text-muted: #9a9490;
+    --kodo-text-muted2: #6b6460;
+    --kodo-bg-page: #f8f6f3;
+    --kodo-bg-card: #ffffff;
+    --kodo-bg-subtle: #f3f1ee;
+    --kodo-bg-orange: #fff3ee;
+    --kodo-bg-orange-mid: #ffedd5;
+    --kodo-border: #e2ddd7;
+    --kodo-border-subtle: #f0ede8;
+    --kodo-border-nav: #e8e3dc;
+    --kodo-progress-track: #f0ede8;
+    --kodo-hero-bg: #0e0c0a;
+    --kodo-hero-eyebrow: #f8a07a;
+    --kodo-nav-inactive: #a09890;
+    --kodo-nav-active-text: #1a1714;
   }
 
   .dark {
@@ -92,6 +109,23 @@ button, a {
     --sidebar-accent-foreground: 36 15% 85%;
     --sidebar-border: 20 8% 20%;
     --sidebar-ring: 16 75% 55%;
+    /* â”€â”€ KÅdo semantic tokens (dark) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    --kodo-text-active: #f0ede8;
+    --kodo-text-muted: #7a7470;
+    --kodo-text-muted2: #5a5450;
+    --kodo-bg-page: #151210;
+    --kodo-bg-card: #1e1a17;
+    --kodo-bg-subtle: #252118;
+    --kodo-bg-orange: #2a1608;
+    --kodo-bg-orange-mid: #3a1e0a;
+    --kodo-border: #2e2a26;
+    --kodo-border-subtle: #242018;
+    --kodo-border-nav: #2e2a26;
+    --kodo-progress-track: #2e2a26;
+    --kodo-hero-bg: #0a0806;
+    --kodo-hero-eyebrow: #e07040;
+    --kodo-nav-inactive: #6a6460;
+    --kodo-nav-active-text: #f0ede8;
   }
 }
 
