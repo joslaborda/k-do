@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { differenceInDays, parseISO, isValid } from 'date-fns';
 import { Train as TrainIcon, Hotel, CalendarCheck, X } from 'lucide-react';
-import { PlaneIcon } from '@/lib/PlaneIcon';
-import { BusFront } from '@/lib/icons';
+import { PlaneIcon, BusFront } from '@/lib/icons';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
