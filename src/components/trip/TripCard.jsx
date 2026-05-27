@@ -61,11 +61,10 @@ export function HeroTripCard({ trip, cities = [] }) {
       ? 'bg-orange-50/90 text-primary border border-orange-200'
       : 'bg-gray-100/90 text-gray-500 border border-gray-200';
 
+  // Only show top-left badge for active trips (day counter). Upcoming countdown is top-right only.
   const topLeft = status?.type==='active' && status.dayNum
     ? `Día ${status.dayNum} de ${status.total}`
-    : status?.type==='upcoming'
-      ? (status.days === 0 ? '¡Hoy empieza!' : `Faltan ${status.days} días`)
-      : null;
+    : null;
 
   return (
     <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
