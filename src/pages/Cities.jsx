@@ -298,7 +298,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
     <div className={`${bgClass} ${borderLeft}`}>
       {/* Title — for empty days or editing */}
       {(isEmpty || titleEditing) && (
-        <div className="px-4 py-3 border-t border-border bg-white">
+        <div className="px-4 py-3 border-t border-border bg-card">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Título del día</p>
           <div className="flex items-center gap-2">
             <Input
