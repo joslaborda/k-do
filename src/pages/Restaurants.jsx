@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useTripContext } from '@/hooks/useTripContext';
+import { createNotification } from '@/lib/notifications';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
@@ -925,7 +926,7 @@ function MySpotRow({ spot, onTap, userId }) {
 }
 
 // ── Spot detail bottom sheet ──────────────────────────────────────────────────
-function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId }) {
+function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId, onNotify }) {
   const queryClient = useQueryClient();
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
@@ -974,6 +975,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
   const handleSave = async () => {
     setSaving(true);
+    const timeChanged = assignedTime !== (spot?.assigned_time || '');
     try {
       await base44.entities.Spot.update(spot.id, {
         notes,
@@ -981,6 +983,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
         assigned_time: assignedTime || null,
       });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      if (timeChanged && assignedTime) onNotify?.('spot_time', `${spot.title}: hora cambiada a ${assignedTime}`, spot.title);
       onClose();
     } catch (e) {
       alert('Error al guardar: ' + e.message);
@@ -1249,6 +1252,26 @@ export default function Restaurants() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { trip, activeCity } = useTripContext(tripId);
+  const { user: currentUser } = useAuth();
+  const { data: profiles = [] } = useQuery({
+    queryKey: ['profiles_rest', tripId],
+    queryFn: async () => {
+      const members = trip?.members || [];
+      if (!members.length) return [];
+      const all = await base44.entities.UserProfile.list();
+      return all.filter(p => members.includes(p.email) || members.includes(p.user_email));
+    },
+    enabled: !!trip?.members?.length,
+    staleTime: 60000,
+  });
+
+  const notifyMembers = (type, message, refTitle) => {
+    const others = (trip?.members || []).filter(e => e !== currentUser?.email);
+    others.forEach(email => {
+      const p = profiles.find(pr => pr.email === email || pr.user_email === email);
+      if (p?.user_id) createNotification({ userId: p.user_id, type, refId: tripId, refTitle: refTitle || trip?.name || '', message });
+    });
+  };
   const city = activeCity?.name || trip?.destination || '';
   const country = activeCity?.country || trip?.country || '';
   const cityId = activeCity?.id || null;
@@ -1374,6 +1397,7 @@ export default function Restaurants() {
       setOsmResults([]); setNearbyResults([]); setSearchQuery('');
       showToastFor({ title: place.name }, city);
       if (created?.id) setAssignDateSpot(created);
+      notifyMembers('spot_added', `Nuevo spot: ${place.name}`, place.name);
     } catch(e) {
       alert('Error al guardar: ' + e.message);
     } finally { setSavingId(null); }
@@ -1392,6 +1416,7 @@ export default function Restaurants() {
       setShowCreate(false);
       showToastFor({ title: form.title }, city);
       if (created?.id) setAssignDateSpot(created);
+      notifyMembers('spot_added', `Nuevo spot: ${form.title}`, form.title);
     } finally { setSavingId(null); }
   };
 
@@ -1858,6 +1883,7 @@ export default function Restaurants() {
           spot={selectedSpot}
           open={!!selectedSpot}
           onClose={() => setSelectedSpot(null)}
+          onNotify={notifyMembers}
           onSave={(id, data) => updateMutation.mutateAsync({ id, data })}
           onDelete={id => deleteMutation.mutate(id)}
           tripId={tripId}
