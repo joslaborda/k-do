@@ -298,12 +298,12 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mx-auto" />
             </div>
           ) : results.length === 0 ? (
-            <div className="bg-white border border-border rounded-2xl text-center py-8">
+            <div className="bg-card border border-border rounded-2xl text-center py-8">
               <p className="text-2xl mb-2">🔍</p>
               <p className="text-sm text-muted-foreground">Sin resultados para "{query}"</p>
             </div>
           ) : (
-            <div className="bg-white border border-border rounded-2xl overflow-hidden">
+            <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <p className="text-xs text-muted-foreground px-3 pt-3 pb-1">
                 {results.length} resultado{results.length !== 1 ? 's' : ''} para "{query}"
               </p>
@@ -445,7 +445,7 @@ export default function Profile() {
       <div className="max-w-2xl mx-auto px-5 py-5 pb-24 space-y-4">
 
         {/* ── Identity card ── */}
-        <div className="bg-white border border-border rounded-2xl p-4">
+        <div className="bg-card border border-border rounded-2xl p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-16 h-16 rounded-full overflow-hidden border border-border flex-shrink-0 flex items-center justify-center bg-primary text-white text-xl font-medium">
               {profile?.avatar_url
@@ -489,7 +489,7 @@ export default function Profile() {
         />
 
         {/* ── Tabs ── */}
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <OTabBar
             tabs={[{key:'guardados',label:'Guardados'},{key:'creados',label:'Creados'}]}
             activeKey={tab}
