@@ -365,7 +365,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
         {/* Handle + header — fixed */}
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
@@ -471,7 +471,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
         </div>
 
         {/* Sticky footer buttons */}
-        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-card">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           <Button
             onClick={handleSave}
@@ -530,7 +530,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
   return (
     <>
       <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
-        <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
+        <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
           <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
             <div className="flex items-start justify-between">
@@ -641,7 +641,7 @@ function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         {/* Clickable top area */}
         <div className="p-4 cursor-pointer hover:bg-secondary/20 transition-colors" onClick={() => setShowDetail(true)}>
           <div className="flex items-start gap-3">
@@ -801,7 +801,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: 'calc(75vh - 80px)' }} onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-md rounded-t-2xl flex flex-col" style={{ maxHeight: 'calc(75vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-border flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
@@ -874,7 +874,7 @@ function MySpotRow({ spot, onTap, userId }) {
   const hasDate = !!spot.assigned_date;
 
   return (
-    <div className="bg-white border-b border-border last:border-0">
+    <div className="bg-card border-b border-border last:border-0">
       {/* Main row — clickable to open sheet */}
       <button onClick={() => onTap(spot)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/20 transition-colors">
         <span className="text-xl shrink-0">{tc.emoji}</span>
@@ -995,7 +995,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   return (
     <>
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col" style={{ maxHeight: 'calc(85vh - 80px)' }} onClick={e => e.stopPropagation()}>
         {/* Handle + Header — fixed */}
         <div className="flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-3" />
@@ -1102,7 +1102,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
         </div>
 
         {/* Sticky footer buttons */}
-        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-white">
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-card">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           <Button onClick={handleSave} disabled={saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
             {saving ? 'Guardando...' : 'Guardar cambios'}
@@ -1140,7 +1140,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 pb-[80px]">
-      <div className="bg-white w-full max-w-md rounded-t-3xl flex flex-col relative" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
+      <div className="bg-card w-full max-w-md rounded-t-3xl flex flex-col relative" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
         <div className="p-5">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
 
@@ -1578,7 +1578,7 @@ export default function Restaurants() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Buscar lugares, hashtags..."
-                className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-white border border-border focus:border-primary text-foreground"
+                className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 {searchQuery ? (
@@ -1684,7 +1684,7 @@ export default function Restaurants() {
                     })}
                     {/* Manual creation option at bottom */}
                     <button onClick={() => { setShowCreate(true); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
+                      className="w-full flex items-center gap-3 px-4 py-3 bg-card border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
                       <Plus className="w-4 h-4" />
                       Crear "{searchQuery}" manualmente
                     </button>
@@ -1726,7 +1726,7 @@ export default function Restaurants() {
                 value={mySpotSearch}
                 onChange={e => setMySpotSearch(e.target.value)}
                 placeholder="Buscar en mis spots..."
-                className="w-full pl-9 pr-9 py-2.5 rounded-xl text-sm outline-none bg-white border border-border focus:border-primary text-foreground"
+                className="w-full pl-9 pr-9 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               {mySpotSearch && (
                 <button onClick={() => setMySpotSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground p-1">
@@ -1759,7 +1759,7 @@ export default function Restaurants() {
             ) : filteredSpots.length === 0 && mySpotSearch.trim().length >= 1 ? (
               /* No local match — show message + seed/OSM suggestions */
               <div className="space-y-4">
-                <div className="text-center py-6 bg-white rounded-2xl border border-border">
+                <div className="text-center py-6 bg-card rounded-2xl border border-border">
                   <p className="text-2xl mb-2">🔍</p>
                   <p className="text-sm font-medium text-foreground mb-1">No tienes ese spot todavía</p>
                   <p className="text-xs text-muted-foreground">Resultados de la comunidad y búsqueda para <strong>"{mySpotSearch}"</strong></p>
@@ -1770,7 +1770,7 @@ export default function Restaurants() {
                   return <PlaceResultCard key={`ms-seed-${i}`} place={{ id: `ms-seed-${i}`, name: p.title, type: p.type, address: p.address || '' }} onSave={saveOsmPlace} saving={savingId===`ms-seed-${i}`} isDuplicate={isDuplicate} />;
                 })}
                 <button onClick={() => { setTab('buscar'); setSearchQuery(mySpotSearch); }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border border-dashed border-border rounded-xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors">
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-card border border-dashed border-border rounded-xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors">
                   <Search className="w-4 h-4" />Buscar "{mySpotSearch}" en el mapa
                 </button>
               </div>
@@ -1779,7 +1779,7 @@ export default function Restaurants() {
                 <p className="text-muted-foreground text-sm">Sin spots con ese filtro</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl border border-border overflow-hidden">
+              <div className="bg-card rounded-2xl border border-border overflow-hidden">
                 {filteredSpots.map(spot => (
                   <MySpotRow
                     key={spot.id}
