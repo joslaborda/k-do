@@ -142,7 +142,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
             </button>
           )}
           <button onClick={() => setOpen(o => !o)}
-            className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-secondary/50 transition-colors">
+            className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
             {open
               ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2.5"><path d="M18 15l-6-6-6 6"/></svg>
               : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
@@ -196,7 +196,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-white">
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-card">
             <button onClick={() => onDelete(ticket)}
               className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
               <Trash2 className="w-3.5 h-3.5" />Eliminar
@@ -348,7 +348,7 @@ export default function Documents() {
       {/* List */}
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
         {grouped.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+          <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
             <p className="text-4xl mb-3">📄</p>
             <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
             <p className="text-xs text-muted-foreground mb-5">Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano</p>
