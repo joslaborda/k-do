@@ -162,7 +162,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
         <Input value={cityFilter} onChange={e => setCityFilter(e.target.value)}
-          placeholder="Filtra por ciudad o país..." className="pl-9 bg-white"/>
+          placeholder="Filtra por ciudad o país..." className="pl-9 bg-card"/>
       </div>
       {filteredSpots.length === 0 ? (
         <EmptyFeed emoji="⭐" title="Sin spots todavía" subtitle="Sé el primero en publicar un spot con valoraciones"/>
@@ -498,7 +498,7 @@ export default function Explore() {
             <div className="relative mb-5">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
               <Input placeholder="Busca por nombre, @usuario o país..." value={peopleQuery}
-                onChange={e => setPeopleQuery(e.target.value)} className="pl-9 bg-white"/>
+                onChange={e => setPeopleQuery(e.target.value)} className="pl-9 bg-card"/>
             </div>
             {filteredProfiles.length === 0 ? (
               <EmptyFeed emoji="🔍" title={peopleQuery ? 'Sin resultados' : 'Sin viajeros todavía'}
