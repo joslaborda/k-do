@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Plane, Train, Hotel, Shield, Ticket, MoreVertical, Trash2, FileText, Eye, X, Loader2 } from 'lucide-react';
+import { Train, Hotel, Shield, Ticket, MoreVertical, Trash2, FileText, Eye, X, Loader2 } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Document, Page, pdfjs } from 'react-pdf';
 import {
@@ -19,7 +20,7 @@ import {
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const categoryConfig = {
-  flight: { icon: Plane, color: 'bg-indigo-900/30 text-indigo-400 border border-indigo-700/50', label: 'Vuelo' },
+  flight: { icon: PlaneIcon, color: 'bg-indigo-900/30 text-indigo-400 border border-indigo-700/50', label: 'Vuelo' },
   train: { icon: Train, color: 'bg-emerald-900/30 text-emerald-400 border border-emerald-700/50', label: 'Tren' },
   hotel: { icon: Hotel, color: 'bg-purple-900/30 text-purple-400 border border-purple-700/50', label: 'Hotel' },
   freetour: { icon: FileText, color: 'bg-orange-900/30 text-orange-400 border border-orange-700/50', label: 'Free Tour' },
