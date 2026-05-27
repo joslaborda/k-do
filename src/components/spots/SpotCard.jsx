@@ -61,7 +61,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
         <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -156,7 +156,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-md rounded-t-2xl flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
         <div className="p-5 border-b border-border flex-shrink-0">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-start justify-between">
@@ -245,7 +245,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 function DeleteConfirmPopup({ spot, onConfirm, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onCancel}>
-      <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
         <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
         <p className="font-semibold text-foreground text-sm mb-1">¿Eliminar este spot?</p>
         <p className="text-xs text-muted-foreground mb-5">Se eliminará <strong>{spot.title}</strong> de tu lista. Esta acción no se puede deshacer.</p>
