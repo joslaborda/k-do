@@ -933,7 +933,7 @@ export default function Expenses() {
         try {
           others.forEach(async email => {
             const p = profiles.find(pr => pr.email === email || pr.user_email === email);
-            if (p?.user_id) createNotification({ userId: p.user_id, type: 'trip_update', refId: tripId, refTitle: trip?.name || 'el viaje', message: `Nuevo gasto: ${d.description}` });
+            if (p?.user_id) createNotification({ userId: p.user_id, type: 'expense_added', refId: tripId, refTitle: d.description || 'gasto', message: `Nuevo gasto: ${d.description} (${d.amount} ${baseCurrency})` });
           });
         } catch {}
       }
