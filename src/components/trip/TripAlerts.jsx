@@ -2,7 +2,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { differenceInDays, parseISO, isValid } from 'date-fns';
-import { Plane, Train, Hotel, CalendarCheck, X } from 'lucide-react';
+import { Train as TrainIcon, Hotel, CalendarCheck, X } from 'lucide-react';
+import { PlaneIcon, BusFront } from '@/lib/icons';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -100,7 +101,7 @@ export default function TripAlerts({ tripId, cities, trip, onUrgentCount }) {
 
         result.push({
           id: t.id,
-          icon: t.category === 'train' ? Train : Plane,
+          icon: t.category === 'train' ? TrainIcon : PlaneIcon,
           color, bg,
           label: t.name,
           daysText,
