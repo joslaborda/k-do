@@ -859,6 +859,527 @@ export const VISA_MATRIX = {
   'AL': { _SCHENGEN: FREE(0,'Ciudadano UE — libre acceso. No es Schengen.'), _LATAM_STRONG: FREE(90,'Sin visado hasta 90 dias.'), _ANGLOPHONE: FREE(90,'Sin visado hasta 90 dias.'), _ASIA_STRONG: FREE(90,'Sin visado hasta 90 dias.'), 'CN': FREE(30,'Sin visado hasta 30 dias.'), 'IN': FREE(30,'Sin visado hasta 30 dias.'), _GULF: FREE(90,'Sin visado hasta 90 dias.'), _default: FREE(90,'Sin visado hasta 90 dias para la mayoria de pasaportes.') },
   'RS': { _SCHENGEN: FREE(90,'Sin visado hasta 90 dias.'), _LATAM_STRONG: FREE(90,'Sin visado hasta 90 dias.'), _ANGLOPHONE: FREE(90,'Sin visado hasta 90 dias.'), _ASIA_STRONG: FREE(90,'Sin visado hasta 90 dias.'), 'CN': FREE(30,'Sin visado hasta 30 dias.'), 'IN': FREE(90,'Sin visado hasta 90 dias.'), 'TR': FREE(90,'Sin visado hasta 90 dias.'), _GULF: FREE(90,'Sin visado hasta 90 dias.'), 'MA': FREE(90,'Sin visado hasta 90 dias.'), _default: FREE(90,'Sin visado hasta 90 dias para la mayoria de pasaportes.') },
 
+  // ══ EUROPA ADICIONAL ══════════════════════════════════════════════════════
+
+  'TR': { // Turquía
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días en 180. Pasaporte válido 6 meses.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:'~15 USD', info:'E-Visa obligatoria. Tramitar en www.evisa.gov.tr', url:'https://www.evisa.gov.tr' },
+    'CN':         { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días desde 2023.', url:null },
+    'PK':         { needed:true,  days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria. Tramitar online.', url:'https://www.evisa.gov.tr' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~50 USD', info:'E-Visa necesaria para la mayoría. Tramitar en evisa.gov.tr', url:'https://www.evisa.gov.tr' },
+  },
+
+  'IS': { // Islandia — Schengen
+    _SCHENGEN:    { needed:false, days:0,  eVisa:false, cost:null, info:'Espacio Schengen — libre circulación.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días (área Schengen).', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado Schengen necesario. Tramitar en embajada danesa (representa a Islandia).', url:'https://www.um.dk/en/travel-and-residence/visas-to-denmark' },
+  },
+
+  'NO': { // Noruega — Schengen
+    _SCHENGEN:    { needed:false, days:0,  eVisa:false, cost:null, info:'Área Schengen — libre circulación.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado Schengen necesario. Tramitar en embajada noruega.', url:'https://www.udi.no/en/want-to-apply' },
+  },
+
+  'CH': { // Suiza — Schengen
+    _SCHENGEN:    { needed:false, days:0,  eVisa:false, cost:null, info:'Área Schengen — libre circulación.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado Schengen necesario. Tramitar en embajada suiza.', url:'https://www.sem.admin.ch/sem/en/home/sem/kontakt/kantonale_behoerden/adressen_kantone_und.html' },
+  },
+
+  // ══ ASIA ══════════════════════════════════════════════════════════════════
+
+  'TH': { // Tailandia
+    _SCHENGEN:    { needed:false, days:60, eVisa:false, cost:null, info:'Sin visado hasta 60 días desde 2024 (extensible a 30 días más).', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:true,  cost:null, info:'Sin visado hasta 30 días. E-Visa disponible para estancias más largas.', url:'https://www.thaievisa.go.th' },
+    _ANGLOPHONE:  { needed:false, days:60, eVisa:false, cost:null, info:'Sin visado hasta 60 días desde 2024.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días (varía por país).', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:'~35 USD', info:'E-Visa disponible o visado en embajada.', url:'https://www.thaievisa.go.th' },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días desde 2023.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~35 USD', info:'E-Visa necesaria. Tramitar en thaievisa.go.th', url:'https://www.thaievisa.go.th' },
+  },
+
+  'VN': { // Vietnam
+    _SCHENGEN:    { needed:false, days:45, eVisa:true,  cost:'~25 USD', info:'Sin visado hasta 45 días (pasaporte de 15 países UE exentos). Resto: e-visa en evisa.xuatnhapcanh.gov.vn', url:'https://evisa.xuatnhapcanh.gov.vn' },
+    _LATAM_STRONG:{ needed:true,  days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria. Válida 90 días, estancia hasta 90 días.', url:'https://evisa.xuatnhapcanh.gov.vn' },
+    _ANGLOPHONE:  { needed:false, days:45, eVisa:false, cost:null, info:'Sin visado hasta 45 días (EE.UU., UK, Canadá, Australia, NZ).', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días (Japón, Corea, Singapur).', url:null },
+    'CN':         { needed:false, days:15, eVisa:false, cost:null, info:'Sin visado hasta 15 días.', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria.', url:'https://evisa.xuatnhapcanh.gov.vn' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria. Tramitar en evisa.xuatnhapcanh.gov.vn', url:'https://evisa.xuatnhapcanh.gov.vn' },
+  },
+
+  'ID': { // Indonesia
+    _SCHENGEN:    { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días (Bali y aeropuertos principales). Extensible 30 días más.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días en puntos de entrada autorizados.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días desde 2023.', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:'~35 USD', info:'Visa on arrival o E-Visa.', url:'https://molina.imigrasi.go.id' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~35 USD', info:'Visa on arrival disponible en aeropuertos principales (30 días, extensible). O E-Visa previa.', url:'https://molina.imigrasi.go.id' },
+  },
+
+  'IN': { // India
+    _SCHENGEN:    { needed:true, days:null, eVisa:true, cost:'~25-80 USD', info:'E-Visa obligatoria (eVisa turista 30/90/180 días). Tramitar con mínimo 4 días de antelación.', url:'https://indianvisaonline.gov.in' },
+    _LATAM_STRONG:{ needed:true, days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria para la mayoría de LATAM.', url:'https://indianvisaonline.gov.in' },
+    _ANGLOPHONE:  { needed:true, days:null, eVisa:true, cost:'~25-80 USD', info:'E-Visa obligatoria. EE.UU./UK/Canadá/Australia: e-Visa 1 año múltiple entrada.', url:'https://indianvisaonline.gov.in' },
+    _ASIA_STRONG: { needed:true, days:null, eVisa:true, cost:'~25 USD', info:'E-Visa necesaria (Japón, Corea, Singapur).', url:'https://indianvisaonline.gov.in' },
+    'CN':         { needed:true, days:null, eVisa:false, cost:null, info:'Visado necesario. Proceso complejo actualmente. Tramitar en embajada.', url:'https://www.mea.gov.in' },
+    'PK':         { needed:true, days:null, eVisa:false, cost:null, info:'Visado necesario. Muy restrictivo. Solo casos especiales.', url:null },
+    _default:     { needed:true, days:null, eVisa:true, cost:'~25 USD', info:'E-Visa obligatoria para casi todos. Tramitar en indianvisaonline.gov.in', url:'https://indianvisaonline.gov.in' },
+  },
+
+  'CN': { // China
+    _SCHENGEN:    { needed:true, days:null, eVisa:false, cost:'~80 EUR', info:'Visado necesario (tipo L turista). Tramitar en embajada/consulado con antelación. EXCEPCIÓN: Tránsito 72h/144h sin visado en algunos aeropuertos.', url:'https://www.visaforchina.cn' },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días (acuerdo bilateral con varios países LATAM desde 2023-2024).', url:null },
+    _ANGLOPHONE:  { needed:false, days:10, eVisa:false, cost:null, info:'Sin visado hasta 10 días para EE.UU. y algunos países desde 2024 (prueba piloto). Verificar vigencia.', url:null },
+    'JP':         { needed:false, days:15, eVisa:false, cost:null, info:'Sin visado hasta 15 días desde 2024.', url:null },
+    'KR':         { needed:false, days:15, eVisa:false, cost:null, info:'Sin visado hasta 15 días desde 2023.', url:null },
+    'SG':         { needed:false, days:15, eVisa:false, cost:null, info:'Sin visado hasta 15 días.', url:null },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~80 EUR', info:'Visado tipo L necesario. Tramitar en embajada china. Puede tomar 2-4 semanas.', url:'https://www.visaforchina.cn' },
+  },
+
+  'KR': { // Corea del Sur
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:15, eVisa:false, cost:null, info:'Sin visado hasta 15 días desde 2024.', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:null, info:'K-ETA o visado necesario.', url:'https://www.k-eta.go.kr' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'K-ETA (autorización electrónica) necesaria para muchos países. Tramitar en k-eta.go.kr', url:'https://www.k-eta.go.kr' },
+  },
+
+  'SG': { // Singapur
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días (pasaportes UE).', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días desde 2023.', url:null },
+    'IN':         { needed:true,  days:null, eVisa:true, cost:'~30 SGD', info:'Visado electrónico necesario. Tramitar online.', url:'https://eservices.ica.gov.sg' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~30 SGD', info:'Visado electrónico necesario. Tramitar en eservices.ica.gov.sg', url:'https://eservices.ica.gov.sg' },
+  },
+
+  'MY': { // Malasia
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'eVisa disponible para muchos países. Tramitar en malaysiavisa.imi.gov.my', url:'https://malaysiavisa.imi.gov.my' },
+  },
+
+  'PH': { // Filipinas
+    _SCHENGEN:    { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días (extensible en inmigración local).', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días desde 2023.', url:null },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días para la mayoría de pasaportes. Solo necesitas billete de salida.', url:null },
+  },
+
+  'KH': { // Camboya
+    _SCHENGEN:    { needed:false, days:30, eVisa:true, cost:'~30 USD', info:'Visa on arrival (30 días) o E-Visa online. Llevar foto pasaporte y efectivo USD.', url:'https://www.evisa.gov.kh' },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:true, cost:'~30 USD', info:'Visa on arrival o E-Visa disponible.', url:'https://www.evisa.gov.kh' },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:true, cost:'~30 USD', info:'Visa on arrival o E-Visa online.', url:'https://www.evisa.gov.kh' },
+    _default:     { needed:true,  days:30, eVisa:true, cost:'~30 USD', info:'Visa on arrival (30 USD, 30 días) o E-Visa (evisa.gov.kh). Llevar foto y efectivo USD.', url:'https://www.evisa.gov.kh' },
+  },
+
+  'MM': { // Myanmar
+    _SCHENGEN:    { needed:true,  days:28, eVisa:true, cost:'~50 USD', info:'E-Visa necesaria (28 días turista). Tramitar en evisa.moip.gov.mm', url:'https://evisa.moip.gov.mm' },
+    _LATAM_STRONG:{ needed:true,  days:28, eVisa:true, cost:'~50 USD', info:'E-Visa necesaria.', url:'https://evisa.moip.gov.mm' },
+    _ANGLOPHONE:  { needed:true,  days:28, eVisa:true, cost:'~50 USD', info:'E-Visa necesaria.', url:'https://evisa.moip.gov.mm' },
+    _ASIA_STRONG: { needed:false, days:14, eVisa:false, cost:null, info:'Sin visado hasta 14 días (Japón, Corea, etc.).', url:null },
+    _default:     { needed:true,  days:28, eVisa:true, cost:'~50 USD', info:'E-Visa necesaria. Tramitar en evisa.moip.gov.mm con al menos 2 semanas de antelación.', url:'https://evisa.moip.gov.mm' },
+  },
+
+  'LA': { // Laos
+    _SCHENGEN:    { needed:false, days:30, eVisa:true, cost:'~35 USD', info:'Visa on arrival (30 días) o E-Visa online. Llevar foto pasaporte y efectivo USD.', url:'https://laoevisa.gov.la' },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:true, cost:'~35 USD', info:'Visa on arrival o E-Visa disponible.', url:'https://laoevisa.gov.la' },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:true, cost:'~35 USD', info:'Visa on arrival o E-Visa online.', url:'https://laoevisa.gov.la' },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:true,  days:30, eVisa:true, cost:'~35 USD', info:'Visa on arrival (~35 USD) o E-Visa (laoevisa.gov.la). Extensible 30 días.', url:'https://laoevisa.gov.la' },
+  },
+
+  'NP': { // Nepal
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~30-100 USD', info:'Visa on arrival (15/30/90 días) o E-Visa online. Precio según duración.', url:'https://online.nepalimmigration.gov.np' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~30-100 USD', info:'Visa on arrival o E-Visa necesaria.', url:'https://online.nepalimmigration.gov.np' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~30-100 USD', info:'Visa on arrival o E-Visa. 15 días 30 USD, 30 días 50 USD, 90 días 125 USD.', url:'https://online.nepalimmigration.gov.np' },
+    'IN':         { needed:false, days:null, eVisa:false, cost:null, info:'Ciudadanos indios no necesitan visado.', url:null },
+    _default:     { needed:true, days:30, eVisa:true, cost:'~50 USD', info:'Visa on arrival o E-Visa en nepalimmigration.gov.np. 30 días es lo más común.', url:'https://online.nepalimmigration.gov.np' },
+  },
+
+  'LK': { // Sri Lanka
+    _SCHENGEN:    { needed:true, days:30, eVisa:true, cost:'~35 USD', info:'E-Visa obligatoria (ETA). Tramitar en eta.gov.lk antes de viajar.', url:'https://eta.gov.lk' },
+    _LATAM_STRONG:{ needed:true, days:30, eVisa:true, cost:'~35 USD', info:'E-Visa (ETA) necesaria.', url:'https://eta.gov.lk' },
+    _ANGLOPHONE:  { needed:true, days:30, eVisa:true, cost:'~35 USD', info:'E-Visa (ETA) necesaria.', url:'https://eta.gov.lk' },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:true, days:30, eVisa:true, cost:'~35 USD', info:'E-Visa (ETA) obligatoria para casi todos. Tramitar en eta.gov.lk', url:'https://eta.gov.lk' },
+  },
+
+  'MV': { // Maldivas
+    _default:     { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado para todos los pasaportes hasta 30 días. Se obtiene a la llegada. Solo necesitas reserva de hotel y billete de salida.', url:null },
+  },
+
+  'BT': { // Bután
+    _SCHENGEN:    { needed:true, days:null, eVisa:false, cost:'~200+ USD/día', info:'Visado obligatorio + Tourist Sustainable Development Fee (200 USD/día). Solo con touroperador autorizado.', url:'https://www.tourism.gov.bt' },
+    'IN':         { needed:false, days:null, eVisa:false, cost:null, info:'Ciudadanos indios solo necesitan permiso especial.', url:null },
+    'BD':         { needed:false, days:null, eVisa:false, cost:null, info:'Ciudadanos bangladesíes solo necesitan permiso especial.', url:null },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~200 USD/día', info:'Visado obligatorio + tasa de sostenibilidad (~200 USD/día). Solo con agencia de viajes autorizada en Bután.', url:'https://www.tourism.gov.bt' },
+  },
+
+  // ══ ORIENTE MEDIO ════════════════════════════════════════════════════════
+
+  'AE': { // Emiratos Árabes Unidos
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días. Pasaporte con validez mínima 6 meses.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:true,  cost:null, info:'Sin visado hasta 30 días a la llegada o E-Visa.', url:'https://icp.gov.ae' },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días a la llegada.', url:null },
+    'PK':         { needed:true,  days:null, eVisa:true, cost:null, info:'Visado necesario. Tramitar online.', url:'https://icp.gov.ae' },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'E-Visa disponible para muchos países. Tramitar en icp.gov.ae o con aerolínea (Emirates, Etihad sponsorean visas).', url:'https://icp.gov.ae' },
+  },
+
+  'SA': { // Arabia Saudí
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~96 USD', info:'E-Visa turista disponible (90 días, múltiple entrada). Tramitar en visa.visitsaudi.com', url:'https://visa.visitsaudi.com' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~96 USD', info:'E-Visa turista disponible.', url:'https://visa.visitsaudi.com' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~96 USD', info:'E-Visa turista disponible.', url:'https://visa.visitsaudi.com' },
+    _ASIA_STRONG: { needed:true, days:90, eVisa:true, cost:'~96 USD', info:'E-Visa disponible.', url:'https://visa.visitsaudi.com' },
+    'IN':         { needed:true, days:30, eVisa:true, cost:'~96 USD', info:'E-Visa disponible.', url:'https://visa.visitsaudi.com' },
+    _default:     { needed:true, days:null, eVisa:false, cost:null, info:'Acceso muy restrictivo. Solo peregrinación (Umra/Hajj) o negocios para muchos países. Contactar embajada.', url:'https://visa.visitsaudi.com' },
+  },
+
+  'QA': { // Qatar
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días a la llegada.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días a la llegada.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'E-Visa disponible para muchos países. Tramitar en portal.moi.gov.qa', url:'https://portal.moi.gov.qa' },
+  },
+
+  'JO': { // Jordania
+    _SCHENGEN:    { needed:false, days:30, eVisa:true, cost:'~35 JOD', info:'Visado a la llegada (~35 JOD) o E-Visa online. Jordan Pass combina visado + entradas (recomendado).', url:'https://www.jordanpass.jo' },
+    _LATAM_STRONG:{ needed:true,  days:30, eVisa:true, cost:'~35 JOD', info:'Visado a la llegada o E-Visa.', url:'https://www.jordanpass.jo' },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:true, cost:'~35 JOD', info:'Visado a la llegada o Jordan Pass (recomendado).', url:'https://www.jordanpass.jo' },
+    _default:     { needed:true,  days:30, eVisa:true, cost:'~35 JOD', info:'Visado a la llegada (35 JOD) o Jordan Pass (39 USD, incluye Petra y Wadi Rum). Evita la cola.', url:'https://www.jordanpass.jo' },
+  },
+
+  'IL': { // Israel
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días. Atención: sellos de Israel pueden causar problemas en países árabes.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días desde 2024.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado necesario. Algunos países árabes y musulmanes tienen restricciones. Consultar embajada israelí.', url:'https://embassies.gov.il' },
+  },
+
+  'IR': { // Irán
+    _SCHENGEN:    { needed:true, days:30, eVisa:true, cost:'~75 USD', info:'E-Visa disponible (excepto ciudadanos de EE.UU., UK, Canadá). Tramitar en evisairan.ir', url:'https://evisairan.ir' },
+    _LATAM_STRONG:{ needed:true, days:30, eVisa:true, cost:'~75 USD', info:'E-Visa disponible.', url:'https://evisairan.ir' },
+    'US':         { needed:true, days:null, eVisa:false, cost:null, info:'Visado extremadamente difícil de obtener. Solo con guía local. Consultar embajada.', url:null },
+    'GB':         { needed:true, days:null, eVisa:false, cost:null, info:'Visado difícil. Requiere guía local. Consultar embajada.', url:null },
+    'CA':         { needed:true, days:null, eVisa:false, cost:null, info:'Visado difícil. Requiere guía local. Consultar embajada.', url:null },
+    _default:     { needed:true, days:30, eVisa:true, cost:'~75 USD', info:'E-Visa disponible para muchos países en evisairan.ir. Solo con circuito organizado o guía local para algunos.', url:'https://evisairan.ir' },
+  },
+
+  // ══ AFRICA ═══════════════════════════════════════════════════════════════
+
+  'ZA': { // Sudáfrica
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días. Pasaporte con 2 páginas en blanco y 30 días de validez mínimos.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'IN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    'CN':         { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado necesario. Tramitar en embajada sudafricana. Algunos países africanos exentos.', url:'https://www.dha.gov.za' },
+  },
+
+  'KE': { // Kenia
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~51 USD', info:'E-Visa obligatoria (eTa). Tramitar en etakenya.go.ke antes de viajar.', url:'https://etakenya.go.ke' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~51 USD', info:'E-Visa (eTa) necesaria.', url:'https://etakenya.go.ke' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~51 USD', info:'E-Visa (eTa) necesaria.', url:'https://etakenya.go.ke' },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para muchos países africanos (East African Community).', url:null },
+    _default:     { needed:true, days:90, eVisa:true, cost:'~51 USD', info:'eTa obligatorio para casi todos. Tramitar en etakenya.go.ke. Rápido y sencillo.', url:'https://etakenya.go.ke' },
+  },
+
+  'TZ': { // Tanzania (incluye Zanzíbar)
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~50 USD', info:'Visa on arrival (~50 USD) o E-Visa previa. Llevar efectivo USD en el aeropuerto.', url:'https://eservices.immigration.go.tz' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~50 USD', info:'Visa on arrival o E-Visa.', url:'https://eservices.immigration.go.tz' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~50 USD', info:'Visa on arrival o E-Visa.', url:'https://eservices.immigration.go.tz' },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para países de la East African Community.', url:null },
+    _default:     { needed:true, days:90, eVisa:true, cost:'~50 USD', info:'Visa on arrival o E-Visa en eservices.immigration.go.tz. Llevar foto pasaporte y USD.', url:'https://eservices.immigration.go.tz' },
+  },
+
+  'ET': { // Etiopía
+    _SCHENGEN:    { needed:true, days:30, eVisa:true, cost:'~52 USD', info:'E-Visa disponible (30 días turista). Tramitar en evisa.et', url:'https://www.evisa.et' },
+    _LATAM_STRONG:{ needed:true, days:30, eVisa:true, cost:'~52 USD', info:'E-Visa disponible.', url:'https://www.evisa.et' },
+    _ANGLOPHONE:  { needed:true, days:30, eVisa:true, cost:'~52 USD', info:'E-Visa disponible.', url:'https://www.evisa.et' },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para muchos países africanos.', url:null },
+    _default:     { needed:true, days:30, eVisa:true, cost:'~52 USD', info:'E-Visa disponible en evisa.et. Visa on arrival también disponible pero menos recomendado.', url:'https://www.evisa.et' },
+  },
+
+  'GH': { // Ghana
+    _SCHENGEN:    { needed:true, days:60, eVisa:true, cost:'~100 USD', info:'Visado necesario. E-Visa disponible en portal.ghanaimmigration.org', url:'https://portal.ghanaimmigration.org' },
+    _LATAM_STRONG:{ needed:true, days:60, eVisa:true, cost:'~100 USD', info:'E-Visa disponible.', url:'https://portal.ghanaimmigration.org' },
+    _ANGLOPHONE:  { needed:true, days:60, eVisa:true, cost:'~100 USD', info:'E-Visa disponible.', url:'https://portal.ghanaimmigration.org' },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para muchos países de ECOWAS.', url:null },
+    _default:     { needed:true, days:60, eVisa:true, cost:'~100 USD', info:'E-Visa necesaria. Tramitar en portal.ghanaimmigration.org', url:'https://portal.ghanaimmigration.org' },
+  },
+
+  'MA': { // Marruecos
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días. Pasaporte con 6 meses de validez.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días desde 2023.', url:null },
+    'CN':         { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado necesario para la mayoría de países africanos y asiáticos restantes.', url:null },
+  },
+
+  'EG': { // Egipto
+    _SCHENGEN:    { needed:true, days:30, eVisa:true, cost:'~25 USD', info:'E-Visa disponible (30 días turista) o visado a la llegada en aeropuerto (~25 USD). Tramitar en visa2egypt.com', url:'https://visa2egypt.com' },
+    _LATAM_STRONG:{ needed:true, days:30, eVisa:true, cost:'~25 USD', info:'E-Visa o visado a la llegada.', url:'https://visa2egypt.com' },
+    _ANGLOPHONE:  { needed:true, days:30, eVisa:true, cost:'~25 USD', info:'E-Visa o visado a la llegada (~25 USD).', url:'https://visa2egypt.com' },
+    _ASIA_STRONG: { needed:true, days:30, eVisa:true, cost:'~25 USD', info:'E-Visa o visado a la llegada.', url:'https://visa2egypt.com' },
+    'IN':         { needed:true, days:30, eVisa:true, cost:'~25 USD', info:'Visa on arrival disponible.', url:'https://visa2egypt.com' },
+    _default:     { needed:true, days:30, eVisa:true, cost:'~25 USD', info:'Visado a la llegada (~25 USD) en aeropuertos egipcios o E-Visa online (visa2egypt.com). Llevar efectivo USD.', url:'https://visa2egypt.com' },
+  },
+
+  'TN': { // Túnez
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:false, cost:null, info:'Visado necesario. Tramitar en embajada tunecina.', url:null },
+  },
+
+  'NG': { // Nigeria
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~100-160 USD', info:'E-Visa disponible (portal.immigration.gov.ng). Proceso puede ser lento.', url:'https://portal.immigration.gov.ng' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~100 USD', info:'E-Visa disponible.', url:'https://portal.immigration.gov.ng' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~100 USD', info:'E-Visa disponible.', url:'https://portal.immigration.gov.ng' },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para países de ECOWAS.', url:null },
+    _default:     { needed:true, days:null, eVisa:true, cost:'~100 USD', info:'E-Visa disponible en portal.immigration.gov.ng. Tramitar con 2+ semanas de antelación.', url:'https://portal.immigration.gov.ng' },
+  },
+
+  'SN': { // Senegal
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _AFRICA:      { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para países de ECOWAS.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'E-Visa disponible en consulat.sec.gouv.sn', url:'https://consulat.sec.gouv.sn' },
+  },
+
+  // ══ AMERICAS ═════════════════════════════════════════════════════════════
+
+  'US': { // Estados Unidos
+    _SCHENGEN:    { needed:false, days:90, eVisa:true, cost:'~21 USD', info:'ESTA obligatoria (no es visado, es autorización previa). Tramitar en esta.cbp.dhs.gov antes del viaje.', url:'https://esta.cbp.dhs.gov' },
+    _LATAM_STRONG:{ needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado B1/B2 necesario para la mayoría de LATAM. Tramitar en embajada USA. Espera de meses posible.', url:'https://travel.state.gov' },
+    _LATAM_WEAK:  { needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado necesario. Tasa de tramitación ~185 USD. Lista de espera larga.', url:'https://travel.state.gov' },
+    'GB':         { needed:false, days:90, eVisa:true, cost:'~21 USD', info:'ESTA obligatoria (Visa Waiver Program).', url:'https://esta.cbp.dhs.gov' },
+    'AU':         { needed:false, days:90, eVisa:true, cost:'~21 USD', info:'ESTA obligatoria.', url:'https://esta.cbp.dhs.gov' },
+    'CA':         { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días (canadienses).', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:true, cost:'~21 USD', info:'ESTA (Japan, Korea, Singapore, etc.)', url:'https://esta.cbp.dhs.gov' },
+    'IN':         { needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado B1/B2 necesario. Tramitar en embajada. Espera larga posible.', url:'https://travel.state.gov' },
+    'CN':         { needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado B1/B2 necesario. Tramitar en embajada USA en China.', url:'https://travel.state.gov' },
+    'MX':         { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _AFRICA:      { needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado necesario para la mayoría de pasaportes africanos.', url:'https://travel.state.gov' },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~185 USD', info:'Visado B1/B2 necesario. Tramitar en travel.state.gov. Proceso largo.', url:'https://travel.state.gov' },
+  },
+
+  'CA': { // Canadá
+    _SCHENGEN:    { needed:false, days:180, eVisa:true, cost:'~7 CAD', info:'eTA obligatoria (no es visado). Tramitar en canada.ca/eta antes del vuelo.', url:'https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta.html' },
+    _LATAM_STRONG:{ needed:true, days:null, eVisa:false, cost:'~100 CAD', info:'Visado necesario. Tramitar en ircc.canada.ca. Proceso de 1-3 meses.', url:'https://ircc.canada.ca' },
+    _ANGLOPHONE:  { needed:false, days:180, eVisa:true, cost:'~7 CAD', info:'eTA obligatoria (UK, Australia, NZ). EE.UU. exento totalmente.', url:'https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta.html' },
+    'US':         { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado, sin eTA. Solo con pasaporte o licencia NEXUS.', url:null },
+    _ASIA_STRONG: { needed:false, days:180, eVisa:true, cost:'~7 CAD', info:'eTA necesaria (Japón, Corea, Singapur).', url:'https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada/eta.html' },
+    'IN':         { needed:true, days:null, eVisa:false, cost:'~100 CAD', info:'Visado necesario. Tramitar online en ircc.canada.ca', url:'https://ircc.canada.ca' },
+    'CN':         { needed:true, days:null, eVisa:false, cost:'~100 CAD', info:'Visado necesario.', url:'https://ircc.canada.ca' },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~100 CAD', info:'Visado necesario. Tramitar en ircc.canada.ca. Proceso puede tomar meses.', url:'https://ircc.canada.ca' },
+  },
+
+  'AU': { // Australia
+    _SCHENGEN:    { needed:true, days:90, eVisa:true, cost:'~20 AUD', info:'ETA (Electronic Travel Authority) obligatoria. Tramitar en eta.homeaffairs.gov.au o en la app Visa Verify.', url:'https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601' },
+    _LATAM_STRONG:{ needed:true, days:90, eVisa:true, cost:'~190 AUD', info:'eVisitor o visado turista necesario. Tramitar online.', url:'https://immi.homeaffairs.gov.au' },
+    _ANGLOPHONE:  { needed:true, days:90, eVisa:true, cost:'~20 AUD', info:'ETA obligatoria (UK, USA, Canada, NZ).', url:'https://immi.homeaffairs.gov.au' },
+    _ASIA_STRONG: { needed:true, days:90, eVisa:true, cost:'~20 AUD', info:'ETA disponible (Japón, Corea, Singapur, HK).', url:'https://immi.homeaffairs.gov.au' },
+    'CN':         { needed:true, days:null, eVisa:false, cost:'~145 AUD', info:'Visado necesario. Tramitar en embajada australiana.', url:'https://immi.homeaffairs.gov.au' },
+    'IN':         { needed:true, days:null, eVisa:false, cost:'~145 AUD', info:'Visado necesario. Tramitar online.', url:'https://immi.homeaffairs.gov.au' },
+    'NZ':         { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para neozelandeses (Trans-Tasman).', url:null },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~145 AUD', info:'Visado turista necesario. Tramitar en immi.homeaffairs.gov.au', url:'https://immi.homeaffairs.gov.au' },
+  },
+
+  'NZ': { // Nueva Zelanda
+    _SCHENGEN:    { needed:false, days:90, eVisa:true, cost:'~17 NZD', info:'NZeTA obligatoria (no es visado). Tramitar en app New Zealand Travel o en web.', url:'https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/about-visa/nzeta' },
+    _LATAM_STRONG:{ needed:true, days:null, eVisa:false, cost:'~211 NZD', info:'Visado turista necesario. Tramitar online.', url:'https://www.immigration.govt.nz' },
+    _ANGLOPHONE:  { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para UK y Australia. EE.UU. y Canadá: NZeTA.', url:null },
+    'AU':         { needed:false, days:null, eVisa:false, cost:null, info:'Sin visado para australianos.', url:null },
+    _ASIA_STRONG: { needed:false, days:90, eVisa:true, cost:'~17 NZD', info:'NZeTA necesaria.', url:'https://www.immigration.govt.nz' },
+    _default:     { needed:true, days:null, eVisa:false, cost:'~211 NZD', info:'Visado turista necesario. Tramitar en immigration.govt.nz', url:'https://www.immigration.govt.nz' },
+  },
+
+  // ══ LATINOAMÉRICA ADICIONAL ══════════════════════════════════════════════
+
+  'MX': { // México
+    _SCHENGEN:    { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días. Solo pasaporte con 6 meses de validez.', url:null },
+    _LATAM_STRONG:{ needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    'IN':         { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días desde 2024.', url:null },
+    'CN':         { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días desde 2024.', url:null },
+    _default:     { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90-180 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'CO': { // Colombia
+    _SCHENGEN:    { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días por año (no necesariamente consecutivos).', url:null },
+    _LATAM_STRONG:{ needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días desde 2023.', url:null },
+    'IN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'AR': { // Argentina
+    _SCHENGEN:    { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días (o ilimitado para algunos vecinos).', url:null },
+    _ANGLOPHONE:  { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes occidentales.', url:null },
+  },
+
+  'BR': { // Brasil
+    _SCHENGEN:    { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días (Schengen exentos desde 2023).', url:null },
+    _LATAM_STRONG:{ needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días (EE.UU., UK, Australia, Canadá exentos desde 2024).', url:null },
+    _ASIA_STRONG: { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días desde 2024.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'PE': { // Perú
+    _SCHENGEN:    { needed:false, days:183, eVisa:false, cost:null, info:'Sin visado hasta 183 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:183, eVisa:false, cost:null, info:'Sin visado hasta 183 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:183, eVisa:false, cost:null, info:'Sin visado hasta 183 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'CL': { // Chile
+    _SCHENGEN:    { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'CN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    'IN':         { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'UY': { // Uruguay
+    _SCHENGEN:    { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90,  eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'CU': { // Cuba
+    _SCHENGEN:    { needed:false, days:30, eVisa:false, cost:'~25 CUC tarjeta turista', info:'Sin visado pero OBLIGATORIA tarjeta de turista (rosa o verde). Se compra en aeropuerto o agencia (~25 EUR). Sin ella no embarcan.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:'~25 USD tarjeta turista', info:'Tarjeta de turista obligatoria (~25 USD). Se compra en aeropuerto.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:false, cost:'~25 USD tarjeta turista', info:'Tarjeta turista obligatoria. EE.UU.: restricciones especiales — solo con licencia OFAC.', url:null },
+    'US':         { needed:true,  days:null, eVisa:false, cost:null, info:'Ciudadanos americanos necesitan licencia OFAC. Muy restringido. Consultar normativa vigente.', url:'https://home.treasury.gov/policy-issues/financial-sanctions/sanctions-programs-and-country-information/cuba-sanctions' },
+    _default:     { needed:false, days:30, eVisa:false, cost:'~25 USD tarjeta turista', info:'Tarjeta de turista obligatoria para casi todos (~25 USD). Sin ella no puedes embarcar.', url:null },
+  },
+
+  'DO': { // República Dominicana
+    _SCHENGEN:    { needed:false, days:30, eVisa:false, cost:'~10 USD tarjeta turista', info:'Sin visado. La tarjeta de turista (~10 USD) está incluida en el precio del vuelo en la mayoría de aerolíneas.', url:null },
+    _LATAM_STRONG:{ needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:false, days:30, eVisa:false, cost:null, info:'Sin visado hasta 30 días para la mayoría de pasaportes.', url:null },
+  },
+
+  'CR': { // Costa Rica
+    _SCHENGEN:    { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días.', url:null },
+    _default:     { needed:false, days:90, eVisa:false, cost:null, info:'Sin visado hasta 90 días para la mayoría de pasaportes.', url:null },
+  },
+
+  // ══ CAUCASO Y ASIA CENTRAL ═══════════════════════════════════════════════
+
+  'GE': { // Georgia
+    _SCHENGEN:    { needed:false, days:365, eVisa:false, cost:null, info:'Sin visado hasta 365 días (¡un año!). Uno de los países más acogedores del mundo para viajeros.', url:null },
+    _LATAM_STRONG:{ needed:false, days:365, eVisa:false, cost:null, info:'Sin visado hasta 365 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:365, eVisa:false, cost:null, info:'Sin visado hasta 365 días.', url:null },
+    _ASIA_STRONG: { needed:false, days:365, eVisa:false, cost:null, info:'Sin visado hasta 365 días.', url:null },
+    'IN':         { needed:false, days:365, eVisa:false, cost:null, info:'Sin visado hasta 365 días.', url:null },
+    'CN':         { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:null, info:'E-Visa disponible en evisa.gov.ge', url:'https://www.evisa.gov.ge' },
+  },
+
+  'AM': { // Armenia
+    _SCHENGEN:    { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:180, eVisa:false, cost:null, info:'Sin visado hasta 180 días.', url:null },
+    _default:     { needed:true,  days:null, eVisa:true, cost:'~6 USD', info:'E-Visa disponible en evisa.mfa.am (~6 USD, 21 días).', url:'https://evisa.mfa.am' },
+  },
+
+  'AZ': { // Azerbaiyán
+    _SCHENGEN:    { needed:true, days:30,  eVisa:true, cost:'~20 USD', info:'ASAN Visa (e-Visa) en evisa.gov.az. Fácil y rápido.', url:'https://evisa.gov.az' },
+    _LATAM_STRONG:{ needed:true, days:30,  eVisa:true, cost:'~20 USD', info:'E-Visa necesaria.', url:'https://evisa.gov.az' },
+    _ANGLOPHONE:  { needed:true, days:30,  eVisa:true, cost:'~20 USD', info:'E-Visa necesaria.', url:'https://evisa.gov.az' },
+    _default:     { needed:true, days:30,  eVisa:true, cost:'~20 USD', info:'ASAN E-Visa en evisa.gov.az. Rápido (48h). 30 días turista.', url:'https://evisa.gov.az' },
+  },
+
+  'UZ': { // Uzbekistán
+    _SCHENGEN:    { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días para ciudadanos de muchos países europeos. Verifica en e-visa.uz', url:'https://e-visa.uz' },
+    _ANGLOPHONE:  { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _LATAM_STRONG:{ needed:true,  days:30,  eVisa:true,  cost:'~20 USD', info:'E-Visa disponible en e-visa.uz', url:'https://e-visa.uz' },
+    _default:     { needed:true,  days:30,  eVisa:true,  cost:'~20 USD', info:'E-Visa disponible en e-visa.uz. Fácil de tramitar.', url:'https://e-visa.uz' },
+  },
+
+  'KZ': { // Kazajistán
+    _SCHENGEN:    { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días para ciudadanos de muchos países europeos.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _LATAM_STRONG:{ needed:true,  days:null, eVisa:true,  cost:'~70 USD', info:'E-Visa disponible en viza.gov.kz', url:'https://viza.gov.kz' },
+    _default:     { needed:true,  days:null, eVisa:true,  cost:'~70 USD', info:'E-Visa disponible en viza.gov.kz', url:'https://viza.gov.kz' },
+  },
+
+  'MN': { // Mongolia
+    _SCHENGEN:    { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:30,  eVisa:false, cost:null, info:'Sin visado hasta 30 días.', url:null },
+    _LATAM_STRONG:{ needed:true,  days:30,  eVisa:true,  cost:'~50 USD', info:'E-Visa disponible en evisa.mn', url:'https://evisa.mn' },
+    _default:     { needed:true,  days:30,  eVisa:true,  cost:'~50 USD', info:'E-Visa disponible en evisa.mn (30 días turista).', url:'https://evisa.mn' },
+  },
+
+  // ══ OCEANÍA ADICIONAL ════════════════════════════════════════════════════
+
+  'PG': { // Papúa Nueva Guinea
+    _SCHENGEN:    { needed:true, days:60, eVisa:false, cost:null, info:'Visado a la llegada (60 días) o tramitar en embajada. Llevar efectivo para tasas aeroportuarias.', url:null },
+    _ANGLOPHONE:  { needed:true, days:60, eVisa:false, cost:null, info:'Visado a la llegada disponible.', url:null },
+    _default:     { needed:true, days:60, eVisa:false, cost:null, info:'Visado a la llegada para la mayoría de pasaportes (60 días). Tramitar también en embajada PNG.', url:null },
+  },
+
+  'FJ': { // Fiyi
+    _SCHENGEN:    { needed:false, days:120, eVisa:false, cost:null, info:'Sin visado hasta 120 días.', url:null },
+    _ANGLOPHONE:  { needed:false, days:120, eVisa:false, cost:null, info:'Sin visado hasta 120 días.', url:null },
+    _LATAM_STRONG:{ needed:false, days:120, eVisa:false, cost:null, info:'Sin visado hasta 120 días.', url:null },
+    _default:     { needed:false, days:120, eVisa:false, cost:null, info:'Sin visado hasta 120 días para la mayoría de pasaportes.', url:null },
+  },
+
+
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
