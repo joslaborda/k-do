@@ -94,7 +94,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden flex flex-col" style={{ height: '420px' }}>
+    <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col" style={{ height: '420px' }}>
       {/* Header */}
       <div className="px-4 py-3 border-b border-border flex items-center gap-2 bg-orange-50">
         <MessageCircle className="w-4 h-4 text-orange-700" />
