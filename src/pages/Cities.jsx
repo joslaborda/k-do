@@ -97,7 +97,7 @@ function DraggableSpots({ spots, onReorder, onEdit }) {
             }
           </div>
           <button onClick={() => onEdit(spot)}
-            className="w-7 h-7 rounded-lg border border-border bg-white flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors">
+            className="w-7 h-7 rounded-lg border border-border bg-card flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -368,7 +368,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             isTomorrow_ ? '¿Algo que apuntar para mañana?' :
             '¿Algo que apuntar para este día?'
           }
-          className="text-sm bg-white border-border resize-none min-h-[100px] w-full"
+          className="text-sm bg-card border-border resize-none min-h-[100px] w-full"
           rows={4}
         />
       </div>
