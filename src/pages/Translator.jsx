@@ -231,6 +231,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
 
   const pendingTextRef = useRef('');
+  const interimRef = useRef('');
 
   const doTranslate = async (text) => {
     if (!text.trim()) return;

@@ -96,7 +96,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
                   padding: '1px 5px',
                 }}>{tab.badge}</span>
               )}
-              {tab.urgent && urgentCount > 0 && !isOn && (
+              {tab.urgent && (typeof urgentCount !== 'undefined' ? urgentCount : 0) > 0 && !isOn && (
                 <span style={{
                   width: 7, height: 7, borderRadius: '50%',
                   background: '#c2410c',
