@@ -65,7 +65,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-[80px]"
       onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+      <div className="bg-card w-full max-w-lg rounded-t-3xl overflow-hidden"
         onClick={e => e.stopPropagation()}>
         <div className="pt-3 pb-0 flex justify-center">
           <div className="w-9 h-1 rounded-full bg-border" />
@@ -336,7 +336,7 @@ export default function TripsList() {
 
             {/* New trip button */}
             <button onClick={() => setDialogOpen(true)}
-              className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-white hover:bg-orange-50 transition-colors">
+              className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-card hover:bg-orange-50 transition-colors">
               <Plus className="w-4 h-4" />Nuevo viaje
             </button>
 
@@ -345,7 +345,7 @@ export default function TripsList() {
               <div>
                 <button
                   onClick={() => setShowPast(p => !p)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-white border border-border rounded-2xl text-sm text-muted-foreground hover:bg-secondary/30 transition-colors">
+                  className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-2xl text-sm text-muted-foreground hover:bg-secondary/30 transition-colors">
                   <div className="flex items-center gap-2">
                     <span className="text-base">🗂️</span>
                     <span>{pastCount} viaje{pastCount !== 1 ? 's' : ''} finalizado{pastCount !== 1 ? 's' : ''}</span>
@@ -395,7 +395,7 @@ export default function TripsList() {
       {newTripPopup && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-[80px]"
           onClick={() => setNewTripPopup(null)}>
-          <div className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+          <div className="bg-card w-full max-w-lg rounded-t-3xl overflow-hidden"
             onClick={e => e.stopPropagation()}>
             <div className="pt-3 pb-0 flex justify-center">
               <div className="w-9 h-1 rounded-full bg-border" />
