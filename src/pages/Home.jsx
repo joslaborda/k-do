@@ -82,15 +82,27 @@ function OTabBar({ tabs, activeKey, onChange }) {
                 color: isOn ? '#1a1714' : '#a09890',
                 transition: 'color 0.2s',
                 lineHeight: 1,
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
               }}
             >
               {tab.label}
               {tab.badge > 0 && (
                 <span style={{
-                  marginLeft: 4, background: '#c2410c', color: 'white',
+                  background: '#c2410c', color: 'white',
                   fontSize: 10, fontWeight: 500, borderRadius: 10,
-                  padding: '1px 5px', verticalAlign: 'middle',
+                  padding: '1px 5px',
                 }}>{tab.badge}</span>
+              )}
+              {tab.urgent && urgentCount > 0 && !isOn && (
+                <span style={{
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#c2410c',
+                  display: 'inline-block',
+                  flexShrink: 0,
+                }} />
               )}
             </span>
           </button>
@@ -513,7 +525,16 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                 <button
                   key={item.id || idx}
                   onClick={() => setSelected(item)}
-                  className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left"
+                  className={`w-full flex items-center gap-3 px-4 py-3 border-t border-border transition-colors text-left ${
+                    isDoc && item.time && ['flight','train','bus'].includes(item.type) && (() => {
+                      const now = new Date();
+                      const [h, m] = item.time.split(':').map(Number);
+                      const dep = new Date(now); dep.setHours(h, m, 0, 0);
+                      const diffMin = Math.round((dep - now) / 60000);
+                      if (diffMin <= 0 || diffMin > 240) return false;
+                      return diffMin <= 60 ? 'bg-red-50 hover:bg-red-50' : 'bg-orange-50/60 hover:bg-orange-50/80';
+                    })() || 'hover:bg-secondary/20'
+                  }`}
                 >
                   {/* Time column */}
                   <div className="w-11 shrink-0 flex flex-col items-center self-stretch justify-start pt-0.5">
@@ -543,6 +564,23 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                     {isDoc && !hasTime && (
                       <p className="text-xs text-muted-foreground mt-0.5">Sin hora · toca para añadir</p>
                     )}
+                    {/* Countdown for transport items */}
+                    {isDoc && item.time && ['flight','train','bus'].includes(item.type) && (() => {
+                      const now = new Date();
+                      const [h, m] = item.time.split(':').map(Number);
+                      const dep = new Date(now); dep.setHours(h, m, 0, 0);
+                      const diffMin = Math.round((dep - now) / 60000);
+                      if (diffMin <= 0 || diffMin > 240) return null;
+                      const hrs = Math.floor(diffMin / 60);
+                      const mins = diffMin % 60;
+                      const label = hrs > 0 ? `Sale en ${hrs}h${mins > 0 ? ` ${mins}min` : ''}` : `Sale en ${diffMin} min`;
+                      const urgent = diffMin <= 60;
+                      return (
+                        <p className="text-xs font-semibold mt-0.5" style={{color: urgent ? '#dc2626' : '#c2410c'}}>
+                          {urgent ? '⚠ ' : ''}{label}
+                        </p>
+                      );
+                    })()}
                   </div>
 
                   <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -1778,10 +1816,8 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
-  const [tab, setTab] = useState(() => {
-    // will be corrected after trip load
-    return 'hoy';
-  });
+  const [tab, setTab] = useState(() => 'hoy');
+  const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
@@ -1957,7 +1993,7 @@ export default function Home() {
       return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
     }
     if (isDeparture || tripInProgress) {
-      tabs.push({ key: 'hoy', label: 'Hoy' });
+      tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
       tabs.push({ key: 'manana', label: 'Mañana' });
       if (isDeparture) tabs.unshift({ key: 'inicio', label: 'Inicio' });
       tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
@@ -2080,7 +2116,7 @@ export default function Home() {
       {/* Content */}
       <div className="max-w-3xl mx-auto px-5 pt-5 pb-2 space-y-3">
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
-        <TripAlerts tripId={tripId} cities={cities} trip={trip} />
+        <TripAlerts tripId={tripId} cities={cities} trip={trip} onUrgentCount={setUrgentCount} />
 
         {tab === 'previaje' && (
           <PreTripTab
