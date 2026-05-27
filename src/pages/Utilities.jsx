@@ -114,7 +114,7 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[88vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[88vh]" onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 pt-4 px-5 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
@@ -302,7 +302,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
     <div className="space-y-3">
       {/* Inner tabs */}
       {tripInProgress && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex">
             {innerTabs.map(t => (
               <button key={t.key} onClick={() => setActiveInnerTab(t.key)}
@@ -326,7 +326,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
       {activeInnerTab === 'maleta' && (
         <>
           {totalItems === 0 ? (
-            <div className="bg-white rounded-2xl border border-border text-center py-14 px-6">
+            <div className="bg-card rounded-2xl border border-border text-center py-14 px-6">
               <p className="text-4xl mb-3">🧳</p>
               <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
               <p className="text-xs text-muted-foreground mb-5">
@@ -340,7 +340,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
           ) : (
             <>
               {/* Progress */}
-              <div className="bg-white rounded-2xl border border-border p-4">
+              <div className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-foreground">Progreso total</p>
                   <p className="text-sm font-medium text-primary">{progress}%</p>
@@ -362,7 +362,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
                 const isAddingHere = adding === cat.value;
 
                 return (
-                  <div key={cat.value} className="bg-white rounded-2xl border border-border overflow-hidden">
+                  <div key={cat.value} className="bg-card rounded-2xl border border-border overflow-hidden">
                     {/* Category header */}
                     <button onClick={() => toggleCollapsed(cat.value)}
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/20 transition-colors">
@@ -451,7 +451,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
       {/* ── SOUVENIRS ── */}
       {activeInnerTab === 'souvenirs' && (
         <div className="space-y-3">
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {souvenirItems.length === 0 && adding !== 'souvenir' && (
               <div className="text-center py-12 px-6">
                 <p className="text-3xl mb-2">🛍️</p>
@@ -526,7 +526,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
   }, [country, homeCountry]);
 
   if (!country) return (
-    <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+    <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
       <p className="text-4xl mb-3">🚨</p>
       <p className="text-sm font-medium text-foreground mb-1">Abre desde un viaje</p>
       <p className="text-xs text-muted-foreground">La información de emergencias aparece al abrir Utilidades desde un viaje activo</p>
@@ -541,7 +541,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
   );
 
   if (!data) return (
-    <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+    <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
       <p className="text-4xl mb-3">🚨</p>
       <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
       <p className="text-xs text-muted-foreground">Aún no tenemos información de emergencias para este país</p>
@@ -559,7 +559,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
     <div className="space-y-4">
       {/* Emergency numbers */}
       {numbers.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               Emergencias · {meta.flag} {country}
@@ -579,7 +579,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
 
       {/* Embassy */}
       {data.embassy && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu embajada</p>
           {data.embassy.address && <p className="text-sm text-foreground mb-2">📍 {data.embassy.address}</p>}
           {data.embassy.phone && (
@@ -599,7 +599,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
 
       {/* Second nationality embassy */}
       {data.secondEmbassy && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu segunda embajada</p>
           {data.secondEmbassy.address && <p className="text-sm text-foreground mb-2">📍 {data.secondEmbassy.address}</p>}
           {data.secondEmbassy.phone && <p className="text-sm text-foreground mb-2">📞 <span className="font-medium">{data.secondEmbassy.phone}</span></p>}
@@ -615,7 +615,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
 
       {/* Useful apps */}
       {data.useful_apps?.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">📱 Apps útiles</p>
           </div>
@@ -630,7 +630,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
 
       {/* Safety tips */}
       {data.safety_tips?.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🛡️ Consejos</p>
           </div>
@@ -717,7 +717,7 @@ export default function Utilities() {
         {activeTab === 'clima' && (
           <>
             {cities.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+              <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
                 <p className="text-4xl mb-3">☁️</p>
                 <p className="text-sm font-medium text-foreground mb-1">Sin ciudades</p>
                 <p className="text-xs text-muted-foreground">Añade ciudades en la sección Ruta para ver el clima</p>
