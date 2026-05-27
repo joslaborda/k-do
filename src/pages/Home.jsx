@@ -27,7 +27,7 @@ import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, 
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
-function OTabBar({ tabs, activeKey, onChange }) {
+function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
   const [mounted, setMounted] = useState(false);
@@ -81,7 +81,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-nav-active-text)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
                 position: 'relative',
@@ -97,6 +97,12 @@ function OTabBar({ tabs, activeKey, onChange }) {
                   fontSize: 10, fontWeight: 500, borderRadius: 10,
                   padding: '1px 5px',
                 }}>{tab.badge}</span>
+              )}
+              {tab.key === 'hoy' && urgentCount > 0 && !isOn && (
+                <span style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#c2410c', display: 'inline-block', flexShrink: 0,
+                }} />
               )}
               {tab.badge > 0 && (
                 <span style={{
@@ -116,7 +122,15 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡', health:'🏥' };
+// PreTripTab requirement group icons — Lucide components
+const REQ_ICON_MAP = {
+  visa:    (p) => <Shield size={14} {...p} />,
+  vaccine: (p) => <Cross size={14} {...p} />,
+  tech:    (p) => <Wifi size={14} {...p} />,
+  money:   (p) => <DollarSign size={14} {...p} />,
+  safety:  (p) => <AlertTriangle size={14} {...p} />,
+  health:  (p) => <Cross size={14} {...p} />,
+};
 const DOC_ICONS = {
   flight: (p) => <PlaneIcon size={13} {...p} />,
   hotel: (p) => <Hotel size={13} {...p} />,
@@ -524,6 +538,28 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
       </button>
 
+      {/* Holiday banner — shown even when collapsed */}
+      {(() => {
+        if (!city?.country || !dateStr) return null;
+        const holidays = getHolidaysForDate(city.country, dateStr, city.name);
+        if (!holidays.length) return null;
+        return (
+          <div className="border-t border-amber-100 dark:border-amber-900/30">
+            {holidays.map((h, i) => (
+              <div key={i} className="flex items-start gap-2.5 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/20">
+                <span className="text-sm flex-shrink-0 mt-0.5">🎉</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-amber-800 dark:text-amber-400">
+                    {h.name} <span className="font-normal opacity-70">· Festivo</span>
+                  </p>
+                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
       {open && (
         <div>
           {hasContent ? (
@@ -830,6 +866,37 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
         </div>
       )}
 
+      {/* Días festivos en el viaje */}
+      {(() => {
+        if (!trip?.start_date || !trip?.end_date) return null;
+        const allCountries = [...new Set(sortedCities.map(c => c.country).filter(Boolean))];
+        const tripHolidays = getHolidaysInRange(allCountries, trip.start_date, trip.end_date, sortedCities);
+        if (!tripHolidays.length) return null;
+        return (
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <p className="text-sm font-semibold text-foreground">Días festivos en tu viaje</p>
+              <span className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/40">
+                {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            {tripHolidays.map((h, i) => (
+              <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
+                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-sm flex-shrink-0">🎉</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{h.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                    {h.city ? ` · ${h.city}` : h.country ? ` · ${h.country}` : ''}
+                  </p>
+                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
       {/* Viajeros */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
@@ -996,7 +1063,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                         }`}>
                           {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
                         </div>
-                        <span className="text-base shrink-0">{REQ_ICONS[req.type] || '📋'}</span>
+                        <span className="text-base shrink-0">{(REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-primary'}) : null)}</span>
                         <div className="flex-1 min-w-0">
                           <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                             {req.title}{allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
@@ -1027,6 +1094,37 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           })()}
         </div>
       )}
+
+      {/* Días festivos en el viaje */}
+      {(() => {
+        if (!trip?.start_date || !trip?.end_date) return null;
+        const allCountries = [...new Set(sortedCities.map(c => c.country).filter(Boolean))];
+        const tripHolidays = getHolidaysInRange(allCountries, trip.start_date, trip.end_date, sortedCities);
+        if (!tripHolidays.length) return null;
+        return (
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <p className="text-sm font-semibold text-foreground">Días festivos en tu viaje</p>
+              <span className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/40">
+                {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            {tripHolidays.map((h, i) => (
+              <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
+                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-sm flex-shrink-0">🎉</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{h.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                    {h.city ? ` · ${h.city}` : h.country ? ` · ${h.country}` : ''}
+                  </p>
+                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* Viajeros */}
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
@@ -2142,6 +2240,7 @@ export default function Home() {
             tabs={homeTabs}
             activeKey={tab}
             onChange={handleTabChange}
+            urgentCount={urgentCount}
           />
         </div>
       </div>
