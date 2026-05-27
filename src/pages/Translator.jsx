@@ -174,7 +174,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden">
       {original && (
         <div className="px-4 py-3 border-b border-border">
           <p className="text-xs text-muted-foreground mb-1">{fromL.flag} Original</p>
@@ -423,7 +423,7 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="px-4 pt-3 pb-1">
           <p className="text-xs text-muted-foreground mb-1.5">{fromL.flag} {fromL.label}</p>
           <textarea
@@ -444,7 +444,7 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
             <button
               onClick={() => speakText(input, fromL.bcp)}
               disabled={!input.trim()}
-              className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+              className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
             >
               <Volume2 className="w-3.5 h-3.5" />
             </button>
@@ -550,7 +550,7 @@ function HistorialTab() {
   return (
     <div>
       {saved.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden mb-4">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden mb-4">
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
               <div style={{ height: 3, width: 48, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
@@ -564,7 +564,7 @@ function HistorialTab() {
       )}
 
       {recent.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
               <div style={{ height: 3, width: 30, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
