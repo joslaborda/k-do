@@ -1269,7 +1269,7 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
 // ── AMPLIACIÓN COMPLETA ────────────────────────────────────────────────────────
 // Añadidos via Object.assign al final del archivo
 
-Object.assign(EMERGENCY_DATA, {
+Object.assign(EMERGENCY_DB, {
 
   // ══ EUROPA ════════════════════════════════════════════════════════════════════
 
