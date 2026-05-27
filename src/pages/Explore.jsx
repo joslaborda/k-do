@@ -44,7 +44,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
   const isOwn = currentUser?.id === spot.created_by_user_id;
   const attribution = spot.source_username || spot.source_display_name;
   return (
-    <div className="bg-white border border-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
       {spot.image_url && <div className="h-36 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover"/></div>}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
@@ -100,7 +100,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
   const followRecord = myFollows.find(f => f.followed_user_id === profile.user_id);
   const isFollowing = !!followRecord;
   return (
-    <div className="bg-white border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
+    <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
       <Avatar profile={profile}/>
       <div className="flex-1 min-w-0">
         <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-primary block truncate">
@@ -174,7 +174,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
             const profile = profileMap[spot.created_by_user_id];
             const isOwn = currentUser?.id === spot.created_by_user_id;
             return (
-              <div key={spot.id} className="bg-white border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-shadow">
+              <div key={spot.id} className="bg-card border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-shadow">
                 <div className={"w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 " +
                   (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-slate-100 text-slate-600' : idx === 2 ? 'bg-orange-50 text-primary' : 'bg-secondary text-muted-foreground')}>
                   {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
@@ -364,7 +364,7 @@ export default function Explore() {
 
       <div className="max-w-2xl mx-auto px-4 py-4">
         <Tabs defaultValue="explorar">
-          <TabsList className="w-full mb-5 bg-white border border-border">
+          <TabsList className="w-full mb-5 bg-card border border-border">
             <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Globe className="w-4 h-4 mr-1"/>Explorar
             </TabsTrigger>
@@ -385,7 +385,7 @@ export default function Explore() {
           {/* ── EXPLORAR ──────────────────────────────────────────────────── */}
           <TabsContent value="explorar">
             {/* Filtros de spots */}
-            <div className="bg-white rounded-2xl border border-border p-4 mb-5 space-y-3">
+            <div className="bg-card rounded-2xl border border-border p-4 mb-5 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtrar spots</p>
                 {activeFilters > 0 && (
@@ -422,7 +422,7 @@ export default function Explore() {
                 <Badge variant="secondary" className="ml-auto">{filteredSpots.length}</Badge>
               </div>
               {loadingSpots ? (
-                <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+                <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
               ) : filteredSpots.length === 0 ? (
                 <EmptyFeed emoji="📍" title="Sin spots" subtitle={activeFilters > 0 ? 'Prueba cambiando los filtros' : 'Sé el primero en publicar un spot'}/>
               ) : (
@@ -443,7 +443,7 @@ export default function Explore() {
                 <Badge variant="secondary" className="ml-auto">{publicTemplates.length}</Badge>
               </div>
               {loadingTemplates ? (
-                <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+                <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
               ) : publicTemplates.length === 0 ? (
                 <EmptyFeed emoji="🗺️" title="Sin itinerarios todavía" subtitle="Publica tu primer viaje"/>
               ) : (
