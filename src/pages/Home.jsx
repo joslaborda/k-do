@@ -98,7 +98,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
                   padding: '1px 5px',
                 }}>{tab.badge}</span>
               )}
-              {tab.urgent && !isOn && (
+              {tab.badge > 0 && (
                 <span style={{
                   width: 7, height: 7, borderRadius: '50%',
                   background: '#c2410c',
@@ -564,7 +564,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   {/* Icon */}
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : 'bg-secondary'}`}>
                     {isDoc && DocIcon
-                      ? <DocIcon size={16} className="text-primary" />
+                      ? <DocIcon size={16} stroke="currentColor" className="text-primary" />
                       : <span className="text-base">{spotEmoji}</span>
                     }
                   </div>
