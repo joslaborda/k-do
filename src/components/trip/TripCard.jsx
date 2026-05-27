@@ -69,7 +69,7 @@ export function HeroTripCard({ trip, cities = [] }) {
   return (
     <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
       <div className="rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-shadow">
-        <div className="h-44 relative overflow-hidden bg-stone-800">
+        <div className="h-44 relative overflow-hidden" style={{background:"var(--kodo-hero-bg)"}}>
           <img src={coverImage} alt={trip.name}
             className="w-full h-full object-cover opacity-85"
             onError={e=>{
@@ -102,7 +102,7 @@ export function HeroTripCard({ trip, cities = [] }) {
             </div>
           </div>
         </div>
-        <div className="bg-white px-3 py-2.5 flex items-center justify-between">
+        <div className="bg-card px-3 py-2.5 flex items-center justify-between">
           <p className="text-xs text-muted-foreground">{dateRange || 'Sin fechas'}</p>
           <p className="text-xs text-primary font-medium">Abrir →</p>
         </div>
