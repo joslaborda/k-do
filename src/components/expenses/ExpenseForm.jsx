@@ -126,7 +126,7 @@ export default function ExpenseForm({
         <div className="flex items-center justify-center gap-3 mb-3">
           {/* Currency selector inline */}
           <select value={currency} onChange={e => set('currency', e.target.value)}
-            className="border border-border rounded-xl px-2 py-1.5 text-sm bg-white outline-none focus:border-primary h-9">
+            className="border border-border rounded-xl px-2 py-1.5 text-sm bg-card outline-none focus:border-primary h-9">
             {orderedCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <input
@@ -149,7 +149,7 @@ export default function ExpenseForm({
       </div>
 
       {/* Descripción + recibos */}
-      <div className="bg-white border border-border rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
           <input
             placeholder="Descripción del gasto *"
@@ -194,7 +194,7 @@ export default function ExpenseForm({
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha</p>
         <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
-          className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-white text-foreground" />
+          className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground" />
       </div>
 
       {/* Categoría */}
