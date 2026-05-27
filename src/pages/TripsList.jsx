@@ -23,7 +23,7 @@ function getGreeting() {
 // ── Empty state ───────────────────────────────────────────────────────────────
 function EmptyState({ onCreateTrip }) {
   return (
-    <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-white">
+    <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-card">
       <p className="text-4xl mb-3">✈️</p>
       <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
       <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
@@ -265,7 +265,7 @@ export default function TripsList() {
   // Email verification
   if (user && user.is_verified === false) return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl border border-border p-8 max-w-sm w-full text-center">
+      <div className="bg-card rounded-2xl border border-border p-8 max-w-sm w-full text-center">
         <p className="text-5xl mb-4">📧</p>
         <p className="text-lg font-medium mb-2">Verifica tu email</p>
         <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
