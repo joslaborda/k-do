@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
+import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
@@ -835,6 +836,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
 function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite }) {
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
+  const [collapsedGroups, setCollapsedGroups] = useState({});
   const [checkedItems, setCheckedItems] = useState(() => {
     try { return JSON.parse(localStorage.getItem(`kodo_checklist_${tripId}`) || '{}'); } catch { return {}; }
   });
@@ -946,13 +948,28 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
             return GROUPS.map(group => {
               const items = actionableReqs.filter(r => group.types.includes(r.type));
               if (!items.length) return null;
+              const doneCount = items.filter(r => checkedItems[r.id]).length;
+              const allDone = doneCount === items.length;
+              const isCollapsed = collapsedGroups[group.key] ?? allDone;
               return (
                 <div key={group.key}>
-                  {/* Ō category header */}
-                  <div className="flex flex-col gap-1 px-4 py-2 bg-secondary/30 border-b border-border">
-                    <div style={{height:2.5,width:24,background:'#c2410c',borderRadius:2}} />
-                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
-                  </div>
+                  {/* Ō category header — clickable to collapse */}
+                  <button onClick={() => setCollapsedGroups(p => ({ ...p, [group.key]: !isCollapsed }))}
+                    className="w-full flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border hover:bg-secondary/50 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div style={{height:2.5,width:24,background:'#c2410c',borderRadius:2}} />
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                      {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-muted-foreground">{doneCount}/{items.length}</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                        className={"text-muted-foreground transition-transform " + (isCollapsed ? '' : 'rotate-180')}>
+                        <polyline points="18 15 12 9 6 15"/>
+                      </svg>
+                    </div>
+                  </button>
+                  {!isCollapsed && <>
                   {items.map(req => {
                     const isInfo = req.level === 'info';
                     const isCheckable = !isInfo;
@@ -988,6 +1005,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                       </div>
                     );
                   })}
+                </>}
                 </div>
               );
             });
