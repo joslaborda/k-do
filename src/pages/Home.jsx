@@ -7,7 +7,6 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
-import OTabBar from '@/components/trip/OTabBar';
 import { format, differenceInDays, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -26,6 +25,94 @@ import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+
+function OTabBar({ tabs, activeKey, onChange }) {
+  const containerRef = useRef(null);
+  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  const updateLine = useCallback(() => {
+    if (!containerRef.current) return;
+    const idx = tabs.findIndex(t => t.key === activeKey);
+    const buttons = containerRef.current.querySelectorAll('button');
+    const btn = buttons[idx];
+    if (!btn) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const labelEl = btn.querySelector('.tab-label');
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    setLineStyle({
+      left: labelRect.left - containerRect.left,
+      width: labelRect.width,
+    });
+  }, [activeKey, tabs]);
+
+  useEffect(() => {
+    updateLine();
+    if (!mounted) setTimeout(() => setMounted(true), 50);
+  }, [updateLine, mounted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex"
+      style={{ position: 'relative' }}
+    >
+
+      {tabs.map(tab => {
+        const isOn = tab.key === activeKey;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onChange(tab.key)}
+            className="flex-1 flex flex-col items-center pt-2.5 pb-2.5 gap-0"
+          >
+            {/* Ō line — sits tight above the label */}
+            <div style={{
+              height: 3, borderRadius: 2,
+              background: isOn ? '#c2410c' : 'transparent',
+              width: isOn ? lineStyle.width : 0,
+              marginBottom: 6,
+              transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',
+            }} />
+            <span
+              className="tab-label"
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isOn ? '#1a1714' : '#a09890',
+                transition: 'color 0.2s',
+                lineHeight: 1,
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              {tab.label}
+              {tab.badge > 0 && (
+                <span style={{
+                  background: '#c2410c', color: 'white',
+                  fontSize: 10, fontWeight: 500, borderRadius: 10,
+                  padding: '1px 5px',
+                }}>{tab.badge}</span>
+              )}
+              {tab.urgent && (typeof urgentCount !== 'undefined' ? urgentCount : 0) > 0 && !isOn && (
+                <span style={{
+                  width: 7, height: 7, borderRadius: '50%',
+                  background: '#c2410c',
+                  display: 'inline-block',
+                  flexShrink: 0,
+                }} />
+              )}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const REQ_ICONS = { visa:'🛂', vaccine:'💉', tech:'🔌', money:'💰', safety:'💡', health:'🏥' };
@@ -219,7 +306,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-lg rounded-t-3xl overflow-hidden"
+        className="bg-card w-full max-w-lg rounded-t-3xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Handle */}
@@ -579,7 +666,7 @@ function TomorrowTab({ trip, cities, tripId }) {
     : [];
 
   if (!tomorrowCity) return (
-    <div className="bg-white rounded-2xl border border-border text-center py-12 px-4">
+    <div className="bg-card rounded-2xl border border-border text-center py-12 px-4">
       <p className="text-3xl mb-2">📅</p>
       <p className="text-sm font-medium text-foreground mb-1">Nada planificado para mañana</p>
       <p className="text-xs text-muted-foreground">Añade spots o documentos para el día de mañana</p>
@@ -682,7 +769,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
 
       {/* First transport doc */}
       {firstDoc && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {TRANSPORT_TYPES.includes(firstDoc.type) ? 'Tu primer ' + (firstDoc.type === 'flight' ? 'vuelo' : firstDoc.type === 'train' ? 'tren' : 'transporte') : 'Primer documento'}
@@ -716,7 +803,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
 
       {/* Packing quick check */}
       {packingItems.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-foreground">Maleta</p>
             <p className="text-sm font-medium text-primary">{packedPct}%</p>
@@ -729,7 +816,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
       )}
 
       {/* Viajeros */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
@@ -795,7 +882,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
     <div className="space-y-3">
       {/* Countdown */}
       {daysLeft !== null && daysLeft >= 0 && (
-        <div className="bg-white rounded-2xl border border-border p-5 text-center">
+        <div className="bg-card rounded-2xl border border-border p-5 text-center">
           <p className="text-5xl font-semibold text-primary leading-none">{daysLeft}</p>
           <p className="text-sm text-muted-foreground mt-1">días para el viaje</p>
           {sortedCities.length > 0 && (
@@ -810,7 +897,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
       {/* Quick status */}
       <div className="grid grid-cols-2 gap-3">
         <Link to={createPageUrl('Utilities') + '?trip_id=' + tripId + '&tab=maleta'}>
-          <div className="bg-white rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
+          <div className="bg-card rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
             <p className="text-xs text-muted-foreground mb-1">Maleta</p>
             <p className="text-2xl font-semibold text-foreground">{packedPct}%</p>
             <div className="mt-2 h-1 bg-secondary rounded-full overflow-hidden">
@@ -820,7 +907,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           </div>
         </Link>
         <Link to={createPageUrl('Documents') + '?trip_id=' + tripId}>
-          <div className="bg-white rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
+          <div className="bg-card rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
             <p className="text-xs text-muted-foreground mb-1">Documentos</p>
             <p className="text-2xl font-semibold text-foreground">{docsCount}</p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -832,7 +919,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
 
       {/* Checklist */}
       {actionableReqs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
               <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
@@ -927,7 +1014,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
       )}
 
       {/* Viajeros */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
@@ -1054,7 +1141,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
         />
       )}
 
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
@@ -1128,7 +1215,7 @@ function FinishedTab({ trip, cities, expenses, spots }) {
 
   return (
     <div className="space-y-3">
-      <div className="bg-white rounded-2xl border border-orange-200 p-6 text-center">
+      <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
         <p className="text-4xl mb-3">🌸</p>
         <p className="text-sm text-muted-foreground mb-1">Viaje completado</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
@@ -1146,13 +1233,13 @@ function FinishedTab({ trip, cities, expenses, spots }) {
           { label: 'Ciudades', value: cities.length, icon: '🏙️' },
           { label: 'Spots visitados', value: visitedSpots, icon: '📍' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl border border-border p-4">
+          <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
             <p className="text-xl mb-1">{s.icon}</p>
             <p className="text-xl font-semibold text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
-        <div className="bg-white rounded-2xl border border-border p-4 col-span-2">
+        <div className="bg-card rounded-2xl border border-border p-4 col-span-2">
           <p className="text-xl mb-1">💰</p>
           <p className="text-xl font-semibold text-foreground">{totalSpent.toFixed(0)} {currency}</p>
           <p className="text-xs text-muted-foreground">Total · {avgPerDay.toFixed(0)} {currency}/día</p>
@@ -1160,7 +1247,7 @@ function FinishedTab({ trip, cities, expenses, spots }) {
       </div>
 
       {sortedCities.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-3">Ruta del viaje</p>
           <div className="flex items-center gap-2 flex-wrap">
             {sortedCities.map((city, i) => (
@@ -1250,7 +1337,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   const isMe = (msg) => msg.user_id === currentUserId || msg.user_email === currentUserEmail;
 
   return (
-    <div className="flex flex-col bg-white rounded-2xl border border-border overflow-hidden" style={{ minHeight: '60vh' }}>
+    <div className="flex flex-col bg-card rounded-2xl border border-border overflow-hidden" style={{ minHeight: '60vh' }}>
       <div className="flex-1 p-4 overflow-y-auto" style={{ maxHeight: '60vh' }}>
         {grouped.length === 0 && (
           <div className="flex flex-col items-center justify-center h-40 gap-3">
@@ -1303,7 +1390,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
           onChange={e => setMessage(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
           placeholder="Mensaje..."
-          className="flex-1 h-10 text-sm bg-white border-border"
+          className="flex-1 h-10 text-sm bg-card border-border"
           disabled={sending}
         />
         <Button onClick={sendMessage} disabled={!message.trim() || sending}
@@ -1978,7 +2065,7 @@ export default function Home() {
                   )}
                 </button>
                 {notifOpen && (
-                  <div className="absolute top-11 right-0 w-72 bg-white rounded-2xl border border-border shadow-xl z-50 overflow-hidden">
+                  <div className="absolute top-11 right-0 w-72 bg-card rounded-2xl border border-border shadow-xl z-50 overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                       <p className="text-sm font-semibold text-foreground">Notificaciones</p>
                       <button onClick={() => setNotifOpen(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
@@ -2040,7 +2127,6 @@ export default function Home() {
             tabs={homeTabs}
             activeKey={tab}
             onChange={handleTabChange}
-            urgentCount={urgentCount}
           />
         </div>
       </div>
