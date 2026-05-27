@@ -79,6 +79,22 @@ const COUNTRY_IMAGES = {
   // ── Américas territorios ───────────────────────────────────────────────────
   'belice':'photo-1552074284-5e88ef1aef18','islas malvinas':'photo-1580060839134-75a5edca2e99',
   'groenlandia':'photo-1531168556467-80aace0d0144',
+  // ── Micro-estados y países sin foto propia → usar país cercano ──────────────
+  'andorra':'photo-1558618047-f4cac43b1ee4',          // Pirineos como España
+  'monaco':'photo-1558618666-fcd25c85cd64',            // Costa Azul
+  'san marino':'photo-1539650116574-75c0c6d73f6e',     // Similar Italia
+  'liechtenstein':'photo-1506905925346-21bda4d32df4',  // Alpino como Suiza
+  'kosovo':'photo-1558618047-f4cac43b1ee4',            // Balcanes
+  'timor oriental':'photo-1518509562904-e7ef99cdcc86', // Similar Indonesia
+  'brunei':'photo-1508702973812-62b6a9e50aeb',         // Similar Malasia
+  'tuvalu':'photo-1507699622108-4be3abd695ad',          // Pacífico
+  'nauru':'photo-1507699622108-4be3abd695ad',           // Pacífico
+  'kiribati':'photo-1507699622108-4be3abd695ad',        // Pacífico
+  'marshall islands':'photo-1507699622108-4be3abd695ad', // Pacífico
+  'palau':'photo-1518509562904-e7ef99cdcc86',           // Pacífico tropical
+  'solomon islands':'photo-1518509562904-e7ef99cdcc86', // Pacífico
+  'micronesia':'photo-1507699622108-4be3abd695ad',      // Pacífico
+
 };
 
 const FALLBACK_IMAGES = [
