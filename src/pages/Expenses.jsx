@@ -229,7 +229,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-border text-center py-16 px-6">
+      <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
         <p className="text-4xl mb-3">💸</p>
         <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
         <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
@@ -243,7 +243,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
   return (
     <div className="space-y-4">
       {/* Mi balance */}
-      <div className="bg-white rounded-2xl border border-border p-4">
+      <div className="bg-card rounded-2xl border border-border p-4">
         <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
         <div className="flex items-baseline justify-between">
           <p className={`text-2xl font-medium ${Math.abs(myBalance) < 0.5 ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
@@ -278,7 +278,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
         grouped.map(([date, exps]) => (
           <div key={date}>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{formatDate(date)}</p>
-            <div className="bg-white rounded-2xl border border-border overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border overflow-hidden">
               {exps.map(e => (
                 <ExpenseRow key={e.id} expense={e} baseCurrency={baseCurrency} userMap={userMap} onEdit={onEdit} onDelete={onDelete} />
               ))}
@@ -305,7 +305,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-border text-center py-16">
+      <div className="bg-card rounded-2xl border border-border text-center py-16">
         <p className="text-4xl mb-3">⚖️</p>
         <p className="text-sm font-medium text-foreground mb-1">Sin datos aún</p>
         <p className="text-xs text-muted-foreground">Añade gastos para ver los balances del grupo</p>
@@ -332,7 +332,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {iOwe.length > 0 && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tienes que pagar</p>
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {iOwe.map((d, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
                 <Avatar email={d.to} profiles={profiles} size={32} />
@@ -356,7 +356,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {owesMe.length > 0 && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Te deben</p>
-          <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {owesMe.map((d, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
                 <Avatar email={d.from} profiles={profiles} size={32} />
@@ -377,7 +377,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {/* Todos los saldos */}
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
           {members.map((email, i) => {
             const bal = balances[email] || 0;
             const isMe = email === currentUserEmail;
@@ -494,7 +494,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-border text-center py-16">
+      <div className="bg-card rounded-2xl border border-border text-center py-16">
         <p className="text-4xl mb-3">📊</p>
         <p className="text-sm font-medium text-foreground mb-1">Sin estadísticas</p>
         <p className="text-xs text-muted-foreground">Añade gastos para ver el desglose</p>
@@ -507,18 +507,18 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
       {/* Mi gasto — PRIMERO */}
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mi gasto</p>
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-1">Total mío</p>
           <p className="text-xl font-medium text-foreground">{fmtAmt(mySpend, baseCurrency)} {s}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-1">Media/día</p>
           <p className="text-xl font-medium text-foreground">{fmtAmt(myPerDay, baseCurrency)} {s}</p>
         </div>
       </div>
 
       {myByCategory.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-3">Por categoría (mi parte)</p>
           <div className="space-y-3">
             {myByCategory.map(([cat, amt]) => {
@@ -545,7 +545,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
 
       {/* Grupo — curiosidad */}
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Grupo (total)</p>
-      <div className="bg-white rounded-2xl border border-border p-4">
+      <div className="bg-card rounded-2xl border border-border p-4">
         <div className="flex justify-between items-center mb-3">
           <span className="text-xs text-muted-foreground">Total grupo</span>
           <span className="text-sm font-medium text-foreground">{fmtAmt(totalGroup, baseCurrency)} {s}</span>
@@ -573,7 +573,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
       </div>
 
       {byCity.length > 1 && (
-        <div className="bg-white rounded-2xl border border-border p-4">
+        <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-3">Por ciudad</p>
           <div className="space-y-2">
             {byCity.map(([city, amt]) => (
@@ -600,7 +600,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-        <div className="bg-white w-full max-w-lg rounded-t-3xl" onClick={e => e.stopPropagation()}>
+        <div className="bg-card w-full max-w-lg rounded-t-3xl" onClick={e => e.stopPropagation()}>
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-4" />
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
@@ -679,7 +679,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
       </div>
       {confirmDelete && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50">
-          <div className="bg-white w-full max-w-lg rounded-t-3xl p-5 pb-8">
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
             <p className="text-sm font-medium text-foreground mb-1">¿Eliminar este gasto?</p>
             <p className="text-xs text-muted-foreground mb-5"><strong>{expense.description}</strong> se eliminará permanentemente.</p>
@@ -702,7 +702,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
@@ -779,7 +779,7 @@ function ConversionTab({ cities, baseCurrency, activeCity }) {
   return (
     <div className="space-y-3">
       {/* Amount + from currency */}
-      <div className="bg-white rounded-2xl border border-border p-4">
+      <div className="bg-card rounded-2xl border border-border p-4">
         <p className="text-xs text-muted-foreground mb-2">Convertir desde</p>
         <div className="flex items-center gap-2">
           <select
@@ -808,7 +808,7 @@ function ConversionTab({ cities, baseCurrency, activeCity }) {
       </div>
 
       {/* Results */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
         {loadingRates ? (
           <div className="py-8 text-center">
             <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
