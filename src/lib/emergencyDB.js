@@ -753,6 +753,425 @@ const EMERGENCY_DB = {
     ],
   },
 
+
+  // ══ EUROPA ADICIONAL ══════════════════════════════════════════════════════
+  'Bélgica': {
+    emergency_general: '112', police: '101', ambulance: '100', fire: '100',
+    embassy_ES: 'Embajada de España en Bruselas: +32 2 230 03 40',
+    useful_apps: [{ name: 'BE-Alert', icon: '🚨', description: 'Alertas de emergencia oficiales de Bélgica.' }],
+    safety_tips: ['Los barrios del centro de Bruselas son seguros de día. Cuidado con carteristas en el metro.'],
+  },
+  'Países Bajos': {
+    emergency_general: '112', police: '0900-8844', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en La Haya: +31 70 302 49 99',
+    useful_apps: [{ name: 'Burgernet', icon: '🚔', description: 'Red ciudadana de seguridad de la policía holandesa.' }],
+    safety_tips: ['Cuidado con los carriles bici en Amsterdam y otras ciudades — tienen prioridad.', 'Los robos de bicicletas son muy frecuentes.'],
+  },
+  'Suecia': {
+    emergency_general: '112', police: '114 14', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Estocolmo: +46 8 667 43 00',
+    useful_apps: [{ name: '112 Sverige', icon: '🆘', description: 'App oficial de emergencias sueca con geolocalización.' }],
+    safety_tips: ['País muy seguro. Cuidado con el frío extremo en invierno.'],
+  },
+  'Noruega': {
+    emergency_general: '112', police: '02800', ambulance: '113', fire: '110',
+    embassy_ES: 'Embajada de España en Oslo: +47 22 92 28 80',
+    useful_apps: [{ name: 'Hjelp112', icon: '🆘', description: 'App oficial de emergencias noruega.' }],
+    safety_tips: ['País muy seguro. En senderismo avisa siempre de tu ruta. Clima cambiante.'],
+  },
+  'Dinamarca': {
+    emergency_general: '112', police: '114', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Copenhague: +45 35 42 47 00',
+    useful_apps: [{ name: '112 app', icon: '🆘', description: 'App de emergencias danesa.' }],
+    safety_tips: ['Muy seguro. Cuidado con los robos en zonas turísticas de Copenhague (Nyhavn).'],
+  },
+  'Finlandia': {
+    emergency_general: '112', police: '0295 419 800', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Helsinki: +358 9 687 00 80',
+    useful_apps: [{ name: '112 Suomi', icon: '🆘', description: 'App oficial de emergencias finlandesa con GPS.' }],
+    safety_tips: ['País muy seguro. Peligro de hipotermia en invierno. Nunca camines solo en el hielo sin comprobarlo.'],
+  },
+  'Irlanda': {
+    emergency_general: '112/999', police: '999', ambulance: '999', fire: '999',
+    embassy_ES: 'Embajada de España en Dublín: +353 1 269 16 40',
+    useful_apps: [],
+    safety_tips: ['Muy seguro. Tráfico por la izquierda. Cuidado con los acantilados costeros sin barandilla.'],
+  },
+  'Polonia': {
+    emergency_general: '112', police: '997', ambulance: '999', fire: '998',
+    embassy_ES: 'Embajada de España en Varsovia: +48 22 583 40 00',
+    useful_apps: [],
+    safety_tips: ['Seguro. Cuidado con taxis no regulados en Varsovia. Usa Bolt o Uber.'],
+  },
+  'República Checa': {
+    emergency_general: '112', police: '158', ambulance: '155', fire: '150',
+    embassy_ES: 'Embajada de España en Praga: +420 233 097 211',
+    useful_apps: [],
+    safety_tips: ['Seguro. Praga: cuidado con cambio de moneda en la calle — timo frecuente. Usa cajeros de banco.'],
+  },
+  'Hungría': {
+    emergency_general: '112', police: '107', ambulance: '104', fire: '105',
+    embassy_ES: 'Embajada de España en Budapest: +36 1 202 40 06',
+    useful_apps: [],
+    safety_tips: ['Seguro. Cuidado con bares y clubes en Budapest que cobran precios abusivos a turistas.'],
+  },
+  'Croacia': {
+    emergency_general: '112', police: '192', ambulance: '194', fire: '193',
+    embassy_ES: 'Embajada de España en Zagreb: +385 1 4848 950',
+    useful_apps: [],
+    safety_tips: ['Seguro. Costa dálmata: cuidado con las embarcaciones en zonas de baño. Sol muy intenso en verano.'],
+  },
+  'Rumania': {
+    emergency_general: '112', police: '112', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Bucarest: +40 21 318 10 20',
+    useful_apps: [],
+    safety_tips: ['Relativamente seguro. Cuidado con perros callejeros en zonas rurales. Carreteras en mal estado.'],
+  },
+  'Bulgaria': {
+    emergency_general: '112', police: '166', ambulance: '150', fire: '160',
+    embassy_ES: 'Embajada de España en Sofía: +359 2 943 30 32',
+    useful_apps: [],
+    safety_tips: ['Seguro. Cuidado con taxis sin taxímetro visible. Pregunta el precio antes.'],
+  },
+  'Serbia': {
+    emergency_general: '112', police: '192', ambulance: '194', fire: '193',
+    embassy_ES: 'Embajada de España en Belgrado: +381 11 2444 476',
+    useful_apps: [],
+    safety_tips: ['Seguro. Belgrado tiene vida nocturna activa — los barcos-discoteca (splavovi) en el Danubio son seguros.'],
+  },
+  'Portugal': {
+    emergency_general: '112', police: '112', ambulance: '112', fire: '112',
+    embassy_ES: null,
+    useful_apps: [{ name: 'INEM app', icon: '🆘', description: 'App del Instituto Nacional de Emergencias Médicas de Portugal.' }],
+    safety_tips: ['Muy seguro. Cuidado con carteristas en tranvías de Lisboa (línea 28). Oleaje fuerte en Costa Atlántica.'],
+  },
+  'Eslovaquia': {
+    emergency_general: '112', police: '158', ambulance: '155', fire: '150',
+    embassy_ES: 'Embajada de España en Bratislava: +421 2 5441 6597',
+    useful_apps: [],
+    safety_tips: ['Seguro. Montañas Tatra: riesgo de tormentas repentinas en verano. Sigue siempre los senderos marcados.'],
+  },
+  'Eslovenia': {
+    emergency_general: '112', police: '113', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Ljubljana: +386 1 425 40 34',
+    useful_apps: [],
+    safety_tips: ['Muy seguro. Lago Bled: corrientes en zonas de natación. Cueva de Postojna: sigue al guía.'],
+  },
+  'Islandia': {
+    emergency_general: '112', police: '444 1000', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Reikiavik: +354 511 28 50',
+    useful_apps: [{ name: 'Safetravel IS', icon: '🌋', description: 'App oficial de seguridad en viajes por Islandia. Imprescindible.' }],
+    safety_tips: ['Naturaleza peligrosa: géiseres queman, olas rogue en la costa negra, erupciones volcánicas. Consulta safetravel.is SIEMPRE.', 'Nunca cruces ríos sin conocer su profundidad. Alquila 4x4 para el interior (Highlands).'],
+  },
+  'Malta': {
+    emergency_general: '112', police: '2122 4001', ambulance: '112', fire: '199',
+    embassy_ES: 'Embajada de España en La Valeta: +356 21 232 843',
+    useful_apps: [],
+    safety_tips: ['Muy seguro. Calor extremo en verano. Tráfico por la izquierda. Buceo: avisa siempre a alguien.'],
+  },
+
+  // ══ ASIA ADICIONAL ════════════════════════════════════════════════════════
+  'Tailandia': {
+    emergency_general: '191/1669', police: '191', ambulance: '1669', fire: '199',
+    embassy_ES: 'Embajada de España en Bangkok: +66 2 661 80 84',
+    useful_apps: [
+      { name: 'Tourist Police 1155', icon: '👮', description: 'Policía turística tailandesa. Inglés disponible.' },
+      { name: 'Grab', icon: '🚗', description: 'Taxi/moto por app. Más seguro que taxis de calle.' },
+    ],
+    safety_tips: ['No insultes ni hagas gestos irrespetuosos con la familia real — es ilegal.', 'Cuidado con los tuktuk que te llevan a tiendas de joyería.', 'Moto sin casco es multa. Ponte siempre el casco aunque el conductor no lo lleve.'],
+  },
+  'Vietnam': {
+    emergency_general: '113/115', police: '113', ambulance: '115', fire: '114',
+    embassy_ES: 'Embajada de España en Hanói: +84 24 3771 5207',
+    useful_apps: [
+      { name: 'Grab', icon: '🚗', description: 'Imprescindible para motos y coches. Precios fijos, sin regateo.' },
+    ],
+    safety_tips: ['Cruzar la calle: camina despacio y constante — las motos te esquivarán.', 'Cuidado con robos en moto (bolso arrancado desde moto en movimiento). Lleva el bolso cruzado hacia el interior.', 'Nunca dejes objetos en la cesta del scooter que alquilas.'],
+  },
+  'Indonesia': {
+    emergency_general: '112', police: '110', ambulance: '118', fire: '113',
+    embassy_ES: 'Embajada de España en Yakarta: +62 21 314 30 52',
+    useful_apps: [
+      { name: 'Gojek', icon: '🛵', description: 'Transporte, comida y más. Imprescindible en Indonesia.' },
+      { name: 'Grab', icon: '🚗', description: 'Alternativa a Gojek. Muy usado en Bali.' },
+    ],
+    safety_tips: ['Bali: cuidado con los monos del Templo de Ubud — pueden robar objetos.', 'Zona volcánica: consulta nivel de alerta del volcán antes de senderismo (Merapi, Rinjani, Agung).', 'Agua del grifo no potable en todo el país.'],
+  },
+  'India': {
+    emergency_general: '112', police: '100', ambulance: '108', fire: '101',
+    embassy_ES: 'Embajada de España en Nueva Delhi: +91 11 46 75 00 00',
+    useful_apps: [
+      { name: 'Ola Cabs', icon: '🚗', description: 'Taxi por app. Más seguro que taxis de calle.' },
+      { name: 'Uber', icon: '🚗', description: 'Disponible en ciudades principales.' },
+      { name: 'IRCTC Rail Connect', icon: '🚆', description: 'Reserva trenes de la red ferroviaria india.' },
+    ],
+    safety_tips: ['Agua del grifo no potable — solo agua embotellada con sello intacto.', 'Agencias de viaje "falsas" muy comunes en zonas turísticas. Compra directamente en taquillas oficiales.', 'Mujer viajera: ropa conservadora en zonas rurales y templos. Evita salidas nocturnas sola.'],
+  },
+  'China': {
+    emergency_general: '120/110', police: '110', ambulance: '120', fire: '119',
+    embassy_ES: 'Embajada de España en Pekín: +86 10 6532 3629',
+    useful_apps: [
+      { name: 'DiDi', icon: '🚗', description: 'Taxi por app (equivalente a Uber). Esencial.' },
+      { name: 'WeChat / Alipay', icon: '💳', description: 'Para pagos — el efectivo apenas se usa en ciudades.' },
+      { name: 'VPN', icon: '🔒', description: 'Google, WhatsApp, Instagram bloqueados. Instala VPN ANTES de llegar.' },
+    ],
+    safety_tips: ['Instala VPN antes de entrar — Google, WhatsApp, YouTube e Instagram están bloqueados.', 'WeChat o Alipay son imprescindibles para pagar (muchos sitios no aceptan efectivo ni tarjeta extranjera).', 'No fotografíes instalaciones militares, policía o protestas.'],
+  },
+  'Japón': {
+    emergency_general: '110/119', police: '110', ambulance: '119', fire: '119',
+    embassy_ES: 'Embajada de España en Tokio: +81 3 3583 8531',
+    useful_apps: [
+      { name: 'Safety Tips', icon: '🌊', description: 'App oficial del gobierno japonés: terremotos, tsunamis, alertas.' },
+      { name: 'Google Maps', icon: '🗺️', description: 'Mejor app para transporte público en Japón. Fiabilísimo.' },
+      { name: 'Hyperdia', icon: '🚆', description: 'Horarios de trenes y Shinkansen en detalle.' },
+    ],
+    safety_tips: ['País muy seguro. Mayor riesgo: terremotos y tsunamis. Aprende el protocolo de evacuación del hotel.', 'En terremoto: aléjate de ventanas, protégete bajo una mesa. Sal tras las réplicas.', 'Las clínicas médicas a menudo no hablan inglés — lleva tu documentación médica en japonés si tienes condición preexistente.'],
+  },
+  'Corea del Sur': {
+    emergency_general: '119/112', police: '112', ambulance: '119', fire: '119',
+    embassy_ES: 'Embajada de España en Seúl: +82 2 794 3581',
+    useful_apps: [
+      { name: 'Kakao T', icon: '🚕', description: 'Taxi por app. Imprescindible en Corea.' },
+      { name: 'Naver Maps', icon: '🗺️', description: 'Mejor que Google Maps para Corea del Sur.' },
+    ],
+    safety_tips: ['País muy seguro. Cuidado con cruzar en rojo — multas frecuentes en ciudades.'],
+  },
+  'Singapur': {
+    emergency_general: '999/995', police: '999', ambulance: '995', fire: '995',
+    embassy_ES: 'Embajada de España en Singapur: +65 6379 7830',
+    useful_apps: [
+      { name: 'Grab', icon: '🚗', description: 'Taxi/transporte por app. El más usado en Singapur.' },
+    ],
+    safety_tips: ['País muy seguro con leyes estrictas.', 'Prohibido: chicle (multa), comer en metro (multa), fumar en zonas no designadas (multa).', 'Drogas: pena de muerte. Sin excepciones.'],
+  },
+  'Malasia': {
+    emergency_general: '999', police: '999', ambulance: '999', fire: '994',
+    embassy_ES: 'Embajada de España en Kuala Lumpur: +60 3 2148 4868',
+    useful_apps: [
+      { name: 'Grab', icon: '🚗', description: 'Transporte y comida por app. Muy usado.' },
+      { name: 'MyEG', icon: '📋', description: 'Trámites oficiales en Malasia.' },
+    ],
+    safety_tips: ['Seguro en zonas turísticas. Borneo: zona fronteriza Sabah (Lahad Datu) — evitar o consultar situación actual.', 'Conducción temeraria en algunos estados — usa cinturón siempre.'],
+  },
+  'Filipinas': {
+    emergency_general: '911', police: '117', ambulance: '911', fire: '160',
+    embassy_ES: 'Embajada de España en Manila: +63 2 8523 9586',
+    useful_apps: [
+      { name: 'Angkas', icon: '🛵', description: 'Mototaxi por app en Manila. Legal y seguro.' },
+      { name: 'Grab', icon: '🚗', description: 'Taxi y entrega de comida.' },
+    ],
+    safety_tips: ['Cuidado en zonas de Mindanao (Maguindanao, Marawi) — riesgo de seguridad activo. Consulta aviso de viaje.', 'Tifones de junio a noviembre. Sigue instrucciones de evacuación.', 'Nunca lleves mochila en la espalda en zonas concurridas de Manila — riesgo de arrebato.'],
+  },
+  'Nepal': {
+    emergency_general: '100/102', police: '100', ambulance: '102', fire: '101',
+    embassy_ES: 'Embajada de España en Nueva Delhi cubre Nepal. En Katmandú: Honorary Consul.',
+    useful_apps: [
+      { name: 'Trekking Nepal', icon: '🏔️', description: 'Rutas de trekking y altitudes. Útil para Everest Base Camp.' },
+    ],
+    safety_tips: ['Trekking: nunca solo sin guía registrado. Seguro de evacuación en helicóptero obligatorio para rutas de alta montaña.', 'Mal de altura (AMS) a partir de 3.000m — ascende despacio, hidratate, y baja si tienes síntomas.', 'Agua solo embotellada o purificada.'],
+  },
+  'Sri Lanka': {
+    emergency_general: '119/110', police: '119', ambulance: '110', fire: '111',
+    embassy_ES: 'Embajada de España en Colombo: +94 11 269 11 11 (Consulado Hon.)',
+    useful_apps: [
+      { name: 'PickMe', icon: '🚗', description: 'App de taxi local. Alternativa a Uber.' },
+    ],
+    safety_tips: ['Costa este: cuidado con corrientes (undertow) en playas. Muchas muertes de bañistas por corrientes.', 'Agua del grifo no potable en general.'],
+  },
+  'Maldivas': {
+    emergency_general: '119', police: '119', ambulance: '102', fire: '118',
+    embassy_ES: 'No hay embajada española en Maldivas. La más cercana está en Colombo (Sri Lanka).',
+    useful_apps: [],
+    safety_tips: ['País muy seguro para turistas en resorts. Malé (capital): más cuidado que en los resorts.', 'Buceo: nunca solo. Certifícate con instructores de PADI.', 'Alcohol: solo se sirve en resorts de islas turísticas, no en isla locales habitadas.'],
+  },
+
+  // ══ ORIENTE MEDIO ═════════════════════════════════════════════════════════
+  'Emiratos Árabes Unidos': {
+    emergency_general: '999', police: '999', ambulance: '998', fire: '997',
+    embassy_ES: 'Embajada de España en Abu Dabi: +971 2 626 90 44',
+    useful_apps: [
+      { name: 'Careem', icon: '🚗', description: 'App de taxi local. Muy usada en UAE.' },
+      { name: 'RTA Dubai', icon: '🚇', description: 'App de transporte público de Dubai.' },
+    ],
+    safety_tips: ['Respeta las leyes locales: alcohol solo en lugares licenciados.', 'Ramadán: no comer, beber o fumar en público durante el ayuno (multa o detención).', 'Muestras de afecto en público entre parejas no casadas pueden ser multadas.', 'Fotografiar edificios gubernamentales, militares o personas sin permiso: ilegal.'],
+  },
+  'Arabia Saudí': {
+    emergency_general: '911', police: '999', ambulance: '911', fire: '998',
+    embassy_ES: 'Embajada de España en Riad: +966 11 488 08 05',
+    useful_apps: [
+      { name: 'Uber', icon: '🚗', description: 'Disponible en Arabia Saudí desde 2019.' },
+      { name: 'Careem', icon: '🚗', description: 'App de taxi local muy usada.' },
+    ],
+    safety_tips: ['Respeta siempre las costumbres locales: ropa cubriente en público, especialmente en Meca y Medina (no-musulmanes no pueden entrar).', 'No muestres afecto en público. Alcohol: completamente prohibido.', 'Horario de negocios cambia drásticamente durante Ramadán.'],
+  },
+  'Israel': {
+    emergency_general: '100/101/102', police: '100', ambulance: '101', fire: '102',
+    embassy_ES: 'Embajada de España en Tel Aviv: +972 3 754 62 00',
+    useful_apps: [
+      { name: 'Home Front Command (Pikud HaOref)', icon: '🚨', description: 'Alertas de cohetes y emergencias de seguridad. Imprescindible.' },
+      { name: 'Moovit', icon: '🚌', description: 'Transporte público en Israel.' },
+    ],
+    safety_tips: ['Consulta el nivel de alerta de seguridad antes y durante el viaje (Ministerio de Exteriores de tu país).', 'En alerta de cohetes: busca el mampara más cercano (mirpeset) — hay menos de 90 segundos. El hotel te indicará el refugio.', 'Controles de seguridad muy estrictos en aeropuertos — llega con 3+ horas de antelación.'],
+  },
+  'Jordania': {
+    emergency_general: '911', police: '911', ambulance: '911', fire: '911',
+    embassy_ES: 'Embajada de España en Ammán: +962 6 465 52 52',
+    useful_apps: [
+      { name: 'Careem', icon: '🚗', description: 'Taxi por app en Ammán.' },
+    ],
+    safety_tips: ['País seguro para turistas. Cuidado en zonas fronterizas con Siria e Iraq.', 'Wadi Rum y Petra: lleva agua suficiente (mínimo 3L/persona/día en verano). Calor extremo.', 'Agua del grifo no potable.'],
+  },
+  'Irán': {
+    emergency_general: '115/110', police: '110', ambulance: '115', fire: '125',
+    embassy_ES: 'Embajada de España en Teherán: +98 21 267 3800',
+    useful_apps: [
+      { name: 'Snapp', icon: '🚗', description: 'App de taxi local (equivalente a Uber en Irán).' },
+    ],
+    safety_tips: ['Mujeres: hiyab obligatorio en todo momento en espacios públicos.', 'Fotografiar instalaciones militares, gubernamentales o personas sin permiso: ilegal.', 'VPN necesaria — internet muy censurado. Instala antes de entrar.', 'No hacer comentarios sobre política en público.'],
+  },
+
+  // ══ AFRICA ════════════════════════════════════════════════════════════════
+  'Sudáfrica': {
+    emergency_general: '10111/10177', police: '10111', ambulance: '10177', fire: '10111',
+    embassy_ES: 'Embajada de España en Pretoria: +27 12 460 07 99',
+    useful_apps: [
+      { name: 'Uber', icon: '🚗', description: 'IMPRESCINDIBLE en SA. Nunca tomes taxis de calle.' },
+      { name: 'Panic Button SA', icon: '🚨', description: 'Botón de pánico para emergencias de seguridad.' },
+    ],
+    safety_tips: ['Nunca camines con el móvil visible en la calle en Johannesburgo o Cape Town.', 'Conduce con las puertas bloqueadas y ventanas subidas en ciudades.', 'Smash-and-grab en semáforos: no dejes nada visible en el coche.', 'Townships: solo con guía de confianza. Nunca solo/a.', 'Playas: corrientes fuertes. Algunas playas tienen tiburones (Cape Town — hay alertas).'],
+  },
+  'Kenia': {
+    emergency_general: '999/112', police: '999', ambulance: '999', fire: '999',
+    embassy_ES: 'Embajada de España en Nairobi: +254 20 228 64 60',
+    useful_apps: [
+      { name: 'Uber', icon: '🚗', description: 'Seguro y fiable en Nairobi.' },
+      { name: 'Little Cab', icon: '🚗', description: 'Alternativa local a Uber.' },
+      { name: 'M-Pesa', icon: '💳', description: 'Sistema de pagos por móvil. Muy útil.' },
+    ],
+    safety_tips: ['Nairobi: nunca pasees de noche en zonas no turísticas. Westlands y Karen son las más seguras.', 'Safari: nunca salgas del vehículo salvo en zonas designadas.', 'Costa de Kenya: zona fronteriza con Somalia (Lamu) — evitar o consultar avisos actuales.', 'Malaria: profilaxis recomendada. Consulta médico viajes de tu país.'],
+  },
+  'Tanzania': {
+    emergency_general: '112', police: '112', ambulance: '112', fire: '115',
+    embassy_ES: 'Embajada de España en Nairobi cubre Tanzania. Consulado Honorario en Dar es Salaam.',
+    useful_apps: [],
+    safety_tips: ['Zanzíbar: muy segura en zonas turísticas. Evita playas solitarias de noche.', 'Safari Serengeti/Ngorongoro: respeta las normas del parque. Nunca fuera del vehículo.', 'Malaria: profilaxis recomendada. Mosquitera por la noche.', 'Kilimanjaro: seguro médico de evacuación obligatorio.'],
+  },
+  'Marruecos': {
+    emergency_general: '19/15', police: '19', ambulance: '15', fire: '15',
+    embassy_ES: 'Embajada de España en Rabat: +212 5 37 63 39 00. Consulado en Casablanca: +212 5 22 22 05 52',
+    useful_apps: [
+      { name: 'inDrive', icon: '🚗', description: 'App de taxi negociado. Más seguro que taxis de calle.' },
+    ],
+    safety_tips: ['Medinas: cuidado con guías "espontáneos" que luego cobran. Si no quieres su servicio, dilo claramente.', 'Regatear es normal en zocos. Nunca obligatorio comprar.', 'No fotografíes personas sin pedir permiso.', 'Ramadán: actitud de respeto en espacios públicos.'],
+  },
+  'Egipto': {
+    emergency_general: '123/122', police: '122', ambulance: '123', fire: '180',
+    embassy_ES: 'Embajada de España en El Cairo: +20 2 2735 6264',
+    useful_apps: [
+      { name: 'Careem', icon: '🚗', description: 'Taxi por app. Mucho más seguro que taxis de calle.' },
+      { name: 'inDrive', icon: '🚗', description: 'Alternativa a Careem.' },
+    ],
+    safety_tips: ['Nunca tomes un taxi de calle sin negociar el precio antes.', 'El Sinaí norte (Al-Arish, Rafah): evitar completamente — riesgo terrorista activo.', 'Hidratación fundamental: calor extremo. Agua solo embotellada.', 'Luxor/Aswan: cuidado con fellucas sin chaleco salvavidas.'],
+  },
+
+  // ══ AMERICAS ══════════════════════════════════════════════════════════════
+  'México': {
+    emergency_general: '911', police: '911', ambulance: '911', fire: '911',
+    embassy_ES: 'Embajada de España en Ciudad de México: +52 55 5282 2974',
+    useful_apps: [
+      { name: 'Uber', icon: '🚗', description: 'IMPRESCINDIBLE en CDMX. Evita taxis de calle.' },
+      { name: 'CDMX', icon: '🚇', description: 'App oficial del metro de Ciudad de México.' },
+    ],
+    safety_tips: ['Nunca tomes taxis de calle en CDMX ni en aeropuertos — riesgo de secuestro exprés. Solo Uber, Cabify o taxis en parada oficial.', 'Jalisco, Tamaulipas, Guerrero: zonas con alerta activa de seguridad. Consulta mapa de riesgo.', 'CDMX es relativamente segura en Polanco, Roma, Condesa. Evita Tepito y algunos barrios del norte de noche.'],
+  },
+  'Colombia': {
+    emergency_general: '123', police: '112', ambulance: '125', fire: '119',
+    embassy_ES: 'Embajada de España en Bogotá: +57 601 622 0090',
+    useful_apps: [
+      { name: 'Cabify', icon: '🚗', description: 'Más seguro que taxis de calle en Colombia.' },
+      { name: 'InDriver', icon: '🚗', description: 'Muy usado en ciudades intermedias.' },
+    ],
+    safety_tips: ['Nunca aceptes bebidas de desconocidos — riesgo de burundanga (escopolamina).', 'En Cartagena: cuidado con joyas y móvil visibles en la calle.', 'Medellín: zonas turísticas (El Poblado, Laureles) seguras. Evita el centro de noche.', 'Rumbles/Scopolamine: el mayor riesgo en Colombia. No aceptes cigarrillos, dulces ni bebidas de extraños.'],
+  },
+  'Argentina': {
+    emergency_general: '911/101/107', police: '101', ambulance: '107', fire: '100',
+    embassy_ES: 'Embajada de España en Buenos Aires: +54 11 4819 3000',
+    useful_apps: [
+      { name: 'Uber', icon: '🚗', description: 'Disponible pero con restricciones. Cabify es más fiable.' },
+      { name: 'Cabify', icon: '🚗', description: 'Más usado que Uber en Argentina.' },
+    ],
+    safety_tips: ['Buenos Aires relativamente segura. Cuidado con "sauceo" (distracción + robo).', 'Cambio de divisas: solo en casas de cambio oficiales. Los "arbolitos" son ilegales.', 'Patagonia: clima extremadamente cambiante. Equipo técnico indispensable.'],
+  },
+  'Chile': {
+    emergency_general: '133/131/132', police: '133', ambulance: '131', fire: '132',
+    embassy_ES: 'Embajada de España en Santiago: +56 2 2235 2755',
+    useful_apps: [
+      { name: 'Cabify', icon: '🚗', description: 'Fiable en Santiago.' },
+      { name: 'SafeTrip SENAPRED', icon: '🌋', description: 'Alertas de desastres naturales (terremotos, tsunamis, volcanes).' },
+    ],
+    safety_tips: ['País sísmico: aprende el protocolo de terremotos.', 'Santiago: cuidado con arrebatos de móvil en zonas concurridas. Taxis oficiales llevan taxímetro.', 'Torres del Paine: condiciones climatológicas extremas. Lleva equipo técnico y avisa de tu ruta.'],
+  },
+  'Perú': {
+    emergency_general: '105/106/116', police: '105', ambulance: '106', fire: '116',
+    embassy_ES: 'Embajada de España en Lima: +51 1 212 1100',
+    useful_apps: [
+      { name: 'InDriver', icon: '🚗', description: 'Taxi por app. Mejor que taxis de calle en Lima.' },
+      { name: 'Grab Peru', icon: '🚗', description: 'Alternativa a InDriver.' },
+    ],
+    safety_tips: ['Lima: barrios seguros son Miraflores, San Isidro, Barranco. Evita el Centro Histórico de noche.', 'Cusco: mal de altura (>3.400m) — descansa 24h antes de actividad intensa. Coca disponible.', 'Camino Inca: contrata operadora registrada. El trekking sin guía no está permitido.', 'Agua solo embotellada.'],
+  },
+  'Brasil': {
+    emergency_general: '190/192/193', police: '190', ambulance: '192', fire: '193',
+    embassy_ES: 'Embajada de España en Brasilia: +55 61 3061 0900. Consulado en São Paulo: +55 11 3372 2200',
+    useful_apps: [
+      { name: '99 (taxi)', icon: '🚗', description: 'App de taxi. Fiable en todo Brasil.' },
+      { name: 'Uber', icon: '🚗', description: 'Muy usado en Brasil.' },
+    ],
+    safety_tips: ['Nunca exhibas joyas, móvil o cámara cara en la calle — especialmente en Río y São Paulo.', 'Río: favelas solo con tour guiado oficial. Nunca entres solo.', 'Playas de Río: no dejes objetos sin vigilancia. Los "arrastões" (robos colectivos) existen.', 'Vacuna amarilla recomendada para zona amazónica.'],
+  },
+  'Cuba': {
+    emergency_general: '106/105', police: '106', ambulance: '104', fire: '105',
+    embassy_ES: 'Embajada de España en La Habana: +53 7 866 8025',
+    useful_apps: [],
+    safety_tips: ['Internet muy limitado — VPN recomendada.', 'Dinero en efectivo imprescindible — tarjetas de crédito/débito de bancos europeos raramente funcionan.', 'Jineteros (vendedores ambulantes) muy insistentes en zonas turísticas. Un "no" firme es suficiente.', 'Nunca compres cosas en mercado negro (ron, habanos "de regalo") — puede ser timo.'],
+  },
+  'Uruguay': {
+    emergency_general: '911', police: '911', ambulance: '105', fire: '104',
+    embassy_ES: 'Embajada de España en Montevideo: +598 2 708 6010',
+    useful_apps: [],
+    safety_tips: ['País muy seguro en Latinoamérica. Montevideo: cuidado con robos en Ciudad Vieja y zona del Puerto de noche.', 'Punta del Este en temporada alta: precios muy elevados. Reserva con meses de antelación.'],
+  },
+
+  // ══ OTROS ═════════════════════════════════════════════════════════════════
+  'Nueva Zelanda': {
+    emergency_general: '111', police: '111', ambulance: '111', fire: '111',
+    embassy_ES: 'Embajada de España en Wellington: +64 4 802 5665',
+    useful_apps: [
+      { name: 'MetService NZ', icon: '🌦️', description: 'Tiempo oficial de Nueva Zelanda. Cambia muy rápido.' },
+      { name: 'GeoNet NZ', icon: '🌋', description: 'Alertas de terremotos y volcanes en Nueva Zelanda.' },
+    ],
+    safety_tips: ['País muy seguro. Mayor riesgo: naturaleza. Clima cambia en minutos, especialmente en Fiordland.', 'Alertas sísmicas: NZ es zona sísmica activa. GeoNet app imprescindible.', 'Ríos: corrientes muy fuertes. No cruces ríos a pie sin evaluarlos con un guía.'],
+  },
+  'Georgia': {
+    emergency_general: '112', police: '112', ambulance: '112', fire: '112',
+    embassy_ES: 'Embajada de España en Ankara cubre Georgia. Embajada de Polonia representa a España en Tiflis.',
+    useful_apps: [
+      { name: 'Bolt', icon: '🚗', description: 'Taxi por app. Muy usado en Georgia.' },
+      { name: 'Yandex Go', icon: '🚗', description: 'Alternativa muy usada en Cáucaso.' },
+    ],
+    safety_tips: ['País muy seguro. Tiflis: cuidado de noche en Gldani y zonas periféricas.', 'Conducción caótica — usa siempre el cinturón.', 'Zona de Osetia del Sur y Abjasia: evitar completamente. Son territorios ocupados con acceso restringido.'],
+  },
+  'Canadá': {
+    emergency_general: '911', police: '911', ambulance: '911', fire: '911',
+    embassy_ES: 'Embajada de España en Ottawa: +1 613 747 2252',
+    useful_apps: [
+      { name: 'WeatherCAN', icon: '🌦️', description: 'App meteorológica oficial de Environment Canada.' },
+      { name: 'Uber', icon: '🚗', description: 'Disponible en ciudades principales.' },
+    ],
+    safety_tips: ['País muy seguro. Cuidado con osos en zonas de senderismo (Parques Rocosas). Lleva spray antiosos.', 'Inviernos extremos: frostbite puede ocurrir en minutos con viento. Cúbrete siempre.', 'Conducción: calzado de invierno en ruedas obligatorio en ciertas provincias.'],
+  },
+
+
 };
 
 /**
