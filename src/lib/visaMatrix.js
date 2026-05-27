@@ -1380,6 +1380,120 @@ export const VISA_MATRIX = {
   },
 
 
+  // ══ SCHENGEN DESTINOS FALTANTES (todos aplican mismas reglas) ════════════
+  // Nota: estos países aplican idénticas reglas Schengen que ES/FR/DE
+  'CY': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días Schengen.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'CZ': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'DK': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'EE': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'FI': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'GR': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'HU': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'IE': { _SCHENGEN:FREE(0,'UE. Irlanda NO es Schengen pero libre circulación UE.'), _ANGLOPHONE:FREE(180,'Sin visado hasta 180 días.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:true,cost:null,info:'eVisa disponible en irishimmigration.ie',url:'https://www.irishimmigration.ie' } },
+  'LT': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'LU': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'LV': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'MT': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'NL': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'PL': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'RO': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'SE': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'SK': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'SI': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'AT': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+  'BE': { _SCHENGEN:FREE(0,'UE — libre circulación.'), _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado.'), _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado Schengen necesario.',url:null } },
+
+  // ══ DESTINOS ADICIONALES ══════════════════════════════════════════════════
+  'HK': { // Hong Kong
+    _SCHENGEN:FREE(90,'Sin visado hasta 90 días.'), _LATAM_STRONG:FREE(30,'Sin visado hasta 30 días.'),
+    _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(30,'Sin visado hasta 30 días.'),
+    'CN':{ needed:false,days:30,eVisa:false,cost:null,info:'Sin visado hasta 30 días. HK tiene sistema de inmigración separado de China continental.',url:null },
+    _default:{ needed:true,days:null,eVisa:true,cost:null,info:'Visa on arrival para muchos países o visado previo. Consulta immd.gov.hk',url:'https://www.immd.gov.hk' }
+  },
+  'TW': { // Taiwán
+    _SCHENGEN:FREE(90,'Sin visado hasta 90 días.'), _LATAM_STRONG:FREE(30,'Sin visado hasta 30-90 días según país.'),
+    _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'), _ASIA_STRONG:FREE(90,'Sin visado hasta 90 días.'),
+    'IN':{ needed:true,days:null,eVisa:true,cost:null,info:'Visa de turismo electrónica disponible. Consultar boca.gov.tw',url:'https://www.boca.gov.tw' },
+    _default:{ needed:true,days:null,eVisa:true,cost:null,info:'Visado necesario para algunos países. Ver boca.gov.tw',url:'https://www.boca.gov.tw' }
+  },
+  'MO': { // Macao
+    _default:FREE(30,'Sin visado hasta 30 días para casi todos los pasaportes. Sistema de inmigración separado de China continental.')
+  },
+  'KW': { // Kuwait
+    _SCHENGEN:FREE(90,'Sin visado hasta 90 días.'), _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'),
+    _LATAM_STRONG:{ needed:true,days:null,eVisa:true,cost:null,info:'Visado online disponible en evisa.moi.gov.kw',url:'https://evisa.moi.gov.kw' },
+    _ASIA_STRONG:FREE(90,'Sin visado hasta 90 días.'),
+    _default:{ needed:true,days:null,eVisa:true,cost:null,info:'E-Visa en evisa.moi.gov.kw',url:'https://evisa.moi.gov.kw' }
+  },
+  'OM': { // Omán
+    _SCHENGEN:FREE(30,'Sin visado hasta 30 días a la llegada.'), _ANGLOPHONE:FREE(30,'Sin visado hasta 30 días.'),
+    _LATAM_STRONG:{ needed:true,days:null,eVisa:true,cost:'~20 USD',info:'E-Visa en evisa.rop.gov.om',url:'https://evisa.rop.gov.om' },
+    _ASIA_STRONG:FREE(30,'Sin visado hasta 30 días.'),
+    'IN':FREE(30,'Sin visado hasta 30 días desde 2023.'),
+    _default:{ needed:true,days:null,eVisa:true,cost:'~20 USD',info:'E-Visa en evisa.rop.gov.om',url:'https://evisa.rop.gov.om' }
+  },
+  'DZ': { // Argelia
+    _SCHENGEN:{ needed:true,days:90,eVisa:false,cost:null,info:'Visado necesario para la mayoría. Tramitar en embajada argelina.',url:null },
+    _LATAM_STRONG:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario.',url:null },
+    _ANGLOPHONE:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario.',url:null },
+    'FR':FREE(90,'Ciudadanos franceses: sin visado hasta 90 días (acuerdo bilateral).'),
+    'MA':FREE(90,'Sin visado (acuerdo bilateral Argelia-Marruecos).'),
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. Tramitar en embajada argelina con antelación.',url:null }
+  },
+  'LY': { // Libia
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado muy difícil. País en conflicto. Solo visitas esenciales con carta de invitación.',url:null }
+  },
+  'SD': { // Sudán
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. País en conflicto activo — no viajar.',url:null }
+  },
+  'SS': { // Sudán del Sur
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. País en conflicto activo — no viajar.',url:null }
+  },
+  'SO': { // Somalia
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. País extremadamente peligroso — no viajar.',url:null }
+  },
+  'SY': { // Siria
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. País en guerra — no viajar.',url:null }
+  },
+  'KP': { // Corea del Norte
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Acceso extremadamente restringido. Solo tours organizados muy específicos. La mayoría de pasaportes no pueden entrar.',url:null }
+  },
+  'RU': { // Rusia
+    _SCHENGEN:{ needed:true,days:null,eVisa:true,cost:null,info:'E-Visa disponible en evisa.kdmid.ru. Relaciones diplomáticas muy tensas desde 2022. Muchos vuelos cancelados.',url:'https://evisa.kdmid.ru' },
+    _LATAM_STRONG:{ needed:true,days:null,eVisa:true,cost:null,info:'E-Visa disponible para muchos países latinoamericanos.',url:'https://evisa.kdmid.ru' },
+    _ANGLOPHONE:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado muy difícil de obtener (UK, USA, CA, AU). Relaciones diplomáticas rotas.',url:null },
+    _ASIA_STRONG:FREE(14,'Sin visado hasta 14 días (Japón, Corea, Singapur).'),
+    'CN':FREE(30,'Sin visado hasta 30 días.'),
+    _default:{ needed:true,days:null,eVisa:true,cost:null,info:'E-Visa en evisa.kdmid.ru. Situación diplomática muy compleja en 2024.',url:'https://evisa.kdmid.ru' }
+  },
+  'BY': { // Bielorrusia
+    _SCHENGEN:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. Régimen sancionado. Vuelos directos muy limitados desde UE.',url:null },
+    _ANGLOPHONE:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario para la mayoría.',url:null },
+    'RU':FREE(30,'Sin visado — libre circulación bilateral.'),
+    'CN':FREE(30,'Sin visado hasta 30 días.'),
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. Tramitar en embajada bielorrusa.',url:null }
+  },
+  'UA': { // Ucrania
+    _SCHENGEN:FREE(90,'Sin visado hasta 90 días. ATENCIÓN: conflicto armado activo — no viajar.'),
+    _ANGLOPHONE:FREE(90,'Sin visado hasta 90 días.'),
+    _LATAM_STRONG:FREE(90,'Sin visado hasta 90 días.'),
+    _ASIA_STRONG:FREE(90,'Sin visado hasta 90 días.'),
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario para algunos países. País en guerra activa — no viajar.',url:null }
+  },
+  'UG': { // Uganda
+    _SCHENGEN:{ needed:true,days:90,eVisa:true,cost:'~50 USD',info:'E-Visa en visas.immigration.go.ug',url:'https://visas.immigration.go.ug' },
+    _LATAM_STRONG:{ needed:true,days:90,eVisa:true,cost:'~50 USD',info:'E-Visa disponible.',url:'https://visas.immigration.go.ug' },
+    _ANGLOPHONE:{ needed:true,days:90,eVisa:true,cost:'~50 USD',info:'E-Visa disponible.',url:'https://visas.immigration.go.ug' },
+    _AFRICA:FREE(null,'Sin visado para países de la EAC (East African Community).'),
+    _default:{ needed:true,days:90,eVisa:true,cost:'~50 USD',info:'E-Visa en visas.immigration.go.ug',url:'https://visas.immigration.go.ug' }
+  },
+  'TL': { // Timor Oriental
+    _default:{ needed:false,days:30,eVisa:false,cost:null,info:'Visa on arrival gratuita (30 días) para casi todos los pasaportes en aeropuerto de Dili.',url:null }
+  },
+  'ER': { // Eritrea
+    _default:{ needed:true,days:null,eVisa:false,cost:null,info:'Visado necesario. País muy cerrado. Tramitar en embajada eritrea. Solo turismo muy organizado.',url:null }
+  },
+
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
