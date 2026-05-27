@@ -79,7 +79,7 @@ export default function Layout({ children, currentPageName }) {
   const tripUrl = (page) => createPageUrl(`${page}?trip_id=${tripId}`);
 
   return (
-    <div className="min-h-screen bg-[#f8f6f3] text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <OfflineIndicator />
       <DarkModeToggle />
       <SyncIndicator />
@@ -102,7 +102,7 @@ export default function Layout({ children, currentPageName }) {
             drawerOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-3 pointer-events-none'
           }`}
         >
-          <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-lg">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-lg">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Más herramientas</span>
               <button
@@ -153,7 +153,7 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
           <div className="mx-3 mb-3">
-            <nav className="bg-white border border-[#e8e3dc] rounded-2xl px-1 flex items-center justify-around shadow-sm">
+            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none">
               {showTripNav && mainNavItems.map((item) => {
                 const isActive = currentPageName === item.page;
                 return (
@@ -164,10 +164,10 @@ export default function Layout({ children, currentPageName }) {
                   >
                     <item.icon
                       className="w-5 h-5 flex-shrink-0 transition-colors"
-                      style={{color: isActive ? '#c2410c' : '#a09890'}}
+                      style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
                       strokeWidth={isActive ? 2.5 : 1.75}
                     />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : '#a09890'}}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
                     <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
@@ -204,10 +204,10 @@ export default function Layout({ children, currentPageName }) {
                   >
                     <item.icon
                       className="w-5 h-5 flex-shrink-0"
-                      style={{color: isActive ? '#c2410c' : '#a09890'}}
+                      style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
                       strokeWidth={isActive ? 2.5 : 1.75}
                     />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : '#a09890'}}>
+                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
                     <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
@@ -221,7 +221,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* ── Side Navigation Desktop ──────────────────────────────────────── */}
       {showNav && (showTripNav || showGlobalNav) && (
-        <nav className="fixed left-0 top-0 bottom-0 w-16 bg-white border-r border-[#e8e3dc] hidden md:flex flex-col items-center py-8 z-50">
+        <nav className="fixed left-0 top-0 bottom-0 w-16 bg-card border-r border-border hidden md:flex flex-col items-center py-8 z-50">
           <Link
             to={createPageUrl('TripsList')}
             className="text-2xl mb-8 hover:scale-110 transition-transform"
@@ -256,7 +256,7 @@ export default function Layout({ children, currentPageName }) {
             {/* Drawer items in desktop sidebar */}
             {showTripNav && (
               <>
-                <div className="w-8 h-px bg-white/10 my-1" />
+                <div className="w-8 h-px bg-border my-1" />
                 {drawerItems.map((item) => {
                   const isActive = currentPageName === item.page ||
                     (item.page === 'Cities' && currentPageName === 'CityDetail');
@@ -284,7 +284,7 @@ export default function Layout({ children, currentPageName }) {
           {showTripNav && (
             <Link
               to={createPageUrl('Profile')}
-              className="p-2 rounded-xl text-[#6b6460] hover:text-[#f8f6f3] hover:bg-white/10 transition-colors mt-4"
+              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors mt-4"
             >
               <User className="w-5 h-5" />
             </Link>
