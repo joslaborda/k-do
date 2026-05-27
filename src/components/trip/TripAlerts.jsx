@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { differenceInDays, parseISO, isValid } from 'date-fns';
-import { Bell, Plane, Hotel, CalendarCheck, X } from 'lucide-react';
+import { Plane, Train, Hotel, CalendarCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -30,8 +30,14 @@ function AlertItem({ icon: Icon, color, bg, label, daysText, link, tripId, onDis
   ) : content;
 }
 
-export default function TripAlerts({ tripId, cities, trip }) {
+export default function TripAlerts({ tripId, cities, trip, onUrgentCount }) {
   const [dismissed, setDismissed] = useState(new Set());
+  // Tick every minute so hour-level countdowns stay fresh
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
@@ -45,22 +51,66 @@ export default function TripAlerts({ tripId, cities, trip }) {
     const result = [];
 
     tickets
-      .filter(t => ['flight', 'train'].includes(t.category) && t.date)
+      .filter(t => ['flight', 'train', 'bus'].includes(t.category) && t.date)
       .forEach(t => {
         const d = parseISO(t.date);
         if (!isValid(d)) return;
         const diff = differenceInDays(d, today);
-        if (diff >= 0 && diff <= 30) {
-          result.push({
-            id: t.id,
-            icon: Plane,
-            color: diff <= 3 ? 'text-red-600' : 'text-blue-600',
-            bg: diff <= 3 ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200',
-            label: t.name,
-            daysText: diff === 0 ? '¡Hoy!' : diff === 1 ? 'Mañana' : `En ${diff} días`,
-            link: 'Documents',
-          });
+        if (diff < 0 || diff > 30) return;
+
+        // Hour-level countdown for today's transport
+        let daysText;
+        let color;
+        let bg;
+        if (diff === 0 && t.time) {
+          const [h, m] = t.time.split(':').map(Number);
+          const depDate = new Date(d);
+          depDate.setHours(h, m, 0, 0);
+          const diffMs = depDate - today;
+          const diffMin = Math.round(diffMs / 60000);
+          if (diffMin < 0) {
+            daysText = 'En curso';
+            color = 'text-gray-500';
+            bg = 'bg-gray-50 border-gray-200';
+          } else if (diffMin <= 240) {
+            // ≤4h — urgent alert
+            const hrs = Math.floor(diffMin / 60);
+            const mins = diffMin % 60;
+            daysText = hrs > 0 ? `Sale en ${hrs}h${mins > 0 ? ` ${mins}min` : ''}` : `Sale en ${diffMin} min`;
+            color = diffMin <= 60 ? 'text-red-600' : 'text-orange-600';
+            bg = diffMin <= 60 ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200';
+          } else {
+            daysText = `Hoy a las ${t.time}`;
+            color = 'text-blue-600';
+            bg = 'bg-blue-50 border-blue-200';
+          }
+        } else if (diff === 0) {
+          daysText = '¡Hoy!';
+          color = 'text-red-600';
+          bg = 'bg-red-50 border-red-200';
+        } else if (diff === 1) {
+          daysText = 'Mañana' + (t.time ? ` a las ${t.time}` : '');
+          color = 'text-blue-600';
+          bg = 'bg-blue-50 border-blue-200';
+        } else {
+          daysText = `En ${diff} días`;
+          color = 'text-blue-600';
+          bg = 'bg-blue-50 border-blue-200';
         }
+
+        result.push({
+          id: t.id,
+          icon: t.category === 'train' ? Train : Plane,
+          color, bg,
+          label: t.name,
+          daysText,
+          urgent: diff === 0 && t.time && (() => {
+            const [h, m] = t.time.split(':').map(Number);
+            const dep = new Date(d); dep.setHours(h, m, 0, 0);
+            return (dep - today) / 60000 <= 240;
+          })(),
+          link: 'Documents',
+        });
       });
 
     tickets
@@ -102,30 +152,18 @@ export default function TripAlerts({ tripId, cities, trip }) {
       });
 
     return result.sort((a, b) => {
-      const uA = a.color.includes('red') ? 0 : 1;
-      const uB = b.color.includes('red') ? 0 : 1;
+      // Urgent (≤4h) first, then red, then rest
+      const uA = a.urgent ? 0 : a.color.includes('red') ? 1 : 2;
+      const uB = b.urgent ? 0 : b.color.includes('red') ? 1 : 2;
       return uA - uB;
     });
   }, [tickets, cities]);
 
-  const visible = alerts.filter(a => !dismissed.has(a.id));
-  if (visible.length === 0) return null;
+  const urgent = alerts.filter(a => a.urgent && !dismissed.has(a.id));
 
-  return (
-    <div>
-      <h2 className="text-foreground text-sm font-medium uppercase tracking-widest mb-3 flex items-center gap-2">
-        <Bell className="w-4 h-4 text-primary" />Alertas próximas
-      </h2>
-      <div className="grid sm:grid-cols-2 gap-2">
-        {visible.map(alert => (
-          <AlertItem
-            key={alert.id}
-            {...alert}
-            tripId={tripId}
-            onDismiss={() => setDismissed(prev => new Set([...prev, alert.id]))}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    onUrgentCount?.(urgent.length);
+  }, [urgent.length]);
+
+  return null;
 }
