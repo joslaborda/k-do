@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { createNotification } from '@/lib/notifications';
 import { Plus, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -263,7 +264,15 @@ export default function Documents() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setAddOpen(false); },
+    onSuccess: (_, data) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setAddOpen(false);
+      const others = (trip?.members || []).filter(e => e !== currentUserEmail);
+      others.forEach(email => {
+        const p = profiles.find(pr => pr.email === email || pr.user_email === email);
+        if (p?.user_id) createNotification({ userId: p.user_id, type: 'doc_added', refId: tripId, refTitle: data.name || 'documento', message: `Nuevo documento: ${data.name || ''}` });
+      });
+    },
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
