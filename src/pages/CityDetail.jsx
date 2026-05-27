@@ -547,7 +547,7 @@ export default function CityDetail() {
                 open={expandedDays[day.id]}
                 onOpenChange={() => toggleDay(day.id)}
               >
-                <div className="bg-white rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+                <div className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-md transition-shadow">
                     <CollapsibleTrigger asChild>
                     <div className="w-full p-5 flex items-center justify-between text-left hover:bg-secondary/50 transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
