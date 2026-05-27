@@ -191,7 +191,7 @@ function CountryField({ value, onChange, hasError, ref: externalRef }) {
         }`}
       />
       {open && suggestions.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-card border border-border rounded-xl shadow-lg">
           {suggestions.map(c => (
             <li key={c.code} onMouseDown={() => handleSelect(c)}
               className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-primary transition-colors flex items-center gap-2">
@@ -241,14 +241,14 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
           onFocus={() => setOpen(true)}
           placeholder={loading ? 'Cargando...' : placeholder}
           autoComplete="off"
-          className="w-full h-9 border border-border rounded-xl px-3 pr-7 text-sm outline-none focus:border-primary bg-white"
+          className="w-full h-9 border border-border rounded-xl px-3 pr-7 text-sm outline-none focus:border-primary bg-card"
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
         </div>
       </div>
       {open && !loading && filtered.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-card border border-border rounded-xl shadow-lg">
           {filtered.map(city => (
             <li key={city} onMouseDown={() => { setQ(city); onChange(city); setOpen(false); }}
               className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-primary transition-colors">
@@ -258,7 +258,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
         </ul>
       )}
       {open && !loading && filtered.length === 0 && q.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-lg px-3 py-2.5">
+        <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg px-3 py-2.5">
           <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
           <button onMouseDown={() => { onChange(q); setOpen(false); }}
             className="mt-1.5 text-sm text-primary font-medium">
@@ -267,7 +267,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
         </div>
       )}
       {open && !loading && cities.length === 0 && q.length === 0 && country && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-lg px-3 py-2.5">
+        <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg px-3 py-2.5">
           <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
         </div>
       )}
@@ -481,7 +481,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                 value={formData.end_date}
                 min={formData.start_date || undefined}
                 onChange={e => setFormData(p => ({ ...p, end_date: e.target.value }))}
-                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-white"
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card"
               />
             </div>
           </div>
