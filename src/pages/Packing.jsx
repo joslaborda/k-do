@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Package, Trash2, Grip, Sparkles, AlertTriangle, CheckCircle2, Info, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Package, Trash2, Grip, AlertTriangle, CheckCircle2, Info, ChevronDown, ChevronRight } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getSmartPackingList, COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -104,7 +104,7 @@ export default function Packing() {
               <button onClick={() => setShowSmartPanel(o => !o)}
                 className="w-full flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
+                  <Info className="w-4 h-4" />
                   <span className="font-semibold text-sm">Requisitos para {country}</span>
                 </div>
                 {showSmartPanel ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
