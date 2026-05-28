@@ -1,5 +1,4 @@
 import { PlaneIcon } from '@/lib/PlaneIcon';
-import { Calendar, MapPin } from '@/lib/icons';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
