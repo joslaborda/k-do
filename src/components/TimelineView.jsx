@@ -1,7 +1,8 @@
+import { PlaneIcon } from '@/lib/PlaneIcon';
 import { useMemo } from 'react';
 import { format, isValid, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, MapPin, Receipt, BookOpen, Plane, Train, Hotel, Ticket as TicketIcon } from 'lucide-react';
+import { Calendar, MapPin, Receipt, BookOpen, Train, Hotel, Ticket as TicketIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
@@ -47,8 +48,7 @@ export default function TimelineView({ cities, expenses, diaryEntries, itinerary
         if (ticket.date) {
           const date = startOfDay(new Date(ticket.date));
           const iconMap = {
-            flight: Plane,
-            train: Train,
+            flight: train: Train,
             hotel: Hotel,
             freetour: TicketIcon,
             insurance: TicketIcon
