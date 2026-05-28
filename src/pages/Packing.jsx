@@ -13,11 +13,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const categories = [
-  { value: 'personal', label: 'Personal', icon: '👤', color: 'from-blue-500 to-cyan-500' },
-  { value: 'neceser', label: 'Neceser', icon: '🧴', color: 'from-pink-500 to-rose-500' },
-  { value: 'tecnologia', label: 'Tecnología', icon: '📱', color: 'from-purple-500 to-indigo-500' },
-  { value: 'ropa', label: 'Ropa', icon: '👕', color: 'from-[#c2410c] to-[#c2410c]/80' },
-  { value: 'medicinas', label: 'Medicinas', icon: '💊', color: 'from-green-500 to-emerald-500' },
+  { value: 'personal', label: 'Personal', color: 'from-blue-500 to-cyan-500' },
+  { value: 'neceser', label: 'Neceser', color: 'from-pink-500 to-rose-500' },
+  { value: 'tecnologia', label: 'Tecnología', color: 'from-purple-500 to-indigo-500' },
+  { value: 'ropa', label: 'Ropa', color: 'from-[#c2410c] to-[#c2410c]/80' },
+  { value: 'medicinas', label: 'Medicinas', color: 'from-green-500 to-emerald-500' },
 ];
 
 export default function Packing() {
@@ -194,7 +194,7 @@ export default function Packing() {
                 {[{value:'all',label:'Todo',icon:'📋'}, ...categories].map(cat => (
                   <button key={cat.value} onClick={() => setActiveCategory(cat.value)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${activeCategory === cat.value ? 'bg-primary text-white' : 'bg-secondary text-foreground hover:bg-border'}`}
-                  >{cat.icon} {cat.label}</button>
+                  >{cat.label}</button>
                 ))}
               </div>
               <div className="grid md:grid-cols-2 gap-6">
@@ -213,7 +213,7 @@ export default function Packing() {
                   {/* Category Header */}
                   <div className={`bg-gradient-to-r ${cat.color} p-6 text-white`}>
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-4xl">{cat.icon}</span>
+                      
                       <div className="flex-1">
                         <h2 className="text-xl font-bold">{cat.label}</h2>
                         <p className="text-sm opacity-90">
@@ -341,7 +341,7 @@ export default function Packing() {
                 <SelectContent>
                   {categories.map((cat) => (
                     <SelectItem key={cat.value} value={cat.value}>
-                      {cat.icon} {cat.label}
+                      {cat.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

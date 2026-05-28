@@ -461,7 +461,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
               </button>
               <button onClick={() => setIsPublic(false)}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
-                🔒 Solo mi viaje
+                Solo mi viaje
               </button>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5 px-1">
