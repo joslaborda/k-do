@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X , CalendarDays } from 'lucide-react';
+import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import DarkModeToggle from '@/components/DarkModeToggle';
@@ -18,7 +18,6 @@ const mainNavItems = [
 // ── Drawer: el resto de páginas del viaje ─────────────────────────────────────
 const drawerItems = [
   { name: 'Ruta',      page: 'Cities',     icon: MapPin,   sub: 'Ciudades e itinerario' },
-  { name: 'Calendario',page: 'Calendar',   icon: CalendarDays, sub: 'Itinerario visual'  },
   { name: 'Traducir',  page: 'Translator', icon: Languages, sub: 'Voz, texto e imagen'  },
   { name: 'Utilidades',page: 'Utilities',  icon: Info,     sub: 'Embajadas, emergencias'},
 ];
