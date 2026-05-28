@@ -43,6 +43,18 @@ async function fromFrankfurter(from, to) {
   return { rate, source: 'frankfurter/ECB' };
 }
 
+async function fromExchangeRateApi(from, to) {
+  // Free tier, no API key needed for basic rates
+  const url = `https://open.er-api.com/v6/latest/${from}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+  if (!res.ok) throw new Error(`ExchangeRate-API ${res.status}`);
+  const data = await res.json();
+  if (data.result !== 'success') throw new Error('API error');
+  const rate = data?.rates?.[to];
+  if (!rate) throw new Error('No rate');
+  return { rate, source: 'open.er-api.com' };
+}
+
 async function fromHistoricalFrankfurter(from, to, dateStr) {
   const url = `https://api.frankfurter.app/${dateStr}?from=${from}&to=${to}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -111,7 +123,16 @@ export async function getFxRate(from, to, dateStr = null) {
     return entityCached;
   }
 
-  // 4. Frankfurter API (current)
+  // 4a. ExchangeRate-API (primary, most reliable)
+  try {
+    const result = await fromExchangeRateApi(from, to);
+    const fetchedAt = new Date().toISOString();
+    lsSet(from, to, result.rate, result.source);
+    persistToEntity(from, to, result.rate, result.source);
+    return { ...result, fetchedAt };
+  } catch {}
+
+  // 4b. Frankfurter API fallback
   try {
     const result = await fromFrankfurter(from, to);
     const fetchedAt = new Date().toISOString();
