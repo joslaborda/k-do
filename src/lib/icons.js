@@ -1,7 +1,10 @@
 /**
- * KÅdo Icon System â€” re-exports from lucide-react
- * For the custom plane icon: import { PlaneIcon } from '@/lib/PlaneIcon'
+ * Kōdo Icon System
+ * Import everything from here:
+ *   import { PlaneIcon, TrainFront, BusFront, ... } from '@/lib/icons';
  */
+
+import React from 'react';
 import {
   TrainFront, BusFront, Car, Ship, Bike,
   Hotel, Home,
@@ -14,14 +17,37 @@ import {
   Pencil, Trash2, Copy, Share2, ArrowRight, ArrowLeft,
   MessageCircle, UserPlus, Bookmark, Mail,
   AlertCircle, AlertTriangle, Info, CheckCircle2,
-  Package, Luggage, Cross, Syringe,
+  Package, Luggage, Cross, Syringe, Plug,
   DollarSign, CreditCard, TrendingUp,
   Globe, Calendar, Navigation, Eye, EyeOff,
   Filter, SlidersHorizontal, MoreHorizontal,
   Wifi, WifiOff, RefreshCw, Minus,
   ThumbsUp, Flag, Tag, Hash, Lock, Unlock,
+  Paperclip, Download, ZoomIn, Send,
 } from 'lucide-react';
 
+// ── Custom PlaneIcon (top-view silhouette) ───────────────────────────────────
+export function PlaneIcon({ size = 24, color = 'currentColor', strokeWidth = 1.6, style, className }) {
+  return React.createElement('svg', {
+    width: size, height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: color,
+    strokeWidth: strokeWidth,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    style: style,
+    className: className,
+  },
+    React.createElement('path', { d: 'M12 3 C13 3 14 4 14 6 L14 18 C14 20 13 21 12 21 C11 21 10 20 10 18 L10 6 C10 4 11 3 12 3Z' }),
+    React.createElement('path', { d: 'M10 9 L3 13 L3 15 L10 13' }),
+    React.createElement('path', { d: 'M14 9 L21 13 L21 15 L14 13' }),
+    React.createElement('path', { d: 'M10 17 L7 19 L7 20 L10 19' }),
+    React.createElement('path', { d: 'M14 17 L17 19 L17 20 L14 19' })
+  );
+}
+
+// ── Re-exports ────────────────────────────────────────────────────────────────
 export {
   TrainFront, BusFront, Car, Ship, Bike,
   Hotel, Home,
@@ -34,15 +60,11 @@ export {
   Pencil, Trash2, Copy, Share2, ArrowRight, ArrowLeft,
   MessageCircle, UserPlus, Bookmark, Mail,
   AlertCircle, AlertTriangle, Info, CheckCircle2,
-  Package, Luggage, Cross, Syringe,
+  Package, Luggage, Cross, Syringe, Plug,
   DollarSign, CreditCard, TrendingUp,
   Globe, Calendar, Navigation, Eye, EyeOff,
   Filter, SlidersHorizontal, MoreHorizontal,
   Wifi, WifiOff, RefreshCw, Minus,
   ThumbsUp, Flag, Tag, Hash, Lock, Unlock,
+  Paperclip, Download, ZoomIn, Send,
 };
-
-// Re-export PlaneIcon so both import paths work:
-// import { PlaneIcon } from '@/lib/icons'
-// import { PlaneIcon } from '@/lib/PlaneIcon'
-export { PlaneIcon } from '@/lib/PlaneIcon';
