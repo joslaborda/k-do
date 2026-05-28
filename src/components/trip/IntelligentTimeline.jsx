@@ -5,10 +5,11 @@ import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
-  Plane, Train, Hotel, Calendar, MapPin, FileText,
+  Train, Hotel, Calendar, MapPin, FileText,
   Shield, Ticket, ChevronDown, ChevronRight, Eye,
   Navigation, Receipt, Clock, AlertCircle
 } from 'lucide-react';
+import { PlaneIcon } from '@/lib/PlaneIcon';
 import TicketQuickViewer from './TicketQuickViewer';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -28,7 +29,7 @@ function formatDay(dateString) {
 }
 
 const DOC_ICON = {
-  flight: Plane, train: Train, hotel: Hotel, insurance: Shield,
+  flight: PlaneIcon, train: Train, hotel: Hotel, insurance: Shield,
   event: Calendar, personal: FileText, other: FileText, freetour: Ticket,
 };
 const DOC_COLOR = {
