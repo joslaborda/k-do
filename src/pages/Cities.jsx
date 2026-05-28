@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, ChevronDown, ChevronUp, Plus, X, Check, GripVertical, MapPin } from 'lucide-react';
+import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ship, Ticket, Shield, FileText } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -327,7 +328,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
           {dayDocs.map(doc => (
             <button key={doc.id} onClick={() => setViewingDoc(doc)}
               className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-              <span className="text-lg shrink-0">{DOC_ICON_MAP[doc.category || doc.type || doc.doc_type] || DOC_ICONS.other}</span>
+              {(() => { const I = DOC_ICON_MAP[doc.category || doc.type || doc.doc_type] || FileText; return <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0"><I size={16} className="text-muted-foreground" /></div>; })()}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
                 {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}

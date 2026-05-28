@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ship, Ticket, Shield, FileText } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
