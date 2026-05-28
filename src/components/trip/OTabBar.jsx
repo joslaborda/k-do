@@ -41,14 +41,6 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
             onClick={() => onChange(tab.key)}
             className="flex-1 flex flex-col items-center pt-2.5 pb-2.5 gap-0"
           >
-            {/* Ō line — sits tight above the label */}
-            <div style={{
-              height: 3, borderRadius: 2,
-              background: isOn ? '#c2410c' : 'transparent',
-              width: isOn ? lineStyle.width : 0,
-              marginBottom: 6,
-              transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',
-            }} />
             <span
               className="tab-label"
               style={{
@@ -80,6 +72,14 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
                 }} />
               )}
             </span>
+            {/* Ō line — sits tight BELOW the label */}
+            <div style={{
+              height: 3, borderRadius: 2,
+              background: isOn ? '#c2410c' : 'transparent',
+              width: isOn ? lineStyle.width : 0,
+              marginTop: 5,
+              transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',
+            }} />
           </button>
         );
       })}
