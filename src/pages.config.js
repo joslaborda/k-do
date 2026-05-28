@@ -53,7 +53,6 @@ import CityDetail from './pages/CityDetail';
 
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
-import MigrateData from './pages/MigrateData';
 import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
 import Translator from './pages/Translator';
@@ -74,7 +73,6 @@ export const PAGES = {
 
     "Expenses": Expenses,
     "Home": Home,
-    "MigrateData": MigrateData,
     "Packing": Packing,
     "Restaurants": Restaurants,
     "Translator": Translator,
