@@ -1,15 +1,39 @@
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { useState, useEffect } from 'react';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { base44 } from '@/api/base44Client';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { useQuery } from '@tanstack/react-query';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { ArrowLeft, Users, MapPin, Calendar } from 'lucide-react';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { Link } from 'react-router-dom';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { createPageUrl } from '@/utils';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { format, differenceInDays } from 'date-fns';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { es } from 'date-fns/locale';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { getTripCoverImage } from '@/lib/tripImage';
 import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { MapPin, DollarSign, FileText } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 
 export default function TripDetail() {
@@ -86,7 +110,7 @@ export default function TripDetail() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">✈️</div>
+          <div className="mb-4 flex justify-center"><PlaneIcon size={48} color="#c2410c" /></div>
           <p className="text-muted-foreground">Cargando viaje...</p>
         </div>
       </div>
@@ -151,21 +175,21 @@ export default function TripDetail() {
             </div>
           </Link>
           <Link to={createPageUrl(`Documents?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
-            <span className="text-2xl">📄</span>
+            <FileText size={20} className="text-muted-foreground" />
             <div className="min-w-0">
               <p className="font-semibold text-sm text-foreground">Docs</p>
               <p className="text-xs text-muted-foreground">{tickets.length} documento{tickets.length !== 1 ? 's' : ''}</p>
             </div>
           </Link>
           <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
-            <span className="text-2xl">📍</span>
+            <MapPin size={20} className="text-muted-foreground" />
             <div className="min-w-0">
               <p className="font-semibold text-sm text-foreground">Spots</p>
               <p className="text-xs text-muted-foreground">{spots.length} spot{spots.length !== 1 ? 's' : ''}</p>
             </div>
           </Link>
           <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)} className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 hover:shadow-sm transition-all">
-            <span className="text-2xl">💰</span>
+            <DollarSign size={20} className="text-muted-foreground" />
             <div className="min-w-0">
               <p className="font-semibold text-sm text-foreground">Gastos</p>
               <p className="text-xs text-muted-foreground">{totalExpenses > 0 ? totalExpenses.toFixed(0) + ' ' + (trip?.currency || '') : 'Sin gastos'}</p>

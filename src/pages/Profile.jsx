@@ -88,10 +88,10 @@ const TYPE_EMOJI  = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'�
 const TYPE_LABEL  = { food:'Comida', sight:'Sights', activity:'Actividades', shopping:'Compras', custom:'Otro' };
 const TYPE_FILTERS = [
   { key:'all',      label:'Todos' },
-  { key:'food',     label:'🍜 Comida' },
-  { key:'sight',    label:'🏛️ Sights' },
-  { key:'activity', label:'⚡ Actividades' },
-  { key:'shopping', label:'🛍️ Compras' },
+  { key:'food',     label:'Comida' },
+  { key:'sight',    label:'Sights' },
+  { key:'activity', label:'Actividades' },
+  { key:'shopping', label:'Compras' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ function SpotCollection({ spots, showLikes = false, showVisibility = false }) {
 
   if (!spots.length) return (
     <div className="text-center py-10 px-4">
-      <p className="text-3xl mb-2">📍</p>
+      
       <p className="text-sm font-medium text-foreground mb-1">Nada aquí todavía</p>
       <p className="text-xs text-muted-foreground">Usa el buscador para descubrir spots y guardarlos</p>
     </div>

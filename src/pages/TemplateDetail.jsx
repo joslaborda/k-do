@@ -1,15 +1,39 @@
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { useState, useEffect } from 'react';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { base44 } from '@/api/base44Client';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { useQuery } from '@tanstack/react-query';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { ArrowLeft, Users, Settings, MapPin, Calendar, DollarSign, CheckSquare } from 'lucide-react';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { Link } from 'react-router-dom';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { createPageUrl } from '@/utils';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { format, differenceInDays } from 'date-fns';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { es } from 'date-fns/locale';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { getTripCoverImage } from '@/lib/tripImage';
 import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
+import { PlaneIcon } from '@/lib/PlaneIcon';
+import { Calendar, MapPin } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 
 export default function TripDetail() {
@@ -72,7 +96,7 @@ export default function TripDetail() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">✈️</div>
+          <div className="mb-4 flex justify-center"><PlaneIcon size={48} color="#c2410c" /></div>
           <p className="text-muted-foreground">Cargando viaje...</p>
         </div>
       </div>
@@ -124,7 +148,7 @@ export default function TripDetail() {
 
           <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
+              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform"><Calendar size={20} className="text-muted-foreground" /></div>
               <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
               <p className="text-xs text-muted-foreground">Documentos y checklist</p>
             </div>

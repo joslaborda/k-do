@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Package, Trash2, Grip, AlertTriangle, CheckCircle2, Info, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Package, Trash2, Grip, AlertTriangle, CheckCircle2, Info, ChevronDown, ChevronRight, Plug, Syringe, DollarSign } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getSmartPackingList, COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -126,7 +126,7 @@ export default function Packing() {
                     <div className="flex items-start gap-2 p-2.5 rounded-xl bg-yellow-500/20">
                       <AlertTriangle className="w-4 h-4 text-yellow-200 flex-shrink-0 mt-0.5"/>
                       <div>
-                        <p className="text-xs font-semibold">🔌 Adaptador {requirements.adapter.type}</p>
+                        <p className="text-xs font-semibold flex items-center gap-1.5"><Plug size={12} />Adaptador {requirements.adapter.type}</p>
                         <p className="text-xs text-white/80 mt-0.5">{requirements.adapter.info}</p>
                       </div>
                     </div>
@@ -136,7 +136,7 @@ export default function Packing() {
                     <div className="flex items-start gap-2 p-2.5 rounded-xl bg-blue-500/20">
                       <Info className="w-4 h-4 text-blue-200 flex-shrink-0 mt-0.5"/>
                       <div>
-                        <p className="text-xs font-semibold">💉 Vacunas recomendadas</p>
+                        <p className="text-xs font-semibold flex items-center gap-1.5"><Syringe size={12} />Vacunas recomendadas</p>
                         <p className="text-xs text-white/80 mt-0.5">{requirements.vaccines.map(v => v.name).join(' · ')}</p>
                       </div>
                     </div>

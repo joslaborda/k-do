@@ -13,7 +13,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const DOC_ICONS = { flight:'✈️', hotel:'🏨', train:'🚆', bus:'🚌', car:'🚗', ticket:'🎟️', insurance:'🛡️', other:'📄' };
+const DOC_ICON_MAP = {
+  flight: PlaneIcon, hotel: Hotel, train: TrainFront,
+  bus: BusFront, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
+};
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
 const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
 
@@ -25,7 +28,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  return t === 'flight' ? '✈️' : t === 'train' ? '🚆' : t === 'bus' ? '🚌' : '⛴️';
+  const M = { flight: PlaneIcon, train: TrainFront, bus: BusFront }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────
@@ -157,7 +160,7 @@ const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50',
 
 function DocViewerModal({ doc, open, onClose }) {
   const type = doc?.category || doc?.type || doc?.doc_type || 'other';
-  const icon = DOC_ICONS[type] || '📄';
+  const DocIcon = DOC_ICON_MAP[type] || FileText;
   const bgColor = DOC_BG[type] || 'bg-secondary';
 
   const openFile = () => {
@@ -169,7 +172,7 @@ function DocViewerModal({ doc, open, onClose }) {
       <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-          <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center text-xl shrink-0`}>{icon}</div>
+          <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center shrink-0`}><DocIcon size={18} className='text-foreground opacity-70' /></div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
@@ -213,7 +216,7 @@ function DocViewerModal({ doc, open, onClose }) {
             <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Notas</span><span className="text-sm text-foreground">{doc.notes}</span></div>
           )}
           {doc?.visibility === 'shared' && (
-            <div className="flex gap-3 items-center"><span className="text-xs text-muted-foreground w-14 shrink-0">Con</span><span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">👥 Grupo</span></div>
+            <div className="flex gap-3 items-center"><span className="text-xs text-muted-foreground w-14 shrink-0">Con</span><span className="text-xs bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">Grupo</span></div>
           )}
         </div>
 
@@ -324,7 +327,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
           {dayDocs.map(doc => (
             <button key={doc.id} onClick={() => setViewingDoc(doc)}
               className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-              <span className="text-lg shrink-0">{DOC_ICONS[doc.category || doc.type || doc.doc_type] || DOC_ICONS.other}</span>
+              <span className="text-lg shrink-0">{DOC_ICON_MAP[doc.category || doc.type || doc.doc_type] || DOC_ICONS.other}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
                 {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}

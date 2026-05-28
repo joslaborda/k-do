@@ -1749,7 +1749,7 @@ export default function Restaurants() {
 
             {spots.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-4xl mb-4">📍</p>
+                
                 <p className="text-muted-foreground mb-4">Aún no tienes spots en este viaje</p>
                 <button onClick={() => setShowCreate(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
