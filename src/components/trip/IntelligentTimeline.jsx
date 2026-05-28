@@ -120,7 +120,7 @@ function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaul
       </button>
 
       {open && (
-        <div className="p-4 space-y-3 bg-white">
+        <div className="p-4 space-y-3 bg-card">
           {!hasContent && (
             <p className="text-sm text-muted-foreground text-center py-3">Sin actividad planificada para este día</p>
           )}
@@ -254,7 +254,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
 
   if (cities.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-dashed border-border p-8 text-center">
+      <div className="bg-card rounded-2xl border border-dashed border-border p-8 text-center">
         <AlertCircle className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-50" />
         <p className="text-sm text-muted-foreground">Añade paradas a tu viaje para ver la timeline</p>
       </div>
@@ -277,7 +277,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
         </div>
         {/* Show upcoming docs if any */}
         {tickets.length > 0 && (
-          <div className="bg-white rounded-2xl border border-border p-4">
+          <div className="bg-card rounded-2xl border border-border p-4">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Documentos del viaje</p>
             <div className="space-y-2">
               {tickets.slice(0, 3).map(doc => {
@@ -298,7 +298,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
           </div>
         )}
         {/* Packing reminder */}
-        <div className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3">
+        <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3">
           <span className="text-2xl">🧳</span>
           <div className="flex-1">
             <p className="font-semibold text-sm">¿Lista la maleta?</p>
@@ -315,7 +315,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
       {/* Gastos de hoy si hay */}
       {todayExpenses.length > 0 && (
         <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-          <div className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 transition-colors">
+          <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 transition-colors">
             <div className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
               <Receipt className="w-4 h-4 text-green-700" />
             </div>

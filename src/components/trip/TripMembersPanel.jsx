@@ -119,7 +119,7 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
             const isMe = memberEmail === currentUserEmail;
             const isCreator = trip?.created_by === memberEmail;
             return (
-              <div key={memberEmail} className="flex items-center gap-3 bg-white rounded-xl p-3 border border-border">
+              <div key={memberEmail} className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border">
                 {profileByEmail[memberEmail]?.avatar_url ? (
                   <img src={profileByEmail[memberEmail].avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
                 ) : (
@@ -193,7 +193,7 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
             <UserPlus className="w-4 h-4" /> Invitar persona
           </h3>
           {/* Mode toggle */}
-          <div className="flex rounded-xl border border-orange-200 overflow-hidden mb-3 bg-white">
+          <div className="flex rounded-xl border border-orange-200 overflow-hidden mb-3 bg-card">
             <button
               onClick={() => setInviteMode('email')}
               className={`flex-1 py-2 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${inviteMode === 'email' ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
@@ -214,11 +214,11 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
                 placeholder="email@ejemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.trim())}
-                className="flex-1 bg-white border-border text-sm"
+                className="flex-1 bg-card border-border text-sm"
                 onKeyDown={(e) => e.key === 'Enter' && canInviteEmail && inviteMutation.mutate({ email, role, mode: 'email' })}
               />
               <Select value={role} onValueChange={setRole}>
-                <SelectTrigger className="w-24 bg-white border-border text-sm">
+                <SelectTrigger className="w-24 bg-card border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,7 +241,7 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
                 placeholder="+34 612 345 678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="bg-white border-border text-sm"
+                className="bg-card border-border text-sm"
                 type="tel"
               />
               <p className="text-xs text-muted-foreground">Se abrirá WhatsApp con un mensaje de invitación</p>
