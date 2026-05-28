@@ -64,7 +64,7 @@ async function nearbyPlaces(lat, lng) {
 function PlaceResultCard({ place, onSave, saving }) {
   const tc = ALL_TYPES.find(t => t.value === place.type) || ALL_TYPES[6];
   return (
-    <div className="bg-white rounded-xl border border-border flex overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl border border-border flex overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="w-12 h-12 bg-orange-50 flex-shrink-0 flex items-center justify-center self-stretch">
         <span className="text-xl">{tc.emoji}</span>
       </div>
@@ -90,7 +90,7 @@ function ManualForm({ onSave, saving, onClose }) {
   const [tags, setTags] = useState([]);
   const addTag = v => { const t=v.trim().toLowerCase(); if(t&&!tags.includes(t)) setTags(p=>[...p,t]); setTagInput(''); };
   return (
-    <div className="bg-white rounded-xl border border-border p-3 space-y-2.5">
+    <div className="bg-card rounded-xl border border-border p-3 space-y-2.5">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">Crear spot</p>
         <button onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
@@ -223,7 +223,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
           <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             placeholder={city ? `Busca en ${city}...` : 'Busca un lugar...'}
-            className="pl-9 pr-20 h-10 text-sm bg-white"/>
+            className="pl-9 pr-20 h-10 text-sm bg-card"/>
           {searchQuery ? (
             <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"><X className="w-4 h-4"/></button>
           ) : (
@@ -287,7 +287,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
       {isLoading ? (
         <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse"/>)}</div>
       ) : filteredSpots.length === 0 && !searchResults.length && !nearbyResults.length ? (
-        <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-white">
+        <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-card">
           <p className="text-2xl mb-2">📍</p>
           <p className="text-sm text-muted-foreground">Busca lugares o crea un spot manualmente</p>
         </div>
