@@ -44,39 +44,39 @@ export default function TicketCard({ ticket, onDelete }) {
 
   return (
     <>
-      <div className="group bg-stone-800/40 backdrop-blur rounded-xl border border-stone-700 p-5 hover:border-stone-600 transition-all duration-300">
+      <div className="group bg-card rounded-xl border border-border p-5 hover:border-primary/30 transition-all duration-300">
         <div className="flex items-start gap-4">
           <div className={`w-12 h-12 rounded-lg ${config.color} flex items-center justify-center flex-shrink-0`}>
             <Icon className="w-5 h-5" />
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-stone-100 truncate text-sm">{ticket.name}</h3>
-            <p className="text-xs text-stone-400 mt-1">{config.label}</p>
+            <h3 className="font-semibold text-foreground truncate text-sm">{ticket.name}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{config.label}</p>
             {ticket.date && (
-              <p className="text-xs text-stone-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {format(new Date(ticket.date), 'd MMM, yyyy')}
               </p>
             )}
             {ticket.notes && (
-              <p className="text-xs text-stone-400 mt-2 line-clamp-2">{ticket.notes}</p>
+              <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ticket.notes}</p>
             )}
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-stone-400 hover:text-stone-200">
+              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-stone-800 border-stone-700">
+            <DropdownMenuContent align="end" className="bg-card border-border">
               {ticket.file_url && (
-                <DropdownMenuItem onClick={() => setViewerOpen(true)} className="text-stone-200 focus:bg-stone-700">
+                <DropdownMenuItem onClick={() => setViewerOpen(true)} className="text-foreground focus:bg-secondary">
                   <Eye className="w-4 h-4 mr-2" />
                   Ver documento
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={() => onDelete(ticket.id)} className="text-red-400 focus:bg-stone-700">
+              <DropdownMenuItem onClick={() => onDelete(ticket.id)} className="text-red-400 focus:bg-secondary">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Eliminar
               </DropdownMenuItem>
@@ -101,8 +101,8 @@ export default function TicketCard({ ticket, onDelete }) {
       <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
         <DialogContent className="bg-stone-800 border-stone-700 max-w-4xl max-h-[90vh]">
           <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle className="text-stone-100">{ticket.name}</DialogTitle>
-            <button onClick={() => setViewerOpen(false)} className="text-stone-400 hover:text-stone-200">
+            <DialogTitle className="text-foreground">{ticket.name}</DialogTitle>
+            <button onClick={() => setViewerOpen(false)} className="text-muted-foreground hover:text-foreground">
               <X className="w-5 h-5" />
             </button>
           </DialogHeader>
@@ -112,7 +112,7 @@ export default function TicketCard({ ticket, onDelete }) {
              <>
                {isLoading && (
                  <div className="flex-1 flex items-center justify-center">
-                   <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
+                   <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
                  </div>
                )}
                <div className="flex-1 overflow-auto">
@@ -120,7 +120,7 @@ export default function TicketCard({ ticket, onDelete }) {
                    file={ticket.file_url}
                    onLoadSuccess={onDocumentLoadSuccess}
                    onLoadStart={() => setIsLoading(true)}
-                   loading={<div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 text-stone-400 animate-spin" /></div>}
+                   loading={<div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 text-muted-foreground animate-spin" /></div>}
                  >
                    <Page 
                      pageNumber={currentPage}
@@ -136,11 +136,11 @@ export default function TicketCard({ ticket, onDelete }) {
                      disabled={currentPage === 1}
                      variant="ghost"
                      size="sm"
-                     className="text-stone-400 hover:text-stone-200"
+                     className="text-muted-foreground hover:text-foreground"
                    >
                      ← Anterior
                    </Button>
-                   <span className="text-xs text-stone-400">
+                   <span className="text-xs text-muted-foreground">
                      Página {currentPage} de {numPages}
                    </span>
                    <Button
@@ -148,7 +148,7 @@ export default function TicketCard({ ticket, onDelete }) {
                      disabled={currentPage === numPages}
                      variant="ghost"
                      size="sm"
-                     className="text-stone-400 hover:text-stone-200"
+                     className="text-muted-foreground hover:text-foreground"
                    >
                      Siguiente →
                    </Button>

@@ -7,28 +7,28 @@ import { Check } from 'lucide-react';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon: '✈️', label: 'Vuelo',   color: 'bg-blue-50'   },
-  train:    { icon: '🚆', label: 'Tren',    color: 'bg-green-50'  },
-  hotel:    { icon: '🏨', label: 'Hotel',   color: 'bg-purple-50' },
-  event:    { icon: '🎟️', label: 'Evento',  color: 'bg-orange-50' },
-  personal: { icon: '🛡️', label: 'Seguro',  color: 'bg-amber-50'  },
-  other:    { icon: '📄', label: 'Otro',    color: 'bg-secondary' },
+  flight:   { icon: PlaneIcon,  label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  train:    { icon: TrainFront, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
+  hotel:    { icon: Hotel,      label: 'Hotel',   color: 'bg-purple-50 dark:bg-purple-950/30' },
+  event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
+  personal: { icon: Shield,     label: 'Seguro',  color: 'bg-amber-50 dark:bg-amber-950/30'  },
+  other:    { icon: FileText,   label: 'Otro',    color: 'bg-secondary' },
 };
 
 
 const CATEGORIES = [
-  { key: 'flight',   icon: '✈️', label: 'Vuelo'   },
-  { key: 'hotel',    icon: '🏨', label: 'Hotel'   },
-  { key: 'train',    icon: '🚆', label: 'Tren'    },
-  { key: 'event',    icon: '🎟️', label: 'Evento'  },
-  { key: 'personal', icon: '🛡️', label: 'Seguro'  },
-  { key: 'other',    icon: '📄', label: 'Otro'    },
+  { key: 'flight',   Icon: PlaneIcon,  label: 'Vuelo'   },
+  { key: 'hotel',    Icon: Hotel,      label: 'Hotel'   },
+  { key: 'train',    Icon: TrainFront, label: 'Tren'    },
+  { key: 'event',    Icon: Ticket,     label: 'Evento'  },
+  { key: 'personal', Icon: Shield,     label: 'Seguro'  },
+  { key: 'other',    Icon: FileText,   label: 'Otro'    },
 ];
 
 const VISIBILITY_OPTS = [
-  { key: 'personal',       icon: '🔒', label: 'Solo yo',       desc: 'Nadie más puede verlo'     },
-  { key: 'shared',         icon: '👥', label: 'Todo el grupo', desc: 'Visible para todos'        },
-  { key: 'selected_users', icon: '👤', label: 'Elegir',        desc: 'Selecciona quién lo ve'   },
+  { key: 'personal',       label: 'Solo yo',       desc: 'Nadie más puede verlo'   },
+  { key: 'shared',         label: 'Todo el grupo', desc: 'Visible para todos'      },
+  { key: 'selected_users', label: 'Elegir',        desc: 'Selecciona quién lo ve'  },
 ];
 
 const SHOW_FIELDS = {
@@ -138,7 +138,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
           {CATEGORIES.map(cat => (
             <button key={cat.key} onClick={() => setCategory(cat.key)}
               className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${category === cat.key ? 'border-primary' : 'border-transparent'}`}>
-              <span className="text-base leading-none">{cat.icon}</span>
+              <cat.Icon size={16} className="flex-shrink-0" />
               <span className={`text-xs font-medium leading-none ${category === cat.key ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
             </button>
           ))}
@@ -247,7 +247,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
               className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
                 visibility === opt.key ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:bg-secondary/30'
               }`}>
-              <span className="text-lg shrink-0">{opt.icon}</span>
+              
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium ${visibility === opt.key ? 'text-primary' : 'text-foreground'}`}>{opt.label}</p>
                 <p className={`text-xs mt-0.5 ${visibility === opt.key ? 'text-primary/70' : 'text-muted-foreground'}`}>{opt.desc}</p>
