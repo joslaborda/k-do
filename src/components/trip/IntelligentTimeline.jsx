@@ -9,7 +9,7 @@ import {
   Shield, Ticket, ChevronDown, ChevronRight, Eye,
   Navigation, Receipt, Clock, AlertCircle
 } from 'lucide-react';
-import { PlaneIcon } from '@/lib/PlaneIcon';
+import { PlaneIcon } from '@/lib/icons';
 import TicketQuickViewer from './TicketQuickViewer';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
