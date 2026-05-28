@@ -23,7 +23,7 @@ import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
-import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image , Cross, Camera, Wifi, DollarSign, AlertTriangle, Calendar, Users, MapPin, Star} from '@/lib/icons';
+import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, AlertTriangle, Star } from '@/lib/icons';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
