@@ -1,4 +1,4 @@
-import { PlaneIcon } from '@/lib/PlaneIcon';
+import { PlaneIcon } from '@/lib/icons';
 import { useMemo } from 'react';
 import { format, isValid, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
