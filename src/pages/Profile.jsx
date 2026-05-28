@@ -366,7 +366,7 @@ export default function Profile() {
       const all = await base44.entities.Spot.filter({ created_by: user.email });
       // Only count truly user-created spots (not saved from OSM/community search)
       // A spot is "created" if it has no osm_id and was explicitly added by the user
-      return all.filter(s => !s.osm_id && s.source !== 'osm' && s.source !== 'community_search');
+      return all.filter(s => s.source === 'manual' || (!s.osm_id && !s.source));
     },
     enabled: !!user?.email,
     staleTime: 60000,

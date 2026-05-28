@@ -1,13 +1,13 @@
+import { PlaneIcon } from '@/lib/PlaneIcon';
 import { useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { format, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Plane, Train, Hotel, MapPin, FileText, Calendar as CalendarIcon } from 'lucide-react';
+import { Train, Hotel, MapPin, FileText, Calendar as CalendarIcon } from 'lucide-react';
 
 const categoryIcons = {
-  flight: Plane,
-  train: Train,
+  flight: train: Train,
   hotel: Hotel,
 };
 

@@ -777,7 +777,14 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
     }
   }
 
-  const DOC_ICON = { flight: '✈️', train: '🚆', bus: '🚌', hotel: '🏨', car: '🚗', other: '📄' };
+  const DOC_ICON = {
+    flight: (props) => <PlaneIcon size={20} {...props} />,
+    train:  (props) => <TrainFront size={20} {...props} />,
+    bus:    (props) => <BusFront size={20} {...props} />,
+    hotel:  (props) => <Hotel size={20} {...props} />,
+    car:    (props) => <Car size={20} {...props} />,
+    other:  (props) => <FileText size={20} {...props} />,
+  };
   const packedCount = packingItems.filter(i => i.packed).length;
   const packedPct = packingItems.length ? Math.round(packedCount / packingItems.length * 100) : 0;
 
@@ -824,7 +831,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
           </div>
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-xl flex-shrink-0">
-              {DOC_ICON[firstDoc.type] || '📄'}
+              {(() => { const I = DOC_ICON[firstDoc.type] || DOC_ICON.other; return <I className="text-primary" />; })()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{firstDoc.title || firstDoc.name}</p>

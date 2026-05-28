@@ -1392,7 +1392,7 @@ export default function Restaurants() {
     if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
     setSavingId(place.id);
     try {
-      const created = await createMutation.mutateAsync(baseData({ title: place.name, type: place.type || 'sight', address: place.address || '', lat: place.lat, lng: place.lng }));
+      const created = await createMutation.mutateAsync(baseData({ title: place.name, type: place.type || 'sight', address: place.address || '', lat: place.lat, lng: place.lng, osm_id: place.id || null, source: 'osm' }));
       setLastSavedId(created?.id);
       setOsmResults([]); setNearbyResults([]); setSearchQuery('');
       showToastFor({ title: place.name }, city);
@@ -1410,7 +1410,7 @@ export default function Restaurants() {
       const created = await createMutation.mutateAsync(baseData({
         title: form.title, type: form.type, notes: form.notes,
         address: form.address, lat: form.lat, lng: form.lng,
-        visibility: form.visibility,
+        visibility: form.visibility, source: 'manual',
       }));
       setLastSavedId(created?.id);
       setShowCreate(false);
