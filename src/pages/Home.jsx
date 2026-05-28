@@ -1076,7 +1076,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                       </button>
                     ) : (
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
-                        <span className="text-base shrink-0 mt-0.5">{REQ_ICONS[req.type] || 'ℹ️'}</span>
+                        <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground leading-tight">{req.title}
                             {allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}

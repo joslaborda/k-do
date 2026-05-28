@@ -1,5 +1,5 @@
 import { PlaneIcon } from '@/lib/icons';
-import { MapPin, DollarSign, FileText } from '@/lib/icons';
+import { DollarSign, FileText } from '@/lib/icons';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';

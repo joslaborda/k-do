@@ -48,7 +48,8 @@ export default function TimelineView({ cities, expenses, diaryEntries, itinerary
         if (ticket.date) {
           const date = startOfDay(new Date(ticket.date));
           const iconMap = {
-            flight: train: Train,
+            flight: Train,
+            train: Train,
             hotel: Hotel,
             freetour: TicketIcon,
             insurance: TicketIcon

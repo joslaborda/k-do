@@ -7,7 +7,8 @@ import { es } from 'date-fns/locale';
 import { Train, Hotel, MapPin, FileText, Calendar as CalendarIcon } from 'lucide-react';
 
 const categoryIcons = {
-  flight: train: Train,
+  flight: Train,
+  train: Train,
   hotel: Hotel,
 };
 

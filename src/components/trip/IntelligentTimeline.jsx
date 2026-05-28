@@ -281,7 +281,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Documentos del viaje</p>
             <div className="space-y-2">
               {tickets.slice(0, 3).map(doc => {
-                const Icon = doc.category === 'flight' ? Plane : doc.category === 'hotel' ? Hotel : FileText;
+                const Icon = doc.category === 'flight' ? FileText : doc.category === 'hotel' ? Hotel : FileText;
                 return (
                   <div key={doc.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary">
                     <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
