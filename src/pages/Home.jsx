@@ -12,8 +12,7 @@ import { es } from 'date-fns/locale';
 import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
-  Send, UserPlus, Check, X, GripVertical, Clock,
-  Cross, Wifi, DollarSign, AlertTriangle
+  Send, UserPlus, Check, X, GripVertical, Clock
 } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
@@ -105,14 +104,7 @@ function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
                   background: '#c2410c', display: 'inline-block', flexShrink: 0,
                 }} />
               )}
-              {tab.badge > 0 && (
-                <span style={{
-                  width: 7, height: 7, borderRadius: '50%',
-                  background: '#c2410c',
-                  display: 'inline-block',
-                  flexShrink: 0,
-                }} />
-              )}
+
             </span>
           </button>
         );
@@ -146,6 +138,7 @@ const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'�
 
 // ── Mini weather ──────────────────────────────────────────────────────────────
 const WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'🌨️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
+// weather fetched inline in DayCard
 
 // ── Requirements builder ──────────────────────────────────────────────────────
 function buildRequirements(countries, originCountry, secondNationality = null) {
@@ -600,7 +593,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   {/* Icon */}
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : 'bg-secondary'}`}>
                     {isDoc && DocIcon
-                      ? <DocIcon size={16} stroke="currentColor" className={isDoc ? 'text-primary' : 'text-muted-foreground'} />
+                      ? <DocIcon size={16} stroke="currentColor" className="text-primary" />
                       : <span className="text-base">{spotEmoji}</span>
                     }
                   </div>
@@ -1076,7 +1069,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                       </button>
                     ) : (
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
-                        <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
+                        <span className="text-base shrink-0 mt-0.5">{REQ_ICONS[req.type] || 'ℹ️'}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground leading-tight">{req.title}
                             {allCountries.size > 1 && <span className="text-xs text-muted-foreground ml-1 font-normal">· {req.country}</span>}
@@ -1301,13 +1294,14 @@ function FinishedTab({ trip, cities, expenses, spots }) {
   const members = trip?.members?.length || 1;
 
   const allCountries = useMemo(() => {
-    const _norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const _seen = {};
-    const _all = [];
-    if (trip?.country) _all.push(trip.country);
-    cities.forEach(c => { if (c.country) _all.push(c.country); });
-    _all.forEach(c => { const key = _norm(c); if (!_seen[key]) _seen[key] = c; });
-    return Object.values(_seen);
+    // Prefer city countries over trip.country to avoid duplicates like "Japón y Japan"
+    const sources = cities.length > 0
+      ? cities.map(c => c.country).filter(Boolean)
+      : [trip?.country].filter(Boolean);
+    const norm = (s) => (s || '').trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const seen = {};
+    sources.forEach(s => { const k = norm(s); if (!seen[k]) seen[k] = s; });
+    return Object.values(seen);
   }, [trip, cities]);
 
   const sortedCities = useMemo(() =>
@@ -1341,19 +1335,19 @@ function FinishedTab({ trip, cities, expenses, spots }) {
 
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: 'Días de viaje', value: totalDays || '—', icon: '📅' },
-          { label: members === 1 ? 'Viajero' : 'Viajeros', value: members, icon: '👥' },
-          { label: 'Ciudades', value: cities.length, icon: '🏙️' },
-          { label: 'Spots visitados', value: visitedSpots, icon: '📍' },
+          { label: 'Días de viaje', value: totalDays || '—', Icon: Calendar },
+          { label: members === 1 ? 'Viajero' : 'Viajeros', value: members, Icon: Users },
+          { label: 'Ciudades', value: cities.length, Icon: MapPin },
+          { label: 'Spots visitados', value: visitedSpots, Icon: Star },
         ].map(s => (
           <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
-            <p className="text-xl mb-1">{s.icon}</p>
+            <s.Icon className="w-4 h-4 text-muted-foreground mb-2" />
             <p className="text-xl font-semibold text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
         <div className="bg-card rounded-2xl border border-border p-4 col-span-2">
-          <p className="text-xl mb-1">💰</p>
+          <DollarSign className="w-4 h-4 text-muted-foreground mb-2" />
           <p className="text-xl font-semibold text-foreground">{totalSpent.toFixed(0)} {currency}</p>
           <p className="text-xs text-muted-foreground">Total · {avgPerDay.toFixed(0)} {currency}/día</p>
         </div>
