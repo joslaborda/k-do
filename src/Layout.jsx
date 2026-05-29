@@ -148,37 +148,32 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
           <div className="mx-3 mb-3">
-            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none relative">
+            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none relative overflow-hidden">
               {showTripNav && (() => {
-                // Active index for sliding macron (0-4)
-                const navItems = [...mainNavItems, { page: '__mas__' }];
-                const activeIdx = drawerOpen || isDrawerPageActive
-                  ? navItems.length - 1
-                  : navItems.findIndex(i => i.page === currentPageName);
-                const pct = 100 / navItems.length;
-
+                const allItems = [...mainNavItems, { page: '__mas__' }];
+                const activeIdx = (drawerOpen || isDrawerPageActive)
+                  ? allItems.length - 1
+                  : Math.max(0, allItems.findIndex(i => i.page === currentPageName));
+                const pct = 100 / allItems.length;
                 return (
                   <>
-                    {/* Single sliding macron — one element that translates */}
+                    {/* Single sliding macron */}
                     <div style={{
                       position: 'absolute',
-                      top: 0,
+                      top: 6,
                       left: `calc(${activeIdx * pct}% + ${pct / 2}% - 10px)`,
-                      width: 20,
-                      height: 2.5,
-                      borderRadius: 2,
+                      width: 20, height: 2.5, borderRadius: 2,
                       background: '#c2410c',
-                      transition: 'left 0.25s cubic-bezier(.4,0,.2,1)',
-                      pointerEvents: 'none',
+                      transition: 'left 0.3s cubic-bezier(.4,0,.2,1)',
+                      pointerEvents: 'none', zIndex: 2,
                     }} />
-
                     {mainNavItems.map((item) => {
                       const isActive = currentPageName === item.page && !drawerOpen && !isDrawerPageActive;
                       return (
                         <Link
                           key={item.page}
                           to={tripUrl(item.page)}
-                          className="flex flex-col items-center flex-1 pt-3.5 pb-1.5 gap-1"
+                          className="flex flex-col items-center flex-1 pt-4 pb-1.5 gap-0.5"
                         >
                           <item.icon
                             className="w-5 h-5 flex-shrink-0 transition-colors"
@@ -191,24 +186,26 @@ export default function Layout({ children, currentPageName }) {
                         </Link>
                       );
                     })}
-
-                    {/* Más button */}
-                    <button
-                      onClick={() => setDrawerOpen(o => !o)}
-                      className="flex flex-col items-center flex-1 pt-3.5 pb-1.5 gap-1"
-                    >
-                      <MoreHorizontal
-                        className="w-5 h-5 flex-shrink-0 transition-colors"
-                        style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
-                        strokeWidth={1.75}
-                      />
-                      <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
-                        Más
-                      </span>
-                    </button>
                   </>
                 );
               })()}
+
+              {/* Más button */}
+              {showTripNav && (
+                <button
+                  onClick={() => setDrawerOpen(o => !o)}
+                  className="flex flex-col items-center flex-1 pt-4 pb-1.5 gap-0.5"
+                >
+                  <MoreHorizontal
+                    className="w-5 h-5 flex-shrink-0 transition-colors"
+                    style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}
+                    strokeWidth={1.75}
+                  />
+                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}>
+                    Más
+                  </span>
+                </button>
+              )}
 
               {/* Global nav items (outside trip) */}
               {showGlobalNav && globalNavItems.map((item) => {
@@ -219,7 +216,6 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl(item.page)}
                     className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                   >
-                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',marginBottom:2}} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0"
                       style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
@@ -228,6 +224,7 @@ export default function Layout({ children, currentPageName }) {
                     <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
+                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
