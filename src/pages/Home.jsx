@@ -1477,12 +1477,20 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   };
 
   const openPicker = (type) => {
-    fileInputType.current = type;
-    fileInputRef.current.accept = type === 'photo' ? 'image/*' : type === 'camera' ? 'image/*' : type === 'doc' ? '.pdf,.doc,.docx,.txt,.xls,.xlsx' : 'image/*,application/pdf,.doc,.docx,.txt';
-    if (type === 'camera') fileInputRef.current.capture = 'environment';
-    else fileInputRef.current.removeAttribute('capture');
-    fileInputRef.current.click();
     setAttachOpen(false);
+    if (type === 'camera') {
+      // Use dedicated camera input with capture attribute for mobile
+      const camInput = document.getElementById('chat-camera-input');
+      if (camInput) camInput.click();
+    } else {
+      fileInputRef.current.accept = type === 'photo'
+        ? 'image/*'
+        : type === 'doc'
+        ? '.pdf,.doc,.docx,.txt,.xls,.xlsx'
+        : 'image/*,application/pdf,.doc,.docx,.txt';
+      fileInputRef.current.removeAttribute('capture');
+      fileInputRef.current.click();
+    }
   };
 
   const startRecording = async () => {
@@ -1518,9 +1526,9 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   };
 
   const isMe = (msg) => msg.user_id === currentUserId || msg.user_email === currentUserEmail;
-  const isImage = (msg) => msg.file_type === 'image' && msg.file_url;
-  const isAudio = (msg) => msg.file_type === 'audio' && msg.file_url;
-  const isFile  = (msg) => msg.file_type === 'file'  && msg.file_url;
+  const isImage = (msg) => (msg.file_type === 'image' || msg.file_type?.startsWith?.('image/')) && msg.file_url;
+  const isAudio = (msg) => (msg.file_type === 'audio' || msg.file_type?.startsWith?.('audio/')) && msg.file_url;
+  const isFile  = (msg) => msg.file_url && !isImage(msg) && !isAudio(msg);
 
   return (
     <>
@@ -1626,7 +1634,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                     )}
                     {!isImage(msg) && !isAudio(msg) && !isFile(msg) && (
                       <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${me ? 'bg-primary text-white rounded-br-sm' : 'bg-secondary text-foreground rounded-bl-sm'}`}>
-                        {msg.content}
+                        {msg.content || (msg.file_url ? '📎 Archivo adjunto' : '')}
                       </div>
                     )}
                     <span className="text-[9px] text-muted-foreground px-1">
@@ -1642,8 +1650,19 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
         {/* Input bar */}
         <div className="border-t border-border p-2.5 flex gap-2 items-center">
+          {/* File picker */}
           <input ref={fileInputRef} type="file" className="hidden"
             onChange={e => { handleUpload(e.target.files?.[0]); e.target.value=''; }} />
+          {/* Camera - capture="environment" opens camera directly on mobile */}
+          <input
+            ref={el => { if (el) el._isCameraInput = true; }}
+            id="chat-camera-input"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={e => { handleUpload(e.target.files?.[0]); e.target.value=''; }}
+          />
 
           {/* + button */}
           <button onClick={() => setAttachOpen(o => !o)}
