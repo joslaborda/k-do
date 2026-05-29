@@ -148,58 +148,67 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
           <div className="mx-3 mb-3">
-            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none">
-              {showTripNav && mainNavItems.map((item) => {
-                const isActive = currentPageName === item.page;
-                return (
-                  <Link
-                    key={item.page}
-                    to={tripUrl(item.page)}
-                    className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
-                  >
-                    {/* Macron Ō — animated, above icon only */}
-                    <div style={{
-                      height: 2.5, borderRadius: 2,
-                      background: isActive ? '#c2410c' : 'transparent',
-                      width: isActive ? 20 : 0,
-                      transition: 'all 0.25s cubic-bezier(.4,0,.2,1)',
-                      marginBottom: 2,
-                    }} />
-                    <item.icon
-                      className="w-5 h-5 flex-shrink-0 transition-colors"
-                      style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
-                      strokeWidth={isActive ? 2.5 : 1.75}
-                    />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
-                      {item.name}
-                    </span>
-                  </Link>
-                );
-              })}
+            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none relative">
+              {showTripNav && (() => {
+                // Active index for sliding macron (0-4)
+                const navItems = [...mainNavItems, { page: '__mas__' }];
+                const activeIdx = drawerOpen || isDrawerPageActive
+                  ? navItems.length - 1
+                  : navItems.findIndex(i => i.page === currentPageName);
+                const pct = 100 / navItems.length;
 
-              {/* Más button */}
-              {showTripNav && (
-                <button
-                  onClick={() => setDrawerOpen(o => !o)}
-                  className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
-                >
+                return (
+                  <>
+                    {/* Single sliding macron — one element that translates */}
                     <div style={{
-                      height: 2.5, borderRadius: 2,
-                      background: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'transparent',
-                      width: (drawerOpen||isDrawerPageActive) ? 20 : 0,
-                      transition: 'all 0.25s cubic-bezier(.4,0,.2,1)',
-                      marginBottom: 2,
+                      position: 'absolute',
+                      top: 0,
+                      left: `calc(${activeIdx * pct}% + ${pct / 2}% - 10px)`,
+                      width: 20,
+                      height: 2.5,
+                      borderRadius: 2,
+                      background: '#c2410c',
+                      transition: 'left 0.25s cubic-bezier(.4,0,.2,1)',
+                      pointerEvents: 'none',
                     }} />
-                  <MoreHorizontal
-                    className="w-5 h-5 flex-shrink-0 transition-colors"
-                    style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
-                    strokeWidth={1.75}
-                  />
-                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
-                    Más
-                  </span>
-                </button>
-              )}
+
+                    {mainNavItems.map((item) => {
+                      const isActive = currentPageName === item.page && !drawerOpen && !isDrawerPageActive;
+                      return (
+                        <Link
+                          key={item.page}
+                          to={tripUrl(item.page)}
+                          className="flex flex-col items-center flex-1 pt-3.5 pb-1.5 gap-1"
+                        >
+                          <item.icon
+                            className="w-5 h-5 flex-shrink-0 transition-colors"
+                            style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
+                            strokeWidth={isActive ? 2.5 : 1.75}
+                          />
+                          <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
+                            {item.name}
+                          </span>
+                        </Link>
+                      );
+                    })}
+
+                    {/* Más button */}
+                    <button
+                      onClick={() => setDrawerOpen(o => !o)}
+                      className="flex flex-col items-center flex-1 pt-3.5 pb-1.5 gap-1"
+                    >
+                      <MoreHorizontal
+                        className="w-5 h-5 flex-shrink-0 transition-colors"
+                        style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
+                        strokeWidth={1.75}
+                      />
+                      <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
+                        Más
+                      </span>
+                    </button>
+                  </>
+                );
+              })()}
 
               {/* Global nav items (outside trip) */}
               {showGlobalNav && globalNavItems.map((item) => {
