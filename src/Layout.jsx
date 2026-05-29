@@ -192,10 +192,10 @@ export default function Layout({ children, currentPageName }) {
                     }} />
                   <MoreHorizontal
                     className="w-5 h-5 flex-shrink-0 transition-colors"
-                    style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}
+                    style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
                     strokeWidth={1.75}
                   />
-                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}>
+                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                     Más
                   </span>
                 </button>
@@ -210,6 +210,7 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl(item.page)}
                     className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                   >
+                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)',marginBottom:2}} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0"
                       style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
@@ -218,7 +219,6 @@ export default function Layout({ children, currentPageName }) {
                     <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
-                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
