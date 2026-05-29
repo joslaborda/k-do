@@ -1602,13 +1602,18 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                       </div>
                     )}
                     {isAudio(msg) && (
-                      <div className={`px-3 py-2 rounded-2xl ${me ? 'bg-primary/10 border border-primary/30' : 'bg-secondary border border-border'}`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <svg className="w-3.5 h-3.5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm7 10a1 1 0 0 1 2 0c0 5-3.6 9.3-8.5 9.9V23h-1v-2.1C6.6 20.3 3 16 3 11a1 1 0 0 1 2 0c0 4.4 3.6 8 7 8s7-3.6 7-8z"/></svg>
-                          <span className="text-xs font-medium text-primary">Audio</span>
+                      <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
+                        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-2xl no-underline ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${me ? 'bg-white/20' : 'bg-primary/10'}`}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={me ? 'text-white' : 'text-primary'}>
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                          </svg>
                         </div>
-                        <audio src={msg.file_url} controls style={{width:'180px',height:'32px'}} />
-                      </div>
+                        <div>
+                          <p className="text-xs font-semibold">Audio</p>
+                          <p className={`text-[10px] ${me ? 'text-white/70' : 'text-muted-foreground'}`}>Toca para escuchar</p>
+                        </div>
+                      </a>
                     )}
                     {isFile(msg) && (
                       <a href={msg.file_url} download={msg.file_name} target="_blank" rel="noopener noreferrer"
@@ -1654,14 +1659,18 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
             className="flex-1 text-sm bg-background border-border rounded-full px-4"
             disabled={sendMutation.isPending || recording} />
 
-          {/* Mic button */}
-          <button
-            onPointerDown={startRecording}
-            onPointerUp={stopRecording}
-            disabled={uploading || sendMutation.isPending}
-            className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${recording ? 'bg-red-500 text-white animate-pulse' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}>
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm7 10a1 1 0 0 1 2 0c0 5-3.6 9.3-8.5 9.9V23h-1v-2.1C6.6 20.3 3 16 3 11a1 1 0 0 1 2 0c0 4.4 3.6 8 7 8s7-3.6 7-8z"/></svg>
-          </button>
+          {/* Mic button - toggle record */}
+          {!message.trim() && (
+            <button
+              onClick={recording ? stopRecording : startRecording}
+              disabled={uploading || sendMutation.isPending}
+              className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${recording ? 'bg-red-500 text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'}`}>
+              {recording
+                ? <div className="w-3 h-3 rounded-sm bg-white" />
+                : <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm7 10a1 1 0 0 1 2 0c0 5-3.6 9.3-8.5 9.9V23h-1v-2.1C6.6 20.3 3 16 3 11a1 1 0 0 1 2 0c0 4.4 3.6 8 7 8s7-3.6 7-8z"/></svg>
+              }
+            </button>
+          )}
 
           {message.trim() && (
             <Button onClick={sendMessage} disabled={sendMutation.isPending}
