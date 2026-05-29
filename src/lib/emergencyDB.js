@@ -1184,13 +1184,38 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
   // Exact match
   let data = EMERGENCY_DB[countryLabel];
 
-  // Case-insensitive fallback
+  // Case-insensitive fallback (strips accents)
   if (!data) {
     const norm = countryLabel.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const key = Object.keys(EMERGENCY_DB).find(
       k => k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === norm
     );
     if (key) data = EMERGENCY_DB[key];
+  }
+  
+  // English → Spanish alias fallback (city.country may be in English from OSM)
+  const EN_TO_ES = {
+    'japan': 'Japón', 'france': 'Francia', 'germany': 'Alemania', 'italy': 'Italia',
+    'portugal': 'Portugal', 'united kingdom': 'Reino Unido', 'uk': 'Reino Unido',
+    'united states': 'Estados Unidos', 'usa': 'Estados Unidos',
+    'mexico': 'México', 'colombia': 'Colombia', 'peru': 'Perú',
+    'argentina': 'Argentina', 'brazil': 'Brasil', 'chile': 'Chile',
+    'thailand': 'Tailandia', 'vietnam': 'Vietnam', 'indonesia': 'Indonesia',
+    'india': 'India', 'china': 'China', 'south korea': 'Corea del Sur',
+    'morocco': 'Marruecos', 'turkey': 'Turquía', 'greece': 'Grecia',
+    'netherlands': 'Países Bajos', 'belgium': 'Bélgica', 'switzerland': 'Suiza',
+    'austria': 'Austria', 'sweden': 'Suecia', 'norway': 'Noruega',
+    'denmark': 'Dinamarca', 'poland': 'Polonia', 'czech republic': 'República Checa',
+    'hungary': 'Hungría', 'romania': 'Rumanía', 'croatia': 'Croacia',
+    'singapore': 'Singapur', 'malaysia': 'Malasia', 'philippines': 'Filipinas',
+    'cambodia': 'Camboya', 'nepal': 'Nepal', 'egypt': 'Egipto',
+    'kenya': 'Kenia', 'south africa': 'Sudáfrica', 'ethiopia': 'Etiopía',
+    'australia': 'Australia', 'new zealand': 'Nueva Zelanda',
+    'canada': 'Canadá', 'cuba': 'Cuba', 'peru': 'Perú',
+  };
+  if (!data) {
+    const alias = EN_TO_ES[countryLabel.toLowerCase()];
+    if (alias) data = EMERGENCY_DB[alias];
   }
 
   if (!data) return null;
