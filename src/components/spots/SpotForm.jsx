@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Camera, X, Loader2 } from 'lucide-react';
 
 const TYPES = [
   { value: 'food',      label: 'Comida',     emoji: '🍜' },
@@ -14,23 +16,23 @@ const TYPES = [
 ];
 
 const VISIBILITY_OPTIONS = [
-  { value: 'trip_members', label: '👥 Todo el grupo' },
-  { value: 'personal',     label: '🔒 Solo yo' },
-  { value: 'selected_users', label: '👤 Personas específicas' },
+  { value: 'trip_members', label: 'Todo el grupo' },
+  { value: 'personal',     label: 'Solo yo' },
+  { value: 'community',    label: 'Comunidad' },
 ];
 
 const DEFAULT_FORM = {
   title: '', type: 'food', notes: '', link: '', address: '',
-  visibility: 'trip_members', shared_with: [],
+  visibility: 'trip_members', shared_with: [], image_url: null,
 };
 
 export default function SpotForm({ open, onOpenChange, onSubmit, isPending, tripMembers = [] }) {
   const [form, setForm] = useState({ ...DEFAULT_FORM });
-  const [membersInput, setMembersInput] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleClose = () => {
     setForm({ ...DEFAULT_FORM });
-    setMembersInput('');
     onOpenChange(false);
   };
 
@@ -40,141 +42,150 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
     handleClose();
   };
 
-  const toggleMember = (email) => {
-    setForm((prev) => {
-      const already = prev.shared_with.includes(email);
-      return {
-        ...prev,
-        shared_with: already
-          ? prev.shared_with.filter((e) => e !== email)
-          : [...prev.shared_with, email],
-      };
-    });
+  const handlePhoto = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    if (file.size > 10 * 1024 * 1024) { alert('Máximo 10MB'); return; }
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setForm(f => ({ ...f, image_url: file_url }));
+    } catch (err) {
+      alert('Error al subir: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const canSubmit = form.title.trim() && form.type &&
-    (form.visibility !== 'selected_users' || form.shared_with.length > 0);
+  const canSubmit = form.title.trim() && form.type && !uploading;
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-card border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground text-xl">📍 Añadir Spot</DialogTitle>
+          <DialogTitle className="text-foreground">Añadir spot</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
-          {/* Title */}
+
+          {/* Foto */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Nombre *</label>
+            <label className="text-xs font-medium text-muted-foreground mb-2 block">Foto (opcional)</label>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+            {form.image_url ? (
+              <div className="relative rounded-xl overflow-hidden aspect-video bg-secondary">
+                <img src={form.image_url} alt="foto spot" className="w-full h-full object-cover" />
+                <button
+                  onClick={() => setForm(f => ({ ...f, image_url: null }))}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="w-full border border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted-foreground hover:bg-secondary/50 transition-colors"
+              >
+                {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                <span className="text-xs">{uploading ? 'Subiendo...' : 'Añadir foto'}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Nombre */}
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nombre *</label>
             <Input
-              placeholder="ej. Ramen Ichiran, Fushimi Inari…"
+              placeholder="ej. Ramen Ichiran"
               value={form.title}
-              onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              className="bg-secondary border-border"
             />
           </div>
 
-          {/* Type chips */}
+          {/* Tipo */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">Tipo *</label>
-            <div className="flex flex-wrap gap-2">
-              {TYPES.map((t) => (
+            <label className="text-xs font-medium text-muted-foreground mb-2 block">Tipo *</label>
+            <div className="grid grid-cols-3 gap-2">
+              {TYPES.map(t => (
                 <button
                   key={t.value}
-                  type="button"
-                  onClick={() => setForm((p) => ({ ...p, type: t.value }))}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                  onClick={() => setForm(f => ({ ...f, type: t.value }))}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-all ${
                     form.type === t.value
-                      ? 'bg-orange-700 text-white border-orange-700'
-                      : 'bg-white text-foreground border-border hover:border-orange-300'
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-border bg-card text-foreground hover:bg-secondary'
                   }`}
                 >
-                  <span>{t.emoji}</span>
-                  {t.label}
+                  <span>{t.emoji}</span>{t.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Notes */}
+          {/* Notas */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Notas</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Notas</label>
             <Textarea
-              placeholder="Horarios, precio, recomendaciones…"
+              placeholder="Descripción, horarios, precio..."
               value={form.notes}
-              onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
-              rows={3}
+              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+              className="bg-secondary border-border resize-none"
+              rows={2}
             />
           </div>
 
-          {/* Link */}
+          {/* Dirección */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Enlace (web, reserva…)</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Dirección</label>
             <Input
-              placeholder="https://..."
-              value={form.link}
-              onChange={(e) => setForm((p) => ({ ...p, link: e.target.value }))}
-            />
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Dirección</label>
-            <Input
-              placeholder="ej. 1-2-3 Shinjuku, Tokyo"
+              placeholder="Calle, zona..."
               value={form.address}
-              onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+              className="bg-secondary border-border"
             />
           </div>
 
-          {/* Visibility */}
+          {/* Visibilidad */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">Visibilidad</label>
-            <div className="flex flex-col gap-2">
-              {VISIBILITY_OPTIONS.map((v) => (
-                <label key={v.value} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    value={v.value}
-                    checked={form.visibility === v.value}
-                    onChange={() => setForm((p) => ({ ...p, visibility: v.value, shared_with: [] }))}
-                    className="accent-orange-700"
-                  />
-                  <span className="text-sm">{v.label}</span>
-                </label>
+            <label className="text-xs font-medium text-muted-foreground mb-2 block">Visibilidad</label>
+            <div className="flex gap-2">
+              {VISIBILITY_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setForm(f => ({ ...f, visibility: opt.value }))}
+                  className={`flex-1 py-2 rounded-full border text-xs font-medium transition-all ${
+                    form.visibility === opt.value
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-border text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {opt.label}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Selected users picker */}
-          {form.visibility === 'selected_users' && tripMembers.length > 0 && (
-            <div className="bg-orange-50 rounded-xl p-3 space-y-2">
-              <p className="text-xs font-medium text-orange-700">Selecciona quién puede verlo:</p>
-              {tripMembers.map((email) => (
-                <label key={email} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.shared_with.includes(email)}
-                    onChange={() => toggleMember(email)}
-                    className="accent-orange-700"
-                  />
-                  <span className="text-sm text-foreground">{email}</span>
-                </label>
-              ))}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button
-              onClick={handleSubmit}
-              className="bg-orange-700 hover:bg-orange-800 text-white"
-              disabled={!canSubmit || isPending}
+          {/* Buttons */}
+          <div className="flex gap-3 pt-1">
+            <button
+              onClick={handleClose}
+              className="flex-1 py-2.5 rounded-full border border-border text-sm font-medium text-muted-foreground bg-secondary hover:bg-border transition-colors"
             >
-              {isPending ? 'Guardando…' : 'Guardar Spot'}
-            </Button>
+              Cancelar
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit || isPending}
+              className="flex-2 px-6 py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              {isPending ? 'Guardando...' : 'Guardar spot'}
+            </button>
           </div>
+
         </div>
       </DialogContent>
     </Dialog>
