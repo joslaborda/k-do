@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X } from 'lucide-react';
-import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
 
@@ -80,7 +79,6 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <OfflineIndicator />
       <SyncIndicator />
-      <KeyboardShortcuts />
       {children}
 
       {/* ── Drawer overlay backdrop ─────────────────────────────────────── */}
