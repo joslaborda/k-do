@@ -578,24 +578,30 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
       )}
 
       {/* Embassy */}
-      {data.embassy && (
-        <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu embajada</p>
-          {data.embassy.address && <p className="text-sm text-foreground mb-2">📍 {data.embassy.address}</p>}
-          {data.embassy.phone && (
-            <p className="text-sm text-foreground mb-2">
-              📞 <span className="font-medium">{data.embassy.phone}</span>
-            </p>
-          )}
-          {data.embassy.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {data.embassy.hours}</p>}
-          {data.embassy.web && (
-            <a href={data.embassy.web} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
-              <ExternalLink className="w-3.5 h-3.5" />Web oficial
-            </a>
-          )}
-        </div>
-      )}
+      {data.embassy && (() => {
+        const emb = typeof data.embassy === 'string'
+          ? { phone: data.embassy.match(/\+[\d\s()]+/)?.[0], address: data.embassy.split(':')[0] }
+          : data.embassy;
+        return (
+          <div className="bg-card rounded-2xl border border-border p-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu embajada</p>
+            {emb.address && <p className="text-sm text-foreground mb-2">📍 {emb.address}</p>}
+            {emb.phone && (
+              <a href={`tel:${emb.phone.replace(/\s/g,'')}`} className="flex items-center gap-2 mb-2">
+                <span className="text-sm">📞</span>
+                <span className="text-sm font-semibold text-primary">{emb.phone}</span>
+              </a>
+            )}
+            {emb.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {emb.hours}</p>}
+            {emb.web && (
+              <a href={emb.web} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
+                🌐 Sitio web
+              </a>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Second nationality embassy */}
       {data.secondEmbassy && (

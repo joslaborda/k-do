@@ -1602,9 +1602,12 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                       </div>
                     )}
                     {isAudio(msg) && (
-                      <div className={`flex items-center gap-2 px-3 py-2 rounded-2xl ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm7 10a1 1 0 0 1 2 0c0 5-3.6 9.3-8.5 9.9V23h-1v-2.1C6.6 20.3 3 16 3 11a1 1 0 0 1 2 0c0 4.4 3.6 8 7 8s7-3.6 7-8z"/></svg>
-                        <audio src={msg.file_url} controls className="h-7" style={{maxWidth:120}} />
+                      <div className={`px-3 py-2 rounded-2xl ${me ? 'bg-primary/10 border border-primary/30' : 'bg-secondary border border-border'}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <svg className="w-3.5 h-3.5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm7 10a1 1 0 0 1 2 0c0 5-3.6 9.3-8.5 9.9V23h-1v-2.1C6.6 20.3 3 16 3 11a1 1 0 0 1 2 0c0 4.4 3.6 8 7 8s7-3.6 7-8z"/></svg>
+                          <span className="text-xs font-medium text-primary">Audio</span>
+                        </div>
+                        <audio src={msg.file_url} controls style={{width:'180px',height:'32px'}} />
                       </div>
                     )}
                     {isFile(msg) && (
