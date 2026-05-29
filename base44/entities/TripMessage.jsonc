@@ -32,11 +32,11 @@
     },
     "file_type": {
       "type": "string",
-      "description": "Tipo: image, audio, file"
+      "description": "Tipo MIME del archivo (image, pdf, etc.)"
     },
     "file_name": {
       "type": "string",
-      "description": "Nombre del archivo adjunto"
+      "description": "Nombre original del archivo"
     }
   },
   "required": [

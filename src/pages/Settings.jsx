@@ -180,17 +180,6 @@ function DeleteAccountRow() {
       <div className="flex gap-2">
         <button onClick={() => setConfirm(false)} className="flex-1 py-2 border border-border rounded-xl text-xs text-muted-foreground">Cancelar</button>
         <button onClick={() => base44.auth.logout()} className="flex-1 py-2 bg-red-500 text-white rounded-xl text-xs font-medium">Sí, eliminar</button>
-        {/* ── Guardar — siempre al final ── */}
-        <div className="pt-2 pb-6">
-          {saveMsg && (
-            <p className={`text-xs text-center mb-2 ${saveMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{saveMsg.text}</p>
-          )}
-          <button onClick={handleSave} disabled={saving}
-            className="w-full py-3 bg-primary text-white rounded-full text-sm font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar cambios'}
-          </button>
-        </div>
-
       </div>
     </div>
   );
