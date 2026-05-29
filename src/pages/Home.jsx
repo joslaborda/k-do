@@ -13,7 +13,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock
-} from 'lucide-react';
+, Download, Paperclip, Image, MessageCircle} from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1417,147 +1417,205 @@ function FinishedTab({ trip, cities, expenses, spots }) {
 }
 
 // ── Chat tab ──────────────────────────────────────────────────────────────────
-function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
+function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, trip }) {
+  const { user } = useAuth();
   const [message, setMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
+  const fileInputRef = useRef(null);
   const [sending, setSending] = useState(false);
   const queryClient = useQueryClient();
   const bottomRef = useRef(null);
 
   const { data: messages = [] } = useQuery({
     queryKey: ['tripMessages', tripId],
-    queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }),
+    queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, 'created_date', 100),
     enabled: !!tripId,
-    staleTime: 8000,
-    refetchInterval: 12000,
+    staleTime: 0,
   });
 
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const profileMap = useMemo(() => {
-    const m = {};
-    profiles.forEach(p => { if (p.user_id) m[p.user_id] = p; });
-    return m;
-  }, [profiles]);
-
-  const sorted = useMemo(() =>
-    [...messages].sort((a, b) => new Date(a.created_date) - new Date(b.created_date)),
-    [messages]
-  );
+  useEffect(() => {
+    if (!tripId) return;
+    const unsub = base44.entities.TripMessage.subscribe((event) => {
+      if (event.data?.trip_id === tripId) {
+        queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+      }
+    });
+    return unsub;
+  }, [tripId, queryClient]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [sorted.length]);
+  }, [messages]);
 
-  const sendMessage = async () => {
-    const content = message.trim();
-    if (!content || sending) return;
-    setSending(true);
-    setMessage('');
-    try {
-      await base44.entities.TripMessage.create({
-        trip_id: tripId,
-        user_id: currentUserId,
-        user_email: currentUserEmail,
-        display_name: myProfile?.display_name || currentUserEmail?.split('@')[0] || 'Usuario',
-        content,
-      });
+  const sendMutation = useMutation({
+    mutationFn: (payload) => base44.entities.TripMessage.create({
+      trip_id: tripId,
+      user_id: currentUserId,
+      user_email: currentUserEmail,
+      display_name: myProfile?.display_name || currentUserEmail,
+      avatar_url: myProfile?.avatar_url || null,
+      ...payload,
+    }),
+    onSuccess: () => {
+      setMessage('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
-    } catch {
-      setMessage(content);
-    } finally {
-      setSending(false);
-    }
+    },
+  });
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    if (file.size > 10 * 1024 * 1024) { alert('Máximo 10MB'); return; }
+    const isImage = file.type.startsWith('image/');
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      sendMutation.mutate({
+        content: isImage ? '' : file.name,
+        file_url,
+        file_type: isImage ? 'image' : 'file',
+        file_name: file.name,
+      });
+    } catch (err) {
+      alert('Error al subir: ' + err.message);
+    } finally { setUploading(false); }
   };
 
-  const fmt = (d) => { try { return format(new Date(d), 'HH:mm'); } catch { return ''; } };
-  const fmtDate = (d) => { try { const dt = new Date(d); return isToday(dt) ? 'Hoy' : format(dt, 'dd MMM', { locale: es }); } catch { return ''; } };
+  const sendMessage = () => {
+    if (!message.trim()) return;
+    sendMutation.mutate({ content: message.trim() });
+  };
 
-  const grouped = useMemo(() => {
-    const items = [];
-    let lastDate = null;
-    sorted.forEach(msg => {
-      const dl = fmtDate(msg.created_date);
-      if (dl !== lastDate) { items.push({ type: 'date', label: dl }); lastDate = dl; }
-      items.push({ type: 'msg', msg });
-    });
-    return items;
-  }, [sorted]);
-
+  const isImageMsg = (msg) => msg.file_type === 'image' && msg.file_url;
+  const isFileMsg  = (msg) => msg.file_type === 'file'  && msg.file_url;
   const isMe = (msg) => msg.user_id === currentUserId || msg.user_email === currentUserEmail;
 
   return (
-    <div className="flex flex-col bg-card rounded-2xl border border-border overflow-hidden" style={{ minHeight: '60vh' }}>
-      <div className="flex-1 p-4 overflow-y-auto" style={{ maxHeight: '60vh' }}>
-        {grouped.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-40 gap-3">
-            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
-              <span className="text-2xl">💬</span>
-            </div>
-            <p className="text-sm text-muted-foreground text-center">Empieza la conversación del viaje</p>
-          </div>
-        )}
-        {grouped.map((item, i) => {
-          if (item.type === 'date') return (
-            <div key={i} className="flex items-center gap-2 py-3">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground">{item.label}</span>
-              <div className="flex-1 h-px bg-border" />
-            </div>
-          );
-          const { msg } = item;
-          const me = isMe(msg);
-          const profile = profileMap[msg.user_id];
-          const displayName = msg.display_name || profile?.display_name || (msg.user_email || '').split('@')[0] || 'Usuario';
-          const initials = displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-          return (
-            <div key={msg.id || i} className={`flex items-end gap-2 mb-3 ${me ? 'flex-row-reverse' : 'flex-row'}`}>
-              {!me && (
-                <div className="w-7 h-7 rounded-full bg-accent border border-orange-200 flex items-center justify-center text-xs font-semibold text-primary shrink-0 mb-1">
-                  {initials}
-                </div>
-              )}
-              <div className={`flex flex-col max-w-[75%] ${me ? 'items-end' : 'items-start'}`}>
-                {!me && <p className="text-xs text-muted-foreground mb-1 px-1">{displayName}</p>}
-                <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
-                  me
-                    ? 'bg-primary text-white rounded-br-sm'
-                    : 'bg-secondary text-foreground rounded-bl-sm'
-                }`}>
-                  {msg.content}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 px-1">{fmt(msg.created_date)}</p>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={bottomRef} />
-      </div>
+    <>
+      {/* Lightbox */}
+      {lightbox && (
+        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+          onClick={() => setLightbox(null)}>
+          <button className="absolute top-4 right-4 text-white/70 hover:text-white z-10"
+            onClick={() => setLightbox(null)}>
+            <X className="w-6 h-6" />
+          </button>
+          <a href={lightbox} download
+            className="absolute top-4 right-14 text-white/70 hover:text-white z-10"
+            onClick={e => e.stopPropagation()}>
+            <Download className="w-6 h-6" />
+          </a>
+          <img src={lightbox} alt="Imagen"
+            className="max-w-[92vw] max-h-[88vh] object-contain rounded-xl"
+            onClick={e => e.stopPropagation()} />
+        </div>
+      )}
 
-      <div className="flex gap-2 p-3 border-t border-border bg-secondary/20">
-        <Input
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-          placeholder="Mensaje..."
-          className="flex-1 h-10 text-sm bg-card border-border"
-          disabled={sending}
-        />
-        <Button onClick={sendMessage} disabled={!message.trim() || sending}
-          className="h-10 w-10 p-0 bg-primary hover:bg-primary/90 text-white shrink-0">
-          <Send className="w-4 h-4" />
-        </Button>
+      <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col mx-4" style={{height:'420px'}}>
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {messages.length === 0 && (
+            <div className="text-center text-muted-foreground text-sm py-8">
+              <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              Sin mensajes aún
+            </div>
+          )}
+          {messages.map((msg, idx) => {
+            const msgDate = msg.created_date ? new Date(msg.created_date) : null;
+            const prevDate = idx > 0 && messages[idx-1].created_date ? new Date(messages[idx-1].created_date) : null;
+            const showDate = msgDate && (!prevDate || msgDate.toDateString() !== prevDate.toDateString());
+            const me = isMe(msg);
+            return (
+              <div key={msg.id}>
+                {showDate && msgDate && (
+                  <div className="flex items-center gap-2 my-3">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[10px] text-muted-foreground font-medium px-2">
+                      {msgDate.getDate()} {msgDate.toLocaleString('es', {month:'short'})}
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                )}
+                <div className={`flex items-end gap-2 ${me ? 'flex-row-reverse' : ''}`}>
+                  <div className="flex-shrink-0">
+                    {msg.avatar_url
+                      ? <img src={msg.avatar_url} className="w-6 h-6 rounded-full object-cover" alt="" />
+                      : <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                          {(msg.display_name || msg.user_email || '?')[0].toUpperCase()}
+                        </div>
+                    }
+                  </div>
+                  <div className={`max-w-[72%] flex flex-col gap-0.5 ${me ? 'items-end' : 'items-start'}`}>
+                    <span className={`text-[10px] text-muted-foreground px-1`}>
+                      {me ? 'Tú' : (msg.display_name || msg.user_email)}
+                    </span>
+                    {isImageMsg(msg) && (
+                      <div className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                        style={{maxWidth:200}} onClick={() => setLightbox(msg.file_url)}>
+                        <img src={msg.file_url} alt="foto"
+                          className="w-full object-cover rounded-2xl" style={{maxHeight:200}} />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                      </div>
+                    )}
+                    {isFileMsg(msg) && (
+                      <a href={msg.file_url} download={msg.file_name} target="_blank" rel="noopener noreferrer"
+                        className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
+                        <Paperclip className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate max-w-[120px]">{msg.file_name || 'Archivo'}</span>
+                        <Download className="w-3 h-3 flex-shrink-0" />
+                      </a>
+                    )}
+                    {!isImageMsg(msg) && !isFileMsg(msg) && (
+                      <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${me ? 'bg-primary text-white rounded-br-sm' : 'bg-secondary text-foreground rounded-bl-sm'}`}>
+                        {msg.content}
+                      </div>
+                    )}
+                    <span className="text-[10px] text-muted-foreground px-1">
+                      {msgDate ? `${msgDate.getHours()}:${String(msgDate.getMinutes()).padStart(2,'0')}` : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input bar */}
+        <div className="border-t border-border p-3 flex gap-2 items-center">
+          <input ref={fileInputRef} type="file"
+            accept="image/*,application/pdf,.doc,.docx,.txt"
+            className="hidden" onChange={handleFileChange} />
+          <button onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || sendMutation.isPending}
+            className="w-9 h-9 rounded-xl flex items-center justify-center bg-secondary hover:bg-secondary/80 transition-colors flex-shrink-0 text-muted-foreground">
+            {uploading
+              ? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              : <Paperclip className="w-4 h-4" />}
+          </button>
+          <button onClick={() => { if(fileInputRef.current){ fileInputRef.current.accept='image/*'; fileInputRef.current.click(); setTimeout(()=>{ if(fileInputRef.current) fileInputRef.current.accept='image/*,application/pdf,.doc,.docx,.txt'; },500); }}}
+            disabled={uploading || sendMutation.isPending}
+            className="w-9 h-9 rounded-xl flex items-center justify-center bg-secondary hover:bg-secondary/80 transition-colors flex-shrink-0 text-muted-foreground">
+            <Image className="w-4 h-4" />
+          </button>
+          <Input value={message} onChange={e => setMessage(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }}}
+            placeholder="Escribe un mensaje..."
+            className="flex-1 text-sm bg-card border-border"
+            disabled={sendMutation.isPending} />
+          <Button onClick={sendMessage} disabled={!message.trim() || sendMutation.isPending}
+            className="h-10 w-10 p-0 bg-primary hover:bg-primary/90 text-white shrink-0 rounded-full">
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 
-
-// ── Member avatar row ─────────────────────────────────────────────────────────
 function MemberAvatarRow({ trip, profiles, onInvite, isToday }) {
   const members = (trip?.members || [trip?.created_by]).filter(Boolean);
   const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
