@@ -160,11 +160,11 @@ export default function Layout({ children, currentPageName }) {
                     {/* Single sliding macron */}
                     <div style={{
                       position: 'absolute',
-                      top: 6,
+                      top: 5,
                       left: `calc(${activeIdx * pct}% + ${pct / 2}% - 10px)`,
-                      width: 20, height: 2.5, borderRadius: 2,
+                      width: 20, height: 3, borderRadius: 2,
                       background: '#c2410c',
-                      transition: 'left 0.3s cubic-bezier(.4,0,.2,1)',
+                      transition: 'left 0.28s cubic-bezier(.4,0,.2,1)',
                       pointerEvents: 'none', zIndex: 2,
                     }} />
                     {mainNavItems.map((item) => {
