@@ -1289,6 +1289,46 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
 }
 
 // ── Finished tab ──────────────────────────────────────────────────────────────
+
+function FotosTab({ tripId }) {
+  const { data: messages = [] } = useQuery({
+    queryKey: ['tripMessages', tripId],
+    queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, 'created_date', 200),
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+  const photos = messages.filter(m => m.file_type === 'image' && m.file_url);
+
+  if (photos.length === 0) {
+    return (
+      <div className="text-center py-16 text-muted-foreground px-4">
+        <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
+          <Camera className="w-5 h-5" />
+        </div>
+        <p className="text-sm font-medium text-foreground">Sin fotos aún</p>
+        <p className="text-xs mt-1">Las fotos enviadas en el chat aparecerán aquí</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 pb-6">
+      <div className="grid grid-cols-3 gap-1.5 mt-2">
+        {photos.map((msg, i) => (
+          <div key={i}
+            className="aspect-square rounded-xl overflow-hidden bg-secondary cursor-pointer"
+            onClick={() => window.open(msg.file_url, '_blank')}>
+            <img src={msg.file_url} alt="" className="w-full h-full object-cover" />
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground text-center mt-3">
+        {photos.length} foto{photos.length > 1 ? 's' : ''} del viaje
+      </p>
+    </div>
+  );
+}
+
 function FinishedTab({ trip, cities, expenses, spots }) {
   const totalDays = (trip?.start_date && trip?.end_date)
     ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1
@@ -2127,7 +2167,7 @@ export default function Home() {
       tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
       tabs.push({ key: 'manana', label: 'Mañana' });
       if (isDeparture) tabs.unshift({ key: 'inicio', label: 'Inicio' });
-      tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
+      tabs.push({ key: 'fotos', label: 'Fotos' }); tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
       return tabs;
     }
     if (isDMinus1) {
@@ -2271,6 +2311,9 @@ export default function Home() {
         )}
         {tab === 'manana' && (
           <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} />
+        )}
+        {tab === 'fotos' && tripId && (
+          <FotosTab tripId={tripId} />
         )}
         {tab === 'resumen' && (
           <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />

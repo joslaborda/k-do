@@ -191,6 +191,8 @@ export default function Settings() {
 
   // Notifications prefs (stored in profile)
   const [secondNationality, setSecondNationality] = useState('');
+  const [secondNatQuery, setSecondNatQuery] = useState('');
+  const [showSecondNatList, setShowSecondNatList] = useState(false);
   const [notifInvites,  setNotifInvites]  = useState(true);
   const [notifExpenses, setNotifExpenses] = useState(true);
   const [notifComments, setNotifComments] = useState(false);
@@ -387,11 +389,46 @@ export default function Settings() {
           </div>
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs text-muted-foreground mb-1.5">Segunda nacionalidad <span className="text-muted-foreground/60">· Opcional</span></p>
-            <select value={secondNationality} onChange={e => setSecondNationality(e.target.value)}
-              className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
-              <option value="">Sin segunda nacionalidad</option>
-              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
-            </select>
+            {/* Searchable second nationality */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Buscar país..."
+                value={showSecondNatList ? secondNatQuery : secondNationality || ''}
+                onChange={e => { setSecondNatQuery(e.target.value); setShowSecondNatList(true); }}
+                onFocus={() => { setSecondNatQuery(''); setShowSecondNatList(true); }}
+                onBlur={() => setTimeout(() => setShowSecondNatList(false), 150)}
+                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+              />
+              {secondNationality && !showSecondNatList && (
+                <button onClick={() => { setSecondNationality(''); setSecondNatQuery(''); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              )}
+              {showSecondNatList && (
+                <div className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
+                  <button className="w-full text-left px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
+                    onMouseDown={() => { setSecondNationality(''); setSecondNatQuery(''); setShowSecondNatList(false); }}>
+                    Sin segunda nacionalidad
+                  </button>
+                  {COUNTRIES.filter(c => {
+                    const name = typeof c === 'string' ? c : c.name;
+                    return !secondNatQuery || name.toLowerCase().includes(secondNatQuery.toLowerCase());
+                  }).map(c => {
+                    const name = typeof c === 'string' ? c : c.name;
+                    const flag = typeof c === 'string' ? '' : (c.flag || '');
+                    return (
+                      <button key={name}
+                        className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary flex items-center gap-2"
+                        onMouseDown={() => { setSecondNationality(name); setSecondNatQuery(''); setShowSecondNatList(false); }}>
+                        {flag && <span>{flag}</span>}{name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             {secondNationality && (
               <p className="text-xs text-muted-foreground mt-1.5">En emergencias Kōdo mostrará también la embajada de {secondNationality}</p>
             )}
