@@ -5,7 +5,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, MessageCircle, Paperclip, Image, X, Download, ZoomIn } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { createNotification } from '@/lib/notifications';
 
 export default function TripChat({ tripId, myProfile, trip }) {
@@ -95,7 +96,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
 
     setUploading(true);
     try {
-      const { file_url } = await base44.storage.upload(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       sendMutation.mutate({
         content: isImage ? '' : file.name,
         file_url,
@@ -171,10 +172,23 @@ export default function TripChat({ tripId, myProfile, trip }) {
               Sin mensajes aún. ¡Di algo!
             </div>
           )}
-          {messages.map((msg) => {
+          {messages.map((msg, idx) => {
+            const msgDate = msg.created_date ? new Date(msg.created_date) : null;
+            const prevDate = idx > 0 && messages[idx-1].created_date ? new Date(messages[idx-1].created_date) : null;
+            const showDate = msgDate && (!prevDate || !isSameDay(msgDate, prevDate));
             const isMe = msg.user_id === user?.id;
             return (
-              <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
+              <div key={msg.id}>
+                {showDate && msgDate && (
+                  <div className="flex items-center gap-2 my-3">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[10px] text-muted-foreground font-medium px-2">
+                      {format(msgDate, 'd MMM', { locale: es })}
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                )}
+                <div className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   {msg.avatar_url ? (
@@ -244,6 +258,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                     {format(new Date(msg.created_date), 'HH:mm')}
                   </span>
                 </div>
+                  </div>
               </div>
             );
           })}
