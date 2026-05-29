@@ -2189,7 +2189,10 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
-  const [tab, setTab] = useState(() => 'hoy');
+  const [tab, setTab] = useState(() => {
+    const urlTab = new URLSearchParams(window.location.search).get('tab');
+    return urlTab || 'hoy';
+  });
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -2363,27 +2366,25 @@ export default function Home() {
   const homeTabs = useMemo(() => {
     const tabs = [];
     if (tripFinished) {
-      return [{ key: 'resumen', label: 'Resumen' }, { key: 'fotos', label: 'Fotos' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
+      return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
     }
     if (isDeparture || tripInProgress) {
       tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
       tabs.push({ key: 'manana', label: 'Mañana' });
       if (isDeparture) tabs.unshift({ key: 'inicio', label: 'Inicio' });
-      tabs.push({ key: 'fotos', label: 'Fotos' }); tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
+      tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
       return tabs;
     }
     if (isDMinus1) {
       return [
         { key: 'previaje', label: 'Pre-viaje' },
         { key: 'inicio', label: 'Inicio' },
-        { key: 'fotos', label: 'Fotos' },
         { key: 'chat', label: 'Chat', badge: unreadMessages },
       ];
     }
     // Normal pre-trip
     return [
       { key: 'previaje', label: 'Pre-viaje' },
-      { key: 'fotos', label: 'Fotos' },
       { key: 'chat', label: 'Chat', badge: unreadMessages },
     ];
   }, [tripFinished, isDeparture, tripInProgress, isDMinus1, unreadMessages]);
