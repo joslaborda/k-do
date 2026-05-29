@@ -25,6 +25,18 @@
     "content": {
       "type": "string",
       "description": "Contenido del mensaje"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL del archivo adjunto"
+    },
+    "file_type": {
+      "type": "string",
+      "description": "Tipo: image, audio, file"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Nombre del archivo adjunto"
     }
   },
   "required": [
