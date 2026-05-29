@@ -1284,6 +1284,29 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           </button>
         </div>
       </div>
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 flex items-center justify-center"
+          style={{zIndex: 9999, background: 'rgba(0,0,0,0.92)'}}
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+            onClick={() => setLightbox(null)}>
+            <X className="w-5 h-5 text-white" />
+          </button>
+          <a href={lightbox} download
+            className="absolute top-6 right-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+            onClick={e => e.stopPropagation()}>
+            <Download className="w-5 h-5 text-white" />
+          </a>
+          <img src={lightbox}
+            className="object-contain rounded-2xl"
+            style={{maxWidth:'90vw', maxHeight:'85vh'}}
+            onClick={e => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   );
 }
@@ -1534,22 +1557,6 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
   return (
     <>
-      {/* Lightbox */}
-      {lightbox && (
-        <div className="fixed inset-0 z-[100] bg-black/92 flex items-center justify-center"
-          onClick={() => setLightbox(null)}>
-          <button className="absolute top-5 right-5 text-white/70 hover:text-white" onClick={() => setLightbox(null)}>
-            <X className="w-6 h-6" />
-          </button>
-          <a href={lightbox} download className="absolute top-5 right-16 text-white/70 hover:text-white"
-            onClick={e => e.stopPropagation()}>
-            <Download className="w-6 h-6" />
-          </a>
-          <img src={lightbox} className="max-w-[92vw] max-h-[88vh] object-contain rounded-xl"
-            onClick={e => e.stopPropagation()} />
-        </div>
-      )}
-
       {/* Attach menu */}
       {attachOpen && (
         <div className="fixed inset-0 z-40" onClick={() => setAttachOpen(false)}>
