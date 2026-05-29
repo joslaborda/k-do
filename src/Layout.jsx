@@ -157,15 +157,15 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.page}
                     to={tripUrl(item.page)}
-                    className="flex flex-col items-center flex-1 pt-1 pb-1.5 gap-1"
+                    className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                   >
-                    {/* Macron Ō line ABOVE icon */}
+                    {/* Macron Ō — animated, above icon only */}
                     <div style={{
                       height: 2.5, borderRadius: 2,
                       background: isActive ? '#c2410c' : 'transparent',
-                      width: 20,
+                      width: isActive ? 20 : 0,
+                      transition: 'all 0.25s cubic-bezier(.4,0,.2,1)',
                       marginBottom: 2,
-                      transition: 'background 0.2s',
                     }} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0 transition-colors"
@@ -175,7 +175,6 @@ export default function Layout({ children, currentPageName }) {
                     <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
-                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
@@ -184,9 +183,15 @@ export default function Layout({ children, currentPageName }) {
               {showTripNav && (
                 <button
                   onClick={() => setDrawerOpen(o => !o)}
-                  className="flex flex-col items-center flex-1 pt-1.5 pb-2 gap-1"
+                  className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
                 >
-                  <div style={{height:3,borderRadius:2,background:(drawerOpen||isDrawerPageActive)?'#c2410c':'transparent',width:(drawerOpen||isDrawerPageActive)?20:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
+                    <div style={{
+                      height: 2.5, borderRadius: 2,
+                      background: (drawerOpen||isDrawerPageActive) ? '#c2410c' : 'transparent',
+                      width: (drawerOpen||isDrawerPageActive) ? 20 : 0,
+                      transition: 'all 0.25s cubic-bezier(.4,0,.2,1)',
+                      marginBottom: 2,
+                    }} />
                   <MoreHorizontal
                     className="w-5 h-5 flex-shrink-0 transition-colors"
                     style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}
