@@ -1602,18 +1602,19 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                       </div>
                     )}
                     {isAudio(msg) && (
-                      <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
-                        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-2xl no-underline ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${me ? 'bg-white/20' : 'bg-primary/10'}`}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={me ? 'text-white' : 'text-primary'}>
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold">Audio</p>
-                          <p className={`text-[10px] ${me ? 'text-white/70' : 'text-muted-foreground'}`}>Toca para escuchar</p>
-                        </div>
-                      </a>
+                      <div className="flex flex-col gap-1.5" style={{minWidth: 220}}>
+                        <audio
+                          src={msg.file_url}
+                          controls
+                          preload="none"
+                          style={{
+                            width: '220px',
+                            height: '40px',
+                            borderRadius: '20px',
+                            outline: 'none',
+                          }}
+                        />
+                      </div>
                     )}
                     {isFile(msg) && (
                       <a href={msg.file_url} download={msg.file_name} target="_blank" rel="noopener noreferrer"

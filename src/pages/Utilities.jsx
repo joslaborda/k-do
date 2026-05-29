@@ -580,25 +580,59 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
       {/* Embassy */}
       {data.embassy && (() => {
         const emb = typeof data.embassy === 'string'
-          ? { phone: data.embassy.match(/\+[\d\s()]+/)?.[0], address: data.embassy.split(':')[0] }
+          ? { name: data.embassy.split(':')[0], phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
           : data.embassy;
         return (
-          <div className="bg-card rounded-2xl border border-border p-4">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu embajada</p>
-            {emb.address && <p className="text-sm text-foreground mb-2">📍 {emb.address}</p>}
-            {emb.phone && (
-              <a href={`tel:${emb.phone.replace(/\s/g,'')}`} className="flex items-center gap-2 mb-2">
-                <span className="text-sm">📞</span>
-                <span className="text-sm font-semibold text-primary">{emb.phone}</span>
-              </a>
-            )}
-            {emb.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {emb.hours}</p>}
-            {emb.web && (
-              <a href={emb.web} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
-                🌐 Sitio web
-              </a>
-            )}
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="px-4 py-3 bg-secondary/40 border-b border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">🏛️ Tu embajada</p>
+              {emb.name && <p className="text-sm font-semibold text-foreground mt-0.5">{emb.name}</p>}
+            </div>
+            <div className="divide-y divide-border">
+              {emb.address && (
+                <div className="flex items-start gap-3 px-4 py-3">
+                  <span className="text-base mt-0.5">📍</span>
+                  <p className="text-sm text-foreground leading-snug">{emb.address}</p>
+                </div>
+              )}
+              {emb.phone && (
+                <a href={`tel:${emb.phone.replace(/\s/g,'')}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                  <span className="text-base">📞</span>
+                  <span className="text-sm font-semibold text-primary">{emb.phone}</span>
+                </a>
+              )}
+              {emb.email && (
+                <a href={`mailto:${emb.email}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                  <span className="text-base">✉️</span>
+                  <span className="text-sm text-primary">{emb.email}</span>
+                </a>
+              )}
+              {emb.hours && (
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <span className="text-base">🕐</span>
+                  <p className="text-sm text-muted-foreground">{emb.hours}</p>
+                </div>
+              )}
+              {emb.emergency_phone && (
+                <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                  <span className="text-base">🆘</span>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Emergencias 24h</p>
+                    <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
+                  </div>
+                </a>
+              )}
+              {emb.web && (
+                <a href={emb.web} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                  <span className="text-base">🌐</span>
+                  <span className="text-sm text-primary font-medium">Sitio web oficial</span>
+                </a>
+              )}
+            </div>
           </div>
         );
       })()}
