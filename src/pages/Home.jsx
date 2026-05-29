@@ -367,7 +367,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-4 py-1.5 bg-primary text-white text-sm rounded-xl font-medium disabled:opacity-50"
+                  className="px-4 py-1.5 bg-primary text-white text-sm rounded-full font-medium disabled:opacity-50"
                 >
                   {saving ? '...' : 'Guardar'}
                 </button>
@@ -432,7 +432,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
           {isDoc && item.file_url && (
             <button
               onClick={() => { onClose(); setTimeout(() => onOpenPdf(item.file_url), 50); }}
-              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-medium"
+              className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium"
             >
               Ver documento
             </button>
@@ -442,7 +442,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
               href={`https://maps.google.com/?q=${item.lat},${item.lng}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-medium text-center"
+              className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium text-center"
             >
               Ver en mapa
             </a>
@@ -844,7 +844,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
           {firstDoc.file_url && (
             <div className="px-4 pb-3">
               <Link to={createPageUrl('Documents') + '?trip_id=' + tripId}
-                className="block w-full py-2.5 bg-primary text-white text-sm font-medium text-center rounded-xl">
+                className="block w-full py-2.5 bg-primary text-white text-sm font-medium text-center rounded-full">
                 Ver billete
               </Link>
             </div>

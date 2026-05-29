@@ -353,7 +353,7 @@ export default function Documents() {
             <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
             <p className="text-xs text-muted-foreground mb-5">Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano</p>
             <button onClick={() => setAddOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors">
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary/90 transition-colors">
               <Plus className="w-4 h-4" />Añadir documento
             </button>
           </div>

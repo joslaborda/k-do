@@ -28,7 +28,7 @@ function EmptyState({ onCreateTrip }) {
       <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
       <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
       <button onClick={onCreateTrip}
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm rounded-xl font-medium hover:bg-primary/90 transition-colors">
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
         <Plus className="w-4 h-4" />Nuevo viaje
       </button>
     </div>
@@ -110,7 +110,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
               Cerrar
             </button>
             <button onClick={handleShare}
-              className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold">
+              className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold">
               Compartir ✈️
             </button>
           </div>
@@ -269,7 +269,7 @@ export default function TripsList() {
         <p className="text-5xl mb-4">📧</p>
         <p className="text-lg font-medium mb-2">Verifica tu email</p>
         <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
-        <button className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-medium"
+        <button className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium"
           onClick={() => window.location.reload()}>
           Ya verifiqué ✓
         </button>
@@ -418,7 +418,7 @@ export default function TripsList() {
                 <Link
                   to={createPageUrl('Restaurants') + '?trip_id=' + newTripPopup.trip.id}
                   onClick={() => setNewTripPopup(null)}
-                  className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold text-center"
+                  className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold text-center"
                 >
                   Ver spots →
                 </Link>

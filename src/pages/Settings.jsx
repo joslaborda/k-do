@@ -146,7 +146,7 @@ function PasswordSection({ user }) {
         <div className="flex gap-2">
           <button onClick={() => setOpen(false)} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
           <button onClick={handleSave} disabled={saving}
-            className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40">
+            className="flex-1 py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40">
             {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar'}
           </button>
         </div>
@@ -366,7 +366,7 @@ export default function Settings() {
               <p className={`text-xs mb-2 ${saveMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{saveMsg.text}</p>
             )}
             <button onClick={handleSave} disabled={saving}
-              className="w-full py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">
+              className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar cambios'}
             </button>
           </div>

@@ -233,7 +233,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
         <p className="text-4xl mb-3">💸</p>
         <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
         <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
-        <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
+        <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
           <Plus className="w-4 h-4" />Añadir primer gasto
         </button>
       </div>
@@ -671,7 +671,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
           <div className="flex gap-3 px-5 pb-5 pt-2">
             <button onClick={onClose} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">Cerrar</button>
             <button onClick={() => { onClose(); onEdit(expense); }}
-              className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium">
+              className="flex-1 py-2.5 bg-primary text-white rounded-full text-sm font-medium">
               Editar
             </button>
           </div>

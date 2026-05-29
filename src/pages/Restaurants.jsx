@@ -1218,7 +1218,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
                 onSkip();
               }
             }}
-            className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-semibold transition-colors"
+            className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold transition-colors"
           >
             {selectedDate && isAllowed(selectedDate) ? 'Confirmar' : 'Ahora no'}
           </button>
@@ -1694,7 +1694,7 @@ export default function Restaurants() {
                   <div className="text-center py-8">
                     <p className="text-sm text-muted-foreground mb-3">Sin resultados para "{searchQuery}"</p>
                     <button onClick={() => setShowCreate(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-full font-medium">
                       <Plus className="w-4 h-4" />Crear manualmente
                     </button>
                   </div>
@@ -1752,7 +1752,7 @@ export default function Restaurants() {
                 
                 <p className="text-muted-foreground mb-4">Aún no tienes spots en este viaje</p>
                 <button onClick={() => setShowCreate(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl font-medium">
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-full font-medium">
                   <Plus className="w-4 h-4" />Crear primer spot
                 </button>
               </div>
