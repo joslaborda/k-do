@@ -675,7 +675,19 @@ export default function Utilities() {
   });
 
   const homeCountry = myProfile?.home_country || 'España';
-  const country = activeCity?.country || trip?.country || '';
+  // Use activeCity first, then any city, then trip.country
+  const countryRaw = activeCity?.country || cities?.[0]?.country || trip?.country || '';
+  // Normalize English country names to Spanish for emergency DB lookup
+  const EN_TO_ES_QUICK = {
+    'japan':'Japón','france':'Francia','germany':'Alemania','italy':'Italia',
+    'portugal':'Portugal','united kingdom':'Reino Unido','spain':'España',
+    'united states':'Estados Unidos','usa':'Estados Unidos','mexico':'México',
+    'colombia':'Colombia','peru':'Perú','argentina':'Argentina','brazil':'Brasil',
+    'thailand':'Tailandia','vietnam':'Vietnam','india':'India','china':'China',
+    'south korea':'Corea del Sur','morocco':'Marruecos','turkey':'Turquía',
+    'greece':'Grecia','netherlands':'Países Bajos','switzerland':'Suiza',
+  };
+  const country = EN_TO_ES_QUICK[countryRaw.toLowerCase()] || countryRaw;
   const meta = getCountryMeta(country);
 
   const TABS = [
