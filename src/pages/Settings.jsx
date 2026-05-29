@@ -349,18 +349,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Apariencia */}
-      <div className="bg-white dark:bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-4">
-          <div>
-            <p className="text-sm font-medium text-foreground">Modo oscuro</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Cambia entre tema claro y oscuro</p>
-          </div>
-          <DarkModeToggle />
-        </div>
-      </div>
-
-      {/* Save button */}
+          {/* Save button */}
           <div className="px-4 py-3">
             {saveMsg && (
               <p className={`text-xs mb-2 ${saveMsg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{saveMsg.text}</p>
@@ -369,6 +358,18 @@ export default function Settings() {
               className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">
               {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar cambios'}
             </button>
+          </div>
+        </div>
+
+        {/* ── APARIENCIA ── */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Apariencia</p>
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-4">
+            <div>
+              <p className="text-sm font-medium text-foreground">Modo oscuro</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Se guarda automáticamente</p>
+            </div>
+            <DarkModeToggle />
           </div>
         </div>
 
