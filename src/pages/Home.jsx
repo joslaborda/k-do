@@ -1158,6 +1158,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
 
 // ── Today tab ─────────────────────────────────────────────────────────────────
 function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
+  const [lightbox, setLightbox] = useState(null);
   const queryClient = useQueryClient();
   const today = new Date();
   const todayStr = format(today, 'yyyy-MM-dd');
@@ -1298,28 +1299,25 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           </button>
         </div>
       </div>
-      {/* Lightbox */}
-      {lightbox && (
+      {/* Lightbox — portal to body to escape overflow:hidden */}
+      {lightbox && createPortal(
         <div
-          className="fixed inset-0 flex items-center justify-center"
-          style={{zIndex: 9999, background: 'rgba(0,0,0,0.92)'}}
+          style={{position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.92)', display:'flex', alignItems:'center', justifyContent:'center'}}
           onClick={() => setLightbox(null)}
         >
-          <button
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+          <button style={{position:'absolute',top:20,right:20,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}
             onClick={() => setLightbox(null)}>
-            <X className="w-5 h-5 text-white" />
+            <X size={20} />
           </button>
-          <a href={lightbox} download
-            className="absolute top-6 right-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+          <a href={lightbox} download style={{position:'absolute',top:20,right:70,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',textDecoration:'none'}}
             onClick={e => e.stopPropagation()}>
-            <Download className="w-5 h-5 text-white" />
+            <Download size={20} />
           </a>
-          <img src={lightbox}
-            className="object-contain rounded-2xl"
-            style={{maxWidth:'90vw', maxHeight:'85vh'}}
+          <img src={lightbox} alt="foto"
+            style={{maxWidth:'90vw', maxHeight:'85vh', objectFit:'contain', borderRadius:12}}
             onClick={e => e.stopPropagation()} />
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -1799,6 +1797,26 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
           )}
         </div>
       </div>
+      {/* Lightbox — portal to body */}
+      {lightbox && createPortal(
+        <div
+          style={{position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.92)', display:'flex', alignItems:'center', justifyContent:'center'}}
+          onClick={() => setLightbox(null)}
+        >
+          <button style={{position:'absolute',top:20,right:20,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}
+            onClick={() => setLightbox(null)}>
+            <X size={20} />
+          </button>
+          <a href={lightbox} download style={{position:'absolute',top:20,right:70,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',textDecoration:'none'}}
+            onClick={e => e.stopPropagation()}>
+            <Download size={20} />
+          </a>
+          <img src={lightbox} alt="foto"
+            style={{maxWidth:'90vw', maxHeight:'85vh', objectFit:'contain', borderRadius:12}}
+            onClick={e => e.stopPropagation()} />
+        </div>,
+        document.body
+      )}
     </>
   );
 }
