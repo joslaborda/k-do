@@ -27,7 +27,7 @@ const globalNavItems = [
 ];
 
 const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile'];
-const globalPages     = ['Explore', 'Settings'];
+const globalPages     = ['Explore'];
 const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants',
                          'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
 
