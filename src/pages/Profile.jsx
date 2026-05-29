@@ -487,7 +487,7 @@ export default function Profile() {
           <div className="flex border-t border-border pt-3">
             {[
               { value: tripsCount, label: 'Viajes' },
-              { value: mySpots.length, label: 'Creados' },
+              { value: mySpots.length, label: 'Mis spots' },
               { value: countriesCount, label: 'Países' },
             ].map((stat, i) => (
               <div key={stat.label} className={`flex-1 text-center ${i > 0 ? 'border-l border-border' : ''}`}>

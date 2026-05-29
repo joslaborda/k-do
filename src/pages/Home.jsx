@@ -926,11 +926,10 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
   const allCountries = useMemo(() => {
     const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const seen = {};
-    const s = new Set();
-    // Prefer Spanish names: Japón over Japan
-    const all = [];
-    if (trip?.country) all.push(trip.country);
-    cities.forEach(c => { if (c.country) all.push(c.country); });
+    // Use ONLY city countries - never trip.country which may be in a different language
+    const all = cities.length > 0
+      ? cities.map(c => c.country).filter(Boolean)
+      : [trip?.country].filter(Boolean);
     all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
     return Object.values(seen);
   }, [trip, cities]);
@@ -1331,7 +1330,7 @@ function FinishedTab({ trip, cities, expenses, spots }) {
     <div className="space-y-3">
       <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
         <p className="text-4xl mb-3">🌸</p>
-        <p className="text-sm text-muted-foreground mb-1">Viaje completado</p>
+        <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
         {trip?.start_date && trip?.end_date && (
           <p className="text-xs text-muted-foreground mt-2">

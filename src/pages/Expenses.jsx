@@ -732,24 +732,27 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 // ── Tab: Conversión de divisa ─────────────────────────────────────────────────
-function ConversionTab({ cities, baseCurrency, activeCity }) {
+function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' }) {
   const [amount, setAmount] = useState('1');
-  const [fromCurrency, setFromCurrency] = useState(baseCurrency);
+  const [fromCurrency, setFromCurrency] = useState(homeCurrency || baseCurrency);
   const [rates, setRates] = useState({});
   const [loadingRates, setLoadingRates] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);
 
   // Collect ALL currencies from trip cities, always include baseCurrency
   const allCurrencies = useMemo(() => {
-    const set = new Set([baseCurrency]);
+    const set = new Set();
+    // Always include user's home currency first
+    if (homeCurrency) set.add(homeCurrency);
+    set.add(baseCurrency);
     cities.forEach(c => {
       const meta = getCountryMeta(c.country_code || c.country || '');
       if (meta?.currency) set.add(meta.currency);
     });
-    // Always show at least EUR and USD if trip has no countries yet
-    if (set.size < 2) { set.add('EUR'); set.add('USD'); }
+    // Always show at least EUR and USD
+    set.add('EUR'); set.add('USD');
     return Array.from(set);
-  }, [cities, baseCurrency]);
+  }, [cities, homeCurrency, baseCurrency]);
 
   const activeMeta = getCountryMeta(activeCity?.country_code || activeCity?.country || '');
   const activeCurrency = activeMeta?.currency;
@@ -772,7 +775,7 @@ function ConversionTab({ cities, baseCurrency, activeCity }) {
   }, [fromCurrency, targetCurrencies.join(',')]);
 
   // Reset fromCurrency if baseCurrency changes
-  useEffect(() => { setFromCurrency(baseCurrency); }, [baseCurrency]);
+  useEffect(() => { setFromCurrency(homeCurrency || baseCurrency); }, [homeCurrency, baseCurrency]);
 
   const numeric = parseFloat(amount) || 0;
 
@@ -1053,6 +1056,8 @@ export default function Expenses() {
             cities={cities}
             baseCurrency={baseCurrency}
             activeCity={activeCity}
+            homeCountry={myProfile_?.home_country}
+            homeCurrency={myProfile_?.home_currency || 'EUR'}
           />
         )}
       </div>
