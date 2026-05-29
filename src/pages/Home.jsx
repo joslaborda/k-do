@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -1315,6 +1316,8 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
 // ── Finished tab ──────────────────────────────────────────────────────────────
 
 function FotosTab({ tripId }) {
+  const [lbUrl, setLbUrl] = useState(null);
+  const [lbIdx, setLbIdx] = useState(0);
   const { data: messages = [] } = useQuery({
     queryKey: ['tripMessages', tripId],
     queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, 'created_date', 200),
@@ -1322,6 +1325,22 @@ function FotosTab({ tripId }) {
     staleTime: 60000,
   });
   const photos = messages.filter(m => m.file_type === 'image' && m.file_url);
+
+  const open = (i) => { setLbIdx(i); setLbUrl(photos[i].file_url); };
+  const close = () => setLbUrl(null);
+  const prev = (e) => { e.stopPropagation(); const i = lbIdx - 1; setLbIdx(i); setLbUrl(photos[i].file_url); };
+  const next = (e) => { e.stopPropagation(); const i = lbIdx + 1; setLbIdx(i); setLbUrl(photos[i].file_url); };
+
+  useEffect(() => {
+    if (!lbUrl) return;
+    const h = (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft' && lbIdx > 0) { const i = lbIdx-1; setLbIdx(i); setLbUrl(photos[i].file_url); }
+      if (e.key === 'ArrowRight' && lbIdx < photos.length-1) { const i = lbIdx+1; setLbIdx(i); setLbUrl(photos[i].file_url); }
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [lbUrl, lbIdx, photos]);
 
   if (photos.length === 0) {
     return (
@@ -1336,20 +1355,46 @@ function FotosTab({ tripId }) {
   }
 
   return (
-    <div className="px-4 pb-6">
-      <div className="grid grid-cols-3 gap-1.5 mt-2">
-        {photos.map((msg, i) => (
-          <div key={i}
-            className="aspect-square rounded-xl overflow-hidden bg-secondary cursor-pointer"
-            onClick={() => window.open(msg.file_url, '_blank')}>
-            <img src={msg.file_url} alt="" className="w-full h-full object-cover" />
+    <>
+      {lbUrl && typeof document !== 'undefined' && createPortal(
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.93)',display:'flex',alignItems:'center',justifyContent:'center'}} onClick={close}>
+          <button onClick={close} style={{position:'absolute',top:20,right:20,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <X size={20} />
+          </button>
+          <a href={lbUrl} download onClick={e=>e.stopPropagation()} style={{position:'absolute',top:20,right:70,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',textDecoration:'none'}}>
+            <Download size={20} />
+          </a>
+          {lbIdx > 0 && (
+            <button onClick={prev} style={{position:'absolute',left:16,top:'50%',transform:'translateY(-50%)',width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <ArrowRight size={20} style={{transform:'rotate(180deg)'}} />
+            </button>
+          )}
+          {lbIdx < photos.length-1 && (
+            <button onClick={next} style={{position:'absolute',right:16,top:'50%',transform:'translateY(-50%)',width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <ArrowRight size={20} />
+            </button>
+          )}
+          <img src={lbUrl} alt="foto" onClick={e=>e.stopPropagation()} style={{maxWidth:'90vw',maxHeight:'85vh',objectFit:'contain',borderRadius:12}} />
+          <div style={{position:'absolute',bottom:20,left:0,right:0,textAlign:'center',color:'rgba(255,255,255,0.5)',fontSize:13}}>
+            {lbIdx+1} / {photos.length}
           </div>
-        ))}
+        </div>,
+        document.body
+      )}
+      <div className="pb-6">
+        <div className="grid grid-cols-3 gap-1 mt-1">
+          {photos.map((msg, i) => (
+            <div key={i} className="aspect-square overflow-hidden bg-secondary cursor-pointer relative group" onClick={() => open(i)}>
+              <img src={msg.file_url} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          {photos.length} foto{photos.length > 1 ? 's' : ''} · toca para ampliar
+        </p>
       </div>
-      <p className="text-xs text-muted-foreground text-center mt-3">
-        {photos.length} foto{photos.length > 1 ? 's' : ''} del viaje
-      </p>
-    </div>
+    </>
   );
 }
 
@@ -2318,7 +2363,7 @@ export default function Home() {
   const homeTabs = useMemo(() => {
     const tabs = [];
     if (tripFinished) {
-      return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
+      return [{ key: 'resumen', label: 'Resumen' }, { key: 'fotos', label: 'Fotos' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
     }
     if (isDeparture || tripInProgress) {
       tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
@@ -2331,12 +2376,14 @@ export default function Home() {
       return [
         { key: 'previaje', label: 'Pre-viaje' },
         { key: 'inicio', label: 'Inicio' },
+        { key: 'fotos', label: 'Fotos' },
         { key: 'chat', label: 'Chat', badge: unreadMessages },
       ];
     }
     // Normal pre-trip
     return [
       { key: 'previaje', label: 'Pre-viaje' },
+      { key: 'fotos', label: 'Fotos' },
       { key: 'chat', label: 'Chat', badge: unreadMessages },
     ];
   }, [tripFinished, isDeparture, tripInProgress, isDMinus1, unreadMessages]);
