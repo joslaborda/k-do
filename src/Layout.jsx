@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X } from 'lucide-react';
+import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X, Camera } from 'lucide-react';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
 
@@ -15,6 +15,7 @@ const mainNavItems = [
 
 // ── Drawer: el resto de páginas del viaje ─────────────────────────────────────
 const drawerItems = [
+  { name: 'Fotos',     page: 'Home',       icon: Camera,   sub: 'Fotos del viaje', fotosTab: true },
   { name: 'Ruta',      page: 'Cities',     icon: MapPin,   sub: 'Ciudades e itinerario' },
   { name: 'Traducir',  page: 'Translator', icon: Languages, sub: 'Voz, texto e imagen'  },
   { name: 'Utilidades',page: 'Utilities',  icon: Info,     sub: 'Embajadas, emergencias'},
@@ -113,7 +114,7 @@ export default function Layout({ children, currentPageName }) {
               return (
                 <Link
                   key={item.page}
-                  to={tripUrl(item.page)}
+                  to={item.fotosTab ? tripUrl('Home') + '&tab=fotos' : tripUrl(item.page)}
                   onClick={() => setDrawerOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0 transition-colors ${
                     isActive ? 'bg-primary/5' : 'hover:bg-secondary/40'
