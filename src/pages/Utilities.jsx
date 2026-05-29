@@ -636,6 +636,15 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
           </div>
         );
       })()}
+      {!data.embassy && (
+        <div className="bg-card rounded-2xl border border-border p-4 text-center">
+          <p className="text-sm text-muted-foreground">No tenemos datos de tu embajada en este país todavía</p>
+          <a href="https://www.exteriores.gob.es/es/EmbajadasConsulados" target="_blank" rel="noopener noreferrer"
+            className="text-xs text-primary font-medium mt-1 inline-block">
+            Buscar en exteriores.gob.es →
+          </a>
+        </div>
+      )}
 
       {/* Second nationality embassy */}
       {data.secondEmbassy && (
