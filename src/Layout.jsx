@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X } from 'lucide-react';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import OfflineIndicator from '@/components/OfflineIndicator';
-import DarkModeToggle from '@/components/DarkModeToggle';
 import SyncIndicator from '@/components/SyncIndicator';
 
 // ── Nav principal del viaje — los 4 que más se usan ──────────────────────────
@@ -31,7 +30,7 @@ const globalNavItems = [
 const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile'];
 const globalPages     = ['Explore', 'Settings'];
 const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants',
-                         'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary', 'Calendar'];
+                         'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
 
 export default function Layout({ children, currentPageName }) {
   const getTripId = () => { const p = new URLSearchParams(window.location.search); return p.get('trip_id') || p.get('id') || null; };
@@ -80,7 +79,6 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <OfflineIndicator />
-      <DarkModeToggle />
       <SyncIndicator />
       <KeyboardShortcuts />
       {children}
@@ -159,8 +157,16 @@ export default function Layout({ children, currentPageName }) {
                   <Link
                     key={item.page}
                     to={tripUrl(item.page)}
-                    className="flex flex-col items-center flex-1 pt-2 pb-1.5 gap-1"
+                    className="flex flex-col items-center flex-1 pt-1 pb-1.5 gap-1"
                   >
+                    {/* Macron Ō line ABOVE icon */}
+                    <div style={{
+                      height: 2.5, borderRadius: 2,
+                      background: isActive ? '#c2410c' : 'transparent',
+                      width: 20,
+                      marginBottom: 2,
+                      transition: 'background 0.2s',
+                    }} />
                     <item.icon
                       className="w-5 h-5 flex-shrink-0 transition-colors"
                       style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
