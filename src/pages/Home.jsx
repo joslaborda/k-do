@@ -1500,8 +1500,10 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       audioChunksRef.current = [];
       mr.ondataavailable = e => audioChunksRef.current.push(e.data);
       mr.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const file = new File([blob], 'audio.webm', { type: 'audio/webm' });
+        const mimeType = mr.mimeType || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        const file = new File([blob], `audio_${Date.now()}.${ext}`, { type: mimeType });
         stream.getTracks().forEach(t => t.stop());
         await handleUpload(file);
       };
@@ -1527,7 +1529,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
   const isMe = (msg) => msg.user_id === currentUserId || msg.user_email === currentUserEmail;
   const isImage = (msg) => (msg.file_type === 'image' || msg.file_type?.startsWith?.('image/')) && msg.file_url;
-  const isAudio = (msg) => (msg.file_type === 'audio' || msg.file_type?.startsWith?.('audio/')) && msg.file_url;
+  const isAudio = (msg) => msg.file_url && (msg.file_type === 'audio' || (msg.file_type && msg.file_type.startsWith('audio/')));
   const isFile  = (msg) => msg.file_url && !isImage(msg) && !isAudio(msg);
 
   return (

@@ -360,12 +360,7 @@ export default function TripsList() {
                     {pastTrips.map(({ t, cities }) => (
                       <div key={t.id}>
                         <TripCard trip={t} cities={cities} />
-                        <button
-                          onClick={() => setSummaryTrip({ trip: t, cities })}
-                          className="w-full mt-1 mb-2 py-2 text-xs text-muted-foreground hover:text-primary transition-colors font-medium"
-                        >
-                          Ver resumen y compartir →
-                        </button>
+
                       </div>
                     ))}
                   </div>
