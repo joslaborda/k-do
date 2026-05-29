@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import CountryInput from '@/components/trip/CountryInput';
@@ -26,6 +27,19 @@ import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
 import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, AlertTriangle, Star } from '@/lib/icons';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+
+/* Tab slide animation injected once */
+if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-style')) {
+  const s = document.createElement('style');
+  s.id = 'kodo-tab-slide-style';
+  s.textContent = `
+    @keyframes slideInRight { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideInLeft  { from { transform: translateX(-40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .kodo-slide-right { animation: slideInRight 0.22s cubic-bezier(.25,.46,.45,.94) both; }
+    .kodo-slide-left  { animation: slideInLeft  0.22s cubic-bezier(.25,.46,.45,.94) both; }
+  `;
+  document.head.appendChild(s);
+}
 
 function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
   const containerRef = useRef(null);
@@ -1320,7 +1334,27 @@ function FotosTab({ tripId }) {
     enabled: !!tripId,
     staleTime: 60000,
   });
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+  const [lightboxIdx, setLightboxIdx] = useState(0);
+
   const photos = messages.filter(m => m.file_type === 'image' && m.file_url);
+
+  const openPhoto = (idx) => { setLightboxIdx(idx); setLightboxUrl(photos[idx].file_url); };
+  const closeLightbox = () => setLightboxUrl(null);
+  const goPrev = (e) => { e.stopPropagation(); const i = Math.max(0, lightboxIdx - 1); setLightboxIdx(i); setLightboxUrl(photos[i].file_url); };
+  const goNext = (e) => { e.stopPropagation(); const i = Math.min(photos.length - 1, lightboxIdx + 1); setLightboxIdx(i); setLightboxUrl(photos[i].file_url); };
+
+  // Close on Escape, arrow keys
+  useEffect(() => {
+    if (!lightboxUrl) return;
+    const handler = (e) => {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft' && lightboxIdx > 0) { const i = lightboxIdx - 1; setLightboxIdx(i); setLightboxUrl(photos[i].file_url); }
+      if (e.key === 'ArrowRight' && lightboxIdx < photos.length - 1) { const i = lightboxIdx + 1; setLightboxIdx(i); setLightboxUrl(photos[i].file_url); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [lightboxUrl, lightboxIdx, photos]);
 
   if (photos.length === 0) {
     return (
@@ -1335,20 +1369,76 @@ function FotosTab({ tripId }) {
   }
 
   return (
-    <div className="px-4 pb-6">
-      <div className="grid grid-cols-3 gap-1.5 mt-2">
-        {photos.map((msg, i) => (
-          <div key={i}
-            className="aspect-square rounded-xl overflow-hidden bg-secondary cursor-pointer"
-            onClick={() => window.open(msg.file_url, '_blank')}>
-            <img src={msg.file_url} alt="" className="w-full h-full object-cover" />
-          </div>
-        ))}
+    <>
+      {/* Lightbox — mounted in document.body to escape overflow:hidden parents */}
+      {lightboxUrl && typeof document !== 'undefined' && (
+        createPortal(
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.93)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={closeLightbox}
+            >
+              {/* Close */}
+              <button
+                style={{ position: 'absolute', top: 20, right: 20, width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}
+                onClick={closeLightbox}
+              >
+                <X size={20} />
+              </button>
+              {/* Download */}
+              <a
+                href={lightboxUrl} download
+                style={{ position: 'absolute', top: 20, right: 70, width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', textDecoration: 'none' }}
+                onClick={e => e.stopPropagation()}
+              >
+                <Download size={20} />
+              </a>
+              {/* Prev */}
+              {lightboxIdx > 0 && (
+                <button onClick={goPrev} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ArrowRight size={20} style={{ transform: 'rotate(180deg)' }} />
+                </button>
+              )}
+              {/* Next */}
+              {lightboxIdx < photos.length - 1 && (
+                <button onClick={goNext} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ArrowRight size={20} />
+                </button>
+              )}
+              {/* Image */}
+              <img
+                src={lightboxUrl}
+                alt="foto"
+                onClick={e => e.stopPropagation()}
+                style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: 12 }}
+              />
+              {/* Counter */}
+              <div style={{ position: 'absolute', bottom: 20, left: 0, right: 0, textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
+                {lightboxIdx + 1} / {photos.length}
+              </div>
+            </div>,
+            document.body
+        )
+      )}
+
+      <div className="pb-6">
+        <div className="grid grid-cols-3 gap-1 mt-1">
+          {photos.map((msg, i) => (
+            <div key={i}
+              className="aspect-square overflow-hidden bg-secondary cursor-pointer relative group"
+              style={{ borderRadius: i === 0 ? '12px 0 0 0' : i === 2 ? '0 12px 0 0' : 0 }}
+              onClick={() => openPhoto(i)}>
+              <img src={msg.file_url} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                <Download className="w-5 h-5 text-white opacity-0 group-hover:opacity-80 transition-opacity" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          {photos.length} foto{photos.length > 1 ? 's' : ''} del viaje · toca para ampliar
+        </p>
       </div>
-      <p className="text-xs text-muted-foreground text-center mt-3">
-        {photos.length} foto{photos.length > 1 ? 's' : ''} del viaje
-      </p>
-    </div>
+    </>
   );
 }
 
@@ -2144,6 +2234,7 @@ export default function Home() {
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const [tab, setTab] = useState(() => 'hoy');
+  const [tabDirection, setTabDirection] = useState(0); // -1 left, 1 right
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -2152,6 +2243,10 @@ export default function Home() {
   const [chatLastRead, setChatLastRead] = useState(new Date());
 
   const handleTabChange = (key) => {
+    const keys = homeTabs.map(t => t.key);
+    const oldIdx = keys.indexOf(tab);
+    const newIdx = keys.indexOf(key);
+    setTabDirection(newIdx > oldIdx ? 1 : -1);
     setTab(key);
     if (key === 'chat') setChatLastRead(new Date());
   };
@@ -2317,7 +2412,7 @@ export default function Home() {
   const homeTabs = useMemo(() => {
     const tabs = [];
     if (tripFinished) {
-      return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
+      return [{ key: 'resumen', label: 'Resumen' }, { key: 'fotos', label: 'Fotos' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
     }
     if (isDeparture || tripInProgress) {
       tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
@@ -2445,6 +2540,7 @@ export default function Home() {
       <div className="max-w-3xl mx-auto px-5 pt-5 pb-2 space-y-3">
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} onUrgentCount={setUrgentCount} />
+        <div key={tab} className={tabDirection >= 0 ? 'kodo-slide-right' : 'kodo-slide-left'}>
 
         {tab === 'previaje' && (
           <PreTripTab
@@ -2474,6 +2570,9 @@ export default function Home() {
         {tab === 'resumen' && (
           <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />
         )}
+        {tab === 'fotos' && tripId && (
+          <FotosTab tripId={tripId} />
+        )}
         {tab === 'chat' && (
           <ChatTab
             tripId={tripId}
@@ -2482,6 +2581,7 @@ export default function Home() {
             myProfile={myProfile}
           />
         )}
+        </div>
       </div>
 
       {/* Settings dialog */}
