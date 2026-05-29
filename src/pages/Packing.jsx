@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, Info, ChevronDown, ChevronRight, Plug, Syringe, AlertTriangle, CheckCircle2, MoreHorizontal } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getSmartPackingList } from '@/lib/packingDB';
+import { normalizeCountry } from '@/lib/countryConfig';
 
 const CATEGORIES = [
   { value: 'personal',    label: 'Personal',    icon: (c) => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
@@ -22,7 +23,7 @@ export default function Packing() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
   const { trip } = useTripContext(tripId);
-  const country = trip?.country || '';
+  const country = normalizeCountry(trip?.country || '');
   const { items: suggestedItems, requirements } = getSmartPackingList(country);
 
   const [showReqs, setShowReqs] = useState(true);
