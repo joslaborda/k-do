@@ -148,20 +148,24 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
           <div className="mx-3 mb-3">
-            <nav className="bg-card border border-border rounded-2xl px-1 flex items-center justify-around shadow-sm dark:shadow-none relative overflow-hidden">
+            <nav className="bg-card border border-border rounded-2xl flex items-center shadow-sm dark:shadow-none relative overflow-hidden">
               {showTripNav && (() => {
                 const allItems = [...mainNavItems, { page: '__mas__' }];
                 const activeIdx = (drawerOpen || isDrawerPageActive)
                   ? allItems.length - 1
                   : Math.max(0, allItems.findIndex(i => i.page === currentPageName));
-                const pct = 100 / allItems.length;
+                // Each item is flex-1 (equal width). Nav has px-1 padding.
+                // Center of item[i] = padding_left + (i + 0.5) * itemWidth
+                // We express as % of total nav width for CSS
+                const n = allItems.length;
+                const macronLeft = `calc(${activeIdx * (100/n)}% + ${100/(n*2)}% - 10px)`;
                 return (
                   <>
-                    {/* Single sliding macron */}
+                    {/* Single sliding macron — centered on each flex-1 item */}
                     <div style={{
                       position: 'absolute',
                       top: 5,
-                      left: `calc(${activeIdx * pct}% + ${pct / 2}% - 10px)`,
+                      left: macronLeft,
                       width: 20, height: 3, borderRadius: 2,
                       background: '#c2410c',
                       transition: 'left 0.28s cubic-bezier(.4,0,.2,1)',
