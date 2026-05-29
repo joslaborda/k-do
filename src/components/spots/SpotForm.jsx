@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Camera, X, Loader2 } from 'lucide-react';
+import { Camera, Image, X, Loader2 } from 'lucide-react';
 
 const TYPES = [
   { value: 'food',      label: 'Comida',     emoji: '🍜' },
@@ -73,6 +73,7 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-2 block">Foto (opcional)</label>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+          <input id="spot-camera-input" type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
             {form.image_url ? (
               <div className="relative rounded-xl overflow-hidden aspect-video bg-secondary">
                 <img src={form.image_url} alt="foto spot" className="w-full h-full object-cover" />
@@ -84,14 +85,24 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="w-full border border-dashed border-border rounded-xl py-6 flex flex-col items-center gap-2 text-muted-foreground hover:bg-secondary/50 transition-colors"
-              >
-                {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-                <span className="text-xs">{uploading ? 'Subiendo...' : 'Añadir foto'}</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex-1 border border-dashed border-border rounded-xl py-5 flex flex-col items-center gap-1.5 text-muted-foreground hover:bg-secondary/50 transition-colors"
+                >
+                  {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Image className="w-5 h-5" />}
+                  <span className="text-xs">Galería</span>
+                </button>
+                <button
+                  onClick={() => document.getElementById('spot-camera-input')?.click()}
+                  disabled={uploading}
+                  className="flex-1 border border-dashed border-border rounded-xl py-5 flex flex-col items-center gap-1.5 text-muted-foreground hover:bg-secondary/50 transition-colors"
+                >
+                  <Camera className="w-5 h-5" />
+                  <span className="text-xs">Cámara</span>
+                </button>
+              </div>
             )}
           </div>
 
