@@ -380,11 +380,91 @@ export function getCountryMeta(countryLabelOrCode) {
   return { ...DEFAULT_META };
 }
 
+// Exhaustive English → Spanish map (OSM returns English country names)
+const EN_TO_ES = {
+  // Europe
+  'Spain':'España','France':'Francia','Germany':'Alemania','Italy':'Italia',
+  'Portugal':'Portugal','United Kingdom':'Reino Unido','Great Britain':'Reino Unido',
+  'England':'Reino Unido','Scotland':'Reino Unido','Wales':'Reino Unido',
+  'Netherlands':'Países Bajos','Holland':'Países Bajos','Belgium':'Bélgica',
+  'Switzerland':'Suiza','Austria':'Austria','Sweden':'Suecia','Norway':'Noruega',
+  'Denmark':'Dinamarca','Finland':'Finlandia','Greece':'Grecia','Croatia':'Croacia',
+  'Czech Republic':'República Checa','Czechia':'República Checa','Poland':'Polonia',
+  'Hungary':'Hungría','Romania':'Rumanía','Bulgaria':'Bulgaria','Slovakia':'Eslovaquia',
+  'Slovenia':'Eslovenia','Serbia':'Serbia','Montenegro':'Montenegro',
+  'Bosnia and Herzegovina':'Bosnia','Bosnia & Herzegovina':'Bosnia',
+  'Albania':'Albania','North Macedonia':'Macedonia','Kosovo':'Kosovo',
+  'Estonia':'Estonia','Latvia':'Letonia','Lithuania':'Lituania','Iceland':'Islandia',
+  'Ireland':'Irlanda','Luxembourg':'Luxemburgo','Malta':'Malta','Cyprus':'Chipre',
+  'Turkey':'Turquía','Russia':'Rusia','Ukraine':'Ucrania','Belarus':'Bielorrusia',
+  'Moldova':'Moldova','Georgia':'Georgia','Armenia':'Armenia','Azerbaijan':'Azerbaiyán',
+  'Kazakhstan':'Kazajistán','Uzbekistan':'Uzbekistán','Kyrgyzstan':'Kirguistán',
+  'Tajikistan':'Tayikistán','Turkmenistan':'Turkmenistán',
+  'Monaco':'Mónaco','Andorra':'Andorra','San Marino':'San Marino',
+  'Liechtenstein':'Liechtenstein',
+  // Americas
+  'United States':'Estados Unidos','United States of America':'Estados Unidos',
+  'USA':'Estados Unidos','US':'Estados Unidos',
+  'Canada':'Canadá','Mexico':'México','Brazil':'Brasil','Argentina':'Argentina',
+  'Colombia':'Colombia','Chile':'Chile','Peru':'Perú','Venezuela':'Venezuela',
+  'Ecuador':'Ecuador','Bolivia':'Bolivia','Paraguay':'Paraguay','Uruguay':'Uruguay',
+  'Cuba':'Cuba','Dominican Republic':'República Dominicana',
+  'Costa Rica':'Costa Rica','Panama':'Panamá','Guatemala':'Guatemala',
+  'Honduras':'Honduras','El Salvador':'El Salvador','Nicaragua':'Nicaragua',
+  'Belize':'Belice','Jamaica':'Jamaica','Haiti':'Haití',
+  'Trinidad and Tobago':'Trinidad y Tobago','Barbados':'Barbados',
+  'Bahamas':'Bahamas','Puerto Rico':'Puerto Rico','Guyana':'Guyana',
+  'Suriname':'Surinam',
+  // Asia
+  'Japan':'Japón','China':'China','South Korea':'Corea del Sur','Korea':'Corea del Sur',
+  'North Korea':'Corea del Norte','Thailand':'Tailandia','Vietnam':'Vietnam',
+  'Indonesia':'Indonesia','Philippines':'Filipinas','Malaysia':'Malasia',
+  'Singapore':'Singapur','Myanmar':'Myanmar','Burma':'Myanmar','Cambodia':'Camboya',
+  'Laos':'Laos','India':'India','Nepal':'Nepal','Pakistan':'Pakistán',
+  'Bangladesh':'Bangladés','Sri Lanka':'Sri Lanka','Maldives':'Maldivas',
+  'Afghanistan':'Afganistán','Iran':'Irán','Irak':'Irak','Iraq':'Irak',
+  'Saudi Arabia':'Arabia Saudí','Saudi':'Arabia Saudí',
+  'United Arab Emirates':'Emiratos Árabes','UAE':'Emiratos Árabes',
+  'Qatar':'Qatar','Kuwait':'Kuwait','Bahrain':'Baréin','Oman':'Omán',
+  'Yemen':'Yemen','Jordan':'Jordania','Lebanon':'Líbano','Syria':'Siria',
+  'Israel':'Israel','Palestine':'Palestina','Taiwan':'Taiwán',
+  'Hong Kong':'Hong Kong','Macau':'Macao','Mongolia':'Mongolia','Bhutan':'Bután',
+  'Brunei':'Brunéi','Timor-Leste':'Timor Oriental',
+  // Africa
+  'Morocco':'Marruecos','Egypt':'Egipto','Tunisia':'Túnez','Algeria':'Argelia',
+  'Libya':'Libia','South Africa':'Sudáfrica','Kenya':'Kenia','Tanzania':'Tanzania',
+  'Ethiopia':'Etiopía','Nigeria':'Nigeria','Ghana':'Ghana','Senegal':'Senegal',
+  "Ivory Coast":"Costa de Marfil","Côte d'Ivoire":"Costa de Marfil",
+  'Cameroon':'Camerún','Rwanda':'Ruanda','Uganda':'Uganda',
+  'Mozambique':'Mozambique','Zimbabwe':'Zimbabue','Zambia':'Zambia',
+  'Botswana':'Botsuana','Namibia':'Namibia','Madagascar':'Madagascar',
+  'Mauritius':'Mauricio','Seychelles':'Seychelles','Cape Verde':'Cabo Verde',
+  'Sudan':'Sudán','South Sudan':'Sudán del Sur','Somalia':'Somalia',
+  'Mali':'Malí','Niger':'Níger','Chad':'Chad',
+  'Democratic Republic of the Congo':'República Democrática del Congo',
+  'Republic of the Congo':'República del Congo','Congo':'Congo',
+  'Angola':'Angola','Gabon':'Gabón','Equatorial Guinea':'Guinea Ecuatorial',
+  'Gambia':'Gambia','The Gambia':'Gambia','Eswatini':'Suazilandia',
+  'Swaziland':'Suazilandia',
+  // Oceania
+  'Australia':'Australia','New Zealand':'Nueva Zelanda','Fiji':'Fiyi',
+  'Papua New Guinea':'Papúa Nueva Guinea','Samoa':'Samoa','Tonga':'Tonga',
+  'Vanuatu':'Vanuatu',
+};
+
 export function normalizeCountry(input) {
   if (!input) return '';
-  const n = normalizeText(input);
+  const trimmed = input.trim();
+  // 1. Direct English match
+  if (EN_TO_ES[trimmed]) return EN_TO_ES[trimmed];
+  // 2. Case-insensitive English match
+  const lc = trimmed.toLowerCase();
+  const engMatch = Object.keys(EN_TO_ES).find(k => k.toLowerCase() === lc);
+  if (engMatch) return EN_TO_ES[engMatch];
+  // 3. Direct Spanish match (already correct)
+  const n = normalizeText(trimmed);
   const found = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
-  return found || input.trim();
+  return found || trimmed;
 }
 
 // ─── TOP CITIES ───────────────────────────────────────────────────────────────
