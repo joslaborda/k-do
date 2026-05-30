@@ -23,16 +23,32 @@ const VISIBILITY_OPTIONS = [
 
 const DEFAULT_FORM = {
   title: '', type: 'food', notes: '', link: '', address: '',
-  visibility: 'trip_members', shared_with: [], image_url: null,
+  visibility: 'trip_members', shared_with: [], image_url: null, tags: [],
 };
 
 export default function SpotForm({ open, onOpenChange, onSubmit, isPending, tripMembers = [] }) {
   const [form, setForm] = useState({ ...DEFAULT_FORM });
   const [uploading, setUploading] = useState(false);
+  const [tagInput, setTagInput] = useState('');
   const fileInputRef = useRef(null);
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
+      e.preventDefault();
+      const tag = tagInput.replace(/^#/, '').trim().toLowerCase().replace(/\s+/g, '_');
+      if (tag && !form.tags.includes(tag)) {
+        setForm(f => ({ ...f, tags: [...f.tags, tag] }));
+      }
+      setTagInput('');
+    }
+    if (e.key === 'Backspace' && !tagInput && form.tags.length > 0) {
+      setForm(f => ({ ...f, tags: f.tags.slice(0, -1) }));
+    }
+  };
 
   const handleClose = () => {
     setForm({ ...DEFAULT_FORM });
+    setTagInput('');
     onOpenChange(false);
   };
 
@@ -178,6 +194,31 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Hashtags */}
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Hashtags</label>
+            <div className={`flex flex-wrap gap-1.5 items-center min-h-[40px] px-3 py-2 rounded-xl border bg-secondary border-border ${tagInput || form.tags.length > 0 ? 'border-primary/30' : ''}`}>
+              {form.tags.map(tag => (
+                <span key={tag} className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                  #{tag}
+                  <button
+                    onClick={() => setForm(f => ({ ...f, tags: f.tags.filter(t => t !== tag) }))}
+                    className="text-primary/60 hover:text-primary leading-none ml-0.5"
+                  >×</button>
+                </span>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder={form.tags.length === 0 ? "ramen, mirador, imprescindible..." : ""}
+                className="flex-1 min-w-[80px] bg-transparent text-sm outline-none text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">Pulsa Enter o coma para añadir · Backspace para borrar</p>
           </div>
 
           {/* Buttons */}
