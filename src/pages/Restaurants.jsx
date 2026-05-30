@@ -1601,7 +1601,7 @@ export default function Restaurants() {
                       className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors ${
                         selectedCity === c.name
                           ? 'bg-primary text-white border-primary'
-                          : 'bg-white border-border text-foreground hover:border-primary/40'
+                          : 'bg-card border-border text-foreground hover:border-primary/40'
                       }`}>
                       {c.name}
                     </button>

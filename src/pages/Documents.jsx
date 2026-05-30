@@ -124,7 +124,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
     : null;
 
   return (
-    <div className={`bg-white rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
+    <div className={`bg-card rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
       {/* Main row */}
       <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>

@@ -349,14 +349,14 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
               {[5,9,14,9,5,12,8].map((h, i) => (
                 <div
                   key={i}
-                  className="w-1.5 bg-white rounded-full"
+                  className="w-1.5 bg-background rounded-full"
                   style={{ height: h, animation: `wave 0.7s ease-in-out ${i * 0.08}s infinite alternate` }}
                 />
               ))}
             </div>
             {/* Stop icon */}
             <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-              <div className="w-6 h-6 bg-white rounded-md" />
+              <div className="w-6 h-6 bg-background rounded-md" />
             </div>
             <p className="text-sm font-medium text-white">Grabando · pulsa para parar</p>
             {interim && (

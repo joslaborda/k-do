@@ -516,7 +516,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   };
 
   return (
-    <div className={`bg-white rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
+    <div className={`bg-card rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
       {/* Header row */}
       <button
         onClick={() => setOpen(o => !o)}
