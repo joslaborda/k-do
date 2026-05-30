@@ -14,7 +14,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock
-, MessageCircle , Download } from 'lucide-react';
+, MessageCircle , Download , BarChart2 } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1443,6 +1443,9 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   const [recording, setRecording] = useState(false);
   const [lightbox, setLightbox] = useState(null);
   const [attachOpen, setAttachOpen] = useState(false);
+  const [pollOpen, setPollOpen] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState(['', '']);
   const fileInputRef = useRef(null);
   const fileInputType = useRef('all');
   const mediaRecorderRef = useRef(null);
@@ -1461,6 +1464,29 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const sendPoll = async () => {
+    const opts = pollOptions.filter(o => o.trim());
+    if (!pollQuestion.trim() || opts.length < 2) return;
+    const pollData = { question: pollQuestion.trim(), options: opts.map(o => ({ text: o.trim(), votes: [] })) };
+    await sendMutation.mutateAsync({ content: pollQuestion.trim(), file_type: 'poll', file_name: JSON.stringify(pollData) });
+    setPollOpen(false); setPollQuestion(''); setPollOptions(['', '']);
+  };
+
+  const votePoll = async (msg, optionIdx) => {
+    try {
+      const pollData = JSON.parse(msg.file_name || '{}');
+      if (!pollData.options) return;
+      pollData.options = pollData.options.map((opt, i) => ({
+        ...opt,
+        votes: i === optionIdx
+          ? [...new Set([...(opt.votes || []), currentUser?.email])]
+          : (opt.votes || []).filter(v => v !== currentUser?.email)
+      }));
+      await base44.entities.TripMessage.update(msg.id, { file_name: JSON.stringify(pollData) });
+      queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+    } catch {}
+  };
 
   const sendMutation = useMutation({
     mutationFn: (payload) => base44.entities.TripMessage.create({
@@ -1563,6 +1589,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
               { label: 'Foto', icon: <Image className="w-5 h-5" />, action: () => openPicker('photo') },
               { label: 'Cámara', icon: <Camera className="w-5 h-5" />, action: () => openPicker('camera') },
               { label: 'Archivo', icon: <FileText className="w-5 h-5" />, action: () => openPicker('doc') },
+              { label: 'Encuesta', icon: <BarChart2 className="w-5 h-5" />, action: () => { setAttachOpen(false); setPollOpen(true); } },
             ].map(btn => (
               <button key={btn.label} onClick={btn.action}
                 className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl hover:bg-secondary transition-colors">
@@ -1638,9 +1665,43 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                         <Download className="w-3 h-3" />
                       </a>
                     )}
-                    {!isImage(msg) && !isAudio(msg) && !isFile(msg) && (
+                    {msg.file_type === 'poll' && (() => {
+                        let pd = {};
+                        try { pd = JSON.parse(msg.file_name || '{}'); } catch {}
+                        const total = (pd.options||[]).reduce((a,o) => a + (o.votes||[]).length, 0);
+                        return (
+                          <div className="rounded-2xl border border-border bg-card overflow-hidden" style={{minWidth:200}}>
+                            <div className="px-3 pt-2.5 pb-2 border-b border-border">
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <BarChart2 className="w-3.5 h-3.5 text-primary" />
+                                <span className="text-xs font-medium text-primary">Encuesta</span>
+                              </div>
+                              <p className="text-sm font-medium text-foreground leading-snug">{pd.question}</p>
+                            </div>
+                            <div className="p-2 space-y-1.5">
+                              {(pd.options||[]).map((opt, i) => {
+                                const votes = opt.votes?.length || 0;
+                                const pct = total ? Math.round(votes / total * 100) : 0;
+                                const voted = opt.votes?.includes(currentUser?.email);
+                                return (
+                                  <button key={i} onClick={() => votePoll(msg, i)}
+                                    className={`w-full text-left px-3 py-2 rounded-xl border text-xs transition-all relative overflow-hidden ${voted ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-border text-foreground hover:border-primary/30'}`}>
+                                    <div className="absolute inset-y-0 left-0 bg-primary/10 rounded-xl transition-all" style={{width: pct + '%'}} />
+                                    <span className="relative flex items-center justify-between gap-3">
+                                      <span className="truncate">{opt.text}</span>
+                                      <span className="text-muted-foreground font-normal flex-shrink-0">{pct}%</span>
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <p className="text-[10px] text-muted-foreground text-center pb-2">{total} voto{total !== 1 ? 's' : ''}</p>
+                          </div>
+                        );
+                      })()}
+                    {!isImage(msg) && !isAudio(msg) && !isFile(msg) && msg.file_type !== 'poll' && (
                       <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${me ? 'bg-primary text-white rounded-br-sm' : 'bg-secondary text-foreground rounded-bl-sm'}`}>
-                        {msg.content || (msg.file_url ? '📎 Archivo adjunto' : '')}
+                        {msg.content || (msg.file_url ? 'Archivo adjunto' : '')}
                       </div>
                     )}
                     <span className="text-[9px] text-muted-foreground px-1">
@@ -1706,6 +1767,51 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
           )}
         </div>
       </div>
+
+      {pollOpen && typeof document !== 'undefined' && createPortal(
+        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'flex-end',justifyContent:'center'}}
+          onClick={() => setPollOpen(false)}>
+          <div style={{background:'var(--card,#fff)',borderRadius:'24px 24px 0 0',padding:24,width:'100%',maxWidth:480}}
+            onClick={e => e.stopPropagation()}>
+            <div style={{width:36,height:4,borderRadius:2,background:'#e5e7eb',margin:'0 auto 20px'}} />
+            <p style={{fontWeight:500,fontSize:15,marginBottom:16}}>Nueva encuesta</p>
+            <input placeholder="Pregunta..." value={pollQuestion}
+              onChange={e => setPollQuestion(e.target.value)}
+              style={{width:'100%',padding:'10px 14px',borderRadius:12,border:'1px solid #e5e7eb',fontSize:14,marginBottom:12,boxSizing:'border-box',outline:'none'}}
+            />
+            {pollOptions.map((opt, i) => (
+              <div key={i} style={{display:'flex',gap:8,marginBottom:8}}>
+                <input placeholder={'Opcion ' + (i+1)} value={opt}
+                  onChange={e => { const o=[...pollOptions]; o[i]=e.target.value; setPollOptions(o); }}
+                  style={{flex:1,padding:'10px 14px',borderRadius:12,border:'1px solid #e5e7eb',fontSize:14,outline:'none'}}
+                />
+                {pollOptions.length > 2 && (
+                  <button onClick={() => setPollOptions(pollOptions.filter((_,j)=>j!==i))}
+                    style={{width:36,height:36,borderRadius:'50%',border:'none',background:'#f3f4f6',cursor:'pointer',fontSize:18}}>x</button>
+                )}
+              </div>
+            ))}
+            {pollOptions.length < 5 && (
+              <button onClick={() => setPollOptions([...pollOptions, ''])}
+                style={{width:'100%',padding:9,borderRadius:12,border:'1px dashed #e5e7eb',background:'transparent',color:'#c2410c',fontSize:13,cursor:'pointer',marginBottom:16}}>
+                + Anadir opcion
+              </button>
+            )}
+            <div style={{display:'flex',gap:10,marginTop:8}}>
+              <button onClick={() => setPollOpen(false)}
+                style={{flex:1,padding:12,borderRadius:12,border:'1px solid #e5e7eb',background:'#f9fafb',fontSize:14,cursor:'pointer'}}>
+                Cancelar
+              </button>
+              <button onClick={sendPoll}
+                disabled={!pollQuestion.trim() || pollOptions.filter(o=>o.trim()).length < 2}
+                style={{flex:2,padding:12,borderRadius:12,border:'none',background:'#c2410c',color:'white',fontSize:14,fontWeight:500,cursor:'pointer',opacity:(!pollQuestion.trim()||pollOptions.filter(o=>o.trim()).length<2)?0.5:1}}>
+                Enviar encuesta
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }
