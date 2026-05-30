@@ -219,7 +219,7 @@ export default function ExpenseForm({
           {members.map(email => (
             <button key={email} type="button" onClick={() => set('paid_by', email)}
               className={`flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors ${
-                form.paid_by === email ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:border-primary/40'
+                form.paid_by === email ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
               }`}>
               <div style={{
                 width: 24, height: 24, borderRadius: '50%',
@@ -269,7 +269,7 @@ export default function ExpenseForm({
             return (
               <button key={email} type="button" onClick={() => toggleMember(email)}
                 className={`flex-1 min-w-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${
-                  selected ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:border-primary/40'
+                  selected ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
                 }`}>
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%',

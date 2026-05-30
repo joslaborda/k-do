@@ -83,7 +83,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
 
       {/* Deudas claras */}
       {debts.length > 0 ? (
-        <div className="bg-white rounded-2xl border border-border p-6">
+        <div className="bg-card rounded-2xl border border-border p-6">
           <h3 className="text-lg font-bold text-foreground mb-4">Ajustes pendientes</h3>
           <div className="space-y-3">
             {debts.map((debt, i) => {

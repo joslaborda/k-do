@@ -51,7 +51,7 @@ export default function ExpenseChart({ expenses }) {
   return (
     <div className="space-y-6">
       {/* Pie Chart */}
-      <div className="bg-white rounded-xl border-2 border-stone-200 p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <h3 className="text-lg font-bold text-stone-900 mb-4">Distribución por categoría</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
@@ -76,7 +76,7 @@ export default function ExpenseChart({ expenses }) {
       </div>
 
       {/* Bar Chart */}
-      <div className="bg-white rounded-xl border-2 border-stone-200 p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <h3 className="text-lg font-bold text-stone-900 mb-4">Comparación de gastos</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>

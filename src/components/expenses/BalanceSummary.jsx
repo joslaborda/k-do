@@ -46,7 +46,7 @@ export default function BalanceSummary({ expenses, baseCurrency = 'EUR', members
   const fmt = (n) => `${Math.abs(n).toLocaleString('es-ES', { maximumFractionDigits: 0 })} ${baseCurrency}`;
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-border">
+    <div className="bg-card p-6 rounded-2xl border border-border">
       <div className="flex items-center gap-2 mb-6">
         <Scale className="w-5 h-5 text-primary" />
         <h3 className="font-medium text-foreground">Balance del viaje</h3>
