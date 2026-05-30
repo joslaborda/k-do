@@ -63,6 +63,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyEmail from './pages/VerifyEmail';
 import Invites from './pages/Invites';
+import Photos from './pages/Photos';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +84,7 @@ export const PAGES = {
     "Settings": Settings,
     "VerifyEmail": VerifyEmail,
     "Invites": Invites,
+    "Photos": Photos,
 }
 
 export const pagesConfig = {
