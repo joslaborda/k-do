@@ -82,7 +82,7 @@ export default function TemplateCard({ template, currentUser }) {
 
   return (
     <Link to={`${createPageUrl('TemplateDetail')}?id=${template.id}`}>
-      <div className="group h-full bg-white border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col">
+      <div className="group h-full bg-card border border-border rounded-2xl overflow-hidden transition-colors cursor-pointer flex flex-col">
         {/* Image */}
         <div className="relative h-40 overflow-hidden bg-muted">
           {template.cover_image ? (
