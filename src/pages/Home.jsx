@@ -2189,10 +2189,7 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
-  const [tab, setTab] = useState(() => {
-    const urlTab = new URLSearchParams(window.location.search).get('tab');
-    return urlTab || 'hoy';
-  });
+  const [tab, setTab] = useState(() => 'hoy');
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -2517,9 +2514,7 @@ export default function Home() {
         {tab === 'manana' && (
           <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} />
         )}
-        {tab === 'fotos' && tripId && (
-          <FotosTab tripId={tripId} />
-        )}
+
         {tab === 'resumen' && (
           <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />
         )}
