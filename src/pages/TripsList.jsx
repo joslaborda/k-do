@@ -292,7 +292,7 @@ export default function TripsList() {
         <div className="max-w-2xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">Kōdo</h1>
+              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'#c2410c'}}>ō</span>do</h1>
               <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
               {firstName && (
                 <p className="text-sm text-muted-foreground mt-2">{getGreeting()}, {firstName}</p>
