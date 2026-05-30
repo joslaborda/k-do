@@ -22,7 +22,7 @@ export default function RouteMap({ cities }) {
   if (cities.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden mb-6">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden mb-6">
       <div className="relative" style={{ height: '340px' }}>
         <iframe
           key={embedUrl}
