@@ -333,7 +333,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
                 Añade los artículos que vas a necesitar{country ? ` en ${country}` : ''}
               </p>
               <button onClick={() => openAdding(PACKING_CATEGORIES[0].value)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
                 <Plus className="w-4 h-4" />Añadir artículo
               </button>
             </div>
@@ -458,7 +458,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
                 <p className="text-sm font-medium text-foreground mb-1">Lista vacía</p>
                 <p className="text-xs text-muted-foreground mb-5">Anota lo que quieres comprar en el viaje</p>
                 <button onClick={() => openAdding('souvenir')}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-xl font-medium">
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
                   <Plus className="w-4 h-4" />Añadir
                 </button>
               </div>
