@@ -153,7 +153,7 @@ export default function WeatherCard({ city, tripCountry }) {
   );
 
   if (error || !weather) return (
-    <div className="bg-white rounded-2xl border border-border p-4 flex flex-col items-center justify-center gap-2 min-h-[120px]">
+    <div className="bg-card rounded-2xl border border-border p-4 flex flex-col items-center justify-center gap-2 min-h-[120px]">
       <span className="text-3xl">☁️</span>
       <p className="text-sm text-muted-foreground text-center">{city.name}<br/>Clima no disponible</p>
     </div>
@@ -168,7 +168,7 @@ export default function WeatherCard({ city, tripCountry }) {
     : null;
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden">
 
       {/* ── Header ── */}
       <div className="px-4 py-3.5 border-b border-border">
@@ -227,15 +227,15 @@ export default function WeatherCard({ city, tripCountry }) {
 
           {/* Max / Min / Rain */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
-            <div className="bg-white border border-border rounded-xl p-2 text-center">
+            <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-1">Máxima</p>
               <p className="text-base font-medium text-primary">{sel.max}°</p>
             </div>
-            <div className="bg-white border border-border rounded-xl p-2 text-center">
+            <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-1">Mínima</p>
               <p className="text-base font-medium text-foreground">{sel.min}°</p>
             </div>
-            <div className="bg-white border border-border rounded-xl p-2 text-center">
+            <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-1">Lluvia</p>
               <p className="text-base font-medium text-foreground">{sel.rain}%</p>
             </div>
@@ -243,16 +243,16 @@ export default function WeatherCard({ city, tripCountry }) {
 
           {/* Humidity / Wind / UV */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
-            <div className="bg-white border border-border rounded-xl p-2 text-center">
+            <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-0.5">💧 Humedad</p>
               <p className="text-sm font-medium text-foreground">{weather.humidity}%</p>
             </div>
-            <div className="bg-white border border-border rounded-xl p-2 text-center">
+            <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-0.5">💨 Viento</p>
               <p className="text-sm font-medium text-foreground">{weather.wind} km/h</p>
             </div>
             {uvLabel && (
-              <div className="bg-white border border-border rounded-xl p-2 text-center">
+              <div className="bg-card border border-border rounded-xl p-2 text-center">
                 <p className="text-xs text-muted-foreground mb-0.5">🔆 UV</p>
                 <p className="text-sm font-medium text-foreground">{weather.uv} <span className="text-xs font-normal text-muted-foreground">{uvLabel}</span></p>
               </div>
@@ -265,7 +265,7 @@ export default function WeatherCard({ city, tripCountry }) {
               <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">Por hora</p>
               <div className="flex gap-1.5">
                 {weather.hourly.map(h => (
-                  <div key={h.hour} className="flex-1 text-center bg-white border border-border rounded-lg py-1.5">
+                  <div key={h.hour} className="flex-1 text-center bg-card border border-border rounded-lg py-1.5">
                     <p className="text-xs text-muted-foreground mb-1">{h.hour}h</p>
                     <p className="text-xs leading-none mb-1">{h.emoji}</p>
                     <p className="text-xs font-medium text-foreground">{h.temp}°</p>
