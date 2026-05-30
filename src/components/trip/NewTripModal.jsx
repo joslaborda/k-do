@@ -516,7 +516,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
 
             <div className="space-y-2">
               {stops.map((stop, idx) => (
-                <div key={idx} className={`bg-white border rounded-xl p-3 space-y-2 ${idx === 0 && missingCountry ? 'border-red-300' : 'border-border'}`}>
+                <div key={idx} className={`bg-card border rounded-xl p-3 space-y-2 ${idx === 0 && missingCountry ? 'border-red-300' : 'border-border'}`}>
                   <div className="flex items-center gap-2">
                     <div className="w-40 flex-shrink-0">
                       <CountryField
