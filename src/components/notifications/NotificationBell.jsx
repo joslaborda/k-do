@@ -18,6 +18,7 @@ const TYPE_CONFIG = {
   expense_added:  { icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'añadió un gasto' },
   expense_settled:{ icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'liquidó una deuda contigo' },
   chat_message:   { icon: MessageCircle, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', label: 'escribió en el chat' },
+  photo_upload:   { icon: Camera,        color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/30', label: 'subió fotos al viaje' },
 };
 
 function NotificationItem({ notif, onRead }) {
