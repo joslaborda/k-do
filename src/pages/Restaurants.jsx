@@ -580,7 +580,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
 
           <div className="flex-shrink-0 px-4 py-3 border-t border-border">
             <div className="flex items-center gap-4 mb-3">
-              <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm transition-colors">
+              <button onClick={toggleLike} className="flex items-center gap-1.5 text-sm transition-colors p-1 -m-1 rounded-lg">
                 {isLiked
                   ? <svg width="18" height="18" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                   : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -588,7 +588,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
                 <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : 'Me gusta'}</span>
               </button>
               {isReal && (
-                <button onClick={() => setShowComments(true)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <button onClick={() => setShowComments(true)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors p-1 -m-1 rounded-lg">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   {comments.length > 0 ? comments.length : 'Comentar'}
                 </button>
@@ -807,7 +807,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
           <div className="flex items-center justify-between">
             <p className="font-semibold text-foreground text-sm">{spot.title}</p>
-            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
+            <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
@@ -907,14 +907,14 @@ function MySpotRow({ spot, onTap, userId }) {
 
       {/* Like + comment row */}
       <div className="flex items-center gap-4 px-4 pb-3">
-        <button onClick={e => { e.stopPropagation(); toggleLike(); }} className="flex items-center gap-1.5 text-xs transition-colors">
+        <button onClick={e => { e.stopPropagation(); toggleLike(); }} className="flex items-center gap-1.5 text-xs transition-colors p-1 -m-1 rounded-lg">
           {isLiked
             ? <svg width="14" height="14" viewBox="0 0 24 24" fill="#c2410c" stroke="#c2410c" strokeWidth="0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           }
           <span className={isLiked ? 'text-primary' : 'text-muted-foreground'}>{likeCount > 0 ? likeCount : 'Like'}</span>
         </button>
-        <button onClick={e => { e.stopPropagation(); setShowComments(true); }} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={e => { e.stopPropagation(); setShowComments(true); }} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors p-1 -m-1 rounded-lg">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           {comments.length > 0 ? comments.length : 'Comentar'}
         </button>

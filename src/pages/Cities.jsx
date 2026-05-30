@@ -178,7 +178,7 @@ function DocViewerModal({ doc, open, onClose }) {
             <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-lg border border-border flex items-center justify-center shrink-0">
+          <button onClick={onClose} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
@@ -314,7 +314,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }}
             />
             <button onClick={() => setTitleEditing(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
-            <button onClick={saveTitle} className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center"><Check className="w-3.5 h-3.5 text-white" /></button>
+            <button onClick={saveTitle} className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
         </div>
       )}

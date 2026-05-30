@@ -478,7 +478,7 @@ export default function CityDetail() {
          </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-2 text-white/70 text-sm mb-2">
               <MapPin className="w-4 h-4" />
               <span>{city.country || 'Japan'}</span>
@@ -512,7 +512,7 @@ export default function CityDetail() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 pt-6 pb-12 md:pb-6">
+      <div className="max-w-3xl mx-auto px-6 pt-6 pb-12 md:pb-6">
          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
            <h2 className="text-xl font-semibold text-foreground">Itinerario</h2>
            <div className="flex items-center gap-2 flex-wrap">

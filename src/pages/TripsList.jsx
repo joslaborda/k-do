@@ -289,7 +289,7 @@ export default function TripsList() {
 
       {/* ── Header ── */}
       <div className="bg-background border-b border-border sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-5 pt-12 pb-4">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'#c2410c'}}>ō</span>do</h1>
@@ -315,7 +315,7 @@ export default function TripsList() {
       </div>
 
       {/* ── Content ── */}
-      <div className="max-w-2xl mx-auto px-4 py-5 pb-24 space-y-4">
+      <div className="max-w-3xl mx-auto px-4 py-5 pb-24 space-y-4">
 
         {trips.length === 0 ? (
           <EmptyState onCreateTrip={() => setDialogOpen(true)} />

@@ -351,7 +351,7 @@ export default function Explore() {
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="bg-background pt-12 pb-6 px-6">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <h1 className="text-white text-4xl font-bold mb-1">Explorar</h1>
           <p className="text-white/80 text-sm mb-4">Descubre spots, viajes y viajeros</p>
           <button onClick={() => setSearchOpen(true)}
@@ -362,7 +362,7 @@ export default function Explore() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-4">
+      <div className="max-w-3xl mx-auto px-4 py-4">
         <Tabs defaultValue="explorar">
           <TabsList className="w-full mb-5 bg-card border border-border">
             <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">

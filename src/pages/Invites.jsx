@@ -267,7 +267,7 @@ export default function Invites() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-primary pt-12 pb-8">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-6">
           <h1 className="text-white text-4xl font-bold mb-2">Invitaciones 📬</h1>
           <p className="text-white/90">
             {pendingInvites.length === 0
@@ -278,7 +278,7 @@ export default function Invites() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8 pb-12">
+      <div className="max-w-3xl mx-auto px-6 py-8 pb-12">
         {pendingInvites.length === 0 ? (
           <div className="text-center py-20 bg-card rounded-2xl border border-border">
             <div className="text-6xl mb-4">📭</div>

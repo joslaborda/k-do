@@ -293,7 +293,7 @@ export default function Settings() {
 
       {/* ── Header ── */}
       <div className="bg-background sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-5 pt-12 pb-0">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Profile')}
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
@@ -307,7 +307,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 py-5 pb-24 space-y-5">
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24 space-y-5">
 
         {/* ── PERFIL ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Perfil</p>
