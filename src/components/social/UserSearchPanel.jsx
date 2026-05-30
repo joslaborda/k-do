@@ -108,7 +108,7 @@ export default function UserSearchPanel({ currentUserId }) {
             return (
               <div
                 key={userProfile.id}
-                className="flex items-center justify-between p-3 bg-white border border-border rounded-lg hover:bg-orange-50 transition-colors"
+                className="flex items-center justify-between p-3 bg-card border border-border rounded-lg hover:bg-secondary transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {userProfile.avatar_url ? (

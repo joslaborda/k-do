@@ -86,7 +86,7 @@ export default function CreateProfileModal({ user, open }) {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="bg-white border-border max-w-md" onInteractOutside={e => e.preventDefault()}>
+      <DialogContent className="bg-card border-border max-w-md" onInteractOutside={e => e.preventDefault()}>
 
         {/* Step indicator */}
         <div className="flex gap-2 mb-2">
@@ -159,7 +159,7 @@ export default function CreateProfileModal({ user, open }) {
                   className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left " +
                     (homeCountry === country.name
                       ? 'bg-orange-50 border-orange-400 text-orange-900'
-                      : 'bg-white border-border hover:border-orange-200 text-foreground')}>
+                      : 'bg-card border-border hover:border-orange-200 text-foreground')}>
                   <span className="text-xl flex-shrink-0">{country.flag}</span>
                   <span className="flex-1 font-medium text-sm">{country.name}</span>
                   <span className="text-xs text-muted-foreground">{country.currency}</span>

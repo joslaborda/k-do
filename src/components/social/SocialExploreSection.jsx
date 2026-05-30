@@ -154,7 +154,7 @@ function TemplatesBlock({ myUserId }) {
           {templates.map(t => {
             const saved = savedIds.has(t.id);
             return (
-              <div key={t.id} className="bg-white border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+              <div key={t.id} className="bg-card border border-border rounded-xl overflow-hidden transition-colors">
                 {t.cover_image && <img src={t.cover_image} className="w-full h-24 object-cover" alt={t.title} onError={e => e.currentTarget.style.display='none'} />}
                 <div className="p-3">
                   <p className="font-semibold text-sm text-foreground">{t.title}</p>
@@ -226,7 +226,7 @@ function PublishBlock({ myUserId, trips, allCities }) {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-white border-border max-w-sm">
+        <DialogContent className="bg-card border-border max-w-sm">
           <DialogHeader>
             <DialogTitle>Publicar itinerario</DialogTitle>
           </DialogHeader>
@@ -261,15 +261,15 @@ export default function SocialExploreSection({ myUserId, myProfile, trips, allCi
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl border border-border p-5">
+        <div className="bg-card rounded-2xl border border-border p-5">
           <UserSearchBlock myUserId={myUserId} myProfile={myProfile} />
         </div>
-        <div className="md:col-span-2 bg-white rounded-2xl border border-border p-5">
+        <div className="md:col-span-2 bg-card rounded-2xl border border-border p-5">
           <TemplatesBlock myUserId={myUserId} />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border p-5">
+      <div className="bg-card rounded-2xl border border-border p-5">
         <PublishBlock myUserId={myUserId} trips={trips} allCities={allCities} />
       </div>
     </div>
