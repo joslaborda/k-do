@@ -532,23 +532,19 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
       </button>
 
-      {/* Holiday banner — shown even when collapsed */}
+      {/* Holiday banner — minimalista */}
       {(() => {
         if (!city?.country || !dateStr) return null;
         const holidays = getHolidaysForDate(city.country, dateStr, city.name);
         if (!holidays.length) return null;
         return (
-          <div className="border-t border-amber-100 dark:border-amber-900/30">
+          <div className="border-t border-amber-200/60 dark:border-amber-900/30 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-2 flex flex-col gap-1">
             {holidays.map((h, i) => (
-              <div key={i} className="flex items-start gap-2.5 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/20">
-                <span className="text-sm flex-shrink-0 mt-0.5">🎉</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-amber-800 dark:text-amber-400">
-                    {h.name} <span className="font-normal opacity-70">· Festivo</span>
-                  </p>
-                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
-                </div>
-              </div>
+              <p key={i} className="text-xs text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+                <span className="font-medium">{h.name}</span>
+                {h.note && <span className="text-amber-600 dark:text-amber-500 opacity-80">· {h.note}</span>}
+              </p>
             ))}
           </div>
         );
@@ -876,24 +872,37 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
         return (
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <p className="text-sm font-semibold text-foreground">Días festivos en tu viaje</p>
-              <span className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/40">
+              <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center text-xs">📅</span>
+                Festivos en tu viaje
+              </p>
+              <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
                 {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
               </span>
             </div>
-            {tripHolidays.map((h, i) => (
-              <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
-                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-sm flex-shrink-0">🎉</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{h.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                    {h.city ? ` · ${h.city}` : h.country ? ` · ${h.country}` : ''}
-                  </p>
-                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
+            {tripHolidays.map((h, i) => {
+              const d = new Date(h.date + 'T12:00:00');
+              const day = d.toLocaleDateString('es-ES', { day: 'numeric' });
+              const mon = d.toLocaleDateString('es-ES', { month: 'short' });
+              return (
+                <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
+                  <div className="flex-shrink-0 min-w-[38px] text-center bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-lg py-1.5 px-1">
+                    <p className="text-base font-medium text-amber-800 dark:text-amber-300 leading-none">{day}</p>
+                    <p className="text-[9px] text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
+                  </div>
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <p className="text-sm font-medium text-foreground leading-snug">{h.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {h.city ? h.city : h.country || ''}
+                      {(h.city || h.country) && h.scope ? ` · ${h.scope}` : ''}
+                    </p>
+                    {h.note && (
+                      <p className="text-xs text-amber-700 dark:text-amber-500 mt-1.5 pl-2 border-l-2 border-amber-300 dark:border-amber-700 leading-relaxed">{h.note}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       })()}
@@ -1104,24 +1113,37 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
         return (
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <p className="text-sm font-semibold text-foreground">Días festivos en tu viaje</p>
-              <span className="text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-100 dark:border-amber-900/40">
+              <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center text-xs">📅</span>
+                Festivos en tu viaje
+              </p>
+              <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
                 {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
               </span>
             </div>
-            {tripHolidays.map((h, i) => (
-              <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
-                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-sm flex-shrink-0">🎉</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{h.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                    {h.city ? ` · ${h.city}` : h.country ? ` · ${h.country}` : ''}
-                  </p>
-                  {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5 leading-relaxed">{h.note}</p>}
+            {tripHolidays.map((h, i) => {
+              const d = new Date(h.date + 'T12:00:00');
+              const day = d.toLocaleDateString('es-ES', { day: 'numeric' });
+              const mon = d.toLocaleDateString('es-ES', { month: 'short' });
+              return (
+                <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
+                  <div className="flex-shrink-0 min-w-[38px] text-center bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-lg py-1.5 px-1">
+                    <p className="text-base font-medium text-amber-800 dark:text-amber-300 leading-none">{day}</p>
+                    <p className="text-[9px] text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
+                  </div>
+                  <div className="flex-1 min-w-0 pt-0.5">
+                    <p className="text-sm font-medium text-foreground leading-snug">{h.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {h.city ? h.city : h.country || ''}
+                      {(h.city || h.country) && h.scope ? ` · ${h.scope}` : ''}
+                    </p>
+                    {h.note && (
+                      <p className="text-xs text-amber-700 dark:text-amber-500 mt-1.5 pl-2 border-l-2 border-amber-300 dark:border-amber-700 leading-relaxed">{h.note}</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       })()}
