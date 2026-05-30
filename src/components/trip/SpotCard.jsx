@@ -7,7 +7,7 @@ import { MapPin, X, Camera, Navigation, Pencil } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
-  food:      { label: 'Restaurante', emoji: '🍽️', color: 'bg-orange-100 text-orange-800' },
+  food:      { label: 'Restaurante', emoji: '🍽️', color: 'bg-primary/10 text-primary' },
   sight:     { label: 'Atracción',   emoji: '🏛️', color: 'bg-blue-100 text-blue-800' },
   activity:  { label: 'Actividad',   emoji: '⚡',  color: 'bg-green-100 text-green-800' },
   shopping:  { label: 'Compras',     emoji: '🛍️', color: 'bg-purple-100 text-purple-800' },
@@ -101,7 +101,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
                 const url = await uploadPhoto(file);
                 if (url) setImageUrl(url);
               }} />
-            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-orange-50 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
+            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
               <Camera className="w-4 h-4" />
               {imageUrl ? 'Foto seleccionada ✓' : 'Subir foto'}
             </div>
@@ -220,7 +220,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
                     const url = await uploadPhoto(file);
                     if (url) setImageUrl(url);
                   }} />
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-orange-50 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
                   <Camera className="w-3.5 h-3.5" />
                   {imageUrl ? '✓' : 'Foto'}
                 </div>
