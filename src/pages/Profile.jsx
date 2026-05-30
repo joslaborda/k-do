@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 import { getTripCoverImage } from '@/lib/tripImage';
+import TripCard from '@/components/trip/TripCard';
 
 
 function OTabBar({ tabs, activeKey, onChange }) {
@@ -385,15 +386,36 @@ export default function Profile() {
     staleTime: 60000,
   });
 
-  // All trips for the user — to count finished ones
+  // All trips for the user — created OR member
   const { data: myTrips = [] } = useQuery({
-    queryKey: ['myTrips', user?.id],
+    queryKey: ['myTrips', user?.id, user?.email],
     queryFn: async () => {
-      // Get trips where user is creator or member
-      const created = await base44.entities.Trip.filter({ created_by: user.id });
-      return created;
+      const [created, all] = await Promise.all([
+        base44.entities.Trip.filter({ created_by: user.id }),
+        base44.entities.Trip.list(),
+      ]);
+      const asMember = all.filter(t =>
+        !created.find(c => c.id === t.id) &&
+        Array.isArray(t.members) && t.members.includes(user.email)
+      );
+      return [...created, ...asMember].sort((a, b) =>
+        (b.start_date || '').localeCompare(a.start_date || '')
+      );
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!user?.email,
+    staleTime: 60000,
+  });
+
+  const { data: myTripCities = [] } = useQuery({
+    queryKey: ['myTripCities', myTrips.map(t => t.id).join(',')],
+    queryFn: async () => {
+      if (!myTrips.length) return [];
+      const all = await Promise.all(
+        myTrips.map(t => base44.entities.City.filter({ trip_id: t.id }))
+      );
+      return all.flat();
+    },
+    enabled: myTrips.length > 0,
     staleTime: 60000,
   });
 
@@ -401,11 +423,12 @@ export default function Profile() {
 
   const savedSpotIds = useMemo(() => new Set(savedSpots.map(s => s.id)), [savedSpots]);
 
-  // Count unique countries visited
+  // Count unique countries visited — from trip cities
   const countriesCount = useMemo(() => {
-    const countries = new Set(mySpots.map(s => s.country).filter(Boolean));
-    return countries.size;
-  }, [mySpots]);
+    const fromCities = new Set(myTripCities.map(c => c.country).filter(Boolean));
+    const fromSpots = new Set(mySpots.map(s => s.country).filter(Boolean));
+    return new Set([...fromCities, ...fromSpots]).size;
+  }, [myTripCities, mySpots]);
 
   // Save a spot to library
   const saveMutation = useMutation({
@@ -507,7 +530,7 @@ export default function Profile() {
         {/* ── Tabs ── */}
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <OTabBar
-            tabs={[{key:'guardados',label:'Guardados'},{key:'creados',label:'Creados'}]}
+            tabs={[{key:'guardados',label:'Guardados'},{key:'creados',label:'Creados'},{key:'viajes',label:`Viajes${tripsCount ? ' ('+tripsCount+')' : ''}`}]}
             activeKey={tab}
             onChange={setTab}
           />
@@ -518,6 +541,21 @@ export default function Profile() {
 
           {tab === 'creados' && (
             <SpotCollection spots={mySpots} showLikes showVisibility />
+          )}
+
+          {tab === 'viajes' && (
+            <div className="p-3 space-y-2">
+              {myTrips.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground">
+                  <p className="text-sm">Sin viajes aún</p>
+                </div>
+              ) : (
+                myTrips.map(trip => {
+                  const cities = myTripCities.filter(c => c.trip_id === trip.id);
+                  return <TripCard key={trip.id} trip={trip} cities={cities} />;
+                })
+              )}
+            </div>
           )}
         </div>
 
