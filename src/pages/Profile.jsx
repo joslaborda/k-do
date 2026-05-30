@@ -140,7 +140,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
           spot.visibility === 'public'
             ? 'bg-orange-50 text-primary border border-orange-200'
-            : 'bg-gray-100 text-gray-500 border border-gray-200'
+            : 'bg-secondary text-muted-foreground border border-border'
         }`}>
           {spot.visibility === 'public' ? 'Público' : 'Privado'}
         </span>
@@ -260,7 +260,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
   return (
     <div className="space-y-2">
       {/* Search input */}
-      <div className={`bg-white border rounded-2xl px-3 py-2.5 flex items-center gap-2 transition-colors ${
+      <div className={`bg-card border rounded-2xl px-3 py-2.5 flex items-center gap-2 transition-colors ${
         query ? 'border-primary' : 'border-border'
       }`}>
         <Search className={`w-4 h-4 flex-shrink-0 ${query ? 'text-primary' : 'text-muted-foreground'}`} />
@@ -297,7 +297,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
                 className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   typeFilter === f.key
                     ? 'bg-primary text-white border-primary'
-                    : 'bg-white border-border text-muted-foreground'
+                    : 'bg-card border-border text-muted-foreground'
                 }`}>
                 {f.label}
               </button>

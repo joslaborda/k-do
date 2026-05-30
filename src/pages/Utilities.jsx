@@ -149,7 +149,7 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${
                     category === c.value
                       ? 'bg-primary text-white border-primary'
-                      : 'bg-white text-muted-foreground border-border hover:border-primary/40'
+                      : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                   }`}
                 >
                   {c.icon} {c.label}

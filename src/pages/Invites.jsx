@@ -187,7 +187,7 @@ export default function Invites() {
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 py-12">
-        <Card className="max-w-md w-full border-primary/20 bg-white shadow-lg">
+        <Card className="max-w-md w-full border-primary/20 bg-card">
           <div className="p-8">
             {/* Header */}
             <div className="text-center mb-6">
@@ -251,7 +251,7 @@ export default function Invites() {
                 onClick={handleDecline}
                 disabled={processing}
                 variant="outline"
-                className="w-full border-gray-300 text-foreground hover:bg-gray-50 font-bold h-10"
+                className="w-full border-border text-foreground hover:bg-secondary font-bold h-10"
               >
                 {processing ? 'Rechazando...' : 'Rechazar'}
               </Button>
@@ -280,7 +280,7 @@ export default function Invites() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8 pb-12">
         {pendingInvites.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-border">
+          <div className="text-center py-20 bg-card rounded-2xl border border-border">
             <div className="text-6xl mb-4">📭</div>
             <h2 className="text-xl font-bold text-foreground mb-2">Sin invitaciones</h2>
             <p className="text-muted-foreground mb-6">
@@ -301,7 +301,7 @@ export default function Invites() {
               return (
                 <Card
                   key={invite.id}
-                  className="border-primary/20 bg-white hover:shadow-lg transition-all"
+                  className="border-primary/20 bg-card transition-all"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between gap-4 mb-4">
@@ -354,7 +354,7 @@ export default function Invites() {
                         onClick={() => handleDeclineFromList(invite.id)}
                         disabled={processing}
                         variant="outline"
-                        className="flex-1 border-gray-300 text-foreground hover:bg-gray-50 font-bold"
+                        className="flex-1 border-border text-foreground hover:bg-secondary font-bold"
                       >
                         <XCircle className="w-4 h-4 mr-2" />
                         Rechazar

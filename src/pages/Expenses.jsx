@@ -264,7 +264,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
         {[['all', '🌍', 'Todos'], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, v.emoji, v.label])].map(([k, em, l]) => (
           <button key={k} onClick={() => setCatFilter(k)}
             className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${
-              catFilter === k ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+              catFilter === k ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
             }`}>
             <span>{em}</span> {l}
           </button>
@@ -316,7 +316,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
   return (
     <div className="space-y-4">
       {/* Mi balance */}
-      <div className={`rounded-2xl border p-4 ${iSettled ? 'bg-white border-border' : myBalance > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+      <div className={`rounded-2xl border p-4 ${iSettled ? 'bg-card border-border' : myBalance > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
         <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
         <p className={`text-2xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
           {iSettled ? '✓ Al día' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
@@ -946,11 +946,13 @@ export default function Expenses() {
   const updateMutation = useMutation({
     mutationFn: ({ id, d }) => base44.entities.Expense.update(id, { ...d, amount: parseFloat(d.amount) }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }); setSheetOpen(false); setEditingExpense(null); },
+    onError: () => alert('Error al actualizar el gasto.'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: id => base44.entities.Expense.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }),
+    onError: () => alert('Error al eliminar el gasto.'),
   });
 
   const handleSave = d => {

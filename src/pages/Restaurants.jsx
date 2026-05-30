@@ -432,7 +432,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
               {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
                 <button key={val} onClick={() => setType(val)}
                   className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
-                    type === val ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary/40'
+                    type === val ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                   }`}>
                   {tc.emoji} {tc.label}
                 </button>
@@ -456,11 +456,11 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
             <div className="flex rounded-xl border border-border overflow-hidden">
               <button onClick={() => setIsPublic(true)}
-                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
                 🌍 Kōdo Community
               </button>
               <button onClick={() => setIsPublic(false)}
-                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
                 Solo mi viaje
               </button>
             </div>
@@ -489,7 +489,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
   const tc = TYPE_CONFIG[place.type] || TYPE_CONFIG.custom;
   return (
-    <div className={`bg-white rounded-xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
+    <div className={`bg-card rounded-xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
       <div className="w-12 bg-orange-50 flex items-center justify-center flex-shrink-0">
         <span className="text-xl">{tc.emoji}</span>
       </div>
@@ -1233,7 +1233,7 @@ function Toast({ spot, city, onUndo, visible }) {
   if (!visible || !spot) return null;
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
-      <div className="bg-gray-900 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg">
+      <div className="bg-foreground rounded-xl px-4 py-3 flex items-center gap-3">
         <span className="text-lg">✅</span>
         <div className="flex-1 min-w-0">
           <p className="text-white text-sm font-medium truncate">Guardado{city ? ' en ' + city : ''}</p>
@@ -1624,7 +1624,7 @@ export default function Restaurants() {
                   <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none',msOverflowStyle:'none'}}>
                     {hashtags.map(tag => (
                       <button key={tag} onClick={() => setSearchQuery(tag.replace('#', ''))}
-                        className="text-sm px-3 py-1.5 rounded-full border border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex-shrink-0">
+                        className="text-sm px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex-shrink-0">
                         {tag}
                       </button>
                     ))}
@@ -1740,7 +1740,7 @@ export default function Restaurants() {
               {[['all','Todos'],['assigned','Asignados'],['unassigned','Sin asignar']].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                    stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                    stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                   }`}>
                   {l}
                 </button>
@@ -1806,7 +1806,7 @@ export default function Restaurants() {
                   return (
                     <button key={c.id} onClick={() => setSelectedCity(c.name)}
                       className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors flex items-center gap-1.5 ${
-                        isActive ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                        isActive ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                       }`}>
                       {c.name}
                       {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>}
@@ -1832,7 +1832,7 @@ export default function Restaurants() {
               ].map(([v,l,em]) => (
                 <button key={v} onClick={() => setCommunityFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex-shrink-0 flex items-center gap-1 ${
-                    communityFilter===v ? 'bg-primary text-white border-primary' : 'bg-white border-border text-muted-foreground hover:border-primary/40'
+                    communityFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                   }`}>
                   {em} {l}
                 </button>

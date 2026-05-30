@@ -140,20 +140,20 @@ function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
       <select
         value={fromLang}
         onChange={e => onFromChange(e.target.value)}
-        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-card outline-none focus:border-primary appearance-none"
       >
         {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
       </select>
       <button
         onClick={onSwap}
-        className="p-2 rounded-xl border border-border bg-white hover:bg-orange-50 hover:border-primary/30 transition-colors flex-shrink-0"
+        className="p-2 rounded-xl border border-border bg-card hover:bg-secondary hover:border-primary/30 transition-colors flex-shrink-0"
       >
         <ArrowRightLeft className="w-4 h-4 text-muted-foreground" />
       </button>
       <select
         value={toLang}
         onChange={e => onToChange(e.target.value)}
-        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-white outline-none focus:border-primary appearance-none"
+        className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-card outline-none focus:border-primary appearance-none"
       >
         {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
       </select>
@@ -339,7 +339,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
         className={`rounded-2xl border-2 p-6 flex flex-col items-center gap-3 cursor-pointer select-none transition-all ${
           recording
             ? 'bg-primary border-primary'
-            : 'bg-white border-border hover:border-primary/40'
+            : 'bg-card border-border hover:border-primary/40'
         }`}
       >
         {recording ? (

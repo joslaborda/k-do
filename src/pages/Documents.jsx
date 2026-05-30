@@ -183,7 +183,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
             {/* File */}
             {hasFile && (
               <button onClick={() => onView(ticket.file_url)}
-                className="w-full flex items-center gap-3 px-3 py-2 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
+                className="w-full flex items-center gap-3 px-3 py-2 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                 </svg>

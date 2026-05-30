@@ -74,7 +74,7 @@ function Toggle({ value, onChange }) {
       onClick={() => onChange(!value)}
       className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${value ? 'bg-primary' : 'bg-border'}`}
     >
-      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${value ? 'left-5' : 'left-1'}`} />
+      <span className={`absolute top-1 w-4 h-4 rounded-full bg-background shadow transition-all ${value ? 'left-5' : 'left-1'}`} />
     </button>
   );
 }

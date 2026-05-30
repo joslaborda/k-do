@@ -451,7 +451,7 @@ export default function CityDetail() {
   if (!city) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
+        <div className="animate-pulse text-muted-foreground">Cargando...</div>
       </div>
     );
   }
@@ -600,7 +600,7 @@ export default function CityDetail() {
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                      <div className="px-5 pb-5 pt-0 border-t border-border bg-white/50">
+                      <div className="px-5 pb-5 pt-0 border-t border-border bg-card/50">
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
                           <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
                         </div>

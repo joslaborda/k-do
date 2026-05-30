@@ -295,7 +295,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
     setEditingSpot(null);
   };
 
-  const bgClass = isToday_ ? 'bg-orange-50/50' : 'bg-white';
+  const bgClass = isToday_ ? 'bg-orange-50/50 dark:bg-orange-950/10' : 'bg-card';
   const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
 
   return (
@@ -423,7 +423,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
 
   const rowBg = isToday_
     ? 'bg-orange-50'
-    : open ? 'bg-secondary/20' : 'bg-white hover:bg-secondary/10';
+    : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
   const rowBorder = isToday_ ? 'border-t-2 border-t-primary' : 'border-t border-t-border';
 
   return (
@@ -513,7 +513,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
 
       {/* Card */}
       <div className={`flex-1 mb-0 min-w-0 ${idx < total - 1 ? 'pb-0' : ''}`}>
-        <div className={`bg-white rounded-2xl border overflow-hidden mb-1 ${
+        <div className={`bg-card rounded-2xl border overflow-hidden mb-1 ${
           isActive ? 'border-orange-200' : isPast ? 'border-border opacity-75' : 'border-border'
         }`}>
           {/* City header */}

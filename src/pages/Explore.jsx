@@ -111,7 +111,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
       </div>
       {!isOwn && currentUser && (
         <Button size="sm" onClick={() => onFollow(profile, followRecord)}
-          className={isFollowing ? 'border border-primary/30 text-primary bg-white hover:bg-orange-50' : 'bg-primary hover:bg-primary/90 text-white'}>
+          className={isFollowing ? 'border border-primary/30 text-primary bg-card hover:bg-secondary' : 'bg-primary hover:bg-primary/90 text-white'}>
           {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1"/>Siguiendo</> : <><UserPlus className="w-3.5 h-3.5 mr-1"/>Seguir</>}
         </Button>
       )}
