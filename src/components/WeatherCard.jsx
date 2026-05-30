@@ -140,7 +140,7 @@ export default function WeatherCard({ city, tripCountry }) {
   }, [cacheKey]);
 
   if (loading) return (
-    <div className="bg-white rounded-2xl border border-border p-4 animate-pulse space-y-3">
+    <div className="bg-card rounded-2xl border border-border p-4 animate-pulse space-y-3">
       <div className="flex justify-between">
         <div className="h-5 w-24 bg-secondary rounded-lg" />
         <div className="h-9 w-12 bg-secondary rounded-lg" />

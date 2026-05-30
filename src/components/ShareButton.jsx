@@ -29,7 +29,6 @@ export default function ShareButton({ title, description }) {
         toast.success('Compartido exitosamente');
       } catch (err) {
         if (err.name !== 'AbortError') {
-          console.error('Error sharing:', err);
         }
       }
     } else {
