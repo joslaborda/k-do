@@ -68,7 +68,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
             <p className="font-semibold text-foreground text-sm">¿Qué te pareció?</p>
             <p className="text-xs text-muted-foreground mt-0.5">{spot.title}</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -167,7 +167,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
                 <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
               </div>
             </div>
-            <button onClick={onClose} className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+            <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
