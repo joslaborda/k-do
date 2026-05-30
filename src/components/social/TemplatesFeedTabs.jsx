@@ -29,7 +29,7 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
   const downs = comments.filter(c => c.thumb === 'down').length;
 
   return (
-    <div className="bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-2xl border border-border overflow-hidden transition-colors">
       {spot.image_url && <div className="h-32 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover"/></div>}
       <div className="p-3">
         <div className="flex items-center gap-2 mb-2">
@@ -85,7 +85,7 @@ function UserCard({ profile, currentUserId, myFollows }) {
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3">
+    <div className="bg-card rounded-2xl border border-border p-3 flex items-center gap-3">
       <Avatar profile={profile}/>
       <div className="flex-1 min-w-0">
         <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id}
@@ -210,7 +210,7 @@ export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myP
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
         <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
           placeholder="Busca spots, destinos, viajeros..."
-          className="pl-9 bg-white"/>
+          className="pl-9 bg-card"/>
       </div>
 
       {/* Tabs */}
@@ -218,7 +218,7 @@ export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myP
         {tabs.map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
             className={"flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border " +
-              (activeTab === t.id ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border hover:border-orange-300')}>
+              (activeTab === t.id ? 'bg-orange-700 text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
             <span>{t.icon}</span>
             <span>{t.label}</span>
             {t.count > 0 && <span className={"text-xs " + (activeTab === t.id ? 'text-white/70' : 'text-muted-foreground')}>{t.count}</span>}
@@ -229,7 +229,7 @@ export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myP
       {/* SPOTS */}
       {activeTab === 'spots' && (
         loadingSpots ? (
-          <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+          <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
         ) : filteredSpots.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">📍</div>
@@ -249,7 +249,7 @@ export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myP
       {/* VIAJES */}
       {activeTab === 'viajes' && (
         loadingTemplates ? (
-          <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-white rounded-2xl border border-border animate-pulse"/>)}</div>
+          <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
         ) : filteredTemplates.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">🗺️</div>
