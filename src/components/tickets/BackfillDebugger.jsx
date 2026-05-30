@@ -81,7 +81,7 @@ export default function BackfillDebugger({ tripId }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-border p-4 mb-6">
+    <div className="bg-card rounded-xl border border-border p-4 mb-6">
       <div className="flex items-start gap-3 mb-4">
         <Database className="w-5 h-5 text-orange-600 flex-shrink-0 mt-1" />
         <div className="flex-1">
