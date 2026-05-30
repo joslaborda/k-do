@@ -114,7 +114,6 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setField('file_url', file_url);
     } catch (err) {
-      console.error('Upload error:', err);
     }
     setFileUploading(false);
   };
@@ -246,7 +245,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
           {VISIBILITY_OPTS.map(opt => (
             <button key={opt.key} onClick={() => setVisibility(opt.key)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
-                visibility === opt.key ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:bg-secondary/30'
+                visibility === opt.key ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:bg-secondary/30'
               }`}>
               
               <div className="flex-1 min-w-0">
@@ -278,7 +277,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
                   onClick={() => !isYou && toggleSharedWith(email)}
                   disabled={isYou}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${
-                    selected ? 'bg-orange-50 border-orange-200' : 'bg-white border-border hover:bg-secondary/20'
+                    selected ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:bg-secondary/20'
                   } ${isYou ? 'cursor-default' : ''}`}>
                   {profile?.avatar_url
                     ? <img src={profile.avatar_url} alt={name} className="w-8 h-8 rounded-full object-cover shrink-0" />

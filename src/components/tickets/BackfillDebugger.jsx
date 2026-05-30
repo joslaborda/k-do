@@ -46,23 +46,11 @@ export default function BackfillDebugger({ tripId }) {
         cities,
       });
 
-      console.log('📊 STATISTICS:', {
-        total: tickets.length,
-        withCityId,
-        withItineraryDayId,
-        withBoth,
-        withoutAny,
-        withDate,
-      });
-
       // Log sample tickets
-      console.log('📋 SAMPLE TICKETS:');
       tickets.slice(0, 3).forEach(t => {
-        console.log(`  - ${t.name}: date=${t.date}, city_id=${t.city_id || 'NULL'}, itinerary_day_id=${t.itinerary_day_id || 'NULL'}`);
       });
     } catch (err) {
       setError(err.message);
-      console.error('Error analyzing data:', err);
     } finally {
       setLoading(false);
     }
@@ -76,8 +64,6 @@ export default function BackfillDebugger({ tripId }) {
     try {
       const mutations = createBackfillMutation(stats.tickets, stats.itineraryDays, stats.cities);
 
-      console.log(`🔄 Running backfill for ${mutations.length} tickets...`);
-
       let updated = 0;
       for (const { ticketId, updates } of mutations) {
         if (Object.keys(updates).length > 0) {
@@ -85,13 +71,10 @@ export default function BackfillDebugger({ tripId }) {
           updated++;
         }
       }
-
-      console.log(`✅ Backfill complete: ${updated} tickets updated`);
       setBackfillDone(true);
       setStats(null); // Reset para re-analizar
     } catch (err) {
       setError(err.message);
-      console.error('Error running backfill:', err);
     } finally {
       setLoading(false);
     }
