@@ -1320,28 +1320,28 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           </button>
         </div>
       </div>
-      {/* Lightbox */}
-      {lightbox && (
+      {/* Lightbox — portal to escape overflow:hidden */}
+      {lightbox && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 flex items-center justify-center"
-          style={{zIndex: 9999, background: 'rgba(0,0,0,0.92)'}}
+          style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.93)',display:'flex',alignItems:'center',justifyContent:'center'}}
           onClick={() => setLightbox(null)}
         >
           <button
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+            style={{position:'absolute',top:20,right:20,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}
             onClick={() => setLightbox(null)}>
-            <X className="w-5 h-5 text-white" />
+            <X size={18} />
           </button>
           <a href={lightbox} download
-            className="absolute top-6 right-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
+            style={{position:'absolute',top:20,right:70,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',textDecoration:'none'}}
             onClick={e => e.stopPropagation()}>
-            <Download className="w-5 h-5 text-white" />
+            <Download size={18} />
           </a>
           <img src={lightbox}
-            className="object-contain rounded-2xl"
-            style={{maxWidth:'90vw', maxHeight:'85vh'}}
+            alt="foto"
+            style={{maxWidth:'95vw',maxHeight:'88vh',objectFit:'contain',borderRadius:10,width:'100%'}}
             onClick={e => e.stopPropagation()} />
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -2150,8 +2150,11 @@ export default function Home() {
   const [chatLastRead, setChatLastRead] = useState(new Date());
 
   const handleTabChange = (key) => {
-    const keys = homeTabs.map(t => t.key);
-    setTabDir(keys.indexOf(key) >= keys.indexOf(tab) ? 1 : -1);
+    // Note: uses tab state ref via closure — homeTabs resolved at call time
+    setTabDir(prev => {
+      const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat','fotos'];
+      return tabOrder.indexOf(key) >= tabOrder.indexOf(tab) ? 1 : -1;
+    });
     setTab(key);
     if (key === 'chat') setChatLastRead(new Date());
   };
