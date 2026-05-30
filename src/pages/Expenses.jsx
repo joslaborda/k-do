@@ -928,6 +928,7 @@ export default function Expenses() {
 
   const createMutation = useMutation({
     mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount) }),
+    onError: () => alert('Error al guardar el gasto. Inténtalo de nuevo.'),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setSheetOpen(false); setEditingExpense(null);

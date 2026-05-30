@@ -28,6 +28,18 @@ import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, 
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
+if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-style')) {
+  const st = document.createElement('style');
+  st.id = 'kodo-tab-slide-style';
+  st.textContent = `
+    @keyframes slideInRight { from { transform: translateX(32px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideInLeft  { from { transform: translateX(-32px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .kodo-slide-right { animation: slideInRight 0.2s cubic-bezier(.25,.46,.45,.94) both; }
+    .kodo-slide-left  { animation: slideInLeft  0.2s cubic-bezier(.25,.46,.45,.94) both; }
+  `;
+  document.head.appendChild(st);
+}
+
 function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
@@ -2129,6 +2141,7 @@ export default function Home() {
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
   const [tab, setTab] = useState(() => 'hoy');
+  const [tabDir, setTabDir] = useState(1);
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -2137,6 +2150,8 @@ export default function Home() {
   const [chatLastRead, setChatLastRead] = useState(new Date());
 
   const handleTabChange = (key) => {
+    const keys = homeTabs.map(t => t.key);
+    setTabDir(keys.indexOf(key) >= keys.indexOf(tab) ? 1 : -1);
     setTab(key);
     if (key === 'chat') setChatLastRead(new Date());
   };
@@ -2430,6 +2445,7 @@ export default function Home() {
       <div className="max-w-3xl mx-auto px-5 pt-5 pb-2 space-y-3">
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} onUrgentCount={setUrgentCount} />
+        <div key={tab} className={tabDir >= 0 ? 'kodo-slide-right' : 'kodo-slide-left'}>
 
         {tab === 'previaje' && (
           <PreTripTab
@@ -2467,6 +2483,7 @@ export default function Home() {
         )}
       </div>
 
+        </div>
       {/* Settings dialog */}
       <SettingsDialog
         open={settingsOpen}
