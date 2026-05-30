@@ -181,10 +181,8 @@ export default function Photos() {
         {/* Empty state */}
         {photos.length === 0 && !uploading && (
           <div
-            className="mx-4 mt-8 border-2 border-dashed border-border rounded-2xl p-12 flex flex-col items-center gap-3 cursor-pointer hover:border-primary/40 transition-colors"
+            className="mx-4 mt-8 border border-border rounded-2xl p-12 flex flex-col items-center gap-3 cursor-pointer hover:bg-secondary/40 transition-colors"
             onClick={() => fileInputRef.current?.click()}
-            onDrop={handleDrop}
-            onDragOver={e => e.preventDefault()}
           >
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
               <Camera className="w-6 h-6 text-muted-foreground" />
@@ -194,18 +192,7 @@ export default function Photos() {
           </div>
         )}
 
-        {/* Drop zone when has photos */}
-        {photos.length > 0 && (
-          <div
-            className="mx-4 mt-4 mb-2 border border-dashed border-border rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:border-primary/40 hover:bg-secondary/30 transition-colors"
-            onClick={() => fileInputRef.current?.click()}
-            onDrop={handleDrop}
-            onDragOver={e => e.preventDefault()}
-          >
-            <Upload className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm text-muted-foreground">Arrastra fotos aquí o toca para seleccionar</span>
-          </div>
-        )}
+
 
         {/* Grouped grid */}
         {groups.map(({ date, items }) => (
@@ -284,7 +271,7 @@ export default function Photos() {
             src={currentPhoto.file_url}
             alt=""
             onClick={e => e.stopPropagation()}
-            style={{ maxWidth: '90vw', maxHeight: '80vh', objectFit: 'contain', borderRadius: 8 }}
+            style={{ maxWidth: '95vw', maxHeight: '88vh', objectFit: 'contain', borderRadius: 8, width: '100%' }}
           />
 
           {/* Next */}
