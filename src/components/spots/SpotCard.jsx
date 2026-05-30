@@ -212,21 +212,24 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           </div>
           <div className="flex gap-2">
             {showImageField ? (
-              <label className="cursor-pointer">
-                <input type="file" accept="image/*" capture="environment" className="hidden"
-                  onChange={async e => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadPhoto(file);
-                    if (url) setImageUrl(url);
-                  }} />
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
-                  <Camera className="w-3.5 h-3.5" />
-                  {imageUrl ? '✓' : 'Foto'}
-                </div>
-              </label>
+              <div className="flex gap-1.5 flex-1">
+                <label className="cursor-pointer flex-1">
+                  <input type="file" accept="image/*" className="hidden"
+                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
+                  <div className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
+                    <Image className="w-3.5 h-3.5" />{imageUrl ? 'OK' : 'Galeria'}
+                  </div>
+                </label>
+                <label className="cursor-pointer flex-1">
+                  <input type="file" accept="image/*" capture="environment" className="hidden"
+                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
+                  <div className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:border-primary/40 transition-colors">
+                    <Camera className="w-3.5 h-3.5" />Camara
+                  </div>
+                </label>
+              </div>
             ) : (
-              <button onClick={() => setShowImageField(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-orange-600 px-2 py-1.5 border border-dashed border-border rounded-xl flex-1 justify-center">
+              <button onClick={() => setShowImageField(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary px-2 py-1.5 border border-dashed border-border rounded-xl flex-1 justify-center transition-colors">
                 <Camera className="w-3.5 h-3.5" />Foto
               </button>
             )}
