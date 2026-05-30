@@ -75,7 +75,7 @@ function DocItem({ doc, onClick }) {
 function SpotItem({ spot }) {
   const emoji = SPOT_EMOJI[spot.type] || '📍';
   return (
-    <div className={"flex items-center gap-3 p-3 rounded-xl border border-border bg-white " + (spot.visited ? 'opacity-50' : '')}>
+    <div className={"flex items-center gap-3 p-3 rounded-xl border border-border bg-card " + (spot.visited ? 'opacity-50' : '')}>
       <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 text-lg">
         {emoji}
       </div>
@@ -100,7 +100,7 @@ function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaul
     <div className={"rounded-2xl border overflow-hidden " + (isToday ? "border-orange-300 shadow-sm" : "border-border")}>
       <button onClick={() => setOpen(o => !o)}
         className={"w-full flex items-center justify-between px-4 py-3.5 transition-colors " +
-          (isToday ? "bg-orange-700 text-white" : "bg-white text-foreground hover:bg-orange-50")}>
+          (isToday ? "bg-orange-700 text-white" : "bg-card text-foreground hover:bg-secondary")}>
         <div className="flex items-center gap-3">
           <span className="text-lg">{isToday ? '☀️' : isTomorrow ? '🌙' : '📅'}</span>
           <div className="text-left">

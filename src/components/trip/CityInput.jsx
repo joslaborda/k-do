@@ -72,7 +72,7 @@ export default function CityInput({ country, value, onChange, placeholder = 'Eli
       </div>
 
       {open && filtered.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-white border border-border rounded-xl shadow-lg">
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-y-auto bg-card border border-border rounded-xl shadow-lg">
           {filtered.map((city) => (
             <li
               key={city}

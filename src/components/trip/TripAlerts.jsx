@@ -11,7 +11,7 @@ import { createPageUrl } from '@/utils';
 function AlertItem({ icon: Icon, color, bg, label, daysText, link, tripId, onDismiss }) {
   const content = (
     <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${bg} hover:opacity-90 transition-opacity`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-white/60 flex-shrink-0`}>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-background/60 flex-shrink-0`}>
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
@@ -72,8 +72,8 @@ export default function TripAlerts({ tripId, cities, trip, onUrgentCount }) {
           const diffMin = Math.round(diffMs / 60000);
           if (diffMin < 0) {
             daysText = 'En curso';
-            color = 'text-gray-500';
-            bg = 'bg-gray-50 border-gray-200';
+            color = 'text-muted-foreground';
+            bg = 'bg-secondary border-border';
           } else if (diffMin <= 240) {
             // ≤4h — urgent alert
             const hrs = Math.floor(diffMin / 60);

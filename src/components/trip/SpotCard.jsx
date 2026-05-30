@@ -314,7 +314,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
 
   return (
     <>
-      <div className={"rounded-2xl border transition-all " + (spot.visited ? 'bg-green-50 border-green-200' : 'bg-white border-border')}>
+      <div className={"rounded-2xl border transition-all " + (spot.visited ? 'bg-green-50 dark:bg-green-950/20 border-green-200' : 'bg-card border-border')}>
         <div className="p-4">
           {/* Header */}
           <div className="flex items-start gap-3">

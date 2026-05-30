@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
@@ -127,33 +128,33 @@ export default function TripChat({ tripId, myProfile, trip }) {
 
   return (
     <>
-      {/* Lightbox */}
-      {lightbox && (
+      {/* Lightbox — portal to escape overflow:hidden */}
+      {lightbox && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+          style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.93)',display:'flex',alignItems:'center',justifyContent:'center'}}
           onClick={() => setLightbox(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white/70 hover:text-white z-10"
+            style={{position:'absolute',top:20,right:20,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',border:'none',cursor:'pointer',color:'white',display:'flex',alignItems:'center',justifyContent:'center'}}
             onClick={() => setLightbox(null)}
           >
-            <X className="w-6 h-6" />
+            <X size={18} />
           </button>
           <a
-            href={lightbox}
-            download
-            className="absolute top-4 right-14 text-white/70 hover:text-white z-10"
+            href={lightbox} download
+            style={{position:'absolute',top:20,right:70,width:40,height:40,borderRadius:'50%',background:'rgba(255,255,255,0.12)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',textDecoration:'none'}}
             onClick={e => e.stopPropagation()}
           >
-            <Download className="w-6 h-6" />
+            <Download size={18} />
           </a>
           <img
             src={lightbox}
             alt="Imagen"
-            className="max-w-[92vw] max-h-[88vh] object-contain rounded-xl"
+            style={{maxWidth:'92vw',maxHeight:'88vh',objectFit:'contain',borderRadius:12}}
             onClick={e => e.stopPropagation()}
           />
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col" style={{ height: '460px' }}>

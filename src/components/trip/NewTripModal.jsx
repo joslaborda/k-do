@@ -187,7 +187,7 @@ function CountryField({ value, onChange, hasError, ref: externalRef }) {
         placeholder="País *"
         autoComplete="off"
         className={`w-full h-9 border rounded-xl px-3 text-sm outline-none transition-colors ${
-          hasError ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+          hasError ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
         }`}
       />
       {open && suggestions.length > 0 && (
@@ -436,7 +436,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               value={formData.name}
               onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
               className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${
-                missingName ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+                missingName ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
               }`}
             />
             {missingName && <p className="text-xs text-red-500 mt-1">El nombre es obligatorio</p>}
@@ -448,7 +448,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             <div className="flex rounded-xl border border-border overflow-hidden max-w-xs">
               {[['single','1 destino'],['multi','Multi-ciudad']].map(([v,l]) => (
                 <button key={v} type="button" onClick={() => setMode_(v)}
-                  className={`flex-1 py-2 text-sm font-medium transition-colors ${mode === v ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'}`}>
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${mode === v ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
                   {l}
                 </button>
               ))}
@@ -467,7 +467,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                 value={formData.start_date}
                 onChange={e => setFormData(p => ({ ...p, start_date: e.target.value }))}
                 className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${
-                  missingStart ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-white focus:border-primary'
+                  missingStart ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
                 }`}
               />
               {missingStart && <p className="text-xs text-red-500 mt-1">La fecha de inicio es obligatoria</p>}

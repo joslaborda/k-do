@@ -92,7 +92,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
           const initials = email.charAt(0).toUpperCase();
 
           return (
-            <div key={email} className="flex items-center justify-between p-3 bg-white rounded-xl border border-border">
+            <div key={email} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-medium text-primary">
                   {initials}

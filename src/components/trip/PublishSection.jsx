@@ -182,7 +182,7 @@ export default function PublishSection({
               type="text"
               readOnly
               value={getTemplateShareUrl(trip.template_id)}
-              className="flex-1 px-3 py-2 bg-white border border-border rounded-lg text-xs text-muted-foreground focus:outline-none"
+              className="flex-1 px-3 py-2 bg-card border border-border rounded-lg text-xs text-muted-foreground focus:outline-none"
             />
             <Button
               size="sm"

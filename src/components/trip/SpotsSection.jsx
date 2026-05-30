@@ -99,7 +99,7 @@ function ManualForm({ onSave, saving, onClose }) {
       <div className="flex flex-wrap gap-1.5">
         {ALL_TYPES.filter(t => t.value!=='all').map(t => (
           <button key={t.value} onClick={() => setType(t.value)}
-            className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-orange-700 text-white border-orange-700':'bg-white text-muted-foreground border-border hover:border-orange-300')}>
+            className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-orange-700 text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-orange-300')}>
             {t.emoji} {t.label}
           </button>
         ))}
@@ -234,7 +234,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
         </div>
         <button onClick={() => setPanelMode(panelMode==='manual'?null:'manual')}
           className={"w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center border transition-all " +
-            (panelMode==='manual' ? 'bg-orange-700 text-white border-orange-700' : 'bg-white border-border hover:border-orange-300 text-muted-foreground')}>
+            (panelMode==='manual' ? 'bg-orange-700 text-white border-orange-700' : 'bg-card border-border hover:border-orange-300 text-muted-foreground')}>
           {panelMode==='manual' ? <X className="w-5 h-5"/> : <Plus className="w-5 h-5"/>}
         </button>
       </div>
@@ -275,7 +275,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
           {ALL_TYPES.filter(t => t.value==='all' || spots.some(s => s.type===t.value)).map(t => (
             <button key={t.value} onClick={() => setActiveType(t.value)}
               className={"text-xs px-2.5 py-1 rounded-full border font-medium transition-colors " +
-                (activeType===t.value ? 'bg-orange-700 text-white border-orange-700' : 'bg-white text-muted-foreground border-border hover:border-orange-300')}>
+                (activeType===t.value ? 'bg-orange-700 text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
               {t.emoji} {t.label}
               {t.value!=='all' && <span className="ml-1 opacity-60">{spots.filter(s=>s.type===t.value).length}</span>}
             </button>
