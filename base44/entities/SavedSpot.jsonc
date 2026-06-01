@@ -1,15 +1,16 @@
 {
   "name": "SavedSpot",
   "type": "object",
+  "description": "Spot guardado por un usuario sin estar ligado a un viaje concreto. Sistema de favoritos con carpetas, similar a Instagram Saved.",
   "properties": {
     "user_id": {
       "type": "string",
-      "description": "ID del usuario"
+      "description": "ID del usuario que guarda el spot"
     },
     "folder": {
       "type": "string",
-      "default": "General",
-      "description": "Nombre de la carpeta"
+      "description": "Nombre de la carpeta. Por defecto 'General'",
+      "default": "General"
     },
     "title": {
       "type": "string",
@@ -29,7 +30,7 @@
     },
     "address": {
       "type": "string",
-      "description": "Direcci\u00f3n"
+      "description": "Direcci\u00f3n del lugar"
     },
     "city_name": {
       "type": "string",
@@ -49,7 +50,7 @@
     },
     "link": {
       "type": "string",
-      "description": "Web o enlace"
+      "description": "Web o enlace externo"
     },
     "notes": {
       "type": "string",
@@ -57,15 +58,19 @@
     },
     "image_url": {
       "type": "string",
-      "description": "Foto"
+      "description": "Foto del lugar"
     },
     "source_spot_id": {
       "type": "string",
-      "description": "ID del spot original si se guard\u00f3 de otro usuario"
+      "description": "ID del Spot original si se guard\u00f3 desde el perfil de otro usuario"
     },
     "source_user_id": {
       "type": "string",
-      "description": "ID del usuario original"
+      "description": "ID del usuario original si se guard\u00f3 desde otro perfil"
+    },
+    "fsq_id": {
+      "type": "string",
+      "description": "ID de Foursquare si viene de b\u00fasqueda"
     }
   },
   "required": [

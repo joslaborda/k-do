@@ -1,0 +1,61 @@
+{
+  "name": "DiaryEntry",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "group"
+      ],
+      "default": "personal",
+      "description": "Tipo de entrada"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de la entrada"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del d\u00eda"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido del diario"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de fotos del d\u00eda"
+    },
+    "location": {
+      "type": "string",
+      "description": "Lugar/ciudad"
+    },
+    "mood": {
+      "type": "string",
+      "enum": [
+        "\ud83d\ude0a",
+        "\ud83d\ude0d",
+        "\ud83d\ude0e",
+        "\ud83e\udd14",
+        "\ud83d\ude34",
+        "\ud83e\udd29",
+        "\ud83d\ude0b"
+      ],
+      "description": "Estado de \u00e1nimo"
+    }
+  },
+  "required": [
+    "trip_id",
+    "date",
+    "content"
+  ]
+}

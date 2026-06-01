@@ -16,10 +16,31 @@
     "currency": {
       "type": "string",
       "enum": [
-        "JPY",
         "EUR",
         "USD",
-        "GBP"
+        "GBP",
+        "JPY",
+        "MXN",
+        "COP",
+        "ARS",
+        "CLP",
+        "PEN",
+        "DOP",
+        "BOB",
+        "UYU",
+        "VES",
+        "CNY",
+        "THB",
+        "KRW",
+        "VND",
+        "MAD",
+        "TRY",
+        "CHF",
+        "CAD",
+        "AUD",
+        "IDR",
+        "SGD",
+        "INR"
       ],
       "default": "EUR"
     },
@@ -46,7 +67,8 @@
       "type": "string",
       "enum": [
         "equal",
-        "custom"
+        "custom",
+        "solo"
       ],
       "default": "equal",
       "description": "Tipo de divisi\u00f3n: a partes iguales o personalizado"
@@ -68,6 +90,14 @@
         "type": "string"
       },
       "description": "URLs de fotos de recibos"
+    },
+    "amount_base": {
+      "type": "number",
+      "description": "Importe convertido a la moneda base del viaje (para c\u00e1lculo de balances)"
+    },
+    "exchange_rate": {
+      "type": "number",
+      "description": "Tipo de cambio usado en la conversi\u00f3n (currency \u2192 base_currency)"
     }
   },
   "required": [

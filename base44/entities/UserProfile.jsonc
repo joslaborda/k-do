@@ -74,6 +74,10 @@
         "personal"
       ],
       "default": "trip_members"
+    },
+    "nationality": {
+      "type": "string",
+      "description": "Nacionalidad del usuario \u2014 determina requisitos de visado"
     }
   },
   "required": [

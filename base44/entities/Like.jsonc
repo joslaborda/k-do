@@ -1,6 +1,7 @@
 {
   "name": "Like",
   "type": "object",
+  "description": "Like de un usuario a un spot o itinerario p\u00fablico",
   "properties": {
     "user_id": {
       "type": "string",
@@ -8,7 +9,7 @@
     },
     "target_id": {
       "type": "string",
-      "description": "ID del spot o itinerario"
+      "description": "ID del spot o itinerario que recibe el like"
     },
     "target_type": {
       "type": "string",
@@ -16,11 +17,11 @@
         "spot",
         "template"
       ],
-      "description": "Tipo de contenido"
+      "description": "Tipo de contenido: spot o itinerario"
     },
     "target_owner_id": {
       "type": "string",
-      "description": "ID del propietario del contenido, para notificaciones"
+      "description": "ID del usuario propietario del contenido \u2014 para notificaciones"
     }
   },
   "required": [

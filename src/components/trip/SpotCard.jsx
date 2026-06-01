@@ -217,7 +217,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
                   <input type="file" accept="image/*" className="hidden"
                     onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
                   <div className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
-                    <Image className="w-3.5 h-3.5" />{imageUrl ? 'OK' : 'Galeria'}
+                    <Camera className="w-3.5 h-3.5" />{imageUrl ? 'OK' : 'Galeria'}
                   </div>
                 </label>
                 <label className="cursor-pointer flex-1">

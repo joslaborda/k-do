@@ -1,0 +1,13 @@
+{
+  "name": "FavoriteRestaurant",
+  "type": "object",
+  "properties": {
+    "restaurant_id": {
+      "type": "string",
+      "description": "ID del restaurante"
+    }
+  },
+  "required": [
+    "restaurant_id"
+  ]
+}

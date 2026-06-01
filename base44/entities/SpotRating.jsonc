@@ -1,7 +1,7 @@
 {
   "name": "SpotRating",
   "type": "object",
-  "description": "Valoraci\u00f3n de un spot por un usuario",
+  "description": "Valoraci\u00f3n de un spot por un usuario. Solo se puede valorar si se ha visitado.",
   "properties": {
     "spot_id": {
       "type": "string",

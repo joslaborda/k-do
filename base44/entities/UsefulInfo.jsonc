@@ -1,0 +1,43 @@
+{
+  "name": "UsefulInfo",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la informaci\u00f3n"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "emergencia",
+        "apps",
+        "transporte",
+        "contactos",
+        "otros"
+      ],
+      "description": "Categor\u00eda"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido/descripci\u00f3n"
+    },
+    "link": {
+      "type": "string",
+      "description": "URL si aplica"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji del icono"
+    }
+  },
+  "required": [
+    "trip_id",
+    "title",
+    "category",
+    "content"
+  ]
+}

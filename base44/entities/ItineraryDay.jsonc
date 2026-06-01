@@ -1,0 +1,34 @@
+{
+  "name": "ItineraryDay",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "city_id": {
+      "type": "string",
+      "description": "Reference to City"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "title": {
+      "type": "string",
+      "description": "Day title/theme"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full day content in markdown"
+    },
+    "order": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "trip_id",
+    "city_id",
+    "title"
+  ]
+}

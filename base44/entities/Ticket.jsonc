@@ -42,7 +42,7 @@
     },
     "time": {
       "type": "string",
-      "description": "Hora del documento (HH:MM)"
+      "description": "Hora de salida/llegada en formato HH:MM (vuelos, trenes, buses)"
     },
     "notes": {
       "type": "string"

@@ -1,0 +1,25 @@
+{
+  "name": "TodoItem",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "text": {
+      "type": "string",
+      "description": "Todo item text"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "trip_id",
+    "text"
+  ]
+}

@@ -728,13 +728,7 @@ function TomorrowTab({ trip, cities, tripId }) {
   const { data: allDocs = [] } = useQuery({
     queryKey: ['allDocs', tripId],
     queryFn: async () => {
-      const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
-      // Filter visible tickets (shared or owned by current user)
-      return tickets.filter(t => {
-        const vis = t.visibility || 'personal';
-        if (vis === 'shared') return true;
-        return t.created_by === currentUserEmail || t.user_id === userId;
-      });
+      return base44.entities.Ticket.filter({ trip_id: tripId });
     },
     enabled: !!tripId, staleTime: 60000,
   });
@@ -1527,8 +1521,8 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       pollData.options = pollData.options.map((opt, i) => ({
         ...opt,
         votes: i === optionIdx
-          ? [...new Set([...(opt.votes || []), currentUser?.email])]
-          : (opt.votes || []).filter(v => v !== currentUser?.email)
+          ? [...new Set([...(opt.votes || []), currentUserEmail])]
+          : (opt.votes || []).filter(v => v !== currentUserEmail)
       }));
       await base44.entities.TripMessage.update(msg.id, { file_name: JSON.stringify(pollData) });
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
@@ -1729,7 +1723,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                               {(pd.options||[]).map((opt, i) => {
                                 const votes = opt.votes?.length || 0;
                                 const pct = total ? Math.round(votes / total * 100) : 0;
-                                const voted = opt.votes?.includes(currentUser?.email);
+                                const voted = opt.votes?.includes(currentUserEmail);
                                 return (
                                   <button key={i} onClick={() => votePoll(msg, i)}
                                     className={`w-full text-left px-3 py-2 rounded-xl border text-xs transition-all relative overflow-hidden ${voted ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-border text-foreground hover:border-primary/30'}`}>
@@ -2375,7 +2369,7 @@ export default function Home() {
       return tickets.filter(t => {
         const vis = t.visibility || 'personal';
         if (vis === 'shared') return true;
-        return t.created_by === currentUserEmail || t.user_id === userId;
+        return t.created_by === currentUserEmail || t.user_id === currentUserId;
       });
     },
     enabled: !!tripId && !!currentUserEmail,

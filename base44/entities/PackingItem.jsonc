@@ -1,0 +1,43 @@
+{
+  "name": "PackingItem",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string",
+      "description": "ID del viaje"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario due\u00f1o"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre del art\u00edculo"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "personal",
+        "neceser",
+        "tecnologia",
+        "ropa",
+        "medicinas"
+      ],
+      "description": "Categor\u00eda del art\u00edculo"
+    },
+    "packed": {
+      "type": "boolean",
+      "default": false
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    }
+  },
+  "required": [
+    "trip_id",
+    "user_id",
+    "name",
+    "category"
+  ]
+}
