@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -696,12 +697,21 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
       {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
 
       {/* Item detail sheet */}
-      {selected && (
+      {selected && selected._kind !== 'spot' && (
         <ItemDetailSheet
           item={selected}
           onClose={() => setSelected(null)}
           onSaveTime={handleSaveTime}
           onOpenPdf={(url) => setViewFile(url)}
+        />
+      )}
+      {selected && selected._kind === 'spot' && (
+        <SpotDetailModal
+          spot={selected}
+          open={true}
+          onClose={() => setSelected(null)}
+          queryClient={queryClient}
+          tripId={tripId}
         />
       )}
     </div>

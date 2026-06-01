@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DocumentForm from '@/components/tickets/DocumentForm';
+import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -579,8 +580,15 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
 
       {/* Spot modal — view + edit */}
       {editingSpot && (
-        <SpotEditModal spot={editingSpot} open={!!editingSpot}
-          onClose={() => setEditingSpot(null)} onSave={handleSpotSave} onRemove={handleSpotRemove} />
+        <SpotDetailModal
+          spot={editingSpot}
+          open={!!editingSpot}
+          onClose={() => setEditingSpot(null)}
+          onSave={() => { queryClient.invalidateQueries({ queryKey: ['spots', tripId] }); setEditingSpot(null); }}
+          onRemove={handleSpotRemove}
+          queryClient={queryClient}
+          tripId={tripId}
+        />
       )}
 
       {/* Doc view modal */}
