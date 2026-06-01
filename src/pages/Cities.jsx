@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import DocumentForm from '@/components/tickets/DocumentForm';
+import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
@@ -93,6 +95,7 @@ function DraggableSpots({ spots, onReorder, onEdit }) {
           <span className="text-sm shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
+            {spot.assigned_time && <p className="text-xs text-primary font-medium mt-0.5">{spot.assigned_time}</p>}
             {spot.notes
               ? <p className="text-xs text-muted-foreground mt-0.5 truncate">{spot.notes}</p>
               : <button onClick={() => onEdit(spot)} className="text-xs text-primary mt-0.5 flex items-center gap-1">
@@ -116,7 +119,8 @@ function DraggableSpots({ spots, onReorder, onEdit }) {
 // ── Spot edit modal ───────────────────────────────────────────────────────────
 function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
   const [notes, setNotes] = useState(spot?.notes || '');
-  useEffect(() => { if (spot) setNotes(spot.notes || ''); }, [spot]);
+  const [time, setTime] = useState(spot?.assigned_time || '');
+  useEffect(() => { if (spot) { setNotes(spot.notes || ''); setTime(spot.assigned_time || ''); } }, [spot]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -127,27 +131,40 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
             {spot?.title}
           </DialogTitle>
         </DialogHeader>
-        <div className="px-4 py-4">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Nota personal</p>
-          <Textarea
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="Añade una nota para este spot..."
-            className="text-sm bg-secondary border-border resize-none"
-            rows={3}
-            autoFocus
-          />
+        <div className="px-4 py-4 space-y-4">
+          <div>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Hora</p>
+            <div className="flex items-center gap-2">
+              <input
+                type="time"
+                value={time}
+                onChange={e => setTime(e.target.value)}
+                className="h-9 border border-border rounded-xl px-3 text-sm text-foreground bg-secondary outline-none focus:border-primary w-[120px]"
+              />
+              {time && <button onClick={() => setTime('')} className="text-xs text-muted-foreground hover:text-foreground">Quitar</button>}
+              {!time && <span className="text-xs text-muted-foreground">opcional</span>}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Nota personal</p>
+            <Textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Añade una nota para este spot..."
+              className="text-sm bg-secondary border-border resize-none"
+              rows={3}
+            />
+          </div>
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <button onClick={() => onRemove(spot)}
             className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-            Quitar del día
+            <Trash2 className="w-3 h-3" />Quitar del día
           </button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
-              onClick={() => onSave(spot, notes)}>Guardar</Button>
+              onClick={() => onSave(spot, notes, time)}>Guardar</Button>
           </div>
         </div>
       </DialogContent>
@@ -159,7 +176,7 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
 // ── Doc viewer modal ──────────────────────────────────────────────────────────
 const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50', bus:'bg-amber-50', car:'bg-orange-50', ticket:'bg-rose-50', insurance:'bg-teal-50', other:'bg-secondary' };
 
-function DocViewerModal({ doc, open, onClose }) {
+function DocViewerModal({ doc, open, onClose, onEdit }) {
   const type = doc?.category || doc?.type || doc?.doc_type || 'other';
   const DocIcon = DOC_ICON_MAP[type] || FileText;
   const bgColor = DOC_BG[type] || 'bg-secondary';
@@ -221,11 +238,18 @@ function DocViewerModal({ doc, open, onClose }) {
           )}
         </div>
 
-        <div className="px-4 py-3 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onClose}>Cerrar</Button>
-          {doc?.file_url && (
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" onClick={openFile}>
-              Abrir documento
+        <div className="px-4 py-3 border-t border-border flex justify-between items-center">
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={onClose}>Cerrar</Button>
+            {doc?.file_url && (
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" onClick={openFile}>
+                Abrir
+              </Button>
+            )}
+          </div>
+          {onEdit && (
+            <Button size="sm" variant="outline" onClick={onEdit} className="flex items-center gap-1.5">
+              <Pencil className="w-3.5 h-3.5" />Editar
             </Button>
           )}
         </div>
@@ -235,111 +259,222 @@ function DocViewerModal({ doc, open, onClose }) {
 }
 
 // ── Day expanded content ──────────────────────────────────────────────────────
-function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient }) {
-  const [editingSpot, setEditingSpot] = useState(null);
-  const [viewingDoc, setViewingDoc] = useState(null);
-  const [titleVal, setTitleVal] = useState(day?.title || '');
+function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId }) {
+  const [editingSpot, setEditingSpot] = useState(null);   // spot object — view+edit modal
+  const [viewingDoc,  setViewingDoc]  = useState(null);   // doc object — view modal
+  const [editingDoc,  setEditingDoc]  = useState(null);   // doc object — edit modal
+  const [titleVal,    setTitleVal]    = useState(day?.title || '');
   const [titleEditing, setTitleEditing] = useState(false);
+  const [addingNote,  setAddingNote]  = useState(false);
+  const [editingNote, setEditingNote] = useState(null);   // noteIdx
+  const [newNoteText, setNewNoteText] = useState('');
+  const [newNoteTime, setNewNoteTime] = useState('');
+  const [savingDoc,   setSavingDoc]   = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [order, setOrder]             = useState(null);   // manual drag order for no-time items
 
-  // Notes — multiple notes per day, each with optional time
+  // Notes
   const parseNotes = (raw) => {
     if (!raw) return [];
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    } catch {}
-    // Legacy: single string note
+    try { const p = JSON.parse(raw); if (Array.isArray(p)) return p; } catch {}
     return raw.trim() ? [{ text: raw, time: '' }] : [];
   };
   const [notesList, setNotesList] = useState(() => parseNotes(day?.content));
-  const [savingNotes, setSavingNotes] = useState(false);
   useEffect(() => { setNotesList(parseNotes(day?.content)); setTitleVal(day?.title || ''); }, [day?.id, day?.content, day?.title]);
 
-  const addNote = () => setNotesList(prev => [...prev, { text: '', time: '' }]);
   const updateNote = (i, field, val) => setNotesList(prev => prev.map((n, idx) => idx === i ? { ...n, [field]: val } : n));
-  const removeNote = (i) => setNotesList(prev => prev.filter((_, idx) => idx !== i));
 
-  const saveNotes = async () => {
+  const saveNotes = async (list) => {
     setSavingNotes(true);
-    const clean = notesList.filter(n => n.text.trim());
+    const clean = (list || notesList).filter(n => n.text?.trim());
     const payload = { content: JSON.stringify(clean) };
     try {
-      if (day?.id) {
-        await base44.entities.ItineraryDay.update(day.id, payload);
-      } else {
-        await base44.entities.ItineraryDay.create({
-          city_id: cityId, trip_id: tripId, date: dayDate,
-          title: '', ...payload, order: 0
-        });
-      }
+      if (day?.id) await base44.entities.ItineraryDay.update(day.id, payload);
+      else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: '', ...payload, order: 0 });
       queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
-      queryClient.invalidateQueries({ queryKey: ['allCities'] });
-    } finally {
-      setSavingNotes(false);
-    }
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+    } finally { setSavingNotes(false); }
   };
 
-  const dayDocs = useMemo(() =>
-    [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')),
-    [docs]
-  );
-
-
-
   const saveTitle = async () => {
-    if (day?.id) {
-      await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
-    } else {
-      await base44.entities.ItineraryDay.create({
-        city_id: cityId, trip_id: tripId, date: dayDate,
-        title: titleVal, content: '', order: 0
-      });
-    }
+    if (day?.id) await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
+    else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: titleVal, content: '', order: 0 });
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
-    queryClient.invalidateQueries({ queryKey: ['allCities'] });
     setTitleEditing(false);
   };
 
-  const handleReorder = async (newOrder) => {
-    await Promise.all(newOrder.map((s, i) => base44.entities.Spot.update(s.id, { day_order: i })));
-    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-  };
-
-  const handleSpotSave = async (spot, newNotes) => {
-    await base44.entities.Spot.update(spot.id, { notes: newNotes });
+  const handleSpotSave = async (spot, newNotes, newTime) => {
+    await base44.entities.Spot.update(spot.id, { notes: newNotes, assigned_time: newTime || null });
     queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
     setEditingSpot(null);
   };
-
   const handleSpotRemove = async (spot) => {
-    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null });
+    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
     queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
     setEditingSpot(null);
   };
 
+  const handleDocSave = async (data) => {
+    setSavingDoc(true);
+    try {
+      const enriched = enrichTicketDataWithAutoLinks(data, itineraryDays || [], data.city_id);
+      await base44.entities.Ticket.update(editingDoc.id, enriched);
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setEditingDoc(null);
+    } finally { setSavingDoc(false); }
+  };
+
+  const handleAddNote = async () => {
+    if (!newNoteText.trim()) return;
+    const updated = [...notesList, { text: newNoteText.trim(), time: newNoteTime }];
+    setNotesList(updated);
+    setNewNoteText(''); setNewNoteTime(''); setAddingNote(false);
+    await saveNotes(updated);
+  };
+  const handleDeleteNote = async (idx) => {
+    const updated = notesList.filter((_, i) => i !== idx);
+    setNotesList(updated);
+    setEditingNote(null);
+    await saveNotes(updated);
+  };
+  const handleSaveNote = async (idx) => {
+    await saveNotes(notesList);
+    setEditingNote(null);
+  };
+
+  const dayDocs = [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+
+  // Build timeline
+  const { withTime, noTime } = useMemo(() => {
+    const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _title: d.name || d.title || 'Documento', _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
+    const spotItems = spots.map(s   => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _title: s.title || 'Spot', _sub: s.notes || null }));
+    const noteItems = notesList.filter(n => n.text?.trim()).map((n, i) => ({
+      id: 'note-' + i, _kind: 'note', _time: n.time || null, _title: n.text, _sub: null, _noteIdx: i,
+    }));
+    const all = [...docItems, ...spotItems, ...noteItems];
+    return {
+      withTime: all.filter(i => i._time).sort((a, b) => a._time.localeCompare(b._time)),
+      noTime:   all.filter(i => !i._time),
+    };
+  }, [dayDocs, spots, notesList]);
+
+  // Draggable no-time items
+  const [dragItems, setDragItems]   = useState(noTime);
+  const [dragging,  setDragging]    = useState(null);
+  const [dragOver,  setDragOver]    = useState(null);
+  const touchRef = useRef(null);
+  useEffect(() => { setDragItems(noTime); }, [noTime.length, spots.length, notesList.length]);
+
+  const onDragStart = (e, i) => { setDragging(i); e.dataTransfer.effectAllowed = 'move'; };
+  const onDragOver  = (e, i) => { e.preventDefault(); setDragOver(i); };
+  const onDrop = (e, i) => {
+    e.preventDefault();
+    if (dragging === null || dragging === i) return;
+    const next = [...dragItems]; const [m] = next.splice(dragging, 1); next.splice(i, 0, m);
+    setDragItems(next); setDragging(null); setDragOver(null);
+  };
+  const onDragEnd = () => { setDragging(null); setDragOver(null); };
+  const onTouchStart = (e, i) => { touchRef.current = i; setDragging(i); };
+  const onTouchMove = (e) => {
+    if (touchRef.current === null) return; e.preventDefault();
+    const y = e.touches[0].clientY;
+    document.querySelectorAll('[data-notime-row]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (y >= r.top && y <= r.bottom) setDragOver(parseInt(el.dataset.notimeRow));
+    });
+  };
+  const onTouchEnd = () => {
+    if (touchRef.current !== null && dragOver !== null && touchRef.current !== dragOver) {
+      const next = [...dragItems]; const [m] = next.splice(touchRef.current, 1); next.splice(dragOver, 0, m);
+      setDragItems(next);
+    }
+    touchRef.current = null; setDragging(null); setDragOver(null);
+  };
+
+  const timeline = [...withTime, ...dragItems];
   const bgClass = isToday_ ? 'bg-orange-50/50 dark:bg-orange-950/10' : 'bg-card';
   const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
 
+  const renderItem = (item, idx, isNoTime) => {
+    const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null;
+    const isLast = idx === timeline.length - 1;
+
+    return (
+      <div key={item.id || idx}
+        data-notime-row={isNoTime ? idx - withTime.length : undefined}
+        draggable={isNoTime}
+        onDragStart={isNoTime ? e => onDragStart(e, idx - withTime.length) : undefined}
+        onDragOver={isNoTime ? e => onDragOver(e, idx - withTime.length) : undefined}
+        onDrop={isNoTime ? e => onDrop(e, idx - withTime.length) : undefined}
+        onDragEnd={isNoTime ? onDragEnd : undefined}
+        onTouchStart={isNoTime ? e => onTouchStart(e, idx - withTime.length) : undefined}
+        className={`flex items-stretch border-t border-border transition-all select-none
+          ${isNoTime && dragging === idx - withTime.length ? 'opacity-40' : ''}
+          ${isNoTime && dragOver === idx - withTime.length && dragging !== idx - withTime.length ? 'bg-accent/20' : ''}
+        `}>
+
+        {/* Time column */}
+        <div className="w-12 shrink-0 flex flex-col items-center pt-3.5 pb-1 pl-4 gap-0">
+          {item._time
+            ? <span className="text-[11px] font-medium text-primary leading-none whitespace-nowrap">{item._time}</span>
+            : isNoTime
+            ? <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 cursor-grab touch-none mt-0.5" />
+            : <div className="w-2 h-2 rounded-full bg-border mt-1" />}
+          {!isLast && <div className="w-px flex-1 bg-border/50 mt-1.5" />}
+        </div>
+
+        {/* Tappable body — opens view */}
+        <button
+          onClick={() => {
+            if (item._kind === 'doc')  setViewingDoc(item);
+            if (item._kind === 'spot') setEditingSpot(item);
+            if (item._kind === 'note') setEditingNote(item._noteIdx);
+          }}
+          className="flex-1 flex items-center gap-3 px-3 py-3 hover:bg-secondary/20 transition-colors text-left min-w-0">
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item._kind === 'doc' ? 'bg-orange-50 dark:bg-orange-950/30' : 'bg-secondary'}`}>
+            {item._kind === 'doc' && DocIcon
+              ? <DocIcon size={15} className="text-primary" />
+              : item._kind === 'note'
+              ? <span className="text-sm">📝</span>
+              : <span className="text-sm">{SPOT_ICONS[item.type] || '📍'}</span>}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{item._title}</p>
+            {item._sub && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item._sub}</p>}
+          </div>
+        </button>
+
+        {/* Edit button */}
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            if (item._kind === 'doc')  setEditingDoc(item);
+            if (item._kind === 'spot') setEditingSpot(item);
+            if (item._kind === 'note') setEditingNote(item._noteIdx);
+          }}
+          className="w-10 flex items-center justify-center shrink-0 border-l border-border hover:bg-secondary/30 transition-colors">
+          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+        </button>
+      </div>
+    );
+  };
+
   return (
-    <div className={`${bgClass} ${borderLeft}`}>
-      {/* Title — always editable via pencil button */}
+    <div className={`${bgClass} ${borderLeft}`} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+
+      {/* Title */}
       <div className="px-4 py-3 border-t border-border bg-card">
         {titleEditing ? (
           <div className="flex items-center gap-2">
-            <Input
-              value={titleVal}
-              onChange={e => setTitleVal(e.target.value)}
-              placeholder="¿Qué harás este día?"
-              className="flex-1 h-9 text-sm bg-secondary border-border"
-              autoFocus
-              onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }}
-            />
-            <button onClick={() => setTitleEditing(false)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
+            <Input value={titleVal} onChange={e => setTitleVal(e.target.value)}
+              placeholder="¿Qué harás este día?" className="flex-1 h-9 text-sm bg-secondary border-border"
+              autoFocus onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }} />
+            <button onClick={() => setTitleEditing(false)} className="text-muted-foreground p-1"><X className="w-4 h-4" /></button>
             <button onClick={saveTitle} className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
         ) : (
-          <button onClick={() => setTitleEditing(true)}
-            className="w-full flex items-center gap-2 text-left group">
+          <button onClick={() => setTitleEditing(true)} className="w-full flex items-center gap-2 text-left group">
             <span className={`flex-1 text-sm ${titleVal ? 'font-medium text-foreground' : 'text-muted-foreground italic'}`}>
               {titleVal || 'Añadir título al día...'}
             </span>
@@ -348,119 +483,103 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         )}
       </div>
 
-      {/* Documents */}
-      {dayDocs.length > 0 && (
-        <div>
-          <div className="px-4 py-1.5 bg-secondary/50 border-t border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Documentos</p>
-          </div>
-          {dayDocs.map(doc => (
-            <button key={doc.id} onClick={() => setViewingDoc(doc)}
-              className="w-full flex items-center gap-3 px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors text-left">
-              {(() => { const I = DOC_ICON_MAP[doc.category || doc.type || doc.doc_type] || FileText; return <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0"><I size={16} className="text-muted-foreground" /></div>; })()}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{doc.name || doc.title}</p>
-                {doc.time && <p className="text-xs text-primary font-medium mt-0.5">{doc.time}</p>}
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Timeline */}
+      {timeline.map((item, idx) => renderItem(item, idx, idx >= withTime.length))}
 
-      {/* Spots */}
-      {spots.length > 0 && (
-        <div>
-          <div className="px-4 py-1.5 bg-secondary/50 border-t border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Spots</p>
-          </div>
-          <DraggableSpots
-            spots={spots}
-            onReorder={handleReorder}
-            onEdit={setEditingSpot}
-          />
-        </div>
-      )}
-
-      {/* Add spot */}
-      <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-        className="flex items-center gap-2 px-4 py-3 border-t border-border hover:bg-accent/20 transition-colors">
-        <MapPin className="w-3.5 h-3.5 text-primary" />
-        <span className="text-sm text-primary font-medium">Añadir spot</span>
-      </Link>
-
-      {/* Notes — multiple */}
-      <div className="px-4 py-3 border-t border-border">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notas del día</p>
-          <button onClick={addNote} className="flex items-center gap-1 text-xs text-primary font-medium hover:opacity-70 transition-opacity">
-            <Plus className="w-3.5 h-3.5" />Añadir nota
-          </button>
-        </div>
-        {notesList.length === 0 && (
-          <button onClick={addNote}
-            className="w-full py-3 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex items-center justify-center gap-1.5">
-            <Plus className="w-4 h-4" />Nueva nota
-          </button>
-        )}
-        <div className="space-y-3">
-          {notesList.map((note, i) => (
-            <div key={i} className="bg-secondary/40 rounded-xl border border-border overflow-hidden">
-              <Textarea
-                value={note.text}
-                onChange={e => updateNote(i, 'text', e.target.value)}
-                placeholder={isToday_ ? '¿Algo que apuntar para hoy?' : isTomorrow_ ? '¿Algo que apuntar para mañana?' : 'Nota...'}
-                className="text-sm bg-transparent border-0 resize-none w-full focus:ring-0 shadow-none"
-                rows={3}
-              />
-              <div className="flex items-center gap-2 px-3 pb-2 border-t border-border/50 pt-2">
-                <input
-                  type="time"
-                  value={note.time}
-                  onChange={e => updateNote(i, 'time', e.target.value)}
-                  className="h-7 border border-border rounded-lg px-2 text-xs text-foreground bg-card outline-none focus:border-primary w-[100px]"
-                />
-                <span className="text-[10px] text-muted-foreground">hora opcional</span>
-                <button onClick={() => removeNote(i)} className="ml-auto text-muted-foreground hover:text-red-500 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        {notesList.length > 0 && (
-          <button
-            onClick={saveNotes}
-            disabled={savingNotes}
-            className="mt-3 w-full py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50">
-            {savingNotes ? 'Guardando...' : 'Guardar notas'}
-          </button>
-        )}
+      {/* Add actions */}
+      <div className="flex border-t border-border">
+        <button onClick={() => { /* open doc form via editingDoc=null+addingDoc */ }}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors border-r border-border">
+          <Plus className="w-3.5 h-3.5" />Doc
+        </button>
+        <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors border-r border-border">
+          <MapPin className="w-3.5 h-3.5" />Spot
+        </Link>
+        <button onClick={() => { setAddingNote(true); setNewNoteText(''); setNewNoteTime(''); }}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors">
+          <Plus className="w-3.5 h-3.5" />Nota
+        </button>
       </div>
 
-      {editingSpot && (
-        <SpotEditModal
-          spot={editingSpot}
-          open={!!editingSpot}
-          onClose={() => setEditingSpot(null)}
-          onSave={handleSpotSave}
-          onRemove={handleSpotRemove}
-        />
+      {/* Add note inline */}
+      {addingNote && (
+        <div className="border-t border-border p-4 bg-secondary/30">
+          <Textarea value={newNoteText} onChange={e => setNewNoteText(e.target.value)}
+            placeholder="Escribe una nota..." className="text-sm bg-card border-border resize-none w-full mb-3" rows={3} autoFocus />
+          <div className="flex items-center gap-3 flex-wrap">
+            <input type="time" value={newNoteTime} onChange={e => setNewNoteTime(e.target.value)}
+              className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
+            <span className="text-xs text-muted-foreground">hora opcional</span>
+            <div className="ml-auto flex gap-2">
+              <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-3 py-1.5 rounded-lg border border-border">Cancelar</button>
+              <button onClick={handleAddNote} disabled={!newNoteText.trim()}
+                className="text-xs text-white bg-primary px-3 py-1.5 rounded-lg disabled:opacity-40">Guardar</button>
+            </div>
+          </div>
+        </div>
       )}
 
+      {/* Edit note inline */}
+      {editingNote !== null && notesList[editingNote] && (
+        <div className="border-t border-border p-4 bg-secondary/30">
+          <Textarea value={notesList[editingNote].text} onChange={e => updateNote(editingNote, 'text', e.target.value)}
+            className="text-sm bg-card border-border resize-none w-full mb-3" rows={3} autoFocus />
+          <div className="flex items-center gap-3 flex-wrap">
+            <input type="time" value={notesList[editingNote].time || ''} onChange={e => updateNote(editingNote, 'time', e.target.value)}
+              className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
+            <button onClick={() => handleDeleteNote(editingNote)} className="text-xs text-red-500 flex items-center gap-1">
+              <Trash2 className="w-3 h-3" />Eliminar
+            </button>
+            <div className="ml-auto flex gap-2">
+              <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-3 py-1.5 rounded-lg border border-border">Cancelar</button>
+              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-3 py-1.5 rounded-lg">Guardar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spot modal — view + edit */}
+      {editingSpot && (
+        <SpotEditModal spot={editingSpot} open={!!editingSpot}
+          onClose={() => setEditingSpot(null)} onSave={handleSpotSave} onRemove={handleSpotRemove} />
+      )}
+
+      {/* Doc view modal */}
       {viewingDoc && (
-        <DocViewerModal
-          doc={viewingDoc}
-          open={!!viewingDoc}
-          onClose={() => setViewingDoc(null)}
-        />
+        <DocViewerModal doc={viewingDoc} open={!!viewingDoc} onClose={() => setViewingDoc(null)}
+          onEdit={() => { setEditingDoc(viewingDoc); setViewingDoc(null); }} />
+      )}
+
+      {/* Doc edit modal */}
+      {editingDoc && (
+        <Dialog open={!!editingDoc} onOpenChange={o => { if (!o) setEditingDoc(null); }}>
+          <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
+            <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
+              <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
+            </DialogHeader>
+            <div className="px-5 py-4 overflow-y-auto flex-1">
+              <DocumentForm
+                initialData={editingDoc}
+                cities={cities || []}
+                itineraryDays={itineraryDays || []}
+                members={trip?.members || []}
+                profiles={profiles || []}
+                tripCities={cities || []}
+                onSave={handleDocSave}
+                onCancel={() => setEditingDoc(null)}
+                saving={savingDoc}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
 }
 
 // ── Day row ───────────────────────────────────────────────────────────────────
-function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen }) {
+function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen, trip, cities, itineraryDays, profiles, userId }) {
   const [open, setOpen] = useState(defaultOpen);
 
   const docs = useMemo(() =>
@@ -523,6 +642,11 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
           isEmpty={isEmpty}
           onReorderSpots={() => {}}
           queryClient={queryClient}
+          trip={trip}
+          cities={cities}
+          itineraryDays={itineraryDays}
+          profiles={profiles}
+          userId={userId}
         />
       )}
     </div>
@@ -530,7 +654,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
 }
 
 // ── City block ────────────────────────────────────────────────────────────────
-function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient }) {
+function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId }) {
   const [open, setOpen] = useState(isActive);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -625,6 +749,11 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
                   isTomorrow_={dateStr === tomorrowStr}
                   queryClient={queryClient}
                   defaultOpen={dateStr === todayStr}
+                  trip={trip}
+                  cities={cities}
+                  itineraryDays={itineraryDays}
+                  profiles={profiles}
+                  userId={userId}
                 />
               ))}
             </div>
@@ -655,6 +784,7 @@ export default function Cities() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
+  const userId = currentUser?.id ?? '';
 
   const [tripId, setTripId] = useState(null);
 
@@ -687,6 +817,12 @@ export default function Cities() {
     queryKey: ['allDocs', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 60000,
+  });
+
+  const { data: profiles = [] } = useQuery({
+    queryKey: ['allProfiles'],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: allSpots = [] } = useQuery({
@@ -788,6 +924,10 @@ export default function Cities() {
                   isActive={isActive}
                   isPast={isPast}
                   queryClient={queryClient}
+                  trip={trip}
+                  cities={cities}
+                  profiles={profiles}
+                  userId={userId}
                 />
               );
             })}
