@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, X, Check, GripVertical, MapPin } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin } from 'lucide-react';
 import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ship, Ticket, Shield, FileText } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -239,7 +239,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   const [editingSpot, setEditingSpot] = useState(null);
   const [viewingDoc, setViewingDoc] = useState(null);
   const [titleVal, setTitleVal] = useState(day?.title || '');
-  const [titleEditing, setTitleEditing] = useState(isEmpty && !day?.title);
+  const [titleEditing, setTitleEditing] = useState(false);
 
   // Notes — multiple notes per day, each with optional time
   const parseNotes = (raw) => {
@@ -322,24 +322,31 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
 
   return (
     <div className={`${bgClass} ${borderLeft}`}>
-      {/* Title — for empty days or editing */}
-      {(isEmpty || titleEditing) && (
-        <div className="px-4 py-3 border-t border-border bg-card">
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Título del día</p>
+      {/* Title — always editable via pencil button */}
+      <div className="px-4 py-3 border-t border-border bg-card">
+        {titleEditing ? (
           <div className="flex items-center gap-2">
             <Input
               value={titleVal}
               onChange={e => setTitleVal(e.target.value)}
               placeholder="¿Qué harás este día?"
               className="flex-1 h-9 text-sm bg-secondary border-border"
-              autoFocus={isEmpty}
+              autoFocus
               onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }}
             />
-            <button onClick={() => setTitleEditing(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
-            <button onClick={saveTitle} className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center"><Check className="w-3.5 h-3.5 text-white" /></button>
+            <button onClick={() => setTitleEditing(false)} className="text-muted-foreground hover:text-foreground p-1"><X className="w-4 h-4" /></button>
+            <button onClick={saveTitle} className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
-        </div>
-      )}
+        ) : (
+          <button onClick={() => setTitleEditing(true)}
+            className="w-full flex items-center gap-2 text-left group">
+            <span className={`flex-1 text-sm ${titleVal ? 'font-medium text-foreground' : 'text-muted-foreground italic'}`}>
+              {titleVal || 'Añadir título al día...'}
+            </span>
+            <Pencil className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          </button>
+        )}
+      </div>
 
       {/* Documents */}
       {dayDocs.length > 0 && (
@@ -490,9 +497,11 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
         <span className={`flex-1 text-sm text-left truncate ${
           day?.title
             ? isToday_ ? 'font-semibold text-primary' : 'font-medium text-foreground'
-            : 'text-muted-foreground italic'
+            : hasContent ? 'font-medium text-foreground' : 'text-muted-foreground italic'
         }`}>
-          {day?.title || 'Sin planificar'}
+          {day?.title || (hasContent
+            ? [docs.length && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')
+            : 'Sin planificar')}
         </span>
         {isToday_ && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0">hoy</span>}
         {isTomorrow_ && open && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full shrink-0">mañana</span>}
