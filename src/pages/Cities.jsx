@@ -528,7 +528,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             <div className="ml-auto flex gap-2">
               <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
               <button onClick={handleAddNote} disabled={!newNoteText.trim()}
-                className="text-xs text-white bg-[#c2410c] px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-[#c2410c]/90 transition-colors">Guardar</button>
+                className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">Guardar</button>
             </div>
           </div>
         </div>
@@ -547,7 +547,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             </button>
             <div className="ml-auto flex gap-2">
               <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
-              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-[#c2410c] px-4 py-2 rounded-full font-medium hover:bg-[#c2410c]/90 transition-colors">Guardar</button>
+              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors">Guardar</button>
             </div>
           </div>
         </div>
