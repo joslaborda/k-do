@@ -498,15 +498,26 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
     })();
   }, [isToday_, city?.name]);
 
-  // Merge docs + spots into one timeline sorted by time
+  // Merge docs + spots + day notes into one timeline sorted by time
   const timeline = useMemo(() => {
     const docItems  = docs.map(d  => ({ ...d,  _kind: 'doc'  }));
     const spotItems = spots.map(s => ({ ...s,  _kind: 'spot' }));
-    const all = [...docItems, ...spotItems];
+    // Include ItineraryDay notes that have content
+    const dayNotes = (itineraryDays || [])
+      .filter(d => d.city_id === city?.id && d.date === dateStr && d.content?.trim())
+      .map(d => ({
+        id: d.id,
+        _kind: 'note',
+        title: d.content.length > 50 ? d.content.slice(0, 50) + '…' : d.content,
+        content: d.content,
+        time: d.note_time || null,
+        type: 'note',
+      }));
+    const all = [...docItems, ...spotItems, ...dayNotes];
     const withTime    = all.filter(i => i.time).sort((a, b) => a.time.localeCompare(b.time));
     const withoutTime = all.filter(i => !i.time);
     return [...withTime, ...withoutTime];
-  }, [docs, spots]);
+  }, [docs, spots, itineraryDays, city?.id, dateStr]);
 
   const hasContent = timeline.length > 0;
 
@@ -567,8 +578,9 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           {hasContent ? (
             timeline.map((item, idx) => {
               const isDoc   = item._kind === 'doc';
+              const isNote  = item._kind === 'note';
               const DocIcon = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : null;
-              const spotEmoji = !isDoc ? (SPOT_ICONS[item.type] || '📍') : null;
+              const spotEmoji = (!isDoc && !isNote) ? (SPOT_ICONS[item.type] || '📍') : null;
               const isLast  = idx === timeline.length - 1;
               const hasTime = !!item.time;
 
@@ -600,9 +612,11 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   </div>
 
                   {/* Icon */}
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : 'bg-secondary'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : item._kind === 'note' ? 'bg-secondary' : 'bg-secondary'}`}>
                     {isDoc && DocIcon
                       ? <DocIcon size={16} stroke="currentColor" className="text-primary" />
+                      : item._kind === 'note'
+                      ? <span className="text-base">📝</span>
                       : <span className="text-base">{spotEmoji}</span>
                     }
                   </div>
@@ -612,8 +626,11 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                     <p className="text-sm font-medium text-foreground truncate">
                       {item.title || item.name || 'Sin título'}
                     </p>
-                    {!isDoc && item.notes && (
+                    {!isDoc && !isNote && item.notes && (
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.notes}</p>
+                    )}
+                    {isNote && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.content}</p>
                     )}
                     {isDoc && !hasTime && (
                       <p className="text-xs text-muted-foreground mt-0.5">Sin hora · toca para añadir</p>
@@ -720,6 +737,12 @@ function TomorrowTab({ trip, cities, tripId }) {
     enabled: !!tripId, staleTime: 30000,
   });
 
+  const { data: itineraryDays = [] } = useQuery({
+    queryKey: ['itineraryDays', tripId],
+    queryFn: () => base44.entities.ItineraryDay.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+
   const tomorrowDocs = allDocs.filter(d => d.date === tomorrowStr || d.valid_from === tomorrowStr || d.start_date === tomorrowStr);
   const tomorrowSpots = tomorrowCity
     ? allSpots.filter(s => s.city_id === tomorrowCity.id && s.assigned_date === tomorrowStr)
@@ -741,7 +764,8 @@ function TomorrowTab({ trip, cities, tripId }) {
         city={tomorrowCity}
         docs={tomorrowDocs}
         spots={tomorrowSpots}
-        itineraryDays={[]}
+        itineraryDays={itineraryDays}
+        dateStr={tomorrowStr}
         tripId={tripId}
         defaultOpen={true}
         dateStr={tomorrowStr}

@@ -239,8 +239,10 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   const [editingSpot, setEditingSpot] = useState(null);
   const [viewingDoc, setViewingDoc] = useState(null);
   const [notes, setNotes] = useState(day?.content || '');
+  const [noteTime, setNoteTime] = useState(day?.note_time || '');
   const [notesChanged, setNotesChanged] = useState(false);
   const [titleVal, setTitleVal] = useState(day?.title || '');
+  useEffect(() => { setNotes(day?.content || ''); setNoteTime(day?.note_time || ''); }, [day?.id]);
   const [titleEditing, setTitleEditing] = useState(isEmpty && !day?.title);
 
   const dayDocs = useMemo(() =>
@@ -250,13 +252,13 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
 
   const saveNotes = async () => {
     if (!notesChanged) return;
+    const payload = { content: notes, note_time: noteTime || null };
     if (day?.id) {
-      await base44.entities.ItineraryDay.update(day.id, { content: notes });
+      await base44.entities.ItineraryDay.update(day.id, payload);
     } else {
-      // Create ItineraryDay if it doesn't exist
       await base44.entities.ItineraryDay.create({
         city_id: cityId, trip_id: tripId, date: dayDate,
-        title: '', content: notes, order: 0
+        title: '', ...payload, order: 0
       });
     }
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
@@ -366,7 +368,6 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         <Textarea
           value={notes}
           onChange={e => { setNotes(e.target.value); setNotesChanged(true); }}
-          onBlur={saveNotes}
           placeholder={
             isToday_ ? '¿Algo que apuntar para hoy?' :
             isTomorrow_ ? '¿Algo que apuntar para mañana?' :
@@ -375,6 +376,23 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
           className="text-sm bg-card border-border resize-none min-h-[100px] w-full"
           rows={4}
         />
+        <div className="flex items-center gap-2 mt-2">
+          <label className="text-xs text-muted-foreground shrink-0">Hora</label>
+          <input
+            type="time"
+            value={noteTime}
+            onChange={e => { setNoteTime(e.target.value); setNotesChanged(true); }}
+            className="h-8 border border-border rounded-lg px-2 text-sm text-foreground bg-card outline-none focus:border-primary flex-1 max-w-[110px]"
+          />
+          <span className="text-xs text-muted-foreground">opcional</span>
+        </div>
+        {notesChanged && (
+          <button
+            onClick={saveNotes}
+            className="mt-2 w-full py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors">
+            Guardar nota
+          </button>
+        )}
       </div>
 
       {editingSpot && (
