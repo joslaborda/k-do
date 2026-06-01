@@ -270,6 +270,8 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   const [newNoteText, setNewNoteText] = useState('');
   const [newNoteTime, setNewNoteTime] = useState('');
   const [savingDoc,   setSavingDoc]   = useState(false);
+  const [addingDoc,   setAddingDoc]   = useState(false);
+  const [savingNewDoc, setSavingNewDoc] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [order, setOrder]             = useState(null);   // manual drag order for no-time items
 
@@ -321,8 +323,20 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
       await base44.entities.Ticket.update(editingDoc.id, enriched);
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       setEditingDoc(null);
     } finally { setSavingDoc(false); }
+  };
+
+  const handleDocCreate = async (data) => {
+    setSavingNewDoc(true);
+    try {
+      const enriched = enrichTicketDataWithAutoLinks(data, itineraryDays || [], data.city_id);
+      await base44.entities.Ticket.create({ ...enriched, trip_id: tripId, user_id: userId, date: enriched.date || dayDate });
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setAddingDoc(false);
+    } finally { setSavingNewDoc(false); }
   };
 
   const handleAddNote = async () => {
@@ -488,16 +502,16 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
 
       {/* Add actions */}
       <div className="flex border-t border-border">
-        <button onClick={() => { /* open doc form via editingDoc=null+addingDoc */ }}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors border-r border-border">
+        <button onClick={() => setAddingDoc(true)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors border-r border-border">
           <Plus className="w-3.5 h-3.5" />Doc
         </button>
         <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors border-r border-border">
-          <MapPin className="w-3.5 h-3.5" />Spot
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors border-r border-border">
+          <Plus className="w-3.5 h-3.5" />Spot
         </Link>
         <button onClick={() => { setAddingNote(true); setNewNoteText(''); setNewNoteTime(''); }}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs text-muted-foreground hover:text-primary hover:bg-secondary/20 transition-colors">
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors">
           <Plus className="w-3.5 h-3.5" />Nota
         </button>
       </div>
@@ -512,9 +526,9 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
             <span className="text-xs text-muted-foreground">hora opcional</span>
             <div className="ml-auto flex gap-2">
-              <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-3 py-1.5 rounded-lg border border-border">Cancelar</button>
+              <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
               <button onClick={handleAddNote} disabled={!newNoteText.trim()}
-                className="text-xs text-white bg-primary px-3 py-1.5 rounded-lg disabled:opacity-40">Guardar</button>
+                className="text-xs text-white bg-[#c2410c] px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-[#c2410c]/90 transition-colors">Guardar</button>
             </div>
           </div>
         </div>
@@ -532,11 +546,35 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               <Trash2 className="w-3 h-3" />Eliminar
             </button>
             <div className="ml-auto flex gap-2">
-              <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-3 py-1.5 rounded-lg border border-border">Cancelar</button>
-              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-3 py-1.5 rounded-lg">Guardar</button>
+              <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
+              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-[#c2410c] px-4 py-2 rounded-full font-medium hover:bg-[#c2410c]/90 transition-colors">Guardar</button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Add doc modal */}
+      {addingDoc && (
+        <Dialog open={addingDoc} onOpenChange={o => { if (!o) setAddingDoc(false); }}>
+          <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
+            <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
+              <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
+            </DialogHeader>
+            <div className="px-5 py-4 overflow-y-auto flex-1">
+              <DocumentForm
+                cities={cities || []}
+                itineraryDays={itineraryDays || []}
+                members={trip?.members || []}
+                profiles={profiles || []}
+                tripCities={cities || []}
+                initialData={{ date: dayDate }}
+                onSave={handleDocCreate}
+                onCancel={() => setAddingDoc(false)}
+                saving={savingNewDoc}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Spot modal — view + edit */}
