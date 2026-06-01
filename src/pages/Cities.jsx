@@ -238,33 +238,53 @@ function DocViewerModal({ doc, open, onClose }) {
 function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient }) {
   const [editingSpot, setEditingSpot] = useState(null);
   const [viewingDoc, setViewingDoc] = useState(null);
-  const [notes, setNotes] = useState(day?.content || '');
-  const [noteTime, setNoteTime] = useState(day?.note_time || '');
-  const [notesChanged, setNotesChanged] = useState(false);
   const [titleVal, setTitleVal] = useState(day?.title || '');
-  useEffect(() => { setNotes(day?.content || ''); setNoteTime(day?.note_time || ''); }, [day?.id]);
   const [titleEditing, setTitleEditing] = useState(isEmpty && !day?.title);
+
+  // Notes — multiple notes per day, each with optional time
+  const parseNotes = (raw) => {
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    // Legacy: single string note
+    return raw.trim() ? [{ text: raw, time: '' }] : [];
+  };
+  const [notesList, setNotesList] = useState(() => parseNotes(day?.content));
+  const [savingNotes, setSavingNotes] = useState(false);
+  useEffect(() => { setNotesList(parseNotes(day?.content)); setTitleVal(day?.title || ''); }, [day?.id, day?.content, day?.title]);
+
+  const addNote = () => setNotesList(prev => [...prev, { text: '', time: '' }]);
+  const updateNote = (i, field, val) => setNotesList(prev => prev.map((n, idx) => idx === i ? { ...n, [field]: val } : n));
+  const removeNote = (i) => setNotesList(prev => prev.filter((_, idx) => idx !== i));
+
+  const saveNotes = async () => {
+    setSavingNotes(true);
+    const clean = notesList.filter(n => n.text.trim());
+    const payload = { content: JSON.stringify(clean) };
+    try {
+      if (day?.id) {
+        await base44.entities.ItineraryDay.update(day.id, payload);
+      } else {
+        await base44.entities.ItineraryDay.create({
+          city_id: cityId, trip_id: tripId, date: dayDate,
+          title: '', ...payload, order: 0
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['allCities'] });
+    } finally {
+      setSavingNotes(false);
+    }
+  };
 
   const dayDocs = useMemo(() =>
     [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')),
     [docs]
   );
 
-  const saveNotes = async () => {
-    if (!notesChanged) return;
-    const payload = { content: notes, note_time: noteTime || null };
-    if (day?.id) {
-      await base44.entities.ItineraryDay.update(day.id, payload);
-    } else {
-      await base44.entities.ItineraryDay.create({
-        city_id: cityId, trip_id: tripId, date: dayDate,
-        title: '', ...payload, order: 0
-      });
-    }
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
-    queryClient.invalidateQueries({ queryKey: ['allCities'] });
-    setNotesChanged(false);
-  };
+
 
   const saveTitle = async () => {
     if (day?.id) {
@@ -362,35 +382,51 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         <span className="text-sm text-primary font-medium">Añadir spot</span>
       </Link>
 
-      {/* Notes */}
+      {/* Notes — multiple */}
       <div className="px-4 py-3 border-t border-border">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Notas del día</p>
-        <Textarea
-          value={notes}
-          onChange={e => { setNotes(e.target.value); setNotesChanged(true); }}
-          placeholder={
-            isToday_ ? '¿Algo que apuntar para hoy?' :
-            isTomorrow_ ? '¿Algo que apuntar para mañana?' :
-            '¿Algo que apuntar para este día?'
-          }
-          className="text-sm bg-card border-border resize-none min-h-[100px] w-full"
-          rows={4}
-        />
-        <div className="flex items-center gap-2 mt-2">
-          <label className="text-xs text-muted-foreground shrink-0">Hora</label>
-          <input
-            type="time"
-            value={noteTime}
-            onChange={e => { setNoteTime(e.target.value); setNotesChanged(true); }}
-            className="h-8 border border-border rounded-lg px-2 text-sm text-foreground bg-card outline-none focus:border-primary flex-1 max-w-[110px]"
-          />
-          <span className="text-xs text-muted-foreground">opcional</span>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notas del día</p>
+          <button onClick={addNote} className="flex items-center gap-1 text-xs text-primary font-medium hover:opacity-70 transition-opacity">
+            <Plus className="w-3.5 h-3.5" />Añadir nota
+          </button>
         </div>
-        {notesChanged && (
+        {notesList.length === 0 && (
+          <button onClick={addNote}
+            className="w-full py-3 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex items-center justify-center gap-1.5">
+            <Plus className="w-4 h-4" />Nueva nota
+          </button>
+        )}
+        <div className="space-y-3">
+          {notesList.map((note, i) => (
+            <div key={i} className="bg-secondary/40 rounded-xl border border-border overflow-hidden">
+              <Textarea
+                value={note.text}
+                onChange={e => updateNote(i, 'text', e.target.value)}
+                placeholder={isToday_ ? '¿Algo que apuntar para hoy?' : isTomorrow_ ? '¿Algo que apuntar para mañana?' : 'Nota...'}
+                className="text-sm bg-transparent border-0 resize-none w-full focus:ring-0 shadow-none"
+                rows={3}
+              />
+              <div className="flex items-center gap-2 px-3 pb-2 border-t border-border/50 pt-2">
+                <input
+                  type="time"
+                  value={note.time}
+                  onChange={e => updateNote(i, 'time', e.target.value)}
+                  className="h-7 border border-border rounded-lg px-2 text-xs text-foreground bg-card outline-none focus:border-primary w-[100px]"
+                />
+                <span className="text-[10px] text-muted-foreground">hora opcional</span>
+                <button onClick={() => removeNote(i)} className="ml-auto text-muted-foreground hover:text-red-500 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        {notesList.length > 0 && (
           <button
             onClick={saveNotes}
-            className="mt-2 w-full py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors">
-            Guardar nota
+            disabled={savingNotes}
+            className="mt-3 w-full py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50">
+            {savingNotes ? 'Guardando...' : 'Guardar notas'}
           </button>
         )}
       </div>

@@ -502,17 +502,25 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   const timeline = useMemo(() => {
     const docItems  = docs.map(d  => ({ ...d,  _kind: 'doc'  }));
     const spotItems = spots.map(s => ({ ...s,  _kind: 'spot' }));
-    // Include ItineraryDay notes that have content
+    // Include ItineraryDay notes — new format is JSON array, legacy is plain string
+    const parseNotes = (raw) => {
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+      return raw.trim() ? [{ text: raw, time: '' }] : [];
+    };
     const dayNotes = (itineraryDays || [])
       .filter(d => d.city_id === city?.id && d.date === dateStr && d.content?.trim())
-      .map(d => ({
-        id: d.id,
+      .flatMap(d => parseNotes(d.content).filter(n => n.text?.trim()).map((n, i) => ({
+        id: d.id + '-' + i,
         _kind: 'note',
-        title: d.content.length > 50 ? d.content.slice(0, 50) + '…' : d.content,
-        content: d.content,
-        time: d.note_time || null,
+        title: n.text.length > 50 ? n.text.slice(0, 50) + '…' : n.text,
+        content: n.text,
+        time: n.time || null,
         type: 'note',
-      }));
+      })));
     const all = [...docItems, ...spotItems, ...dayNotes];
     const withTime    = all.filter(i => i.time).sort((a, b) => a.time.localeCompare(b.time));
     const withoutTime = all.filter(i => !i.time);
