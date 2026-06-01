@@ -1237,14 +1237,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
 
   const { data: allDocs = [] } = useQuery({
     queryKey: ['allDocs', tripId],
-    queryFn: async () => {
-      const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
-      return tickets.filter(t => {
-        const vis = t.visibility || 'personal';
-        if (vis === 'shared') return true;
-        return t.created_by === currentUserEmail || t.user_id === userId;
-      });
-    },
+    queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 60000,
   });
 
