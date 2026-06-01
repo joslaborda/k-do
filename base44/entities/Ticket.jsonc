@@ -40,6 +40,10 @@
       "format": "date",
       "description": "Fecha fin (checkout hotel, etc.)"
     },
+    "time": {
+      "type": "string",
+      "description": "Hora del documento (HH:MM)"
+    },
     "notes": {
       "type": "string"
     },
