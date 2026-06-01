@@ -702,7 +702,15 @@ function TomorrowTab({ trip, cities, tripId }) {
 
   const { data: allDocs = [] } = useQuery({
     queryKey: ['allDocs', tripId],
-    queryFn: () => base44.entities.Document.filter({ trip_id: tripId }),
+    queryFn: async () => {
+      const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
+      // Filter visible tickets (shared or owned by current user)
+      return tickets.filter(t => {
+        const vis = t.visibility || 'personal';
+        if (vis === 'shared') return true;
+        return t.created_by === currentUserEmail || t.user_id === userId;
+      });
+    },
     enabled: !!tripId, staleTime: 60000,
   });
 
@@ -712,7 +720,7 @@ function TomorrowTab({ trip, cities, tripId }) {
     enabled: !!tripId, staleTime: 30000,
   });
 
-  const tomorrowDocs  = allDocs.filter(d => d.date === tomorrowStr || d.valid_from === tomorrowStr || d.start_date === tomorrowStr);
+  const tomorrowDocs = allDocs.filter(d => d.date === tomorrowStr || d.valid_from === tomorrowStr || d.start_date === tomorrowStr);
   const tomorrowSpots = tomorrowCity
     ? allSpots.filter(s => s.city_id === tomorrowCity.id && s.assigned_date === tomorrowStr)
         .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999))
@@ -1203,7 +1211,14 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
 
   const { data: allDocs = [] } = useQuery({
     queryKey: ['allDocs', tripId],
-    queryFn: () => base44.entities.Document.filter({ trip_id: tripId }),
+    queryFn: async () => {
+      const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
+      return tickets.filter(t => {
+        const vis = t.visibility || 'personal';
+        if (vis === 'shared') return true;
+        return t.created_by === currentUserEmail || t.user_id === userId;
+      });
+    },
     enabled: !!tripId, staleTime: 60000,
   });
 
@@ -2321,7 +2336,19 @@ export default function Home() {
   const { data: cities = [] } = useQuery({ queryKey: ['cities', tripId], queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'), enabled: !!tripId, staleTime: 30000 });
   const { data: expenses = [] } = useQuery({ queryKey: ['expenses', tripId], queryFn: () => base44.entities.Expense.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: packingItems = [] } = useQuery({ queryKey: ['packingItems', tripId], queryFn: () => base44.entities.PackingItem.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
-  const { data: documents = [] } = useQuery({ queryKey: ['documents', tripId], queryFn: () => base44.entities.Document.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
+  const { data: documents = [] } = useQuery({
+    queryKey: ['documents', tripId],
+    queryFn: async () => {
+      const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
+      return tickets.filter(t => {
+        const vis = t.visibility || 'personal';
+        if (vis === 'shared') return true;
+        return t.created_by === currentUserEmail || t.user_id === userId;
+      });
+    },
+    enabled: !!tripId && !!currentUserEmail,
+    staleTime: 30000,
+  });
   const { data: allSpots = [] } = useQuery({ queryKey: ['spots', tripId], queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: tripMessages = [] } = useQuery({ queryKey: ['tripMessages', tripId], queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 10000, refetchInterval: 30000 });
   const { data: profiles = [] } = useQuery({ queryKey: ['allProfilesHome'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 5 * 60 * 1000 });

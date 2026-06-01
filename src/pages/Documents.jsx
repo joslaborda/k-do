@@ -113,9 +113,12 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
   const todayDoc = ticket.date && isToday(parseISO(ticket.date));
   const hasFile  = !!ticket.file_url;
 
-  const displayName = ticket.origin && ticket.destination
+  const displayName = ticket.name || (ticket.origin && ticket.destination
     ? `${ticket.origin} → ${ticket.destination}`
-    : ticket.name;
+    : 'Sin nombre');
+  const routeLabel = ticket.origin && ticket.destination
+    ? `${ticket.origin} → ${ticket.destination}`
+    : null;
 
   const timeLabel = ticket.time
     ? ticket.time
@@ -130,6 +133,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
+          {routeLabel && <p className="text-xs text-muted-foreground mt-0.5">{routeLabel}</p>}
           {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -229,7 +233,7 @@ export default function Documents() {
   const { data: tickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
-    enabled: !!tripId, staleTime: 30000,
+    enabled: !!tripId, staleTime: 0,  // always fresh so new members see docs immediately
   });
   const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
@@ -286,8 +290,12 @@ export default function Documents() {
   // Filter
   const filtered = useMemo(() => tickets.filter(t => {
     const vis = t.visibility || 'personal';
-    if (vis === 'personal' && t.created_by !== currentUserEmail && t.user_id !== userId) return false;
-    if (vis === 'selected_users' && t.created_by !== currentUserEmail && !(t.shared_with || []).includes(currentUserEmail)) return false;
+    const isOwner = t.created_by === currentUserEmail || t.user_id === userId;
+    // personal: only owner sees it
+    if (vis === 'personal' && !isOwner) return false;
+    // selected_users: owner or explicitly shared
+    if (vis === 'selected_users' && !isOwner && !(t.shared_with || []).includes(currentUserEmail)) return false;
+    // shared: all trip members — no extra check needed
     if (catFilter !== 'all') {
       if (catFilter === 'other') return !['flight','hotel','train'].includes(t.category);
       return t.category === catFilter;
