@@ -3,7 +3,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNotification } from '@/lib/notifications';
-import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText } from 'lucide-react';
+import { Plus, Trash2, Pencil } from 'lucide-react';
+import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ticket, Shield, FileText } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -89,15 +90,15 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 const DOC_ICONS = {
-  flight:   (p) => <Plane   size={16} {...p} />,
-  train:    (p) => <Train   size={16} {...p} />,
-  hotel:    (p) => <Hotel   size={16} {...p} />,
-  bus:      (p) => <Bus     size={16} {...p} />,
-  car:      (p) => <Car     size={16} {...p} />,
-  event:    (p) => <Ticket  size={16} {...p} />,
-  personal: (p) => <Shield  size={16} {...p} />,
-  insurance:(p) => <Shield  size={16} {...p} />,
-  other:    (p) => <FileText size={16} {...p} />,
+  flight:    PlaneIcon,
+  train:     TrainFront,
+  hotel:     Hotel,
+  bus:       BusFront,
+  car:       Car,
+  event:     Ticket,
+  personal:  Shield,
+  insurance: Shield,
+  other:     FileText,
 };
 const DOC_BG = { flight:'bg-blue-50', train:'bg-green-50', hotel:'bg-purple-50', event:'bg-orange-50', personal:'bg-amber-50', other:'bg-secondary' };
 const ICON_BG = {
@@ -153,7 +154,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
       {/* Main row */}
       <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${iconCls}`}>
-          <IconComp className="w-4 h-4" />
+          <IconComp size={16} className="flex-shrink-0" />
         </div>
         <button onClick={() => hasFile && onView(ticket.file_url)} className="flex-1 min-w-0 text-left">
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
