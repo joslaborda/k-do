@@ -294,10 +294,18 @@ export default function Documents() {
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);
+      const myProf = profiles.find(pr => pr.email === currentUserEmail || pr.user_email === currentUserEmail);
       const others = (trip?.members || []).filter(e => e !== currentUserEmail);
-      others.forEach(email => {
-        const p = profiles.find(pr => pr.email === email || pr.user_email === email);
-        if (p?.user_id) createNotification({ userId: p.user_id, type: 'doc_added', refId: tripId, refTitle: data.name || 'documento', message: `Nuevo documento: ${data.name || ''}` });
+      others.forEach(memberEmail => {
+        const p = profiles.find(pr => pr.email === memberEmail || pr.user_email === memberEmail);
+        if (p?.user_id) createNotification({
+          userId: p.user_id,
+          type: 'doc_added',
+          actorProfile: myProf,
+          refId: tripId,
+          refTitle: trip?.name || 'el viaje',
+          message: `ha subido un documento: ${data.name || 'nuevo doc'}`,
+        });
       });
     },
   });

@@ -513,9 +513,24 @@ function PackingTab({ tripId, country, tripInProgress }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
+function EmergencyTab({ country, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta }) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+
+  // Get homeCountry from user profile if not passed as prop
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', user?.id],
+    queryFn: async () => {
+      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return profiles[0] || null;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const homeCountry = homeCountryProp || myProfile?.nationality || myProfile?.country || 'España';
+  const secondNationality = secondNationalityProp || myProfile?.second_nationality || null;
 
   useEffect(() => {
     if (!country) { setData(null); setLoading(false); return; }
@@ -523,7 +538,7 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
-  }, [country, homeCountry]);
+  }, [country, homeCountry, secondNationality]);
 
   if (!country) return (
     <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
@@ -577,8 +592,11 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
         </div>
       )}
 
-      {/* Embassy */}
+      {/* Embassy — hide if user is in their own country */}
       {data.embassy && (() => {
+        const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const isHomeCountry = normalizeC(country) === normalizeC(homeCountry);
+        if (isHomeCountry) return null;
         const emb = typeof data.embassy === 'string'
           ? { name: data.embassy.split(':')[0], phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
           : data.embassy;
@@ -628,7 +646,10 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
           </div>
         );
       })()}
-      {!data.embassy && (
+      {!data.embassy && (() => {
+        const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (normalizeC(country) === normalizeC(homeCountry)) return null;
+        return (
         <div className="bg-card rounded-2xl border border-border p-4 text-center">
           <p className="text-sm text-muted-foreground">No tenemos datos de tu embajada en este país todavía</p>
           <a href="https://www.exteriores.gob.es/es/EmbajadasConsulados" target="_blank" rel="noopener noreferrer"
@@ -636,172 +657,6 @@ function EmergencyTab({ country, homeCountry, secondNationality, meta }) {
             Buscar en exteriores.gob.es →
           </a>
         </div>
-      )}
+        );
+      })()}
 
-      {/* Second nationality embassy */}
-      {data.secondEmbassy && (
-        <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">🏛️ Tu segunda embajada</p>
-          {data.secondEmbassy.address && <p className="text-sm text-foreground mb-2">📍 {data.secondEmbassy.address}</p>}
-          {data.secondEmbassy.phone && <p className="text-sm text-foreground mb-2">📞 <span className="font-medium">{data.secondEmbassy.phone}</span></p>}
-          {data.secondEmbassy.hours && <p className="text-sm text-muted-foreground mb-2">🕐 {data.secondEmbassy.hours}</p>}
-          {data.secondEmbassy.web && (
-            <a href={data.secondEmbassy.web} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-primary font-medium">
-              <ExternalLink className="w-3.5 h-3.5" />Web oficial
-            </a>
-          )}
-        </div>
-      )}
-
-      {/* Useful apps */}
-      {data.useful_apps?.length > 0 && (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">📱 Apps útiles</p>
-          </div>
-          {data.useful_apps.map((app, i) => (
-            <div key={i} className="px-4 py-3 border-b border-border last:border-0">
-              <p className="text-sm font-medium text-foreground mb-0.5">{app.icon} {app.name}</p>
-              <p className="text-xs text-muted-foreground">{app.description}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Safety tips */}
-      {data.safety_tips?.length > 0 && (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">🛡️ Consejos</p>
-          </div>
-          {data.safety_tips.map((tip, i) => (
-            <div key={i} className="flex items-start gap-2.5 px-4 py-3 border-b border-border last:border-0">
-              <span className="text-primary font-medium text-sm flex-shrink-0 mt-0.5">✓</span>
-              <p className="text-sm text-foreground">{tip}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN PAGE
-// ─────────────────────────────────────────────────────────────────────────────
-export default function Utilities() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const [searchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') || 'clima';
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [tripId, setTripId] = useState(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('trip_id');
-    if (!id) { navigate('/TripsList', { replace: true }); return; }
-    setTripId(id);
-  }, [navigate]);
-
-  const { trip, cities, activeCity } = useTripContext(tripId);
-
-  const { data: myProfile } = useQuery({
-    queryKey: ['myProfile', user?.id],
-    queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: user.id }); return r[0] || null; },
-    enabled: !!user?.id, staleTime: 60000,
-  });
-
-  const homeCountry = myProfile?.home_country || 'España';
-  // Use activeCity first, then any city, then trip.country
-  const countryRaw = activeCity?.country || cities?.[0]?.country || trip?.country || '';
-  // Normalize English country names to Spanish for emergency DB lookup
-  const EN_TO_ES_QUICK = {
-    'japan':'Japón','france':'Francia','germany':'Alemania','italy':'Italia',
-    'portugal':'Portugal','united kingdom':'Reino Unido','spain':'España',
-    'united states':'Estados Unidos','usa':'Estados Unidos','mexico':'México',
-    'colombia':'Colombia','peru':'Perú','argentina':'Argentina','brazil':'Brasil',
-    'thailand':'Tailandia','vietnam':'Vietnam','india':'India','china':'China',
-    'south korea':'Corea del Sur','morocco':'Marruecos','turkey':'Turquía',
-    'greece':'Grecia','netherlands':'Países Bajos','switzerland':'Suiza',
-  };
-  const country = EN_TO_ES_QUICK[countryRaw.toLowerCase()] || countryRaw;
-  const meta = getCountryMeta(country);
-
-  const TABS = [
-    ['clima',        '☁️',  'Clima'],
-    ['maleta',       '🧳',  'Maleta'],
-    ['emergencias',  '🚨',  'Emergencias'],
-  ];
-
-  return (
-    <div className="bg-background min-h-screen">
-
-      {/* ── Header — exact Documents pattern ── */}
-      <div className="bg-background sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
-          <div className="flex items-center justify-between mb-4">
-            <a
-              href={createPageUrl('Home') + (tripId ? `?trip_id=${tripId}` : '')}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 5l-7 7 7 7"/>
-              </svg>
-              Inicio
-            </a>
-          </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Utilidades</h1>
-          <OTabBar
-            tabs={TABS.map(([k,_em,l]) => ({key:k,label:l}))}
-            activeKey={activeTab}
-            onChange={setActiveTab}
-          />
-        </div>
-      </div>
-
-      {/* ── Content ── */}
-      <div className="max-w-3xl mx-auto px-5 py-5 pb-24 space-y-4">
-
-        {/* CLIMA */}
-        {activeTab === 'clima' && (
-          <>
-            {cities.length === 0 ? (
-              <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-                <p className="text-4xl mb-3">☁️</p>
-                <p className="text-sm font-medium text-foreground mb-1">Sin ciudades</p>
-                <p className="text-xs text-muted-foreground">Añade ciudades en la sección Ruta para ver el clima</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {cities.map(city => (
-                  <WeatherCard key={city.id} city={city} tripCountry={trip?.country} />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* MALETA */}
-        {activeTab === 'maleta' && (
-          <PackingTab
-            tripId={tripId}
-            country={country}
-            tripInProgress={!!(trip?.start_date && trip?.end_date && (() => {
-              const today = new Date().toISOString().slice(0,10);
-              return today >= trip.start_date && today <= trip.end_date;
-            })())}
-          />
-        )}
-
-        {/* EMERGENCIAS */}
-        {activeTab === 'emergencias' && (
-          <EmergencyTab country={country} homeCountry={homeCountry} secondNationality={myProfile?.second_nationality} meta={meta} />
-        )}
-      </div>
-    </div>
-  );
-}

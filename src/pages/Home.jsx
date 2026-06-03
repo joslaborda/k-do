@@ -1905,12 +1905,20 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
     setSending(true); setError('');
     try {
       const currentMembers = trip?.members || [];
-      if (currentMembers.includes(email.trim())) { setError('Este usuario ya es miembro'); setSending(false); return; }
-      await base44.entities.Trip.update(tripId, { members: [...currentMembers, email.trim()] });
+      if (currentMembers.includes(email.trim())) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
+      // Send invite email + create TripInvite record (user must accept)
+      await sendTripInvite({
+        tripId,
+        email: email.trim(),
+        role: 'member',
+        tripName: trip?.name || 'el viaje',
+        inviterEmail: trip?.created_by || '',
+        inviterName: trip?.created_by || '',
+      });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       setDone(true); setEmail('');
-      setTimeout(() => { setDone(false); onClose(); }, 2000);
-    } catch { setError('Error al añadir el usuario. Inténtalo de nuevo.'); }
+      setTimeout(() => { setDone(false); onClose(); }, 2500);
+    } catch (e) { setError('Error al enviar la invitación. Inténtalo de nuevo.'); }
     setSending(false);
   };
 
