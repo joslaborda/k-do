@@ -501,7 +501,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
 
   // Merge docs + spots + day notes into one timeline sorted by time
   const timeline = useMemo(() => {
-    const docItems  = docs.map(d  => ({ ...d,  _kind: 'doc'  }));
+    const docItems  = docs.map(d  => ({ ...d, _kind: 'doc', time: d.time || null, type: d.category || d.type || 'other' }));
     const spotItems = spots.map(s => ({ ...s, _kind: 'spot', time: s.assigned_time || s.time || null }));
     // Include ItineraryDay notes — new format is JSON array, legacy is plain string
     const parseNotes = (raw) => {
@@ -588,7 +588,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
             timeline.map((item, idx) => {
               const isDoc   = item._kind === 'doc';
               const isNote  = item._kind === 'note';
-              const DocIcon = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : null;
+              const DocIcon = isDoc ? (DOC_ICONS[item.category] || DOC_ICONS[item.type] || DOC_ICONS.other) : null;
               const spotEmoji = (!isDoc && !isNote) ? (SPOT_ICONS[item.type] || '📍') : null;
               const isLast  = idx === timeline.length - 1;
               const hasTime = !!item.time;
@@ -598,7 +598,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   key={item.id || idx}
                   onClick={() => setSelected(item)}
                   className={`w-full flex items-center gap-3 px-4 py-3 border-t border-border transition-colors text-left ${
-                    isDoc && item.time && ['flight','train','bus'].includes(item.type) && (() => {
+                    isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
                       const dep = new Date(now); dep.setHours(h, m, 0, 0);
@@ -645,7 +645,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                       <p className="text-xs text-muted-foreground mt-0.5">Sin hora · toca para añadir</p>
                     )}
                     {/* Countdown for transport items */}
-                    {isDoc && item.time && ['flight','train','bus'].includes(item.type) && (() => {
+                    {isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
                       const dep = new Date(now); dep.setHours(h, m, 0, 0);
@@ -969,9 +969,6 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <button onClick={onInvite} className="flex items-center gap-1 text-xs text-primary font-medium">
-            <UserPlus className="w-3.5 h-3.5" />Invitar
-          </button>
         </div>
         <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
       </div>
@@ -1210,10 +1207,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <button onClick={onInvite}
-            className="flex items-center gap-1 text-xs text-primary font-medium">
-            <UserPlus className="w-3.5 h-3.5" />Invitar
-          </button>
+
         </div>
         <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
       </div>
@@ -1338,10 +1332,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" />Viajeros
           </p>
-          <button onClick={onInvite}
-            className="flex items-center gap-1 text-xs text-primary font-medium">
-            <UserPlus className="w-3.5 h-3.5" />Invitar
-          </button>
+
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
@@ -2493,7 +2484,7 @@ export default function Home() {
     if (isDeparture || tripInProgress) {
       tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
       tabs.push({ key: 'manana', label: 'Mañana' });
-      if (isDeparture) tabs.unshift({ key: 'inicio', label: 'Inicio' });
+      // 'Inicio' tab only on day of departure, not during trip
       tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
       return tabs;
     }
