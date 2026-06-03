@@ -502,7 +502,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   // Merge docs + spots + day notes into one timeline sorted by time
   const timeline = useMemo(() => {
     const docItems  = docs.map(d  => ({ ...d,  _kind: 'doc'  }));
-    const spotItems = spots.map(s => ({ ...s,  _kind: 'spot' }));
+    const spotItems = spots.map(s => ({ ...s, _kind: 'spot', time: s.assigned_time || s.time || null }));
     // Include ItineraryDay notes — new format is JSON array, legacy is plain string
     const parseNotes = (raw) => {
       if (!raw) return [];
@@ -1393,13 +1393,19 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
 
 // ── Finished tab ──────────────────────────────────────────────────────────────
 
-function FinishedTab({ trip, cities, expenses, spots }) {
+function FinishedTab({ trip, cities, expenses, spots, tripId }) {
+  const { data: allTripSpots = spots } = useQuery({
+    queryKey: ['allTripSpots', tripId],
+    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 0,
+  });
   const totalDays = (trip?.start_date && trip?.end_date)
     ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1
     : null;
   const totalSpent = expenses.reduce((s, e) => s + (e.amount || 0), 0);
   const avgPerDay = totalDays ? totalSpent / totalDays : 0;
-  const visitedSpots = spots.filter(s => s.visited).length;
+  const visitedSpots = allTripSpots.filter(s => !!s.assigned_date).length;
   const currency = trip?.currency || 'EUR';
   const members = trip?.members?.length || 1;
 
@@ -2636,7 +2642,7 @@ export default function Home() {
         )}
 
         {tab === 'resumen' && (
-          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} />
+          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} tripId={tripId} />
         )}
         {tab === 'chat' && (
           <ChatTab
