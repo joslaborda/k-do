@@ -99,7 +99,11 @@ export default function PDFViewer({ fileUrl, onClose }) {
 
       {/* Content */}
       <div ref={containerRef} className="flex-1 overflow-auto flex items-start justify-center px-4 py-4"
-        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onWheel={onWheel}>
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onWheel={onWheel}
+        style={{touchAction: 'pan-x pan-y'}}>
         {loading && <p className="text-sm mt-8" style={{ color: 'rgba(255,255,255,.4)' }}>Cargando...</p>}
         {error && (
           <div className="text-center mt-8">
@@ -112,7 +116,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
         )}
         {!loading && isImg && (
           <img src={fileUrl} alt={fileName} className="rounded-lg shadow-2xl object-contain"
-            style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', maxWidth: '100%', maxHeight: 'calc(100vh - 140px)', transition: 'transform 0.1s' }} />
+            style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', width: '100%', maxHeight: 'calc(100vh - 140px)', transition: 'transform 0.15s ease-out', display: 'block' }} />
         )}
         {!loading && !error && !isPDF && !isImg && (
           <div className="text-center mt-8">
