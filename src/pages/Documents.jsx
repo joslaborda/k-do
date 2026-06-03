@@ -131,7 +131,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
       {/* Main row */}
       <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>
-        <div className="flex-1 min-w-0">
+        <button onClick={() => hasFile && onView(ticket.file_url)} className="flex-1 min-w-0 text-left">
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
           {routeLabel && <p className="text-xs text-muted-foreground mt-0.5">{routeLabel}</p>}
           {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
