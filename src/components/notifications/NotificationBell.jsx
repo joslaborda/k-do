@@ -19,6 +19,7 @@ const TYPE_CONFIG = {
   expense_settled:{ icon: Receipt,   color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'liquidó una deuda contigo' },
   chat_message:   { icon: MessageCircle, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', label: 'escribió en el chat' },
   photo_upload:   { icon: Camera,        color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-950/30', label: 'subió fotos al viaje' },
+  trip_join:      { icon: UserPlus,      color: 'text-green-500',  bg: 'bg-green-50 dark:bg-green-950/30',  label: 'se unió al viaje' },
 };
 
 function NotificationItem({ notif, onRead }) {
@@ -95,7 +96,11 @@ export default function NotificationBell({ userId }) {
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={() => {
+          const opening = !open;
+          setOpen(opening);
+          if (opening && unread > 0) markAllRead.mutate();
+        }}
         className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors text-foreground"
         aria-label="Notificaciones"
       >
