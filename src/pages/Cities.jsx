@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import DocumentForm from '@/components/tickets/DocumentForm';
+import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
@@ -263,6 +264,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
 function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId }) {
   const [editingSpot, setEditingSpot] = useState(null);   // spot object — view+edit modal
   const [viewingDoc,  setViewingDoc]  = useState(null);   // doc object — view modal
+  const [viewingFile, setViewingFile] = useState(null);   // file url — PDFViewer
   const [editingDoc,  setEditingDoc]  = useState(null);   // doc object — edit modal
   const [titleVal,    setTitleVal]    = useState(day?.title || '');
   const [titleEditing, setTitleEditing] = useState(false);
@@ -442,7 +444,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         {/* Tappable body — opens view */}
         <button
           onClick={() => {
-            if (item._kind === 'doc')  setViewingDoc(item);
+            if (item._kind === 'doc') { if (item.file_url) setViewingFile(item.file_url); else setViewingDoc(item); }
             if (item._kind === 'spot') setEditingSpot(item);
             if (item._kind === 'note') setEditingNote(item._noteIdx);
           }}
@@ -591,7 +593,12 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         />
       )}
 
-      {/* Doc view modal */}
+      {/* PDFViewer — opens file directly */}
+      {viewingFile && (
+        <PDFViewer fileUrl={viewingFile} onClose={() => setViewingFile(null)} />
+      )}
+
+      {/* Doc view modal — for docs without file */}
       {viewingDoc && (
         <DocViewerModal doc={viewingDoc} open={!!viewingDoc} onClose={() => setViewingDoc(null)}
           onEdit={() => { setEditingDoc(viewingDoc); setViewingDoc(null); }} />

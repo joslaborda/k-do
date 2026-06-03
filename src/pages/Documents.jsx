@@ -135,7 +135,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
           {routeLabel && <p className="text-xs text-muted-foreground mt-0.5">{routeLabel}</p>}
           {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
-        </div>
+        </button>
         <div className="flex items-center gap-1.5 shrink-0">
           {hasFile && (
             <button onClick={() => onView(ticket.file_url)}
@@ -145,6 +145,10 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
               </svg>
             </button>
           )}
+          <button onClick={() => onEdit(ticket)}
+            className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
+            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
           <button onClick={() => setOpen(o => !o)}
             className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
             {open
