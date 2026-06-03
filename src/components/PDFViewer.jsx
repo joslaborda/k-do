@@ -3,11 +3,41 @@ import { X, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PDFViewer({ fileUrl, onClose }) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const [pdfDoc, setPdfDoc]       = useState(null);
   const [pageNum, setPageNum]     = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
+  const [zoom, setZoom]           = useState(1);
+  const lastDist = useRef(null);
+
+  // Pinch-to-zoom
+  const onTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lastDist.current = Math.sqrt(dx*dx + dy*dy);
+    }
+  };
+  const onTouchMove = (e) => {
+    if (e.touches.length === 2 && lastDist.current) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const delta = dist / lastDist.current;
+      setZoom(z => Math.min(5, Math.max(0.5, z * delta)));
+      lastDist.current = dist;
+    }
+  };
+  const onTouchEnd = () => { lastDist.current = null; };
+  const onWheel = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      setZoom(z => Math.min(5, Math.max(0.5, z - e.deltaY * 0.005)));
+    }
+  };
 
   const isPDF = fileUrl?.toLowerCase().includes('.pdf');
   const isImg = fileUrl && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(fileUrl);
@@ -68,7 +98,8 @@ export default function PDFViewer({ fileUrl, onClose }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto flex items-start justify-center px-4 py-4">
+      <div ref={containerRef} className="flex-1 overflow-auto flex items-start justify-center px-4 py-4"
+        onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onWheel={onWheel}>
         {loading && <p className="text-sm mt-8" style={{ color: 'rgba(255,255,255,.4)' }}>Cargando...</p>}
         {error && (
           <div className="text-center mt-8">
@@ -77,11 +108,11 @@ export default function PDFViewer({ fileUrl, onClose }) {
           </div>
         )}
         {!loading && !error && isPDF && (
-          <canvas ref={canvasRef} className="rounded-lg shadow-2xl" style={{ maxWidth: '100%' }} />
+          <canvas ref={canvasRef} className="rounded-lg shadow-2xl" style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', maxWidth: '100%', transition: 'transform 0.1s' }} />
         )}
         {!loading && isImg && (
           <img src={fileUrl} alt={fileName} className="rounded-lg shadow-2xl object-contain"
-            style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 140px)' }} />
+            style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', maxWidth: '100%', maxHeight: 'calc(100vh - 140px)', transition: 'transform 0.1s' }} />
         )}
         {!loading && !error && !isPDF && !isImg && (
           <div className="text-center mt-8">
@@ -114,6 +145,15 @@ export default function PDFViewer({ fileUrl, onClose }) {
               </button>
             </>
           )}
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-light"
+            style={{ background: 'rgba(255,255,255,.1)' }}>−</button>
+          <span className="text-xs w-10 text-center" style={{ color: 'rgba(255,255,255,.5)' }}>{Math.round(zoom*100)}%</span>
+          <button onClick={() => setZoom(z => Math.min(5, z + 0.25))}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-light"
+            style={{ background: 'rgba(255,255,255,.1)' }}>+</button>
         </div>
         <a href={fileUrl} download target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white transition-colors"
