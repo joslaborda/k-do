@@ -24,6 +24,7 @@ const VISIBILITY_OPTIONS = [
 const DEFAULT_FORM = {
   title: '', type: 'food', notes: '', link: '', address: '',
   visibility: 'trip_members', shared_with: [], image_url: null, tags: [],
+  assigned_date: '', assigned_time: '',
 };
 
 export default function SpotForm({ open, onOpenChange, onSubmit, isPending, tripMembers = [] }) {
@@ -174,6 +175,20 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
               onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
               className="bg-secondary border-border"
             />
+          </div>
+
+          {/* Hora */}
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium text-muted-foreground w-10 shrink-0">Hora</label>
+            <input
+              type="time"
+              value={form.assigned_time}
+              onChange={e => setForm(f => ({ ...f, assigned_time: e.target.value }))}
+              className="h-9 border border-border rounded-xl px-3 text-sm bg-secondary text-foreground outline-none focus:border-primary w-[120px]"
+            />
+            {form.assigned_time
+              ? <button type="button" onClick={() => setForm(f => ({ ...f, assigned_time: '' }))} className="text-xs text-muted-foreground hover:text-foreground">Quitar</button>
+              : <span className="text-xs text-muted-foreground">opcional</span>}
           </div>
 
           {/* Visibilidad */}
