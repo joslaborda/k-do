@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNotification } from '@/lib/notifications';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -88,8 +88,29 @@ function OTabBar({ tabs, activeKey, onChange }) {
 }
 
 
-const DOC_ICONS = { flight:'✈️', train:'🚆', hotel:'🏨', event:'🎟️', personal:'🛡️', other:'📄' };
+const DOC_ICONS = {
+  flight:   (p) => <Plane   size={16} {...p} />,
+  train:    (p) => <Train   size={16} {...p} />,
+  hotel:    (p) => <Hotel   size={16} {...p} />,
+  bus:      (p) => <Bus     size={16} {...p} />,
+  car:      (p) => <Car     size={16} {...p} />,
+  event:    (p) => <Ticket  size={16} {...p} />,
+  personal: (p) => <Shield  size={16} {...p} />,
+  insurance:(p) => <Shield  size={16} {...p} />,
+  other:    (p) => <FileText size={16} {...p} />,
+};
 const DOC_BG = { flight:'bg-blue-50', train:'bg-green-50', hotel:'bg-purple-50', event:'bg-orange-50', personal:'bg-amber-50', other:'bg-secondary' };
+const ICON_BG = {
+  flight:    'bg-blue-50 dark:bg-blue-950/30 text-blue-500',
+  train:     'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600',
+  hotel:     'bg-purple-50 dark:bg-purple-950/30 text-purple-500',
+  bus:       'bg-amber-50 dark:bg-amber-950/30 text-amber-600',
+  car:       'bg-amber-50 dark:bg-amber-950/30 text-amber-600',
+  event:     'bg-orange-50 dark:bg-orange-950/30 text-primary',
+  personal:  'bg-secondary text-muted-foreground',
+  insurance: 'bg-secondary text-muted-foreground',
+  other:     'bg-secondary text-muted-foreground',
+};
 const CAT_TABS = [
   { key:'all',    icon:'📋', label:'Todos'   },
   { key:'flight', icon:'✈️', label:'Vuelos'  },
@@ -107,7 +128,8 @@ const VIS = {
 function DocRow({ ticket, onEdit, onDelete, onView }) {
   const [open, setOpen] = useState(false);
   const cat  = ticket.category || 'other';
-  const icon = DOC_ICONS[cat] || '📄';
+  const IconComp = DOC_ICONS[cat] || DOC_ICONS.other;
+  const iconCls = ICON_BG[cat] || ICON_BG.other;
   const bg   = DOC_BG[cat]   || 'bg-secondary';
   const vis  = VIS[ticket.visibility || 'personal'];
   const todayDoc = ticket.date && isToday(parseISO(ticket.date));
@@ -130,7 +152,9 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
     <div className={`bg-card rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
       {/* Main row */}
       <div className={`flex items-center gap-3 px-4 py-3 ${todayDoc ? 'bg-orange-50/40' : ''}`}>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${bg}`}>{icon}</div>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${iconCls}`}>
+          <IconComp className="w-4 h-4" />
+        </div>
         <button onClick={() => hasFile && onView(ticket.file_url)} className="flex-1 min-w-0 text-left">
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
           {routeLabel && <p className="text-xs text-muted-foreground mt-0.5">{routeLabel}</p>}
@@ -149,13 +173,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
             className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
             <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-          <button onClick={() => setOpen(o => !o)}
-            className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
-            {open
-              ? <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-              : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-            }
-          </button>
+
         </div>
       </div>
 
