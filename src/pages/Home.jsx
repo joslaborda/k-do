@@ -478,6 +478,11 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
   const [open, setOpen]           = useState(defaultOpen);
   const [viewFile, setViewFile]   = useState(null);
   const [selected, setSelected]   = useState(null);
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
   const isToday_ = defaultOpen;
   const [weather, setWeather] = useState(null);
