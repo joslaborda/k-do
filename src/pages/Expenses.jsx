@@ -992,8 +992,9 @@ export default function Expenses() {
       if (others.length > 0) {
         try {
           others.forEach(async email => {
-            const p = profiles[email] || null;  // profilesByEmail
-            if (p?.user_id) createNotification({ userId: p.user_id, type: 'expense_added', refId: tripId, refTitle: d.description || 'gasto', message: `Nuevo gasto: ${d.description} (${d.amount} ${baseCurrency})` });
+            const p = profiles[email] || null;
+            const myProf = profiles[currentUser?.email] || null;
+            if (p?.user_id) createNotification({ userId: p.user_id, type: 'expense_added', actorProfile: myProf, refId: tripId, refTitle: d.description || 'gasto' });
           });
         } catch {}
       }
