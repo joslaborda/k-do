@@ -1408,7 +1408,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }
 
 // ── Finished tab ──────────────────────────────────────────────────────────────
 
-function FinishedTab({ trip, cities, expenses, spots, tripId }) {
+function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail }) {
   const { data: allTripSpots = spots } = useQuery({
     queryKey: ['allTripSpots', tripId],
     queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
@@ -2695,7 +2695,7 @@ export default function Home() {
         )}
 
         {tab === 'resumen' && (
-          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} tripId={tripId} />
+          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} tripId={tripId} currentUserEmail={currentUserEmail} />
         )}
         {tab === 'chat' && (
           <ChatTab
