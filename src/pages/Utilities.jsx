@@ -540,40 +540,42 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
     setLoading(false);
   }, [country, homeCountry, secondNationality]);
 
-  if (!country) return (
-    <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-      <p className="text-4xl mb-3">🚨</p>
-      <p className="text-sm font-medium text-foreground mb-1">Abre desde un viaje</p>
-      <p className="text-xs text-muted-foreground">La información de emergencias aparece al abrir Utilidades desde un viaje activo</p>
-    </div>
-  );
+  // No early return — show all tabs even without active trip
 
-  if (loading) return (
-    <div className="text-center py-12">
-      <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
-      <p className="text-sm text-muted-foreground">Cargando...</p>
-    </div>
-  );
+  // loading/data handled inline below
 
-  if (!data) return (
-    <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-      <p className="text-4xl mb-3">🚨</p>
-      <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
-      <p className="text-xs text-muted-foreground">Aún no tenemos información de emergencias para este país</p>
-    </div>
-  );
-
-  const numbers = [
+  const numbers = data ? [
     data.police && { label:'Policía', number:data.police, emoji:'🚔' },
     data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, emoji:'🚑' },
     data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, emoji:'🚒' },
     data.emergency_general && !data.police && { label:'General', number:data.emergency_general, emoji:'🆘' },
-  ].filter(Boolean);
+  ].filter(Boolean) : [];
 
   return (
     <div className="space-y-4">
+      {/* No trip — show info message */}
+      {!country && (
+        <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
+          <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
+          <p className="text-sm font-medium text-foreground mb-1">Sin viaje activo</p>
+          <p className="text-xs text-muted-foreground">Abre Utilidades desde un viaje para ver la información de emergencias</p>
+        </div>
+      )}
+      {loading && country && (
+        <div className="text-center py-12">
+          <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Cargando...</p>
+        </div>
+      )}
+      {!loading && country && !data && (
+        <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
+          <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
+          <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
+          <p className="text-xs text-muted-foreground">Aún no tenemos información de emergencias para este país</p>
+        </div>
+      )}
       {/* Emergency numbers */}
-      {numbers.length > 0 && (
+      {!loading && data && numbers.length > 0 && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -646,7 +648,7 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
           </div>
         );
       })()}
-      {!data.embassy && (() => {
+      {!loading && data && !data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         if (normalizeC(country) === normalizeC(homeCountry)) return null;
         return (
