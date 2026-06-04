@@ -10,7 +10,7 @@ import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, Compass, ArrowRight, Pencil } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, Compass, ArrowRight, Pencil, UtensilsCrossed, Landmark, Ticket, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
