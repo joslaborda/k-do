@@ -44,6 +44,7 @@ export default function ExpenseForm({
     paid_by: members[0] || '',
     split_type: 'equal',
     split_with: [...members],
+    amounts_by_user: {},
   });
 
   const [receipts, setReceipts] = useState(initialData?.receipt_photos || []);
@@ -101,7 +102,11 @@ export default function ExpenseForm({
     } finally { setUploadingReceipt(false); }
   };
 
-  const canSave = form.description.trim() && form.amount && parseFloat(form.amount) > 0 && form.split_with.length > 0 && !saving;
+  const canSave = form.description.trim() && form.amount && parseFloat(form.amount) > 0 && !saving && (
+    form.split_type === 'solo' ||
+    (form.split_type === 'equal' && form.split_with.length > 0) ||
+    (form.split_type === 'custom' && Object.values(form.amounts_by_user||{}).some(v => parseFloat(v) > 0))
+  );
 
   const handleSave = async () => {
     let amountBase = parseFloat(form.amount);
@@ -116,7 +121,10 @@ export default function ExpenseForm({
         } catch {}
       }
     }
-    onSave({ ...form, currency, amount_base: amountBase, fx_rate_to_base: fxRate, fx_source: fxSource, fx_timestamp: fxTimestamp, receipt_photos: receipts });
+    const splitWith = form.split_type === 'custom'
+      ? Object.entries(form.amounts_by_user||{}).filter(([,v]) => parseFloat(v) > 0).map(([e]) => e)
+      : form.split_with;
+    onSave({ ...form, split_with: splitWith, currency, amount_base: amountBase, fx_rate_to_base: fxRate, fx_source: fxSource, fx_timestamp: fxTimestamp, receipt_photos: receipts });
   };
 
   return (
@@ -242,53 +250,102 @@ export default function ExpenseForm({
       {/* División */}
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Dividir entre</p>
-        {/* Toggle */}
-        <div className="flex rounded-xl border border-border overflow-hidden mb-3">
-          <button type="button" onClick={selectAll}
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${
-              form.split_with.length === members.length ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'
-            }`}>
-            Todos por igual
-          </button>
-          <button type="button" onClick={() => { if (form.split_with.length === members.length) selectNone(); }}
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${
-              form.split_with.length !== members.length ? 'bg-primary text-white' : 'bg-white text-muted-foreground hover:bg-secondary/50'
-            }`}>
-            Seleccionar
-          </button>
+        {/* Mode selector */}
+        <div className="flex rounded-xl border border-border overflow-hidden mb-3 text-sm">
+          {[
+            { key: 'equal', label: 'A partes iguales' },
+            { key: 'custom', label: 'Personalizado' },
+            { key: 'solo', label: 'Solo yo' },
+          ].map(m => (
+            <button key={m.key} type="button"
+              onClick={() => {
+                set('split_type', m.key);
+                if (m.key === 'equal') set('split_with', [...members]);
+                if (m.key === 'solo') { set('split_with', [form.paid_by || members[0]]); }
+                if (m.key === 'custom') {
+                  const eq = form.amount ? (parseFloat(form.amount) / members.length).toFixed(2) : '';
+                  const init = members.reduce((a, e) => ({ ...a, [e]: eq }), {});
+                  set('amounts_by_user', init); set('split_with', [...members]);
+                }
+              }}
+              className={`flex-1 py-2 font-medium transition-colors text-xs ${
+                form.split_type === m.key ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'
+              }`}>
+              {m.label}
+            </button>
+          ))}
         </div>
 
-        {/* Members selection */}
-        <div className="flex gap-2 flex-wrap">
-          {members.map(email => {
-            const selected = form.split_with.includes(email);
-            const share = selected && form.split_with.length > 0 && form.amount
-              ? (parseFloat(form.amount) / form.split_with.length)
-              : null;
-            const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(currency);
-            const shareStr = share ? (isZeroDecimal ? Math.round(share).toLocaleString('es') : share.toFixed(2)) : null;
-            return (
-              <button key={email} type="button" onClick={() => toggleMember(email)}
-                className={`flex-1 min-w-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${
-                  selected ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
-                }`}>
-                {(() => {
-                  const sp = profiles?.[email];
-                  return sp?.avatar_url
-                    ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+        {form.split_type === 'equal' && (
+          <div className="flex gap-2 flex-wrap">
+            {members.map(email => {
+              const selected = form.split_with.includes(email);
+              const share = selected && form.split_with.length > 0 && form.amount
+                ? (parseFloat(form.amount) / form.split_with.length) : null;
+              const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(currency);
+              const shareStr = share ? (isZeroDecimal ? Math.round(share).toLocaleString('es') : share.toFixed(2)) : null;
+              const sp = profiles?.[email];
+              return (
+                <button key={email} type="button" onClick={() => toggleMember(email)}
+                  className={`flex-1 min-w-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${
+                    selected ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
+                  }`}>
+                  {sp?.avatar_url
+                    ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover'}} />
                     : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'#fbd5c0':'#f0ede8',color:selected?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
-                        {getName(email).slice(0,2).toUpperCase()}
-                      </div>;
-                })()}
-                <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
-                </span>
-                {shareStr && <span className="text-xs text-primary font-medium">{shareStr}</span>}
-              </button>
-            );
-          })}
-        </div>
-        {form.split_with.length === 0 && (
+                        {getName(email).slice(0,2).toUpperCase()}</div>}
+                  <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
+                  </span>
+                  {shareStr && <span className="text-xs text-primary font-medium">{shareStr} {currency}</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {form.split_type === 'custom' && (
+          <div className="space-y-2">
+            {members.map(email => {
+              const sp = profiles?.[email];
+              return (
+                <div key={email} className="flex items-center gap-3 px-3 py-2 rounded-xl border border-border bg-card">
+                  {sp?.avatar_url
+                    ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+                    : <div style={{width:28,height:28,borderRadius:'50%',background:'#f0ede8',color:'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500,flexShrink:0}}>
+                        {getName(email).slice(0,2).toUpperCase()}</div>}
+                  <span className="text-xs font-medium text-foreground flex-1 truncate">
+                    {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
+                  </span>
+                  <input
+                    type="number" min="0" step="any" placeholder="0"
+                    value={form.amounts_by_user?.[email] || ''}
+                    onChange={e => set('amounts_by_user', { ...form.amounts_by_user, [email]: e.target.value })}
+                    className="w-20 text-right text-sm border border-border rounded-lg px-2 py-1 outline-none focus:border-primary bg-secondary"
+                  />
+                  <span className="text-xs text-muted-foreground">{currency}</span>
+                </div>
+              );
+            })}
+            {(() => {
+              const total = Object.values(form.amounts_by_user || {}).reduce((s,v) => s + parseFloat(v||0), 0);
+              const diff = parseFloat(form.amount||0) - total;
+              return Math.abs(diff) > 0.01 ? (
+                <p className="text-xs text-amber-600 mt-1">Faltan {Math.abs(diff).toFixed(2)} {currency} por asignar</p>
+              ) : total > 0 ? (
+                <p className="text-xs text-green-600 mt-1">✓ Total cuadra</p>
+              ) : null;
+            })()}
+          </div>
+        )}
+
+        {form.split_type === 'solo' && (
+          <p className="text-xs text-muted-foreground bg-secondary rounded-xl px-3 py-2">
+            Este gasto es solo para ti. No afecta a los balances del grupo.
+          </p>
+        )}
+
+        {form.split_type === 'equal' && form.split_with.length === 0 && (
           <p className="text-xs text-red-500 mt-2">Selecciona al menos una persona</p>
         )}
       </div>
