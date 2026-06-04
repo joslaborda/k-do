@@ -235,7 +235,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
         <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
         <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
         <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
-          <Plus className="w-4 h-4" />Gasto primer gasto
+          <Plus className="w-4 h-4" />Añadir primer gasto
         </button>
       </div>
     );
@@ -600,7 +600,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 
   return (
     <>
-      <div className="fixed inset-0z-[70] flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
+      <div className="fixed inset-0 flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
         <div className="bg-card w-full max-w-lg rounded-t-3xl" onClick={e => e.stopPropagation()}>
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-4" />
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
@@ -702,8 +702,8 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profiles }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0z-[70] flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
-      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col" style={{maxHeight:"min(96vh, 700px)"}} onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
