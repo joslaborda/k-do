@@ -975,7 +975,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
             <Users className="w-4 h-4" />Viajeros
           </p>
         </div>
-        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
+        <MemberAvatarRow trip={trip} profiles={profilesByEmail} onInvite={onInvite} />
       </div>
     </div>
   );
@@ -1214,7 +1214,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           </p>
 
         </div>
-        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
+        <MemberAvatarRow trip={trip} profiles={profilesByEmail} onInvite={onInvite} />
       </div>
     </div>
   );
@@ -1341,7 +1341,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-            const prof = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
+            const prof = profiles?.[email] || null;
             const name = prof?.display_name || email?.split('@')[0] || '?';
             const initials = name.slice(0,2).toUpperCase();
             const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
@@ -1873,7 +1873,7 @@ function MemberAvatarRow({ trip, profiles, onInvite, isToday }) {
   return (
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
       {members.map((email, i) => {
-        const profile = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
+        const profile = profiles?.[email] || null;
         const initials = (profile?.display_name || email || '').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || (email||'').split('@')[0].slice(0,2).toUpperCase();
         const name = profile?.display_name || (email||'').split('@')[0];
         return (
@@ -2271,7 +2271,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const prof = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
+              const prof = profiles?.[email] || null;
               const name = prof?.display_name || email?.split('@')[0] || '?';
               const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
@@ -2407,6 +2407,8 @@ export default function Home() {
   const { data: allSpots = [] } = useQuery({ queryKey: ['spots', tripId], queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: tripMessages = [] } = useQuery({ queryKey: ['tripMessages', tripId], queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 10000, refetchInterval: 30000 });
   const { data: profiles = [] } = useQuery({ queryKey: ['allProfilesHome'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 5 * 60 * 1000 });
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 10 * 60 * 1000 });
+  const profilesByEmail = useMemo(() => buildProfilesByEmail(profiles, usersData), [profiles, usersData]);
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', currentUserId],
     queryFn: async () => {
@@ -2650,13 +2652,13 @@ export default function Home() {
           <InicioTab
             trip={trip} cities={sortedCities}
             documents={documents} packingItems={packingItems}
-            profiles={profiles} tripId={tripId}
+            profiles={profilesByEmail} tripId={tripId}
             onInvite={() => setInviteOpen(true)}
             currentUserEmail={currentUserEmail}
           />
         )}
         {tab === 'hoy' && (
-          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profiles} onInvite={() => setInviteOpen(true)} currentUserEmail={currentUserEmail} />
+          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profilesByEmail} onInvite={() => setInviteOpen(true)} currentUserEmail={currentUserEmail} />
         )}
         {tab === 'manana' && (
           <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} />
