@@ -272,15 +272,14 @@ export default function ExpenseForm({
                 className={`flex-1 min-w-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${
                   selected ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
                 }`}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%',
-                  background: selected ? '#fbd5c0' : '#f0ede8',
-                  color: selected ? '#b34a1a' : '#888',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 500,
-                }}>
-                  {getName(email).slice(0, 2).toUpperCase()}
-                </div>
+                {(() => {
+                  const sp = profiles?.[email];
+                  return sp?.avatar_url
+                    ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+                    : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'#fbd5c0':'#f0ede8',color:selected?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
+                        {getName(email).slice(0,2).toUpperCase()}
+                      </div>;
+                })()}
                 <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
                   {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
                 </span>
