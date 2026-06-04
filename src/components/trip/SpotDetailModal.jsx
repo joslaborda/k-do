@@ -5,7 +5,21 @@ import { MapPin, X, Navigation, Clock, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
-const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍', restaurant:'🍜', museum:'🏛️' };
+const SPOT_ICONS = {
+  food:     UtensilsCrossed,
+  sight:    Landmark,
+  activity: Ticket,
+  shopping: ShoppingBag,
+  custom:   CirclePlus,
+  restaurant: UtensilsCrossed,
+  museum:   Landmark,
+};
+const SPOT_COLORS = {
+  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  museum: 'bg-violet-50 text-violet-600',
+};
 const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo' };
 
 function getMapsUrl(spot) {
