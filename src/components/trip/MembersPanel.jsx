@@ -14,7 +14,7 @@ const roleConfig = {
   viewer: { label: 'Lector', icon: Eye, color: 'bg-gray-100 text-gray-600 border-gray-200' },
 };
 
-export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
+export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles = [] }) {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
@@ -89,7 +89,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
           const config = roleConfig[role];
           const RoleIcon = config.icon;
           const isCurrentUser = email === currentUserEmail;
-          const prof = profilesByEmail?.[email] || profiles?.find(p => p.email === email || p.user_email === email);
+          const prof = profiles.find(p => p.email === email || p.user_email === email);
           const displayName = prof?.display_name || email?.split('@')[0] || email;
           const initials = displayName.slice(0,2).toUpperCase();
 
