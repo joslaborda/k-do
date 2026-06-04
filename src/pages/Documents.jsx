@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNotification } from '@/lib/notifications';
-import { Plus, Trash2, Pencil } from 'lucide-react';
-import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ticket, Shield, FileText } from '@/lib/icons';
+import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -91,10 +89,10 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 const DOC_ICONS = {
-  flight:    PlaneIcon,
-  train:     TrainFront,
+  flight:    Plane,
+  train:     Train,
   hotel:     Hotel,
-  bus:       BusFront,
+  bus:       Bus,
   car:       Car,
   event:     Ticket,
   personal:  Shield,
