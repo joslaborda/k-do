@@ -1,7 +1,6 @@
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowRight, X } from 'lucide-react';
@@ -937,7 +936,14 @@ export default function Expenses() {
 
   const userMap = usersData.reduce((m, u) => { m[u.email] = u.full_name || u.email; return m; }, {});
   // Build profilesByEmail: cross-reference usersData (has email) with profiles (has user_id + avatar_url)
-  const profilesByEmail = buildProfilesByEmail(profiles, usersData);
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    (usersData || []).forEach(u => {
+      const prof = (profiles || []).find(p => p.user_id === u.id);
+      if (prof) map[u.email] = prof;
+    });
+    return map;
+  }, [profiles, usersData]);
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],

@@ -244,7 +244,14 @@ export default function Documents() {
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
-  const profilesByEmail = buildProfilesByEmail(profiles, usersData || []);
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    (usersData || []).forEach(u => {
+      const prof = (profiles || []).find(p => p.user_id === u.id);
+      if (prof) map[u.email] = prof;
+    });
+    return map;
+  }, [profiles, usersData]);
   const userId = currentUser?.id ?? '';
 
   const [catFilter, setCatFilter]   = useState('all');
