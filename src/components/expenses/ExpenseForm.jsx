@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2, Camera, Upload, X } from 'lucide-react';
+import { Loader2, Camera, Upload, X, Utensils, Bus, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
 
 const CATEGORIES = [
-  { value: 'food',          label: '🍜 Comida' },
-  { value: 'transport',     label: '🚆 Transporte' },
-  { value: 'accommodation', label: '🏨 Alojamiento' },
-  { value: 'activities',    label: '⚡ Actividades' },
-  { value: 'shopping',      label: '🛍️ Compras' },
-  { value: 'other',         label: '💰 Otro' },
+  { value: 'food',          label: 'Comida',      Icon: Utensils    },
+  { value: 'transport',     label: 'Transporte',  Icon: Bus         },
+  { value: 'accommodation', label: 'Alojamiento', Icon: Hotel       },
+  { value: 'activities',    label: 'Actividades', Icon: Ticket      },
+  { value: 'shopping',      label: 'Compras',     Icon: ShoppingBag },
+  { value: 'other',         label: 'Otro',        Icon: CirclePlus  },
 ];
 
 const COMMON_CURRENCIES = [
@@ -213,10 +213,10 @@ export default function ExpenseForm({
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map(c => (
             <button key={c.value} type="button" onClick={() => set('category', c.value)}
-              className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
-                form.category === c.value ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-border hover:border-primary/40'
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-colors ${
+                form.category === c.value ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
               }`}>
-              {c.label}
+              <c.Icon size={13} />{c.label}
             </button>
           ))}
         </div>
