@@ -34,7 +34,7 @@ function NotificationItem({ notif, onRead }) {
     >
       {/* Avatar / icon */}
       <div className="relative flex-shrink-0">
-        {notif.actor_avatar ? (
+        {notif.actor_avatar && notif.actor_avatar.startsWith('http') ? (
           <img src={notif.actor_avatar} className="w-9 h-9 rounded-full object-cover" alt="" />
         ) : (
           <div className={`w-9 h-9 rounded-full ${cfg.bg} flex items-center justify-center`}>
@@ -123,11 +123,13 @@ export default function NotificationBell({ userId, userEmail }) {
       await Promise.all(unreadItems.map(n => base44.entities.Notification.update(n.id, { read: true })));
     },
     onMutate: () => {
-      queryClient.setQueryData(['notifications', userId], (old) =>
-        old ? old.map(n => ({ ...n, read: true })) : old
+      // Optimistic: mark all read locally immediately — badge disappears
+      queryClient.setQueryData(['notifications', userId], (prev) =>
+        prev ? prev.map(n => ({ ...n, read: true })) : prev
       );
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications', userId] }),
+    // No invalidateQueries here — would undo the optimistic update while panel is open
+    // The query will refresh naturally when panel closes and refetchInterval resumes
   });
 
   return (
