@@ -1615,24 +1615,24 @@ export default function Restaurants() {
             {!searchQuery && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 {[
-                  { key: 'food', label: '🍜 Comer' },
-                  { key: 'cultural', label: '🏛️ Cultural' },
-                  { key: 'interest', label: '📍 Interés' },
-                  { key: 'shop', label: '🛍️ Compras' },
-                ].map(f => (
-                  <button key={f.key} type="button"
+                  { key: 'food',     Icon: UtensilsCrossed, label: 'Comer' },
+                  { key: 'cultural', Icon: Landmark,         label: 'Cultural' },
+                  { key: 'interest', Icon: Ticket,           label: 'Interés' },
+                  { key: 'shop',     Icon: ShoppingBag,      label: 'Compras' },
+                ].map(({ key: k, Icon, label }) => (
+                  <button key={k} type="button"
                     onClick={() => {
-                      const next = nearbyFilter.includes(f.key)
-                        ? nearbyFilter.filter(k => k !== f.key)
-                        : [...nearbyFilter, f.key];
+                      const next = nearbyFilter.includes(k)
+                        ? nearbyFilter.filter(x => x !== k)
+                        : [...nearbyFilter, k];
                       setNearbyFilter(next);
                     }}
-                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-                      nearbyFilter.includes(f.key)
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                      nearbyFilter.includes(k)
                         ? 'bg-primary text-white border-primary'
                         : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                     }`}>
-                    {f.label}
+                    <Icon size={12} />{label}
                   </button>
                 ))}
               </div>
