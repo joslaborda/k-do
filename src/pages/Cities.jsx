@@ -427,7 +427,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
 
   const renderItem = (item, idx, isNoTime) => {
-    const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null; const spotColor = item._kind !== 'doc' ? 'bg-secondary' : '';
+    const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null;
     const isLast = idx === timeline.length - 1;
 
     return (
@@ -462,12 +462,12 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             if (item._kind === 'note') setEditingNote(item._noteIdx);
           }}
           className="flex-1 flex items-center gap-3 px-3 py-3 hover:bg-secondary/20 transition-colors text-left min-w-0">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item._kind === 'doc' ? 'bg-orange-50 dark:bg-orange-950/30' : spotColor || 'bg-secondary'}`}>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item._kind === 'doc' ? 'bg-orange-50 dark:bg-orange-950/30' : (SPOT_COLORS[item.type] || 'bg-secondary')}`}>
             {item._kind === 'doc' && DocIcon
               ? <DocIcon size={15} className="text-primary" />
               : item._kind === 'note'
               ? <span className="text-sm">📝</span>
-              : <span className="text-sm">{SPOT_ICONS[item.type] || '📍'}</span>}
+              : (() => { const SpI = SPOT_ICONS[item.type] || CirclePlus; return <SpI size={14} className={SPOT_COLORS[item.type]?.split(' ')[1] || 'text-muted-foreground'} />; })()}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">{item._title}</p>
