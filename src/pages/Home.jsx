@@ -1341,14 +1341,17 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-            const initials = (email || '').split('@')[0].slice(0,2).toUpperCase();
+            const prof = profiles?.find(p => p.email === email || p.user_email === email);
+            const name = prof?.display_name || email?.split('@')[0] || '?';
+            const initials = name.slice(0,2).toUpperCase();
             const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
             return (
               <div key={email} className="flex flex-col items-center gap-1">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>
-                  {initials}
-                </div>
-                <span className="text-xs text-muted-foreground">{i === 0 ? 'Tú' : email.split('@')[0]}</span>
+                {prof?.avatar_url
+                  ? <img src={prof.avatar_url} alt={name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                  : <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>
+                }
+                <span className="text-xs text-muted-foreground">{email === currentUserEmail ? 'Tú' : name}</span>
               </div>
             );
           })}
@@ -2255,13 +2258,13 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const initials = (email || '').split('@')[0].slice(0, 2).toUpperCase();
+              const prof = profiles?.find(p => p.email === email || p.user_email === email);
+              const name = prof?.display_name || email?.split('@')[0] || '?';
+              const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
-              return (
-                <div key={email} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>
-                  {initials}
-                </div>
-              );
+              return prof?.avatar_url
+                ? <img key={email} src={prof.avatar_url} alt={name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                : <div key={email} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>;
             })}
           </div>
           <button onClick={() => { onClose(); setTimeout(() => onInvite?.(), 100); }}

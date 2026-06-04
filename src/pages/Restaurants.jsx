@@ -820,9 +820,10 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-2">
-              <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">
-                {c.user_display_name?.[0]?.toUpperCase() || '?'}
-              </div>
+              {c.avatar_url
+                ? <img src={c.avatar_url} alt={c.user_display_name||''} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                : <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
+              }
               <div className="flex-1 bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
                 <span className="text-xs font-semibold text-foreground">@{c.username || c.user_display_name}</span>
                 {c.text && <p className="text-sm text-foreground mt-0.5">{c.text}</p>}
