@@ -712,7 +712,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             </button>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 overflow-y-auto px-5 pt-4 pb-2">
           <ExpenseForm
             members={members}
             initialData={editingExpense}
@@ -726,6 +726,19 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             currentUserEmail={currentUserEmail}
             profiles={profiles}
           />
+        </div>
+        {/* Buttons — outside scroll, always visible */}
+        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border">
+          <button onClick={onClose}
+            className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
+            Cancelar
+          </button>
+          <button
+            form="expense-form"
+            onClick={() => document.getElementById('expense-form-submit')?.click()}
+            className="py-3 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-colors" style={{flex:2}}>
+            {saving ? 'Guardando...' : (editingExpense ? 'Guardar cambios' : 'Guardar gasto')}
+          </button>
         </div>
       </div>
     </div>
@@ -922,6 +935,12 @@ export default function Expenses() {
   });
 
   const userMap = usersData.reduce((m, u) => { m[u.email] = u.full_name || u.email; return m; }, {});
+  // Build profilesByEmail: cross-reference usersData (has email) with profiles (has user_id + avatar_url)
+  const profilesByEmail = usersData.reduce((m, u) => {
+    const prof = profiles.find(p => p.user_id === u.id);
+    if (prof) m[u.email] = prof;
+    return m;
+  }, {});
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
@@ -1094,7 +1113,7 @@ export default function Expenses() {
         onSave={handleSave}
         saving={createMutation.isPending || updateMutation.isPending}
         currentUserEmail={currentUserEmail}
-        profiles={profiles}
+        profiles={profilesByEmail}
       />
     </div>
   );
