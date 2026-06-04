@@ -120,6 +120,7 @@ export default function ExpenseForm({
   };
 
   return (
+    <>
     <div className="space-y-5">
 
       {/* Importe + conversión */}
@@ -307,5 +308,5 @@ export default function ExpenseForm({
         {saving ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Guardando...</> : 'Guardar gasto'}
       </button>
     </div>
-  );
+  </>;
 }
