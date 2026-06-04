@@ -1904,15 +1904,28 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
   const [error, setError] = useState('');
 
   const handleInvite = async () => {
-    if (!email.trim() || !email.includes('@')) { setError('Introduce un email válido'); return; }
+    const raw = email.trim();
+    if (!raw) { setError('Introduce un email o @usuario'); return; }
     setSending(true); setError('');
     try {
+      let resolvedEmail = raw;
+      // Resolve username → email
+      if (!raw.includes('@') || raw.startsWith('@')) {
+        const query = raw.startsWith('@') ? raw.slice(1) : raw;
+        const found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
+        const profile = found[0] || (await base44.entities.UserProfile.filter({}))
+          .find(p => p.username?.toLowerCase() === query.toLowerCase() || p.display_name?.toLowerCase() === query.toLowerCase());
+        if (!profile) { setError(`No existe el usuario @${query}`); setSending(false); return; }
+        const users = await base44.entities.User.list();
+        const user = users.find(u => u.id === profile.user_id);
+        if (!user?.email) { setError('No se pudo resolver el email'); setSending(false); return; }
+        resolvedEmail = user.email;
+      }
       const currentMembers = trip?.members || [];
-      if (currentMembers.includes(email.trim())) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
-      // Send invite email + create TripInvite record (user must accept)
+      if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
       await sendTripInvite({
         tripId,
-        email: email.trim(),
+        email: resolvedEmail,
         role: 'member',
         tripName: trip?.name || 'el viaje',
         inviterEmail: trip?.created_by || '',
@@ -1950,7 +1963,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
                 value={email}
                 onChange={e => { setEmail(e.target.value); setError(''); }}
                 onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
-                placeholder="nombre@email.com"
+                placeholder="email o @usuario"
                 type="email"
                 className="h-10 text-sm"
                 autoFocus
