@@ -1221,7 +1221,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
 }
 
 // ── Today tab ─────────────────────────────────────────────────────────────────
-function TodayTab({ trip, cities, tripId, profiles, onInvite }) {
+function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }) {
   const [lightbox, setLightbox] = useState(null);
   const queryClient = useQueryClient();
   const today = new Date();
@@ -2643,7 +2643,7 @@ export default function Home() {
           />
         )}
         {tab === 'hoy' && (
-          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profiles} onInvite={() => setInviteOpen(true)} />
+          <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profiles} onInvite={() => setInviteOpen(true)} currentUserEmail={currentUserEmail} />
         )}
         {tab === 'manana' && (
           <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} />
