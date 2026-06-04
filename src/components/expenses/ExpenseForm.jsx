@@ -308,5 +308,6 @@ export default function ExpenseForm({
         {saving ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Guardando...</> : 'Guardar gasto'}
       </button>
     </div>
-  </>;
+  </>
+  );
 }
