@@ -29,22 +29,58 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
   });
 
   const handleInvite = async () => {
-    if (!inviteEmail.trim()) return;
-    if (members.includes(inviteEmail.trim())) {
-      toast({ title: 'Ya es miembro', description: 'Este usuario ya está en el viaje' });
-      return;
-    }
+    const raw = inviteEmail.trim();
+    if (!raw) return;
     setInviting(true);
     try {
+      let resolvedEmail = raw;
+      // If not an email, search by username
+      if (!raw.includes('@')) {
+        const query = raw.startsWith('@') ? raw.slice(1) : raw;
+        const found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
+        if (!found.length) {
+          // Try display_name search fallback
+          const all = await base44.entities.UserProfile.filter({});
+          const match = all.find(p => p.username?.toLowerCase() === query.toLowerCase() || p.display_name?.toLowerCase() === query.toLowerCase());
+          if (!match) {
+            toast({ title: 'Usuario no encontrado', description: `No existe el usuario @${query}` });
+            setInviting(false);
+            return;
+          }
+          // Get email from Users
+          const users = await base44.entities.User.list();
+          const user = users.find(u => u.id === match.user_id);
+          if (!user?.email) {
+            toast({ title: 'Error', description: 'No se pudo resolver el email del usuario' });
+            setInviting(false);
+            return;
+          }
+          resolvedEmail = user.email;
+        } else {
+          const users = await base44.entities.User.list();
+          const user = users.find(u => u.id === found[0].user_id);
+          if (!user?.email) {
+            toast({ title: 'Error', description: 'No se pudo resolver el email del usuario' });
+            setInviting(false);
+            return;
+          }
+          resolvedEmail = user.email;
+        }
+      }
+      if (members.includes(resolvedEmail)) {
+        toast({ title: 'Ya es miembro', description: 'Este usuario ya está en el viaje' });
+        setInviting(false);
+        return;
+      }
       await sendTripInvite({
         tripId: trip.id,
-        email: inviteEmail.trim(),
+        email: resolvedEmail,
         role: inviteRole,
         tripName: trip.name,
         inviterEmail: currentUserEmail,
         inviterName: currentUserEmail.split('@')[0],
       });
-      toast({ title: '✓ Invitación enviada', description: `Email enviado a ${inviteEmail.trim()}` });
+      toast({ title: '✓ Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
       setInviteEmail('');
       setInviteRole('editor');
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
