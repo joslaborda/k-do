@@ -9,7 +9,7 @@ import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
@@ -1277,7 +1277,7 @@ export default function Restaurants() {
   const notifyMembers = (type, message, refTitle) => {
     const others = (trip?.members || []).filter(e => e !== currentUser?.email);
     others.forEach(email => {
-      const p = profilesByEmail?.[email] || profiles.find(pr => pr.user_email === email);
+      const p = profiles.find(pr => pr.user_email === email);
       if (p?.user_id) createNotification({ userId: p.user_id, type, refId: tripId, refTitle: refTitle || trip?.name || '', message });
     });
   };

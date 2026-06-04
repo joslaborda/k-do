@@ -557,7 +557,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
               const pct = amt / maxCat * 100;
               return (
                 <div key={cat} className="flex items-center gap-2.5">
-                  {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
+                  {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-foreground">{tc.label}</span>
@@ -587,11 +587,11 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
             const pct = amt / totalGroup * 100;
             return (
               <div key={cat} className="flex items-center gap-2.5">
-                {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
+                {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                 <div className="flex-1">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-foreground">{tc.label}</span>
-                    <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-foreground">{tc.label}</span>
+                      <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                   </div>
                   <div style={{ height: 4, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
                     <div style={{ width: `${pct}%`, height: '100%', background: '#f97316', borderRadius: 4 }} />

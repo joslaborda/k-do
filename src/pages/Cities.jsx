@@ -427,7 +427,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
   const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
 
   const renderItem = (item, idx, isNoTime) => {
-    const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null;
+    const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null; const spotColor = item._kind !== 'doc' ? 'bg-secondary' : '';
     const isLast = idx === timeline.length - 1;
 
     return (
