@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, Check, UserPlus, Bookmark, Mail, MapPin, X, FileText, Receipt, MessageCircle, Camera } from 'lucide-react';
+import { Bell, Check, UserPlus, Bookmark, Mail, MapPin, X, FileText, Receipt, MessageCircle, Camera, Loader2 } from 'lucide-react';
+import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
@@ -60,10 +63,40 @@ function NotificationItem({ notif, onRead }) {
   );
 }
 
-export default function NotificationBell({ userId }) {
+export default function NotificationBell({ userId, userEmail }) {
   const [open, setOpen] = useState(false);
+  const [processingInvite, setProcessingInvite] = useState(null);
   const ref = useRef();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const { data: pendingInvites = [] } = useQuery({
+    queryKey: ['pendingInvites', userEmail],
+    queryFn: () => base44.entities.TripInvite.filter({ email: userEmail, status: 'pending' }),
+    enabled: !!userEmail && open,
+    staleTime: 30000,
+    refetchInterval: open ? 30000 : false,
+  });
+
+  const handleAcceptInvite = async (invite) => {
+    setProcessingInvite(invite.id);
+    try {
+      await acceptTripInvite(invite.id, invite.invite_token, invite.trip_id, userEmail);
+      queryClient.invalidateQueries({ queryKey: ['pendingInvites', userEmail] });
+      setOpen(false);
+      navigate(createPageUrl('Home') + '?trip_id=' + invite.trip_id);
+    } catch {}
+    setProcessingInvite(null);
+  };
+
+  const handleDeclineInvite = async (invite) => {
+    setProcessingInvite(invite.id);
+    try {
+      await declineTripInvite(invite.id, invite.invite_token);
+      queryClient.invalidateQueries({ queryKey: ['pendingInvites', userEmail] });
+    } catch {}
+    setProcessingInvite(null);
+  };
 
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -78,7 +111,7 @@ export default function NotificationBell({ userId }) {
     refetchInterval: 30000,
   });
 
-  const unread = notifications.filter(n => !n.read).length;
+  const unread = notifications.filter(n => !n.read).length + pendingInvites.length;
 
   const markRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
@@ -134,7 +167,38 @@ export default function NotificationBell({ userId }) {
 
           {/* List */}
           <div className="max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {/* Pending invites — always on top */}
+            {pendingInvites.map(invite => (
+              <div key={invite.id} className="mx-3 my-2 rounded-xl overflow-hidden border border-orange-200 dark:border-orange-800" style={{background:'#fff7ed'}}>
+                <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{background:'#fde8df'}}>
+                    <Mail className="w-4 h-4" style={{color:'#c2410c'}} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium leading-snug" style={{color:'#7c2d12'}}>{invite.trip_name || 'Nuevo viaje'}</p>
+                    <p className="text-xs mt-0.5" style={{color:'#9a3412'}}>{invite.invited_by || 'Alguien'} te ha invitado</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 px-3 pb-3">
+                  <button
+                    onClick={() => handleAcceptInvite(invite)}
+                    disabled={processingInvite === invite.id}
+                    className="flex-2 flex-1 py-1.5 rounded-full text-xs font-medium text-white border-none cursor-pointer"
+                    style={{background:'#c2410c', flex:2}}>
+                    {processingInvite === invite.id ? '...' : 'Aceptar'}
+                  </button>
+                  <button
+                    onClick={() => handleDeclineInvite(invite)}
+                    disabled={processingInvite === invite.id}
+                    className="flex-1 py-1.5 rounded-full text-xs cursor-pointer"
+                    style={{background:'transparent', border:'0.5px solid #fed7aa', color:'#9a3412', flex:1}}>
+                    Rechazar
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {notifications.length === 0 && pendingInvites.length === 0 ? (
               <div className="py-10 text-center text-muted-foreground text-sm">
                 <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
                 Sin notificaciones
