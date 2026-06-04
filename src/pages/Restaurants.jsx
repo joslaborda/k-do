@@ -10,7 +10,7 @@ import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, Compass, ArrowRight, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
@@ -117,7 +117,7 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng, filterCats = null) {
-  const viewbox = `${lng-0.03},${lat+0.03},${lng+0.03},${lat-0.03}`;
+  const viewbox = `${lng-0.02},${lat+0.02},${lng+0.02},${lat-0.02}`;
   const CAT_MAP = {
     food:     ['restaurant', 'cafe', 'bar', 'fast_food', 'pub'],
     cultural: ['museum', 'theatre', 'cinema', 'art_gallery', 'library', 'monument'],
@@ -126,7 +126,7 @@ async function nearbyPlaces(lat, lng, filterCats = null) {
   };
   const categories = filterCats?.length
     ? filterCats.flatMap(k => CAT_MAP[k] || [k])
-    : ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction', 'park', 'monument'];
+    : ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction'];
   const seen = new Set();
   const results = [];
   await Promise.all(categories.map(async cat => {
@@ -134,7 +134,7 @@ async function nearbyPlaces(lat, lng, filterCats = null) {
       const params = new URLSearchParams({ format:'json', limit:5, addressdetails:1, namedetails:1, viewbox, bounded:1, q:cat });
       const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
         headers: { 'Accept-Language':'es,en', 'User-Agent':'KodoTravelApp/1.0' },
-        signal: AbortSignal.timeout(8000),
+        signal: (() => { const c = new AbortController(); setTimeout(() => c.abort(), 8000); return c.signal; })(),
       });
       if (!res.ok) return;
       const data = await res.json();
@@ -1377,19 +1377,19 @@ export default function Restaurants() {
       async pos => {
         try {
           const res = await nearbyPlaces(pos.coords.latitude, pos.coords.longitude, cats.length ? cats : null);
-          setNearbyResults(res);
+          setNearbyResults(res.length ? res : [{ id:'empty', name:'Sin resultados cerca', address:'Prueba a cambiar el filtro de categoría', type:'custom' }]);
         } catch(e) {
-          setNearbyResults([{ id:'err', name:'Sin resultados cerca', address: e.message || 'Intenta buscar por nombre', type:'custom' }]);
+          setNearbyResults([{ id:'err', name:'Sin resultados', address: e.message || 'Intenta buscar por nombre', type:'custom' }]);
         } finally { setLoadingNearby(false); }
       },
       (err) => {
         setLoadingNearby(false);
-        const msg = err.code === 1 ? 'Permite el acceso a tu ubicación en el navegador'
-          : err.code === 2 ? 'Ubicación no disponible en este momento'
-          : 'Tiempo de espera agotado. Intenta de nuevo.';
-        setNearbyResults([{ id:'err', name:'No se pudo obtener tu ubicación', address: msg, type:'custom' }]);
+        setNearbyResults([{ id:'err',
+          name: err.code === 1 ? 'Permiso de ubicación denegado' : 'No se pudo obtener tu ubicación',
+          address: err.code === 1 ? 'Ve a ajustes del navegador y permite el acceso a ubicación' : 'Intenta de nuevo',
+          type:'custom' }]);
       },
-      { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 }
+      { timeout: 15000, enableHighAccuracy: true, maximumAge: 30000 }
     );
   };
 
@@ -1611,7 +1611,7 @@ export default function Restaurants() {
               </div>
             </div>
 
-            {/* Filter chips + Cerca */}
+            {/* Filter chips — no Cerca here, it's already in the search bar */}
             {!searchQuery && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 {[
@@ -1635,10 +1635,6 @@ export default function Restaurants() {
                     {f.label}
                   </button>
                 ))}
-                <button onClick={() => handleNearby(nearbyFilter)}
-                  className="flex items-center gap-1 text-xs bg-accent text-primary px-3 py-1 rounded-full font-medium border border-border">
-                  <Navigation className="w-3 h-3"/>Cerca
-                </button>
               </div>
             )}
 

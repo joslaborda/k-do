@@ -23,7 +23,21 @@ const DOC_ICON_MAP = {
   bus: BusFront, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
-const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
+const SPOT_ICONS = {
+  food:     UtensilsCrossed,
+  sight:    Landmark,
+  activity: Ticket,
+  shopping: ShoppingBag,
+  custom:   CirclePlus,
+  restaurant: UtensilsCrossed,
+  museum:   Landmark,
+};
+const SPOT_COLORS = {
+  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  museum: 'bg-violet-50 text-violet-600',
+};
 
 function getTransportIcon(docs, cityStartDate) {
   if (!docs || !cityStartDate) return null;
@@ -449,7 +463,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             if (item._kind === 'note') setEditingNote(item._noteIdx);
           }}
           className="flex-1 flex items-center gap-3 px-3 py-3 hover:bg-secondary/20 transition-colors text-left min-w-0">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item._kind === 'doc' ? 'bg-orange-50 dark:bg-orange-950/30' : 'bg-secondary'}`}>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item._kind === 'doc' ? 'bg-orange-50 dark:bg-orange-950/30' : spotColor || 'bg-secondary'}`}>
             {item._kind === 'doc' && DocIcon
               ? <DocIcon size={15} className="text-primary" />
               : item._kind === 'note'

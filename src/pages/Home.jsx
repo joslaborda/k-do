@@ -148,7 +148,21 @@ const DOC_ICONS = {
   insurance: (p) => <Shield size={13} {...p} />,
   other: (p) => <FileText size={13} {...p} />,
 };
-const SPOT_ICONS = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍' };
+const SPOT_ICONS = {
+  food:     UtensilsCrossed,
+  sight:    Landmark,
+  activity: Ticket,
+  shopping: ShoppingBag,
+  custom:   CirclePlus,
+  restaurant: UtensilsCrossed,
+  museum:   Landmark,
+};
+const SPOT_COLORS = {
+  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  museum: 'bg-violet-50 text-violet-600',
+};
 
 // ── Mini weather ──────────────────────────────────────────────────────────────
 const WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'🌨️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
@@ -322,7 +336,8 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
 
   const isDoc  = item._kind === 'doc';
   const EmojiIcon = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : null;
-  const spotEmoji = !isDoc ? (SPOT_ICONS[item.type] || '📍') : null;
+  const SpotIcon = !isDoc ? (SPOT_ICONS[item.type] || CirclePlus) : null;
+      const spotColor = !isDoc ? (SPOT_COLORS[item.type] || SPOT_COLORS.custom) : '';
   const title  = item.title || item.name || 'Sin título';
 
   const handleSave = async () => {
@@ -348,7 +363,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
 
         {/* Header */}
         <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ${isDoc ? 'bg-orange-50' : 'bg-secondary'}`}>
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ${isDoc ? 'bg-orange-50' : spotColor || 'bg-secondary'}`}>
             {isDoc ? <EmojiIcon size={20} className="text-primary" /> : <span className="text-xl">{spotEmoji}</span>}
           </div>
           <div className="flex-1 min-w-0">
@@ -594,7 +609,8 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
               const isDoc   = item._kind === 'doc';
               const isNote  = item._kind === 'note';
               const DocIcon = isDoc ? (DOC_ICONS[item.category] || DOC_ICONS[item.type] || DOC_ICONS.other) : null;
-              const spotEmoji = (!isDoc && !isNote) ? (SPOT_ICONS[item.type] || '📍') : null;
+              const SpotIcon = (!isDoc && !isNote) ? (SPOT_ICONS[item.type] || CirclePlus) : null;
+              const spotColor = (!isDoc && !isNote) ? (SPOT_COLORS[item.type] || SPOT_COLORS.custom) : '';
               const isLast  = idx === timeline.length - 1;
               const hasTime = !!item.time;
 
@@ -626,12 +642,12 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   </div>
 
                   {/* Icon */}
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : item._kind === 'note' ? 'bg-secondary' : 'bg-secondary'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : item._kind === 'note' ? 'bg-secondary' : spotColor || 'bg-secondary'}`}>
                     {isDoc && DocIcon
                       ? <DocIcon size={16} stroke="currentColor" className="text-primary" />
                       : item._kind === 'note'
                       ? <span className="text-base">📝</span>
-                      : <span className="text-base">{spotEmoji}</span>
+                      : SpotIcon ? <SpotIcon size={16} /> : null
                     }
                   </div>
 
