@@ -600,7 +600,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="fixed inset-0z-[70] flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
         <div className="bg-card w-full max-w-lg rounded-t-3xl" onClick={e => e.stopPropagation()}>
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-4" />
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
@@ -702,7 +702,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profiles }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0z-[70] flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
       <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[92vh]" onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
@@ -729,7 +729,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
           />
         </div>
         {/* Buttons — outside scroll, always visible */}
-        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border">
+        <div className="flex-shrink-0 flex gap-3 px-5 pt-4 pb-8 border-t border-border" style={{paddingBottom:"max(2rem, env(safe-area-inset-bottom, 2rem))"}}>
           <button onClick={onClose}
             className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
             Cancelar
