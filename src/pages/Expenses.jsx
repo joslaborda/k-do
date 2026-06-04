@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X } from 'lucide-react';
+import { Plus, ArrowRight, X , Utensils , Bus , Hotel , Ticket , ShoppingBag , MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useUndo } from '@/components/hooks/useUndo';
 import { useTripContext } from '@/hooks/useTripContext';
@@ -87,6 +87,19 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 // ── Category config ───────────────────────────────────────────────────────────
+const CAT_ICONS = {
+  food:          Utensils,
+  transport:     Bus,
+  accommodation: Hotel,
+  activities:    Ticket,
+  shopping:      ShoppingBag,
+  other:         MoreHorizontal,
+};
+const CAT_COLORS = {
+  food: 'bg-orange-100 text-orange-600', transport: 'bg-blue-100 text-blue-600',
+  accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
+  shopping: 'bg-emerald-100 text-emerald-600', other: 'bg-slate-100 text-slate-600',
+};
 const CAT_CONFIG = {
   food:          { label: 'Comida',      emoji: '🍜' },
   transport:     { label: 'Transporte',  emoji: '🚆' },
@@ -326,6 +339,24 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
             {myBalance > 0 ? 'Te deben este dinero' : 'Debes este dinero'}
           </p>
         )}
+        {/* Mi gasto real */}
+        {(() => {
+          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail).reduce((s, e) => s + (e.amount_base || e.amount || 0), 0);
+          const iOweTotal = debts.filter(d => d.from === currentUserEmail).reduce((s, d) => s + d.amount, 0);
+          const myRealSpend = iPaid - Math.max(0, myBalance);
+          return iPaid > 0 ? (
+            <div className="mt-3 pt-3 border-t border-border/50 flex gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground">He pagado</p>
+                <p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Mi parte real</p>
+                <p className="text-sm font-medium text-foreground">{fmtAmt(Math.max(0, myRealSpend), baseCurrency)} {sym(baseCurrency)}</p>
+              </div>
+            </div>
+          ) : null;
+        })()}
       </div>
 
       {/* Lo que debo yo — botón "He pagado" para saldar */}
@@ -526,7 +557,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
               const pct = amt / maxCat * 100;
               return (
                 <div key={cat} className="flex items-center gap-2.5">
-                  <span className="text-base flex-shrink-0">{tc.emoji}</span>
+                  {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-foreground">{tc.label}</span>
@@ -556,7 +587,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
             const pct = amt / totalGroup * 100;
             return (
               <div key={cat} className="flex items-center gap-2.5">
-                <span className="text-base flex-shrink-0">{tc.emoji}</span>
+                {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                 <div className="flex-1">
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-foreground">{tc.label}</span>
@@ -971,7 +1002,7 @@ export default function Expenses() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, d }) => base44.entities.Expense.update(id, { ...d, amount: parseFloat(d.amount) }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }); setSheetOpen(false); setEditingExpense(null); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }); setSheetOpen(false); setEditingExpense(null); window.scrollTo({ top: 0, behavior: 'smooth' }); },
     onError: () => alert('Error al actualizar el gasto.'),
   });
 
