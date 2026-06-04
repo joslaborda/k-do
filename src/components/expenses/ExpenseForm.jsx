@@ -224,7 +224,7 @@ export default function ExpenseForm({
                 form.paid_by === email ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
               }`}>
               {(() => {
-                const prof = profiles[email] || profiles.find?.(p => p.email === email || p.user_email === email);
+                const prof = profiles?.[email] || null;
                 return prof?.avatar_url
                   ? <img src={prof.avatar_url} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
                   : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'#fbd5c0':'#f0ede8',color:form.paid_by===email?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
