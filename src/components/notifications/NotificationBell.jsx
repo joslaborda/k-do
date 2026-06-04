@@ -51,7 +51,7 @@ function NotificationItem({ notif, onRead }) {
         <p className="text-sm text-foreground leading-snug">
           <span className="font-semibold">{notif.actor_display_name || notif.actor_username || 'Alguien'}</span>
           {' '}{cfg.label}
-          {notif.ref_title ? <span className="font-medium"> · {notif.ref_title}</span> : ''}
+          {notif.ref_title ? <span className="font-medium"> "{notif.ref_title}"</span> : ''}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {formatDistanceToNow(new Date(notif.created_date), { addSuffix: true, locale: es })}
@@ -122,7 +122,6 @@ export default function NotificationBell({ userId, userEmail }) {
       await Promise.all(unreadItems.map(n => base44.entities.Notification.update(n.id, { read: true })));
     },
     onMutate: () => {
-      // Clear badge immediately without waiting for server
       queryClient.setQueryData(['notifications', userId], (old) =>
         old ? old.map(n => ({ ...n, read: true })) : old
       );
