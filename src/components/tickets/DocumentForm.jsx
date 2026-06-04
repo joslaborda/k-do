@@ -4,26 +4,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ticket, Shield, FileText } from '@/lib/icons';
+import { Plane, Hotel, Train, Bus, Car, Ticket, Shield, CirclePlus } from 'lucide-react';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon: PlaneIcon,  label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
-  train:    { icon: TrainFront, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
+  flight:   { icon: Plane,  label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  train:    { icon: Train, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
   hotel:    { icon: Hotel,      label: 'Hotel',   color: 'bg-purple-50 dark:bg-purple-950/30' },
   event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
   personal: { icon: Shield,     label: 'Seguro',  color: 'bg-amber-50 dark:bg-amber-950/30'  },
-  other:    { icon: FileText,   label: 'Otro',    color: 'bg-secondary' },
+  other:    { icon: CirclePlus,   label: 'Otro',    color: 'bg-secondary' },
 };
 
 
 const CATEGORIES = [
-  { key: 'flight',   Icon: PlaneIcon,  label: 'Vuelo'   },
+  { key: 'flight',   Icon: Plane,  label: 'Vuelo'   },
   { key: 'hotel',    Icon: Hotel,      label: 'Hotel'   },
-  { key: 'train',    Icon: TrainFront, label: 'Tren'    },
+  { key: 'train',    Icon: Train, label: 'Tren'    },
   { key: 'event',    Icon: Ticket,     label: 'Evento'  },
   { key: 'personal', Icon: Shield,     label: 'Seguro'  },
-  { key: 'other',    Icon: FileText,   label: 'Otro'    },
+  { key: 'other',    Icon: CirclePlus,   label: 'Otro'    },
 ];
 
 const VISIBILITY_OPTS = [
