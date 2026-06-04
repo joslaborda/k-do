@@ -234,7 +234,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
         <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
         <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
         <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
-          <Plus className="w-4 h-4" />Añadir primer gasto
+          <Plus className="w-4 h-4" />Gasto primer gasto
         </button>
       </div>
     );
@@ -698,7 +698,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 }
 
 // ── Expense add/edit sheet ────────────────────────────────────────────────────
-function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving }) {
+function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profiles }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
@@ -723,6 +723,8 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             onCancel={onClose}
             saving={saving}
             userMap={userMap}
+            currentUserEmail={currentUserEmail}
+            profiles={profiles}
           />
         </div>
       </div>
@@ -996,7 +998,7 @@ export default function Expenses() {
               </button>
             </Link>
             <button onClick={openAdd} className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
-              <Plus className="w-4 h-4" />Añadir
+              <Plus className="w-4 h-4" />Gasto
             </button>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
@@ -1090,6 +1092,8 @@ export default function Expenses() {
         userMap={userMap}
         onSave={handleSave}
         saving={createMutation.isPending || updateMutation.isPending}
+        currentUserEmail={currentUserEmail}
+        profiles={profiles}
       />
     </div>
   );
