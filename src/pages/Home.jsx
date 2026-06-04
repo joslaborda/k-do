@@ -1463,8 +1463,23 @@ function FinishedTab({ trip, cities, expenses, spots, tripId }) {
         ))}
         <div className="bg-card rounded-2xl border border-border p-4 col-span-2">
           <DollarSign className="w-4 h-4 text-muted-foreground mb-2" />
+          <p className="text-xs text-muted-foreground mb-0.5">Gasto total del viaje</p>
           <p className="text-xl font-semibold text-foreground">{totalSpent.toFixed(0)} {currency}</p>
-          <p className="text-xs text-muted-foreground">Total · {avgPerDay.toFixed(0)} {currency}/día</p>
+          {(() => {
+            const myPaid = expenses.filter(e => e.paid_by === currentUserEmail).reduce((s, e) => s + (e.amount || 0), 0);
+            const myShare = expenses.reduce((s, e) => {
+              if (!e.split_with?.includes(currentUserEmail) && e.paid_by !== currentUserEmail) return s;
+              if (e.split_type === 'custom') return s + parseFloat(e.amounts_by_user?.[currentUserEmail] || 0);
+              const n = (e.split_with?.length || 1);
+              return s + (e.amount || 0) / n;
+            }, 0);
+            return (
+              <p className="text-xs text-muted-foreground mt-1">
+                Tu parte: <span className="font-medium text-foreground">{myShare.toFixed(0)} {currency}</span>
+                {' · '}{avgPerDay.toFixed(0)} {currency}/día
+              </p>
+            );
+          })()}
         </div>
       </div>
 
