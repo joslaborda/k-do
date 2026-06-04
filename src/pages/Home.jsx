@@ -799,7 +799,7 @@ function TomorrowTab({ trip, cities, tripId }) {
 
 
 // ── Inicio tab — D-1 and departure day ────────────────────────────────────────
-function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, onInvite }) {
+function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, onInvite, currentUserEmail }) {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const tripStart = trip?.start_date || '';
   const daysLeft = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
@@ -2639,6 +2639,7 @@ export default function Home() {
             documents={documents} packingItems={packingItems}
             profiles={profiles} tripId={tripId}
             onInvite={() => setInviteOpen(true)}
+            currentUserEmail={currentUserEmail}
           />
         )}
         {tab === 'hoy' && (
