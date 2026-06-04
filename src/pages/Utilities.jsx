@@ -659,7 +659,6 @@ function EmergencyTab({ country, homeCountry: homeCountryProp, secondNationality
         </div>
         );
       })()}
-      </div>
     </div>
   );
 }
