@@ -109,7 +109,8 @@ export default function NotificationBell({ userId, userEmail }) {
     refetchInterval: 30000,
   });
 
-  const unread = notifications.filter(n => !n.read).length + pendingInvites.length;
+  const unreadNotifs = notifications.filter(n => !n.read).length;
+  const unread = unreadNotifs + pendingInvites.length;
 
   const markRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
