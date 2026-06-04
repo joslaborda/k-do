@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNotification } from '@/lib/notifications';
@@ -245,6 +246,7 @@ export default function Documents() {
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
+  const profilesByEmail = buildProfilesByEmail(profiles, usersData || []);
   const userId = currentUser?.id ?? '';
 
   const [catFilter, setCatFilter]   = useState('all');
@@ -294,10 +296,10 @@ export default function Documents() {
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);
-      const myProf = profiles.find(pr => pr.email === currentUserEmail || pr.user_email === currentUserEmail);
+      const myProf = profilesByEmail?.[currentUserEmail] || null;
       const others = (trip?.members || []).filter(e => e !== currentUserEmail);
       others.forEach(memberEmail => {
-        const p = profiles.find(pr => pr.email === memberEmail || pr.user_email === memberEmail);
+        const p = profilesByEmail?.[memberEmail] || null;
         if (p?.user_id) createNotification({
           userId: p.user_id,
           type: 'doc_added',

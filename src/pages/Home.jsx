@@ -1341,7 +1341,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-            const prof = profiles?.find(p => p.email === email || p.user_email === email);
+            const prof = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
             const name = prof?.display_name || email?.split('@')[0] || '?';
             const initials = name.slice(0,2).toUpperCase();
             const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
@@ -1873,7 +1873,7 @@ function MemberAvatarRow({ trip, profiles, onInvite, isToday }) {
   return (
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
       {members.map((email, i) => {
-        const profile = profiles?.find(p => p.user_email === email || p.created_by === email);
+        const profile = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
         const initials = (profile?.display_name || email || '').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || (email||'').split('@')[0].slice(0,2).toUpperCase();
         const name = profile?.display_name || (email||'').split('@')[0];
         return (
@@ -2271,7 +2271,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const prof = profiles?.find(p => p.email === email || p.user_email === email);
+              const prof = profilesByEmail?.[email] || profiles?.find(p => p.user_email === email);
               const name = prof?.display_name || email?.split('@')[0] || '?';
               const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];

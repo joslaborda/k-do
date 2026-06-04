@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { useTripContext } from '@/hooks/useTripContext';
 import { createNotification } from '@/lib/notifications';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
@@ -1269,7 +1270,7 @@ export default function Restaurants() {
   const notifyMembers = (type, message, refTitle) => {
     const others = (trip?.members || []).filter(e => e !== currentUser?.email);
     others.forEach(email => {
-      const p = profiles.find(pr => pr.email === email || pr.user_email === email);
+      const p = profilesByEmail?.[email] || profiles.find(pr => pr.user_email === email);
       if (p?.user_id) createNotification({ userId: p.user_id, type, refId: tripId, refTitle: refTitle || trip?.name || '', message });
     });
   };

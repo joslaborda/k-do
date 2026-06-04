@@ -1,6 +1,7 @@
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowRight, X } from 'lucide-react';
@@ -110,7 +111,7 @@ function fmtAmt(n, code) {
 
 // ── Avatar ─────────────────────────────────────────────────────────────────────
 function Avatar({ email, profiles = [], size = 28 }) {
-  const profile = profiles.find(p => p.email === email || p.user_email === email);
+  const profile = profiles[email] || null;  // profiles is profilesByEmail map
   const name = profile?.display_name || profile?.username || email?.split('@')[0] || '?';
   const initials = name.slice(0, 2).toUpperCase();
   if (profile?.avatar_url) {
@@ -936,11 +937,7 @@ export default function Expenses() {
 
   const userMap = usersData.reduce((m, u) => { m[u.email] = u.full_name || u.email; return m; }, {});
   // Build profilesByEmail: cross-reference usersData (has email) with profiles (has user_id + avatar_url)
-  const profilesByEmail = usersData.reduce((m, u) => {
-    const prof = profiles.find(p => p.user_id === u.id);
-    if (prof) m[u.email] = prof;
-    return m;
-  }, {});
+  const profilesByEmail = buildProfilesByEmail(profiles, usersData);
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
@@ -958,7 +955,7 @@ export default function Expenses() {
       if (others.length > 0) {
         try {
           others.forEach(async email => {
-            const p = profiles.find(pr => pr.email === email || pr.user_email === email);
+            const p = profiles[email] || null;  // profilesByEmail
             if (p?.user_id) createNotification({ userId: p.user_id, type: 'expense_added', refId: tripId, refTitle: d.description || 'gasto', message: `Nuevo gasto: ${d.description} (${d.amount} ${baseCurrency})` });
           });
         } catch {}
