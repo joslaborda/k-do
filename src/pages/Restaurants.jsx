@@ -1602,9 +1602,12 @@ export default function Restaurants() {
                 className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                {searchQuery && (
-                  <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
-                )}
+                {searchQuery
+                  ? <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
+                  : <button onClick={() => handleNearby(nearbyFilter)} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium">
+                      <Navigation className="w-3 h-3"/>Cerca
+                    </button>
+                }
               </div>
             </div>
 
