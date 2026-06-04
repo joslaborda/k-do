@@ -990,18 +990,19 @@ export default function Expenses() {
       setSheetOpen(false); setEditingExpense(null);
       const others = (trip?.members || []).filter(e => e !== currentUser?.email);
       if (others.length > 0) {
-        try {
-          others.forEach(async email => {
-            const p = profiles[email] || null;  // profilesByEmail
-            if (p?.user_id) createNotification({
-              userId: p.user_id,
+        const usersForNotif = await base44.entities.User.list();
+        for (const email of others) {
+          const u = usersForNotif.find(x => x.email === email);
+          if (u?.id) {
+            createNotification({
+              userId: u.id,
               type: 'expense_added',
               actorProfile: myProfile_,
               refId: tripId,
               refTitle: d.description || 'gasto',
             });
-          });
-        } catch {}
+          }
+        }
       }
     },
   });
