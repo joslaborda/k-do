@@ -3,14 +3,13 @@ import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { buildProfilesByEmail } from '@/lib/profileUtils';
 import { useTripContext } from '@/hooks/useTripContext';
 import { createNotification } from '@/lib/notifications';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, Compass, ArrowRight, Pencil, UtensilsCrossed, Landmark, Ticket, ShoppingBag } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
@@ -103,7 +102,7 @@ async function searchPlaces(query, city, country) {
   const params = new URLSearchParams({ q, format:'json', limit:8, addressdetails:1, namedetails:1 });
   const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
     headers: { 'Accept-Language':'es,en', 'User-Agent':'KodoTravelApp/1.0' },
-    signal: AbortSignal.timeout(8000),
+    signal: (() => { const c = new AbortController(); setTimeout(() => c.abort(), 8000); return c.signal; })(),
   });
   if (!res.ok) throw new Error('search failed');
   const data = await res.json();
@@ -117,7 +116,7 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng, filterCats = null) {
-  const viewbox = `${lng-0.02},${lat+0.02},${lng+0.02},${lat-0.02}`;
+  const viewbox = `${lng-0.03},${lat+0.03},${lng+0.03},${lat-0.03}`;
   const CAT_MAP = {
     food:     ['restaurant', 'cafe', 'bar', 'fast_food', 'pub'],
     cultural: ['museum', 'theatre', 'cinema', 'art_gallery', 'library', 'monument'],
@@ -126,7 +125,7 @@ async function nearbyPlaces(lat, lng, filterCats = null) {
   };
   const categories = filterCats?.length
     ? filterCats.flatMap(k => CAT_MAP[k] || [k])
-    : ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction'];
+    : ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction', 'park', 'monument'];
   const seen = new Set();
   const results = [];
   await Promise.all(categories.map(async cat => {
@@ -186,12 +185,12 @@ async function loadLeaflet() {
 
 // ── Type config ───────────────────────────────────────────────────────────────
 const TYPE_CONFIG = {
-  food:      { label:'Comer',      emoji:'🍜', color:'bg-orange-100 text-orange-800' },
-  sight:     { label:'Cultura',    emoji:'🏛️', color:'bg-blue-100 text-blue-800' },
-  activity:  { label:'Actividad',  emoji:'⚡',  color:'bg-green-100 text-green-800' },
-  shopping:  { label:'Compras',    emoji:'🛍️', color:'bg-purple-100 text-purple-800' },
-  transport: { label:'Transporte', emoji:'🚆', color:'bg-slate-100 text-slate-800' },
-  custom:    { label:'Otro',       emoji:'📍', color:'bg-yellow-100 text-yellow-800' },
+  food:      { label:'Comer',      Icon: Utensils,    color:'bg-orange-100 text-orange-600' },
+  sight:     { label:'Cultura',    Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
+  activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
+  shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
+  transport: { label:'Transporte', Icon: Compass,     color:'bg-slate-100 text-slate-600' },
+  custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
 // ── Country-specific special tags ─────────────────────────────────────────────
@@ -425,7 +424,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
             />
             {duplicate && (
               <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-start gap-2">
-                <span className="text-lg shrink-0">⚠️</span>
+                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-amber-800">Ya existe este spot en {city}</p>
                   <p className="text-xs text-amber-700 mt-0.5">"{duplicate.title}" ya está en tu lista.</p>
@@ -443,7 +442,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
                   className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
                     type === val ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                   }`}>
-                  {tc.emoji} {tc.label}
+                  {tc.Icon && <tc.Icon size={13} />} {tc.label}
                 </button>
               ))}
             </div>
@@ -466,7 +465,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
             <div className="flex rounded-xl border border-border overflow-hidden">
               <button onClick={() => setIsPublic(true)}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
-                🌍 Kōdo Community
+                Kōdo Community
               </button>
               <button onClick={() => setIsPublic(false)}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
@@ -500,7 +499,7 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
   return (
     <div className={`bg-card rounded-xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
       <div className="w-12 bg-orange-50 flex items-center justify-center flex-shrink-0">
-        <span className="text-xl">{tc.emoji}</span>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${tc.color}`}>{tc.Icon && <tc.Icon size={16} />}</div>
       </div>
       <div className="flex-1 min-w-0 p-3">
         <p className="font-semibold text-sm text-foreground leading-tight">{place.name}</p>
@@ -545,7 +544,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${tc.color}`}>
-                  {tc.emoji}
+                  {tc.Icon && <tc.Icon size={14} />}
                 </div>
                 <div>
                   <p className="font-semibold text-foreground text-sm">{spot.title}</p>
@@ -655,7 +654,7 @@ function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
         <div className="p-4 cursor-pointer hover:bg-secondary/20 transition-colors" onClick={() => setShowDetail(true)}>
           <div className="flex items-start gap-3">
             <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${tc.color}`}>
-              {tc.emoji}
+              {tc.Icon && <tc.Icon size={14} />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-foreground leading-tight">{spot.title}</p>
@@ -887,7 +886,7 @@ function MySpotRow({ spot, onTap, userId }) {
     <div className="bg-card border-b border-border last:border-0">
       {/* Main row — clickable to open sheet */}
       <button onClick={() => onTap(spot)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-secondary/20 transition-colors">
-        <span className="text-xl shrink-0">{tc.emoji}</span>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${tc.color}`}>{tc.Icon && <tc.Icon size={16} />}</div>
         <div className="flex-1 min-w-0">
           <p className={`text-sm font-medium truncate ${spot.visited ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
             {spot.title}
@@ -1012,7 +1011,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${tc.color}`}>
-                {tc.emoji}
+                {tc.Icon && <tc.Icon size={14} />}
               </div>
               <div>
                 <p className="font-semibold text-foreground text-sm">{spot.title}</p>
@@ -1244,7 +1243,7 @@ function Toast({ spot, city, onUndo, visible }) {
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
       <div className="bg-foreground rounded-xl px-4 py-3 flex items-center gap-3">
-        <span className="text-lg">✅</span>
+        <CheckCircle2 className="w-5 h-5 text-green-500" />
         <div className="flex-1 min-w-0">
           <p className="text-white text-sm font-medium truncate">Guardado{city ? ' en ' + city : ''}</p>
           <p className="text-white/60 text-xs truncate">{spot.title}</p>
@@ -1377,19 +1376,19 @@ export default function Restaurants() {
       async pos => {
         try {
           const res = await nearbyPlaces(pos.coords.latitude, pos.coords.longitude, cats.length ? cats : null);
-          setNearbyResults(res.length ? res : [{ id:'empty', name:'Sin resultados cerca', address:'Prueba a cambiar el filtro de categoría', type:'custom' }]);
+          setNearbyResults(res);
         } catch(e) {
-          setNearbyResults([{ id:'err', name:'Sin resultados', address: e.message || 'Intenta buscar por nombre', type:'custom' }]);
+          setNearbyResults([{ id:'err', name:'Sin resultados cerca', address: e.message || 'Intenta buscar por nombre', type:'custom' }]);
         } finally { setLoadingNearby(false); }
       },
       (err) => {
         setLoadingNearby(false);
-        setNearbyResults([{ id:'err',
-          name: err.code === 1 ? 'Permiso de ubicación denegado' : 'No se pudo obtener tu ubicación',
-          address: err.code === 1 ? 'Ve a ajustes del navegador y permite el acceso a ubicación' : 'Intenta de nuevo',
-          type:'custom' }]);
+        const msg = err.code === 1 ? 'Permite el acceso a tu ubicación en el navegador'
+          : err.code === 2 ? 'Ubicación no disponible en este momento'
+          : 'Tiempo de espera agotado. Intenta de nuevo.';
+        setNearbyResults([{ id:'err', name:'No se pudo obtener tu ubicación', address: msg, type:'custom' }]);
       },
-      { timeout: 15000, enableHighAccuracy: true, maximumAge: 30000 }
+      { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 }
     );
   };
 
@@ -1602,41 +1601,38 @@ export default function Restaurants() {
                 className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                {searchQuery
-                  ? <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
-                  : <button onClick={() => handleNearby(nearbyFilter)} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium">
+                {searchQuery ? (
+                  <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
+                ) : (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[
+                      { key: 'food',     Icon: Utensils,    label: 'Comer' },
+                      { key: 'cultural', Icon: Landmark,    label: 'Cultural' },
+                      { key: 'interest', Icon: Ticket,      label: 'Interés' },
+                      { key: 'shop',     Icon: ShoppingBag, label: 'Compras' },
+                    ].map(({ key: k, Icon, label }) => (
+                      <button key={k} type="button"
+                        onClick={() => {
+                          const next = nearbyFilter.includes(k)
+                            ? nearbyFilter.filter(x => x !== k)
+                            : [...nearbyFilter, k];
+                          setNearbyFilter(next);
+                        }}
+                        className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border transition-colors ${
+                          nearbyFilter.includes(k)
+                            ? 'bg-primary text-white border-primary'
+                            : 'bg-card text-muted-foreground border-border hover:border-primary/40'
+                        }`}>
+                        <Icon size={11} />{label}
+                      </button>
+                    ))}
+                    <button onClick={() => handleNearby(nearbyFilter)} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium">
                       <Navigation className="w-3 h-3"/>Cerca
                     </button>
-                }
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Filter chips — no Cerca here, it's already in the search bar */}
-            {!searchQuery && (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {[
-                  { key: 'food',     Icon: UtensilsCrossed, label: 'Comer' },
-                  { key: 'cultural', Icon: Landmark,         label: 'Cultural' },
-                  { key: 'interest', Icon: Ticket,           label: 'Interés' },
-                  { key: 'shop',     Icon: ShoppingBag,      label: 'Compras' },
-                ].map(({ key: k, Icon, label }) => (
-                  <button key={k} type="button"
-                    onClick={() => {
-                      const next = nearbyFilter.includes(k)
-                        ? nearbyFilter.filter(x => x !== k)
-                        : [...nearbyFilter, k];
-                      setNearbyFilter(next);
-                    }}
-                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                      nearbyFilter.includes(k)
-                        ? 'bg-primary text-white border-primary'
-                        : 'bg-card text-muted-foreground border-border hover:border-primary/40'
-                    }`}>
-                    <Icon size={12} />{label}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* City chips */}
             {!isSearchActive && tripCities.length > 0 && (
@@ -1807,7 +1803,7 @@ export default function Restaurants() {
               /* No local match — show message + seed/OSM suggestions */
               <div className="space-y-4">
                 <div className="text-center py-6 bg-card rounded-2xl border border-border">
-                  <p className="text-2xl mb-2">🔍</p>
+                  <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-sm font-medium text-foreground mb-1">No tienes ese spot todavía</p>
                   <p className="text-xs text-muted-foreground">Resultados de la comunidad y búsqueda para <strong>"{mySpotSearch}"</strong></p>
                 </div>
@@ -1866,29 +1862,29 @@ export default function Restaurants() {
             {/* Category filters */}
             <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
               {[
-                ['all','Todos','🌍'],
-                ['restaurant','Restaurantes','🍽️'],
-                ['bar','Bares','🍺'],
-                ['nightlife','Nightlife','🎉'],
-                ['vistas','Vistas','🌅'],
-                ['museos','Museos','🏛️'],
-                ['templos','Templos','⛩️'],
-                ['naturaleza','Naturaleza','🌿'],
-                ['lgtbq','LGTBQ+','🏳️‍🌈'],
-                ['shopping','Compras','🛍️'],
-              ].map(([v,l,em]) => (
+                ['all','Todos'],
+                ['restaurant','Restaurantes'],
+                ['bar','Bares'],
+                ['nightlife','Nightlife'],
+                ['vistas','Vistas'],
+                ['museos','Museos'],
+                ['templos','Templos'],
+                ['naturaleza','Naturaleza'],
+                ['lgtbq','LGTBQ+'],
+                ['shopping','Compras'],
+              ].map(([v,l]) => (
                 <button key={v} onClick={() => setCommunityFilter(v)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex-shrink-0 flex items-center gap-1 ${
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex-shrink-0 ${
                     communityFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                   }`}>
-                  {em} {l}
+                  {l}
                 </button>
               ))}
             </div>
 
             {communitySpots.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-4xl mb-4">🌍</p>
+                <Compass className="w-10 h-10 text-muted-foreground/40 mx-auto mb-4" />
                 <p className="text-muted-foreground">Sin spots de la comunidad para {selectedCity || city} todavía</p>
               </div>
             ) : (
