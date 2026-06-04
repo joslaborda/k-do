@@ -120,7 +120,6 @@ export default function ExpenseForm({
   };
 
   return (
-    <>
     <div className="space-y-5">
 
       {/* Importe + conversión */}
@@ -225,7 +224,7 @@ export default function ExpenseForm({
                 form.paid_by === email ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
               }`}>
               {(() => {
-                const prof = profiles.find(p => p.email === email || p.user_email === email);
+                const prof = profiles[email] || profiles.find?.(p => p.email === email || p.user_email === email);
                 return prof?.avatar_url
                   ? <img src={prof.avatar_url} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
                   : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'#fbd5c0':'#f0ede8',color:form.paid_by===email?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
@@ -296,18 +295,8 @@ export default function ExpenseForm({
       </div>
 
       {/* Botones */}
-      <div className="h-20" />
+    {/* Hidden submit trigger for ExpenseSheet */}
+    <button id="expense-form-submit" type="button" onClick={handleSave} style={{display:'none'}} />
     </div>
-    <div className="sticky bottom-0 bg-card border-t border-border px-5 py-4 flex gap-3">
-      <button type="button" onClick={onCancel}
-        className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
-        Cancelar
-      </button>
-      <button type="button" onClick={handleSave} disabled={!canSave}
-        className="py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors" style={{flex:2}}>
-        {saving ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Guardando...</> : 'Guardar gasto'}
-      </button>
-    </div>
-  </>
   );
 }
