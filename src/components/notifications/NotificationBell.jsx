@@ -106,10 +106,8 @@ export default function NotificationBell({ userId, userEmail }) {
     queryKey: ['notifications', userId],
     queryFn: () => base44.entities.Notification.filter({ user_id: userId }, '-created_date', 30),
     enabled: !!userId,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: true,
-    refetchInterval: 30000,
+    refetchInterval: open ? false : 30000,
+    refetchOnWindowFocus: false,
   });
 
   const unread = notifications.filter(n => !n.read).length;
@@ -141,8 +139,9 @@ export default function NotificationBell({ userId, userEmail }) {
           const opening = !open;
           setOpen(opening);
           if (opening) {
-            queryClient.invalidateQueries({ queryKey: ['notifications', userId] });
             markAllRead.mutate();
+          } else {
+            queryClient.invalidateQueries({ queryKey: ['notifications', userId] });
           }
         }}
         className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors text-foreground"
