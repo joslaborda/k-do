@@ -855,6 +855,7 @@ export default function Expenses() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
   const { user: currentUser } = useAuth();
+  const currentUserEmail = currentUser?.email ?? '';
   const queryClient = useQueryClient();
   const { performDelete } = useUndo();
 
