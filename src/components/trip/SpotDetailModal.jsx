@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { base44 } from '@/api/base44Client';
-import { MapPin, X, Navigation, Clock, Trash2 } from 'lucide-react';
+import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 const SPOT_ICONS = {
-  food:     UtensilsCrossed,
+  food:     Utensils,
   sight:    Landmark,
   activity: Ticket,
   shopping: ShoppingBag,
   custom:   CirclePlus,
-  restaurant: UtensilsCrossed,
+  restaurant: Utensils,
   museum:   Landmark,
 };
 const SPOT_COLORS = {
