@@ -28,6 +28,8 @@ export default function ExpenseForm({
   onCancel,
   saving = false,
   userMap = {},
+  currentUserEmail = '',
+  profiles = [],
 }) {
   const getName = email => userMap[email] || email?.split('@')[0] || email || '?';
 
@@ -221,17 +223,16 @@ export default function ExpenseForm({
               className={`flex-1 min-w-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors ${
                 form.paid_by === email ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
               }`}>
-              <div style={{
-                width: 24, height: 24, borderRadius: '50%',
-                background: form.paid_by === email ? '#fbd5c0' : '#f0ede8',
-                color: form.paid_by === email ? '#b34a1a' : '#888',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 10, fontWeight: 500, flexShrink: 0,
-              }}>
-                {getName(email).slice(0, 2).toUpperCase()}
-              </div>
+              {(() => {
+                const prof = profiles.find(p => p.email === email || p.user_email === email);
+                return prof?.avatar_url
+                  ? <img src={prof.avatar_url} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+                  : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'#fbd5c0':'#f0ede8',color:form.paid_by===email?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
+                      {getName(email).slice(0,2).toUpperCase()}
+                    </div>;
+              })()}
               <span className={`text-xs truncate font-medium ${form.paid_by === email ? 'text-primary' : 'text-muted-foreground'}`}>
-                {email === members[0] ? 'Tú' : getName(email)}
+                {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
               </span>
             </button>
           ))}
@@ -281,7 +282,7 @@ export default function ExpenseForm({
                   {getName(email).slice(0, 2).toUpperCase()}
                 </div>
                 <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {email === members[0] ? 'Tú' : getName(email)}
+                  {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
                 </span>
                 {shareStr && <span className="text-xs text-primary font-medium">{shareStr}</span>}
               </button>
@@ -294,16 +295,17 @@ export default function ExpenseForm({
       </div>
 
       {/* Botones */}
-      <div className="flex gap-3 pt-2">
-        <button type="button" onClick={onCancel}
-          className="flex-1 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
-          Cancelar
-        </button>
-        <button type="button" onClick={handleSave} disabled={!canSave}
-          className="flex-1 py-3 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Guardando...</> : 'Guardar gasto'}
-        </button>
-      </div>
+      <div className="h-20" />
+    </div>
+    <div className="sticky bottom-0 bg-card border-t border-border px-5 py-4 flex gap-3">
+      <button type="button" onClick={onCancel}
+        className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
+        Cancelar
+      </button>
+      <button type="button" onClick={handleSave} disabled={!canSave}
+        className="py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors" style={{flex:2}}>
+        {saving ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Guardando...</> : 'Guardar gasto'}
+      </button>
     </div>
   );
 }
