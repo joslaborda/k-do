@@ -513,7 +513,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-function EmergencyTab({ country, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta }) {
+export default function EmergencyTab({ country, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
