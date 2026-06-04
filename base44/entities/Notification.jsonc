@@ -12,9 +12,17 @@
         "follow",
         "template_save",
         "trip_invite",
-        "trip_update"
+        "trip_update",
+        "spot_added",
+        "spot_time",
+        "doc_added",
+        "expense_added",
+        "expense_settled",
+        "chat_message",
+        "photo_upload",
+        "trip_join"
       ],
-      "description": "Tipo de notificaci\u00f3n"
+      "description": "Tipo de notificación"
     },
     "read": {
       "type": "boolean",
@@ -22,7 +30,7 @@
     },
     "actor_user_id": {
       "type": "string",
-      "description": "ID del usuario que genera la notificaci\u00f3n"
+      "description": "ID del usuario que genera la notificación"
     },
     "actor_display_name": {
       "type": "string"
@@ -35,11 +43,11 @@
     },
     "ref_id": {
       "type": "string",
-      "description": "ID de referencia (trip_id, template_id, etc.)"
+      "description": "ID de referencia (trip_id, etc.)"
     },
     "ref_title": {
       "type": "string",
-      "description": "T\u00edtulo legible del objeto referenciado"
+      "description": "Título legible del objeto referenciado"
     },
     "message": {
       "type": "string",
