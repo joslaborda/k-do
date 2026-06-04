@@ -1602,38 +1602,42 @@ export default function Restaurants() {
                 className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                {searchQuery ? (
+                {searchQuery && (
                   <button onClick={() => { setSearchQuery(''); setOsmResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
-                ) : (
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {[
-                      { key: 'food', label: '🍜 Comer' },
-                      { key: 'cultural', label: '🏛️ Cultural' },
-                      { key: 'interest', label: '📍 Interés' },
-                      { key: 'shop', label: '🛍️ Compras' },
-                    ].map(f => (
-                      <button key={f.key} type="button"
-                        onClick={() => {
-                          const next = nearbyFilter.includes(f.key)
-                            ? nearbyFilter.filter(k => k !== f.key)
-                            : [...nearbyFilter, f.key];
-                          setNearbyFilter(next);
-                        }}
-                        className={`text-[11px] px-2 py-0.5 rounded-full border transition-colors ${
-                          nearbyFilter.includes(f.key)
-                            ? 'bg-primary text-white border-primary'
-                            : 'bg-card text-muted-foreground border-border hover:border-primary/40'
-                        }`}>
-                        {f.label}
-                      </button>
-                    ))}
-                    <button onClick={() => handleNearby(nearbyFilter)} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium">
-                      <Navigation className="w-3 h-3"/>Cerca
-                    </button>
-                  </div>
                 )}
               </div>
             </div>
+
+            {/* Filter chips + Cerca */}
+            {!searchQuery && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { key: 'food', label: '🍜 Comer' },
+                  { key: 'cultural', label: '🏛️ Cultural' },
+                  { key: 'interest', label: '📍 Interés' },
+                  { key: 'shop', label: '🛍️ Compras' },
+                ].map(f => (
+                  <button key={f.key} type="button"
+                    onClick={() => {
+                      const next = nearbyFilter.includes(f.key)
+                        ? nearbyFilter.filter(k => k !== f.key)
+                        : [...nearbyFilter, f.key];
+                      setNearbyFilter(next);
+                    }}
+                    className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                      nearbyFilter.includes(f.key)
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-card text-muted-foreground border-border hover:border-primary/40'
+                    }`}>
+                    {f.label}
+                  </button>
+                ))}
+                <button onClick={() => handleNearby(nearbyFilter)}
+                  className="flex items-center gap-1 text-xs bg-accent text-primary px-3 py-1 rounded-full font-medium border border-border">
+                  <Navigation className="w-3 h-3"/>Cerca
+                </button>
+              </div>
+            )}
 
             {/* City chips */}
             {!isSearchActive && tripCities.length > 0 && (
