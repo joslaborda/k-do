@@ -24,7 +24,7 @@ const TYPE_CONFIG = {
 };
 
 function NotificationItem({ notif, onRead }) {
-  const cfg = TYPE_CONFIG[notif.type] || { icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: notif.message?.replace(/[^\x00-\x7F]/g, '').trim() || 'nueva notificación' };
+  const cfg = TYPE_CONFIG[notif.type] || TYPE_CONFIG.trip_update;
   const Icon = cfg.icon;
 
   return (
@@ -34,7 +34,7 @@ function NotificationItem({ notif, onRead }) {
     >
       {/* Avatar / icon */}
       <div className="relative flex-shrink-0">
-        {notif.actor_avatar && notif.actor_avatar.startsWith('http') ? (
+        {notif.actor_avatar ? (
           <img src={notif.actor_avatar} className="w-9 h-9 rounded-full object-cover" alt="" />
         ) : (
           <div className={`w-9 h-9 rounded-full ${cfg.bg} flex items-center justify-center`}>
@@ -106,11 +106,11 @@ export default function NotificationBell({ userId, userEmail }) {
     queryKey: ['notifications', userId],
     queryFn: () => base44.entities.Notification.filter({ user_id: userId }, '-created_date', 30),
     enabled: !!userId,
-    refetchInterval: 30000,
+    refetchInterval: open ? false : 30000,
+    refetchOnWindowFocus: false,
   });
 
-  const unreadNotifs = notifications.filter(n => !n.read).length;
-  const unread = unreadNotifs;  // invites shown in panel separately
+  const unread = notifications.filter(n => !n.read).length;
 
   const markRead = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
