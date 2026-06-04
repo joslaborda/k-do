@@ -179,9 +179,10 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs flex-shrink-0">
-                {c.user_display_name?.[0]?.toUpperCase() || '?'}
-              </div>
+              {c.avatar_url
+                ? <img src={c.avatar_url} alt={c.user_display_name || ''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                : <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
+              }
               <div className="flex-1 min-w-0">
                 <div className="bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
                   <div className="flex items-center gap-2 mb-1">

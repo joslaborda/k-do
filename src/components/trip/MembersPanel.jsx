@@ -89,17 +89,20 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin }) {
           const config = roleConfig[role];
           const RoleIcon = config.icon;
           const isCurrentUser = email === currentUserEmail;
-          const initials = email.charAt(0).toUpperCase();
+          const prof = profilesByEmail?.[email] || profiles?.find(p => p.email === email || p.user_email === email);
+          const displayName = prof?.display_name || email?.split('@')[0] || email;
+          const initials = displayName.slice(0,2).toUpperCase();
 
           return (
             <div key={email} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-medium text-primary">
-                  {initials}
-                </div>
+                {prof?.avatar_url
+                  ? <img src={prof.avatar_url} alt={displayName} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  : <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm font-medium text-primary">{initials}</div>
+                }
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    {email}
+                    {displayName}
                     {isCurrentUser && <span className="text-xs text-muted-foreground ml-1">(tú)</span>}
                   </p>
                   <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs mt-0.5 ${config.color}`}>
