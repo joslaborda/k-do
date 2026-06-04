@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import { buildProfilesByEmail } from '@/lib/profileUtils';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
