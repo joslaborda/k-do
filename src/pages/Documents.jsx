@@ -244,14 +244,6 @@ export default function Documents() {
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
-  const profilesByEmail = useMemo(() => {
-    const map = {};
-    (usersData || []).forEach(u => {
-      const prof = (profiles || []).find(p => p.user_id === u.id);
-      if (prof) map[u.email] = prof;
-    });
-    return map;
-  }, [profiles, usersData]);
   const userId = currentUser?.id ?? '';
 
   const [catFilter, setCatFilter]   = useState('all');
@@ -285,6 +277,12 @@ export default function Documents() {
     queryFn: () => base44.entities.UserProfile.list(),
     staleTime: 5 * 60 * 1000,
   });
+  // Note: UserProfile has no email field — lookup by user_email legacy field only
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    profiles.forEach(p => { if (p.user_email) map[p.user_email] = p; if (p.email) map[p.email] = p; });
+    return map;
+  }, [profiles]);
 
   // Backfill auto-links
   useEffect(() => {
