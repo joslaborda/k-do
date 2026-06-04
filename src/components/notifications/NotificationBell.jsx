@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell, Check, UserPlus, Bookmark, Mail, MapPin, X, FileText, Receipt, MessageCircle, Camera, Loader2 } from 'lucide-react';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
-import { Link } from 'react-router-dom';
 
 const TYPE_CONFIG = {
   follow:         { icon: UserPlus,  color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   label: 'te ha seguido' },
