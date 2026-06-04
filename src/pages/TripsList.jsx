@@ -299,7 +299,7 @@ export default function TripsList() {
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
-              {user?.id && <NotificationBell userId={user.id} />}
+              {user?.id && <NotificationBell userId={user.id} userEmail={user.email} />}
               {/* Avatar → directo a perfil */}
               <Link to={createPageUrl('Profile')}>
                 <div className="w-9 h-9 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-sm font-medium flex-shrink-0">
