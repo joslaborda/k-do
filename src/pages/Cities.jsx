@@ -6,8 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin } from 'lucide-react';
-import { PlaneIcon, Hotel, TrainFront, BusFront, Car, Ship, Ticket, Shield, FileText } from '@/lib/icons';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Plane, Hotel, Train, Bus, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,17 +18,17 @@ import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
-  flight: PlaneIcon, hotel: Hotel, train: TrainFront,
-  bus: BusFront, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
+  flight: Plane, hotel: Hotel, train: Train,
+  bus: Bus, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
 const SPOT_ICONS = {
-  food:     UtensilsCrossed,
+  food:     Utensils,
   sight:    Landmark,
   activity: Ticket,
   shopping: ShoppingBag,
   custom:   CirclePlus,
-  restaurant: UtensilsCrossed,
+  restaurant: Utensils,
   museum:   Landmark,
 };
 const SPOT_COLORS = {
@@ -47,7 +46,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  const M = { flight: PlaneIcon, train: TrainFront, bus: BusFront }; const I = M[t] || Ship; return I;
+  const M = { flight: Plane, train: Train, bus: Bus }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────

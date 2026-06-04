@@ -15,7 +15,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock
-, MessageCircle , Download , BarChart2 } from 'lucide-react';
+, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -149,12 +149,12 @@ const DOC_ICONS = {
   other: (p) => <FileText size={13} {...p} />,
 };
 const SPOT_ICONS = {
-  food:     UtensilsCrossed,
+  food:     Utensils,
   sight:    Landmark,
   activity: Ticket,
   shopping: ShoppingBag,
   custom:   CirclePlus,
-  restaurant: UtensilsCrossed,
+  restaurant: Utensils,
   museum:   Landmark,
 };
 const SPOT_COLORS = {
