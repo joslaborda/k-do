@@ -993,11 +993,10 @@ export default function Expenses() {
         try {
           others.forEach(async email => {
             const p = profiles[email] || null;  // profilesByEmail
-            const myProf = profilesByEmail?.[currentUser?.email] || null;
             if (p?.user_id) createNotification({
               userId: p.user_id,
               type: 'expense_added',
-              actorProfile: myProf,
+              actorProfile: myProfile_,
               refId: tripId,
               refTitle: d.description || 'gasto',
             });

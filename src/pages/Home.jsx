@@ -15,7 +15,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock
-, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus } from 'lucide-react';
+, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1469,7 +1469,7 @@ function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail }
           { label: 'Días de viaje', value: totalDays || '—', Icon: Calendar },
           { label: members === 1 ? 'Viajero' : 'Viajeros', value: members, Icon: Users },
           { label: 'Ciudades', value: cities.length, Icon: MapPin },
-          { label: 'Spots visitados', value: visitedSpots, Icon: Star },
+          { label: 'Spots visitados', value: visitedSpots, Icon: Compass },
         ].map(s => (
           <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
             <s.Icon className="w-4 h-4 text-muted-foreground mb-2" />
