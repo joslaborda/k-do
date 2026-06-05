@@ -1,25 +1,41 @@
 import { base44 } from '@/api/base44Client';
 
 /**
- * Crea una notificación para el usuario destino.
- * No lanza error si falla (silencioso).
+ * Crea una notificación. Silencioso si falla.
+ * @param {string} userId - destinatario
+ * @param {string} type - tipo de notificación
+ * @param {object} actor - { display_name, username, avatar_url }
+ * @param {string} tripId - id del viaje
+ * @param {string} tripName - nombre del viaje (para TripsList)
+ * @param {string} refTitle - título del objeto (doc, gasto, etc.)
  */
-export async function createNotification({ userId, type, actorProfile, refId, refTitle, message }) {
+export async function notify({ userId, type, actor, tripId, tripName, refTitle }) {
   if (!userId || !type) return;
   try {
     await base44.entities.Notification.create({
-      user_id: userId,
+      user_id:            userId,
       type,
-      read: false,
-      actor_user_id: actorProfile?.user_id || null,
-      actor_display_name: actorProfile?.display_name || null,
-      actor_username: actorProfile?.username || null,
-      actor_avatar: actorProfile?.avatar_url || null,
-      ref_id: refId || null,
-      ref_title: refTitle || null,
-      message: message || null,
+      read:               false,
+      actor_display_name: actor?.display_name || actor?.username || null,
+      actor_username:     actor?.username || null,
+      actor_avatar:       (actor?.avatar_url && actor.avatar_url.startsWith('http')) ? actor.avatar_url : null,
+      trip_id:            tripId || null,
+      trip_name:          tripName || null,
+      ref_title:          refTitle || null,
     });
-  } catch {
-    // silencioso: no bloquear la acción principal
-  }
+  } catch {}
+}
+
+/**
+ * Resuelve userIds de una lista de emails via User.list().
+ * Devuelve array de { email, userId }.
+ */
+export async function resolveUserIds(emails) {
+  if (!emails?.length) return [];
+  try {
+    const users = await base44.entities.User.list();
+    return emails
+      .map(email => ({ email, userId: users.find(u => u.email === email)?.id }))
+      .filter(x => x.userId);
+  } catch { return []; }
 }
