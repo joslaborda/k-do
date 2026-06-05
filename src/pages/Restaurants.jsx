@@ -1274,12 +1274,12 @@ export default function Restaurants() {
     staleTime: 60000,
   });
 
-  const notifyMembers = (type, _unused, refTitle) => {
+  const notifyMembers = (type, _unused, refTitle, refExtra) => {
     const others = (trip?.members || []).filter(e => e !== currentUser?.email);
     if (!others.length) return;
     resolveUserIds(others).then(resolved => {
       resolved.forEach(({ userId }) => notify({
-        userId, type, actor: myProfile, tripId, tripName: trip?.name, refTitle,
+        userId, type, actor: myProfile, tripId, tripName: trip?.name, refId: refExtra?.spotId, refTitle, refExtra,
       }));
     });
   };
@@ -1419,7 +1419,7 @@ export default function Restaurants() {
       setOsmResults([]); setNearbyResults([]); setSearchQuery(''); setNearbyFilter([]);
       showToastFor({ title: place.name }, city);
       if (created?.id) setAssignDateSpot(created);
-      notifyMembers('spot_added', `Nuevo spot: ${place.name}`, place.name);
+      notifyMembers('spot_added', '', place.name, { spotId: savedSpot?.id, spotDate: savedSpot?.assigned_date });
     } catch(e) {
       alert('Error al guardar: ' + e.message);
     } finally { setSavingId(null); }
@@ -1438,7 +1438,7 @@ export default function Restaurants() {
       setShowCreate(false);
       showToastFor({ title: form.title }, city);
       if (created?.id) setAssignDateSpot(created);
-      notifyMembers('spot_added', `Nuevo spot: ${form.title}`, form.title);
+      notifyMembers('spot_added', '', form.title, { spotId: savedSpot?.id, spotDate: savedSpot?.assigned_date });
     } finally { setSavingId(null); }
   };
 

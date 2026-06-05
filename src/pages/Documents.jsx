@@ -313,6 +313,7 @@ export default function Documents() {
               actor: myProfile_,
               tripId,
               tripName: trip?.name,
+              refId: newDoc?.id,
               refTitle: data.name || 'documento',
             }));
           });
