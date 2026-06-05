@@ -2,14 +2,8 @@ import { base44 } from '@/api/base44Client';
 
 /**
  * Crea una notificación. Silencioso si falla.
- * @param {string} userId - destinatario
- * @param {string} type - tipo de notificación
- * @param {object} actor - { display_name, username, avatar_url }
- * @param {string} tripId - id del viaje
- * @param {string} tripName - nombre del viaje (para TripsList)
- * @param {string} refTitle - título del objeto (doc, gasto, etc.)
  */
-export async function notify({ userId, type, actor, tripId, tripName, refTitle }) {
+export async function notify({ userId, type, actor, tripId, tripName, refId, refTitle, refExtra }) {
   if (!userId || !type) return;
   try {
     await base44.entities.Notification.create({
@@ -21,14 +15,15 @@ export async function notify({ userId, type, actor, tripId, tripName, refTitle }
       actor_avatar:       (actor?.avatar_url && actor.avatar_url.startsWith('http')) ? actor.avatar_url : null,
       trip_id:            tripId || null,
       trip_name:          tripName || null,
+      ref_id:             refId || null,
       ref_title:          refTitle || null,
+      ref_extra:          refExtra ? JSON.stringify(refExtra) : null,
     });
   } catch {}
 }
 
 /**
  * Resuelve userIds de una lista de emails via User.list().
- * Devuelve array de { email, userId }.
  */
 export async function resolveUserIds(emails) {
   if (!emails?.length) return [];
