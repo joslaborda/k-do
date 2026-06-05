@@ -2020,7 +2020,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
 }
 
 // ── Settings Dialog ───────────────────────────────────────────────────────────
-function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
+function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -2633,6 +2633,7 @@ export default function Home() {
         cities={sortedCities}
         tripId={tripId}
         isAdmin={isAdmin}
+        profiles={profiles}
         onDelete={() => { setSettingsOpen(false); setDeleteOpen(true); }}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
