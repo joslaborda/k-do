@@ -5,7 +5,6 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowRight, X , Utensils , Bus , Hotel , Ticket , ShoppingBag , MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useUndo } from '@/components/hooks/useUndo';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
 import { getFxRate } from '@/lib/fxRates';
@@ -178,8 +177,8 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
 
   return (
     <button onClick={() => onEdit(expense)} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-secondary/20 transition-colors border-b border-border last:border-0">
-      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0 }} className={`flex items-center justify-center ${CAT_COLORS[expense.category] || CAT_COLORS.other}`}>
-        {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
+        {tc.emoji}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -407,7 +406,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
       {/* Todos los saldos */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Quién debe · quién cobra</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           {members.map((email, i) => {
             const bal = balances[email] || 0;
@@ -901,7 +900,6 @@ export default function Expenses() {
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
   const queryClient = useQueryClient();
-  const { performDelete } = useUndo();
 
   const [tab, setTab] = useState('gastos');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -1022,7 +1020,6 @@ export default function Expenses() {
   };
 
   const handleDelete = (expense) => {
-    if (deleteMutation.isPending) return;
     deleteMutation.mutate(expense.id);
   };
 
