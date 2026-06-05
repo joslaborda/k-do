@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X , Utensils , Bus , Hotel , Ticket , ShoppingBag , MoreHorizontal } from 'lucide-react';
+import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -708,17 +708,19 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
         </div>
       </div>
       {confirmDelete && (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50">
-          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8">
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={() => setConfirmDelete(false)}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
-            <p className="text-sm font-medium text-foreground mb-1">¿Eliminar este gasto?</p>
-            <p className="text-xs text-muted-foreground mb-5"><strong>{expense.description}</strong> se eliminará permanentemente.</p>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-sm font-medium text-foreground">¿Eliminar este gasto?</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{expense.description} — Se eliminará permanentemente.</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(expense); }}
-                className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm font-medium">
-                Eliminar
-              </button>
+              <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(expense); }} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
             </div>
           </div>
         </div>
