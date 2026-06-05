@@ -1000,7 +1000,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
 
 
 // ── Pre-trip tab ──────────────────────────────────────────────────────────────
-function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite }) {
+function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite, currentUserEmail }) {
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
   const [collapsedGroups, setCollapsedGroups] = useState({});
@@ -2599,6 +2599,7 @@ export default function Home() {
             packingItems={packingItems} documents={documents}
             myProfile={myProfile} profiles={profiles}
             onInvite={() => setInviteOpen(true)}
+            currentUserEmail={currentUserEmail}
           />
         )}
         {tab === 'inicio' && (
