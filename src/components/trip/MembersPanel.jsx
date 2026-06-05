@@ -126,7 +126,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
           const RoleIcon = config.icon;
           const isCurrentUser = email === currentUserEmail;
           const prof = (Array.isArray(profiles) ? null : profiles?.[email]) || null;
-          const displayName = prof?.display_name || email?.split('@')[0] || email;
+          const displayName = prof?.display_name || prof?.username || email?.split('@')[0] || email;
           const initials = displayName.slice(0,2).toUpperCase();
 
           return (
