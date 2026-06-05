@@ -1724,21 +1724,50 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                         <img src={msg.file_url} className="w-full object-cover" style={{maxHeight:160}} />
                       </div>
                     )}
-                    {isAudio(msg) && (
-                      <div className="flex flex-col gap-1.5" style={{minWidth: 220}}>
-                        <audio
-                          src={msg.file_url}
-                          controls
-                          preload="none"
-                          style={{
-                            width: '220px',
-                            height: '40px',
-                            borderRadius: '20px',
-                            outline: 'none',
-                          }}
-                        />
-                      </div>
-                    )}
+                    {isAudio(msg) && (() => {
+                      const audioId = `audio-${msg.id}`;
+                      return (
+                        <div className={`flex items-center gap-2.5 px-3 py-2.5 rounded-full ${me ? 'bg-primary' : 'bg-secondary'}`} style={{minWidth:200,maxWidth:240}}>
+                          <button
+                            onClick={() => {
+                              const el = document.getElementById(audioId);
+                              if (!el) return;
+                              el.paused ? el.play() : el.pause();
+                            }}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${me ? 'bg-white/20' : 'bg-border'}`}>
+                            <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+                              <path d="M1 1.5L11 7L1 12.5V1.5Z" fill={me ? 'white' : 'var(--foreground)'} />
+                            </svg>
+                          </button>
+                          <div className="flex-1 flex flex-col gap-1">
+                            <div className={`h-1 rounded-full ${me ? 'bg-white/30' : 'bg-border'}`}>
+                              <div className={`h-1 rounded-full w-0 ${me ? 'bg-white' : 'bg-primary'}`} id={`prog-${msg.id}`} />
+                            </div>
+                            <span className={`text-[10px] ${me ? 'text-white/70' : 'text-muted-foreground'}`} id={`dur-${msg.id}`}>0:00</span>
+                          </div>
+                          <audio id={audioId} src={msg.file_url} preload="metadata"
+                            onTimeUpdate={e => {
+                              const el = e.target;
+                              const pct = el.duration ? (el.currentTime / el.duration * 100) : 0;
+                              const prog = document.getElementById(`prog-${msg.id}`);
+                              const dur = document.getElementById(`dur-${msg.id}`);
+                              if (prog) prog.style.width = pct + '%';
+                              if (dur) {
+                                const t = Math.floor(el.currentTime);
+                                dur.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+                              }
+                            }}
+                            onLoadedMetadata={e => {
+                              const dur = document.getElementById(`dur-${msg.id}`);
+                              if (dur && e.target.duration) {
+                                const t = Math.floor(e.target.duration);
+                                dur.textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+                              }
+                            }}
+                            style={{display:'none'}} />
+                        </div>
+                      );
+                    })()}
                     {isFile(msg) && (
                       <a href={msg.file_url} download={msg.file_name} target="_blank" rel="noopener noreferrer"
                         className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
@@ -1851,42 +1880,53 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       </div>
 
       {pollOpen && typeof document !== 'undefined' && createPortal(
-        <div style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'flex-end',justifyContent:'center'}}
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/50"
           onClick={() => setPollOpen(false)}>
-          <div style={{background:'var(--card,#fff)',borderRadius:'24px 24px 0 0',padding:24,width:'100%',maxWidth:480}}
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-3"
             onClick={e => e.stopPropagation()}>
-            <div style={{width:36,height:4,borderRadius:2,background:'#e5e7eb',margin:'0 auto 20px'}} />
-            <p style={{fontWeight:500,fontSize:15,marginBottom:16}}>Nueva encuesta</p>
-            <input placeholder="Pregunta..." value={pollQuestion}
+            <div className="w-9 h-1 bg-border rounded-full mx-auto" />
+            <div className="flex items-center gap-2 pb-1">
+              <BarChart2 className="w-4 h-4 text-primary" />
+              <p className="text-sm font-medium text-foreground">Nueva encuesta</p>
+            </div>
+            <input
+              placeholder="¿Cuál es la pregunta?"
+              value={pollQuestion}
               onChange={e => setPollQuestion(e.target.value)}
-              style={{width:'100%',padding:'10px 14px',borderRadius:12,border:'1px solid #e5e7eb',fontSize:14,marginBottom:12,boxSizing:'border-box',outline:'none'}}
+              className="w-full px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50"
             />
-            {pollOptions.map((opt, i) => (
-              <div key={i} style={{display:'flex',gap:8,marginBottom:8}}>
-                <input placeholder={'Opcion ' + (i+1)} value={opt}
-                  onChange={e => { const o=[...pollOptions]; o[i]=e.target.value; setPollOptions(o); }}
-                  style={{flex:1,padding:'10px 14px',borderRadius:12,border:'1px solid #e5e7eb',fontSize:14,outline:'none'}}
-                />
-                {pollOptions.length > 2 && (
-                  <button onClick={() => setPollOptions(pollOptions.filter((_,j)=>j!==i))}
-                    style={{width:36,height:36,borderRadius:'50%',border:'none',background:'#f3f4f6',cursor:'pointer',fontSize:18}}>x</button>
-                )}
-              </div>
-            ))}
+            <div className="space-y-2">
+              {pollOptions.map((opt, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input
+                    placeholder={`Opción ${i + 1}`}
+                    value={opt}
+                    onChange={e => { const o=[...pollOptions]; o[i]=e.target.value; setPollOptions(o); }}
+                    className="flex-1 px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50"
+                  />
+                  {pollOptions.length > 2 && (
+                    <button onClick={() => setPollOptions(pollOptions.filter((_,j)=>j!==i))}
+                      className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center flex-shrink-0">
+                      <X className="w-3.5 h-3.5 text-muted-foreground" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
             {pollOptions.length < 5 && (
               <button onClick={() => setPollOptions([...pollOptions, ''])}
-                style={{width:'100%',padding:9,borderRadius:12,border:'1px dashed #e5e7eb',background:'transparent',color:'#c2410c',fontSize:13,cursor:'pointer',marginBottom:16}}>
-                + Anadir opcion
+                className="w-full py-2.5 rounded-2xl border border-dashed border-border text-xs text-primary">
+                + Añadir opción
               </button>
             )}
-            <div style={{display:'flex',gap:10,marginTop:8}}>
+            <div className="flex gap-3 pt-1">
               <button onClick={() => setPollOpen(false)}
-                style={{flex:1,padding:12,borderRadius:12,border:'1px solid #e5e7eb',background:'#f9fafb',fontSize:14,cursor:'pointer'}}>
+                className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">
                 Cancelar
               </button>
               <button onClick={sendPoll}
                 disabled={!pollQuestion.trim() || pollOptions.filter(o=>o.trim()).length < 2}
-                style={{flex:2,padding:12,borderRadius:12,border:'none',background:'#c2410c',color:'white',fontSize:14,fontWeight:500,cursor:'pointer',opacity:(!pollQuestion.trim()||pollOptions.filter(o=>o.trim()).length<2)?0.5:1}}>
+                className="flex-[2] py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
                 Enviar encuesta
               </button>
             </div>
