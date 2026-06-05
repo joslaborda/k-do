@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { createNotification } from '@/lib/notifications';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -78,6 +78,14 @@ export default function Invites() {
     setProcessing(true);
     try {
       await acceptTripInvite(invite.id, token, invite.trip_id, currentUser.email);
+      try {
+        const allProfiles = await base44.entities.UserProfile.list();
+        const myProf = allProfiles.find(p => p.user_id === currentUser.id);
+        const tripData = await base44.entities.Trip.get(invite.trip_id);
+        const others = (tripData?.members || []).filter(e => e !== currentUser.email);
+        const resolved = await resolveUserIds(others);
+        resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId: invite.trip_id, tripName: tripData?.name }));
+      } catch {}
       toast({
         title: '✓ ¡Invitación aceptada!',
         description: `Te has unido a ${trip?.name || 'el viaje'}`
@@ -120,6 +128,15 @@ export default function Invites() {
     try {
       const inviteToAccept = pendingInvites.find((i) => i.id === inviteId);
       await acceptTripInvite(inviteId, inviteToAccept.invite_token, tripId, inviteEmail);
+      try {
+        const allProfiles = await base44.entities.UserProfile.list();
+        const acceptedUser = await base44.entities.User.filter({ email: inviteEmail });
+        const myProf = allProfiles.find(p => p.user_id === acceptedUser[0]?.id);
+        const tripData = await base44.entities.Trip.get(tripId);
+        const others = (tripData?.members || []).filter(e => e !== inviteEmail);
+        const resolved = await resolveUserIds(others);
+        resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId, tripName: tripData?.name }));
+      } catch {}
       toast({
         title: '✓ ¡Invitación aceptada!',
         description: 'Te has unido al viaje'

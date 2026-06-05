@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNotification } from '@/lib/notifications';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText, CirclePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -299,19 +299,25 @@ export default function Documents() {
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);
-      const myProf = profilesByEmail?.[currentUserEmail] || null;
-      const others = (trip?.members || []).filter(e => e !== currentUserEmail);
-      others.forEach(memberEmail => {
-        const p = profilesByEmail?.[memberEmail] || null;
-        if (p?.user_id) createNotification({
-          userId: p.user_id,
-          type: 'doc_added',
-          actorProfile: myProf,
-          refId: tripId,
-          refTitle: trip?.name || 'el viaje',
-          message: `ha subido un documento: ${data.name || 'nuevo doc'}`,
-        });
-      });
+      // Notify members about new doc
+      if (data.visibility !== 'personal') {
+        const sharedWith = data.visibility === 'selected_users'
+          ? (data.shared_with || [])
+          : (trip?.members || []).filter(e => e !== currentUserEmail);
+        const targets = sharedWith.filter(e => e !== currentUserEmail);
+        if (targets.length) {
+          resolveUserIds(targets).then(resolved => {
+            resolved.forEach(({ userId }) => notify({
+              userId,
+              type: 'doc_added',
+              actor: myProfile_,
+              tripId,
+              tripName: trip?.name,
+              refTitle: data.name || 'documento',
+            }));
+          });
+        }
+      }
     },
   });
   const updateMutation = useMutation({

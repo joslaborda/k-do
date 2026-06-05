@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripContext } from '@/hooks/useTripContext';
-import { createNotification } from '@/lib/notifications';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { Download, X, ArrowRight, Camera, Upload } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -60,14 +60,7 @@ export default function Photos() {
           p.email === email || p.user_email === email || p.contact_email === email
         );
         if (profile?.user_id) {
-          createNotification({
-            userId: profile.user_id,
-            type: 'photo_upload',
-            actorProfile: myProfile,
-            refId: tripId,
-            refTitle: trip?.name || 'el viaje',
-            message: `ha subido ${count} foto${count > 1 ? 's' : ''}`,
-          });
+          
         }
       });
     } catch {}

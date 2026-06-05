@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useTripContext } from '@/hooks/useTripContext';
-import { createNotification } from '@/lib/notifications';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
@@ -1274,20 +1274,13 @@ export default function Restaurants() {
     staleTime: 60000,
   });
 
-  const notifyMembers = (type, message, refTitle) => {
+  const notifyMembers = (type, _unused, refTitle) => {
     const others = (trip?.members || []).filter(e => e !== currentUser?.email);
-    others.forEach(async email => {
-      try {
-        const users = await base44.entities.User.list();
-        const u = users.find(x => x.email === email);
-        if (u?.id) createNotification({
-          userId: u.id,
-          type,
-          actorProfile: myProfile,
-          refId: tripId,
-          refTitle: refTitle || trip?.name || '',
-        });
-      } catch {}
+    if (!others.length) return;
+    resolveUserIds(others).then(resolved => {
+      resolved.forEach(({ userId }) => notify({
+        userId, type, actor: myProfile, tripId, tripName: trip?.name, refTitle,
+      }));
     });
   };
   const city = activeCity?.name || trip?.destination || '';
