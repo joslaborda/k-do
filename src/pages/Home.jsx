@@ -364,7 +364,7 @@ function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
         {/* Header */}
         <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
           <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ${isDoc ? 'bg-orange-50' : spotColor || 'bg-secondary'}`}>
-            {isDoc ? <EmojiIcon size={20} className="text-primary" /> : <span className="text-xl">📍</span>}
+            {isDoc ? <EmojiIcon size={20} className="text-primary" /> : <span className="text-xl">{spotEmoji}</span>}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-foreground leading-snug">{title}</p>
@@ -731,6 +731,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
           spot={selected}
           open={true}
           onClose={() => setSelected(null)}
+          queryClient={queryClient}
           tripId={tripId}
         />
       )}
@@ -2018,7 +2019,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
 }
 
 // ── Settings Dialog ───────────────────────────────────────────────────────────
-function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
+function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -2720,9 +2721,10 @@ export default function Home() {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
           queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
         }}
-        onInvite={() => setInviteOpen(true)} profiles={profiles}
+        onInvite={() => setInviteOpen(true)}
       />
-      <DeleteTripModal
+
+            <DeleteTripModal
         open={deleteOpen} onOpenChange={setDeleteOpen}
         tripName={trip?.name || ''}
         onConfirm={() => deleteMutation.mutate()}
