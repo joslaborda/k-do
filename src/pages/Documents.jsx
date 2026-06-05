@@ -277,12 +277,28 @@ export default function Documents() {
     queryFn: () => base44.entities.UserProfile.list(),
     staleTime: 5 * 60 * 1000,
   });
+  const { data: usersData = [] } = useQuery({
+    queryKey: ['allUsers'],
+    queryFn: () => base44.entities.User.list(),
+    staleTime: 10 * 60 * 1000,
+  });
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    (usersData || []).forEach(u => {
+      const p = profiles.find(x => x.user_id === u.id);
+      if (p) map[u.email] = p;
+    });
+    return map;
+  }, [profiles, usersData]);
   // Note: UserProfile has no email field — lookup by user_email legacy field only
   const profilesByEmail = useMemo(() => {
     const map = {};
-    profiles.forEach(p => { if (p.user_email) map[p.user_email] = p; if (p.email) map[p.email] = p; });
+    (usersData || []).forEach(u => {
+      const p = (profiles || []).find(x => x.user_id === u.id);
+      if (p) map[u.email] = p;
+    });
     return map;
-  }, [profiles]);
+  }, [profiles, usersData]);
 
   // Backfill auto-links
   useEffect(() => {
@@ -425,7 +441,7 @@ export default function Documents() {
             <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
           </DialogHeader>
           <div className="px-5 py-4 overflow-y-auto flex-1">
-            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
+            <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
           </div>
         </DialogContent>
@@ -439,7 +455,7 @@ export default function Documents() {
           </DialogHeader>
           {editDoc && (
             <div className="px-5 py-4 overflow-y-auto flex-1">
-              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profiles} tripCities={cities}
+              <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
                 initialData={editDoc}
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
                 onCancel={() => setEditDoc(null)} saving={updateMutation.isPending} />

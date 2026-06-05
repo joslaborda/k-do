@@ -992,7 +992,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
             <Users className="w-4 h-4" />Viajeros
           </p>
         </div>
-        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
+        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} currentUserEmail={currentUserEmail} />
       </div>
     </div>
   );
@@ -1231,7 +1231,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           </p>
 
         </div>
-        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} />
+        <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} currentUserEmail={currentUserEmail} />
       </div>
     </div>
   );
@@ -1358,8 +1358,9 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }
         </div>
         <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
           {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-            const prof = profiles?.find(p => p.user_email === email || p.email === email) || null;
-            const name = prof?.display_name || email?.split('@')[0] || '?';
+            const u = (typeof usersData !== 'undefined' ? usersData : []).find(x => x.email === email);
+            const prof = u ? profiles?.find(p => p.user_id === u.id) : null;
+            const name = prof?.display_name || prof?.username || email?.split('@')[0] || '?';
             const initials = name.slice(0,2).toUpperCase();
             const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
             return (
@@ -1898,23 +1899,26 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 }
 
 
-function MemberAvatarRow({ trip, profiles, onInvite, isToday }) {
+function MemberAvatarRow({ trip, profiles, onInvite, isToday, currentUserEmail }) {
   const members = (trip?.members || [trip?.created_by]).filter(Boolean);
   const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 600000 });
 
   return (
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
       {members.map((email, i) => {
-        const profile = profiles?.find(p => p.user_email === email || p.email === email) || null;
-        const initials = (profile?.display_name || email || '').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || (email||'').split('@')[0].slice(0,2).toUpperCase();
-        const name = profile?.display_name || (email||'').split('@')[0];
+        const u = usersData.find(x => x.email === email);
+        const profile = u ? profiles?.find(p => p.user_id === u.id) : null;
+        const name = profile?.display_name || profile?.username || (email||'').split('@')[0];
+        const initials = name.slice(0,2).toUpperCase();
+        const isMe = email === currentUserEmail;
         return (
           <div key={email} className="flex flex-col items-center gap-1">
             {profile?.avatar_url
               ? <img src={profile.avatar_url} alt={name} className="w-9 h-9 rounded-full object-cover" />
               : <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>
             }
-            <span className="text-xs text-muted-foreground max-w-[48px] truncate text-center">{i === 0 ? (isToday ? 'Tú' : 'Admin') : name}</span>
+            <span className="text-xs text-muted-foreground max-w-[48px] truncate text-center">{isMe ? 'Tú' : name}</span>
           </div>
         );
       })}
@@ -2021,7 +2025,6 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
 
 // ── Settings Dialog ───────────────────────────────────────────────────────────
 function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 60000 });
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -2150,14 +2153,22 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground mb-1.5">Fechas del viaje</p>
-            <div className="flex items-center gap-1.5">
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                className="flex-1 min-w-0 h-9 px-2 text-sm border border-border rounded-xl bg-background text-foreground outline-none focus:border-primary" />
-              <span className="text-muted-foreground text-xs shrink-0">→</span>
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                className="flex-1 min-w-0 h-9 px-2 text-sm border border-border rounded-xl bg-background text-foreground outline-none focus:border-primary" />
-              {totalDays > 0 && (
-                <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+                className="h-8 text-sm flex-1"
+              />
+              <span className="text-muted-foreground text-sm">→</span>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+                className="h-8 text-sm flex-1"
+              />
+              {totalDays && (
+                <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0">
                   {totalDays}d
                 </span>
               )}
