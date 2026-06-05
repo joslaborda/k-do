@@ -708,7 +708,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
         </div>
       </div>
       {confirmDelete && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50">
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50">
           <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
             <p className="text-sm font-medium text-foreground mb-1">¿Eliminar este gasto?</p>
