@@ -715,7 +715,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
             <p className="text-xs text-muted-foreground mb-5"><strong>{expense.description}</strong> se eliminará permanentemente.</p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
-              <button onClick={() => { onDelete(expense); setConfirmDelete(false); onClose(); }}
+              <button onClick={() => { setConfirmDelete(false); onDelete(expense); }}
                 className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm font-medium">
                 Eliminar
               </button>
@@ -1008,9 +1008,14 @@ export default function Expenses() {
     onError: () => alert('Error al actualizar el gasto.'),
   });
 
+  const [pendingDeleteClose, setPendingDeleteClose] = useState(null);
+
   const deleteMutation = useMutation({
     mutationFn: id => base44.entities.Expense.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
+      setDetailExpense(null); // close sheet after confirmed delete
+    },
     onError: () => alert('Error al eliminar el gasto.'),
   });
 
@@ -1020,6 +1025,7 @@ export default function Expenses() {
   };
 
   const handleDelete = (expense) => {
+    if (deleteMutation.isPending) return;
     deleteMutation.mutate(expense.id);
   };
 
