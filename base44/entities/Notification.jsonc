@@ -2,19 +2,15 @@
   "name": "Notification",
   "type": "object",
   "properties": {
-    "user_id": { "type": "string", "description": "ID del usuario destinatario" },
-    "type": {
-      "type": "string",
-      "description": "Tipo de notificación"
-    },
-    "read": { "type": "boolean", "default": false },
-    "actor_user_id": { "type": "string" },
+    "user_id":            { "type": "string", "description": "ID del usuario destinatario" },
+    "type":               { "type": "string", "description": "Tipo: doc_added, expense_added, expense_settled, photo_added, member_joined, trip_invite" },
+    "read":               { "type": "boolean", "default": false },
     "actor_display_name": { "type": "string" },
-    "actor_avatar": { "type": "string" },
-    "actor_username": { "type": "string" },
-    "ref_id": { "type": "string" },
-    "ref_title": { "type": "string" },
-    "message": { "type": "string" }
+    "actor_username":     { "type": "string" },
+    "actor_avatar":       { "type": "string" },
+    "trip_id":            { "type": "string" },
+    "trip_name":          { "type": "string" },
+    "ref_title":          { "type": "string", "description": "Nombre del objeto (doc, gasto, etc.)" }
   },
   "required": ["user_id", "type"]
 }
