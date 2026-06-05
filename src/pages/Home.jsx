@@ -2538,8 +2538,8 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <NotificationBell userId={currentUserId} userEmail={currentUserEmail} currentTripId={tripId} />
               <button onClick={() => setSettingsOpen(true)}
-                className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-border/40 transition-colors">
-                <Settings className="w-4 h-4 text-muted-foreground" />
+                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-secondary/60 transition-colors">
+                <Settings className="w-5 h-5 text-foreground" />
               </button>
             </div>
           </div>

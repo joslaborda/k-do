@@ -178,8 +178,8 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
 
   return (
     <button onClick={() => onEdit(expense)} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-secondary/20 transition-colors border-b border-border last:border-0">
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
-        {tc.emoji}
+      <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0 }} className={`flex items-center justify-center ${CAT_COLORS[expense.category] || CAT_COLORS.other}`}>
+        {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -407,7 +407,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
       {/* Todos los saldos */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Quién debe · quién cobra</p>
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           {members.map((email, i) => {
             const bal = balances[email] || 0;
@@ -1021,10 +1021,9 @@ export default function Expenses() {
     else createMutation.mutate(d);
   };
 
-  const handleDelete = async expense => {
-    const data = { ...expense };
-    delete data.id; delete data.created_date; delete data.updated_date; delete data.created_by;
-    await performDelete(() => deleteMutation.mutateAsync(expense.id), () => base44.entities.Expense.create(data), expense.description);
+  const handleDelete = (expense) => {
+    if (deleteMutation.isPending) return;
+    deleteMutation.mutate(expense.id);
   };
 
   const openAdd = () => { setEditingExpense(null); setSheetOpen(true); };
