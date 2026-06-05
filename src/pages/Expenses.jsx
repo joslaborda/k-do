@@ -960,7 +960,7 @@ export default function Expenses() {
   const { data: profiles = [] } = useQuery({
     queryKey: ['profiles'],
     queryFn: () => base44.entities.UserProfile.filter({}),
-    staleTime: 120000,
+    staleTime: 0,
   });
 
   const userMap = useMemo(() => {

@@ -2026,6 +2026,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
 // ── Settings Dialog ───────────────────────────────────────────────────────────
 function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
   const queryClient = useQueryClient();
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 0 });
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
