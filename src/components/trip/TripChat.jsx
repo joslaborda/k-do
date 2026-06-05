@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Send, MessageCircle, Paperclip, Image, X, Download, ZoomIn } from 'lucide-react';
 import { format, isSameDay } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { createNotification } from '@/lib/notifications';
 
 export default function TripChat({ tripId, myProfile, trip }) {
   const { user } = useAuth();
@@ -53,14 +52,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
           p.email === email || p.user_email === email || p.contact_email === email
         );
         if (profile?.user_id) {
-          createNotification({
-            userId: profile.user_id,
-            type: 'chat_message',
-            actorProfile: myProfile,
-            refId: tripId,
-            refTitle: trip?.name || 'el viaje',
-            message: (msgText || '').slice(0, 80),
-          });
+          
         }
       });
     } catch {}
