@@ -1534,6 +1534,9 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   const audioChunksRef = useRef([]);
   const queryClient = useQueryClient();
   const bottomRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const isFirstLoad = useRef(true);
+  const lastMsgCount = useRef(0);
 
   const { data: messages = [] } = useQuery({
     queryKey: ['tripMessages', tripId],
@@ -1544,7 +1547,17 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
   });
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!messages.length) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    // Solo scroll al fondo en primera carga o cuando el último mensaje es mío
+    const lastMsg = messages[messages.length - 1];
+    const isMine = lastMsg && (lastMsg.user_id === currentUserId || lastMsg.user_email === currentUserEmail);
+    if (isFirstLoad.current || (isMine && messages.length > lastMsgCount.current)) {
+      container.scrollTop = container.scrollHeight;
+      isFirstLoad.current = false;
+    }
+    lastMsgCount.current = messages.length;
   }, [messages]);
 
   const sendPoll = async () => {
@@ -1687,7 +1700,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
       <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col mx-4 mb-4" style={{minHeight:'360px',maxHeight:'500px'}}>
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-2">
           {messages.length === 0 && (
             <div className="text-center text-muted-foreground py-10">
               <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-25" />
