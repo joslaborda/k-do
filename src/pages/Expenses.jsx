@@ -708,15 +708,18 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
         </div>
       </div>
       {confirmDelete && (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50">
-          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8">
+        <div className="fixed inset-0 z-[90] flex items-end justify-center" style={{background:'rgba(0,0,0,0.5)'}}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl px-5 pt-4 pb-10">
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
-            <p className="text-sm font-medium text-foreground mb-1">¿Eliminar este gasto?</p>
-            <p className="text-xs text-muted-foreground mb-5"><strong>{expense.description}</strong> se eliminará permanentemente.</p>
+            <p className="text-base font-semibold text-foreground mb-1">¿Eliminar este gasto?</p>
+            <p className="text-sm text-muted-foreground mb-6"><strong className="text-foreground">{expense.description}</strong> se eliminará permanentemente.</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
+              <button onClick={() => setConfirmDelete(false)}
+                className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground font-medium">
+                Cancelar
+              </button>
               <button onClick={() => { setConfirmDelete(false); onDelete(expense); }}
-                className="flex-1 py-3 bg-red-500 text-white rounded-xl text-sm font-medium">
+                className="flex-1 py-3 rounded-full bg-red-500 text-white text-sm font-semibold">
                 Eliminar
               </button>
             </div>
