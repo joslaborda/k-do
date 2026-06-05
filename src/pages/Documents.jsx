@@ -290,15 +290,7 @@ export default function Documents() {
     });
     return map;
   }, [profiles, usersData]);
-  // Note: UserProfile has no email field — lookup by user_email legacy field only
-  const profilesByEmail = useMemo(() => {
-    const map = {};
-    (usersData || []).forEach(u => {
-      const p = (profiles || []).find(x => x.user_id === u.id);
-      if (p) map[u.email] = p;
-    });
-    return map;
-  }, [profiles, usersData]);
+
 
   // Backfill auto-links
   useEffect(() => {
