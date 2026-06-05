@@ -93,9 +93,11 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { read: true })));
     },
     onMutate: () => {
+      // Optimistic: badge goes to 0 immediately
       qc.setQueryData(QKEY, old => old?.map(n => ({ ...n, read: true })));
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: QKEY }),
+    // No onSuccess invalidate — would undo the optimistic update
+    // Invalidation happens when panel closes (handleToggle + outside click)
   });
 
   // Close on outside click + invalidate on close
