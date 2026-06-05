@@ -3,6 +3,7 @@ import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import NotificationBell from '@/components/notifications/NotificationBell';
 import CountryInput from '@/components/trip/CountryInput';
 import PDFViewer from '@/components/PDFViewer';
 import { base44 } from '@/api/base44Client';
@@ -2343,7 +2344,6 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
 export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
@@ -2457,57 +2457,7 @@ export default function Home() {
   const tripInProgress = tripStart && tripEnd && todayStr >= tripStart && todayStr <= tripEnd;
 
   // Notifications
-  const notifications = useMemo(() => {
-    const notifs = [];
-    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
-    const todayStr_ = format(new Date(), 'yyyy-MM-dd');
-    const nowHour = new Date().getHours() * 60 + new Date().getMinutes();
-
-    // Doc time alerts — docs today with a time field
-    documents
-      .filter(d => {
-        const docDate = d.date || d.valid_from || d.start_date;
-        return docDate === todayStr_ && d.time;
-      })
-      .forEach(d => {
-        const [h, m] = (d.time || '').split(':').map(Number);
-        const docMinutes = (h || 0) * 60 + (m || 0);
-        const diff = docMinutes - nowHour;
-        if (diff > 0 && diff <= 240) {
-          const icon = d.type === 'flight' ? '✈️' : d.type === 'train' ? '🚆' : d.type === 'bus' ? '🚌' : '📄';
-          const label = diff <= 60 ? `en ${diff} min` : `en ${Math.round(diff/60)}h`;
-          notifs.push({
-            id: `doctime-${d.id}`, icon,
-            message: `${d.title || d.name} · ${d.time} (${label})`,
-            time: new Date().toISOString(),
-            urgent: diff <= 120,
-          });
-        }
-      });
-
-    expenses
-      .filter(e => e.split_with?.includes(currentUserEmail) && e.created_by !== currentUserEmail && new Date(e.created_date) > cutoff)
-      .forEach(e => notifs.push({
-        id: `exp-${e.id}`, icon: '💰',
-        message: `${(e.created_by || '').split('@')[0]} añadió un gasto: ${e.description || 'Gasto'} ${e.amount}${trip?.currency || '€'}`,
-        time: e.created_date || ''
-      }));
-    documents
-      .filter(d => d.shared_with?.includes(currentUserEmail) && d.created_by !== currentUserEmail && new Date(d.created_date) > cutoff)
-      .forEach(d => notifs.push({
-        id: `doc-${d.id}`, icon: '📄',
-        message: `Nuevo documento: ${d.title || d.name}`,
-        time: d.created_date || ''
-      }));
-    allSpots
-      .filter(s => s.assigned_date && s.created_by !== currentUserEmail && new Date(s.created_date) > cutoff)
-      .forEach(s => notifs.push({
-        id: `spot-${s.id}`, icon: '📍',
-        message: `${s.creator_username || 'Alguien'} asignó un spot: ${s.title}`,
-        time: s.created_date || ''
-      }));
-    return notifs.sort((a, b) => new Date(b.time) - new Date(a.time));
-  }, [expenses, documents, allSpots, currentUserEmail, trip]);
+  // notifications handled by NotificationBell component
 
   const unreadMessages = useMemo(() => {
     return tripMessages.filter(m =>
@@ -2586,40 +2536,7 @@ export default function Home() {
               </button>
             </Link>
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <button onClick={() => setNotifOpen(o => !o)}
-                  className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-border/40 transition-colors relative">
-                  <Bell className="w-4 h-4 text-muted-foreground" />
-                  {notifications.length > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                      {notifications.length > 9 ? '9+' : notifications.length}
-                    </span>
-                  )}
-                </button>
-                {notifOpen && (
-                  <div className="absolute top-11 right-0 w-72 bg-card rounded-2xl border border-border shadow-xl z-50 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                      <p className="text-sm font-semibold text-foreground">Notificaciones</p>
-                      <button onClick={() => setNotifOpen(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
-                    </div>
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-8 text-center">
-                        <Bell className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">Sin notificaciones recientes</p>
-                      </div>
-                    ) : (
-                      <div className="max-h-72 overflow-y-auto divide-y divide-border">
-                        {notifications.map(n => (
-                          <div key={n.id} className={`px-4 py-3 flex items-start gap-3 ${n.urgent ? 'bg-red-50' : ''}`}>
-                            <span className="text-base shrink-0 mt-0.5">{n.icon}</span>
-                            <p className={`text-xs leading-relaxed ${n.urgent ? 'text-red-700 font-medium' : 'text-foreground'}`}>{n.message}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <NotificationBell userId={currentUserId} userEmail={currentUserEmail} currentTripId={tripId} />
               <button onClick={() => setSettingsOpen(true)}
                 className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-border/40 transition-colors">
                 <Settings className="w-4 h-4 text-muted-foreground" />
