@@ -13,8 +13,8 @@ import { normalizeCountry } from '@/lib/countryConfig';
 export default function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
-  const { data: allProfiles = [] } = useQuery({ queryKey: ['allProfiles'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 300000 });
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 600000 });
+  const { data: allProfiles = [] } = useQuery({ queryKey: ['allProfiles'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 60000, refetchOnMount: true });
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 60000, refetchOnMount: true });
   const profilesByEmail = useMemo(() => {
     const map = {};
     usersData.forEach(u => { const p = allProfiles.find(x => x.user_id === u.id); if (p) map[u.email] = p; });
