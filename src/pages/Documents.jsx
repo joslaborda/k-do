@@ -6,7 +6,6 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText, CirclePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { format, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
@@ -457,18 +456,24 @@ export default function Documents() {
       </Dialog>
 
       {/* Delete confirmation */}
-      <AlertDialog open={!!deleteDoc} onOpenChange={(o) => { if (!o) setDeleteDoc(null); }}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar documento?</AlertDialogTitle>
-            <AlertDialogDescription>¿Seguro que quieres eliminar "{deleteDoc?.name}"? Esta acción no se puede deshacer.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate(deleteDoc.id)} className="bg-red-600 hover:bg-red-700">Eliminar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {!!deleteDoc && (
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={() => setDeleteDoc(null)}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-sm font-medium text-foreground">¿Eliminar documento?</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{deleteDoc?.name} se eliminará permanentemente.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
+              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* File viewer */}
       <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />

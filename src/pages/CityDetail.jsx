@@ -26,16 +26,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -683,23 +673,25 @@ export default function CityDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar día?</AlertDialogTitle>
-            <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar "{dayToDelete?.title}"? Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation */}
+      {deleteDialogOpen && (
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={() => setDeleteDialogOpen(false)}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-sm font-medium text-foreground">¿Eliminar este día?</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{dayToDelete?.title} se eliminará permanentemente.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteDialogOpen(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
+              <button onClick={confirmDelete} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
