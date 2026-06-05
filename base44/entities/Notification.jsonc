@@ -2,60 +2,19 @@
   "name": "Notification",
   "type": "object",
   "properties": {
-    "user_id": {
-      "type": "string",
-      "description": "ID del usuario destinatario"
-    },
+    "user_id": { "type": "string", "description": "ID del usuario destinatario" },
     "type": {
       "type": "string",
-      "enum": [
-        "follow",
-        "template_save",
-        "trip_invite",
-        "trip_update",
-        "spot_added",
-        "spot_time",
-        "doc_added",
-        "expense_added",
-        "expense_settled",
-        "chat_message",
-        "photo_upload",
-        "trip_join"
-      ],
       "description": "Tipo de notificación"
     },
-    "read": {
-      "type": "boolean",
-      "default": false
-    },
-    "actor_user_id": {
-      "type": "string",
-      "description": "ID del usuario que genera la notificación"
-    },
-    "actor_display_name": {
-      "type": "string"
-    },
-    "actor_avatar": {
-      "type": "string"
-    },
-    "actor_username": {
-      "type": "string"
-    },
-    "ref_id": {
-      "type": "string",
-      "description": "ID de referencia (trip_id, etc.)"
-    },
-    "ref_title": {
-      "type": "string",
-      "description": "Título legible del objeto referenciado"
-    },
-    "message": {
-      "type": "string",
-      "description": "Mensaje personalizado opcional"
-    }
+    "read": { "type": "boolean", "default": false },
+    "actor_user_id": { "type": "string" },
+    "actor_display_name": { "type": "string" },
+    "actor_avatar": { "type": "string" },
+    "actor_username": { "type": "string" },
+    "ref_id": { "type": "string" },
+    "ref_title": { "type": "string" },
+    "message": { "type": "string" }
   },
-  "required": [
-    "user_id",
-    "type"
-  ]
+  "required": ["user_id", "type"]
 }
