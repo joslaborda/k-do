@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, X, Check, Mail, FileText, Receipt, Camera, UserPlus, Compass } from 'lucide-react';
+import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,30 +7,132 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
 
-// Icon + color per type
 const TYPE = {
-  doc_added:        { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
-  expense_added:    { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'añadió un gasto' },
-  expense_settled:  { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'liquidó tu deuda' },
-  photo_added:      { Icon: Camera,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'subió fotos' },
-  member_joined:    { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'se unió al viaje' },
-  trip_invite:      { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'te invitó a un viaje' },
-  spot_added:       { Icon: Compass,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'añadió un spot' },
+  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
+  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'añadió un gasto' },
+  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'liquidó tu deuda' },
+  photo_added:     { Icon: Camera,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'subió fotos' },
+  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'se unió al viaje' },
+  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'te invitó a un viaje' },
+  spot_added:      { Icon: Compass,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'añadió un spot' },
 };
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'nueva notificación' };
 
-function NotifItem({ n, currentTripId, onRead }) {
+// ── Trip Invite Modal ──────────────────────────────────────────────────────────
+function TripInviteModal({ notif, onClose, onAccept }) {
+  const [trip, setTrip] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!notif?.trip_id) return;
+    (async () => {
+      try {
+        const t = await base44.entities.Trip.get(notif.trip_id);
+        setTrip(t);
+        const profiles = await base44.entities.UserProfile.list();
+        const users = await base44.entities.User.list();
+        const memberProfiles = (t.members || []).map(email => {
+          const u = users.find(x => x.email === email);
+          const p = profiles.find(x => x.user_id === u?.id);
+          return { email, name: p?.display_name || p?.username || email.split('@')[0], avatar: p?.avatar_url };
+        });
+        setMembers(memberProfiles);
+      } catch {}
+      setLoading(false);
+    })();
+  }, [notif?.trip_id]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
+      <div className="bg-card rounded-2xl w-full max-w-sm overflow-hidden shadow-xl" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <p className="font-semibold text-foreground">Invitación al viaje</p>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">Cargando...</div>
+        ) : trip ? (
+          <div className="px-5 py-4 space-y-4">
+            {/* Trip name */}
+            <div>
+              <p className="text-xl font-semibold text-foreground">{trip.name || trip.destination}</p>
+              {trip.destination && <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}</p>}
+            </div>
+
+            {/* Dates */}
+            {trip.start_date && (
+              <div className="bg-secondary rounded-xl px-4 py-3">
+                <p className="text-xs text-muted-foreground mb-1">Fechas</p>
+                <p className="text-sm font-medium text-foreground">
+                  {new Date(trip.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long' })}
+                  {trip.end_date && ` → ${new Date(trip.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                </p>
+              </div>
+            )}
+
+            {/* Members */}
+            {members.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1"><Users className="w-3 h-3" />{members.length} viajero{members.length !== 1 ? 's' : ''}</p>
+                <div className="flex gap-2 flex-wrap">
+                  {members.map(m => (
+                    <div key={m.email} className="flex items-center gap-1.5">
+                      {m.avatar
+                        ? <img src={m.avatar} className="w-7 h-7 rounded-full object-cover" alt={m.name} />
+                        : <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-xs font-semibold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
+                      }
+                      <span className="text-xs text-muted-foreground">{m.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Inviter */}
+            <p className="text-xs text-muted-foreground">
+              Invitado por <span className="font-medium text-foreground">{notif.actor_display_name || notif.actor_username || 'Alguien'}</span>
+            </p>
+          </div>
+        ) : (
+          <div className="py-8 text-center text-sm text-muted-foreground">No se pudo cargar el viaje</div>
+        )}
+
+        {/* Actions */}
+        <div className="px-5 py-4 border-t border-border flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-full border border-border text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
+            Cerrar
+          </button>
+          {trip && (
+            <button onClick={() => onAccept(trip)} className="flex-1 py-2.5 rounded-full bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+              Ver viaje
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── NotifItem ──────────────────────────────────────────────────────────────────
+function NotifItem({ n, currentTripId, onRead, onNavigate }) {
   const cfg = TYPE[n.type] ?? FALLBACK;
   const { Icon } = cfg;
   const name = n.actor_display_name || n.actor_username || 'Alguien';
   const showTrip = !currentTripId && n.trip_name;
 
+  const handleClick = () => {
+    if (!n.read) onRead(n.id);
+    onNavigate(n);
+  };
+
   return (
     <div
-      onClick={() => !n.read && onRead(n.id)}
+      onClick={handleClick}
       className={`flex items-start gap-3 px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/30 transition-colors ${!n.read ? 'bg-primary/5' : ''}`}
     >
-      {/* Avatar */}
       <div className="relative flex-shrink-0">
         {n.actor_avatar
           ? <img src={n.actor_avatar} className="w-9 h-9 rounded-full object-cover" alt={name} />
@@ -38,12 +140,8 @@ function NotifItem({ n, currentTripId, onRead }) {
               <Icon className={`w-4 h-4 ${cfg.color}`} />
             </div>
         }
-        {!n.read && (
-          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
-        )}
+        {!n.read && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />}
       </div>
-
-      {/* Text */}
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground leading-snug">
           <span className="font-semibold">{name}</span>
@@ -61,14 +159,17 @@ function NotifItem({ n, currentTripId, onRead }) {
   );
 }
 
+// ── Main component ─────────────────────────────────────────────────────────────
 export default function NotificationBell({ userId, userEmail, currentTripId }) {
   const [open, setOpen] = useState(false);
+  const [inviteNotif, setInviteNotif] = useState(null);
   const ref = useRef();
+  const navigate = useNavigate();
   const qc = useQueryClient();
-  const QKEY = ['notifications', userId];
+  const qkey = () => ['notifications', userId];
 
   const { data: notifications = [] } = useQuery({
-    queryKey: QKEY,
+    queryKey: qkey(),
     queryFn: () => base44.entities.Notification.filter({ user_id: userId }, '-created_date', 40),
     enabled: !!userId,
     refetchInterval: open ? false : 20000,
@@ -80,45 +181,68 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
 
   const markOne = useMutation({
     mutationFn: (id) => base44.entities.Notification.update(id, { read: true }),
-    onMutate: (id) => {
-      qc.setQueryData(QKEY, old => old?.map(n => n.id === id ? { ...n, read: true } : n));
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: QKEY }),
+    onMutate: (id) => qc.setQueryData(qkey(), old => old?.map(n => n.id === id ? { ...n, read: true } : n)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: qkey() }),
   });
 
   const markAll = useMutation({
-    mutationFn: async () => {
-      const unread = notifications.filter(n => !n.read);
-      if (!unread.length) return;
-      await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { read: true })));
+    mutationFn: async (notifs) => {
+      const items = (notifs || []).filter(n => !n.read);
+      if (!items.length) return;
+      await Promise.all(items.map(n => base44.entities.Notification.update(n.id, { read: true })));
     },
-    onMutate: () => {
-      // Optimistic: badge goes to 0 immediately
-      qc.setQueryData(QKEY, old => old?.map(n => ({ ...n, read: true })));
-    },
-    // No onSuccess invalidate — would undo the optimistic update
-    // Invalidation happens when panel closes (handleToggle + outside click)
+    onMutate: () => qc.setQueryData(qkey(), old => old?.map(n => ({ ...n, read: true }))),
   });
 
-  // Close on outside click + invalidate on close
+  const close = () => {
+    setOpen(false);
+    qc.invalidateQueries({ queryKey: qkey() });
+  };
+
   useEffect(() => {
-    const h = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setOpen(false);
-        qc.invalidateQueries({ queryKey: QKEY });
-      }
-    };
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) close(); };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, [qc, userId]);
 
   const handleToggle = () => {
-    if (open) {
-      setOpen(false);
-      qc.invalidateQueries({ queryKey: QKEY });
-    } else {
-      setOpen(true);
-      markAll.mutate();
+    if (open) { close(); }
+    else { setOpen(true); markAll.mutate(notifications); }
+  };
+
+  // Navigation per type
+  const handleNavigate = (n) => {
+    if (n.type === 'trip_invite') {
+      setInviteNotif(n);
+      return; // show modal, don't close
+    }
+    close();
+    if (!n.trip_id) return;
+    const base = createPageUrl;
+    const trip = `?trip_id=${n.trip_id}`;
+    const extra = n.ref_extra ? JSON.parse(n.ref_extra) : {};
+
+    switch (n.type) {
+      case 'doc_added':
+        navigate(base('Documents') + trip + (n.ref_id ? `&doc_id=${n.ref_id}` : ''));
+        break;
+      case 'expense_added':
+        navigate(base('Expenses') + trip);
+        break;
+      case 'expense_settled':
+        navigate(base('Expenses') + trip + '&tab=balances');
+        break;
+      case 'photo_added':
+        navigate(base('Photos') + trip);
+        break;
+      case 'member_joined':
+        navigate(base('Home') + trip + '&scroll=members');
+        break;
+      case 'spot_added':
+        navigate(base('Cities') + trip + (extra.spotDate ? `&date=${extra.spotDate}` : ''));
+        break;
+      default:
+        navigate(base('Home') + trip);
     }
   };
 
@@ -141,33 +265,35 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
         <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <span className="font-semibold text-sm text-foreground">Notificaciones</span>
-            <button
-              onClick={() => { setOpen(false); qc.invalidateQueries({ queryKey: QKEY }); }}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={close} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
-
           <div className="max-h-[70vh] overflow-y-auto">
             {notifications.length === 0
-              ? (
-                <div className="py-12 text-center">
-                  <Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
-                  <p className="text-sm text-muted-foreground">Sin notificaciones</p>
-                </div>
-              )
+              ? <div className="py-12 text-center"><Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" /><p className="text-sm text-muted-foreground">Sin notificaciones</p></div>
               : notifications.map(n => (
-                  <NotifItem
-                    key={n.id}
-                    n={n}
-                    currentTripId={currentTripId}
+                  <NotifItem key={n.id} n={n} currentTripId={currentTripId}
                     onRead={(id) => markOne.mutate(id)}
+                    onNavigate={handleNavigate}
                   />
                 ))
             }
           </div>
         </div>
+      )}
+
+      {/* Trip invite modal */}
+      {inviteNotif && (
+        <TripInviteModal
+          notif={inviteNotif}
+          onClose={() => setInviteNotif(null)}
+          onAccept={(trip) => {
+            setInviteNotif(null);
+            close();
+            navigate(createPageUrl('Home') + `?trip_id=${trip.id}`);
+          }}
+        />
       )}
     </div>
   );
