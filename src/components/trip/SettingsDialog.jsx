@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Trash2, ChevronDown, UserPlus } from 'lucide-react';
@@ -10,9 +10,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import CountryInput from '@/components/trip/CountryInput';
 import { normalizeCountry } from '@/lib/countryConfig';
 
-export default function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
+export default function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
+  const { data: allProfiles = [] } = useQuery({ queryKey: ['allProfiles'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 300000 });
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 600000 });
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    usersData.forEach(u => { const p = allProfiles.find(x => x.user_id === u.id); if (p) map[u.email] = p; });
+    return map;
+  }, [allProfiles, usersData]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [editingCity, setEditingCity] = useState(null);
@@ -228,8 +235,8 @@ export default function SettingsDialog({ open, onClose, trip, cities, tripId, is
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const prof = profiles?.find(p => p.user_email === email || p.email === email) || null;
-              const name = prof?.display_name || email?.split('@')[0] || '?';
+              const prof = profilesByEmail[email] || null;
+              const name = prof?.display_name || prof?.username || email?.split('@')[0] || '?';
               const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
               return prof?.avatar_url
