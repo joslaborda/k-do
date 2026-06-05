@@ -253,9 +253,9 @@ function DeleteConfirmPopup({ spot, onConfirm, onCancel }) {
         <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
         <p className="font-semibold text-foreground text-sm mb-1">¿Eliminar este spot?</p>
         <p className="text-xs text-muted-foreground mb-5">Se eliminará <strong>{spot.title}</strong> de tu lista. Esta acción no se puede deshacer.</p>
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={onCancel} className="py-3 rounded-xl border border-border bg-secondary text-sm font-medium text-foreground hover:bg-border transition-colors">Cancelar</button>
-          <button onClick={onConfirm} className="py-3 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors">Eliminar</button>
+        <div className="flex gap-3">
+          <button onClick={onCancel} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">Cancelar</button>
+          <button onClick={onConfirm} className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium">Eliminar</button>
         </div>
       </div>
     </div>
