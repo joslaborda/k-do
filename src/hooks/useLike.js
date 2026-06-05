@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { createNotification } from '@/lib/notifications';
 
 /**
  * useLike — hook reutilizable para dar/quitar like a un spot o template
@@ -37,12 +36,7 @@ export function useLike({ targetId, targetType, userId, targetOwnerId }) {
         });
         if (targetOwnerId && targetOwnerId !== userId) {
           try {
-            createNotification({
-              userId: targetOwnerId,
-              type: 'like',
-              refId: targetId,
-              message: targetType === 'spot' ? 'Le ha gustado tu spot' : 'Le ha gustado tu itinerario',
-            });
+            
           } catch {}
         }
       }
