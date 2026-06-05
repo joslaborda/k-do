@@ -13,8 +13,8 @@ import { normalizeCountry } from '@/lib/countryConfig';
 export default function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
-  const { data: allProfiles = [] } = useQuery({ queryKey: ['allProfiles'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 60000, refetchOnMount: true });
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 60000, refetchOnMount: true });
+  const { data: allProfiles = [] } = useQuery({ queryKey: ['allProfiles'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 0 });
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 0 });
   const profilesByEmail = useMemo(() => {
     const map = {};
     usersData.forEach(u => { const p = allProfiles.find(x => x.user_id === u.id); if (p) map[u.email] = p; });
@@ -116,11 +116,13 @@ export default function SettingsDialog({ open, onClose, trip, cities, tripId, is
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground mb-1.5">Fechas del viaje</p>
-            <div className="flex items-center gap-2">
-              <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="h-8 text-sm flex-1" />
-              <span className="text-muted-foreground text-sm">→</span>
-              <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="h-8 text-sm flex-1" />
-              {totalDays && <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0">{totalDays}d</span>}
+            <div className="flex items-center gap-1.5">
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+                className="flex-1 min-w-0 h-9 px-2 text-sm border border-border rounded-xl bg-background text-foreground outline-none focus:border-primary" />
+              <span className="text-muted-foreground text-xs shrink-0">→</span>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+                className="flex-1 min-w-0 h-9 px-2 text-sm border border-border rounded-xl bg-background text-foreground outline-none focus:border-primary" />
+              {totalDays > 0 && <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0 whitespace-nowrap">{totalDays}d</span>}
             </div>
           </div>
         </div>
