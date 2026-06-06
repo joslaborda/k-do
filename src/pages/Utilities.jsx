@@ -213,15 +213,18 @@ function RequirementsTab({ reqs, country, homeCountry }) {
   const currency = reqs.currency || {};
   const tips = reqs.tips || [];
 
-  // Determinar estado del visado
+  // Determinar estado del visado usando nuevo campo type/label
   const visaNeeded = visa.needed;
-  let visaStatus, visaColor, visaIcon, visaLabel;
+  const visaType = visa.type;
+  const visaLabel = visa.label || (visaNeeded === false ? 'Sin visado' : visaNeeded === true ? 'Visado requerido' : 'Verificar con consulado');
+
+  let visaColor, visaIcon;
   if (visaNeeded === false) {
-    visaStatus = 'libre'; visaColor = 'bg-green-50 border-green-200'; visaIcon = <ShieldCheck className="w-5 h-5 text-green-600" />; visaLabel = 'Sin visado';
-  } else if (visaNeeded === null || visaNeeded === 'consultar') {
-    visaStatus = 'consultar'; visaColor = 'bg-amber-50 border-amber-200'; visaIcon = <ShieldAlert className="w-5 h-5 text-amber-500" />; visaLabel = 'Verificar';
+    visaColor = 'bg-green-50 border-green-200'; visaIcon = <ShieldCheck className="w-5 h-5 text-green-600" />;
+  } else if (visaType === 'evisa' || visaType === 'voa' || visaType === 'eta' || visaType === 'esta' || visaType === 'nzeta') {
+    visaColor = 'bg-amber-50 border-amber-200'; visaIcon = <ShieldAlert className="w-5 h-5 text-amber-500" />;
   } else {
-    visaStatus = 'requerido'; visaColor = 'bg-red-50 border-red-200'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />; visaLabel = 'Visado requerido';
+    visaColor = 'bg-red-50 border-red-200'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />;
   }
 
   const requiredVax = vaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
@@ -242,7 +245,16 @@ function RequirementsTab({ reqs, country, homeCountry }) {
           {visaIcon}
           <div className="flex-1">
             <p className="text-sm font-semibold text-foreground">{visaLabel}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{visa.info}</p>
+            {visa.info && <p className="text-xs text-muted-foreground mt-0.5">{visa.info}</p>}
+            {visaType && visaType !== 'esta' && visaType !== 'nzeta' && (
+              <p className="text-xs font-medium text-amber-700 mt-1">
+                {visaType === 'evisa' && '🌐 Tramitar online antes de viajar'}
+                {visaType === 'voa' && '🛬 Se obtiene a la llegada en el aeropuerto'}
+                {visaType === 'eta' && '🌐 Autorización electrónica — tramitar online'}
+              </p>
+            )}
+            {visaType === 'esta' && <p className="text-xs font-medium text-amber-700 mt-1">🌐 Tramitar ESTA en esta.cbp.dhs.gov</p>}
+            {visaType === 'nzeta' && <p className="text-xs font-medium text-amber-700 mt-1">🌐 Tramitar NZeTA en nzeta.immigration.govt.nz</p>}
           </div>
         </div>
       </div>
