@@ -738,12 +738,21 @@ export default function Utilities() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="px-4 pt-4 pb-0">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Inicio
+              </button>
+            </Link>
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Utilidades</h1>
           <OTabBar tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
         </div>
       </div>
 
-      <div className="px-4 py-4 space-y-4">
+      <div className="max-w-3xl mx-auto px-5 py-5 pb-24 space-y-4">
         {activeTab === 'emergencias' && (
           <EmergencyContent
             country={country}
@@ -756,9 +765,16 @@ export default function Utilities() {
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} />
         )}
         {activeTab === 'tiempo' && (
-          <div>
-            {country ? (
-              <WeatherCard city={tripCities[0]?.name || trip?.name || country} tripCountry={country} />
+          <div className="space-y-4">
+            {tripCities.length > 0 ? (
+              tripCities.map(city => (
+                <div key={city.id}>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{city.name}</p>
+                  <WeatherCard city={city.name} tripCountry={city.country || country} />
+                </div>
+              ))
+            ) : country ? (
+              <WeatherCard city={trip?.name || country} tripCountry={country} />
             ) : (
               <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
                 <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
