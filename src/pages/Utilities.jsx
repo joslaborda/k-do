@@ -840,7 +840,15 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           </div>
           {data.useful_apps.map((app, i) => (
             <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
-              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0 text-lg">{app.icon}</div>
+              {(() => {
+                const domains = { 'Uber': 'uber.com', 'Grab': 'grab.com', 'Bolt': 'bolt.eu', 'Gojek': 'gojek.com', 'Cabify': 'cabify.com', 'DiDi': 'didiglobal.com', 'Careem': 'careem.com', 'Rappi': 'rappi.com', 'iFood': 'ifood.com.br', 'Google Maps': 'maps.google.com', 'Google Translate': 'translate.google.com', 'WhatsApp': 'whatsapp.com', 'Citymapper': 'citymapper.com', 'Moovit': 'moovit.com', 'Naver Maps': 'naver.com', 'DB Navigator': 'bahn.de', 'SNCF Connect': 'sncf-connect.com', 'Trenitalia': 'trenitalia.com', 'Yandex Go': 'yandex.ru', 'WeChat': 'wechat.com', 'Alipay': 'alipay.com', 'MakeMyTrip': 'makemytrip.com', 'Traveloka': 'traveloka.com', 'SBB Mobile': 'sbb.ch', 'PassApp': 'passapp.net', 'Doctolib': 'doctolib.fr', 'VPN': 'protonvpn.com', 'AlertCops': 'alertcops.com', 'Ola': 'olacabs.com', 'InDriver': 'indriver.com', 'T-money': 'tmoney.co.kr', 'Suica': 'jreast.co.jp' };
+                const key = Object.keys(domains).find(k => app.name?.includes(k));
+                const domain = key ? domains[key] : null;
+                return domain ? (
+                  <img src={'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64'} alt={app.name} className="w-9 h-9 rounded-xl object-cover flex-shrink-0 bg-secondary" onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                ) : null;
+              })()}
+              <div className="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0 text-sm font-semibold text-primary" style={{display: 'none'}}>{app.name?.[0]?.toUpperCase() || '?'}</div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">{app.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{app.description}</p>
