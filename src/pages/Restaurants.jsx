@@ -1,4 +1,4 @@
-import { createPageUrl } from '@/utils';
+import { Moon, createPageUrl } from '@/utils';
 import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -118,10 +118,11 @@ async function searchPlaces(query, city, country) {
 async function nearbyPlaces(lat, lng, filterCats = null) {
   const viewbox = `${lng-0.03},${lat+0.03},${lng+0.03},${lat-0.03}`;
   const CAT_MAP = {
-    food:     ['restaurant', 'cafe', 'bar', 'fast_food', 'pub'],
-    cultural: ['museum', 'theatre', 'cinema', 'art_gallery', 'library', 'monument'],
-    interest: ['attraction', 'viewpoint', 'park', 'landmark', 'historic'],
-    shop:     ['hotel', 'hostel', 'shopping_mall', 'market', 'supermarket'],
+    food:      ['restaurant', 'cafe', 'fast_food'],
+    cultural:  ['museum', 'theatre', 'cinema', 'art_gallery', 'library', 'monument'],
+    interest:  ['attraction', 'viewpoint', 'park', 'landmark', 'historic'],
+    shop:      ['hotel', 'hostel', 'shopping_mall', 'market', 'supermarket'],
+    nightlife: ['bar', 'pub', 'nightclub', 'cocktail_bar', 'wine_bar'],
   };
   const categories = filterCats?.length
     ? filterCats.flatMap(k => CAT_MAP[k] || [k])
@@ -1556,8 +1557,19 @@ export default function Restaurants() {
         s.city_name?.toLowerCase().includes(q)
       );
     }
+    if (nearbyFilter.length > 0) {
+      const TYPE_MAP = {
+        food:      ['food'],
+        cultural:  ['sight'],
+        interest:  ['activity', 'custom'],
+        shop:      ['hotel', 'transport', 'shopping'],
+        nightlife: ['nightlife', 'bar'],
+      };
+      const allowed = new Set(nearbyFilter.flatMap(k => TYPE_MAP[k] || []));
+      result = result.filter(s => allowed.has(s.type));
+    }
     return result;
-  }, [spots, stateFilter, mySpotSearch]);
+  }, [spots, stateFilter, mySpotSearch, nearbyFilter]);
 
   const isSearchActive = searchQuery.length >= 2;
 
@@ -1620,6 +1632,7 @@ export default function Restaurants() {
                   { key: 'cultural', Icon: Landmark,    label: 'Cultural' },
                   { key: 'interest', Icon: Ticket,      label: 'Interés' },
                   { key: 'shop',     Icon: ShoppingBag, label: 'Compras' },
+                  { key: 'nightlife',Icon: Moon,        label: 'Bares/Noche' },
                 ].map(({ key: k, Icon, label }) => (
                   <button key={k} type="button"
                     onClick={() => {

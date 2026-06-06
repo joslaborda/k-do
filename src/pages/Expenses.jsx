@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass } from 'lucide-react';
+import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -92,12 +92,13 @@ const CAT_ICONS = {
   accommodation: Hotel,
   activities:    Ticket,
   shopping:      ShoppingBag,
+  drinks:        Wine,
   other:         MoreHorizontal,
 };
 const CAT_COLORS = {
   food: 'bg-orange-100 text-orange-600', transport: 'bg-blue-100 text-blue-600',
   accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
-  shopping: 'bg-emerald-100 text-emerald-600', other: 'bg-slate-100 text-slate-600',
+  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-slate-100 text-slate-600',
 };
 const CAT_CONFIG = {
   food:          { label: 'Comida',      emoji: '🍜' },
@@ -105,6 +106,7 @@ const CAT_CONFIG = {
   accommodation: { label: 'Alojamiento', emoji: '🏨' },
   activities:    { label: 'Actividades', emoji: '⚡' },
   shopping:      { label: 'Compras',     emoji: '🛍️' },
+  drinks:        { label: 'Bebidas',     emoji: '🍷' },
   other:         { label: 'Otro',        emoji: '💰' },
 };
 
