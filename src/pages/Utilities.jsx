@@ -513,57 +513,11 @@ function PackingTab({ tripId, country, tripInProgress }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-export default function EmergencyTab({ country: countryProp, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta: metaProp }) {
-  const { user } = useAuth();
-  const [searchParams] = useSearchParams();
+function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
-  // Obtener trip_id de la URL
-  const tripId = searchParams.get('trip_id');
-
-  // Cargar el viaje para obtener su country
-  const { data: trip } = useQuery({
-    queryKey: ['trip', tripId],
-    queryFn: async () => {
-      const r = await base44.entities.Trip.filter({ id: tripId });
-      return r[0] || null;
-    },
-    enabled: !!tripId,
-    staleTime: 60000,
-  });
-
-  // Cargar ciudades del viaje para obtener el país
-  const { data: tripCities = [] } = useQuery({
-    queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-    staleTime: 60000,
-  });
-
-  // Resolver country: prop > ciudad del viaje > trip.country
-  const country = countryProp || tripCities[0]?.country || trip?.country || '';
-  const meta = metaProp || (country ? getCountryMeta(country) : null) || {};
-
-  // Get homeCountry from user profile if not passed as prop
-  const { data: myProfile } = useQuery({
-    queryKey: ['myProfile', user?.id],
-    queryFn: async () => {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
-      return profiles[0] || null;
-    },
-    enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const homeCountry = homeCountryProp || myProfile?.nationality || myProfile?.country || 'España';
-  const secondNationality = secondNationalityProp || myProfile?.second_nationality || null;
-
-  // isResolvingCountry: tenemos trip_id pero aún no tenemos country (queries cargando)
-  const isResolvingCountry = !!tripId && !country;
-
   useEffect(() => {
-    if (isResolvingCountry) return; // esperar a que carguen trip/cities
     if (!country) { setData(null); setLoading(false); return; }
     setLoading(true);
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
@@ -585,12 +539,6 @@ export default function EmergencyTab({ country: countryProp, homeCountry: homeCo
   return (
     <div className="space-y-4">
       {/* No trip — show info message */}
-      {isResolvingCountry && (
-        <div className="text-center py-12">
-          <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Cargando información del destino...</p>
-        </div>
-      )}
       {loading && country && (
         <div className="text-center py-12">
           <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
@@ -754,6 +702,86 @@ export default function EmergencyTab({ country: countryProp, homeCountry: homeCo
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Utilities — wrapper principal con tabs
+// ─────────────────────────────────────────────────────────────────────────────
+export default function Utilities() {
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const tripId = searchParams.get('trip_id');
+  const initialTab = searchParams.get('tab') || 'emergencias';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: async () => { const r = await base44.entities.Trip.filter({ id: tripId }); return r[0] || null; },
+    enabled: !!tripId, staleTime: 60000,
+  });
+
+  const { data: tripCities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId, staleTime: 60000,
+  });
+
+  const { data: myProfile } = useQuery({
+    queryKey: ['myProfile', user?.id],
+    queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: user.id }); return r[0] || null; },
+    enabled: !!user?.id, staleTime: 300000,
+  });
+
+  const country = tripCities[0]?.country || trip?.country || '';
+  const meta = country ? getCountryMeta(country) : {};
+  const homeCountry = myProfile?.nationality || myProfile?.country || 'España';
+  const secondNationality = myProfile?.second_nationality || null;
+
+  const tripInProgress = trip?.start_date && trip?.end_date
+    ? new Date() >= new Date(trip.start_date) && new Date() <= new Date(trip.end_date)
+    : false;
+
+  const tabs = [
+    { key: 'emergencias', label: 'Emergencias' },
+    { key: 'maleta',      label: 'Maleta' },
+    { key: 'tiempo',      label: 'Tiempo' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-10 bg-background border-b border-border">
+        <div className="px-4 pt-12 pb-0">
+          <h1 className="text-xl font-semibold text-foreground mb-3">Utilidades</h1>
+          <OTabBar tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
+        </div>
+      </div>
+
+      <div className="px-4 py-4 space-y-4">
+        {activeTab === 'emergencias' && (
+          <EmergencyContent
+            country={country}
+            homeCountry={homeCountry}
+            secondNationality={secondNationality}
+            meta={meta}
+          />
+        )}
+        {activeTab === 'maleta' && (
+          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} />
+        )}
+        {activeTab === 'tiempo' && (
+          <div>
+            {country ? (
+              <WeatherCard city={tripCities[0]?.name || trip?.name || country} tripCountry={country} />
+            ) : (
+              <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
+                <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
