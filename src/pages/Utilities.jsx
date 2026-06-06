@@ -45,9 +45,8 @@ function OTabBar({ tabs, activeKey, onChange }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex"
-      style={{ position: 'relative' }}
-    >
+      className="relative flex overflow-x-auto"
+      style={{ position: 'relative' }}>
       {/* Animated sliding line */}
       <div
         style={{
@@ -67,7 +66,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           <button
             key={tab.key}
             onClick={() => onChange(tab.key)}
-            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1 min-w-0"
           >
             <span
               className="tab-label"
@@ -963,10 +962,7 @@ export default function Utilities() {
           <div className="space-y-4">
             {tripCities.length > 0 ? (
               tripCities.map(city => (
-                <div key={city.id}>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{city.name}</p>
-                  <WeatherCard city={city.name} tripCountry={city.country || country} showCityName />
-                </div>
+                <WeatherCard key={city.id} city={city.name} tripCountry={city.country || country} showCityName />
               ))
             ) : country ? (
               <WeatherCard city={trip?.name || country} tripCountry={country} />
