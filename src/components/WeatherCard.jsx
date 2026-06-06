@@ -112,7 +112,7 @@ function processWeather(data) {
   };
 }
 
-export default function WeatherCard({ city, tripCountry }) {
+export default function WeatherCard({ city, tripCountry, showCityName = false }) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -174,7 +174,7 @@ export default function WeatherCard({ city, tripCountry }) {
       <div className="px-4 py-3.5 border-b border-border">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm font-medium text-foreground">{city.name}</p>
+            <p className={showCityName ? "text-base font-semibold text-foreground" : "text-sm font-medium text-foreground"}>{city.name || city}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{weather.condition}</p>
           </div>
           <div className="text-right">
