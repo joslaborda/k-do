@@ -394,12 +394,7 @@ function PackingTab({ tripId, country, tripInProgress, userId }) {
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             </button>
                           </div>
-                        ) : (
-                          <button onClick={() => { setSheetCategory(cat.value); setSheetOpen(true); }}
-                            className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-border text-xs text-primary font-medium hover:bg-orange-50/50 transition-colors">
-                            <Plus className="w-3.5 h-3.5" />Añadir artículo
-                          </button>
-                        )}
+                        ) : null}
                       </>
                     )}
                   </div>
@@ -691,6 +686,8 @@ export default function Utilities() {
   const tripId = searchParams.get('trip_id');
   const initialTab = searchParams.get('tab') || 'emergencias';
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [packingSheetOpen, setPackingSheetOpen] = useState(false);
+  const [packingCategory, setPackingCategory] = useState('personal');
 
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],
@@ -733,7 +730,15 @@ export default function Utilities() {
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="px-4 pt-12 pb-0">
-          <h1 className="text-xl font-semibold text-foreground mb-3">Utilidades</h1>
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl font-semibold text-foreground">Utilidades</h1>
+            {activeTab === 'maleta' && (
+              <button onClick={() => setPackingSheetOpen(true)}
+                className="flex items-center gap-1.5 text-primary text-sm font-medium">
+                <Plus className="w-4 h-4" /> Artículo
+              </button>
+            )}
+          </div>
           <OTabBar tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
         </div>
       </div>
@@ -762,6 +767,18 @@ export default function Utilities() {
           </div>
         )}
       </div>
+      {packingSheetOpen && (
+        <AddPackingSheet
+          open={packingSheetOpen}
+          onClose={() => setPackingSheetOpen(false)}
+          defaultCategory={packingCategory}
+          saving={false}
+          onSave={async (data) => {
+            await base44.entities.PackingItem.create({ ...data, trip_id: tripId, user_id: user?.id });
+            setPackingSheetOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
