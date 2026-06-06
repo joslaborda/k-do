@@ -523,7 +523,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
-  }, [country, homeCountry, secondNationality, isResolvingCountry]);
+  }, [country, homeCountry, secondNationality]);
 
   // No early return — show all tabs even without active trip
 
@@ -575,44 +575,30 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
       {/* Embassy — hide if user is in their own country */}
       {data && data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const isHomeCountry = normalizeC(country) === normalizeC(homeCountry);
-        if (isHomeCountry) return null;
+        if (normalizeC(country) === normalizeC(homeCountry)) return null;
         const emb = typeof data.embassy === 'string'
-          ? { name: data.embassy.split(':')[0], phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
+          ? { phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
           : data.embassy;
         return (
           <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada</p></div>
-            {emb.name && <p className="text-sm font-semibold text-foreground">{emb.name}</p>}
+            <div className="flex items-center gap-2">
+              <Landmark className="w-4 h-4 text-muted-foreground" />
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada en {country}</p>
+            </div>
             {emb.address && (
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-foreground">{emb.address}</p>
               </div>
             )}
             {emb.phone && (
-              <a href={`tel:${emb.phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
+              <a href={'tel:' + (emb.phone || '').replace(/[^0-9+]/g, '')} className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-sm font-semibold text-primary">{emb.phone}</span>
               </a>
             )}
-            {emb.emergency_phone && (
-              <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Emergencias 24h</p>
-                  <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
-                </div>
-              </a>
-            )}
-            {emb.email && (
-              <a href={`mailto:${emb.email}`} className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm text-primary">{emb.email}</span>
-              </a>
-            )}
             {emb.hours && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">{emb.hours}</p>
               </div>
