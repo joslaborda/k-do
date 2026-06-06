@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
@@ -13,6 +13,7 @@ const TYPE_CONFIG = {
   shopping:  { label: 'Compras',     Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
   transport: { label: 'Transporte',  Icon: Train,      color: 'bg-slate-100 text-slate-700' },
   hotel:     { label: 'Hotel',       Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
+  nightlife: { label: 'Bares/Noche',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
   custom:    { label: 'Otro',        Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
 
