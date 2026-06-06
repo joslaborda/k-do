@@ -13,6 +13,7 @@ const TYPE_CONFIG = {
   shopping:  { label: 'Compras',     Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
   transport: { label: 'Transporte',  Icon: Train,      color: 'bg-slate-100 text-slate-700' },
   hotel:     { label: 'Hotel',       Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
+  nightlife: { label: 'Bares/Noche',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
   custom:    { label: 'Otro',        Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
 
