@@ -595,7 +595,7 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
       )}
 
       {/* Embassy — hide if user is in their own country */}
-      {data.embassy && (() => {
+      {data && data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const isHomeCountry = normalizeC(country) === normalizeC(homeCountry);
         if (isHomeCountry) return null;
@@ -604,23 +604,23 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
           : data.embassy;
         return (
           <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">🏛️ Tu embajada</p>
+            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada</p></div>
             {emb.name && <p className="text-sm font-semibold text-foreground">{emb.name}</p>}
             {emb.address && (
               <div className="flex items-start gap-2">
-                <span className="text-base leading-none mt-0.5">📍</span>
+                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-foreground">{emb.address}</p>
               </div>
             )}
             {emb.phone && (
               <a href={`tel:${emb.phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
-                <span className="text-base leading-none">📞</span>
+                <Phone className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-sm font-semibold text-primary">{emb.phone}</span>
               </a>
             )}
             {emb.emergency_phone && (
               <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
-                <span className="text-base leading-none">🆘</span>
+                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <div>
                   <p className="text-[10px] text-muted-foreground">Emergencias 24h</p>
                   <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
@@ -629,19 +629,19 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
             )}
             {emb.email && (
               <a href={`mailto:${emb.email}`} className="flex items-center gap-2">
-                <span className="text-base leading-none">✉️</span>
+                <Mail className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-sm text-primary">{emb.email}</span>
               </a>
             )}
             {emb.hours && (
               <div className="flex items-center gap-2">
-                <span className="text-base leading-none">🕐</span>
+                <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">{emb.hours}</p>
               </div>
             )}
             {emb.web && (
               <a href={emb.web} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                <span className="text-base leading-none">🌐</span>
+                <ExternalLink className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-sm text-primary font-medium">Sitio web oficial</span>
               </a>
             )}
@@ -651,14 +651,42 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
       {!loading && data && !data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         if (normalizeC(country) === normalizeC(homeCountry)) return null;
+        const CONSULATE_LINKS = {
+          'argentina': 'https://cancilleria.gob.ar/es/servicios/embajadas-y-consulados',
+          'colombia': 'https://www.cancilleria.gov.co/tramites_servicios/consulados',
+          'mexico': 'https://sre.gob.mx/representaciones',
+          'chile': 'https://www.minrel.gob.cl/embajadas-y-consulados',
+          'peru': 'https://www.rree.gob.pe/SitePages/Embajadas.aspx',
+          'venezuela': 'https://mppre.gob.ve/embajadas-y-consulados/',
+          'ecuador': 'https://www.cancilleria.gob.ec/embajadas-y-consulados/',
+          'bolivia': 'https://www.cancilleria.gob.bo/',
+          'uruguay': 'https://www.gub.uy/ministerio-relaciones-exteriores/',
+          'paraguay': 'https://www.mre.gov.py/',
+          'brasil': 'https://www.gov.br/mre/pt-br/assuntos/embaixadas-e-consulados',
+          'brazil': 'https://www.gov.br/mre/pt-br/assuntos/embaixadas-e-consulados',
+          'espana': 'https://www.exteriores.gob.es/es/EmbajadasConsulados',
+          'spain': 'https://www.exteriores.gob.es/es/EmbajadasConsulados',
+          'portugal': 'https://www.embaixadaportugal.mne.pt',
+          'francia': 'https://www.diplomatie.gouv.fr/fr/le-ministere-et-son-reseau/ambassades-et-consulats/',
+          'alemania': 'https://www.auswaertiges-amt.de/de/about-us/auslandsvertretungen',
+          'italia': 'https://www.esteri.it/it/ambasciate-e-consolati/',
+          'reino unido': 'https://www.gov.uk/world',
+          'estados unidos': 'https://www.usembassy.gov',
+          'china': 'http://www.fmprc.gov.cn/eng/',
+        };
+        const hn = (homeCountry || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const link = Object.entries(CONSULATE_LINKS).find(([k]) => hn.includes(k))?.[1] 
+          || 'https://www.google.com/search?q=embajada+' + encodeURIComponent(homeCountry || '') + '+en+' + encodeURIComponent(country || '');
         return (
-        <div className="bg-card rounded-2xl border border-border p-4 text-center">
-          <p className="text-sm text-muted-foreground">No tenemos datos de tu embajada en este país todavía</p>
-          <a href="https://www.exteriores.gob.es/es/EmbajadasConsulados" target="_blank" rel="noopener noreferrer"
-            className="text-xs text-primary font-medium mt-1 inline-block">
-            Buscar en exteriores.gob.es →
-          </a>
-        </div>
+          <div className="bg-card rounded-2xl border border-border p-4 text-center">
+            <Landmark className="w-7 h-7 mx-auto mb-2 text-muted-foreground/40" />
+            <p className="text-sm font-medium text-foreground mb-1">Sin datos de embajada</p>
+            <p className="text-xs text-muted-foreground mb-3">No tenemos todavía los datos de la embajada de {homeCountry} en {country}.</p>
+            <a href={link} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-primary font-medium">
+              Buscar en web oficial de tu país →
+            </a>
+          </div>
         );
       })()}
     </div>
