@@ -519,15 +519,15 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
       {/* Add actions */}
       <div className="flex border-t border-border">
         <button onClick={() => setAddingDoc(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors border-r border-border">
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors border-r border-border">
           <Plus className="w-3.5 h-3.5" />Doc
         </button>
         <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors border-r border-border">
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors border-r border-border">
           <Plus className="w-3.5 h-3.5" />Spot
         </Link>
         <button onClick={() => { setAddingNote(true); setNewNoteText(''); setNewNoteTime(''); }}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-primary hover:bg-orange-50/60 dark:hover:bg-orange-950/20 transition-colors">
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors">
           <Plus className="w-3.5 h-3.5" />Nota
         </button>
       </div>
@@ -667,29 +667,41 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
   const isEmpty = !day?.title && !hasContent;
   const label = isToday_ ? format(parseISO(dateStr), 'dd MMM', { locale: es }) : format(parseISO(dateStr), 'dd MMM', { locale: es });
 
-  const rowBg = isToday_
-    ? 'bg-orange-50'
-    : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
   const rowBorder = isToday_ ? 'border-t-2 border-t-primary' : 'border-t border-t-border';
+  const rowBg = isToday_ ? 'bg-orange-50/70' : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
 
   return (
     <div className={rowBorder}>
       <button onClick={() => setOpen(o => !o)}
         className={`w-full flex items-center gap-3 px-4 py-3 ${rowBg} transition-colors`}>
-        <span className={`text-xs font-semibold w-12 shrink-0 text-left ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>
-          {label}
-        </span>
-        <span className={`flex-1 text-sm text-left truncate ${
-          day?.title
-            ? isToday_ ? 'font-semibold text-primary' : 'font-medium text-foreground'
-            : hasContent ? 'font-medium text-foreground' : 'text-muted-foreground italic'
+        <div className={`flex flex-col items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 ${
+          isToday_ ? 'bg-primary' : 'bg-card border border-border'
         }`}>
-          {day?.title || (hasContent
-            ? [docs.length && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')
-            : 'Sin planificar')}
-        </span>
-        {isToday_ && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0">hoy</span>}
-        {isTomorrow_ && open && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full shrink-0">mañana</span>}
+          <span className={`text-base font-semibold leading-none ${isToday_ ? 'text-white' : 'text-foreground'}`}>
+            {format(parseISO(dateStr), 'd', { locale: es })}
+          </span>
+          <span className={`text-[9px] uppercase tracking-wide font-medium leading-tight mt-0.5 ${isToday_ ? 'text-white/75' : 'text-muted-foreground'}`}>
+            {format(parseISO(dateStr), 'MMM', { locale: es })}
+          </span>
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className={`text-sm truncate ${
+            day?.title
+              ? isToday_ ? 'font-medium text-primary' : 'font-medium text-foreground'
+              : hasContent ? 'font-medium text-foreground' : 'text-muted-foreground italic'
+          }`}>
+            {day?.title || (hasContent
+              ? [docs.length && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')
+              : 'Sin planificar')}
+          </p>
+          {hasContent && (
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {[docs.length > 0 && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length > 0 && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')}
+            </p>
+          )}
+        </div>
+        {isToday_ && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-medium">hoy</span>}
+        {isTomorrow_ && <span className="text-[10px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full shrink-0">mañana</span>}
         {open
           ? <ChevronUp className={`w-4 h-4 shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
