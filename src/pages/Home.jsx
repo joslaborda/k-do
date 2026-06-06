@@ -16,7 +16,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock
-, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass } from 'lucide-react';
+, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass , AlertTriangle } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,7 +26,7 @@ import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
-import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, AlertTriangle, Star } from '@/lib/icons';
+import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, Star } from '@/lib/icons';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 

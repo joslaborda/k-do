@@ -1542,10 +1542,21 @@ export default function Restaurants() {
   const hashtags = useMemo(() => buildHashtags(spots, tripCities), [spots, tripCities]);
 
   // Filtered spots (by state + local search)
+  const myCreatedSpots = useMemo(() =>
+    spots.filter(s => s.created_by === user?.email || s.created_by_user_id === user?.id),
+    [spots, user]
+  );
+  const mySavedSpots = useMemo(() =>
+    spots.filter(s => Array.isArray(s.saved_by) && s.saved_by.includes(user?.email) && s.created_by !== user?.email),
+    [spots, user]
+  );
+
   const filteredSpots = useMemo(() => {
     let result = spots.filter(s => {
       if (stateFilter === 'assigned') return !!s.assigned_date;
       if (stateFilter === 'unassigned') return !s.assigned_date;
+      if (stateFilter === 'created') return s.created_by === user?.email || s.created_by_user_id === user?.id;
+      if (stateFilter === 'saved') return Array.isArray(s.saved_by) && s.saved_by.includes(user?.email) && s.created_by !== user?.email;
       return true;
     });
     if (mySpotSearch.trim().length >= 1) {
@@ -1798,7 +1809,7 @@ export default function Restaurants() {
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">
-              {[['all','Todos'],['assigned','Asignados'],['unassigned','Sin asignar']].map(([v,l]) => (
+              {[['all','Todos'],['created','Creados'],['saved','Guardados'],['assigned','Asignados']].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                     stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'

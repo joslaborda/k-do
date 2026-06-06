@@ -195,7 +195,7 @@ export default function TripsList() {
         const dates = allocations[i] || { start_date: formData.start_date, end_date: formData.end_date };
         await base44.entities.City.create({
           trip_id: trip.id, name: stops[i],
-          country: stopCountries[i] || formData.country || '',
+          country: normalizeCountry(stopCountries[i] || formData.country || ''),
           order: i,
           start_date: dates.start_date, end_date: dates.end_date,
         });
