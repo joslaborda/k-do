@@ -43,6 +43,22 @@ const EMERGENCY_DB = {
       web: 'https://www.exteriores.gob.es/Embajadas/paris',
     },
     embassy_MX: { address: '9 Rue de Longchamp, 75116 París', phone: '+33 1 53 70 27 70', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/francia' },
+    embassy_AR: { address: '6 Rue Cimarosa, 75116 París', phone: '+33 1 44 05 27 00', hours: 'Lun-Vie 9:00-13:00', web: 'https://efrance.cancilleria.gob.ar' },
+    embassy_CO: { address: '22 Rue de l\'Élysée, 75008 París', phone: '+33 1 42 65 46 08', hours: 'Lun-Vie 9:00-13:00', web: 'https://francia.embajada.gov.co' },
+    embassy_CL: { address: '2 Avenue de la Motte-Picquet, 75007 París', phone: '+33 1 44 18 59 60', hours: 'Lun-Vie 9:00-13:00', web: 'https://chile.embajada.cl/francia' },
+    embassy_PE: { address: '50 Avenue Kléber, 75116 París', phone: '+33 1 53 70 42 00', hours: 'Lun-Vie 9:00-13:00', web: 'https://embajada.pe/francia' },
+    embassy_VE: { address: '11 Rue Copernic, 75116 París', phone: '+33 1 45 53 29 98', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: '34 Avenue de Messine, 75008 París', phone: '+33 1 45 61 10 21', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: '12 Avenue du Président Kennedy, 75016 París', phone: '+33 1 42 24 93 44', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_UY: { address: '15 Rue Le Sueur, 75116 París', phone: '+33 1 45 00 81 37', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_PY: { address: '1 Rue Saint-Dominique, 75007 París', phone: '+33 1 42 22 85 05', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PT: { address: '3 Rue de Noisiel, 75116 París', phone: '+33 1 47 27 35 29', hours: 'Lun-Vie 9:00-13:00', web: 'https://paris.embaixadaportugal.mne.pt' },
+    embassy_DE: { address: '13 Avenue Franklin D. Roosevelt, 75008 París', phone: '+33 1 53 83 45 00', hours: 'Lun-Vie 8:30-12:30', web: 'https://paris.diplo.de' },
+    embassy_IT: { address: '51 Rue de Varenne, 75007 París', phone: '+33 1 49 54 03 00', hours: 'Lun-Vie 9:00-12:30', web: 'https://ambasciataparigi.esteri.it' },
+    embassy_GB: { address: '35 Rue du Faubourg Saint-Honoré, 75008 París', phone: '+33 1 44 51 31 00', hours: 'Lun-Vie 9:30-12:30', web: 'https://www.gov.uk/world/france' },
+    embassy_US: { address: '2 Avenue Gabriel, 75008 París', phone: '+33 1 43 12 22 22', hours: 'Lun-Vie 9:00-12:00', web: 'https://fr.usembassy.gov' },
+    embassy_BR: { address: '34 Cours Albert 1er, 75008 París', phone: '+33 1 45 61 63 00', hours: 'Lun-Vie 9:00-12:30', web: 'https://paris.itamaraty.gov.br' },
+    embassy_CN: { address: '20 Rue Washington, 75008 París', phone: '+33 1 47 23 34 45', hours: 'Lun-Vie 9:00-12:00', web: 'http://fr.china-embassy.gov.cn' },
     useful_apps: [
       { name: 'SNCF Connect', icon: '🚄', description: 'Billetes de tren TGV e Intercités.' },
       { name: 'Doctolib', icon: '🏥', description: 'Reserva cita médica online con médicos franceses.' },
@@ -68,6 +84,20 @@ const EMERGENCY_DB = {
       web: 'https://www.exteriores.gob.es/Embajadas/roma',
     },
     embassy_MX: { address: 'Via Lazzaro Spallanzani 16, 00161 Roma', phone: '+39 06 4416 5830', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/italia' },
+    embassy_AR: { address: 'Via Crispi 1, 00187 Roma', phone: '+39 06 4201 1401', hours: 'Lun-Vie 9:00-13:00', web: 'https://eitalia.cancilleria.gob.ar' },
+    embassy_CO: { address: 'Via Giuseppe Pisanelli 4, 00196 Roma', phone: '+39 06 3207 6001', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: 'Via Po 23, 00198 Roma', phone: '+39 06 844 09 868', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Via Francesco Siacci 4, 00197 Roma', phone: '+39 06 8088 5591', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: 'Via Nicolò Tartaglia 11, 00197 Roma', phone: '+39 06 807 2997', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: 'Via Guido d\'Arezzo 14, 00198 Roma', phone: '+39 06 854 6265', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: 'Via Brenta 2A, 00198 Roma', phone: '+39 06 884 1001', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_UY: { address: 'Via Vittorio Veneto 183, 00187 Roma', phone: '+39 06 482 7054', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Piazza Navona 14, 00186 Roma', phone: '+39 06 683 9871', hours: 'Lun-Vie 9:00-12:00', web: 'https://roma.itamaraty.gov.br' },
+    embassy_PT: { address: 'Via Poli 44, 00187 Roma', phone: '+39 06 6994 2781', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: 'Via San Martino della Battaglia 4, 00185 Roma', phone: '+39 06 492 131', hours: 'Lun-Vie 8:00-12:30', web: 'https://rom.diplo.de' },
+    embassy_GB: { address: 'Via XX Settembre 80a, 00187 Roma', phone: '+39 06 4220 0001', hours: 'Lun-Vie 9:00-13:30', web: 'https://www.gov.uk/world/italy' },
+    embassy_US: { address: 'Via Vittorio Veneto 121, 00187 Roma', phone: '+39 06 46741', hours: 'Lun-Vie 8:30-12:30', web: 'https://it.usembassy.gov' },
+    embassy_CN: { address: 'Via Bruxelles 56, 00198 Roma', phone: '+39 06 8547 3791', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'Trenitalia', icon: '🚂', description: 'Billetes de tren oficiales por toda Italia.' },
       { name: 'Italo', icon: '🚄', description: 'Tren de alta velocidad alternativo, a veces más barato.' },
@@ -91,6 +121,23 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-14:00',
       web: 'https://www.exteriores.gob.es/Embajadas/lisboa',
     },
+    embassy_AR: { address: 'Rua Dr. Arsénio de Carvalho 1, 1250-011 Lisboa', phone: '+351 21 385 7900', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: 'Rua do Sacramento à Lapa 26, 1249-090 Lisboa', phone: '+351 21 392 8170', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'Rua do Pau de Bandeira 4, 1249-089 Lisboa', phone: '+351 21 392 0040', hours: 'Lun-Vie 9:00-14:00', web: null },
+    embassy_CL: { address: 'Rua do Borja 10, 1350-041 Lisboa', phone: '+351 21 363 5010', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Rua Castilho 50, 3º Esq, 1250-071 Lisboa', phone: '+351 21 381 6158', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: 'Rua Marquês de Sá da Bandeira 10, 1050-148 Lisboa', phone: '+351 21 795 1840', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: 'Rua António Maria Cardoso 19, 1200-025 Lisboa', phone: '+351 21 342 1350', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Estrada das Laranjeiras 144, 1649-021 Lisboa', phone: '+351 21 724 8500', hours: 'Lun-Vie 9:00-13:00', web: 'https://lisboa.itamaraty.gov.br' },
+    embassy_BO: { address: 'Rua de São Bernardo 55, 1200-826 Lisboa', phone: '+351 21 396 1305', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_UY: { address: 'Rua de Buenos Aires 26, 1200-073 Lisboa', phone: '+351 21 346 2024', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PY: { address: 'Rua do Salitre 181, 1269-057 Lisboa', phone: '+351 21 319 2390', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: 'Campo dos Mártires da Pátria 38, 1169-043 Lisboa', phone: '+351 21 810 2500', hours: 'Lun-Vie 8:30-12:00', web: 'https://lissabon.diplo.de' },
+    embassy_FR: { address: 'Rua Santos-o-Velho 5, 1249-079 Lisboa', phone: '+351 21 391 3938', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_IT: { address: 'Largo Conde Pombeiro 6, 1150-100 Lisboa', phone: '+351 21 315 2924', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Rua de São Bernardo 33, 1249-082 Lisboa', phone: '+351 21 392 4000', hours: 'Lun-Vie 9:00-12:30', web: 'https://www.gov.uk/world/portugal' },
+    embassy_US: { address: 'Avenida das Forças Armadas, 1600-081 Lisboa', phone: '+351 21 727 3300', hours: 'Lun-Vie 8:00-12:00', web: 'https://pt.usembassy.gov' },
+    embassy_CN: { address: 'Rua de São Caetano à Lapa 5, 1249-087 Lisboa', phone: '+351 21 392 4420', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'CP (Comboios de Portugal)', icon: '🚂', description: 'Trenes por todo Portugal.' },
       { name: 'Bolt', icon: '🚗', description: 'Taxi y VTC en Lisboa y Porto, más barato que Uber.' },
@@ -112,6 +159,22 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/berlin',
     },
+    embassy_AR: { address: 'Kleiststraße 23-26, 10787 Berlín', phone: '+49 30 226 6890', hours: 'Lun-Vie 9:00-13:00', web: 'https://ealem.cancilleria.gob.ar' },
+    embassy_CO: { address: 'Kurfürstendamm 177, 10707 Berlín', phone: '+49 30 263 0053', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'Klingelhöferstraße 3, 10785 Berlín', phone: '+49 30 269 3230', hours: 'Lun-Vie 9:00-13:00', web: 'https://embamex.sre.gob.mx/alemania' },
+    embassy_CL: { address: 'Mohrenstraße 42, 10117 Berlín', phone: '+49 30 726 2095 0', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Mohrenstraße 42, 10117 Berlín', phone: '+49 30 206 4108 0', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: 'Schillstraße 9, 10785 Berlín', phone: '+49 30 832 2400', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: 'Joachim-Karnatz-Allee 45, 10557 Berlín', phone: '+49 30 235 4560', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: 'Wichmannstraße 6, 10787 Berlín', phone: '+49 30 263 9550', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Wallstraße 57, 10179 Berlín', phone: '+49 30 726 2800', hours: 'Lun-Vie 9:00-12:00', web: 'https://berlim.itamaraty.gov.br' },
+    embassy_UY: { address: 'Budapester Straße 14, 10787 Berlín', phone: '+49 30 263 4831', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PT: { address: 'Zimmerstraße 56, 10117 Berlín', phone: '+49 30 590 063 500', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Wilhelmstraße 70, 10117 Berlín', phone: '+49 30 204 570', hours: 'Lun-Vie 9:00-13:00', web: 'https://www.gov.uk/world/germany' },
+    embassy_US: { address: 'Pariser Platz 2, 10117 Berlín', phone: '+49 30 83050', hours: 'Lun-Vie 8:00-12:00', web: 'https://de.usembassy.gov' },
+    embassy_CN: { address: 'Märkisches Ufer 54, 10179 Berlín', phone: '+49 30 275 880', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_FR: { address: 'Pariser Platz 5, 10117 Berlín', phone: '+49 30 590 039 000', hours: 'Lun-Vie 9:00-12:30', web: 'https://de.ambafrance.org' },
+    embassy_IT: { address: 'Dessauer Straße 28-29, 10963 Berlín', phone: '+49 30 254 400', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambberlino.esteri.it' },
     useful_apps: [
       { name: 'DB Navigator', icon: '🚂', description: 'Billetes y horarios de Deutsche Bahn, esencial en Alemania.' },
       { name: 'BVG / MVV', icon: '🚇', description: 'Transporte público en Berlín / Múnich respectivamente.' },
@@ -133,6 +196,22 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/londres',
     },
+    embassy_AR: { address: '65 Brook Street, Londres W1K 4AH', phone: '+44 20 7318 1300', hours: 'Lun-Vie 9:30-13:00', web: 'https://egranbre.cancilleria.gob.ar' },
+    embassy_CO: { address: 'Suite 16, 140 Park Lane, Londres W1K 7AA', phone: '+44 20 7495 4233', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '16 St George Street, Londres W1S 1FD', phone: '+44 20 7499 8586', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/reinounido' },
+    embassy_CL: { address: '37-41 Old Queen Street, Londres SW1H 9JA', phone: '+44 20 7222 2361', hours: 'Lun-Vie 9:00-13:30', web: null },
+    embassy_PE: { address: '52 Sloane Street, Londres SW1X 9SP', phone: '+44 20 7235 1917', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: '1 Cromwell Road, Londres SW7 2HW', phone: '+44 20 7584 4206', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: 'Flat 3B, 3 Hans Crescent, Londres SW1X 0LS', phone: '+44 20 7584 1367', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: '106 Eaton Square, Londres SW1W 9AD', phone: '+44 20 7235 4255', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '14-16 Cockspur Street, Londres SW1Y 5BL', phone: '+44 20 7747 4500', hours: 'Lun-Vie 9:00-13:00', web: 'https://londres.itamaraty.gov.br' },
+    embassy_UY: { address: '125 Kensington High Street, Londres W8 5SF', phone: '+44 20 7937 6490', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_PT: { address: '11 Belgrave Square, Londres SW1X 8PP', phone: '+44 20 7235 5331', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_DE: { address: '23 Belgrave Square, Londres SW1X 8PZ', phone: '+44 20 7824 1300', hours: 'Lun-Vie 9:00-12:00', web: 'https://london.diplo.de' },
+    embassy_FR: { address: '58 Knightsbridge, Londres SW1X 7JT', phone: '+44 20 7073 1000', hours: 'Lun-Vie 9:00-12:30', web: 'https://uk.ambafrance.org' },
+    embassy_IT: { address: '14 Three Kings Yard, Londres W1K 4EH', phone: '+44 20 7312 2200', hours: 'Lun-Vie 9:00-13:00', web: 'https://amblondra.esteri.it' },
+    embassy_US: { address: '33 Nine Elms Lane, Londres SW11 7US', phone: '+44 20 7499 9000', hours: 'Lun-Vie 8:30-12:30', web: 'https://uk.usembassy.gov' },
+    embassy_CN: { address: '49-51 Portland Place, Londres W1B 1JL', phone: '+44 20 7299 4049', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'Citymapper', icon: '🚇', description: 'El mejor para navegar el metro y buses de Londres.' },
       { name: 'NHS App', icon: '🏥', description: 'Servicios de salud del NHS, incluyendo urgencias y médicos.' },
@@ -215,6 +294,19 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:30',
       web: 'https://www.exteriores.gob.es/Embajadas/atenas',
     },
+    embassy_AR: { address: 'Vasilisis Sofias 59, 115 21 Atenas', phone: '+30 210 722 4753', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: 'Efplias 3 & Akti Miaouli, 185 37 El Pireo', phone: '+30 210 428 5631', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'Filikis Eterias 14, Kolonaki, 106 73 Atenas', phone: '+30 210 729 4780', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: 'Vasilisis Sofias 47, 106 76 Atenas', phone: '+30 210 725 0581', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Vasileos Konstantinou 2, 116 35 Atenas', phone: '+30 210 701 0096', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Filikis Eterias 14, Kolonaki, 106 73 Atenas', phone: '+30 210 721 3036', hours: 'Lun-Vie 9:00-13:00', web: 'https://atenas.itamaraty.gov.br' },
+    embassy_DE: { address: 'Karaoli kai Dimitriou 3, 106 75 Atenas', phone: '+30 210 728 5111', hours: 'Lun-Vie 8:00-11:30', web: 'https://athen.diplo.de' },
+    embassy_FR: { address: 'Vasilisis Sofias 7, 106 71 Atenas', phone: '+30 210 339 1000', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_IT: { address: 'Sekeri 2, 106 74 Atenas', phone: '+30 210 361 7260', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Ploutarchou 1, 106 75 Atenas', phone: '+30 210 727 2600', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/greece' },
+    embassy_US: { address: 'Vasilisis Sofias 91, 115 21 Atenas', phone: '+30 210 721 2951', hours: 'Lun-Vie 8:30-11:00', web: 'https://gr.usembassy.gov' },
+    embassy_CN: { address: 'Krinon 2A, Paleo Psychiko, 154 52 Atenas', phone: '+30 210 672 3282', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: 'Lykavittou 7, 106 72 Atenas', phone: '+30 210 362 7731', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'OASA Telematics', icon: '🚌', description: 'Transporte público de Atenas en tiempo real.' },
       { name: 'Beat (FreeNow)', icon: '🚗', description: 'Taxi en Atenas — mejor que intentar parar uno en la calle.' },
@@ -237,6 +329,20 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/ankara',
     },
+    embassy_AR: { address: 'Uğur Mumcu Cad. 7/1, Gaziosmanpaşa, Ankara', phone: '+90 312 468 1061', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: 'Koza Sokak 38, Gaziosmanpaşa, Ankara', phone: '+90 312 446 1602', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'Mahatma Gandhi Cad. 77, Gaziosmanpaşa, Ankara', phone: '+90 312 405 4800', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: 'Kelebek Sokak 10, Gaziosmanpaşa, Ankara', phone: '+90 312 447 3052', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Turan Emeksiz Sokak 10, Gaziosmanpaşa, Ankara', phone: '+90 312 447 4803', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Filistin Sokak 9, Gaziosmanpaşa, Ankara', phone: '+90 312 468 1238', hours: 'Lun-Vie 9:00-13:00', web: 'https://ancara.itamaraty.gov.br' },
+    embassy_VE: { address: 'Kıbrıs Şehitleri Cad. 11, Çankaya, Ankara', phone: '+90 312 441 2572', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: 'Atatürk Bulvarı 114, Kavaklıdere, Ankara', phone: '+90 312 455 5100', hours: 'Lun-Vie 8:00-11:30', web: 'https://ankara.diplo.de' },
+    embassy_FR: { address: 'Paris Cad. 70, Kavaklıdere, Ankara', phone: '+90 312 455 4545', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_IT: { address: 'Atatürk Bulvarı 118, Kavaklıdere, Ankara', phone: '+90 312 426 5460', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_GB: { address: 'Şehit Ersan Cad. 46A, Çankaya, Ankara', phone: '+90 312 455 3344', hours: 'Lun-Vie 8:00-12:30', web: 'https://www.gov.uk/world/turkey' },
+    embassy_US: { address: 'Atatürk Bulvarı 110, Kavaklıdere, Ankara', phone: '+90 312 455 5555', hours: 'Lun-Vie 8:30-11:30', web: 'https://tr.usembassy.gov' },
+    embassy_CN: { address: 'Gölgeli Sokak 34, Gaziosmanpaşa, Ankara', phone: '+90 312 436 0628', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: 'Turan Emeksiz Sokak 3, Gaziosmanpaşa, Ankara', phone: '+90 312 405 4900', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'BiTaksi', icon: '🚕', description: 'App oficial de taxis en Turquía — más seguro que taxis en calle.' },
       { name: 'Trafi', icon: '🚇', description: 'Metro y transporte público en Estambul.' },
@@ -326,6 +432,19 @@ const EMERGENCY_DB = {
     embassy_DE: { address: '4-5-10 Minami-Azabu, Minato-ku, Tokio', phone: '+81 3 5791 7700', hours: 'Lun-Vie 9:00-12:00', web: 'https://japan.diplo.de' },
     embassy_IT: { address: '2-5-4 Mita, Minato-ku, Tokio', phone: '+81 3 3453 5291', hours: 'Lun-Vie 9:00-13:00', web: 'https://ambtokyo.esteri.it' },
     embassy_BR: { address: '2-11-12 Kita-Aoyama, Minato-ku, Tokio', phone: '+81 3 3404 5211', hours: 'Lun-Vie 9:00-13:00', web: 'https://tokio.itamaraty.gov.br' },
+    embassy_AR: { address: '2-14-14 Moto-Azabu, Minato-ku, Tokio', phone: '+81 3 5420 7101', hours: 'Lun-Vie 9:30-13:00', web: 'https://ejapon.cancilleria.gob.ar' },
+    embassy_CO: { address: '3-10-53 Kami-Osaki, Shinagawa-ku, Tokio', phone: '+81 3 3440 6451', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_CL: { address: 'Nihonbashi Hakozakicho 36-1, Chuo-ku, Tokio', phone: '+81 3 3714 2611', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '4-4-27 Higashi, Shibuya-ku, Tokio', phone: '+81 3 3406 4243', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_VE: { address: '38 Kowa Building, Room 703, 4-12-24 Nishi-Azabu, Minato-ku, Tokio', phone: '+81 3 3409 1501', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: '38 Kowa Building, Room 806, 4-12-24 Nishi-Azabu, Minato-ku, Tokio', phone: '+81 3 3499 2800', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: '2-3-2 Kojimachi, Chiyoda-ku, Tokio', phone: '+81 3 3556 6124', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_UY: { address: '38 Kowa Building, Room 908, 4-12-24 Nishi-Azabu, Minato-ku, Tokio', phone: '+81 3 3486 1888', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PY: { address: '38 Kowa Building, Room 903, 4-12-24 Nishi-Azabu, Minato-ku, Tokio', phone: '+81 3 3485 3101', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PT: { address: 'Olympia Annex Roppongi 4F, 6-8-19 Roppongi, Minato-ku, Tokio', phone: '+81 3 5772 5440', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: '1 Ichiban-cho, Chiyoda-ku, Tokio', phone: '+81 3 5211 1100', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/japan' },
+    embassy_US: { address: '1-10-5 Akasaka, Minato-ku, Tokio', phone: '+81 3 3224 5000', hours: 'Lun-Vie 8:30-12:00', web: 'https://jp.usembassy.gov' },
+    embassy_CN: { address: '3-4-33 Moto-Azabu, Minato-ku, Tokio', phone: '+81 3 3403 3380', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'Google Translate + cámara', icon: '📷', description: 'Traduce menús y señales con la cámara en tiempo real.' },
       { name: 'Suica / PASMO', icon: '💳', description: 'Tarjeta de transporte recargable para metro y trenes.' },
@@ -356,6 +475,16 @@ const EMERGENCY_DB = {
     embassy_DE: { address: '9 South Sathorn Road, Bangkok', phone: '+66 2 287 9000', hours: 'Lun-Vie 8:00-11:30', web: 'https://bangkok.diplo.de' },
     embassy_BR: { address: '34th Floor, Abdulrahim Place, 990 Rama IV Road, Bangkok', phone: '+66 2 266 6659', hours: 'Lun-Vie 9:00-12:00', web: 'https://bangkok.itamaraty.gov.br' },
     embassy_IT: { address: '399 Nang Linchi Road, Yan Nawa, Bangkok', phone: '+66 2 285 4090', hours: 'Lun-Vie 8:30-12:30', web: 'https://ambangkok.esteri.it' },
+    embassy_AR: { address: '16th Floor, Wall Street Tower, 33/4 Surawong Road, Bangkok', phone: '+66 2 234 8478', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '17th Floor, Rajanakarn Building, 183 South Sathon Road, Bangkok', phone: '+66 2 676 7340', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: '33rd Floor, Interchange 21, 399 Sukhumvit Road, Bangkok', phone: '+66 2 258 9714', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '898 Ploenchit Road, Bangkok 10330', phone: '+66 2 255 6080', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: 'Wave Place Building 21F, 55 Wireless Road, Bangkok', phone: '+66 2 256 9870', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: 'RSU Tower, 571 Sukhumvit Soi 31, Bangkok', phone: '+66 2 259 4851', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PT: { address: 'Consulate — contactar embajada en KL o Singapur', phone: null, hours: null, web: null },
+    embassy_GB: { address: '14 Wireless Road, Bangkok 10330', phone: '+66 2 305 8333', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/thailand' },
+    embassy_US: { address: '95 Wireless Road, Bangkok 10330', phone: '+66 2 205 4000', hours: 'Lun-Vie 7:30-11:30', web: 'https://th.usembassy.gov' },
+    embassy_CN: { address: '57 Ratchadaphisek Road, Din Daeng, Bangkok', phone: '+66 2 245 7032', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'Grab', icon: '🛵', description: 'El Uber de Asia — taxis, motos y comida a domicilio en toda Tailandia.' },
       { name: 'LINE MAN', icon: '🍜', description: 'Delivery de comida tailandesa a domicilio.' },
@@ -380,6 +509,18 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 8:30-12:00',
       web: 'https://www.exteriores.gob.es/Embajadas/hanoi',
     },
+    embassy_AR: { address: '38A Chu Huy Man, Hanói', phone: '+84 24 3845 7670', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_CO: { address: '50 Ngo Quyen, Hoan Kiem, Hanói', phone: '+84 24 3824 1954', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_MX: { address: '2A Chu Van An, Ba Dinh, Hanói', phone: '+84 24 3746 1040', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_CL: { address: '67 Tran Hung Dao, Hanói', phone: '+84 24 3856 0967', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PE: { address: 'Diplomacy Town, Van Phuc, Ba Dinh, Hanói', phone: '+84 24 3845 4795', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_BR: { address: '14 Thuy Khue, Ba Dinh, Hanói', phone: '+84 24 3843 3529', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_DE: { address: '29 Tran Phu, Ba Dinh, Hanói', phone: '+84 24 3845 3836', hours: 'Lun-Vie 8:00-11:00', web: 'https://hanoi.diplo.de' },
+    embassy_FR: { address: '57 Tran Hung Dao, Hanói', phone: '+84 24 3944 5700', hours: 'Lun-Vie 8:30-12:00', web: null },
+    embassy_IT: { address: '9 Le Phung Hieu, Hoan Kiem, Hanói', phone: '+84 24 3826 2896', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_GB: { address: '31 Hai Ba Trung, Hoan Kiem, Hanói', phone: '+84 24 3936 0500', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/vietnam' },
+    embassy_US: { address: '7 Lang Ha, Ba Dinh, Hanói', phone: '+84 24 3850 5000', hours: 'Lun-Vie 7:30-11:00', web: 'https://vn.usembassy.gov' },
+    embassy_CN: { address: '46 Hoang Dieu, Ba Dinh, Hanói', phone: '+84 24 3845 3736', hours: 'Lun-Vie 8:30-11:30', web: null },
     useful_apps: [
       { name: 'Grab', icon: '🛵', description: 'Moto-taxi, taxi y comida en toda Vietnam — esencial.' },
       { name: 'Google Maps', icon: '🗺️', description: 'Funciona bien en Vietnam, mejor que Maps de Apple.' },
@@ -402,6 +543,19 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:30',
       web: 'https://www.exteriores.gob.es/Embajadas/nuevadelhi',
     },
+    embassy_AR: { address: 'B-2/52 Vasant Vihar, Nueva Delhi 110057', phone: '+91 11 2614 5059', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '9 Sunder Nagar, Nueva Delhi 110003', phone: '+91 11 2435 0091', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'E-18 Vasant Marg, Vasant Vihar, Nueva Delhi 110057', phone: '+91 11 2614 0959', hours: 'Lun-Vie 9:00-13:30', web: 'https://embamex.sre.gob.mx/india' },
+    embassy_CL: { address: 'E-4 Vasant Marg, Vasant Vihar, Nueva Delhi 110057', phone: '+91 11 2614 5857', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'C-109 Anand Niketan, Nueva Delhi 110021', phone: '+91 11 2411 9000', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '8 Aurangzeb Road, Nueva Delhi 110011', phone: '+91 11 2301 7301', hours: 'Lun-Vie 9:00-13:00', web: 'https://novadeli.itamaraty.gov.br' },
+    embassy_VE: { address: 'D-93 Anand Niketan, Nueva Delhi 110021', phone: '+91 11 2411 2060', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: '6-50G Shantipath, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 4419 9199', hours: 'Lun-Vie 8:00-11:30', web: 'https://new-delhi.diplo.de' },
+    embassy_FR: { address: '2/50E Shantipath, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 4319 6100', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_IT: { address: '50E Chandragupta Marg, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 2611 4355', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Shantipath, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 2419 2100', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/india' },
+    embassy_US: { address: 'Shantipath, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 2419 8000', hours: 'Lun-Vie 8:00-11:00', web: 'https://in.usembassy.gov' },
+    embassy_CN: { address: '50D Shantipath, Chanakyapuri, Nueva Delhi 110021', phone: '+91 11 2611 2345', hours: 'Lun-Vie 9:00-12:00', web: null },
     useful_apps: [
       { name: 'Ola / Uber', icon: '🚖', description: 'Las dos apps de taxi más usadas en India — siempre precio cerrado.' },
       { name: 'IRCTC Rail Connect', icon: '🚂', description: 'Reservas de tren oficial en India — necesita registro previo.' },
@@ -449,6 +603,20 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/seul',
     },
+    embassy_AR: { address: '2F, Diplomacia Bldg, 2558 Nambusunhwan-ro, Seocho-gu, Seúl', phone: '+82 2 3476 2580', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '370 Hangang-daero, Yongsan-gu, Seúl', phone: '+82 2 720 1369', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '33-6 Hannam-daero 28-gil, Yongsan-gu, Seúl', phone: '+82 2 798 1694', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: '2F Simplex Bldg, 226 Itaewon-ro, Yongsan-gu, Seúl', phone: '+82 2 740 5970', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '5th Floor, 26 Sowol-ro 2-gil, Yongsan-gu, Seúl', phone: '+82 2 757 1735', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '4th Floor, 125 Sejong-daero, Jung-gu, Seúl', phone: '+82 2 738 4970', hours: 'Lun-Vie 9:00-13:00', web: 'https://seul.itamaraty.gov.br' },
+    embassy_VE: { address: '7th Floor, KDB Life Bldg, 59 Mapo-daero, Mapo-gu, Seúl', phone: '+82 2 716 2238', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: '8-11 Hannam-daero 20-gil, Yongsan-gu, Seúl', phone: '+82 2 748 4114', hours: 'Lun-Vie 8:00-11:00', web: 'https://seoul.diplo.de' },
+    embassy_FR: { address: '30 Hap-dong, Seodaemun-gu, Seúl', phone: '+82 2 3149 4300', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_IT: { address: '1-398 Hannam-dong, Yongsan-gu, Seúl', phone: '+82 2 796 0491', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_GB: { address: '24 Sejong-daero 19-gil, Jung-gu, Seúl', phone: '+82 2 3210 5500', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/south-korea' },
+    embassy_US: { address: '188 Sejong-daero, Jongno-gu, Seúl', phone: '+82 2 397 4114', hours: 'Lun-Vie 8:30-12:00', web: 'https://kr.usembassy.gov' },
+    embassy_CN: { address: '54 Hyoja-ro, Jongno-gu, Seúl', phone: '+82 2 738 1038', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: 'Seúl — contactar embajada en Tokio', phone: null, hours: null, web: null },
     useful_apps: [
       { name: 'Kakao T', icon: '🚕', description: 'La app de taxi oficial de Corea del Sur.' },
       { name: 'Naver Maps', icon: '🗺️', description: 'Mejor que Google Maps en Corea para transporte público.' },
@@ -472,6 +640,19 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/singapur',
     },
+    embassy_AR: { address: 'Goldhill Plaza #03-35, Singapore 308899', phone: '+65 6235 6288', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '101 Thomson Road #25-03, Singapore 307591', phone: '+65 6737 4449', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '152 Beach Road #33-04, Singapore 189721', phone: '+65 6735 0254', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: '105 Cecil Street #16-01/02, Singapore 069534', phone: '+65 6222 8577', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '1 George Street #10-01, Singapore 049145', phone: '+65 6338 9949', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '101 Thomson Road #13-03, Singapore 307591', phone: '+65 6256 8922', hours: 'Lun-Vie 9:00-13:00', web: 'https://cingapura.itamaraty.gov.br' },
+    embassy_DE: { address: '50 Raffles Place #29-00, Singapore 048623', phone: '+65 6533 6002', hours: 'Lun-Vie 8:30-12:00', web: 'https://singapur.diplo.de' },
+    embassy_FR: { address: '101-103 Cluny Park Road, Singapore 259595', phone: '+65 6880 7800', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_GB: { address: '100 Tanglin Road, Singapore 247919', phone: '+65 6424 4200', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/singapore' },
+    embassy_US: { address: '27 Napier Road, Singapore 258508', phone: '+65 6476 9100', hours: 'Lun-Vie 8:00-11:30', web: 'https://sg.usembassy.gov' },
+    embassy_CN: { address: '150 Tanglin Road, Singapore 247969', phone: '+65 6418 0258', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_IT: { address: '101 Thomson Road #27-01, Singapore 307591', phone: '+65 6250 6022', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_PT: { address: '541 Orchard Road #08-01, Singapore 238881', phone: '+65 6235 3724', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Grab', icon: '🚗', description: 'Taxis y VTC en Singapur.' },
       { name: 'MyTransport.SG', icon: '🚇', description: 'Transporte público oficial de Singapur.' },
@@ -494,6 +675,18 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 8:00-12:30',
       web: 'https://www.exteriores.gob.es/Embajadas/yakarta',
     },
+    embassy_AR: { address: 'Menara Mulia Suite 1900, Jl. Jend. Gatot Subroto Kav. 9-11, Yakarta', phone: '+62 21 526 3576', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: 'Wisma Bumi Putera Suite 1007, Jl. Jend. Sudirman Kav. 75, Yakarta', phone: '+62 21 520 4715', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'Menara Mulia Suite 2306, Jl. Jend. Gatot Subroto Kav. 9-11, Yakarta', phone: '+62 21 520 3980', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: 'Gedung Artha Graha Lt. 19, SCBD, Yakarta', phone: '+62 21 251 4726', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: 'Graha Paramita 5F, Jl. Denpasar Raya Kav. 8, Yakarta', phone: '+62 21 252 2776', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Menara Mulia Suite 1602, Jl. Jend. Gatot Subroto Kav. 9-11, Yakarta', phone: '+62 21 526 0580', hours: 'Lun-Vie 9:00-13:00', web: 'https://jacarta.itamaraty.gov.br' },
+    embassy_DE: { address: 'Jl. Madiun No.1-3, Menteng, Yakarta', phone: '+62 21 3985 5000', hours: 'Lun-Vie 8:00-11:30', web: 'https://jakarta.diplo.de' },
+    embassy_FR: { address: 'Jl. MH Thamrin No.20, Yakarta', phone: '+62 21 2355 7600', hours: 'Lun-Vie 8:30-12:00', web: null },
+    embassy_GB: { address: 'Puri Imperium Building, Jl. Kuningan Madya, Yakarta', phone: '+62 21 2356 5200', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/indonesia' },
+    embassy_US: { address: 'Jl. Medan Merdeka Selatan 4-5, Yakarta', phone: '+62 21 5083 1000', hours: 'Lun-Vie 7:30-16:00', web: 'https://id.usembassy.gov' },
+    embassy_CN: { address: 'Jl. Mega Kuningan No.2, Yakarta', phone: '+62 21 5761 001', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: 'Jl. Dr. Kusuma Atmaja No.52, Yakarta', phone: '+62 21 315 1638', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Gojek', icon: '🛵', description: 'El Grab indonesio — mototaxi, taxi y delivery en Indonesia.' },
       { name: 'Traveloka', icon: '✈️', description: 'Vuelos y hoteles para destinos internos en Indonesia.' },
@@ -660,6 +853,14 @@ const EMERGENCY_DB = {
     embassy_DE: { address: '7 Zankat Madnine, Rabat', phone: '+212 5 37 21 00 22', hours: 'Lun-Vie 8:30-11:30', web: 'https://rabat.diplo.de' },
     embassy_IT: { address: '2 Rue Idriss Al Azhar, Rabat', phone: '+212 5 37 72 68 07', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambrabat.esteri.it' },
     embassy_BR: { address: '3 Rue Thami Lamdawar, Souissi, Rabat', phone: '+212 5 37 65 04 56', hours: 'Lun-Vie 9:00-12:00', web: 'https://rabat.itamaraty.gov.br' },
+    embassy_AR: { address: '12 Rue Meknes, Agdal, Rabat', phone: '+212 537 68 96 00', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '25 Rue de Belgique, Hassan, Rabat', phone: '+212 537 70 19 74', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '6 Rue Cadi Mohamed Benatiya, Souissi, Rabat', phone: '+212 537 63 70 70', hours: 'Lun-Vie 9:00-13:30', web: null },
+    embassy_CL: { address: '3 Impasse Ait Melloul, Souissi, Rabat', phone: '+212 537 75 30 14', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '16 Rue Thami Lamdaouar, Souissi, Rabat', phone: '+212 537 75 18 18', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: '28 Avenue SAR Sidi Mohammed, Souissi, Rabat', phone: '+212 537 63 33 33', hours: 'Lun-Vie 8:30-12:00', web: 'https://www.gov.uk/world/morocco' },
+    embassy_US: { address: 'Km 5.7, Avenue Mohamed VI, Souissi, Rabat', phone: '+212 537 63 72 00', hours: 'Lun-Vie 8:00-17:00', web: 'https://ma.usembassy.gov' },
+    embassy_PT: { address: 'Avenue de Marrakech, Quartier de la Gironde, Rabat', phone: '+212 537 73 01 00', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Careem / inDrive', icon: '🚗', description: 'VTC en Casablanca y Marrakech — mucho más seguro que taxis informales.' },
       { name: 'WhatsApp', icon: '💬', description: 'La comunicación principal en Marruecos — todo el mundo lo usa.' },
@@ -688,6 +889,15 @@ const EMERGENCY_DB = {
     embassy_IT: { address: '15 Abd El Rahman Fahmy St, Garden City, El Cairo', phone: '+20 2 2794 3194', hours: 'Lun-Vie 9:00-12:00', web: 'https://ambcairo.esteri.it' },
     embassy_BR: { address: '1 El Shaikh Mohamed Mahran St, Giza, El Cairo', phone: '+20 2 3748 7960', hours: 'Lun-Vie 9:00-12:00', web: 'https://cairo.itamaraty.gov.br' },
     embassy_PE: { address: 'El Cairo — Embajada del Perú: 34 Soliman Abaza, Mohandessin', phone: '+20 2 3748 8040', hours: 'Lun-Vie 9:00-13:00', web: 'https://www.embajadaperu.com.eg' },
+    embassy_AR: { address: '8 Al-Saleh Ayoub Street, Zamalek, El Cairo', phone: '+20 2 2735 0494', hours: 'Lun-Jue 9:00-14:00', web: null },
+    embassy_CO: { address: '6 El Saleh Ayoub, Zamalek, El Cairo', phone: '+20 2 2736 0007', hours: 'Lun-Jue 9:00-14:00', web: null },
+    embassy_MX: { address: '5 Dr. Mostafa Naguib Street, New Cairo', phone: '+20 2 2519 1150', hours: 'Lun-Jue 9:00-14:00', web: null },
+    embassy_CL: { address: '5 Shagaret el Dor, Zamalek, El Cairo', phone: '+20 2 2736 3825', hours: 'Lun-Jue 9:00-14:00', web: null },
+    embassy_VE: { address: '15 El Maahad El Swissry, Zamalek, El Cairo', phone: '+20 2 2735 5019', hours: 'Lun-Jue 9:00-13:00', web: null },
+    embassy_GB: { address: '7 Ahmed Ragheb Street, Garden City, El Cairo', phone: '+20 2 2791 6000', hours: 'Lun-Jue 8:00-12:30', web: 'https://www.gov.uk/world/egypt' },
+    embassy_US: { address: '8 Kamal El Din Salah Street, Garden City, El Cairo', phone: '+20 2 2797 3300', hours: 'Lun-Jue 8:00-10:30', web: 'https://eg.usembassy.gov' },
+    embassy_CN: { address: '14 Bahgat Ali Street, Zamalek, El Cairo', phone: '+20 2 2736 7501', hours: 'Lun-Jue 9:00-12:00', web: null },
+    embassy_PT: { address: '22 El Mecca El Mokarama Street, Dokki, El Cairo', phone: '+20 2 3335 0230', hours: 'Lun-Jue 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Uber / Careem', icon: '🚗', description: 'VTC en El Cairo — imprescindible para moverse con seguridad.' },
       { name: 'WhatsApp', icon: '💬', description: 'Principal comunicación en Egipto.' },
@@ -740,6 +950,20 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-13:00',
       web: 'https://www.exteriores.gob.es/Embajadas/canberra',
     },
+    embassy_AR: { address: 'MLC Tower Level 14, 19-29 Martin Place, Sídney NSW 2000', phone: '+61 2 9262 2933', hours: 'Lun-Vie 9:30-13:00', web: null },
+    embassy_CO: { address: 'Level 1, 17 Castlereagh Street, Sídney NSW 2000', phone: '+61 2 9231 0544', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '14 Perth Ave, Yarralumla, Canberra ACT 2600', phone: '+61 2 6273 3963', hours: 'Lun-Vie 9:00-13:00', web: 'https://embamex.sre.gob.mx/australia' },
+    embassy_CL: { address: '10 Culgoa Circuit, O\'Malley, Canberra ACT 2606', phone: '+61 2 6286 2430', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '40 Brisbane Ave, Barton, Canberra ACT 2600', phone: '+61 2 6273 7351', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'SETL Quadra 801, Lote 62, Brasília DF (embajada en Canberra)', phone: '+61 2 6273 2372', hours: 'Lun-Vie 9:00-13:00', web: 'https://camberra.itamaraty.gov.br' },
+    embassy_VE: { address: '7 Culgoa Circuit, O\'Malley, Canberra ACT 2606', phone: '+61 2 6290 2967', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: '119 Empire Circuit, Yarralumla, Canberra ACT 2600', phone: '+61 2 6270 1911', hours: 'Lun-Vie 8:30-11:30', web: 'https://canberra.diplo.de' },
+    embassy_FR: { address: '6 Perth Ave, Yarralumla, Canberra ACT 2600', phone: '+61 2 6216 0100', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_IT: { address: '12 Grey Street, Deakin, Canberra ACT 2600', phone: '+61 2 6273 3333', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Commonwealth Ave, Yarralumla, Canberra ACT 2600', phone: '+61 2 6270 6666', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/australia' },
+    embassy_US: { address: 'Moonah Place, Yarralumla, Canberra ACT 2600', phone: '+61 2 6214 5600', hours: 'Lun-Vie 8:30-12:00', web: 'https://au.usembassy.gov' },
+    embassy_CN: { address: '15 Coronation Drive, Yarralumla, Canberra ACT 2600', phone: '+61 2 6228 3999', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: '23 Culgoa Circuit, O\'Malley, Canberra ACT 2606', phone: '+61 2 6290 1733', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Emergency+ (112)', icon: '🆘', description: 'App oficial australiana de emergencias con GPS automático.' },
       { name: 'GovReady', icon: '🏛️', description: 'Alertas de desastres naturales y emergencias.' },
@@ -989,6 +1213,20 @@ const EMERGENCY_DB = {
   'Emiratos Árabes Unidos': {
     emergency_general: '999', police: '999', ambulance: '998', fire: '997',
     embassy_ES: 'Embajada de España en Abu Dabi: +971 2 626 90 44',
+    embassy_AR: { address: 'Villa 25, Al Mushrif Area, Abu Dabi', phone: '+971 2 691 2500', hours: 'Lun-Vie 8:00-14:00', web: null },
+    embassy_CO: { address: 'Villa 60, Al Mushrif Area, Abu Dabi', phone: '+971 2 443 7660', hours: 'Lun-Vie 8:30-14:00', web: null },
+    embassy_MX: { address: 'Al Bateen Area, Villa 54, Abu Dabi', phone: '+971 2 672 2222', hours: 'Lun-Vie 8:30-14:00', web: null },
+    embassy_CL: { address: 'Al Karama, Dubai (consulado)', phone: '+971 4 335 4060', hours: 'Lun-Vie 9:00-14:00', web: null },
+    embassy_PE: { address: 'Villa 58, Al Mushrif Area, Abu Dabi', phone: '+971 2 667 7900', hours: 'Lun-Vie 8:00-14:00', web: null },
+    embassy_BR: { address: 'Sector W-59, Street 18, Plot 1, Abu Dabi', phone: '+971 2 672 6788', hours: 'Lun-Vie 8:30-14:00', web: null },
+    embassy_VE: { address: 'Villa 22, Mohamed Bin Khalifa Street, Abu Dabi', phone: '+971 2 635 7222', hours: 'Lun-Vie 8:00-14:00', web: null },
+    embassy_DE: { address: 'Sector W-59, Street 2, Plot 11, Abu Dabi', phone: '+971 2 418 8300', hours: 'Lun-Vie 8:00-11:00', web: 'https://abu-dhabi.diplo.de' },
+    embassy_FR: { address: 'Abu Dhabi Corniche Road, Abu Dabi', phone: '+971 2 613 1100', hours: 'Lun-Vie 8:30-12:30', web: null },
+    embassy_IT: { address: 'Villa 6, Street 17, Al Rowdah, Abu Dabi', phone: '+971 2 443 5622', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Khalid bin Al Waleed Street, Abu Dabi', phone: '+971 2 610 1100', hours: 'Lun-Vie 8:00-15:00', web: 'https://www.gov.uk/world/united-arab-emirates' },
+    embassy_US: { address: 'Embajada Al Dafra Street, Abu Dabi', phone: '+971 2 414 2200', hours: 'Lun-Vie 8:00-17:00', web: 'https://ae.usembassy.gov' },
+    embassy_CN: { address: 'Sector W-59, Street 7, Plot 22, Abu Dabi', phone: '+971 2 443 4276', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: 'Villa 1, Sector E-11-8, Abu Dabi', phone: '+971 2 644 8892', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Careem', icon: '🚗', description: 'App de taxi local. Muy usada en UAE.' },
       { name: 'RTA Dubai', icon: '🚇', description: 'App de transporte público de Dubai.' },
@@ -1034,6 +1272,20 @@ const EMERGENCY_DB = {
   'Sudáfrica': {
     emergency_general: '10111/10177', police: '10111', ambulance: '10177', fire: '10111',
     embassy_ES: 'Embajada de España en Pretoria: +27 12 460 07 99',
+    embassy_AR: { address: '200 Standard Plaza, 440 Hilda Street, Hatfield, Pretoria', phone: '+27 12 430 3524', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: '777 The Hillside, Lynnwood, Pretoria', phone: '+27 12 362 0351', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '339 Veale Street, New Muckleneuk, Pretoria', phone: '+27 12 362 2156', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CL: { address: '1004 Pretorius Street, Hatfield, Pretoria', phone: '+27 12 342 1440', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '820 Stanza Bopape Street, Arcadia, Pretoria', phone: '+27 12 342 2390', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '1012 Schoeman Street, Hatfield, Pretoria', phone: '+27 12 426 9400', hours: 'Lun-Vie 9:00-13:00', web: 'https://pretoria.itamaraty.gov.br' },
+    embassy_VE: { address: '1091 Schoeman Street, Hatfield, Pretoria', phone: '+27 12 342 3461', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: '180 Blackwood Street, Arcadia, Pretoria', phone: '+27 12 427 8900', hours: 'Lun-Vie 8:00-11:30', web: 'https://pretoria.diplo.de' },
+    embassy_FR: { address: '250 Melk Street, Nieuw Muckleneuk, Pretoria', phone: '+27 12 425 1600', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_IT: { address: '796 George Avenue, Arcadia, Pretoria', phone: '+27 12 423 0000', hours: 'Lun-Vie 9:00-12:30', web: null },
+    embassy_GB: { address: '255 Hill Street, Arcadia, Pretoria', phone: '+27 12 421 7500', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/south-africa' },
+    embassy_US: { address: '877 Pretorius Street, Arcadia, Pretoria', phone: '+27 12 431 4000', hours: 'Lun-Vie 7:30-10:30', web: 'https://za.usembassy.gov' },
+    embassy_CN: { address: '972 Pretorius Street, Arcadia, Pretoria', phone: '+27 12 431 6500', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_PT: { address: '599 Leyds Street, Muckleneuk, Pretoria', phone: '+27 12 341 2340', hours: 'Lun-Vie 9:00-13:00', web: null },
     useful_apps: [
       { name: 'Uber', icon: '🚗', description: 'IMPRESCINDIBLE en SA. Nunca tomes taxis de calle.' },
       { name: 'Panic Button SA', icon: '🚨', description: 'Botón de pánico para emergencias de seguridad.' },
@@ -1043,6 +1295,17 @@ const EMERGENCY_DB = {
   'Kenia': {
     emergency_general: '999/112', police: '999', ambulance: '999', fire: '999',
     embassy_ES: 'Embajada de España en Nairobi: +254 20 228 64 60',
+    embassy_AR: { address: 'Limuru Road, Muthaiga, Nairobi', phone: '+254 20 762 7800', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_CO: { address: 'Eden Square, Block 3, 5th Floor, Westlands, Nairobi', phone: '+254 20 375 1551', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: 'KEK Complex, Westlands Road, Nairobi', phone: '+254 20 374 1812', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: 'Jomo Kenyatta Ave, Upper Hill, Nairobi', phone: '+254 20 272 5057', hours: 'Lun-Vie 9:00-13:00', web: 'https://nairobí.itamaraty.gov.br' },
+    embassy_DE: { address: 'Ludwig Krapf House, 113 Riverside Drive, Nairobi', phone: '+254 20 426 2100', hours: 'Lun-Vie 8:30-12:00', web: 'https://nairobi.diplo.de' },
+    embassy_FR: { address: '9th Floor, Barclays Plaza, Loita Street, Nairobi', phone: '+254 20 278 0700', hours: 'Lun-Vie 8:30-12:00', web: null },
+    embassy_IT: { address: 'Saachi Plaza, Ali Hassan Mwinyi Road, Nairobi', phone: '+254 20 750 9700', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_GB: { address: 'Upper Hill Road, Nairobi', phone: '+254 20 287 3000', hours: 'Lun-Vie 8:00-12:00', web: 'https://www.gov.uk/world/kenya' },
+    embassy_US: { address: 'United Nations Ave, Gigiri, Nairobi', phone: '+254 20 363 6000', hours: 'Lun-Vie 7:30-11:00', web: 'https://ke.usembassy.gov' },
+    embassy_CN: { address: 'Woodlands Road, Kilimani, Nairobi', phone: '+254 20 272 2559', hours: 'Lun-Vie 8:30-12:00', web: null },
+    embassy_PT: { address: 'Nairobi — contactar embajada en Johannesburgo', phone: null, hours: null, web: null },
     useful_apps: [
       { name: 'Uber', icon: '🚗', description: 'Seguro y fiable en Nairobi.' },
       { name: 'Little Cab', icon: '🚗', description: 'Alternativa local a Uber.' },
@@ -1172,6 +1435,32 @@ const EMERGENCY_DB = {
   },
 
 
+  'Estados Unidos': {
+    emergency_general: '911',
+    police: '911',
+    ambulance: '911',
+    fire: '911',
+    embassy_ES: { address: '2375 Pennsylvania Ave NW, Washington DC 20037', phone: '+1 202 452 0100', hours: 'Lun-Vie 8:30-14:00', web: 'https://www.exteriores.gob.es/Embajadas/washington' },
+    embassy_AR: { address: '1600 New Hampshire Ave NW, Washington DC 20009', phone: '+1 202 238 6400', hours: 'Lun-Vie 9:30-13:30', web: 'https://eeeuu.cancilleria.gob.ar' },
+    embassy_CO: { address: '1724 Massachusetts Ave NW, Washington DC 20036', phone: '+1 202 387 8338', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_MX: { address: '1911 Pennsylvania Ave NW, Washington DC 20006', phone: '+1 202 728 1600', hours: 'Lun-Vie 9:00-14:00', web: 'https://embamex.sre.gob.mx/eua' },
+    embassy_CL: { address: '1732 Massachusetts Ave NW, Washington DC 20036', phone: '+1 202 785 1746', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PE: { address: '1700 Massachusetts Ave NW, Washington DC 20036', phone: '+1 202 833 9860', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_VE: { address: '1099 30th Street NW, Washington DC 20007', phone: '+1 202 342 2214', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_EC: { address: '2535 15th Street NW, Washington DC 20009', phone: '+1 202 234 7200', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BO: { address: '3014 Massachusetts Ave NW, Washington DC 20008', phone: '+1 202 483 4410', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_PY: { address: '2400 Massachusetts Ave NW, Washington DC 20008', phone: '+1 202 483 6960', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_UY: { address: '1913 I Street NW, Washington DC 20006', phone: '+1 202 331 1313', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_BR: { address: '3006 Massachusetts Ave NW, Washington DC 20008', phone: '+1 202 238 2700', hours: 'Lun-Vie 9:00-13:00', web: 'https://washington.itamaraty.gov.br' },
+    embassy_PT: { address: '2012 Massachusetts Ave NW, Washington DC 20036', phone: '+1 202 350 5400', hours: 'Lun-Vie 9:00-13:00', web: null },
+    embassy_DE: { address: '4645 Reservoir Rd NW, Washington DC 20007', phone: '+1 202 298 4000', hours: 'Lun-Vie 8:30-12:00', web: 'https://www.germany.info/us-en' },
+    embassy_FR: { address: '4101 Reservoir Rd NW, Washington DC 20007', phone: '+1 202 944 6000', hours: 'Lun-Vie 8:45-12:30', web: null },
+    embassy_IT: { address: '3000 Whitehaven St NW, Washington DC 20008', phone: '+1 202 612 4400', hours: 'Lun-Vie 9:00-12:00', web: null },
+    embassy_GB: { address: '3100 Massachusetts Ave NW, Washington DC 20008', phone: '+1 202 588 6500', hours: 'Lun-Vie 9:00-12:00', web: 'https://www.gov.uk/world/usa' },
+    embassy_CN: { address: '3505 International Place NW, Washington DC 20008', phone: '+1 202 495 2266', hours: 'Lun-Vie 9:00-12:00', web: null },
+    useful_apps: [ { name: 'Uber', icon: '🚗', description: 'Transporte en ciudades.' }, { name: 'Google Maps', icon: '🗺️', description: 'Navegación y transporte público.' } ],
+    safety_tips: [ 'Seguro médico imprescindible — la sanidad es extremadamente cara.', 'Propina del 18-20% obligatoria en restaurantes.', 'En emergencias: 911 siempre.' ],
+  },
 };
 
 /**
@@ -1226,27 +1515,35 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
 
   // Mapeo país origen → clave de embajada en orden de prioridad
   const embassyKey = (() => {
-    if (homeNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
-    if (homeNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
-    if (homeNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
-    if (homeNorm.includes('peru') || homeNorm.includes('peru')) return ['embassy_PE', 'embassy_ES'];
-    if (homeNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
-    if (homeNorm.includes('venezuel')) return ['embassy_VE', 'embassy_ES'];
-    if (homeNorm.includes('ecuad'))   return ['embassy_EC', 'embassy_ES'];
-    if (homeNorm.includes('boliv'))   return ['embassy_BO', 'embassy_ES'];
-    if (homeNorm.includes('paragua')) return ['embassy_PY', 'embassy_ES'];
-    if (homeNorm.includes('urugua'))  return ['embassy_UY', 'embassy_ES'];
-    if (homeNorm.includes('costa ric')) return ['embassy_CR', 'embassy_ES'];
-    if (homeNorm.includes('guatemal')) return ['embassy_GT', 'embassy_ES'];
-    if (homeNorm.includes('hondur'))  return ['embassy_HN', 'embassy_ES'];
-    if (homeNorm.includes('el salv') || homeNorm.includes('salvador')) return ['embassy_SV', 'embassy_ES'];
-    if (homeNorm.includes('nicarag'))  return ['embassy_NI', 'embassy_ES'];
-    if (homeNorm.includes('panam'))   return ['embassy_PA', 'embassy_ES'];
-    if (homeNorm.includes('rep.*dom') || homeNorm.includes('dominican')) return ['embassy_DO', 'embassy_ES'];
-    if (homeNorm.includes('cuba'))    return ['embassy_CU', 'embassy_ES'];
-    if (homeNorm.includes('puert'))   return ['embassy_PR', 'embassy_ES'];
-    if (homeNorm.includes('espana') || homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
-    return ['embassy_ES']; // fallback España
+    if (homeNorm.includes('mexic'))    return ['embassy_MX'];
+    if (homeNorm.includes('argentin')) return ['embassy_AR'];
+    if (homeNorm.includes('colombi'))  return ['embassy_CO'];
+    if (homeNorm.includes('peru'))     return ['embassy_PE'];
+    if (homeNorm.includes('chile'))    return ['embassy_CL'];
+    if (homeNorm.includes('venezuel')) return ['embassy_VE'];
+    if (homeNorm.includes('ecuad'))    return ['embassy_EC'];
+    if (homeNorm.includes('boliv'))    return ['embassy_BO'];
+    if (homeNorm.includes('paragua')) return ['embassy_PY'];
+    if (homeNorm.includes('urugua'))   return ['embassy_UY'];
+    if (homeNorm.includes('costa ric')) return ['embassy_CR'];
+    if (homeNorm.includes('guatemal')) return ['embassy_GT'];
+    if (homeNorm.includes('hondur'))   return ['embassy_HN'];
+    if (homeNorm.includes('el salv') || homeNorm.includes('salvador')) return ['embassy_SV'];
+    if (homeNorm.includes('nicarag'))  return ['embassy_NI'];
+    if (homeNorm.includes('panam'))    return ['embassy_PA'];
+    if (homeNorm.includes('dominican') || homeNorm.includes('rep dom')) return ['embassy_DO'];
+    if (homeNorm.includes('cuba'))     return ['embassy_CU'];
+    if (homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
+    if (homeNorm.includes('portug'))   return ['embassy_PT'];
+    if (homeNorm.includes('franc'))    return ['embassy_FR'];
+    if (homeNorm.includes('aleman') || homeNorm.includes('german')) return ['embassy_DE'];
+    if (homeNorm.includes('ital'))     return ['embassy_IT'];
+    if (homeNorm.includes('reino unido') || homeNorm.includes('united kingdom')) return ['embassy_GB'];
+    if (homeNorm.includes('estados unidos') || homeNorm.includes('united states')) return ['embassy_US'];
+    if (homeNorm.includes('brasil') || homeNorm.includes('brazil')) return ['embassy_BR'];
+    if (homeNorm.includes('chin'))     return ['embassy_CN'];
+    if (homeNorm.includes('japon') || homeNorm.includes('japan')) return ['embassy_JP'];
+    return ['embassy_ES']; // solo si el usuario es español
   })();
 
   for (const key of embassyKey) {
