@@ -181,15 +181,15 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-3">
-              {c.avatar_url
-                ? <img src={c.avatar_url} alt={c.user_display_name || ''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                : <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
+              {(c.user_avatar || c.avatar_url)
+                ? <img src={c.user_avatar || c.avatar_url} alt={c.user_display_name || ''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                : <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
               }
               <div className="flex-1 min-w-0">
                 <div className="bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-semibold text-foreground">@{c.username || c.user_display_name}</span>
-                    <span className="text-sm">{c.thumb === 'up' ? '👍' : '👎'}</span>
+                    <span className="text-xs text-muted-foreground">{c.thumb === 'up' ? '↑' : '↓'}</span>
                   </div>
                   {c.text && <p className="text-sm text-foreground">{c.text}</p>}
                   {c.image_url && <img src={c.image_url} alt="foto" className="w-full rounded-xl mt-2 object-cover max-h-40" onError={e => e.currentTarget.style.display='none'} />}
