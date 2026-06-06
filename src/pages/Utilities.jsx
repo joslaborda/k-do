@@ -307,10 +307,10 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
               <div className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-foreground">Progreso total</p>
-                  <p className="text-sm font-medium text-primary">{progress}%</p>
+                  <p className={`text-sm font-medium ${progress === 100 ? 'text-green-700' : 'text-primary'}`}>{progress}%</p>
                 </div>
                 <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-1.5">
-                  <div className="h-full bg-primary rounded-full transition-all duration-500"
+                  <div className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? 'bg-green-600' : 'bg-primary'}`}
                     style={{ width: `${progress}%` }} />
                 </div>
                 <p className="text-xs text-muted-foreground">{packedCount} de {totalItems} artículos listos</p>
