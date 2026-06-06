@@ -841,7 +841,49 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           {data.useful_apps.map((app, i) => (
             <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
               {(() => {
-                const domains = { 'Uber': 'uber.com', 'Grab': 'grab.com', 'Bolt': 'bolt.eu', 'Gojek': 'gojek.com', 'Cabify': 'cabify.com', 'DiDi': 'didiglobal.com', 'Careem': 'careem.com', 'Rappi': 'rappi.com', 'iFood': 'ifood.com.br', 'Google Maps': 'maps.google.com', 'Google Translate': 'translate.google.com', 'WhatsApp': 'whatsapp.com', 'Citymapper': 'citymapper.com', 'Moovit': 'moovit.com', 'Naver Maps': 'naver.com', 'DB Navigator': 'bahn.de', 'SNCF Connect': 'sncf-connect.com', 'Trenitalia': 'trenitalia.com', 'Yandex Go': 'yandex.ru', 'WeChat': 'wechat.com', 'Alipay': 'alipay.com', 'MakeMyTrip': 'makemytrip.com', 'Traveloka': 'traveloka.com', 'SBB Mobile': 'sbb.ch', 'PassApp': 'passapp.net', 'Doctolib': 'doctolib.fr', 'VPN': 'protonvpn.com', 'AlertCops': 'alertcops.com', 'Ola': 'olacabs.com', 'InDriver': 'indriver.com', 'T-money': 'tmoney.co.kr', 'Suica': 'jreast.co.jp' };
+                const domains = {
+                  'Uber': 'uber.com', 'Grab': 'grab.com', 'Bolt': 'bolt.eu',
+                  'Gojek': 'gojek.com', 'Cabify': 'cabify.com', 'DiDi': 'didiglobal.com',
+                  'Careem': 'careem.com', 'Rappi': 'rappi.com', 'iFood': 'ifood.com.br',
+                  'Google Maps': 'maps.google.com', 'Google Translate': 'translate.google.com',
+                  'WhatsApp': 'whatsapp.com', 'Citymapper': 'citymapper.com',
+                  'Moovit': 'moovit.com', 'Naver Maps': 'naver.com', 'Naver': 'naver.com',
+                  'DB Navigator': 'bahn.de', 'SNCF Connect': 'sncf-connect.com',
+                  'Trenitalia': 'trenitalia.com', 'Yandex Go': 'yandex.com',
+                  'WeChat': 'wechat.com', 'Alipay': 'alipay.com',
+                  'MakeMyTrip': 'makemytrip.com', 'Traveloka': 'traveloka.com',
+                  'SBB Mobile': 'sbb.ch', 'PassApp': 'passapp.net',
+                  'Doctolib': 'doctolib.fr', 'VPN': 'protonvpn.com',
+                  'AlertCops': 'alertcops.com', 'Ola': 'olacabs.com',
+                  'InDriver': 'indriver.com', 'inDrive': 'indriver.com',
+                  'T-money': 'tmoney.co.kr', 'Suica': 'jreast.co.jp', 'PASMO': 'pasmo.co.jp',
+                  'Kakao': 'kakaocorp.com', 'LINE': 'line.me', 'LINE MAN': 'lineman.me',
+                  'Snapp': 'snapp.ir', 'BiTaksi': 'bitaksi.com',
+                  'Beat': 'free-now.com', 'FreeNow': 'free-now.com',
+                  'Angkas': 'angkas.com', 'PickMe': 'pickme.lk',
+                  'Little Cab': 'littlecab.co.ke', 'M-Pesa': 'safaricom.co.ke',
+                  'MTR Mobile': 'mtr.com.hk', 'MyTransport': 'lta.gov.sg',
+                  'RTA Dubai': 'rta.ae', 'Dubai Metro': 'rta.ae', 'Karwa': 'mowasalat.com',
+                  'NHS App': 'nhs.uk', 'Mercado Libre': 'mercadolibre.com',
+                  'NS ': 'ns.nl', 'CP ': 'cp.pt', 'ÖBB': 'oebb.at',
+                  'WienMobil': 'wienerlinien.at', 'BVG': 'bvg.de', 'MVV': 'mvv-muenchen.de',
+                  'Italo': 'italotreno.it', 'KOLEO': 'koleo.pl', 'Trafi': 'trafi.com',
+                  'BKK Futár': 'bkk.hu', 'PID Lítačka': 'pid.cz', '9292': '9292.nl',
+                  'MySOS': 'juntendo.ac.jp', 'Hyperdia': 'hyperdia.com',
+                  'IRCTC': 'irctc.co.in', 'MyEG': 'myeg.com.my',
+                  'GeoNet NZ': 'geonet.org.nz', 'MetService NZ': 'metservice.com',
+                  'MeteoSwiss': 'meteoswiss.admin.ch', 'WeatherCAN': 'weather.gc.ca',
+                  'Safetravel IS': 'safetravel.is', 'GovReady': 'govready.io',
+                  'CDMX app': 'cdmx.gob.mx', 'Bip!': 'metro.cl',
+                  'Trekking Nepal': 'tourism.gov.np', 'Machu Picchu Tickets': 'machupicchu.gob.pe',
+                  '99': '99app.com', 'OASA Telematics': 'oasa.gr',
+                  '112 app': '112.eu', 'Emergency+': '112australia.org.au',
+                  'Hjelp112': '112.no', '112 Sverige': 'sos.se', '112 Suomi': '112.fi',
+                  '112 Eesti': 'häirekeskus.ee', 'BE-Alert': 'be-alert.be',
+                  'Burgernet': 'burgernet.nl', 'Air Raid Siren UA': 'dsns.gov.ua',
+                  'Home Front Command': 'oref.org.il', 'Panic Button SA': 'panicbutton.co.za',
+                  '1999 App': 'bangkok.go.th', 'Taiwan Beats': 'emic.gov.tw',
+                };
                 const key = Object.keys(domains).find(k => app.name?.includes(k));
                 const domain = key ? domains[key] : null;
                 return domain ? (
