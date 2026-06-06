@@ -11,7 +11,7 @@ import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList, getCountryRequirements } from '@/lib/packingDB';
-import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -692,10 +692,10 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
   // loading/data handled inline below
 
   const numbers = data ? [
-    data.police && { label:'Policía', number:data.police, Icon: 'shield' },
-    data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, Icon: 'cross' },
-    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: 'flame' },
-    data.emergency_general && !data.police && { label:'General', number:data.emergency_general, Icon: 'alert' },
+    data.police && { label:'Policía', number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50' },
+    data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50' },
+    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    data.emergency_general && !data.police && { label:'General', number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50' },
   ].filter(Boolean) : [];
 
   return (
@@ -725,11 +725,8 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           {numbers.map((n, i) => (
             <div key={i} className="flex items-center justify-between px-4 py-3.5 border-b border-border last:border-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                  {n.Icon === 'shield' && <AlertTriangle className="w-4 h-4 text-muted-foreground" />}
-                  {n.Icon === 'cross' && <Plus className="w-4 h-4 text-muted-foreground" />}
-                  {n.Icon === 'flame' && <AlertTriangle className="w-4 h-4 text-red-500" />}
-                  {n.Icon === 'alert' && <AlertTriangle className="w-4 h-4 text-amber-500" />}
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${n.bg}`}>
+                  <n.Icon className={`w-4 h-4 ${n.color}`} />
                 </div>
                 <span className="text-sm font-medium text-foreground">{n.label}</span>
               </div>
@@ -880,7 +877,7 @@ export default function Utilities() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tripId = searchParams.get('trip_id');
-  const initialTab = searchParams.get('tab') || 'emergencias';
+  const initialTab = searchParams.get('tab') || 'tiempo';
   const [activeTab, setActiveTab] = useState(initialTab);
   const [packingSheetOpen, setPackingSheetOpen] = useState(false);
   const [packingCategory, setPackingCategory] = useState('personal');
@@ -917,10 +914,10 @@ export default function Utilities() {
     : false;
 
   const tabs = [
+    { key: 'tiempo',      label: 'Clima' },
     { key: 'emergencias', label: 'Emergencias' },
-    { key: 'requisitos',  label: 'Requisitos' },
     { key: 'maleta',      label: 'Maleta' },
-    { key: 'tiempo',      label: 'Tiempo' },
+    { key: 'requisitos',  label: 'Requisitos' },
   ];
   
   // Requisitos del país activo
