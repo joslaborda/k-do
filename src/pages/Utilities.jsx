@@ -752,8 +752,7 @@ export default function Utilities() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="px-4 pt-12 pb-0">
-          <h1 className="text-xl font-semibold text-foreground mb-3">Utilidades</h1>
+        <div className="px-4 pt-4 pb-0">
           <OTabBar tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
         </div>
       </div>
