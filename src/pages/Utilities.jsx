@@ -10,7 +10,7 @@ import { Plus, Trash2, ExternalLink, Loader2, X, Minus, AlertTriangle, Landmark,
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
-import { getSmartPackingList } from '@/lib/packingDB';
+import { getSmartPackingList, getCountryRequirements } from '@/lib/packingDB';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
 
