@@ -190,7 +190,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Packing tab
 // ─────────────────────────────────────────────────────────────────────────────
-function PackingTab({ tripId, country, tripInProgress, userId }) {
+function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onExternalClose }) {
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState({});
   const [adding, setAdding] = useState(null);
@@ -198,6 +198,8 @@ function PackingTab({ tripId, country, tripInProgress, userId }) {
   const [newEssential, setNewEssential] = useState(false);
   const [activeInnerTab, setActiveInnerTab] = useState('maleta');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const effectiveSheetOpen = sheetOpen || externalOpen;
+  const closeSheet = () => { setSheetOpen(false); onExternalClose?.(); };
   const [sheetCategory, setSheetCategory] = useState('personal');
   const addInputRef = useRef(null);
 
@@ -462,13 +464,13 @@ function PackingTab({ tripId, country, tripInProgress, userId }) {
         </div>
       )}
       <AddPackingSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
+        open={effectiveSheetOpen}
+        onClose={closeSheet}
         defaultCategory={sheetCategory}
         saving={createMutation.isPending}
         onSave={async (data) => {
           await createMutation.mutateAsync({ ...data, trip_id: tripId });
-          setSheetOpen(false);
+          closeSheet();
         }}
       />
     </div>
@@ -753,7 +755,7 @@ export default function Utilities() {
           />
         )}
         {activeTab === 'maleta' && (
-          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} />
+          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
         {activeTab === 'tiempo' && (
           <div>
@@ -767,18 +769,7 @@ export default function Utilities() {
           </div>
         )}
       </div>
-      {packingSheetOpen && (
-        <AddPackingSheet
-          open={packingSheetOpen}
-          onClose={() => setPackingSheetOpen(false)}
-          defaultCategory={packingCategory}
-          saving={false}
-          onSave={async (data) => {
-            await base44.entities.PackingItem.create({ ...data, trip_id: tripId, user_id: user?.id });
-            setPackingSheetOpen(false);
-          }}
-        />
-      )}
+
     </div>
   );
 }
