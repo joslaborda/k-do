@@ -3,16 +3,17 @@ import { base44 } from '@/api/base44Client';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Image } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Bed } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
-  food:      { label: 'Restaurante', emoji: '🍽️', color: 'bg-primary/10 text-primary' },
-  sight:     { label: 'Atracción',   emoji: '🏛️', color: 'bg-blue-100 text-blue-800' },
-  activity:  { label: 'Actividad',   emoji: '⚡',  color: 'bg-green-100 text-green-800' },
-  shopping:  { label: 'Compras',     emoji: '🛍️', color: 'bg-purple-100 text-purple-800' },
-  transport: { label: 'Transporte',  emoji: '🚆',  color: 'bg-slate-100 text-slate-800' },
-  custom:    { label: 'Otro',        emoji: '⭐',  color: 'bg-yellow-100 text-yellow-800' },
+  food:      { label: 'Restaurante', Icon: Utensils,   color: 'bg-orange-100 text-orange-700' },
+  sight:     { label: 'Atracción',   Icon: Landmark,   color: 'bg-blue-100 text-blue-700' },
+  activity:  { label: 'Actividad',   Icon: Zap,        color: 'bg-green-100 text-green-700' },
+  shopping:  { label: 'Compras',     Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
+  transport: { label: 'Transporte',  Icon: Train,      color: 'bg-slate-100 text-slate-700' },
+  hotel:     { label: 'Hotel',       Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
+  custom:    { label: 'Otro',        Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
 
 function getMapsUrl(spot) {
@@ -322,7 +323,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
         <div className="p-4">
           {/* Header */}
           <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0 mt-0.5">{tc.emoji}</span>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${tc.color}`}>{tc.Icon && <tc.Icon size={16} />}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-foreground text-sm leading-tight">{spot.title}</p>
