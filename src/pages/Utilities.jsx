@@ -11,6 +11,7 @@ import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getSmartPackingList, getCountryRequirements } from '@/lib/packingDB';
+import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -153,6 +154,200 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Requirements tab — Visa, Enchufes, Vacunas, Moneda
+// ─────────────────────────────────────────────────────────────────────────────
+const PLUG_IMAGES = {
+  'A': 'Tipo A — 2 clavijas planas paralelas (EEUU/México/Japón)',
+  'B': 'Tipo B — 2 clavijas planas + redonda (EEUU)',
+  'C': 'Tipo C — 2 clavijas redondas (Europa/Sudamérica)',
+  'D': 'Tipo D — 3 clavijas redondas en triángulo (India)',
+  'E': 'Tipo E — 2 clavijas redondas + agujero (Francia/Bélgica)',
+  'F': 'Tipo F — 2 clavijas redondas con toma tierra (Alemania/Europa)',
+  'G': 'Tipo G — 3 clavijas rectangulares (UK/Singapur/HK)',
+  'H': 'Tipo H — 3 clavijas oblicuas (Israel)',
+  'I': 'Tipo I — 2/3 clavijas planas en ángulo (Australia/Argentina)',
+  'J': 'Tipo J — 3 clavijas redondas (Suiza)',
+  'K': 'Tipo K — 2 redondas + tierra (Dinamarca)',
+  'L': 'Tipo L — 3 clavijas redondas en línea (Italia)',
+  'M': 'Tipo M — 3 clavijas redondas grandes (Sudáfrica)',
+  'N': 'Tipo N — 2/3 clavijas redondas (Brasil)',
+};
+
+function PlugIcon({ type }) {
+  const colors = { A:'bg-blue-50 text-blue-700', B:'bg-blue-50 text-blue-700', C:'bg-green-50 text-green-700', F:'bg-green-50 text-green-700', E:'bg-green-50 text-green-700', G:'bg-purple-50 text-purple-700', I:'bg-amber-50 text-amber-700', default:'bg-secondary text-muted-foreground' };
+  const cls = colors[type] || colors.default;
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${cls} text-xs font-semibold`}>
+      <Zap size={11} />
+      {type}
+    </div>
+  );
+}
+
+function RequirementsTab({ reqs, country, homeCountry }) {
+  const [showAllVaccines, setShowAllVaccines] = useState(false);
+
+  if (!country) return (
+    <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
+      <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
+      <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
+    </div>
+  );
+
+  if (!reqs) return (
+    <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
+      <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
+      <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
+      <p className="text-xs text-muted-foreground">Consulta el consulado o embajada de tu país</p>
+    </div>
+  );
+
+  const visa = reqs.visa || {};
+  const adapter = reqs.adapter || {};
+  const vaccines = reqs.vaccines || [];
+  const currency = reqs.currency || {};
+  const tips = reqs.tips || [];
+
+  // Determinar estado del visado
+  const visaNeeded = visa.needed;
+  let visaStatus, visaColor, visaIcon, visaLabel;
+  if (visaNeeded === false) {
+    visaStatus = 'libre'; visaColor = 'bg-green-50 border-green-200'; visaIcon = <ShieldCheck className="w-5 h-5 text-green-600" />; visaLabel = 'Sin visado';
+  } else if (visaNeeded === null || visaNeeded === 'consultar') {
+    visaStatus = 'consultar'; visaColor = 'bg-amber-50 border-amber-200'; visaIcon = <ShieldAlert className="w-5 h-5 text-amber-500" />; visaLabel = 'Verificar';
+  } else {
+    visaStatus = 'requerido'; visaColor = 'bg-red-50 border-red-200'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />; visaLabel = 'Visado requerido';
+  }
+
+  const requiredVax = vaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
+  const recommendedVax = vaccines.filter(v => !requiredVax.includes(v));
+
+  // Detectar si el adaptador español es compatible
+  const spanishPlugs = ['C', 'E', 'F'];
+  const destPlugs = (adapter.type || '').match(/Tipo ([A-N])/g)?.map(t => t.replace('Tipo ', '')) || [];
+  const needsAdapter = adapter.needed;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">Requisitos para viajar a <span className="font-medium text-foreground">{country}</span> con pasaporte de <span className="font-medium text-foreground">{homeCountry}</span></p>
+
+      {/* Visado */}
+      <div className={`bg-card rounded-2xl border p-4 ${visaColor}`}>
+        <div className="flex items-center gap-3">
+          {visaIcon}
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">{visaLabel}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{visa.info}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Enchufe */}
+      <div className="bg-card rounded-2xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="w-4 h-4 text-muted-foreground" />
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Enchufe y voltaje</p>
+        </div>
+        {needsAdapter ? (
+          <>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              {destPlugs.length > 0 ? destPlugs.map(p => <PlugIcon key={p} type={p} />) : <span className="text-sm text-foreground">{adapter.type || 'Varios tipos'}</span>}
+              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium border border-red-100">Adaptador necesario</span>
+            </div>
+            <p className="text-xs text-muted-foreground">{adapter.info}</p>
+          </>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium border border-green-100">Compatible</span>
+            <p className="text-xs text-muted-foreground">{adapter.info || 'Sin adaptador necesario'}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Vacunas */}
+      {vaccines.length > 0 && (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+            <Syringe className="w-4 h-4 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Vacunas</p>
+          </div>
+          {requiredVax.length > 0 && (
+            <div className="px-4 py-3 border-b border-border">
+              <p className="text-xs font-medium text-red-600 mb-2">Obligatorias para entrada</p>
+              {requiredVax.map((v, i) => (
+                <div key={i} className="flex items-center gap-2 mb-1.5">
+                  <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+                  <span className="text-sm font-medium text-foreground">{v.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {recommendedVax.length > 0 && (
+            <div className="px-4 py-3">
+              <p className="text-xs font-medium text-amber-600 mb-2">Recomendadas</p>
+              {(showAllVaccines ? recommendedVax : recommendedVax.slice(0, 3)).map((v, i) => (
+                <div key={i} className="flex items-start gap-2 mb-1.5">
+                  <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
+                  <div>
+                    <span className="text-sm text-foreground">{v.name}</span>
+                    {v.priority && v.priority !== 'recomendada' && <span className="text-xs text-muted-foreground ml-1">({v.priority})</span>}
+                  </div>
+                </div>
+              ))}
+              {recommendedVax.length > 3 && (
+                <button onClick={() => setShowAllVaccines(v => !v)} className="text-xs text-primary font-medium flex items-center gap-1 mt-1">
+                  {showAllVaccines ? <><ChevronUp size={12} /> Ver menos</> : <><ChevronDown size={12} /> Ver {recommendedVax.length - 3} más</>}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {vaccines.length === 0 && (
+        <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3">
+          <Syringe className="w-4 h-4 text-green-600" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Sin vacunas requeridas</p>
+            <p className="text-xs text-muted-foreground">No hay requisitos de vacunación específicos para {country}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Moneda */}
+      {currency.info && (
+        <div className="bg-card rounded-2xl border border-border p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Coins className="w-4 h-4 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Moneda</p>
+          </div>
+          <p className="text-sm text-foreground">{currency.info}</p>
+        </div>
+      )}
+
+      {/* Tips */}
+      {tips.length > 0 && (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+            <Info className="w-4 h-4 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Consejos útiles</p>
+          </div>
+          <div className="px-4 py-3 space-y-2">
+            {tips.map((tip, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-1.5" />
+                <p className="text-sm text-foreground">{tip}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -724,9 +919,13 @@ export default function Utilities() {
 
   const tabs = [
     { key: 'emergencias', label: 'Emergencias' },
+    { key: 'requisitos',  label: 'Requisitos' },
     { key: 'maleta',      label: 'Maleta' },
     { key: 'tiempo',      label: 'Tiempo' },
   ];
+  
+  // Requisitos del país activo
+  const countryReqs = country ? getCountryRequirements(country, homeCountry) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -757,10 +956,20 @@ export default function Utilities() {
         {activeTab === 'maleta' && (
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
+        {activeTab === 'requisitos' && (
+          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} />
+        )}
         {activeTab === 'tiempo' && (
-          <div>
-            {country ? (
-              <WeatherCard city={tripCities[0]?.name || trip?.name || country} tripCountry={country} />
+          <div className="space-y-4">
+            {tripCities.length > 0 ? (
+              tripCities.map(city => (
+                <div key={city.id}>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{city.name}</p>
+                  <WeatherCard city={city.name} tripCountry={city.country || country} showCityName />
+                </div>
+              ))
+            ) : country ? (
+              <WeatherCard city={trip?.name || country} tripCountry={country} />
             ) : (
               <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
                 <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
