@@ -190,7 +190,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Packing tab
 // ─────────────────────────────────────────────────────────────────────────────
-function PackingTab({ tripId, country, tripInProgress }) {
+function PackingTab({ tripId, country, tripInProgress, userId }) {
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState({});
   const [adding, setAdding] = useState(null);
@@ -208,7 +208,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId }),
+    mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
   });
 
@@ -748,7 +748,7 @@ export default function Utilities() {
           />
         )}
         {activeTab === 'maleta' && (
-          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} />
+          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} />
         )}
         {activeTab === 'tiempo' && (
           <div>
