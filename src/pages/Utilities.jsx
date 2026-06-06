@@ -768,10 +768,7 @@ export default function Utilities() {
           <div className="space-y-4">
             {tripCities.length > 0 ? (
               tripCities.map(city => (
-                <div key={city.id}>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{city.name}</p>
-                  <WeatherCard city={city.name} tripCountry={city.country || country} />
-                </div>
+                <WeatherCard key={city.id} city={city.name} tripCountry={city.country || country} showCityName />
               ))
             ) : country ? (
               <WeatherCard city={trip?.name || country} tripCountry={country} />
