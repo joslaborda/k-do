@@ -1063,12 +1063,6 @@ const EMERGENCY_DB = {
     useful_apps: [],
     safety_tips: ['Seguro. Belgrado tiene vida nocturna activa — los barcos-discoteca (splavovi) en el Danubio son seguros.'],
   },
-  'Portugal': {
-    emergency_general: '112', police: '112', ambulance: '112', fire: '112',
-    embassy_ES: null,
-    useful_apps: [{ name: 'INEM app', icon: '🆘', description: 'App del Instituto Nacional de Emergencias Médicas de Portugal.' }],
-    safety_tips: ['Muy seguro. Cuidado con carteristas en tranvías de Lisboa (línea 28). Oleaje fuerte en Costa Atlántica.'],
-  },
   'Eslovaquia': {
     emergency_general: '112', police: '158', ambulance: '155', fire: '150',
     embassy_ES: 'Embajada de España en Bratislava: +421 2 5441 6597',
@@ -1095,42 +1089,6 @@ const EMERGENCY_DB = {
   },
 
   // ══ ASIA ADICIONAL ════════════════════════════════════════════════════════
-  'Tailandia': {
-    emergency_general: '191/1669', police: '191', ambulance: '1669', fire: '199',
-    embassy_ES: 'Embajada de España en Bangkok: +66 2 661 80 84',
-    useful_apps: [
-      { name: 'Tourist Police 1155', icon: '👮', description: 'Policía turística tailandesa. Inglés disponible.' },
-      { name: 'Grab', icon: '🚗', description: 'Taxi/moto por app. Más seguro que taxis de calle.' },
-    ],
-    safety_tips: ['No insultes ni hagas gestos irrespetuosos con la familia real — es ilegal.', 'Cuidado con los tuktuk que te llevan a tiendas de joyería.', 'Moto sin casco es multa. Ponte siempre el casco aunque el conductor no lo lleve.'],
-  },
-  'Vietnam': {
-    emergency_general: '113/115', police: '113', ambulance: '115', fire: '114',
-    embassy_ES: 'Embajada de España en Hanói: +84 24 3771 5207',
-    useful_apps: [
-      { name: 'Grab', icon: '🚗', description: 'Imprescindible para motos y coches. Precios fijos, sin regateo.' },
-    ],
-    safety_tips: ['Cruzar la calle: camina despacio y constante — las motos te esquivarán.', 'Cuidado con robos en moto (bolso arrancado desde moto en movimiento). Lleva el bolso cruzado hacia el interior.', 'Nunca dejes objetos en la cesta del scooter que alquilas.'],
-  },
-  'Indonesia': {
-    emergency_general: '112', police: '110', ambulance: '118', fire: '113',
-    embassy_ES: 'Embajada de España en Yakarta: +62 21 314 30 52',
-    useful_apps: [
-      { name: 'Gojek', icon: '🛵', description: 'Transporte, comida y más. Imprescindible en Indonesia.' },
-      { name: 'Grab', icon: '🚗', description: 'Alternativa a Gojek. Muy usado en Bali.' },
-    ],
-    safety_tips: ['Bali: cuidado con los monos del Templo de Ubud — pueden robar objetos.', 'Zona volcánica: consulta nivel de alerta del volcán antes de senderismo (Merapi, Rinjani, Agung).', 'Agua del grifo no potable en todo el país.'],
-  },
-  'India': {
-    emergency_general: '112', police: '100', ambulance: '108', fire: '101',
-    embassy_ES: 'Embajada de España en Nueva Delhi: +91 11 46 75 00 00',
-    useful_apps: [
-      { name: 'Ola Cabs', icon: '🚗', description: 'Taxi por app. Más seguro que taxis de calle.' },
-      { name: 'Uber', icon: '🚗', description: 'Disponible en ciudades principales.' },
-      { name: 'IRCTC Rail Connect', icon: '🚆', description: 'Reserva trenes de la red ferroviaria india.' },
-    ],
-    safety_tips: ['Agua del grifo no potable — solo agua embotellada con sello intacto.', 'Agencias de viaje "falsas" muy comunes en zonas turísticas. Compra directamente en taquillas oficiales.', 'Mujer viajera: ropa conservadora en zonas rurales y templos. Evita salidas nocturnas sola.'],
-  },
   'China': {
     emergency_general: '120/110', police: '110', ambulance: '120', fire: '119',
     embassy_ES: 'Embajada de España en Pekín: +86 10 6532 3629',
@@ -1140,33 +1098,6 @@ const EMERGENCY_DB = {
       { name: 'VPN', icon: '🔒', description: 'Google, WhatsApp, Instagram bloqueados. Instala VPN ANTES de llegar.' },
     ],
     safety_tips: ['Instala VPN antes de entrar — Google, WhatsApp, YouTube e Instagram están bloqueados.', 'WeChat o Alipay son imprescindibles para pagar (muchos sitios no aceptan efectivo ni tarjeta extranjera).', 'No fotografíes instalaciones militares, policía o protestas.'],
-  },
-  'Japón': {
-    emergency_general: '110/119', police: '110', ambulance: '119', fire: '119',
-    embassy_ES: 'Embajada de España en Tokio: +81 3 3583 8531',
-    useful_apps: [
-      { name: 'Safety Tips', icon: '🌊', description: 'App oficial del gobierno japonés: terremotos, tsunamis, alertas.' },
-      { name: 'Google Maps', icon: '🗺️', description: 'Mejor app para transporte público en Japón. Fiabilísimo.' },
-      { name: 'Hyperdia', icon: '🚆', description: 'Horarios de trenes y Shinkansen en detalle.' },
-    ],
-    safety_tips: ['País muy seguro. Mayor riesgo: terremotos y tsunamis. Aprende el protocolo de evacuación del hotel.', 'En terremoto: aléjate de ventanas, protégete bajo una mesa. Sal tras las réplicas.', 'Las clínicas médicas a menudo no hablan inglés — lleva tu documentación médica en japonés si tienes condición preexistente.'],
-  },
-  'Corea del Sur': {
-    emergency_general: '119/112', police: '112', ambulance: '119', fire: '119',
-    embassy_ES: 'Embajada de España en Seúl: +82 2 794 3581',
-    useful_apps: [
-      { name: 'Kakao T', icon: '🚕', description: 'Taxi por app. Imprescindible en Corea.' },
-      { name: 'Naver Maps', icon: '🗺️', description: 'Mejor que Google Maps para Corea del Sur.' },
-    ],
-    safety_tips: ['País muy seguro. Cuidado con cruzar en rojo — multas frecuentes en ciudades.'],
-  },
-  'Singapur': {
-    emergency_general: '999/995', police: '999', ambulance: '995', fire: '995',
-    embassy_ES: 'Embajada de España en Singapur: +65 6379 7830',
-    useful_apps: [
-      { name: 'Grab', icon: '🚗', description: 'Taxi/transporte por app. El más usado en Singapur.' },
-    ],
-    safety_tips: ['País muy seguro con leyes estrictas.', 'Prohibido: chicle (multa), comer en metro (multa), fumar en zonas no designadas (multa).', 'Drogas: pena de muerte. Sin excepciones.'],
   },
   'Malasia': {
     emergency_general: '999', police: '999', ambulance: '999', fire: '994',
@@ -1319,79 +1250,8 @@ const EMERGENCY_DB = {
     useful_apps: [],
     safety_tips: ['Zanzíbar: muy segura en zonas turísticas. Evita playas solitarias de noche.', 'Safari Serengeti/Ngorongoro: respeta las normas del parque. Nunca fuera del vehículo.', 'Malaria: profilaxis recomendada. Mosquitera por la noche.', 'Kilimanjaro: seguro médico de evacuación obligatorio.'],
   },
-  'Marruecos': {
-    emergency_general: '19/15', police: '19', ambulance: '15', fire: '15',
-    embassy_ES: 'Embajada de España en Rabat: +212 5 37 63 39 00. Consulado en Casablanca: +212 5 22 22 05 52',
-    useful_apps: [
-      { name: 'inDrive', icon: '🚗', description: 'App de taxi negociado. Más seguro que taxis de calle.' },
-    ],
-    safety_tips: ['Medinas: cuidado con guías "espontáneos" que luego cobran. Si no quieres su servicio, dilo claramente.', 'Regatear es normal en zocos. Nunca obligatorio comprar.', 'No fotografíes personas sin pedir permiso.', 'Ramadán: actitud de respeto en espacios públicos.'],
-  },
-  'Egipto': {
-    emergency_general: '123/122', police: '122', ambulance: '123', fire: '180',
-    embassy_ES: 'Embajada de España en El Cairo: +20 2 2735 6264',
-    useful_apps: [
-      { name: 'Careem', icon: '🚗', description: 'Taxi por app. Mucho más seguro que taxis de calle.' },
-      { name: 'inDrive', icon: '🚗', description: 'Alternativa a Careem.' },
-    ],
-    safety_tips: ['Nunca tomes un taxi de calle sin negociar el precio antes.', 'El Sinaí norte (Al-Arish, Rafah): evitar completamente — riesgo terrorista activo.', 'Hidratación fundamental: calor extremo. Agua solo embotellada.', 'Luxor/Aswan: cuidado con fellucas sin chaleco salvavidas.'],
-  },
 
   // ══ AMERICAS ══════════════════════════════════════════════════════════════
-  'México': {
-    emergency_general: '911', police: '911', ambulance: '911', fire: '911',
-    embassy_ES: 'Embajada de España en Ciudad de México: +52 55 5282 2974',
-    useful_apps: [
-      { name: 'Uber', icon: '🚗', description: 'IMPRESCINDIBLE en CDMX. Evita taxis de calle.' },
-      { name: 'CDMX', icon: '🚇', description: 'App oficial del metro de Ciudad de México.' },
-    ],
-    safety_tips: ['Nunca tomes taxis de calle en CDMX ni en aeropuertos — riesgo de secuestro exprés. Solo Uber, Cabify o taxis en parada oficial.', 'Jalisco, Tamaulipas, Guerrero: zonas con alerta activa de seguridad. Consulta mapa de riesgo.', 'CDMX es relativamente segura en Polanco, Roma, Condesa. Evita Tepito y algunos barrios del norte de noche.'],
-  },
-  'Colombia': {
-    emergency_general: '123', police: '112', ambulance: '125', fire: '119',
-    embassy_ES: 'Embajada de España en Bogotá: +57 601 622 0090',
-    useful_apps: [
-      { name: 'Cabify', icon: '🚗', description: 'Más seguro que taxis de calle en Colombia.' },
-      { name: 'InDriver', icon: '🚗', description: 'Muy usado en ciudades intermedias.' },
-    ],
-    safety_tips: ['Nunca aceptes bebidas de desconocidos — riesgo de burundanga (escopolamina).', 'En Cartagena: cuidado con joyas y móvil visibles en la calle.', 'Medellín: zonas turísticas (El Poblado, Laureles) seguras. Evita el centro de noche.', 'Rumbles/Scopolamine: el mayor riesgo en Colombia. No aceptes cigarrillos, dulces ni bebidas de extraños.'],
-  },
-  'Argentina': {
-    emergency_general: '911/101/107', police: '101', ambulance: '107', fire: '100',
-    embassy_ES: 'Embajada de España en Buenos Aires: +54 11 4819 3000',
-    useful_apps: [
-      { name: 'Uber', icon: '🚗', description: 'Disponible pero con restricciones. Cabify es más fiable.' },
-      { name: 'Cabify', icon: '🚗', description: 'Más usado que Uber en Argentina.' },
-    ],
-    safety_tips: ['Buenos Aires relativamente segura. Cuidado con "sauceo" (distracción + robo).', 'Cambio de divisas: solo en casas de cambio oficiales. Los "arbolitos" son ilegales.', 'Patagonia: clima extremadamente cambiante. Equipo técnico indispensable.'],
-  },
-  'Chile': {
-    emergency_general: '133/131/132', police: '133', ambulance: '131', fire: '132',
-    embassy_ES: 'Embajada de España en Santiago: +56 2 2235 2755',
-    useful_apps: [
-      { name: 'Cabify', icon: '🚗', description: 'Fiable en Santiago.' },
-      { name: 'SafeTrip SENAPRED', icon: '🌋', description: 'Alertas de desastres naturales (terremotos, tsunamis, volcanes).' },
-    ],
-    safety_tips: ['País sísmico: aprende el protocolo de terremotos.', 'Santiago: cuidado con arrebatos de móvil en zonas concurridas. Taxis oficiales llevan taxímetro.', 'Torres del Paine: condiciones climatológicas extremas. Lleva equipo técnico y avisa de tu ruta.'],
-  },
-  'Perú': {
-    emergency_general: '105/106/116', police: '105', ambulance: '106', fire: '116',
-    embassy_ES: 'Embajada de España en Lima: +51 1 212 1100',
-    useful_apps: [
-      { name: 'InDriver', icon: '🚗', description: 'Taxi por app. Mejor que taxis de calle en Lima.' },
-      { name: 'Grab Peru', icon: '🚗', description: 'Alternativa a InDriver.' },
-    ],
-    safety_tips: ['Lima: barrios seguros son Miraflores, San Isidro, Barranco. Evita el Centro Histórico de noche.', 'Cusco: mal de altura (>3.400m) — descansa 24h antes de actividad intensa. Coca disponible.', 'Camino Inca: contrata operadora registrada. El trekking sin guía no está permitido.', 'Agua solo embotellada.'],
-  },
-  'Brasil': {
-    emergency_general: '190/192/193', police: '190', ambulance: '192', fire: '193',
-    embassy_ES: 'Embajada de España en Brasilia: +55 61 3061 0900. Consulado en São Paulo: +55 11 3372 2200',
-    useful_apps: [
-      { name: '99 (taxi)', icon: '🚗', description: 'App de taxi. Fiable en todo Brasil.' },
-      { name: 'Uber', icon: '🚗', description: 'Muy usado en Brasil.' },
-    ],
-    safety_tips: ['Nunca exhibas joyas, móvil o cámara cara en la calle — especialmente en Río y São Paulo.', 'Río: favelas solo con tour guiado oficial. Nunca entres solo.', 'Playas de Río: no dejes objetos sin vigilancia. Los "arrastões" (robos colectivos) existen.', 'Vacuna amarilla recomendada para zona amazónica.'],
-  },
   'Cuba': {
     emergency_general: '106/105', police: '106', ambulance: '104', fire: '105',
     embassy_ES: 'Embajada de España en La Habana: +53 7 866 8025',
