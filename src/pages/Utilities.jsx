@@ -494,17 +494,17 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
-  }, [country, homeCountry, secondNationality, isResolvingCountry]);
+  }, [country, homeCountry, secondNationality]);
 
   // No early return — show all tabs even without active trip
 
   // loading/data handled inline below
 
   const numbers = data ? [
-    data.police && { label:'Policía', number:data.police, emoji:'🚔' },
-    data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, emoji:'🚑' },
-    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, emoji:'🚒' },
-    data.emergency_general && !data.police && { label:'General', number:data.emergency_general, emoji:'🆘' },
+    data.police && { label:'Policía', number:data.police, Icon: 'shield' },
+    data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, Icon: 'cross' },
+    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: 'flame' },
+    data.emergency_general && !data.police && { label:'General', number:data.emergency_general, Icon: 'alert' },
   ].filter(Boolean) : [];
 
   return (
@@ -534,7 +534,12 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           {numbers.map((n, i) => (
             <div key={i} className="flex items-center justify-between px-4 py-3.5 border-b border-border last:border-0">
               <div className="flex items-center gap-2.5">
-                <span className="text-lg">{n.emoji}</span>
+                <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                  {n.Icon === 'shield' && <AlertTriangle className="w-4 h-4 text-muted-foreground" />}
+                  {n.Icon === 'cross' && <Plus className="w-4 h-4 text-muted-foreground" />}
+                  {n.Icon === 'flame' && <AlertTriangle className="w-4 h-4 text-red-500" />}
+                  {n.Icon === 'alert' && <AlertTriangle className="w-4 h-4 text-amber-500" />}
+                </div>
                 <span className="text-sm font-medium text-foreground">{n.label}</span>
               </div>
               <span className="text-xl font-medium text-primary tracking-tight">{n.number}</span>
@@ -553,7 +558,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           : data.embassy;
         return (
           <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada</p></div>
+            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Embajada de {homeCountry} en {country}</p></div>
             {emb.name && <p className="text-sm font-semibold text-foreground">{emb.name}</p>}
             {emb.address && (
               <div className="flex items-start gap-2">
@@ -705,7 +710,11 @@ export default function Utilities() {
     enabled: !!user?.id, staleTime: 300000,
   });
 
-  const country = tripCities[0]?.country || trip?.country || '';
+  // Para viajes multipaís, usar la ciudad activa según la fecha de hoy
+  const today = new Date().toISOString().slice(0, 10);
+  const activeCity = tripCities.find(c => c.start_date <= today && (!c.end_date || c.end_date >= today))
+    || tripCities[0];
+  const country = activeCity?.country || trip?.country || '';
   const meta = country ? getCountryMeta(country) : {};
   const homeCountry = myProfile?.nationality || myProfile?.country || 'España';
   const secondNationality = myProfile?.second_nationality || null;
