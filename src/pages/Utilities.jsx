@@ -719,6 +719,41 @@ export default function EmergencyTab({ country: countryProp, homeCountry: homeCo
           </div>
         );
       })()}
+
+      {/* Apps de interés */}
+      {!loading && data?.useful_apps?.length > 0 && (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Apps útiles en {country}</p>
+          </div>
+          {data.useful_apps.map((app, i) => (
+            <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
+              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0 text-lg">{app.icon}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">{app.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{app.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Consejos de seguridad */}
+      {!loading && data?.safety_tips?.length > 0 && (
+        <div className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Consejos de seguridad</p>
+          </div>
+          <div className="px-4 py-3 space-y-2.5">
+            {data.safety_tips.map((tip, i) => (
+              <div key={i} className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-1.5" />
+                <p className="text-sm text-foreground">{tip}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
