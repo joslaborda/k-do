@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal } from 'lucide-react';
+import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -177,8 +177,8 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
 
   return (
     <button onClick={() => onEdit(expense)} className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-secondary/20 transition-colors border-b border-border last:border-0">
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, flexShrink: 0 }}>
-        {tc.emoji}
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[expense.category] || CAT_COLORS.other}`}>
+        {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -242,7 +242,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
   if (expenses.length === 0) {
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-        <p className="text-4xl mb-3">💸</p>
+        <DollarSign className="w-8 h-8 mx-auto mb-3 opacity-25" />
         <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
         <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
         <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
@@ -272,13 +272,13 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
       </div>
 
       {/* Categorías */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {[['all', '🌍', 'Todos'], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, v.emoji, v.label])].map(([k, em, l]) => (
+      <div className="flex flex-wrap gap-2">
+        {[['all', null, 'Todos'], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, k, v.label])].map(([k, catKey, l]) => (
           <button key={k} onClick={() => setCatFilter(k)}
-            className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${
+            className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${
               catFilter === k ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
             }`}>
-            <span>{em}</span> {l}
+            {catKey && CAT_ICONS[catKey] ? (() => { const I = CAT_ICONS[catKey]; return <I size={12} />; })() : <Compass size={12} />} {l}
           </button>
         ))}
       </div>
@@ -318,7 +318,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
   if (expenses.length === 0) {
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16">
-        <p className="text-4xl mb-3">⚖️</p>
+        <Scale className="w-8 h-8 mx-auto mb-3 opacity-25" />
         <p className="text-sm font-medium text-foreground mb-1">Sin datos aún</p>
         <p className="text-xs text-muted-foreground">Añade gastos para ver los balances del grupo</p>
       </div>
@@ -525,7 +525,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
   if (expenses.length === 0) {
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16">
-        <p className="text-4xl mb-3">📊</p>
+        <BarChart2 className="w-8 h-8 mx-auto mb-3 opacity-25" />
         <p className="text-sm font-medium text-foreground mb-1">Sin estadísticas</p>
         <p className="text-xs text-muted-foreground">Añade gastos para ver el desglose</p>
       </div>
@@ -635,7 +635,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>
-                {tc.emoji}
+                {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">{expense.description}</p>
