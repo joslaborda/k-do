@@ -1,4 +1,4 @@
-import { Moon, createPageUrl } from '@/utils';
+import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -9,7 +9,7 @@ import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
@@ -829,8 +829,8 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-2">
-              {c.avatar_url
-                ? <img src={c.avatar_url} alt={c.user_display_name||''} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+              {(c.user_avatar || c.avatar_url)
+                ? <img src={c.user_avatar || c.avatar_url} alt={c.user_display_name||''} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                 : <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-semibold flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
               }
               <div className="flex-1 bg-secondary rounded-2xl rounded-tl-none px-3 py-2">
