@@ -88,7 +88,7 @@ export default function SettingsDialog({ open, onClose, trip, cities, tripId, is
     if (!cityDraft.name?.trim()) return;
     setCityLoading('new');
     try {
-      await base44.entities.City.create({ trip_id: tripId, name: cityDraft.name.trim(), country: cityDraft.country || '', start_date: cityDraft.start_date || '', end_date: cityDraft.end_date || '' });
+      await base44.entities.City.create({ trip_id: tripId, name: cityDraft.name.trim(), country: normalizeCountry(cityDraft.country || ''), start_date: cityDraft.start_date || '', end_date: cityDraft.end_date || '' });
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
     } catch {}
