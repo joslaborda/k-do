@@ -513,10 +513,37 @@ function PackingTab({ tripId, country, tripInProgress }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-export default function EmergencyTab({ country, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta }) {
+export default function EmergencyTab({ country: countryProp, homeCountry: homeCountryProp, secondNationality: secondNationalityProp, meta: metaProp }) {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+
+  // Obtener trip_id de la URL
+  const tripId = searchParams.get('trip_id');
+
+  // Cargar el viaje para obtener su country
+  const { data: trip } = useQuery({
+    queryKey: ['trip', tripId],
+    queryFn: async () => {
+      const r = await base44.entities.Trip.filter({ id: tripId });
+      return r[0] || null;
+    },
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+
+  // Cargar ciudades del viaje para obtener el país
+  const { data: tripCities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+
+  // Resolver country: prop > ciudad del viaje > trip.country
+  const country = countryProp || tripCities[0]?.country || trip?.country || '';
+  const meta = metaProp || (country ? getCountryMeta(country) : null) || {};
 
   // Get homeCountry from user profile if not passed as prop
   const { data: myProfile } = useQuery({
@@ -532,13 +559,17 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
   const homeCountry = homeCountryProp || myProfile?.nationality || myProfile?.country || 'España';
   const secondNationality = secondNationalityProp || myProfile?.second_nationality || null;
 
+  // isResolvingCountry: tenemos trip_id pero aún no tenemos country (queries cargando)
+  const isResolvingCountry = !!tripId && !country;
+
   useEffect(() => {
+    if (isResolvingCountry) return; // esperar a que carguen trip/cities
     if (!country) { setData(null); setLoading(false); return; }
     setLoading(true);
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
-  }, [country, homeCountry, secondNationality]);
+  }, [country, homeCountry, secondNationality, isResolvingCountry]);
 
   // No early return — show all tabs even without active trip
 
@@ -554,11 +585,10 @@ export default function EmergencyTab({ country, homeCountry: homeCountryProp, se
   return (
     <div className="space-y-4">
       {/* No trip — show info message */}
-      {!country && (
-        <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
-          <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
-          <p className="text-sm font-medium text-foreground mb-1">Sin viaje activo</p>
-          <p className="text-xs text-muted-foreground">Abre Utilidades desde un viaje para ver la información de emergencias</p>
+      {isResolvingCountry && (
+        <div className="text-center py-12">
+          <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Cargando información del destino...</p>
         </div>
       )}
       {loading && country && (
