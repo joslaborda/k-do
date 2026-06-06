@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, ExternalLink, Loader2, X, Minus, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Loader2, X, Minus, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
@@ -91,11 +91,12 @@ function OTabBar({ tabs, activeKey, onChange }) {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 const PACKING_CATEGORIES = [
-  { value:'personal',   label:'Personal',    icon:'👤' },
-  { value:'neceser',    label:'Neceser',     icon:'🧴' },
-  { value:'tecnologia', label:'Tecnología',  icon:'📱' },
-  { value:'ropa',       label:'Ropa',        icon:'👕' },
-  { value:'medicinas',  label:'Medicinas',   icon:'💊' },
+  { value:'personal',   label:'Personal',   Icon: User },
+  { value:'ropa',       label:'Ropa',       Icon: Shirt },
+  { value:'neceser',    label:'Néceres',    Icon: Droplets },
+  { value:'tecnologia', label:'Tecnología', Icon: Smartphone },
+  { value:'medicinas',  label:'Medicinas',  Icon: Pill },
+  { value:'otros',      label:'Otros',      Icon: MoreHorizontal },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,91 +105,51 @@ const PACKING_CATEGORIES = [
 function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, saving }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState(defaultCategory);
-  const [quantity, setQuantity] = useState(1);
+  const [essential, setEssential] = useState(false);
 
   useEffect(() => {
-    if (open) { setName(''); setCategory(defaultCategory); setQuantity(1); }
+    if (open) { setName(''); setCategory(defaultCategory); setEssential(false); }
   }, [open, defaultCategory]);
 
+  const handleSave = () => {
+    if (!name.trim()) return;
+    onSave({ name: name.trim(), category, essential, packed: false });
+  };
+
   if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-card w-full max-w-lg rounded-t-3xl flex flex-col max-h-[88vh]" onClick={e => e.stopPropagation()}>
-        <div className="flex-shrink-0 pt-4 px-5 pb-4 border-b border-border">
-          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
-          <div className="flex items-center justify-between">
-            <p className="text-base font-medium text-foreground">Añadir artículo</p>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
+    <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="w-9 h-1 bg-border rounded-full mx-auto" />
+        <p className="text-sm font-medium text-foreground">Nuevo artículo</p>
+        <input autoFocus placeholder="Nombre del artículo..." value={name}
+          onChange={e => setName(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSave()}
+          className="w-full px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none" />
+        <div>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">Categoría</p>
+          <div className="grid grid-cols-2 gap-2">
+            {PACKING_CATEGORIES.map(cat => (
+              <button key={cat.value} onClick={() => setCategory(cat.value)}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${category === cat.value ? 'border-primary bg-orange-50' : 'border-border'}`}>
+                <cat.Icon size={14} color={category === cat.value ? '#c2410c' : '#888'} />
+                <span className={`text-xs font-medium ${category === cat.value ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
+              </button>
+            ))}
           </div>
         </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-          {/* Name */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Nombre *</p>
-            <Input
-              placeholder="ej. Crema solar SPF 50"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              autoFocus
-              className="h-10 text-sm"
-            />
+        <button onClick={() => setEssential(v => !v)}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-colors ${essential ? 'border-primary bg-orange-50' : 'border-border'}`}>
+          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${essential ? 'border-primary bg-primary' : 'border-border'}`}>
+            {essential && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
           </div>
-
-          {/* Category */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Categoría</p>
-            <div className="flex flex-wrap gap-2">
-              {PACKING_CATEGORIES.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => setCategory(c.value)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${
-                    category === c.value
-                      ? 'bg-primary text-white border-primary'
-                      : 'bg-card text-muted-foreground border-border hover:border-primary/40'
-                  }`}
-                >
-                  {c.icon} {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Quantity */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Cantidad</p>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-orange-50 transition-colors"
-              >
-                <Minus className="w-4 h-4 text-muted-foreground" />
-              </button>
-              <span className="text-xl font-medium text-foreground w-8 text-center">{quantity}</span>
-              <button
-                onClick={() => setQuantity(q => q + 1)}
-                className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-orange-50 transition-colors"
-              >
-                <Plus className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border">
-          <button onClick={onClose} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">
-            Cancelar
-          </button>
-          <button
-            onClick={() => { if (name.trim()) onSave({ name: name.trim(), category, quantity }); }}
-            disabled={!name.trim() || saving}
-            className="flex-1 py-2.5 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-40"
-          >
-            {saving ? 'Guardando...' : 'Guardar'}
+          <span className={`text-sm ${essential ? 'text-primary font-medium' : 'text-muted-foreground'}`}>Marcar como esencial</span>
+        </button>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">Cancelar</button>
+          <button onClick={handleSave} disabled={!name.trim() || saving}
+            className="flex-[2] py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
+            {saving ? 'Añadiendo...' : 'Añadir'}
           </button>
         </div>
       </div>
@@ -232,10 +193,12 @@ function KodoCheck({ checked, onChange, essential = false }) {
 function PackingTab({ tripId, country, tripInProgress }) {
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState({});
-  const [adding, setAdding] = useState(null); // category key or 'souvenir'
+  const [adding, setAdding] = useState(null);
   const [newName, setNewName] = useState('');
   const [newEssential, setNewEssential] = useState(false);
   const [activeInnerTab, setActiveInnerTab] = useState('maleta');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetCategory, setSheetCategory] = useState('personal');
   const addInputRef = useRef(null);
 
   const { data: items = [] } = useQuery({
@@ -327,12 +290,11 @@ function PackingTab({ tripId, country, tripInProgress }) {
         <>
           {totalItems === 0 ? (
             <div className="bg-card rounded-2xl border border-border text-center py-14 px-6">
-              <p className="text-4xl mb-3">🧳</p>
-              <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
+                            <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
               <p className="text-xs text-muted-foreground mb-5">
                 Añade los artículos que vas a necesitar{country ? ` en ${country}` : ''}
               </p>
-              <button onClick={() => openAdding(PACKING_CATEGORIES[0].value)}
+              <button onClick={() => setSheetOpen(true)}
                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
                 <Plus className="w-4 h-4" />Añadir artículo
               </button>
@@ -367,7 +329,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
                     <button onClick={() => toggleCollapsed(cat.value)}
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/20 transition-colors">
                       <div className="flex items-center gap-2">
-                        <span className="text-base">{cat.icon}</span>
+                        <cat.Icon size={15} color="#888" />
                         <span className="text-sm font-medium text-foreground">{cat.label}</span>
                         {essentialCount > 0 && (
                           <span className="text-xs font-medium text-primary bg-orange-50 px-1.5 py-0.5 rounded-full">
@@ -433,7 +395,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
                             </button>
                           </div>
                         ) : (
-                          <button onClick={() => openAdding(cat.value)}
+                          <button onClick={() => { setSheetCategory(cat.value); setSheetOpen(true); }}
                             className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-border text-xs text-primary font-medium hover:bg-orange-50/50 transition-colors">
                             <Plus className="w-3.5 h-3.5" />Añadir artículo
                           </button>
@@ -454,8 +416,7 @@ function PackingTab({ tripId, country, tripInProgress }) {
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {souvenirItems.length === 0 && adding !== 'souvenir' && (
               <div className="text-center py-12 px-6">
-                <p className="text-3xl mb-2">🛍️</p>
-                <p className="text-sm font-medium text-foreground mb-1">Lista vacía</p>
+                                <p className="text-sm font-medium text-foreground mb-1">Lista vacía</p>
                 <p className="text-xs text-muted-foreground mb-5">Anota lo que quieres comprar en el viaje</p>
                 <button onClick={() => openAdding('souvenir')}
                   className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
@@ -505,6 +466,16 @@ function PackingTab({ tripId, country, tripInProgress }) {
           </div>
         </div>
       )}
+      <AddPackingSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        defaultCategory={sheetCategory}
+        saving={createMutation.isPending}
+        onSave={async (data) => {
+          await createMutation.mutateAsync({ ...data, trip_id: tripId });
+          setSheetOpen(false);
+        }}
+      />
     </div>
   );
 }
@@ -523,7 +494,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
     const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
     setData(d);
     setLoading(false);
-  }, [country, homeCountry, secondNationality]);
+  }, [country, homeCountry, secondNationality, isResolvingCountry]);
 
   // No early return — show all tabs even without active trip
 
@@ -575,30 +546,44 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
       {/* Embassy — hide if user is in their own country */}
       {data && data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (normalizeC(country) === normalizeC(homeCountry)) return null;
+        const isHomeCountry = normalizeC(country) === normalizeC(homeCountry);
+        if (isHomeCountry) return null;
         const emb = typeof data.embassy === 'string'
-          ? { phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
+          ? { name: data.embassy.split(':')[0], phone: data.embassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
           : data.embassy;
         return (
           <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Landmark className="w-4 h-4 text-muted-foreground" />
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada en {country}</p>
-            </div>
+            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Tu embajada</p></div>
+            {emb.name && <p className="text-sm font-semibold text-foreground">{emb.name}</p>}
             {emb.address && (
-              <div className="flex items-start gap-2.5">
+              <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-foreground">{emb.address}</p>
               </div>
             )}
             {emb.phone && (
-              <a href={'tel:' + (emb.phone || '').replace(/[^0-9+]/g, '')} className="flex items-center gap-2.5">
+              <a href={`tel:${emb.phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-primary flex-shrink-0" />
                 <span className="text-sm font-semibold text-primary">{emb.phone}</span>
               </a>
             )}
+            {emb.emergency_phone && (
+              <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Emergencias 24h</p>
+                  <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
+                </div>
+              </a>
+            )}
+            {emb.email && (
+              <a href={`mailto:${emb.email}`} className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-sm text-primary">{emb.email}</span>
+              </a>
+            )}
             {emb.hours && (
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">{emb.hours}</p>
               </div>
@@ -738,21 +723,13 @@ export default function Utilities() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
-          <div className="flex items-center justify-between mb-4">
-            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
-              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inicio
-              </button>
-            </Link>
-          </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Utilidades</h1>
+        <div className="px-4 pt-12 pb-0">
+          <h1 className="text-xl font-semibold text-foreground mb-3">Utilidades</h1>
           <OTabBar tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-5 py-5 pb-24 space-y-4">
+      <div className="px-4 py-4 space-y-4">
         {activeTab === 'emergencias' && (
           <EmergencyContent
             country={country}
@@ -765,13 +742,9 @@ export default function Utilities() {
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} />
         )}
         {activeTab === 'tiempo' && (
-          <div className="space-y-4">
-            {tripCities.length > 0 ? (
-              tripCities.map(city => (
-                <WeatherCard key={city.id} city={city.name} tripCountry={city.country || country} showCityName />
-              ))
-            ) : country ? (
-              <WeatherCard city={trip?.name || country} tripCountry={country} />
+          <div>
+            {country ? (
+              <WeatherCard city={tripCities[0]?.name || trip?.name || country} tripCountry={country} />
             ) : (
               <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
                 <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
