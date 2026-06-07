@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
+import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -19,9 +22,13 @@ const TYPE = {
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'nueva notificación' };
 
 function TripInviteModal({ notif, onClose, onAccept }) {
+  const { user: currentUser } = useAuth();
   const [trip, setTrip] = useState(null);
+  const [invite, setInvite] = useState(null);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const qc = useQueryClient();
 
   useEffect(() => {
     if (!notif?.trip_id) { setLoading(false); return; }
@@ -29,6 +36,11 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       try {
         const t = await base44.entities.Trip.get(notif.trip_id);
         setTrip(t);
+        // Buscar la invitación pendiente de este usuario
+        if (currentUser?.email) {
+          const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email, status: 'pending' });
+          setInvite(invs[0] || null);
+        }
         const [profiles, users] = await Promise.all([
           base44.entities.UserProfile.list(),
           base44.entities.User.list(),
@@ -41,53 +53,102 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       } catch {}
       setLoading(false);
     })();
-  }, [notif?.trip_id]);
+  }, [notif?.trip_id, currentUser?.email]);
+
+  const handleAccept = async () => {
+    if (!invite || !currentUser?.email) return;
+    setProcessing(true);
+    try {
+      await acceptTripInvite(invite.id, invite.invite_token, invite.trip_id, currentUser.email);
+      // Notificar a todos los miembros del viaje
+      try {
+        const allProfiles = await base44.entities.UserProfile.list();
+        const myProf = allProfiles.find(p => p.user_id === currentUser.id);
+        const tripData = await base44.entities.Trip.get(invite.trip_id);
+        const others = (tripData?.members || []).filter(e => e !== currentUser.email);
+        const resolved = await resolveUserIds(others);
+        resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId: invite.trip_id, tripName: tripData?.name }));
+      } catch {}
+      qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
+      onAccept(trip);
+    } catch (e) {
+      console.error('Error aceptando invitación:', e);
+    }
+    setProcessing(false);
+  };
+
+  const handleDecline = async () => {
+    if (!invite) return;
+    setProcessing(true);
+    try {
+      await declineTripInvite(invite.id, invite.invite_token);
+      qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
+      onClose();
+    } catch {}
+    setProcessing(false);
+  };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
-      <div className="bg-card rounded-2xl w-full max-w-sm shadow-xl overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-          <p className="font-semibold text-foreground">Invitación al viaje</p>
-          <button onClick={onClose}><X className="w-4 h-4 text-muted-foreground" /></button>
-        </div>
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative bg-[#f8f6f3] rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
         {loading ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">Cargando...</div>
+          <div className="py-10 text-center text-sm text-muted-foreground">Cargando...</div>
         ) : trip ? (
-          <div className="px-5 py-4 space-y-4">
-            <div>
-              <p className="text-xl font-semibold text-foreground">{trip.name || trip.destination}</p>
-              {trip.destination && <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}</p>}
-            </div>
-            {trip.start_date && (
-              <div className="bg-secondary rounded-xl px-4 py-3">
-                <p className="text-xs text-muted-foreground mb-1">Fechas</p>
-                <p className="text-sm font-medium">
-                  {new Date(trip.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long' })}
-                  {trip.end_date && ` → ${new Date(trip.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
-                </p>
+          <>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-primary" />
               </div>
-            )}
-            {members.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1"><Users className="w-3 h-3" />{members.length} viajero{members.length !== 1 ? 's' : ''}</p>
-                <div className="flex gap-2 flex-wrap">
-                  {members.map(m => (
-                    <div key={m.email} className="flex items-center gap-1.5">
-                      {m.avatar ? <img src={m.avatar} className="w-7 h-7 rounded-full object-cover" alt={m.name} />
-                        : <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-xs font-semibold text-primary">{m.name.slice(0,2).toUpperCase()}</div>}
-                      <span className="text-xs text-muted-foreground">{m.name}</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-xs text-muted-foreground">Invitación de <span className="font-medium text-foreground">{notif.actor_display_name || 'Alguien'}</span></p>
+                <p className="text-base font-semibold text-foreground">{trip.name || trip.destination}</p>
               </div>
-            )}
-            <p className="text-xs text-muted-foreground">Invitado por <span className="font-medium text-foreground">{notif.actor_display_name || 'Alguien'}</span></p>
-          </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-2xl p-4 space-y-3 mb-5">
+              {trip.destination && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>{trip.destination}{trip.country ? `, ${trip.country}` : ''}</span>
+                </div>
+              )}
+              {trip.start_date && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="w-4 h-4 flex-shrink-0 text-center text-xs">📅</span>
+                  <span>
+                    {new Date(trip.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {trip.end_date && ` — ${new Date(trip.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                  </span>
+                </div>
+              )}
+              {members.length > 0 && (
+                <div className="flex items-center gap-2 pt-2 border-t border-border">
+                  <div className="flex -space-x-2">
+                    {members.slice(0, 4).map(m => (
+                      m.avatar
+                        ? <img key={m.email} src={m.avatar} className="w-6 h-6 rounded-full object-cover border-2 border-card" alt={m.name} />
+                        : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-[9px] font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{members.length} viajero{members.length !== 1 ? 's' : ''}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button onClick={handleDecline} disabled={processing}
+                className="flex-1 h-11 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
+                Rechazar
+              </button>
+              <button onClick={handleAccept} disabled={processing || !invite}
+                className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50">
+                {processing ? 'Aceptando...' : 'Unirme al viaje'}
+              </button>
+            </div>
+          </>
         ) : <div className="py-8 text-center text-sm text-muted-foreground">No se pudo cargar el viaje</div>}
-        <div className="px-5 py-4 border-t border-border flex gap-3">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-full border border-border text-sm text-muted-foreground">Cerrar</button>
-          {trip && <button onClick={() => onAccept(trip)} className="flex-1 py-2.5 rounded-full bg-primary text-white text-sm font-medium">Ver viaje</button>}
-        </div>
       </div>
     </div>
   );
