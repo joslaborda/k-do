@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import { Plane, Hotel, Train, Bus, Car, Ticket, Shield, CirclePlus } from 'lucide-react';
+import { Plane, Hotel, Train, Bus, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -58,7 +58,7 @@ const FIELD_PLACEHOLDERS = {
 // Personal categories that should NOT restrict to trip dates
 const PERSONAL_CATEGORIES = ['personal'];
 
-export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, onSave, onCancel, saving }) {
+export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, onSave, onCancel, onDelete, saving }) {
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
@@ -323,6 +323,11 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
       </div>
 
       {/* Actions */}
+      {onDelete && (
+        <button onClick={onDelete} className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full border border-red-200 transition-colors">
+          <Trash2 className="w-4 h-4" />Eliminar documento
+        </button>
+      )}
       <div className="flex gap-3 pt-2">
         <Button variant="outline" onClick={onCancel} className="flex-1">Cancelar</Button>
         <Button onClick={handleSave} disabled={!fields.name.trim() || saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
