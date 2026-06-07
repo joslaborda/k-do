@@ -15,7 +15,7 @@ import { es } from 'date-fns/locale';
 import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
-  Send, UserPlus, Check, X, GripVertical, Clock
+  Send, UserPlus, Check, X, GripVertical, Clock, Copy
 , MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass , AlertTriangle } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
@@ -1995,6 +1995,8 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
+  const [shareLink, setShareLink] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const handleInvite = async () => {
     const raw = email.trim();
@@ -2016,7 +2018,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
       }
       const currentMembers = trip?.members || [];
       if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
-      await sendTripInvite({
+      const result = await sendTripInvite({
         tripId,
         email: resolvedEmail,
         role: 'editor',
@@ -2025,8 +2027,13 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
         inviterName: trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-      setDone(true); setEmail('');
-      setTimeout(() => { setDone(false); onClose(); }, 2500);
+      if (!result?.emailSent && result?.inviteUrl) {
+        // base44 no puede enviar emails a usuarios externos — mostrar link para compartir
+        setShareLink(result.inviteUrl);
+      } else {
+        setDone(true); setEmail('');
+        setTimeout(() => { setDone(false); onClose(); }, 2500);
+      }
     } catch (e) { setError(e?.message || 'Error al enviar la invitación. Inténtalo de nuevo.'); }
     setSending(false);
   };
@@ -2046,6 +2053,31 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
             </div>
             <p className="text-base font-semibold text-foreground">¡Invitación enviada!</p>
             <p className="text-sm text-muted-foreground text-center">Hemos enviado un email a {email}</p>
+          </div>
+        ) : shareLink ? (
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <UserPlus className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Invitación creada</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">No podemos enviar email a usuarios que aún no están en Kōdo. Comparte este enlace por WhatsApp o iMessage.</p>
+              </div>
+            </div>
+            <div className="bg-card border border-border rounded-2xl px-4 py-3">
+              <p className="text-[11px] text-muted-foreground mb-1.5">Enlace de invitación</p>
+              <p className="text-xs text-foreground font-mono break-all leading-relaxed">{shareLink}</p>
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+              className="w-full h-11 rounded-full bg-primary text-white text-sm font-medium flex items-center justify-center gap-2"
+            >
+              {copied ? <><Check className="w-4 h-4" />¡Copiado!</> : <><Copy className="w-4 h-4" />Copiar enlace</>}
+            </button>
+            <button onClick={() => { setShareLink(''); onClose(); }} className="text-xs text-muted-foreground text-center py-1">
+              Cerrar
+            </button>
           </div>
         ) : (
           <>
