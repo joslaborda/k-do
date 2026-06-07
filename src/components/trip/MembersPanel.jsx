@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, UserPlus, Crown, Pencil, Eye, Mail } from 'lucide-react';
+import { Users, UserPlus, Crown, Pencil, Eye, Mail, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,6 +18,8 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
 
   const members = trip?.members || [];
@@ -80,13 +82,14 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
         inviterEmail: currentUserEmail,
         inviterName: currentUserEmail.split('@')[0],
       });
-      if (result?.emailSent === false) {
-        toast({ title: '⚠️ Invitación guardada', description: `No se pudo enviar el email a ${resolvedEmail}. La invitación está activa — comparte el link manualmente.`, variant: 'destructive' });
+      if (!result?.emailSent && result?.inviteUrl) {
+        setShareLink(result.inviteUrl);
+        setInviteEmail('');
       } else {
         toast({ title: '✓ Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
+        setInviteEmail('');
+        setInviteRole('editor');
       }
-      setInviteEmail('');
-      setInviteRole('editor');
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
     } catch (e) {
       toast({ title: 'Error', description: e.message || 'No se pudo enviar la invitación' });
@@ -169,37 +172,63 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
       {/* Invite form */}
       {isAdmin && (
         <div className="pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
-            <Mail className="w-3 h-3" />Invitar por email
-          </p>
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <Input
-                id="invite-input"
-                placeholder="email@ejemplo.com"
-                value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleInvite()}
-                className="text-sm flex-1"
-              />
-              <Select value={inviteRole} onValueChange={setInviteRole}>
-                <SelectTrigger className="w-24 h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="editor">Editor</SelectItem>
-                  <SelectItem value="viewer">Lector</SelectItem>
-                </SelectContent>
-              </Select>
+          {shareLink ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <Mail className="w-3 h-3" />Comparte el enlace de invitación
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                No podemos enviar email a usuarios externos. Comparte este enlace directamente.
+              </p>
+              <div className="bg-secondary rounded-xl px-3 py-2.5">
+                <p className="text-xs font-mono break-all text-foreground leading-relaxed">{shareLink}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+                  className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                  size="sm"
+                >
+                  {copied ? <><Check className="w-3.5 h-3.5 mr-1" />¡Copiado!</> : <><Copy className="w-3.5 h-3.5 mr-1" />Copiar enlace</>}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setShareLink('')}>Volver</Button>
+              </div>
             </div>
-            <Button
-              onClick={handleInvite}
-              disabled={!inviteEmail.trim() || inviting}
-              className="w-full bg-primary hover:bg-primary/90 text-white"
-              size="sm"
-            >
-              {inviting ? '...' : 'Enviar invitación'}
-            </Button>
-          </div>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                <Mail className="w-3 h-3" />Invitar por email
+              </p>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Input
+                    id="invite-input"
+                    placeholder="email@ejemplo.com"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleInvite()}
+                    className="text-sm flex-1"
+                  />
+                  <Select value={inviteRole} onValueChange={setInviteRole}>
+                    <SelectTrigger className="w-24 h-9 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                      <SelectItem value="viewer">Lector</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={handleInvite}
+                  disabled={!inviteEmail.trim() || inviting}
+                  className="w-full bg-primary hover:bg-primary/90 text-white"
+                  size="sm"
+                >
+                  {inviting ? '...' : 'Enviar invitación'}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
