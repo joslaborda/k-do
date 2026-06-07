@@ -1,15 +1,16 @@
 import { base44 } from '@/api/base44Client';
 import { notify, resolveUserIds } from '@/lib/notifications';
 
+/**
+ * Generar token único para invitación
+ */
 export function generateInviteToken() {
-  return Math.random().toString(36).substring(2, 15) +
+  return Math.random().toString(36).substring(2, 15) + 
          Math.random().toString(36).substring(2, 15);
 }
 
 /**
- * Crear invitación y enviar email.
- * Si el email falla, la invitación se guarda igualmente y se devuelve
- * { invite, emailSent: false, emailError } para que la UI pueda avisar.
+ * Crear o actualizar invitación y enviar email
  */
 export async function sendTripInvite({
   tripId,
@@ -19,104 +20,109 @@ export async function sendTripInvite({
   inviterEmail,
   inviterName
 }) {
+  // Generar token
   const inviteToken = generateInviteToken();
-  const normalizedEmail = email.trim().toLowerCase();
+  
+  // Verificar si ya existe invitación pending
+  const existingInvites = await base44.entities.TripInvite.filter({
+    trip_id: tripId,
+    email: email.toLowerCase(),
+    status: 'pending'
+  });
 
-  // Reutilizar invitación pending existente o crear nueva
   let invite;
-  try {
-    const existing = await base44.entities.TripInvite.filter({
-      trip_id: tripId,
-      email: normalizedEmail,
-      status: 'pending'
+  if (existingInvites.length > 0) {
+    // Actualizar token y resend
+    invite = await base44.entities.TripInvite.update(existingInvites[0].id, {
+      invite_token: inviteToken,
+      invited_by: inviterEmail
     });
-
-    if (existing.length > 0) {
-      invite = await base44.entities.TripInvite.update(existing[0].id, {
-        invite_token: inviteToken,
-        invited_by: inviterEmail
-      });
-    } else {
-      invite = await base44.entities.TripInvite.create({
-        trip_id: tripId,
-        email: normalizedEmail,
-        role: role || 'editor',
-        status: 'pending',
-        invite_token: inviteToken,
-        invited_by: inviterEmail
-      });
-    }
-  } catch (dbErr) {
-    console.error('[sendTripInvite] DB error:', dbErr);
-    throw new Error('No se pudo guardar la invitación. Inténtalo de nuevo.');
+  } else {
+    // Crear nueva invitación
+    invite = await base44.entities.TripInvite.create({
+      trip_id: tripId,
+      email: email.toLowerCase(),
+      role,
+      status: 'pending',
+      invite_token: inviteToken,
+      invited_by: inviterEmail
+    });
   }
 
-  // Construir URL de aceptación
-  const base = window.location.origin;
-  const appPath = window.location.pathname.split('/')[1];
-  const inviteUrl = `${base}/${appPath}/Invites?token=${inviteToken}`;
+  // Construir link de aceptación
+  const inviteUrl = `${window.location.origin}/${window.location.pathname.split('/')[1]}/Invites?token=${inviteToken}`;
 
-  const roleLabel = role === 'admin' ? 'Administrador' : role === 'editor' ? 'Editor' : 'Miembro';
-  const senderName = inviterName || inviterEmail?.split('@')[0] || 'Un compañero';
+  // Enviar email
+  await base44.integrations.Core.SendEmail({
+    to: email,
+    subject: `Te invitan a ${tripName} 🧳`,
+    body: `Hola,
 
-  // Intentar enviar email — si falla, la invitación ya está guardada
-  let emailSent = true;
-  let emailError = null;
-  try {
-    await base44.integrations.Core.SendEmail({
-      to: normalizedEmail,
-      subject: `${senderName} te invita a "${tripName}" en Kōdo ✈️`,
-      body: `Hola,
+${inviterName || inviterEmail} te ha invitado a colaborar en el viaje "${tripName}" con rol de ${role === 'admin' ? 'Administrador' : role === 'editor' ? 'Editor' : 'Lector'}.
 
-${senderName} te ha invitado a colaborar en el viaje "${tripName}" como ${roleLabel}.
-
-Haz clic aquí para unirte:
+Para aceptar la invitación, haz clic en el siguiente enlace:
 ${inviteUrl}
 
-Si el enlace no funciona, cópialo en tu navegador.
+O cópialo en tu navegador si el enlace no funciona.
 
-Si no tienes cuenta en Kōdo, créala con este mismo email (${normalizedEmail}) y la invitación aparecerá automáticamente.
+¿Preguntas? Contáctanos en soporte@kodo.travel
 
-¡Buen viaje! 🧳`
-    });
-  } catch (emailErr) {
-    emailSent = false;
-    emailError = emailErr?.message || String(emailErr);
-    console.error('[sendTripInvite] Email error:', emailErr);
-  }
+¡Que disfrutes planificando tu viaje! ✈️`
+  });
 
-  return { invite, emailSent, emailError };
+  return invite;
 }
 
+/**
+ * Aceptar invitación: actualizar TripInvite y agregar a Trip
+ */
 export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail) {
+  // Obtener invitación y verificar token
   const invite = await base44.entities.TripInvite.get(inviteId);
-
+  
   if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
     throw new Error('Invitación inválida o expirada');
   }
 
+  // Actualizar invitación
   await base44.entities.TripInvite.update(inviteId, {
     status: 'accepted',
     responded_date: new Date().toISOString()
   });
 
+  // Obtener trip actual
   const trip = await base44.entities.Trip.get(tripId);
+  
+  // Agregar a members (si no está ya)
   const members = trip.members || [];
   const newMembers = members.includes(userEmail) ? members : [...members, userEmail];
-  const roles = trip.roles || {};
-  const newRoles = { ...roles, [userEmail]: invite.role || 'editor' };
 
+  // Asignar rol
+  const roles = trip.roles || {};
+  const newRoles = { ...roles, [userEmail]: invite.role };
+
+  // Actualizar trip
   await base44.entities.Trip.update(tripId, {
     members: newMembers,
     roles: newRoles
   });
 
+  // Notificar al creador del viaje que alguien aceptó
+  try {
+// member_joined notification sent from Invites.jsx
+  } catch {
+    // silencioso
+  }
+
   return trip;
 }
 
+/**
+ * Rechazar invitación
+ */
 export async function declineTripInvite(inviteId, inviteToken) {
   const invite = await base44.entities.TripInvite.get(inviteId);
-
+  
   if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
     throw new Error('Invitación inválida o expirada');
   }
