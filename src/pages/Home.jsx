@@ -1127,13 +1127,10 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                       <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
                       {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-muted-foreground">{doneCount}/{items.length}</span>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                        className={"text-muted-foreground transition-transform " + (isCollapsed ? '' : 'rotate-180')}>
-                        <polyline points="18 15 12 9 6 15"/>
-                      </svg>
-                    </div>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                      className={"text-muted-foreground transition-transform " + (isCollapsed ? '' : 'rotate-180')}>
+                      <polyline points="18 15 12 9 6 15"/>
+                    </svg>
                   </button>
                   {!isCollapsed && <>
                   {items.map(req => {
@@ -2013,18 +2010,25 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
       }
       const currentMembers = trip?.members || [];
       if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
-      await sendTripInvite({
+      const result = await sendTripInvite({
         tripId,
         email: resolvedEmail,
-        role: 'member',
+        role: 'editor',
         tripName: trip?.name || 'el viaje',
         inviterEmail: trip?.created_by || '',
         inviterName: trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-      setDone(true); setEmail('');
-      setTimeout(() => { setDone(false); onClose(); }, 2500);
-    } catch (e) { setError('Error al enviar la invitación. Inténtalo de nuevo.'); }
+      if (result?.emailSent === false) {
+        // Invitación guardada pero email falló — mostrar aviso pero cerrar
+        setError(`Invitación guardada, pero no se pudo enviar el email. Comparte el enlace manualmente.`);
+        setSending(false);
+        setTimeout(() => { setDone(false); onClose(); }, 4000);
+      } else {
+        setDone(true); setEmail('');
+        setTimeout(() => { setDone(false); onClose(); }, 2500);
+      }
+    } catch (e) { setError(e?.message || 'Error al enviar la invitación. Inténtalo de nuevo.'); }
     setSending(false);
   };
 
