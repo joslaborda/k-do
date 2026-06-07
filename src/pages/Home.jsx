@@ -2016,7 +2016,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
       }
       const currentMembers = trip?.members || [];
       if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
-      const result = await sendTripInvite({
+      await sendTripInvite({
         tripId,
         email: resolvedEmail,
         role: 'editor',
@@ -2025,15 +2025,8 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
         inviterName: trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
-      if (result?.emailSent === false) {
-        // Invitación guardada pero email falló — mostrar aviso pero cerrar
-        setError(`Invitación guardada, pero no se pudo enviar el email. Comparte el enlace manualmente.`);
-        setSending(false);
-        setTimeout(() => { setDone(false); onClose(); }, 4000);
-      } else {
-        setDone(true); setEmail('');
-        setTimeout(() => { setDone(false); onClose(); }, 2500);
-      }
+      setDone(true); setEmail('');
+      setTimeout(() => { setDone(false); onClose(); }, 2500);
     } catch (e) { setError(e?.message || 'Error al enviar la invitación. Inténtalo de nuevo.'); }
     setSending(false);
   };
