@@ -2944,3 +2944,9 @@ export function getCountryRequirements(destination, homeCountry = 'España') {
   return { ...req, visa: { ...req.visa, needed, type, label, passportCode: code } };
 }
 
+
+// Función de compatibilidad — PACKING_TEMPLATES eliminadas, devuelve solo requirements
+export function getSmartPackingList(country) {
+  const req = COUNTRY_REQUIREMENTS[country] || null;
+  return { items: [], requirements: req };
+}
