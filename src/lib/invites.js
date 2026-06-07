@@ -52,6 +52,28 @@ export async function sendTripInvite({
   // Construir link de aceptación
   const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
 
+  // Si el usuario ya existe en Kōdo, crearle una notificación in-app
+  try {
+    const users = await base44.entities.User.list();
+    const existingUser = users.find(u => u.email?.toLowerCase() === normalizedEmail);
+    if (existingUser?.id) {
+      const profiles = await base44.entities.UserProfile.filter({ user_id: existingUser.id });
+      const actor = profiles[0] || null;
+      await notify({
+        userId: existingUser.id,
+        type: 'trip_invite',
+        actor: { display_name: inviterName || inviterEmail, email: inviterEmail },
+        tripId,
+        tripName,
+        refId: invite.id,
+        refExtra: { token: inviteToken }
+      });
+    }
+  } catch (e) {
+    // silencioso — la notificación in-app es opcional
+    console.warn('[sendTripInvite] No se pudo crear notificación in-app:', e);
+  }
+
   // Enviar email
   await base44.integrations.Core.SendEmail({
     to: email,
