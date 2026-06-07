@@ -3,11 +3,11 @@ import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Mail } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
 import { getSeedSpotsForCountry } from '@/lib/spotsDB';
@@ -127,7 +127,18 @@ export default function TripsList() {
   const [showPast, setShowPast] = useState(false);
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
+  // Invitaciones pendientes
+  const { data: pendingInvites = [] } = useQuery({
+    queryKey: ['myPendingInvites', user?.email],
+    queryFn: async () => {
+      if (!user?.email) return [];
+      return base44.entities.TripInvite.filter({ email: user.email, status: 'pending' });
+    },
+    enabled: !!user?.email,
+    refetchInterval: 30000,
+  });
 
   const { data: myProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
@@ -316,6 +327,27 @@ export default function TripsList() {
 
       {/* ── Content ── */}
       <div className="max-w-3xl mx-auto px-4 py-5 pb-24 space-y-4">
+
+        {/* Banner invitaciones pendientes */}
+        {pendingInvites.length > 0 && (
+          <button
+            onClick={() => navigate(createPageUrl('Invites'))}
+            className="w-full flex items-center gap-3 bg-orange-50 border border-primary/20 rounded-2xl px-4 py-3.5 text-left hover:bg-orange-100 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Mail className="w-4.5 h-4.5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">
+                {pendingInvites.length === 1 ? '1 invitación pendiente' : `${pendingInvites.length} invitaciones pendientes`}
+              </p>
+              <p className="text-xs text-muted-foreground">Alguien te ha invitado a un viaje</p>
+            </div>
+            <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-[10px] font-bold">{pendingInvites.length}</span>
+            </div>
+          </button>
+        )}
 
         {trips.length === 0 ? (
           <EmptyState onCreateTrip={() => setDialogOpen(true)} />
