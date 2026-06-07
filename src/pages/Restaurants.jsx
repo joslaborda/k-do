@@ -1420,7 +1420,7 @@ export default function Restaurants() {
       setOsmResults([]); setNearbyResults([]); setSearchQuery(''); setNearbyFilter([]);
       showToastFor({ title: place.name }, city);
       if (created?.id) setAssignDateSpot(created);
-      notifyMembers('spot_added', '', place.name, { spotId: savedSpot?.id, spotDate: savedSpot?.assigned_date });
+      notifyMembers('spot_added', '', place.name, { spotId: created?.id, spotDate: created?.assigned_date });
     } catch(e) {
       alert('Error al guardar: ' + e.message);
     } finally { setSavingId(null); }
@@ -1439,7 +1439,7 @@ export default function Restaurants() {
       setShowCreate(false);
       showToastFor({ title: form.title }, city);
       if (created?.id) setAssignDateSpot(created);
-      notifyMembers('spot_added', '', form.title, { spotId: savedSpot?.id, spotDate: savedSpot?.assigned_date });
+      notifyMembers('spot_added', '', form.title, { spotId: created?.id, spotDate: created?.assigned_date });
     } finally { setSavingId(null); }
   };
 
