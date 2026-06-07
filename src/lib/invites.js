@@ -37,11 +37,13 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
   // URL de aceptación
   const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
 
-  // Enviar email — funciona para usuarios registrados Y no registrados
-  await base44.integrations.Core.SendEmail({
-    to: normalizedEmail,
-    subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
-    body: `Hola,
+  // Enviar email — capturar error si base44 no permite externos
+  let emailSent = false;
+  try {
+    await base44.integrations.Core.SendEmail({
+      to: normalizedEmail,
+      subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
+      body: `Hola,
 
 ${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
 
@@ -51,7 +53,11 @@ ${inviteUrl}
 Si aún no tienes cuenta en Kōdo, regístrate con este email (${normalizedEmail}) y la invitación aparecerá automáticamente.
 
 ¡Buen viaje! 🧳`
-  });
+    });
+    emailSent = true;
+  } catch (e) {
+    console.warn('[sendTripInvite] Email no enviado:', e?.message);
+  }
 
   // Si el usuario ya existe en Kōdo, crear notificación in-app
   // Usamos UserProfile.filter por email para no necesitar User.list() (que puede estar restringido)
@@ -73,7 +79,7 @@ Si aún no tienes cuenta en Kōdo, regístrate con este email (${normalizedEmail
     console.warn('[sendTripInvite] Notificación in-app no creada:', e?.message);
   }
 
-  return invite;
+  return { invite, emailSent, inviteUrl };
 }
 
 export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail) {
