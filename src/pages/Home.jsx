@@ -228,12 +228,17 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
       level: 'info'
     });
     (data?.vaccines || []).forEach((v, i) => {
-      const isRequired = v.priority?.includes('requer');
+      const p = v.priority?.toLowerCase() || '';
+      // "obligatoria para entrada" → nivel required (bloquea entrada al país)
+      // "obligatoria si vienes de..." → info (condicional según origen)
+      // "quimioprofilaxis" → info (recomendación médica, no bloquea entrada)
+      // "recomendada..." → info
+      const isHardRequired = p === 'obligatoria para entrada';
       reqs.push({
         id: `${country}-vax-${i}`, type: 'vaccine', country,
-        title: `${v.name}`,
+        title: v.name,
         description: v.priority,
-        level: isRequired ? 'required' : 'info', // recommended = info only, not checkable
+        level: isHardRequired ? 'required' : 'info',
       });
     });
     (data?.tips || []).forEach((tip, i) => reqs.push({
