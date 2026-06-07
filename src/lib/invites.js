@@ -1,66 +1,65 @@
 import { base44 } from '@/api/base44Client';
-import { notify, resolveUserIds } from '@/lib/notifications';
+import { notify } from '@/lib/notifications';
 
-/**
- * Generar token único para invitación
- */
 export function generateInviteToken() {
-  return Math.random().toString(36).substring(2, 15) + 
+  return Math.random().toString(36).substring(2, 15) +
          Math.random().toString(36).substring(2, 15);
 }
 
-/**
- * Crear o actualizar invitación y enviar email
- */
-export async function sendTripInvite({
-  tripId,
-  email,
-  role,
-  tripName,
-  inviterEmail,
-  inviterName
-}) {
-  // Generar token
+export async function sendTripInvite({ tripId, email, role, tripName, inviterEmail, inviterName }) {
   const inviteToken = generateInviteToken();
-  
-  // Verificar si ya existe invitación pending
-  const existingInvites = await base44.entities.TripInvite.filter({
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Crear o reusar invitación pending
+  const existing = await base44.entities.TripInvite.filter({
     trip_id: tripId,
-    email: email.toLowerCase(),
+    email: normalizedEmail,
     status: 'pending'
   });
 
   let invite;
-  if (existingInvites.length > 0) {
-    // Actualizar token y resend
-    invite = await base44.entities.TripInvite.update(existingInvites[0].id, {
+  if (existing.length > 0) {
+    invite = await base44.entities.TripInvite.update(existing[0].id, {
       invite_token: inviteToken,
       invited_by: inviterEmail
     });
   } else {
-    // Crear nueva invitación
     invite = await base44.entities.TripInvite.create({
       trip_id: tripId,
-      email: email.toLowerCase(),
-      role,
+      email: normalizedEmail,
+      role: role || 'editor',
       status: 'pending',
       invite_token: inviteToken,
       invited_by: inviterEmail
     });
   }
 
-  // Construir link de aceptación
+  // URL de aceptación
   const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
 
-  // Si el usuario ya existe en Kōdo, crearle una notificación in-app
+  // Enviar email — funciona para usuarios registrados Y no registrados
+  await base44.integrations.Core.SendEmail({
+    to: normalizedEmail,
+    subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
+    body: `Hola,
+
+${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
+
+Haz clic aquí para aceptar la invitación:
+${inviteUrl}
+
+Si aún no tienes cuenta en Kōdo, regístrate con este email (${normalizedEmail}) y la invitación aparecerá automáticamente.
+
+¡Buen viaje! 🧳`
+  });
+
+  // Si el usuario ya existe en Kōdo, crear notificación in-app
+  // Usamos UserProfile.filter por email para no necesitar User.list() (que puede estar restringido)
   try {
-    const users = await base44.entities.User.list();
-    const existingUser = users.find(u => u.email?.toLowerCase() === normalizedEmail);
-    if (existingUser?.id) {
-      const profiles = await base44.entities.UserProfile.filter({ user_id: existingUser.id });
-      const actor = profiles[0] || null;
+    const profiles = await base44.entities.UserProfile.filter({ email: normalizedEmail });
+    if (profiles.length > 0 && profiles[0].user_id) {
       await notify({
-        userId: existingUser.id,
+        userId: profiles[0].user_id,
         type: 'trip_invite',
         actor: { display_name: inviterName || inviterEmail, email: inviterEmail },
         tripId,
@@ -70,81 +69,39 @@ export async function sendTripInvite({
       });
     }
   } catch (e) {
-    // silencioso — la notificación in-app es opcional
-    console.warn('[sendTripInvite] No se pudo crear notificación in-app:', e);
+    // Silencioso — la notificación in-app es opcional
+    console.warn('[sendTripInvite] Notificación in-app no creada:', e?.message);
   }
-
-  // Enviar email
-  await base44.integrations.Core.SendEmail({
-    to: email,
-    subject: `Te invitan a ${tripName} 🧳`,
-    body: `Hola,
-
-${inviterName || inviterEmail} te ha invitado a colaborar en el viaje "${tripName}" con rol de ${role === 'admin' ? 'Administrador' : role === 'editor' ? 'Editor' : 'Lector'}.
-
-Para aceptar la invitación, haz clic en el siguiente enlace:
-${inviteUrl}
-
-O cópialo en tu navegador si el enlace no funciona.
-
-¿Preguntas? Contáctanos en soporte@kodo.travel
-
-¡Que disfrutes planificando tu viaje! ✈️`
-  });
 
   return invite;
 }
 
-/**
- * Aceptar invitación: actualizar TripInvite y agregar a Trip
- */
 export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail) {
-  // Obtener invitación y verificar token
   const invite = await base44.entities.TripInvite.get(inviteId);
-  
+
   if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
     throw new Error('Invitación inválida o expirada');
   }
 
-  // Actualizar invitación
   await base44.entities.TripInvite.update(inviteId, {
     status: 'accepted',
     responded_date: new Date().toISOString()
   });
 
-  // Obtener trip actual
   const trip = await base44.entities.Trip.get(tripId);
-  
-  // Agregar a members (si no está ya)
   const members = trip.members || [];
   const newMembers = members.includes(userEmail) ? members : [...members, userEmail];
-
-  // Asignar rol
   const roles = trip.roles || {};
-  const newRoles = { ...roles, [userEmail]: invite.role };
+  const newRoles = { ...roles, [userEmail]: invite.role || 'editor' };
 
-  // Actualizar trip
-  await base44.entities.Trip.update(tripId, {
-    members: newMembers,
-    roles: newRoles
-  });
-
-  // Notificar al creador del viaje que alguien aceptó
-  try {
-// member_joined notification sent from Invites.jsx
-  } catch {
-    // silencioso
-  }
+  await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
 
   return trip;
 }
 
-/**
- * Rechazar invitación
- */
 export async function declineTripInvite(inviteId, inviteToken) {
   const invite = await base44.entities.TripInvite.get(inviteId);
-  
+
   if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
     throw new Error('Invitación inválida o expirada');
   }
