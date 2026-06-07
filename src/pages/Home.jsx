@@ -28,6 +28,7 @@ import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
 import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, Star } from '@/lib/icons';
 import { getVisaInfo } from '@/lib/visaMatrix';
+import { sendTripInvite } from '@/lib/invites';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 
 if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-style')) {
@@ -2037,52 +2038,71 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
     setSending(false);
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
-        <DialogHeader className="px-5 py-4 border-b border-border">
-          <DialogTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-primary" />Invitar al viaje
-          </DialogTitle>
-        </DialogHeader>
-        <div className="px-5 py-4">
-          {done ? (
-            <div className="flex flex-col items-center py-4 gap-3">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <Check className="w-6 h-6 text-green-600" />
-              </div>
-              <p className="text-sm font-medium text-foreground">¡Invitación enviada!</p>
-              <p className="text-xs text-muted-foreground text-center">{email} ha sido añadido al viaje</p>
+  if (!open) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative bg-[#f8f6f3] rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+        {/* Handle */}
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
+
+        {done ? (
+          <div className="flex flex-col items-center py-6 gap-3">
+            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+              <Check className="w-7 h-7 text-green-600" />
             </div>
-          ) : (
-            <>
-              <p className="text-sm text-muted-foreground mb-4">Introduce el email de la persona que quieres añadir al viaje.</p>
-              <label className="text-xs font-medium text-foreground mb-1.5 block">Email *</label>
-              <Input
+            <p className="text-base font-semibold text-foreground">¡Invitación enviada!</p>
+            <p className="text-sm text-muted-foreground text-center">Hemos enviado un email a {email}</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                <UserPlus className="w-4 h-4 text-primary" />
+              </div>
+              <h2 className="text-base font-semibold text-foreground">Invitar al viaje</h2>
+            </div>
+
+            <p className="text-sm text-muted-foreground mb-4">
+              Introduce el email de quien quieres añadir. Le llegará un email con el enlace de acceso.
+            </p>
+
+            <div className="bg-card border border-border rounded-2xl px-4 py-3 flex items-center gap-2">
+              <Send className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <input
                 value={email}
                 onChange={e => { setEmail(e.target.value); setError(''); }}
                 onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
-                placeholder="email o @usuario"
+                placeholder="email@ejemplo.com"
                 type="email"
-                className="h-10 text-sm"
                 autoFocus
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
               />
-              {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
-              <p className="text-xs text-muted-foreground mt-3">El usuario recibirá acceso al viaje con su cuenta de Kōdo.</p>
-            </>
-          )}
-        </div>
-        {!done && (
-          <div className="flex gap-2 px-5 py-3 border-t border-border justify-end">
-            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
-              onClick={handleInvite} disabled={!email.trim() || sending}>
-              {sending ? 'Añadiendo...' : 'Añadir al viaje'}
-            </Button>
-          </div>
+            </div>
+
+            {error && (
+              <div className="mt-3 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">
+                <p className="text-xs text-red-600">{error}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={onClose} className="flex-1 h-11 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
+                Cancelar
+              </button>
+              <button
+                onClick={handleInvite}
+                disabled={!email.trim() || sending}
+                className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50"
+              >
+                {sending ? 'Enviando...' : 'Enviar invitación'}
+              </button>
+            </div>
+          </>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>,
+    document.body
   );
 }
 
