@@ -50,7 +50,7 @@ export async function sendTripInvite({
   }
 
   // Construir link de aceptación
-  const inviteUrl = `${window.location.origin}/${window.location.pathname.split('/')[1]}/Invites?token=${inviteToken}`;
+  const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
 
   // Enviar email
   await base44.integrations.Core.SendEmail({
