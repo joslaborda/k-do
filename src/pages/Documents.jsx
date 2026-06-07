@@ -441,8 +441,14 @@ export default function Documents() {
       {/* Edit dialog */}
       <Dialog open={!!editDoc} onOpenChange={(o) => { if (!o) setEditDoc(null); }}>
         <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
-          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
+          <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0 flex flex-row items-center justify-between">
             <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
+            <button
+              onClick={() => { setDeleteDoc(editDoc); setEditDoc(null); }}
+              className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 px-2.5 py-1.5 rounded-full transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" />Eliminar
+            </button>
           </DialogHeader>
           {editDoc && (
             <div className="px-5 py-4 overflow-y-auto flex-1">
