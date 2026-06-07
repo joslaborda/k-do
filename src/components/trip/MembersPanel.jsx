@@ -72,7 +72,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
         setInviting(false);
         return;
       }
-      await sendTripInvite({
+      const result = await sendTripInvite({
         tripId: trip.id,
         email: resolvedEmail,
         role: inviteRole,
@@ -80,7 +80,11 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
         inviterEmail: currentUserEmail,
         inviterName: currentUserEmail.split('@')[0],
       });
-      toast({ title: '✓ Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
+      if (result?.emailSent === false) {
+        toast({ title: '⚠️ Invitación guardada', description: `No se pudo enviar el email a ${resolvedEmail}. La invitación está activa — comparte el link manualmente.`, variant: 'destructive' });
+      } else {
+        toast({ title: '✓ Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
+      }
       setInviteEmail('');
       setInviteRole('editor');
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
