@@ -2943,3 +2943,4 @@ export function getCountryRequirements(destination, homeCountry = 'España') {
 
   return { ...req, visa: { ...req.visa, needed, type, label, passportCode: code } };
 }
+
