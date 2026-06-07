@@ -812,7 +812,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo N', info: 'Voltaje: 127V/220V' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'solo si visitas Amazonia' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas la Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'recomendada si visitas la Amazonia' }],
     currency: { info: 'Real (BRL).' },
     tips: ['Enchufe tipo N — adaptador universal.', 'No saques móvil en la calle.'],
     emergency: '190 · 192 · 193'
@@ -840,7 +840,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 110V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria si visitas zonas selváticas' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria si vienes de zona endémica o visitas selva' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Peso colombiano (COP).' },
     tips: ['Enchufes como EEUU — adaptador si vienes de Europa.'],
     emergency: '112 · 123'
@@ -854,7 +854,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo C', info: 'Voltaje: 220V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas Amazonia' }, { name: 'Malaria (quimioprofilaxis)', priority: 'solo Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas la Amazonia' }, { name: 'Malaria (quimioprofilaxis)', priority: 'recomendada si visitas la Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Sol peruano (PEN). Efectivo en zonas rurales.' },
     tips: ['Machu Picchu: reserva con meses de antelación.', 'Cusco 3400m — aclimatarse 2 días.'],
     emergency: '105 · 117'
@@ -896,7 +896,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas bajas tropicales' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas bajas tropicales' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
     currency: { info: 'Boliviano (BOB). Efectivo necesario.' },
     tips: ['Salar de Uyuni imprescindible.', 'La Paz 3600m — mal de altura.'],
     emergency: '110 · 118'
@@ -910,7 +910,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · Puertas abiertas — sin visa para casi todos.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas Amazonia' }, { name: 'Malaria (quimioprofilaxis)', priority: 'solo Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada si visitas la Amazonia' }, { name: 'Malaria (quimioprofilaxis)', priority: 'recomendada si visitas la Amazonia' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar (USD).' },
     tips: ['Galápagos: tarifa ~$200 — reserva con antelación.'],
     emergency: '911'
@@ -924,7 +924,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas fronterizas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas fronterizas' }],
     currency: { info: 'Bolívar (VES). USD ampliamente aceptado.' },
     tips: ['Lleva dólares en efectivo.'],
     emergency: '911'
@@ -938,7 +938,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas costeras' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas costeras' }],
     currency: { info: 'Colón (CRC). USD aceptado.' },
     tips: ['Biodiversidad increíble — 5% de la fauna mundial.'],
     emergency: '911'
@@ -952,7 +952,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas indígenas remotas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas indígenas remotas' }],
     currency: { info: 'Dólar (USD) y Balboa (PAB).' },
     tips: ['Canal de Panamá: visita Miraflores.'],
     emergency: '911'
@@ -980,7 +980,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 110V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas costeras' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas costeras' }],
     currency: { info: 'Lempira (HNL).' },
     tips: ['Islas de la Bahía: arrecife impresionante.'],
     emergency: '199 · 195'
@@ -1008,7 +1008,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales' }],
     currency: { info: 'Córdoba (NIO).' },
     tips: ['Verificar avisos oficiales antes de viajar.'],
     emergency: '118 · 128'
@@ -1022,7 +1022,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo B · Tipo G', info: 'Voltaje: 110V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales' }],
     currency: { info: 'Dólar de Belice (BZD).' },
     tips: ['Barrera de coral: segunda más grande del mundo.'],
     emergency: '911'
@@ -1064,7 +1064,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 110V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'riesgo moderado' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — riesgo moderado' }],
     currency: { info: 'Gourde (HTG).' },
     tips: ['Zona de riesgo — verificar avisos antes de viajar.'],
     emergency: '114'
@@ -1218,7 +1218,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo D · Tipo G', info: 'Voltaje: 240V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'interior selvático' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas selváticas' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar de Guyana (GYD).' },
     tips: ['Cataratas Kaieteur: 5x más altas que Niágara.'],
     emergency: '911'
@@ -1232,7 +1232,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo F', info: 'Voltaje: 127V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'interior' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas interiores' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar surinamés (SRD).' },
     tips: ['Paramaribo: capital UNESCO.'],
     emergency: '115 · 113'
@@ -1358,7 +1358,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · ES 60 días. India/China/Rusia también sin visa.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas fronterizas del norte' }, { name: 'Rabia', priority: 'contacto con animales' }, { name: 'Encefalitis japonesa', priority: 'zonas rurales estancias largas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas fronterizas del norte' }, { name: 'Rabia', priority: 'recomendada si prevés contacto con animales' }, { name: 'Encefalitis japonesa', priority: 'recomendada para estancias largas en zonas rurales' }],
     currency: { info: 'Baht (THB). Efectivo muy usado.' },
     tips: ['Templos: ropa que cubra hombros y rodillas.', 'Evitar ofender a la monarquía — delito grave.'],
     emergency: '191 · 1669'
@@ -1372,7 +1372,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa ~$25. CN/RU sin visa.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo C · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Rabia', priority: 'contacto con animales' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales fronterizas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Rabia', priority: 'recomendada si prevés contacto con animales' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales fronterizas' }],
     currency: { info: 'Dong (VND). Efectivo principalmente.' },
     tips: ['e-Visa en evisa.xuatnhapcanh.gov.vn.', 'Motocicletas: caos de tráfico — precaución al cruzar.'],
     emergency: '113 · 115'
@@ -1386,7 +1386,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · Sin visa 30d para 169 países. India/China VOA.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'fuera de Bali' }, { name: 'Rabia', priority: 'Bali — monos y perros' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — fuera de Bali y Lombok' }, { name: 'Rabia', priority: 'recomendada — riesgo por monos y perros en Bali' }],
     currency: { info: 'Rupia (IDR). Efectivo en zonas menores.' },
     tips: ['Bali: templos, arroz y naturaleza.', 'Agua: solo embotellada.'],
     emergency: '110 · 118'
@@ -1400,7 +1400,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · India, China, Rusia sin visa.'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 240V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'Borneo interior' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — Borneo interior' }],
     currency: { info: 'Ringgit (MYR).' },
     tips: ['Kuala Lumpur: mezcla multicultural.', 'Borneo: orangutanes y naturaleza salvaje.'],
     emergency: '999'
@@ -1428,7 +1428,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · Rusia sin visa.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo C', info: 'Voltaje: 220V/60Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'fuera de Manila' }, { name: 'Rabia', priority: 'contacto con animales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — fuera de Manila' }, { name: 'Rabia', priority: 'recomendada si prevés contacto con animales' }],
     currency: { info: 'Peso filipino (PHP). Efectivo en islas.' },
     tips: ['7641 islas — El Nido y Palawan imprescindibles.', 'Temporada ciclones: jun-dic.'],
     emergency: '117 · 911'
@@ -1442,7 +1442,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo M', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Hepatitis B', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales y norte' }, { name: 'Rabia', priority: 'riesgo real — contacto con animales' }, { name: 'Encefalitis japonesa', priority: 'zonas rurales estancias largas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Hepatitis B', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales y norte' }, { name: 'Rabia', priority: 'recomendada si prevés contacto con animales' }, { name: 'Encefalitis japonesa', priority: 'recomendada para estancias largas en zonas rurales' }],
     currency: { info: 'Rupia (INR). Efectivo en zonas rurales.' },
     tips: ['e-Visa en indianvisaonline.gov.in — mínimo 4 días antes.', 'Agua: SOLO embotellada.', 'Tren: reservar con semanas de antelación.'],
     emergency: '100 · 102'
@@ -1456,7 +1456,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA para casi todos. India y China sin visa.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo M', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Rabia', priority: 'senderistas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Rabia', priority: 'recomendada para senderistas' }],
     currency: { info: 'Rupia nepalesa (NPR). Efectivo.' },
     tips: ['VOA en Tribhuvan Airport.', 'EBC: aclimatarse mínimo 14 días.', 'Agua: SOLO embotellada.'],
     emergency: '100 · 102'
@@ -1484,7 +1484,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · US: e-Visa · India sin visa.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo G', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'Chittagong Hill Tracts' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — Chittagong Hill Tracts' }],
     currency: { info: 'Taka (BDT). Efectivo.' },
     tips: ['Destino auténtico poco visitado.', 'Dhaka: una de las ciudades más densas del mundo.'],
     emergency: '999'
@@ -1498,7 +1498,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · China sin visa.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo G · Tipo M', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Polio', priority: 'OBLIGATORIA — zona endémica' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Polio', priority: 'obligatoria para entrada' }],
     currency: { info: 'Rupia paquistaní (PKR). Efectivo.' },
     tips: ['e-Visa en visa.nadra.gov.pk.', 'K2 y Karakoram: paisajes espectaculares.', 'Vacuna polio obligatoria — llevar certificado.'],
     emergency: '15 · 115'
@@ -1540,7 +1540,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · CN y RU sin visa.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Rabia', priority: 'zonas rurales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Rabia', priority: 'quimioprofilaxis recomendada — zonas rurales' }],
     currency: { info: 'Tögrög (MNT). Efectivo.' },
     tips: ['Gobi: desierto impresionante.', 'Experiencia en ger con nómadas.'],
     emergency: '102 · 103'
@@ -1554,7 +1554,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · Situación inestable tras golpe 2021. CN/RU sin visa.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo F · Tipo G · Tipo I', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas fronterizas' }, { name: 'Tifoidea', priority: 'recomendada' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas fronterizas' }, { name: 'Tifoidea', priority: 'recomendada' }],
     currency: { info: 'Kyat (MMK). Efectivo USD imprescindible.' },
     tips: ['Verificar avisos de seguridad.', 'Bagan: templos budistas impresionantes.'],
     emergency: '199 · 192'
@@ -1568,7 +1568,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · CN/RU sin visa. e-Visa $36 en evisa.gov.kh.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo C · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales' }, { name: 'Rabia', priority: 'contacto con animales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales' }, { name: 'Rabia', priority: 'recomendada si prevés contacto con animales' }],
     currency: { info: 'Riel (KHR). USD ampliamente aceptado.' },
     tips: ['Angkor Wat: llegar a las 6am.', 'Minas antipersona: solo senderos marcados.'],
     emergency: '117 · 119'
@@ -1582,7 +1582,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · JP/KR/CN/RU sin visa. VOA para la mayoría.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas rurales' }, { name: 'Encefalitis japonesa', priority: 'zonas rurales' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas rurales' }, { name: 'Encefalitis japonesa', priority: 'quimioprofilaxis recomendada — zonas rurales' }],
     currency: { info: 'Kip (LAK). Efectivo o USD.' },
     tips: ['Luang Prabang: ciudad UNESCO.', 'Ruta en barco por el Mekong.'],
     emergency: '191 · 195'
@@ -1610,7 +1610,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo E · Tipo F · Tipo I', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar (USD).' },
     tips: ['Destino auténtico y poco visitado.'],
     emergency: '112'
@@ -1694,7 +1694,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE CONFLICTO EXTREMO — no viajar.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Polio', priority: 'obligatoria' }, { name: 'Malaria (quimioprofilaxis)', priority: 'zonas bajas' }],
+    vaccines: [{ name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }, { name: 'Polio', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — zonas bajas' }],
     currency: { info: 'Afgani (AFN). Solo efectivo.' },
     tips: ['NO VIAJAR — control talibán desde 2021.'],
     emergency: '100 · 102'
@@ -1988,7 +1988,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa en evisa.gov.et.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo E · Tipo F · Tipo L', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
     currency: { info: 'Birr etíope (ETB). Efectivo.' },
     tips: ['Lalibela: iglesias talladas en roca.', 'Addis Abeba a 2300m — aclimatarse.'],
     emergency: '991 · 907'
@@ -2002,7 +2002,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · País muy cerrado — visa difícil.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Nakfa (ERN). Solo efectivo.' },
     tips: ['Asmara: arquitectura colonial italiana única.'],
     emergency: '114'
@@ -2016,7 +2016,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA o evisa en evisa.gouv.dj.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco de Yibuti (DJF). USD aceptado.' },
     tips: ['Lago Assal: punto más bajo de África.'],
     emergency: '17 · 21'
@@ -2030,7 +2030,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE ALTO RIESGO — no viajar.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Chelín somalí (SOS). USD más usado.' },
     tips: ['NO VIAJAR.'],
     emergency: '888'
@@ -2044,7 +2044,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa en etims.go.ke — mínimo 3 días antes.'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 240V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
     currency: { info: 'Chelín keniata (KES). Tarjeta en ciudades.' },
     tips: ['Masai Mara: Gran Migración jul-oct.', 'Nairobi: no sacar móvil en la calle.'],
     emergency: '999'
@@ -2058,7 +2058,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 240V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Chelín ugandés (UGX). Efectivo.' },
     tips: ['Permisos gorilas ($800) — reservar con mucha antelación.'],
     emergency: '999'
@@ -2072,7 +2072,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA $50 en aeropuerto.'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Tifoidea', priority: 'recomendada' }],
     currency: { info: 'Chelín tanzano (TZS). Efectivo USD también.' },
     tips: ['Serengeti: Gran Migración jun-ago.', 'Kilimanjaro: reservar agencia con antelación.'],
     emergency: '112'
@@ -2086,7 +2086,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA gratuita para todos.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo J', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }],
     currency: { info: 'Franco ruandés (RWF). Tarjeta en Kigali.' },
     tips: ['Gorilas: permisos $1500 — reservar muy adelantado.', 'Kigali: ciudad más limpia de África.'],
     emergency: '112'
@@ -2100,7 +2100,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco de Burundi (BIF). Efectivo.' },
     tips: ['Situación inestable — verificar avisos.'],
     emergency: '112'
@@ -2114,7 +2114,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo F · Tipo M', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Metical (MZN). Efectivo.' },
     tips: ['Ilha de Moçambique: UNESCO.', 'Bazaruto: archipiélago espectacular.'],
     emergency: '119'
@@ -2128,7 +2128,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Kwacha (ZMW). USD en zonas turísticas.' },
     tips: ['Cataratas Victoria: compartidas con Zimbabue.', 'KAZA UniVisa con Zimbabue.'],
     emergency: '991 · 993'
@@ -2142,7 +2142,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar de Zimbabwe (ZWL). USD aceptado.' },
     tips: ['Cataratas Victoria: ver desde ambos lados.'],
     emergency: '999'
@@ -2156,7 +2156,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo M', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'norte y este del país' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — norte y este' }],
     currency: { info: 'Dólar namibio (NAD) = Rand sudafricano.' },
     tips: ['Sossusvlei: dunas rojas impresionantes.', 'Etosha: safari de alto nivel.'],
     emergency: '10111 · 10177'
@@ -2170,7 +2170,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G · Tipo M', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'norte — Okavango' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — norte (Okavango)' }],
     currency: { info: 'Pula (BWP). Tarjeta en ciudades.' },
     tips: ['Okavango Delta: UNESCO de alta gama.', 'Chobe: mayor concentración de elefantes de África.'],
     emergency: '999'
@@ -2184,7 +2184,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo M · Tipo N', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'Kruger y norte de Limpopo' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — Kruger y norte Limpopo' }],
     currency: { info: 'Rand (ZAR). Tarjeta ampliamente aceptada.' },
     tips: ['Conducción por la izquierda.', 'Kruger: safari de self-drive accesible.', 'Ciudad del Cabo: una de las más bellas del mundo.'],
     emergency: '10111 · 10177'
@@ -2226,7 +2226,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Ariary (MGA). Efectivo.' },
     tips: ['90% de fauna única en el mundo.', 'Lémures: solo aquí.'],
     emergency: '117 · 124'
@@ -2268,7 +2268,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA gratuita para todos.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco comorense (KMF).' },
     tips: ['Volcán Karthala: activo e imponente.'],
     emergency: '17'
@@ -2282,7 +2282,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · China sin visa.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Kwanza (AOA). USD/EUR usados.' },
     tips: ['Luanda: una de las ciudades más caras de África.'],
     emergency: '113 · 112'
@@ -2296,7 +2296,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · Visado requerido para casi todos.'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Cedi ghanés (GHS). Efectivo.' },
     tips: ['Accra: ciudad vibrante.', 'Castillos ruta de esclavos: historia impactante.'],
     emergency: '191 · 193'
@@ -2310,7 +2310,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · Visado requerido — tramitar con antelación.'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Naira (NGN). Efectivo principalmente.' },
     tips: ['Lagos: megaciudad vibrante.', 'Norte: alto riesgo de inseguridad.'],
     emergency: '199 · 123'
@@ -2324,7 +2324,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo E', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Efectivo.' },
     tips: ['Dakar: ciudad costera vibrante.', 'Isla de Gorée: UNESCO — historia de esclavitud.'],
     emergency: '17 · 15'
@@ -2338,7 +2338,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF).' },
     tips: ['Abidján: capital económica de África occidental.'],
     emergency: '170 · 185'
@@ -2352,7 +2352,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa obligatoria en evisa.dgdi.ga.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XAF).' },
     tips: ['80% cubierto por selva tropical.'],
     emergency: '1730 · 1300'
@@ -2366,7 +2366,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XAF).' },
     tips: ['No confundir con RD Congo.'],
     emergency: '117'
@@ -2380,7 +2380,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Cólera', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Cólera', priority: 'recomendada' }],
     currency: { info: 'Franco congoleño (CDF). Solo efectivo.' },
     tips: ['Alto riesgo en el este.', 'Gorilas en Virunga.'],
     emergency: '112'
@@ -2394,7 +2394,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · Alto riesgo — no viajar sin seguridad.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XAF). Solo efectivo.' },
     tips: ['Situación humanitaria muy compleja.'],
     emergency: '117'
@@ -2408,7 +2408,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE ALTO RIESGO — no viajar.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo E · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XAF). Solo efectivo.' },
     tips: ['No viajar.'],
     emergency: '17'
@@ -2422,7 +2422,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · US: visado requerido · VOA para ES. Resto necesita visa.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'sur del país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — sur del país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }],
     currency: { info: 'Uguiya (MRU). Efectivo.' },
     tips: ['Chinguetti: ciudad caravanera UNESCO.'],
     emergency: '17'
@@ -2436,7 +2436,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE ALTO RIESGO — no viajar.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Solo efectivo.' },
     tips: ['Timbuktu: acceso muy peligroso actualmente.'],
     emergency: '17 · 15'
@@ -2450,7 +2450,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · Golpe 2023 — zona de alto riesgo.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Efectivo.' },
     tips: ['No viajar.'],
     emergency: '17'
@@ -2464,7 +2464,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE ALTO RIESGO — no viajar.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Efectivo.' },
     tips: ['Yihadismo activo.'],
     emergency: '17'
@@ -2478,7 +2478,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo F · Tipo K', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Meningitis meningocócica', priority: 'recomendada' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco guineano (GNF). Efectivo.' },
     tips: ['Fouta Djallon: meseta y cataratas.'],
     emergency: '117'
@@ -2492,7 +2492,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA para todos.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Efectivo.' },
     tips: ['Archipiélago Bijagós: paraíso ecológico.'],
     emergency: '117'
@@ -2506,7 +2506,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XAF). Efectivo.' },
     tips: ['Malabo: capital en isla de Bioko.'],
     emergency: '114'
@@ -2520,7 +2520,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dalasi (GMD). Efectivo.' },
     tips: ['País más pequeño del continente africano.'],
     emergency: '117'
@@ -2534,7 +2534,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Leone (SLL). Efectivo.' },
     tips: ['Freetown: ciudad bulliciosa post-guerra civil.'],
     emergency: '999'
@@ -2548,7 +2548,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · US: sin visa · US sin visa. ES necesita visa.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dólar liberiano (LRD). USD muy usado.' },
     tips: ['Fundada por esclavos liberados de EEUU.'],
     emergency: '911'
@@ -2562,7 +2562,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · VOA en aeropuerto de Lomé para todos.'
     },
     adapter: { needed: false, type: 'Tipo C', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF).' },
     tips: ['Lomé: capital con mercado voodoo.'],
     emergency: '117'
@@ -2576,7 +2576,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa para todos en evisa.gouv.bj.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Franco CFA (XOF). Efectivo.' },
     tips: ['Cuna del voodoo.', 'Ouidah: Festival Internacional del Voodoo.'],
     emergency: '117'
@@ -2604,7 +2604,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Dobra (STN). Euro aceptado.' },
     tips: ['Cacao de altísima calidad.'],
     emergency: '112'
@@ -2618,7 +2618,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · India sin visa.'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Kwacha de Malawi (MWK). Efectivo.' },
     tips: ['Lago Malawi: 3º más grande de África.'],
     emergency: '997 · 998'
@@ -2632,7 +2632,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada · Alto riesgo — verificar avisos.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
+    vaccines: [{ name: 'Fiebre Amarilla', priority: 'obligatoria para entrada' }, { name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }],
     currency: { info: 'Libra sursudanesa (SSP).' },
     tips: ['Conflictos internos frecuentes.'],
     emergency: '911'
@@ -2688,7 +2688,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo I', info: 'Voltaje: 240V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Encefalitis japonesa', priority: 'zonas rurales' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Encefalitis japonesa', priority: 'quimioprofilaxis recomendada — zonas rurales' }],
     currency: { info: 'Kina (PGK). Efectivo.' },
     tips: ['Zona de riesgo elevado — precauciones.', 'Aves del paraíso: habitat único.'],
     emergency: '000'
@@ -2702,7 +2702,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo I', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }],
     currency: { info: 'Vatu (VUV). Efectivo.' },
     tips: ['Archipiélago volcánico.', 'Buceo de primer nivel.'],
     emergency: '112'
@@ -2828,7 +2828,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: visa en llegada'
     },
     adapter: { needed: true, type: 'Tipo G · Tipo I', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'todo el país' }],
+    vaccines: [{ name: 'Malaria (quimioprofilaxis)', priority: 'quimioprofilaxis recomendada — todo el país' }],
     currency: { info: 'Dólar de las Islas Salomón (SBD). Efectivo.' },
     tips: ['WWII: restos históricos en el mar.'],
     emergency: '999'
