@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,16 +32,41 @@ function getMapsUrl(spot) {
 }
 
 export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
-  const [notes, setNotes]     = useState(spot?.notes || '');
-  const [time, setTime]       = useState(spot?.assigned_time || '');
-  const [editingTime, setEditingTime] = useState(false);
+  const [notes, setNotes]         = useState(spot?.notes || '');
+  const [time, setTime]           = useState(spot?.assigned_time || '');
+  const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
+  const [editingTime, setEditingTime]   = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
-  const [saving, setSaving]   = useState(false);
+  const [saving, setSaving]       = useState(false);
+
+  const { data: tripCities = [] } = useQuery({
+    queryKey: ['cities', tripId],
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    enabled: !!tripId,
+    staleTime: 60000,
+  });
+
+  const tripDayOptions = useMemo(() => {
+    const days = [];
+    const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+    sorted.forEach(c => {
+      if (c.start_date && c.end_date) {
+        let d = new Date(c.start_date + 'T00:00:00');
+        const end = new Date(c.end_date + 'T00:00:00');
+        while (d <= end) {
+          days.push({ date: d.toISOString().slice(0, 10), city: c.name });
+          d.setDate(d.getDate() + 1);
+        }
+      }
+    });
+    return days;
+  }, [tripCities]);
 
   useEffect(() => {
     if (spot) {
       setNotes(spot.notes || '');
       setTime(spot.assigned_time || '');
+      setAssignedDate(spot.assigned_date || '');
       setEditingTime(false);
       setEditingNotes(false);
     }
@@ -57,6 +83,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
       await base44.entities.Spot.update(spot.id, {
         notes: notes.trim() || null,
         assigned_time: time || null,
+        assigned_date: assignedDate || null,
       });
       if (queryClient && tripId) {
         queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
@@ -111,6 +138,23 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
               {spot.tags.map(t => (
                 <span key={t} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">#{t}</span>
               ))}
+            </div>
+          )}
+
+          {/* Día */}
+          {tripDayOptions.length > 0 && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Día</p>
+              <select
+                value={assignedDate}
+                onChange={e => setAssignedDate(e.target.value)}
+                className="w-full h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+              >
+                <option value="">Sin asignar</option>
+                {tripDayOptions.map(d => (
+                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                ))}
+              </select>
             </div>
           )}
 
