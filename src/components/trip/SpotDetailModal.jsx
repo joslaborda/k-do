@@ -48,7 +48,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
 
   if (!open || !spot) return null;
 
-  const emoji = SPOT_ICONS[spot.type] || '📍';
+  const IconComp = SPOT_ICONS[spot.type] || null;
   const typeLabel = TYPE_LABELS[spot.type] || spot.type || 'Spot';
 
   const handleSave = async () => {
@@ -83,8 +83,8 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
 
         {/* Header */}
         <div className="flex items-start gap-3 px-5 py-4 border-b border-border">
-          <div className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
-            {emoji}
+          <div className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+            {IconComp ? <IconComp size={20} className="text-muted-foreground" /> : <span className="text-2xl">📍</span>}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-foreground leading-snug">{spot.title}</p>
