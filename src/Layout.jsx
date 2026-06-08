@@ -8,7 +8,7 @@ import SyncIndicator from '@/components/SyncIndicator';
 // ── Nav principal del viaje — los 4 que más se usan ──────────────────────────
 const mainNavItems = [
   { name: 'Inicio',  page: 'Home',      icon: Home     },
-  { name: 'Docs',    page: 'Documents', icon: FileText  },
+  { name: 'Ruta',    page: 'Cities',    icon: MapPin   },
   { name: 'Spots',   page: 'Restaurants', icon: Compass },
   { name: 'Gastos',  page: 'Expenses',  icon: Receipt   },
 ];
@@ -16,7 +16,7 @@ const mainNavItems = [
 // ── Drawer: el resto de páginas del viaje ─────────────────────────────────────
 const drawerItems = [
   { name: 'Fotos',     page: 'Photos',     icon: Camera,   sub: 'Fotos del viaje' },
-  { name: 'Ruta',      page: 'Cities',     icon: MapPin,   sub: 'Ciudades e itinerario' },
+  { name: 'Docs',      page: 'Documents',  icon: FileText, sub: 'Documentos del viaje' },
   { name: 'Traducir',  page: 'Translator', icon: Languages, sub: 'Voz, texto e imagen'  },
   { name: 'Utilidades',page: 'Utilities',  icon: Info,     sub: 'Embajadas, emergencias'},
 ];
