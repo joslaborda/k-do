@@ -1,3 +1,5 @@
+import { getVisaFromDB, visaTypeToInfo } from '@/lib/visaDB';
+
 /**
  * visaMatrix.js — Matriz completa de visados para Kōdo
  * Fuentes: IATA, Timatic, Henley Passport Index, consulados oficiales
@@ -1509,6 +1511,13 @@ export function getVisaInfo(destinationISO, originISO, secondOriginISO = null) {
   const destData = VISA_MATRIX[destinationISO];
   
   if (!destData) {
+    // Fallback: consultar visaDB con datos de visarequirements.info
+    const dbType = getVisaFromDB(destinationISO, originISO) ||
+                   (secondOriginISO ? getVisaFromDB(destinationISO, secondOriginISO) : null);
+    if (dbType) {
+      const info = visaTypeToInfo(dbType, destinationISO);
+      return { ...info, passport: originISO, source: 'visaDB' };
+    }
     return {
       needed: null, days: null, eVisa: false, cost: null,
       info: 'No tenemos datos de visado para este destino. Consulta la embajada.',

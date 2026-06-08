@@ -14,7 +14,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro (EUR).' },
     tips: ['El 112 funciona en toda España.'],
     emergency: '112'
@@ -28,7 +28,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro. Tarjeta aceptada en casi todo.' },
     tips: ['Museos gratuitos primer domingo de mes.'],
     emergency: '112 · 17 · 15'
@@ -42,7 +42,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F · Tipo L', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro. Lleva efectivo en zonas rurales.' },
     tips: ['Reserva el Vaticano con antelación.', 'Valida siempre el billete de tren.'],
     emergency: '112 · 118 · 113'
@@ -56,7 +56,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro.' },
     tips: ['Cuidado carteristas en tranvías de Lisboa.'],
     emergency: '112'
@@ -70,7 +70,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro. Efectivo muy usado.' },
     tips: ['Muchos locales solo efectivo.'],
     emergency: '112 · 110'
@@ -84,7 +84,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro.' },
     tips: ['Cuidado con carriles bici en Amsterdam.'],
     emergency: '112'
@@ -112,7 +112,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro.' },
     tips: ['Vienna City Card para museos y transporte.'],
     emergency: '112 · 133 · 144'
@@ -126,7 +126,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro. Islas pequeñas: lleva efectivo.' },
     tips: ['Reserva ferrys entre islas con antelación.'],
     emergency: '112 · 100 · 166'
@@ -140,7 +140,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Corona sueca (SEK). País cashless.' },
     tips: ['Stockholm Card para museos.'],
     emergency: '112'
@@ -154,7 +154,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Corona noruega (NOK). País muy caro.' },
     tips: ['Ferrys fiordos: reserva semanas antes.'],
     emergency: '112 · 02800 · 113'
@@ -168,7 +168,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F · Tipo K', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Corona danesa (DKK). No usan euro.' },
     tips: ['Copenhague: alquila una bici.'],
     emergency: '112'
@@ -196,7 +196,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Esloti (PLN). No usan euro.' },
     tips: ['Cracovia y Varsovia muy asequibles.'],
     emergency: '112 · 997 · 999'
@@ -210,7 +210,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo E', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Corona checa (CZK). No usan euro.' },
     tips: ['Paga en coronas, no en euros.'],
     emergency: '112 · 158 · 155'
@@ -224,7 +224,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Forinto (HUF). No usan euro.' },
     tips: ['Baños termales: Széchenyi y Gellért.'],
     emergency: '112 · 107 · 104'
@@ -238,7 +238,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Lei (RON). No usan euro aún.' },
     tips: ['Transilvania: Brasov y Sinaia.'],
     emergency: '112'
@@ -252,7 +252,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Lev (BGN). No usan euro.' },
     tips: ['Costa Mar Negro: muy asequible en verano.'],
     emergency: '112'
@@ -266,7 +266,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Euro (desde enero 2023).' },
     tips: ['Reserva ferrys en verano con antelación.'],
     emergency: '112 · 192 · 194'
@@ -406,7 +406,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo J', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Franco suizo (CHF). Todo muy caro.' },
     tips: ['Swiss Travel Pass si usas mucho el tren.'],
     emergency: '112 · 117 · 144'
@@ -490,7 +490,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: ETA electrónica · ETA desde 2024 para VWP. LATAM: Standard Visitor Visa.'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Libra (GBP). Tarjeta ampliamente aceptada.' },
     tips: ['ETA en gov.uk.', 'Circulación por la izquierda.', 'Oyster Card para Londres.'],
     emergency: '999 · 112'
@@ -518,7 +518,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · e-Visa ~$50 en evisa.gov.tr. JP/KR y varios LATAM sin visa.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Lira turca (TRY).' },
     tips: ['e-Visa antes de viajar.', 'Gran Bazar cierra domingos.', 'JP/KR sin visa.'],
     emergency: '112 · 155'
@@ -532,7 +532,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dinar serbio (RSD). Efectivo.' },
     tips: ['Belgrado: vida nocturna increíble.'],
     emergency: '112 · 192 · 194'
@@ -546,7 +546,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Lek albanés (ALL). Efectivo.' },
     tips: ['Riviera albanesa: playas sin masificar.'],
     emergency: '112'
@@ -560,7 +560,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Marco bosnio (BAM).' },
     tips: ['Mostar: puente otomano impresionante.'],
     emergency: '112'
@@ -630,7 +630,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dram (AMD). Asequible.' },
     tips: ['Lago Sevan: impresionante a 2000m.'],
     emergency: '112'
@@ -644,7 +644,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Manat (AZN).' },
     tips: ['e-Visa en evisa.gov.az.', 'Bakú: arquitectura moderna y UNESCO.'],
     emergency: '112'
@@ -658,7 +658,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Leu moldavo (MDL).' },
     tips: ['Chisinau: ciudad auténtica y poco visitada.', 'Vinos excelentes.'],
     emergency: '112'
@@ -672,7 +672,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · ZONA DE GUERRA ACTIVA — no viajar.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Grivna (UAH).' },
     tips: ['ZONA DE GUERRA — no viajar bajo ninguna circunstancia.'],
     emergency: '112'
@@ -700,7 +700,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa · US: visado requerido · Sanciones vigentes — tarjetas occidentales no aceptadas. China y Cuba sin visa.'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Rublo (RUB). Tarjetas occidentales bloqueadas.' },
     tips: ['Verificar restricciones de tu país antes de viajar.'],
     emergency: '112'
@@ -756,7 +756,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: ESTA · US: sin visa · ESTA en esta.cbp.dhs.gov para VWP. Todos los LATAM necesitan visa B1/B2.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dólar (USD). Tarjeta universal.' },
     tips: ['Seguro médico imprescindible.', 'Propina 18-20% por costumbre.'],
     emergency: '911'
@@ -770,7 +770,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: ETA electrónica · US: sin visa · eTA para VWP. MX tiene eTA desde 2016. Resto LATAM visa requerida.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 120V/60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dólar canadiense (CAD).' },
     tips: ['Clima extremo en invierno — prepárate.'],
     emergency: '911'
@@ -784,7 +784,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · Puertas abiertas — todos sin visa hasta 180 días.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 127V/60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Peso mexicano (MXN).' },
     tips: ['Agua: solo embotellada.', 'Adaptador si vienes de Europa.'],
     emergency: '911 · 080'
@@ -798,7 +798,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo I', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Peso argentino (ARS). Usa apps para tipo de cambio.' },
     tips: ['Adaptador tipo I (como Australia).', 'Carne y vinos excepcionales.'],
     emergency: '911 · 101 · 107'
@@ -826,7 +826,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo L', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Peso chileno (CLP).' },
     tips: ['Patagonia: reserva excursiones con meses de antelación.'],
     emergency: '133 · 131 · 132'
@@ -868,7 +868,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo F · Tipo I', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Peso uruguayo (UYU). País caro para LATAM.' },
     tips: ['País más seguro y moderno de LATAM.'],
     emergency: '911'
@@ -1274,7 +1274,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 100V/50-60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Yen (JPY). País mayoritariamente efectivo — lleva suficiente.' },
     tips: ['Suica/Pasmo card para transporte.', 'JR Pass si viajas entre ciudades.', 'Quitar zapatos al entrar en casas y algunos restaurantes.'],
     emergency: '110 · 119'
@@ -1288,7 +1288,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: false, type: 'Tipo C · Tipo F', info: 'Voltaje: 220V/60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Won (KRW). Tarjeta ampliamente aceptada.' },
     tips: ['T-money card para transporte.', 'DMZ: visita histórica a la frontera.'],
     emergency: '112 · 119'
@@ -1302,7 +1302,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · US: visado requerido · ES: 15 días sin visa desde 2024. US/UK/AU/CA/JP necesitan visa. KR sin visa.'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo C · Tipo I', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Yuan Renminbi (CNY). WeChat Pay/Alipay en ciudades.' },
     tips: ['VPN imprescindible — Google/WhatsApp bloqueados.', 'WeChat indispensable para pagar y comunicarse.'],
     emergency: '110 · 120 · 119'
@@ -1316,7 +1316,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B', info: 'Voltaje: 110V/60Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Nuevo Dólar de Taiwán (TWD).' },
     tips: ['EasyCard para transporte.', 'Street food en mercados nocturnos imprescindible.'],
     emergency: '110 · 119'
@@ -1414,7 +1414,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · China necesita eVisa.'
     },
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dólar de Singapur (SGD). Todo con tarjeta.' },
     tips: ['Multarse por mascar chicle o tirar basura.', 'Gardens by the Bay: espectáculo de luces gratuito.'],
     emergency: '999'
@@ -1708,7 +1708,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo H', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Séquel (ILS). Tarjeta ampliamente aceptada.' },
     tips: ['Puede negar entrada con sellos de países árabes no reconocidos.', 'Seguridad estricta en aeropuertos.'],
     emergency: '100 · 101'
@@ -1736,7 +1736,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: e-Visa'
     },
     adapter: { needed: true, type: 'Tipo A · Tipo B · Tipo D · Tipo G', info: 'Voltaje: 127V/220V' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Riyal saudí (SAR). Tarjeta aceptada.' },
     tips: ['e-Visa en visa.mofa.gov.sa.', 'Alcohol prohibido.', 'Ropa modesta requerida.', 'La Meca y Medina: solo para musulmanes.'],
     emergency: '911 · 999'
@@ -1750,7 +1750,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: false, info: 'ES/UE: sin visa · 90d sin visa para la mayoría. India/China/Rusia también libres.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo D · Tipo G', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dírham (AED). Todo con tarjeta.' },
     tips: ['Alcohol solo en hoteles licenciados.', 'Ramadán: no comer/beber en público durante el día.'],
     emergency: '999'
@@ -1848,7 +1848,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE GUERRA — NO VIAJAR.'
     },
     adapter: { needed: true, type: 'Tipo C · Tipo E · Tipo L', info: 'Voltaje: 220V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Libra siria (SYP).' },
     tips: ['ZONA DE GUERRA — no viajar bajo ninguna circunstancia.'],
     emergency: '110'
@@ -1946,7 +1946,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: true, info: 'ES/UE: visado requerido · ZONA DE CONFLICTO — no viajar.'
     },
     adapter: { needed: true, type: 'Tipo D · Tipo L · Tipo M', info: 'Voltaje: 127V/220V' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dinar libio (LYD).' },
     tips: ['NO VIAJAR — zona de conflicto.'],
     emergency: '193'
@@ -2646,7 +2646,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: ETA electrónica · ETA para VWP. LATAM necesita Visitor Visa (subclass 600).'
     },
     adapter: { needed: true, type: 'Tipo I', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dólar australiano (AUD). Todo con tarjeta.' },
     tips: ['Conducción por la izquierda.', 'Fauna peligrosa — respetar advertencias locales.', 'Factor sol muy alto — protección solar.'],
     emergency: '000'
@@ -2660,7 +2660,7 @@ export const COUNTRY_REQUIREMENTS = {
       needed: null, info: 'ES/UE: NZeTA · NZeTA en nzeta.immigration.govt.nz. LATAM necesita visa de visitante.'
     },
     adapter: { needed: true, type: 'Tipo I', info: 'Voltaje: 230V/50Hz' },
-    vaccines: [],
+    vaccines: [{ name: 'COVID-19', priority: 'recomendada (check age and history)' }, { name: 'Hepatitis A', priority: 'recomendada' }, { name: 'Influenza', priority: 'recomendada (seasonal and risk based)' }, { name: 'MMR', priority: 'recomendada (check age and history)' }, { name: 'Polio', priority: 'recomendada (check age and history)' }, { name: 'Td/Tdap', priority: 'recomendada (check age and history)' }, { name: 'Tetanus', priority: 'recomendada' }, { name: 'Varicella', priority: 'recomendada (check age and history)' }],
     currency: { info: 'Dólar neozelandés (NZD). Todo con tarjeta.' },
     tips: ['Conducción por la izquierda.', 'Fiordland y Milford Sound: imprescindibles.'],
     emergency: '111'
