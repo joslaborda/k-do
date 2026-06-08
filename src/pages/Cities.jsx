@@ -984,7 +984,52 @@ export default function Cities() {
               </Button>
             </Link>
           </div>
+        ) : sortedCities.length === 1 ? (
+          // Una sola ciudad — mostrar días directamente sin cabecera de ciudad
+          <div className="flex flex-col gap-0">
+            {(() => {
+              const city = sortedCities[0];
+              const cityDays = (() => {
+                if (!city.start_date || !city.end_date) return [];
+                try {
+                  const start = parseISO(city.start_date);
+                  const end = parseISO(city.end_date);
+                  if (end < start) return [];
+                  return eachDayOfInterval({ start, end }).map(d => format(d, 'yyyy-MM-dd'));
+                } catch { return []; }
+              })();
+              const daysByDate = {};
+              itineraryDays.filter(d => d.city_id === city.id).forEach(d => { if (d.date) daysByDate[d.date] = d; });
+              if (cityDays.length === 0) return (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-xs text-muted-foreground mb-2">Sin fechas asignadas</p>
+                  <p className="text-xs text-primary">Edita el viaje para añadir fechas →</p>
+                </div>
+              );
+              return cityDays.map(dateStr => (
+                <DayRow
+                  key={dateStr}
+                  day={daysByDate[dateStr] || null}
+                  dateStr={dateStr}
+                  allDocs={allDocs}
+                  allSpots={allSpots}
+                  tripId={tripId}
+                  cityId={city.id}
+                  isToday_={dateStr === todayStr}
+                  isTomorrow_={dateStr === tomorrowStr}
+                  queryClient={queryClient}
+                  defaultOpen={dateStr === todayStr}
+                  trip={trip}
+                  cities={cities}
+                  itineraryDays={itineraryDays}
+                  profiles={profiles}
+                  userId={userId}
+                />
+              ));
+            })()}
+          </div>
         ) : (
+          // Varias ciudades — mostrar bloques por ciudad
           <div className="flex flex-col gap-0">
             {sortedCities.map((city, idx) => {
               const isPast = city.end_date && todayStr > city.end_date;
