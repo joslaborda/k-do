@@ -1096,7 +1096,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
             <div>
               <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {doneCount}/{actionableReqs.length} completados · pasaporte de {originCountry}
+                pasaporte de {originCountry}
               </p>
             </div>
             {doneCount === actionableReqs.length && actionableReqs.length > 0 ? (
