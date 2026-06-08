@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Plane, Hotel, Train, Bus, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Plane, Hotel, Train, Bus, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -107,7 +107,7 @@ function DraggableSpots({ spots, onReorder, onEdit }) {
             ${dragOver === i && dragging !== i ? 'bg-accent/40' : ''}
           `}>
           <GripVertical className="w-4 h-4 text-muted-foreground/30 shrink-0 cursor-grab touch-none" />
-          <span className="text-sm shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
+          <span className="text-sm shrink-0">{(() => { const I = SPOT_ICONS[spot.type]; return I ? <I size={14} className='text-muted-foreground' /> : <MapPin size={14} className='text-muted-foreground' />; })()}</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
             {spot.assigned_time && <p className="text-xs text-primary font-medium mt-0.5">{spot.assigned_time}</p>}
@@ -142,7 +142,7 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
       <DialogContent className="bg-card border-border max-w-sm p-0 gap-0">
         <DialogHeader className="px-4 py-3 border-b border-border">
           <DialogTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <span>{SPOT_ICONS[spot?.type] || '📍'}</span>
+            <span>{(() => { const I = SPOT_ICONS[spot?.type]; return I ? <I size={14} className='text-muted-foreground' /> : <MapPin size={14} className='text-muted-foreground' />; })()}</span>
             {spot?.title}
           </DialogTitle>
         </DialogHeader>
@@ -466,7 +466,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
             {item._kind === 'doc' && DocIcon
               ? <DocIcon size={15} className="text-primary" />
               : item._kind === 'note'
-              ? <span className="text-sm">📝</span>
+              ? <FileText size={14} className='text-muted-foreground' />
               : (() => { const SpI = SPOT_ICONS[item.type] || CirclePlus; return <SpI size={14} className={SPOT_COLORS[item.type]?.split(' ')[1] || 'text-muted-foreground'} />; })()}
           </div>
           <div className="flex-1 min-w-0">
@@ -701,7 +701,9 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
             {/* Info */}
             <div className="flex-1 min-w-0">
               <p className={`text-sm font-semibold truncate ${!day?.title && !hasContent ? 'text-muted-foreground italic font-normal' : 'text-foreground'}`}>
-                {day?.title || (hasContent ? 'Ver contenido' : 'Sin planificar')}
+                {day?.title || (hasContent
+                ? pillItems.map(p => p.label).join(' · ')
+                : 'Toca para planificar')}
               </p>
               {hasContent && (
                 <div className="flex gap-1.5 mt-1.5 flex-wrap">
@@ -783,7 +785,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
           isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
         }`}>
-          {isPast ? '✓' : idx + 1}
+          {isPast ? <Check size={10} className='text-green-700' /> : idx + 1}
         </div>
         <div className="flex-1 min-w-0">
           <span className={`text-sm font-bold truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
@@ -970,7 +972,7 @@ export default function Cities() {
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
         {sortedCities.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-4xl mb-4">🗺️</p>
+            <div className='w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4'><Map className='w-7 h-7 text-muted-foreground/50' /></div>
             <p className="text-muted-foreground mb-4">Aún no hay ciudades en la ruta</p>
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
               <Button className="bg-primary hover:bg-primary/90 text-white">

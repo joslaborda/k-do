@@ -16,7 +16,7 @@ import {
   MapPin, Calendar, Users, Settings, Trash2,
   ArrowRight, Bell, ChevronDown, ChevronUp,
   Send, UserPlus, Check, X, GripVertical, Clock, Copy
-, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass , AlertTriangle } from 'lucide-react';
+, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass , AlertTriangle, Calendar, FileText, MapPin } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -653,7 +653,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                     {isDoc && DocIcon
                       ? <DocIcon size={16} stroke="currentColor" className="text-primary" />
                       : item._kind === 'note'
-                      ? <span className="text-base">📝</span>
+                      ? <FileText size={16} className='text-muted-foreground' />
                       : SpotIcon ? <SpotIcon size={16} /> : null
                     }
                   </div>
@@ -685,7 +685,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                       const urgent = diffMin <= 60;
                       return (
                         <p className="text-xs font-semibold mt-0.5" style={{color: urgent ? '#dc2626' : '#c2410c'}}>
-                          {urgent ? '⚠ ' : ''}{label}
+                          {label}
                         </p>
                       );
                     })()}
@@ -791,7 +791,7 @@ function TomorrowTab({ trip, cities, tripId }) {
 
   if (!tomorrowCity) return (
     <div className="bg-card rounded-2xl border border-border text-center py-12 px-4">
-      <p className="text-3xl mb-2">📅</p>
+      <div className='w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3'><Calendar className='w-6 h-6 text-muted-foreground/50' /></div>
       <p className="text-sm font-medium text-foreground mb-1">Nada planificado para mañana</p>
       <p className="text-xs text-muted-foreground">Añade spots o documentos para el día de mañana</p>
     </div>
@@ -957,7 +957,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-sm font-medium text-foreground flex items-center gap-2">
-                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center text-xs">📅</span>
+                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center"><Calendar size={11} className='text-amber-700' /></span>
                 Festivos en tu viaje
               </p>
               <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
@@ -1192,7 +1192,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-sm font-medium text-foreground flex items-center gap-2">
-                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center text-xs">📅</span>
+                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center"><Calendar size={11} className='text-amber-700' /></span>
                 Festivos en tu viaje
               </p>
               <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
