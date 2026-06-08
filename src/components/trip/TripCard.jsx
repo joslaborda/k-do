@@ -96,9 +96,9 @@ export function HeroTripCard({ trip, cities = [] }) {
             <p className="text-base font-medium text-white mb-1">{trip.name}</p>
             {subtitle && <p className="text-xs text-white/70 truncate mb-2">{subtitle}</p>}
             <div className="flex gap-1.5">
-              {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">📅 {duration} días</div>}
+              {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{duration} días</div>}
               {trip.members?.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">👥 {trip.members.length}</div>}
-              {cities.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">📍 {cities[0].name}</div>}
+              {cities.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{cities[0].name}</div>}
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function TripCard({ trip, cities = [] }) {
           <p className="text-sm font-medium text-foreground truncate mb-1">{trip.name}</p>
           {subtitle && <p className="text-xs text-muted-foreground truncate mb-1">{subtitle}</p>}
           <p className="text-xs text-muted-foreground">
-            {dateRange || 'Sin fechas'}{trip.members?.length > 0 ? ` · 👥 ${trip.members.length}` : ''}
+            {dateRange || 'Sin fechas'}{trip.members?.length > 0 ? ` · ${trip.members.length}` : ''}
           </p>
         </div>
         {status && (

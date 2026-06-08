@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, X, Shuffle, ChevronDown, Loader2 } from 'lucide-react';
+import { Plus, X, Shuffle, ChevronDown, Loader2, AlertTriangle } from 'lucide-react';
 import { getCountryMeta, getTopCities, normalizeCountry } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 
@@ -420,7 +420,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground text-2xl">✈️ Nuevo viaje</DialogTitle>
+          <DialogTitle className="text-foreground text-2xl">Nuevo viaje</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
@@ -546,7 +546,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                     <>
                       {mode === 'single' ? (
                         computedTripEndDate() ? (
-                          <p className="text-xs text-primary font-medium pl-1">📅 {formData.start_date} → {computedTripEndDate()}</p>
+                          <p className="text-xs text-primary font-medium pl-1">{formData.start_date} → {computedTripEndDate()}</p>
                         ) : null
                       ) : dateMode === 'nights' ? (
                         <div className="flex items-center gap-2 pl-1">
@@ -595,7 +595,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             {mode === 'multi' && dateMode === 'nights' && formData.start_date && (
               <div className="pl-1 space-y-1">
                 {nightsError ? (
-                  <p className="text-xs text-destructive font-medium">⚠️ {nightsError}</p>
+                  <p className="text-xs text-destructive font-medium flex items-center gap-1"><AlertTriangle size={12} />{nightsError}</p>
                 ) : totalNightsEntered > 0 && (
                   <p className="text-xs text-muted-foreground">
                     Total: <span className="font-medium text-foreground">{totalNightsEntered} noches</span>
