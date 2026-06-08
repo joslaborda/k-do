@@ -46,7 +46,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
                 position: 'relative',
@@ -58,7 +58,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
               {tab.label}
               {tab.badge > 0 && (
                 <span style={{
-                  background: '#c2410c', color: 'white',
+                  background: 'hsl(var(--primary))', color: 'white',
                   fontSize: 10, fontWeight: 500, borderRadius: 10,
                   padding: '1px 5px',
                 }}>{tab.badge}</span>
@@ -66,7 +66,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
               {tab.urgent && urgentCount > 0 && !isOn && (
                 <span style={{
                   width: 7, height: 7, borderRadius: '50%',
-                  background: '#c2410c',
+                  background: 'hsl(var(--primary))',
                   display: 'inline-block',
                   flexShrink: 0,
                 }} />
@@ -75,7 +75,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
             {/* Ō line — sits tight BELOW the label */}
             <div style={{
               height: 3, borderRadius: 2,
-              background: isOn ? '#c2410c' : 'transparent',
+              background: isOn ? 'hsl(var(--primary))' : 'transparent',
               width: isOn ? lineStyle.width : 0,
               marginTop: 5,
               transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',

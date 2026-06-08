@@ -71,7 +71,7 @@ export default function CountryInput({ value, onChange, placeholder = 'País…'
             <li key={c}
               onMouseDown={() => select(c)}
               onTouchEnd={e => { e.preventDefault(); select(c); }}
-              style={{padding:'8px 12px',fontSize:14,cursor:'pointer',borderRadius:8,color:'#1a1714'}}
+              style={{padding:'8px 12px',fontSize:14,cursor:'pointer',borderRadius:8,color:'var(--kodo-text-active)'}}
               onMouseEnter={e => e.currentTarget.style.background='#fff3ee'}
               onMouseLeave={e => e.currentTarget.style.background='transparent'}
             >{c}</li>
