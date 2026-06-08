@@ -670,42 +670,57 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
   const rowBorder = isToday_ ? 'border-t-2 border-t-primary' : 'border-t border-t-border';
   const rowBg = isToday_ ? 'bg-orange-50/70' : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
 
+  // Pills de contenido
+  const notesCount = day?.notes?.length || 0;
+  const pillItems = [
+    docs.length > 0 && { label: `${docs.length} doc${docs.length > 1 ? 's' : ''}`, cls: 'bg-orange-50 text-primary' },
+    spots.length > 0 && { label: `${spots.length} spot${spots.length > 1 ? 's' : ''}`, cls: 'bg-violet-50 text-violet-700' },
+    notesCount > 0 && { label: `${notesCount} nota${notesCount > 1 ? 's' : ''}`, cls: 'bg-green-50 text-green-700' },
+  ].filter(Boolean);
+
   return (
-    <div className={rowBorder}>
-      <button onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center gap-3 px-4 py-3 ${rowBg} transition-colors`}>
-        <div className={`flex flex-col items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 ${
-          isToday_ ? 'bg-primary' : 'bg-card border border-border'
-        }`}>
-          <span className={`text-base font-semibold leading-none ${isToday_ ? 'text-white' : 'text-foreground'}`}>
-            {format(parseISO(dateStr), 'd', { locale: es })}
-          </span>
-          <span className={`text-[9px] uppercase tracking-wide font-medium leading-tight mt-0.5 ${isToday_ ? 'text-white/75' : 'text-muted-foreground'}`}>
-            {format(parseISO(dateStr), 'MMM', { locale: es })}
-          </span>
-        </div>
-        <div className="flex-1 min-w-0 text-left">
-          <p className={`text-sm truncate ${
-            day?.title
-              ? isToday_ ? 'font-medium text-primary' : 'font-medium text-foreground'
-              : hasContent ? 'font-medium text-foreground' : 'text-muted-foreground italic'
-          }`}>
-            {day?.title || (hasContent
-              ? [docs.length && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')
-              : 'Sin planificar')}
-          </p>
-          {hasContent && (
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              {[docs.length > 0 && `${docs.length} doc${docs.length > 1 ? 's' : ''}`, spots.length > 0 && `${spots.length} spot${spots.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ')}
-            </p>
-          )}
-        </div>
-        {isToday_ && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-medium">hoy</span>}
-        {isTomorrow_ && <span className="text-[10px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full shrink-0">mañana</span>}
-        {open
-          ? <ChevronUp className={`w-4 h-4 shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
-          : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
-      </button>
+    <div className="mb-2">
+      {/* Card */}
+      <div className={`bg-card rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
+        {/* Header */}
+        <button onClick={() => setOpen(o => !o)}
+          className="w-full flex items-stretch gap-0 text-left">
+          {/* Franja lateral */}
+          <div className={`w-1 self-stretch rounded-l-2xl flex-shrink-0 ${isToday_ ? 'bg-primary' : hasContent ? 'bg-orange-200' : 'bg-border'}`} />
+          {/* Contenido header */}
+          <div className="flex items-center gap-3 px-4 py-3 flex-1 min-w-0">
+            {/* Fecha */}
+            <div className="flex flex-col items-center w-9 flex-shrink-0">
+              <span className={`text-lg font-bold leading-none ${isToday_ ? 'text-primary' : 'text-foreground'}`}>
+                {format(parseISO(dateStr), 'd', { locale: es })}
+              </span>
+              <span className="text-[9px] uppercase tracking-wide font-semibold text-muted-foreground mt-0.5">
+                {format(parseISO(dateStr), 'MMM', { locale: es })}
+              </span>
+            </div>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold truncate ${!day?.title && !hasContent ? 'text-muted-foreground italic font-normal' : 'text-foreground'}`}>
+                {day?.title || (hasContent ? 'Ver contenido' : 'Sin planificar')}
+              </p>
+              {hasContent && (
+                <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                  {pillItems.map((p, i) => (
+                    <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.cls}`}>{p.label}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Badges + chevron */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {isToday_ && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-semibold">Hoy</span>}
+              {isTomorrow_ && <span className="text-[10px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full">Mañana</span>}
+              {open
+                ? <ChevronUp className={`w-4 h-4 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
+                : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </div>
+          </div>
+        </button>
 
       {open && (
         <DayContent
@@ -727,6 +742,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
           userId={userId}
         />
       )}
+      </div>
     </div>
   );
 }
