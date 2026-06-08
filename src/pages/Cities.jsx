@@ -686,7 +686,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
         <button onClick={() => setOpen(o => !o)}
           className="w-full flex items-stretch gap-0 text-left">
           {/* Franja lateral */}
-          <div className={`w-1 self-stretch rounded-l-2xl flex-shrink-0 ${isToday_ ? 'bg-primary' : hasContent ? 'bg-orange-200' : 'bg-border'}`} />
+          <div className={`w-1 self-stretch rounded-l-2xl flex-shrink-0 ${isToday_ ? 'bg-primary' : 'bg-transparent'}`} />
           {/* Contenido header */}
           <div className="flex items-center gap-3 px-4 py-3 flex-1 min-w-0">
             {/* Fecha */}
