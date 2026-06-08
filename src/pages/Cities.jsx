@@ -915,6 +915,7 @@ export default function Cities() {
   );
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
 
   // Progress
   const tripStart = trip?.start_date;
