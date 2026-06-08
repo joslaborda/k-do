@@ -96,7 +96,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
   if (!fileUrl) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#1a1714' }}>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'hsl(var(--background))' }}>
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>
