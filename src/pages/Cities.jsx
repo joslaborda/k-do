@@ -519,16 +519,16 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
       {/* Add actions */}
       <div className="flex border-t border-border">
         <button onClick={() => setAddingDoc(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors border-r border-border">
-          <Plus className="w-3.5 h-3.5" />Doc
+          className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors border-r border-border">
+          + Doc
         </button>
         <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors border-r border-border">
-          <Plus className="w-3.5 h-3.5" />Spot
+          className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors border-r border-border">
+          + Spot
         </Link>
         <button onClick={() => { setAddingNote(true); setNewNoteText(''); setNewNoteTime(''); }}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium text-[#c2410c] hover:bg-orange-50 transition-colors">
-          <Plus className="w-3.5 h-3.5" />Nota
+          className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors">
+          + Nota
         </button>
       </div>
 
@@ -946,8 +946,8 @@ export default function Cities() {
               </button>
             </Link>
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
-              <button className="text-xs text-primary flex items-center gap-1 font-medium">
-                <Plus className="w-3.5 h-3.5" />Ciudad
+              <button className="text-sm text-primary flex items-center gap-1 font-semibold">
+                <Plus className="w-4 h-4" />Ciudad
               </button>
             </Link>
           </div>
@@ -966,10 +966,13 @@ export default function Cities() {
               {tripFinished ? '100%' : progress > 0 ? `${progress}%` : ''}
             </span>
           </div>
-          <div className="h-1 bg-secondary rounded-full overflow-hidden mb-4">
-            <div className={`h-full rounded-full transition-all ${tripFinished ? 'bg-green-600' : 'bg-primary'}`}
-              style={{ width: `${tripFinished ? 100 : progress}%` }} />
-          </div>
+          {(progress > 0 || tripFinished) && (
+            <div className="h-1 bg-secondary rounded-full overflow-hidden mb-4">
+              <div className={`h-full rounded-full transition-all ${tripFinished ? 'bg-green-600' : 'bg-primary'}`}
+                style={{ width: `${tripFinished ? 100 : progress}%` }} />
+            </div>
+          )}
+          {!(progress > 0 || tripFinished) && <div className="mb-3" />}
         </div>
       </div>
 
