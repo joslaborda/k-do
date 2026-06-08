@@ -168,7 +168,7 @@ export default function Layout({ children, currentPageName }) {
                       top: 5,
                       left: macronLeft,
                       width: 20, height: 3, borderRadius: 2,
-                      background: '#c2410c',
+                      background: 'hsl(var(--primary))',
                       transition: 'left 0.28s cubic-bezier(.4,0,.2,1)',
                       pointerEvents: 'none', zIndex: 2,
                     }} />
@@ -203,10 +203,10 @@ export default function Layout({ children, currentPageName }) {
                 >
                   <MoreHorizontal
                     className="w-5 h-5 flex-shrink-0 transition-colors"
-                    style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}
+                    style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}
                     strokeWidth={1.75}
                   />
-                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? '#1a1714' : '#a09890'}}>
+                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}>
                     Más
                   </span>
                 </button>
