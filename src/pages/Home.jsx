@@ -12,11 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import GlobalSearch from '@/components/GlobalSearch';
 import { format, differenceInDays, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import {
-  MapPin, Calendar, Users, Settings, Trash2,
-  ArrowRight, Bell, ChevronDown, ChevronUp,
-  Send, UserPlus, Check, X, GripVertical, Clock, Copy
-, MessageCircle , Download , BarChart2 , Utensils, Landmark, ShoppingBag, CirclePlus , Compass , AlertTriangle, Calendar, FileText, MapPin } from 'lucide-react';
+import { MapPin, Calendar, Users, Settings, Trash2, ArrowRight, Bell, ChevronDown, ChevronUp, Send, UserPlus, Check, X, GripVertical, Clock, Copy, MessageCircle, Download, BarChart2, Utensils, Landmark, ShoppingBag, CirclePlus, Compass, AlertTriangle, FileText } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
