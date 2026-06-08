@@ -970,7 +970,7 @@ export default function Utilities() {
     || tripCities[0];
   const country = activeCity?.country || trip?.country || '';
   const meta = country ? getCountryMeta(country) : {};
-  const homeCountry = myProfile?.nationality || myProfile?.country || 'España';
+  const homeCountry = myProfile?.nationality || myProfile?.home_country || myProfile?.country || 'España';
   const secondNationality = myProfile?.second_nationality || null;
 
   const tripInProgress = trip?.start_date && trip?.end_date
