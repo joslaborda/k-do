@@ -1,6 +1,6 @@
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowRightLeft, Copy, Check, Volume2, Loader2, AlertCircle , Camera, Loader2 } from 'lucide-react';
+import { ArrowRightLeft, Copy, Check, Volume2, Loader2, AlertCircle, Camera } from 'lucide-react';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
 import { useQuery } from '@tanstack/react-query';
