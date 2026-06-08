@@ -87,7 +87,7 @@ function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
             {/* Ō line — sits tight above the label */}
             <div style={{
               height: 3, borderRadius: 2,
-              background: isOn ? '#c2410c' : 'transparent',
+              background: isOn ? 'hsl(var(--primary))' : 'transparent',
               width: isOn ? lineStyle.width : 0,
               marginBottom: 6,
               transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',
@@ -109,7 +109,7 @@ function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
               {tab.label}
               {tab.badge > 0 && (
                 <span style={{
-                  background: '#c2410c', color: 'white',
+                  background: 'hsl(var(--primary))', color: 'white',
                   fontSize: 10, fontWeight: 500, borderRadius: 10,
                   padding: '1px 5px',
                 }}>{tab.badge}</span>
@@ -117,7 +117,7 @@ function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
               {tab.key === 'hoy' && urgentCount > 0 && !isOn && (
                 <span style={{
                   width: 6, height: 6, borderRadius: '50%',
-                  background: '#c2410c', display: 'inline-block', flexShrink: 0,
+                  background: 'hsl(var(--primary))', display: 'inline-block', flexShrink: 0,
                 }} />
               )}
 
@@ -878,7 +878,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
   return (
     <div className="space-y-3">
       {/* Hero */}
-      <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: 160, background: '#1a1714' }}>
+      <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: 160, background: 'var(--kodo-hero-bg)' }}>
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(0,0,0,.15) 100%)'
@@ -2042,7 +2042,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
   return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-[#f8f6f3] rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         {/* Handle */}
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
 

@@ -54,7 +54,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           left: lineStyle.left,
           width: lineStyle.width,
           height: 3,
-          background: '#c2410c',
+          background: 'hsl(var(--primary))',
           borderRadius: 2,
           transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
         }}
@@ -72,7 +72,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
               }}

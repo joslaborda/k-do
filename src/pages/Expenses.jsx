@@ -52,7 +52,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           left: lineStyle.left,
           width: lineStyle.width,
           height: 3,
-          background: '#c2410c',
+          background: 'hsl(var(--primary))',
           borderRadius: 2,
           transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
         }}
@@ -70,7 +70,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
               }}
@@ -156,7 +156,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onAccept}
-              style={{ flex: 1, background: '#c2410c', color: 'white', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
+              style={{ flex: 1, background: 'hsl(var(--primary))', color: 'white', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
               Sí, usar {currencyCode}
             </button>
             <button onClick={onDismiss}
@@ -305,7 +305,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 }
 
 // ── Tab: Balances ─────────────────────────────────────────────────────────────
-function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrency, profiles, onSettle }) {
+function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrency, profilesByEmail, onSettle }) {
   const balances = useMemo(() => calculateBalances(expenses, members), [expenses, members]);
   const debts = useMemo(() => getDebts(balances), [balances]);
 
@@ -367,7 +367,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {iOwe.map((d, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={d.to} profiles={profiles} size={32} />
+                <Avatar email={d.to} profiles={profilesByEmail} size={32} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
                     {userMap[d.to] || d.to?.split('@')[0]}
@@ -391,7 +391,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {owesMe.map((d, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={d.from} profiles={profiles} size={32} />
+                <Avatar email={d.from} profiles={profilesByEmail} size={32} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
                     {userMap[d.from] || d.from?.split('@')[0]}
@@ -418,7 +418,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
             const pct = Math.abs(bal) / total * 100;
             return (
               <div key={email} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={email} profiles={profiles} size={30} />
+                <Avatar email={email} profiles={profilesByEmail} size={30} />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between mb-1.5">
                     <span className="text-sm font-medium text-foreground">{isMe ? 'Tú' : name}</span>
@@ -565,7 +565,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
                       <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                     </div>
                     <div style={{ height: 5, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: '#c2410c', borderRadius: 4 }} />
+                      <div style={{ width: `${pct}%`, height: '100%', background: 'hsl(var(--primary))', borderRadius: 4 }} />
                     </div>
                   </div>
                 </div>
@@ -622,7 +622,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
 }
 
 // ── Expense detail sheet ──────────────────────────────────────────────────────
-function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose, onEdit, onDelete }) {
+function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, onClose, onEdit, onDelete }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   if (!expense) return null;
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
@@ -664,7 +664,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
             <div className="flex justify-between items-center">
               <span className="text-xs text-muted-foreground">Pagó</span>
               <div className="flex items-center gap-2">
-                <Avatar email={expense.paid_by} profiles={profiles} size={20} />
+                <Avatar email={expense.paid_by} profiles={profilesByEmail} size={20} />
                 <span className="text-sm text-foreground">{userMap[expense.paid_by] || expense.paid_by?.split('@')[0]}</span>
               </div>
             </div>
@@ -674,7 +674,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
                 <span className="text-xs text-muted-foreground">Dividido entre</span>
                 <div className="flex gap-1.5">
                   {expense.split_with.map(email => (
-                    <Avatar key={email} email={email} profiles={profiles} size={22} />
+                    <Avatar key={email} email={email} profiles={profilesByEmail} size={22} />
                   ))}
                 </div>
               </div>
@@ -732,7 +732,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profiles, onClose,
 }
 
 // ── Expense add/edit sheet ────────────────────────────────────────────────────
-function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profiles }) {
+function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
@@ -758,7 +758,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             saving={saving}
             userMap={userMap}
             currentUserEmail={currentUserEmail}
-            profiles={profiles}
+            profiles={profilesByEmail}
           />
         </div>
         {/* Buttons — outside scroll, always visible */}
@@ -1113,7 +1113,7 @@ export default function Expenses() {
             currentUserEmail={currentUser?.email}
             userMap={userMap}
             baseCurrency={baseCurrency}
-            profiles={profiles}
+            profilesByEmail={profilesByEmail}
             onSettle={handleSettle}
           />
         )}
@@ -1144,7 +1144,7 @@ export default function Expenses() {
           expense={detailExpense}
           baseCurrency={baseCurrency}
           userMap={userMap}
-          profiles={profiles}
+          profilesByEmail={profilesByEmail}
           onClose={() => setDetailExpense(null)}
           onEdit={openEdit}
           onDelete={handleDelete}

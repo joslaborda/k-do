@@ -55,7 +55,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           left: lineStyle.left,
           width: lineStyle.width,
           height: 3,
-          background: '#c2410c',
+          background: 'hsl(var(--primary))',
           borderRadius: 2,
           transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
         }}
@@ -73,7 +73,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
               }}
@@ -376,7 +376,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
       style={{
         width: 20, height: 20, borderRadius: 5, flexShrink: 0,
         border: checked ? 'none' : `1.5px solid ${essential ? '#c2410c' : '#d4cfc8'}`,
-        background: checked ? '#c2410c' : essential ? '#fff3ee' : 'white',
+        background: checked ? 'hsl(var(--primary))' : essential ? 'hsl(var(--accent))' : 'hsl(var(--card))',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'all 0.15s',
       }}
@@ -387,7 +387,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
         </svg>
       )}
       {!checked && essential && (
-        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#c2410c' }} />
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'hsl(var(--primary))' }} />
       )}
     </button>
   );
@@ -480,12 +480,12 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                 className="flex-1 flex flex-col items-center py-3 gap-1.5">
                 <div style={{
                   height: 3, borderRadius: 2, width: 18,
-                  background: activeInnerTab === t.key ? '#c2410c' : 'transparent',
+                  background: activeInnerTab === t.key ? 'hsl(var(--primary))' : 'transparent',
                   marginBottom: 2,
                 }} />
                 <span style={{
                   fontSize: 13, fontWeight: 500,
-                  color: activeInnerTab === t.key ? '#1a1714' : '#a09890',
+                  color: activeInnerTab === t.key ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 }}>{t.label}</span>
               </button>
             ))}

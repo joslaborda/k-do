@@ -53,7 +53,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           left: lineStyle.left,
           width: lineStyle.width,
           height: 3,
-          background: '#c2410c',
+          background: 'hsl(var(--primary))',
           borderRadius: 2,
           transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
         }}
@@ -71,7 +71,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
               }}
@@ -1690,7 +1690,7 @@ export default function Restaurants() {
                   {/* fade derecha */}
                   <div style={{
                     position:'absolute',top:0,right:0,width:32,height:'100%',zIndex:1,
-                    background:'linear-gradient(to right, transparent, #f8f6f3)',
+                    background:'linear-gradient(to right, transparent, hsl(var(--background)))',
                     pointerEvents:'none',
                   }}/>
                   <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none',msOverflowStyle:'none'}}>

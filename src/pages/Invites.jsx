@@ -124,7 +124,7 @@ export default function Invites() {
   if (token) {
     if (inviteLoading || tripLoading) {
       return (
-        <div className="min-h-screen bg-[#f8f6f3] flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       );
@@ -132,7 +132,7 @@ export default function Invites() {
 
     if (!invite || !trip) {
       return (
-        <div className="min-h-screen bg-[#f8f6f3] flex flex-col items-center justify-center px-6 gap-4">
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
           <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
             <X className="w-7 h-7 text-red-500" />
           </div>
@@ -149,9 +149,9 @@ export default function Invites() {
     }
 
     return (
-      <div className="min-h-screen bg-[#f8f6f3] flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col">
         {/* Header Kōdo */}
-        <div className="px-5 pt-14 pb-6 border-b border-border bg-[#f8f6f3]">
+        <div className="px-5 pt-14 pb-6 border-b border-border bg-background">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
               <Mail className="w-4 h-4 text-primary" />
@@ -213,9 +213,9 @@ export default function Invites() {
 
   // ── Render: lista sin token ──────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#f8f6f3]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="px-5 pt-14 pb-5 bg-[#f8f6f3] border-b border-border sticky top-0 z-10">
+      <div className="px-5 pt-14 pb-5 bg-background border-b border-border sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center">
             <ChevronLeft className="w-4 h-4 text-foreground" />

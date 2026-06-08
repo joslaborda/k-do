@@ -101,7 +101,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
           left: lineStyle.left,
           width: lineStyle.width,
           height: 3,
-          background: '#c2410c',
+          background: 'hsl(var(--primary))',
           borderRadius: 2,
           transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
         }}
@@ -119,7 +119,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
               style={{
                 fontSize: 13,
                 fontWeight: 500,
-                color: isOn ? '#1a1714' : '#a09890',
+                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
               }}
@@ -553,7 +553,7 @@ function HistorialTab() {
         <div className="bg-card rounded-2xl border border-border overflow-hidden mb-4">
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
-              <div style={{ height: 3, width: 48, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
+              <div style={{ height: 3, width: 48, background: 'hsl(var(--primary))', borderRadius: 2, marginBottom: 4 }} />
               <p className="text-sm font-medium text-foreground">Guardadas</p>
             </div>
           </div>
@@ -567,10 +567,10 @@ function HistorialTab() {
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
-              <div style={{ height: 3, width: 30, background: '#c2410c', borderRadius: 2, marginBottom: 4 }} />
+              <div style={{ height: 3, width: 30, background: 'hsl(var(--primary))', borderRadius: 2, marginBottom: 4 }} />
               <p className="text-sm font-medium text-foreground">Recientes</p>
             </div>
-            <button onClick={clearAll} className="text-xs" style={{ color: '#c2410c' }}>Borrar todo</button>
+            <button onClick={clearAll} className="text-xs" style={{ color: 'hsl(var(--primary))' }}>Borrar todo</button>
           </div>
           <div className="px-4">
             {recent.map(item => <HistItem key={item.id} item={item} />)}
