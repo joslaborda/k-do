@@ -36,9 +36,13 @@ export default function TripChat({ tripId, myProfile, trip }) {
     return unsub;
   }, [tripId, queryClient]);
 
-  // Auto-scroll
+  // Auto-scroll — solo cuando llegan mensajes nuevos, no en refetch
+  const lastMsgCount = useRef(0);
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > lastMsgCount.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    lastMsgCount.current = messages.length;
   }, [messages]);
 
   const notifyMembers = async (msgText) => {
