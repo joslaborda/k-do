@@ -231,9 +231,11 @@ function RequirementsTab({ reqs, country, homeCountry }) {
   const recommendedVax = vaccines.filter(v => !requiredVax.includes(v));
 
   // Detectar si el adaptador español es compatible
+  // Usar meta.plug como fuente si adapter.type no está disponible
+  const plugTypeRaw = adapter.type || (meta?.plug ? meta.plug.split('/').map(p => `Tipo ${p}`).join(' · ') : '');
   const spanishPlugs = ['C', 'E', 'F'];
-  const destPlugs = (adapter.type || '').match(/Tipo ([A-N])/g)?.map(t => t.replace('Tipo ', '')) || [];
-  const needsAdapter = adapter.needed;
+  const destPlugs = plugTypeRaw.match(/Tipo ([A-N])/g)?.map(t => t.replace('Tipo ', '')) || [];
+  const needsAdapter = adapter.needed ?? (destPlugs.length > 0 && !destPlugs.every(p => spanishPlugs.includes(p)));
 
   return (
     <div className="space-y-3">
