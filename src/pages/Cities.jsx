@@ -754,7 +754,6 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
 
-  // Generate all days for this city from start to end date
   const cityDays = useMemo(() => {
     if (!city.start_date || !city.end_date) return [];
     try {
@@ -765,109 +764,85 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
     } catch { return []; }
   }, [city]);
 
-  // Map itinerary days by date
   const daysByDate = useMemo(() => {
     const m = {};
     itineraryDays.filter(d => d.city_id === city.id).forEach(d => { if (d.date) m[d.date] = d; });
     return m;
   }, [itineraryDays, city.id]);
 
-  // Transport icon from docs
   const transportIcon = useMemo(() =>
     getTransportIcon(allDocs, city.start_date),
     [allDocs, city.start_date]
   );
 
-  const dotClass = isPast
-    ? 'bg-green-700 w-3 h-3'
-    : isActive
-    ? 'w-3.5 h-3.5 bg-primary border-2 border-background ring-2 ring-primary'
-    : 'bg-border w-3 h-3';
-
   return (
-    <div className="flex gap-3">
-      {/* Timeline */}
-      <div className="flex flex-col items-center shrink-0 pt-3.5">
-        <div className={`rounded-full shrink-0 ${dotClass}`} />
-        {idx < total - 1 && <div className="w-px bg-border flex-1 min-h-8 mt-1" />}
-      </div>
-
-      {/* Card */}
-      <div className={`flex-1 mb-0 min-w-0 ${idx < total - 1 ? 'pb-0' : ''}`}>
-        <div className={`bg-card rounded-2xl border overflow-hidden mb-1 ${
-          isActive ? 'border-orange-200' : isPast ? 'border-border opacity-75' : 'border-border'
+    <div className="mb-4">
+      {/* Ciudad header — colapsable */}
+      <button onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-1 py-2 text-left">
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+          isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
         }`}>
-          {/* City header */}
-          <button onClick={() => setOpen(o => !o)}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
-              isActive ? 'bg-orange-50' : 'hover:bg-secondary/30'
-            }`}>
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-              isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
-            }`}>
-              {isPast ? '✓' : idx + 1}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className={`text-sm font-semibold truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                {city.name}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {city.start_date && city.end_date
-                  ? `${format(parseISO(city.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: es })}`
-                  : city.start_date
-                  ? format(parseISO(city.start_date), 'dd MMM yyyy', { locale: es })
-                  : 'Sin fechas'}
-              </p>
-            </div>
-            {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0">Visitada</span>}
-            {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0">Ahora</span>}
-            {!isActive && !isPast && <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full shrink-0">Próxima</span>}
-            {open
-              ? <ChevronUp className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-              : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
-          </button>
+          {isPast ? '✓' : idx + 1}
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className={`text-sm font-bold truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+            {city.name}
+          </span>
+          <span className="text-xs text-muted-foreground ml-2">
+            {city.start_date && city.end_date
+              ? `${format(parseISO(city.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: es })}`
+              : 'Sin fechas'}
+          </span>
+        </div>
+        {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">Visitada</span>}
+        {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-semibold">Ahora</span>}
+        {!isActive && !isPast && <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full shrink-0">Próxima</span>}
+        {open
+          ? <ChevronUp className="w-4 h-4 shrink-0 text-muted-foreground" />
+          : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+      </button>
 
-          {/* Days */}
-          {open && cityDays.length > 0 && (
-            <div>
-              {cityDays.map(dateStr => (
-                <DayRow
-                  key={dateStr}
-                  day={daysByDate[dateStr] || null}
-                  dateStr={dateStr}
-                  allDocs={allDocs}
-                  allSpots={allSpots}
-                  tripId={tripId}
-                  cityId={city.id}
-                  isToday_={dateStr === todayStr}
-                  isTomorrow_={dateStr === tomorrowStr}
-                  queryClient={queryClient}
-                  defaultOpen={dateStr === todayStr}
-                  trip={trip}
-                  cities={cities}
-                  itineraryDays={itineraryDays}
-                  profiles={profiles}
-                  userId={userId}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* No dates — prompt */}
-          {open && cityDays.length === 0 && (
-            <div className="px-4 py-4 text-center border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2">Sin fechas asignadas</p>
+      {/* Días sueltos debajo — mismas cards que ciudad única */}
+      {open && (
+        <div className="flex flex-col gap-2 mt-2">
+          {cityDays.length === 0 && (
+            <div className="bg-card border border-border rounded-2xl px-4 py-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Sin fechas asignadas</p>
               <p className="text-xs text-primary">Edita el viaje para añadir fechas →</p>
             </div>
           )}
+          {cityDays.map(dateStr => (
+            <DayRow
+              key={dateStr}
+              day={daysByDate[dateStr] || null}
+              dateStr={dateStr}
+              allDocs={allDocs}
+              allSpots={allSpots}
+              tripId={tripId}
+              cityId={city.id}
+              isToday_={dateStr === todayStr}
+              isTomorrow_={dateStr === tomorrowStr}
+              queryClient={queryClient}
+              defaultOpen={dateStr === todayStr}
+              trip={trip}
+              cities={cities}
+              itineraryDays={itineraryDays}
+              profiles={profiles}
+              userId={userId}
+            />
+          ))}
         </div>
+      )}
 
-        {/* Transport connector to next city */}
-        {idx < total - 1 && transportIcon && (
-          <div className="flex items-center gap-2 px-4 py-1 mb-1">
-            <span className="text-sm">{transportIcon}</span>
-          </div>
-        )}
+      {/* Conector transporte entre ciudades */}
+      {idx < total - 1 && transportIcon && (
+        <div className="flex items-center gap-3 px-2 py-3">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted-foreground font-medium">{transportIcon}</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+      )}
       </div>
     </div>
   );
