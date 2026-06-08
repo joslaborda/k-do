@@ -1,8 +1,46 @@
+import { getVisaInfo } from '@/lib/visaMatrix';
+import { getCountryMeta } from '@/lib/countryConfig';
+
 /**
  * packingDB.js — Base de datos global de requisitos de viaje
  * Cobertura: 205 países — Visa, Enchufe, Vacunas, Moneda
  * Pasaportes: ES/UE, US, UK, AU, CA, JP, KR, IN, CN, RU + 19 LATAM individuales
  */
+
+
+// Mapa nombre español → ISO para fallback de visaDB
+const DEST_NAME_TO_ISO = {
+  'España':'ES','Francia':'FR','Alemania':'DE','Italia':'IT','Portugal':'PT',
+  'Reino Unido':'GB','Estados Unidos':'US','Canadá':'CA','México':'MX',
+  'Argentina':'AR','Brasil':'BR','Chile':'CL','Colombia':'CO','Perú':'PE',
+  'Venezuela':'VE','Ecuador':'EC','Bolivia':'BO','Paraguay':'PY','Uruguay':'UY',
+  'Cuba':'CU','Rep. Dominicana':'DO','República Dominicana':'DO','Costa Rica':'CR',
+  'Panamá':'PA','Guatemala':'GT','Honduras':'HN','El Salvador':'SV','Nicaragua':'NI',
+  'Japón':'JP','China':'CN','Corea del Sur':'KR','India':'IN','Australia':'AU',
+  'Nueva Zelanda':'NZ','Singapur':'SG','Tailandia':'TH','Vietnam':'VN',
+  'Indonesia':'ID','Filipinas':'PH','Malasia':'MY','Camboya':'KH',
+  'Marruecos':'MA','Egipto':'EG','Sudáfrica':'ZA','Kenia':'KE',
+  'Turquía':'TR','Rusia':'RU','Ucrania':'UA','Polonia':'PL',
+  'Países Bajos':'NL','Bélgica':'BE','Suecia':'SE','Noruega':'NO',
+  'Dinamarca':'DK','Finlandia':'FI','Austria':'AT','Suiza':'CH',
+  'Grecia':'GR','República Checa':'CZ','Hungría':'HU','Rumanía':'RO',
+  'Croacia':'HR','Tailandia':'TH','Sri Lanka':'LK','Nepal':'NP',
+  'Pakistán':'PK','Bangladesh':'BD','Irán':'IR','Irak':'IQ',
+  'Israel':'IL','Jordania':'JO','Emiratos Árabes':'AE','Arabia Saudita':'SA',
+  'Catar':'QA','Kuwait':'KW','Líbano':'LB','Islandia':'IS',
+  'Irlanda':'IE','Luxemburgo':'LU','Malta':'MT','Chipre':'CY',
+  'Eslovaquia':'SK','Eslovenia':'SI','Estonia':'EE','Letonia':'LV',
+  'Lituania':'LT','Bulgaria':'BG','Serbia':'RS','Albania':'AL',
+  'Montenegro':'ME','Macedonia del Norte':'MK','Bosnia':'BA',
+  'Kosovo':'XK','Moldova':'MD','Bielorrusia':'BY','Georgia':'GE',
+  'Armenia':'AM','Azerbaiyán':'AZ','Kazajistán':'KZ','Uzbekistán':'UZ',
+  'Mongolia':'MN','Taiwán':'TW','Hong Kong':'HK',
+  'Argelia':'DZ','Túnez':'TN','Libia':'LY','Sudán':'SD',
+  'Etiopía':'ET','Ghana':'GH','Senegal':'SN','Tanzania':'TZ',
+  'Uganda':'UG','Zimbabue':'ZW','Mozambique':'MZ','Angola':'AO',
+  'Camerún':'CM','Costa de Marfil':'CI','Madagascar':'MG','Mali':'ML',
+  'Nigeria':'NG','Congo':'CG','Zambia':'ZM','Kenia':'KE',
+};
 
 export const COUNTRY_REQUIREMENTS = {
 
@@ -2920,7 +2958,34 @@ export function getCountryRequirements(destination, homeCountry = 'España') {
   })();
 
   const req = COUNTRY_REQUIREMENTS[destination] || null;
-  if (!req) return null;
+  if (!req) {
+    // Fallback: intentar visaDB con ISOs
+    const destISO = DEST_NAME_TO_ISO[destination] || getCountryMeta(destination)?.iso || null;
+    if (destISO && code) {
+      try {
+        const visaInfo = getVisaInfo(destISO, code);
+        if (visaInfo && visaInfo.needed !== null) {
+          const type = visaInfo.eVisa ? 'evisa' : visaInfo.needed === false ? null : 'required';
+          const labelMap = { evisa: 'e-Visa requerida', voa: 'Visa en llegada', eta: 'ETA requerida' };
+          return {
+            visa: {
+              needed: visaInfo.needed,
+              type,
+              label: visaInfo.needed === false ? 'Sin visado' : (labelMap[type] || 'Visado requerido'),
+              info: visaInfo.info || '',
+              passportCode: code,
+            },
+            adapter: { needed: null, type: null, info: null },
+            vaccines: [],
+            currency: { info: null },
+            tips: [],
+            emergency: null,
+          };
+        }
+      } catch(e) {}
+    }
+    return null;
+  }
 
   const v = req.visa || {};
   let visaVal = v[code];

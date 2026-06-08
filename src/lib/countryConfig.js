@@ -332,7 +332,7 @@ for (const [label, meta] of Object.entries(KNOWN_META)) {
   }
 }
 
-const DEFAULT_META = { currency: 'USD', symbol: '$', languageCode: 'en-US', languageLabel: 'English', flag: '🌍', iso: null };
+const DEFAULT_META = { currency: 'USD', symbol: '$', languageCode: 'en-US', languageLabel: 'English', flag: '🌍', iso: null, plug: null };
 
 // ─── COUNTRY LIST ─────────────────────────────────────────────────────────────
 export function getCountries(locale = 'es-ES') {
