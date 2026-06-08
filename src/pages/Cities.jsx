@@ -843,7 +843,6 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
           <div className="flex-1 h-px bg-border" />
         </div>
       )}
-      </div>
     </div>
   );
 }
