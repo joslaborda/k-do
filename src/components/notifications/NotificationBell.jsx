@@ -91,7 +91,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-[#f8f6f3] rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">Cargando...</div>
