@@ -116,43 +116,61 @@ async function searchPlaces(query, city, country) {
 }
 
 async function nearbyPlaces(lat, lng, filterCats = null) {
-  const viewbox = `${lng-0.03},${lat+0.03},${lng+0.03},${lat-0.03}`;
-  const CAT_MAP = {
-    food:      ['restaurant', 'cafe', 'fast_food'],
-    cultural:  ['museum', 'theatre', 'cinema', 'art_gallery', 'library', 'monument'],
-    interest:  ['attraction', 'viewpoint', 'park', 'landmark', 'historic'],
-    shop:      ['hotel', 'hostel', 'shopping_mall', 'market', 'supermarket'],
-    nightlife: ['bar', 'pub', 'nightclub', 'cocktail_bar', 'wine_bar'],
+  const RADIUS = 1000;
+  const AMENITY_MAP = {
+    food:      ['restaurant', 'cafe', 'fast_food', 'bar', 'food_court', 'ice_cream'],
+    cultural:  ['museum', 'theatre', 'cinema', 'arts_centre', 'library'],
+    interest:  ['attraction', 'place_of_worship'],
+    shop:      ['hotel', 'hostel', 'guest_house', 'supermarket', 'marketplace'],
+    nightlife: ['bar', 'pub', 'nightclub', 'biergarten'],
   };
-  const categories = filterCats?.length
-    ? filterCats.flatMap(k => CAT_MAP[k] || [k])
-    : ['restaurant', 'cafe', 'museum', 'bar', 'hotel', 'attraction', 'park', 'monument'];
+  const TOURISM_MAP = {
+    cultural:  ['museum', 'gallery', 'artwork', 'monument', 'memorial'],
+    interest:  ['attraction', 'viewpoint', 'theme_park', 'zoo', 'aquarium'],
+    shop:      ['hotel', 'hostel', 'guest_house', 'apartment'],
+  };
+  const amenities = filterCats?.length
+    ? filterCats.flatMap(k => AMENITY_MAP[k] || [])
+    : ['restaurant', 'cafe', 'bar', 'museum', 'hotel', 'fast_food', 'pub', 'theatre'];
+  const tourisms = filterCats?.length
+    ? filterCats.flatMap(k => TOURISM_MAP[k] || [])
+    : ['museum', 'hotel', 'attraction', 'viewpoint', 'gallery'];
+
+  const amenityList = [...new Set(amenities)].join('|');
+  const tourismList = [...new Set(tourisms)].join('|');
+  const amenityFilter = amenityList ? `node["amenity"~"${amenityList}"](around:${RADIUS},${lat},${lng});` : '';
+  const tourismFilter = tourismList ? `node["tourism"~"${tourismList}"](around:${RADIUS},${lat},${lng});` : '';
+  const query = `[out:json][timeout:10];(${amenityFilter}${tourismFilter});out body 30;`;
+
+  const ctrl = new AbortController();
+  setTimeout(() => ctrl.abort(), 12000);
+  const res = await fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST', body: query, signal: ctrl.signal,
+  });
+  if (!res.ok) throw new Error('overpass error');
+  const data = await res.json();
+
   const seen = new Set();
   const results = [];
-  await Promise.all(categories.map(async cat => {
-    try {
-      const params = new URLSearchParams({ format:'json', limit:5, addressdetails:1, namedetails:1, viewbox, bounded:1, q:cat });
-      const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
-        headers: { 'Accept-Language':'es,en', 'User-Agent':'KodoTravelApp/1.0' },
-        signal: (() => { const c = new AbortController(); setTimeout(() => c.abort(), 8000); return c.signal; })(),
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      data.forEach(el => {
-        const name = el.namedetails?.name || el.name || el.display_name?.split(',')[0];
-        if (!name || seen.has(el.place_id)) return;
-        seen.add(el.place_id);
-        results.push({
-          id: el.place_id?.toString(), name,
-          address: [el.address?.road, el.address?.city || el.address?.town || el.address?.suburb].filter(Boolean).join(', ') || '',
-          lat: parseFloat(el.lat), lng: parseFloat(el.lon),
-          type: osmToType(el.type || el.class || cat, cat),
-        });
-      });
-    } catch {}
-  }));
+  (data.elements || []).forEach(el => {
+    const name = el.tags?.name || el.tags?.['name:es'] || el.tags?.['name:en'];
+    if (!name || seen.has(el.id)) return;
+    seen.add(el.id);
+    const amenity = el.tags?.amenity || el.tags?.tourism || '';
+    const dist = Math.round(Math.sqrt(
+      Math.pow((el.lat - lat) * 111000, 2) +
+      Math.pow((el.lon - lng) * 111000 * Math.cos(lat * Math.PI / 180), 2)
+    ));
+    results.push({
+      id: el.id?.toString(), name,
+      address: [el.tags?.['addr:street'], el.tags?.['addr:city']].filter(Boolean).join(', ') || '',
+      lat: el.lat, lng: el.lon, dist,
+      type: osmToType(amenity, amenity),
+    });
+  });
+  results.sort((a, b) => a.dist - b.dist);
   if (results.length === 0) throw new Error('no results nearby');
-  return results.slice(0, 15);
+  return results.slice(0, 20);
 }
 
 async function reverseGeocode(lat, lng) {
@@ -1290,7 +1308,7 @@ export default function Restaurants() {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  const [tab, setTab] = useState('buscar'); // 'buscar' | 'mis' | 'comunidad'
+  const [tab, setTab] = useState('buscar'); // 'buscar' | 'mis'
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState(() => getRecentSearches());
   const [osmResults, setOsmResults] = useState([]);
@@ -1308,6 +1326,8 @@ export default function Restaurants() {
   const [lastSavedId, setLastSavedId] = useState(null);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [mySpotSearch, setMySpotSearch] = useState('');
+  const [showCityInput, setShowCityInput] = useState(false);
+  const [customCity, setCustomCity] = useState('');
   const searchTimer = useRef(null);
   const toastTimer = useRef(null);
 
@@ -1362,12 +1382,12 @@ export default function Restaurants() {
       setSearching(true);
       addRecentSearch(searchQuery.trim());
       setRecentSearches(getRecentSearches());
-      try { setOsmResults(await searchPlaces(searchQuery, city, country)); }
+      try { setOsmResults(await searchPlaces(searchQuery, selectedCity || city, country)); }
       catch { setOsmResults([]); }
       finally { setSearching(false); }
     }, 700);
     return () => clearTimeout(searchTimer.current);
-  }, [searchQuery, city, country]);
+  }, [searchQuery, selectedCity, city, country]);
 
   const handleNearby = async (cats = nearbyFilter) => {
     if (!navigator.geolocation) {
@@ -1601,9 +1621,11 @@ export default function Restaurants() {
               <Plus className="w-4 h-4" />Crear spot
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Spots</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Compass className="w-5 h-5 text-primary" />Spots
+          </h1>
           <OTabBar
-            tabs={[{key:'buscar',label:'Buscar'},{key:'mis',label:'Mis spots'},{key:'comunidad',label:'Comunidad'}]}
+            tabs={[{key:'buscar',label:'Buscar'},{key:'mis',label:'Mis spots'}]}
             activeKey={tab}
             onChange={setTab}
           />
@@ -1616,157 +1638,177 @@ export default function Restaurants() {
         {/* ── BUSCAR TAB ── */}
         {tab === 'buscar' && (
           <div className="space-y-4">
-            {/* Search input */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Buscar lugares, hashtags..."
-                className="w-full pl-9 pr-24 py-2.5 rounded-xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                {searchQuery
-                  ? <button onClick={() => { setSearchQuery(''); setOsmResults([]); setNearbyResults([]); }} className="text-muted-foreground p-1"><X className="w-4 h-4"/></button>
-                  : <button onClick={() => handleNearby(nearbyFilter)} className="flex items-center gap-1 text-xs bg-accent text-primary px-2 py-1 rounded-lg font-medium whitespace-nowrap">
-                      <Navigation className="w-3 h-3"/>Cerca
-                    </button>
-                }
+
+            {/* Search + Cerca */}
+            <div className="flex items-center gap-2">
+              <div className={`flex-1 flex items-center gap-2 bg-card border rounded-xl px-3 py-2.5 transition-colors ${searchQuery ? 'border-primary' : 'border-border'}`}>
+                <Search className={`w-4 h-4 flex-shrink-0 ${searchQuery ? 'text-primary' : 'text-muted-foreground'}`} />
+                <input
+                  value={searchQuery}
+                  onChange={e => { setSearchQuery(e.target.value); setNearbyResults([]); }}
+                  placeholder="Buscar lugares..."
+                  className="flex-1 text-sm outline-none bg-transparent text-foreground min-w-0"
+                />
+                {searchQuery && (
+                  <button onClick={() => { setSearchQuery(''); setOsmResults([]); setNearbyResults([]); }} className="text-muted-foreground flex-shrink-0">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
+              <button
+                onClick={() => handleNearby(nearbyFilter)}
+                className="flex items-center gap-1.5 bg-accent text-primary px-3 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0 border border-orange-200"
+              >
+                <Navigation className="w-3.5 h-3.5" />Cerca
+              </button>
             </div>
 
-            {/* Category filter chips — below search bar */}
+            {/* Chips de ciudad — solo si hay más de una */}
+            {!searchQuery && tripCities.length > 1 && (
+              <div className="flex flex-wrap gap-2">
+                {tripCities.map(c => (
+                  <button key={c.id} onClick={() => setSelectedCity(selectedCity === c.name ? '' : c.name)}
+                    className={`text-sm px-4 py-1.5 rounded-full border font-medium transition-colors flex-shrink-0 ${
+                      selectedCity === c.name
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-card border-border text-foreground hover:border-primary/40'
+                    }`}>
+                    {c.name}
+                  </button>
+                ))}
+                {!showCityInput ? (
+                  <button onClick={() => setShowCityInput(true)}
+                    className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full border border-dashed border-primary/40 text-primary bg-accent font-medium">
+                    <Plus className="w-3.5 h-3.5" />Ciudad
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <input
+                      autoFocus
+                      value={customCity}
+                      onChange={e => setCustomCity(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && customCity.trim()) { setSelectedCity(customCity.trim()); setShowCityInput(false); setCustomCity(''); }
+                        if (e.key === 'Escape') { setShowCityInput(false); setCustomCity(''); }
+                      }}
+                      placeholder="Ej: Rivas..."
+                      className="text-sm px-3 py-1.5 rounded-full border border-primary outline-none bg-card text-foreground w-28"
+                    />
+                    <button onClick={() => { setShowCityInput(false); setCustomCity(''); }} className="text-muted-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Chips de categoría */}
             {!searchQuery && (
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 {[
-                  { key: 'food',     Icon: Utensils,    label: 'Comer' },
-                  { key: 'cultural', Icon: Landmark,    label: 'Cultural' },
-                  { key: 'interest', Icon: Ticket,      label: 'Interés' },
-                  { key: 'shop',     Icon: ShoppingBag, label: 'Compras' },
-                  { key: 'nightlife',Icon: Moon,        label: 'Bares/Noche' },
+                  { key: 'food',      Icon: Utensils,    label: 'Comer' },
+                  { key: 'cultural',  Icon: Landmark,    label: 'Cultural' },
+                  { key: 'interest',  Icon: Ticket,      label: 'Interés' },
+                  { key: 'shop',      Icon: ShoppingBag, label: 'Compras' },
+                  { key: 'nightlife', Icon: Moon,        label: 'Noche' },
                 ].map(({ key: k, Icon, label }) => (
                   <button key={k} type="button"
                     onClick={() => {
-                      const next = nearbyFilter.includes(k)
-                        ? nearbyFilter.filter(x => x !== k)
-                        : [...nearbyFilter, k];
+                      const next = nearbyFilter.includes(k) ? nearbyFilter.filter(x => x !== k) : [...nearbyFilter, k];
                       setNearbyFilter(next);
                     }}
-                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                    className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-colors ${
                       nearbyFilter.includes(k)
                         ? 'bg-primary text-white border-primary'
                         : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                     }`}>
-                    <Icon size={12} />{label}
+                    <Icon size={13} />{label}
                   </button>
                 ))}
               </div>
             )}
 
-            {/* City chips */}
-            {!isSearchActive && tripCities.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ciudades del viaje</p>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {tripCities.map(c => (
-                    <button key={c.id} onClick={() => setSelectedCity(c.name)}
-                      className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors ${
-                        selectedCity === c.name
-                          ? 'bg-primary text-white border-primary'
-                          : 'bg-card border-border text-foreground hover:border-primary/40'
-                      }`}>
-                      {c.name}
-                    </button>
-                  ))}
+            {/* Estado vacío */}
+            {!searchQuery && osmResults.length === 0 && nearbyResults.length === 0 && !searching && !loadingNearby && (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
+                  <Compass className="w-6 h-6 text-muted-foreground/50" />
                 </div>
+                <p className="text-sm text-muted-foreground">Busca un lugar o usa Cerca<br />para descubrir alrededor</p>
               </div>
             )}
 
-            {/* Hashtags */}
-            {!isSearchActive && hashtags.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Explorar por tema</p>
-                <div className="relative">
-                  {/* fade derecha */}
-                  <div style={{
-                    position:'absolute',top:0,right:0,width:32,height:'100%',zIndex:1,
-                    background:'linear-gradient(to right, transparent, hsl(var(--background)))',
-                    pointerEvents:'none',
-                  }}/>
-                  <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none',msOverflowStyle:'none'}}>
-                    {hashtags.map(tag => (
-                      <button key={tag} onClick={() => setSearchQuery(tag.replace('#', ''))}
-                        className="text-sm px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors flex-shrink-0">
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Resultados con búsqueda */}
+            {searchQuery.length >= 2 && (
+              <div className="space-y-4">
 
-            {/* Recent searches */}
-            {!isSearchActive && recentSearches.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Búsquedas recientes</p>
-                  <button onClick={() => { clearRecentSearches(); setRecentSearches([]); }}
-                    className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
-                </div>
-                <div className="space-y-1">
-                  {recentSearches.map((s, i) => {
-                    const now = new Date();
-                    const date = new Date(s.date);
-                    const diffDays = Math.floor((now - date) / 86400000);
-                    const label = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Ayer' : `Hace ${diffDays}d`;
-                    return (
-                      <button key={i} onClick={() => setSearchQuery(s.query)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/50 transition-colors text-left">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground flex-shrink-0"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-                        <span className="flex-1 text-sm text-foreground truncate">{s.query}</span>
-                        <span className="text-xs text-muted-foreground flex-shrink-0">{label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                {/* Tus spots que coinciden — primero */}
+                {(() => {
+                  const q = searchQuery.toLowerCase();
+                  const matched = spots.filter(s =>
+                    s.title?.toLowerCase().includes(q) ||
+                    s.notes?.toLowerCase().includes(q) ||
+                    s.address?.toLowerCase().includes(q)
+                  );
+                  if (!matched.length) return null;
+                  return (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tus spots</p>
+                      <div className="space-y-2">
+                        {matched.map(spot => (
+                          <button key={spot.id} onClick={() => setSelectedSpot(spot)}
+                            className="w-full flex items-center gap-3 bg-card border border-border rounded-xl p-3 text-left hover:border-primary/40 transition-colors">
+                            <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
+                              {(() => { const I = {food:Utensils,sight:Landmark,activity:Ticket,shopping:ShoppingBag,nightlife:Moon,bar:Moon}[spot.type] || Compass; return <I size={16} className="text-primary" />; })()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{spot.title}</p>
+                              <p className="text-xs text-muted-foreground truncate">{spot.city_name || city}</p>
+                            </div>
+                            <span className={`text-xs font-semibold px-2 py-1 rounded-lg flex-shrink-0 ${spot.assigned_date ? 'bg-orange-100 text-primary' : 'bg-green-50 text-green-700'}`}>
+                              {spot.assigned_date ? 'Asignado' : 'Guardado'}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
-            {/* Search results */}
-            {isSearchActive && (
-              <div className="space-y-3">
-                {/* Seed/known spots matching the query */}
-                {seedSearchResults.length > 0 && (
-                  <>
-                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Lugares conocidos</p>
-                    {seedSearchResults.map((p, i) => {
-                      const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.title?.toLowerCase().trim());
-                      return <PlaceResultCard key={`seed-${i}`} place={{ id: `seed-${i}`, name: p.title, type: p.type, address: p.address || '' }} onSave={saveOsmPlace} saving={savingId===`seed-${i}`} isDuplicate={isDuplicate} />;
-                    })}
-                    {osmResults.length > 0 && <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Más resultados</p>}
-                  </>
-                )}
+                {/* Resultados OSM */}
                 {searching && <p className="text-sm text-muted-foreground text-center py-4">Buscando...</p>}
                 {!searching && osmResults.length > 0 && (
-                  <>
-                    {seedSearchResults.length === 0 && <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{osmResults.length} resultados</p>}
-                    {osmResults.map(p => {
-                      const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
-                      return <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id} isDuplicate={isDuplicate} />;
-                    })}
-                    {/* Manual creation option at bottom */}
-                    <button onClick={() => { setShowCreate(true); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 bg-card border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
-                      <Plus className="w-4 h-4" />
-                      Crear "{searchQuery}" manualmente
-                    </button>
-                  </>
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Más resultados</p>
+                    <div className="bg-card border border-border rounded-xl overflow-hidden">
+                      {osmResults.map((p, i) => {
+                        const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
+                        return (
+                          <div key={p.id} className={`flex items-center gap-3 px-3 py-2.5 ${i < osmResults.length - 1 ? 'border-b border-border' : ''}`}>
+                            <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                              {(() => { const I = {food:Utensils,sight:Landmark,activity:Ticket,shopping:ShoppingBag,nightlife:Moon,bar:Moon}[p.type] || Compass; return <I size={14} className="text-muted-foreground" />; })()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                              {p.address && <p className="text-xs text-muted-foreground truncate">{p.address}</p>}
+                            </div>
+                            {isDuplicate
+                              ? <span className="text-xs text-muted-foreground flex-shrink-0">Guardado</span>
+                              : <button onClick={() => saveOsmPlace(p)} disabled={savingId === p.id} className="flex-shrink-0 text-primary hover:text-primary/70 transition-colors">
+                                  <Plus className="w-5 h-5" />
+                                </button>
+                            }
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                {!searching && searchQuery.length >= 2 && osmResults.length === 0 && !loadingNearby && (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground mb-3">Sin resultados para "{searchQuery}"</p>
+                {!searching && searchQuery.length >= 2 && osmResults.length === 0 && (
+                  <div className="text-center py-8 bg-card border border-border rounded-xl">
+                    <p className="text-sm text-muted-foreground">Sin resultados para "{searchQuery}"</p>
                     <button onClick={() => setShowCreate(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-full font-medium">
+                      className="mt-3 flex items-center gap-1.5 mx-auto text-sm text-primary font-medium">
                       <Plus className="w-4 h-4" />Crear manualmente
                     </button>
                   </div>
@@ -1774,21 +1816,40 @@ export default function Restaurants() {
               </div>
             )}
 
-            {/* Nearby results */}
+            {/* Resultados Cerca */}
+            {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">Obteniendo tu ubicación...</p>}
             {nearbyResults.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{nearbyResults.length} lugares cerca</p>
-                {nearbyResults.map(p => {
-                  const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
-                  return <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id} isDuplicate={isDuplicate} />;
-                })}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{nearbyResults.length} lugares cerca</p>
+                <div className="bg-card border border-border rounded-xl overflow-hidden">
+                  {nearbyResults.map((p, i) => {
+                    const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
+                    return (
+                      <div key={p.id} className={`flex items-center gap-3 px-3 py-2.5 ${i < nearbyResults.length - 1 ? 'border-b border-border' : ''}`}>
+                        <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
+                          {(() => { const I = {food:Utensils,sight:Landmark,activity:Ticket,shopping:ShoppingBag,nightlife:Moon,bar:Moon}[p.type] || Compass; return <I size={14} className="text-muted-foreground" />; })()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                          <p className="text-xs text-muted-foreground">{p.address || ''}{p.dist ? ` · ${p.dist < 1000 ? p.dist + 'm' : (p.dist/1000).toFixed(1) + 'km'}` : ''}</p>
+                        </div>
+                        {isDuplicate
+                          ? <span className="text-xs text-muted-foreground flex-shrink-0">Guardado</span>
+                          : <button onClick={() => saveOsmPlace(p)} disabled={savingId === p.id} className="flex-shrink-0 text-primary hover:text-primary/70 transition-colors">
+                              <Plus className="w-5 h-5" />
+                            </button>
+                        }
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
-            {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">Obteniendo tu ubicación...</p>}
+
           </div>
         )}
 
-        {/* ── MIS SPOTS TAB ── */}
+                {/* ── MIS SPOTS TAB ── */}
         {tab === 'mis' && (
           <div>
             {/* Search bar */}
@@ -1834,7 +1895,7 @@ export default function Restaurants() {
                 <div className="text-center py-6 bg-card rounded-2xl border border-border">
                   <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-sm font-medium text-foreground mb-1">No tienes ese spot todavía</p>
-                  <p className="text-xs text-muted-foreground">Resultados de la comunidad y búsqueda para <strong>"{mySpotSearch}"</strong></p>
+                  <p className="text-xs text-muted-foreground">Resultados de búsqueda para <strong>"{mySpotSearch}"</strong></p>
                 </div>
                 {/* Show seed matches as suggestions */}
                 {seedSpots.filter(s => s.title?.toLowerCase().includes(mySpotSearch.toLowerCase())).slice(0, 5).map((p, i) => {
@@ -1865,77 +1926,6 @@ export default function Restaurants() {
           </div>
         )}
 
-        {/* ── COMUNIDAD TAB ── */}
-        {tab === 'comunidad' && (
-          <div>
-            {/* City chips */}
-            {tripCities.length > 0 && (
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-                {tripCities.map(c => {
-                  const isActive = (selectedCity || activeCity?.name) === c.name;
-                  const today = new Date().toISOString().slice(0,10);
-                  const isCurrent = c.start_date && c.end_date && today >= c.start_date && today <= c.end_date;
-                  return (
-                    <button key={c.id} onClick={() => setSelectedCity(c.name)}
-                      className={`text-sm px-4 py-1.5 rounded-full border font-medium flex-shrink-0 transition-colors flex items-center gap-1.5 ${
-                        isActive ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
-                      }`}>
-                      {c.name}
-                      {isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"/>}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Category filters */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-              {[
-                ['all','Todos'],
-                ['restaurant','Restaurantes'],
-                ['bar','Bares'],
-                ['nightlife','Nightlife'],
-                ['vistas','Vistas'],
-                ['museos','Museos'],
-                ['templos','Templos'],
-                ['naturaleza','Naturaleza'],
-                ['lgtbq','LGTBQ+'],
-                ['shopping','Compras'],
-              ].map(([v,l]) => (
-                <button key={v} onClick={() => setCommunityFilter(v)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex-shrink-0 ${
-                    communityFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
-                  }`}>
-                  {l}
-                </button>
-              ))}
-            </div>
-
-            {communitySpots.length === 0 ? (
-              <div className="text-center py-16">
-                <Compass className="w-10 h-10 text-muted-foreground/40 mx-auto mb-4" />
-                <p className="text-muted-foreground">Sin spots de la comunidad para {selectedCity || city} todavía</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {communitySpots.slice(0, 15).map((spot, idx) => {
-                  const alreadySaved = spots.some(s => s.title?.toLowerCase() === spot.title?.toLowerCase());
-                  const savingKey = spot.id || spot.title;
-                  return (
-                    <CommunitySpotCard
-                      key={spot.id || idx}
-                      spot={spot}
-                      onSave={saveCommunitySpot}
-                      saving={savingId === savingKey}
-                      alreadySaved={alreadySaved}
-                      userId={user?.id}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Create sheet */}
