@@ -15,7 +15,7 @@ export default function DayMapButton({ day, city }) {
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
-      className="inline-flex items-center gap-1.5 text-xs font-medium text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 px-2.5 py-1.5 rounded-lg transition-colors"
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary bg-orange-50 hover:bg-orange-100 border border-orange-200 px-2.5 py-1.5 rounded-lg transition-colors"
       title={`Ver ruta desde ${origin} en Google Maps`}
     >
       <Navigation className="w-3.5 h-3.5 flex-shrink-0" />
