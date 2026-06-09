@@ -31,7 +31,7 @@ export default function PhotoGallery({ entries }) {
   if (allPhotos.length === 0) {
     return (
       <div className="text-center py-24 border-2 border-dashed border-stone-200 rounded-2xl">
-        <div className="text-6xl mb-6 opacity-20">📸</div>
+        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-6"><Image className="w-8 h-8 text-muted-foreground/30" /></div>
         <p className="text-stone-400">No hay fotos aún</p>
         <p className="text-sm text-stone-400 mt-2">Añade fotos a tus entradas del diario</p>
       </div>
@@ -113,7 +113,7 @@ export default function PhotoGallery({ entries }) {
                   </span>
                 )}
                 {selectedPhoto?.location && (
-                  <span>📍 {selectedPhoto.location}</span>
+                  <span className="flex items-center gap-1"><MapPin size={12} />{selectedPhoto.location}</span>
                 )}
               </div>
               {allPhotos.length > 1 && (
