@@ -233,7 +233,7 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
                 className="flex-1 min-w-[80px] bg-transparent text-sm outline-none text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Pulsa Enter o coma para añadir · Backspace para borrar</p>
+            <p className="text-label text-muted-foreground mt-1">Pulsa Enter o coma para añadir · Backspace para borrar</p>
           </div>
 
           {/* Buttons */}
