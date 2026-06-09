@@ -1435,7 +1435,16 @@ export default function Restaurants() {
     if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
     setSavingId(place.id);
     try {
-      const created = await createMutation.mutateAsync(baseData({ title: place.name, type: place.type || 'sight', address: place.address || '', lat: place.lat, lng: place.lng, osm_id: place.id || null, source: 'osm' }));
+      const created = await createMutation.mutateAsync({
+        trip_id: tripId || undefined, city_id: cityId||undefined,
+        city_name: selectedCity || city, country: normalizeCountry(country),
+        title: place.name, type: place.type || 'sight',
+        address: place.address || '', lat: place.lat, lng: place.lng,
+        osm_id: place.id || null, source: 'osm',
+        visibility: 'trip_members', visited: false,
+        created_by: null, created_by_user_id: null,
+        saved_by: [user?.email].filter(Boolean),
+      });
       setLastSavedId(created?.id);
       setOsmResults([]); setNearbyResults([]); setSearchQuery(''); setNearbyFilter([]);
       showToastFor({ title: place.name }, city);
@@ -1478,7 +1487,7 @@ export default function Restaurants() {
         lat: spot.lat, lng: spot.lng, notes: spot.notes || '',
         visibility: 'trip_members', visited: false,
         // Keep original authorship — this spot was created by someone else
-        created_by: spot.created_by || spot.created_by_user_id ? spot.created_by : user?.email,
+        created_by: spot.created_by || null,
         created_by_user_id: spot.created_by_user_id || user?.id,
         creator_username: spot.creator_username || myProfile?.username || '',
         // Tag as saved (not created) by current user
