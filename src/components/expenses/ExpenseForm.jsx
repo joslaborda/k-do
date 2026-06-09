@@ -1,3 +1,4 @@
+import { BusFront } from '@/lib/icons';
 import { useState, useRef, useEffect } from 'react';
 import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -5,7 +6,7 @@ import { convertAmount } from '@/lib/fxRates';
 
 const CATEGORIES = [
   { value: 'food',          label: 'Comida',      Icon: Utensils    },
-  { value: 'transport',     label: 'Transporte',  Icon: Bus         },
+  { value: 'transport',     label: 'Transporte',  Icon: BusFront         },
   { value: 'accommodation', label: 'Alojamiento', Icon: Hotel       },
   { value: 'activities',    label: 'Actividades', Icon: Ticket      },
   { value: 'shopping',      label: 'Compras',     Icon: ShoppingBag },
