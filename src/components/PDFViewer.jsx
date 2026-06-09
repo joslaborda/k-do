@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { FileText } from '@/lib/icons';
 import { X, Download } from 'lucide-react';
 
 export default function PDFViewer({ fileUrl, onClose }) {
