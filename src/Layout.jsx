@@ -246,7 +246,7 @@ export default function Layout({ children, currentPageName }) {
             className="text-2xl mb-8 hover:scale-110 transition-transform"
             title="Mis viajes"
           >
-            🌸
+            
           </Link>
           <div className="flex-1 flex flex-col items-center gap-1 w-full px-1.5">
             {(showTripNav ? mainNavItems : globalNavItems).map((item) => {
