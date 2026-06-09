@@ -48,7 +48,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         setMembers((t.members || []).map(email => {
           const u = users.find(x => x.email === email);
           const p = profiles.find(x => x.user_id === u?.id);
-          return { email, name: p?.display_name || p?.username || email.split('@')[0], avatar: p?.avatar_url };
+          return { email, name: p?.display_name || p?.username || email, avatar: p?.avatar_url };
         }));
       } catch {}
       setLoading(false);
