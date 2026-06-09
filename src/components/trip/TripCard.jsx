@@ -97,7 +97,7 @@ export function HeroTripCard({ trip, cities = [] }) {
             {subtitle && <p className="text-xs text-white/70 truncate mb-2">{subtitle}</p>}
             <div className="flex gap-1.5">
               {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{duration} días</div>}
-              {trip.members?.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">👥 {trip.members.length}</div>}
+              {trip.members?.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90 flex items-center gap-1"><Users size={11} />{trip.members.length}</div>}
               {cities.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{cities[0].name}</div>}
             </div>
           </div>

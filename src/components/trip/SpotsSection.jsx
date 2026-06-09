@@ -2,19 +2,19 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, X, Navigation, PenLine, MapPin, Camera } from 'lucide-react';
+import { Bus, Camera, CirclePlus, Compass, Landmark, MapPin, Navigation, PenLine, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SpotCard from './SpotCard';
 
 const ALL_TYPES = [
-  { value: 'all',       label: 'Todos',      emoji: '📍' },
-  { value: 'food',      label: 'Comida',     emoji: '🍜' },
-  { value: 'sight',     label: 'Atracción',  emoji: '🏛️' },
-  { value: 'activity',  label: 'Actividad',  emoji: '⚡' },
-  { value: 'shopping',  label: 'Compras',    emoji: '🛍️' },
-  { value: 'transport', label: 'Transporte', emoji: '🚆' },
-  { value: 'custom',    label: 'Otro',       emoji: '⭐' },
+  { value: 'all',       label: 'Todos',      Icon: Compass },
+  { value: 'food',      label: 'Comida',     Icon: Utensils },
+  { value: 'sight',     label: 'Atracción',  Icon: Landmark },
+  { value: 'activity',  label: 'Actividad',  Icon: Ticket },
+  { value: 'shopping',  label: 'Compras',    Icon: ShoppingBag },
+  { value: 'transport', label: 'Transporte', Icon: Bus },
+  { value: 'custom',    label: 'Otro',       Icon: CirclePlus },
 ];
 
 const OSM_MAP = {
@@ -66,7 +66,7 @@ function PlaceResultCard({ place, onSave, saving }) {
   return (
     <div className="bg-card rounded-xl border border-border flex overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="w-12 h-12 bg-orange-50 flex-shrink-0 flex items-center justify-center self-stretch">
-        <span className="text-xl">{tc.emoji}</span>
+        {tc.Icon && <tc.Icon size={18} className="text-muted-foreground" />}
       </div>
       <div className="flex-1 min-w-0 p-2.5">
         <p className="font-semibold text-sm leading-tight text-foreground">{place.name}</p>
@@ -100,7 +100,7 @@ function ManualForm({ onSave, saving, onClose }) {
         {ALL_TYPES.filter(t => t.value!=='all').map(t => (
           <button key={t.value} onClick={() => setType(t.value)}
             className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-orange-700 text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-orange-300')}>
-            {t.emoji} {t.label}
+            {t.Icon && <t.Icon size={13} className="mr-1 inline" />}{t.label}
           </button>
         ))}
       </div>
@@ -214,7 +214,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-foreground">📍 Spots</h2>
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2"><Compass size={18} />Spots</h2>
       </div>
 
       {/* Buscador + botones */}
@@ -276,7 +276,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
             <button key={t.value} onClick={() => setActiveType(t.value)}
               className={"text-xs px-2.5 py-1 rounded-full border font-medium transition-colors " +
                 (activeType===t.value ? 'bg-orange-700 text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
-              {t.emoji} {t.label}
+              {t.Icon && <t.Icon size={13} className="mr-1 inline" />}{t.label}
               {t.value!=='all' && <span className="ml-1 opacity-60">{spots.filter(s=>s.type===t.value).length}</span>}
             </button>
           ))}
@@ -288,7 +288,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
         <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse"/>)}</div>
       ) : filteredSpots.length === 0 && !searchResults.length && !nearbyResults.length ? (
         <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-card">
-          <p className="text-2xl mb-2">📍</p>
+          <Compass className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
           <p className="text-sm text-muted-foreground">Busca lugares o crea un spot manualmente</p>
         </div>
       ) : (

@@ -74,7 +74,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
     onSuccess: async (_, payload) => {
       setText('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
-      await notifyMembers(payload.content || '📎 Archivo adjunto');
+      await notifyMembers(payload.content || 'Archivo adjunto');
     },
   });
 

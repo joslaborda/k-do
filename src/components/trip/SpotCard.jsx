@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon } from 'lucide-react';
+import { Camera, Check, Hotel, Image, Landmark, MapPin, Moon, Navigation, Pencil, ShoppingBag, Star, ThumbsDown, ThumbsUp, Train, Utensils, X, Zap } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
@@ -79,13 +79,13 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
           <button onClick={() => setThumb('up')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'up' ? 'bg-green-50 border-green-300' : 'bg-secondary border-border hover:border-green-200')}>
-            <span className="text-xl">👍</span>
+            <ThumbsUp size={16} />
             <span className={"text-sm font-medium " + (thumb === 'up' ? 'text-green-700' : 'text-muted-foreground')}>Me gustó</span>
           </button>
           <button onClick={() => setThumb('down')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'down' ? 'bg-red-50 border-red-300' : 'bg-secondary border-border hover:border-red-200')}>
-            <span className="text-xl">👎</span>
+            <ThumbsDown size={16} />
             <span className={"text-sm font-medium " + (thumb === 'down' ? 'text-red-700' : 'text-muted-foreground')}>No tanto</span>
           </button>
         </div>
@@ -105,7 +105,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
               }} />
             <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
               <Camera className="w-4 h-4" />
-              {imageUrl ? 'Foto seleccionada ✓' : 'Subir foto'}
+              {imageUrl ? 'Foto seleccionada' : 'Subir foto'}
             </div>
           </label>
         ) : (
@@ -165,8 +165,8 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
             <div>
               <p className="font-semibold text-foreground text-sm">Comentarios</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>
-                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
+                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsUp size={10} />{ups}</span>
+                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsDown size={10} />{downs}</span>
               </div>
             </div>
             <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
@@ -203,11 +203,11 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           <div className="flex gap-2">
             <button onClick={() => setThumb(thumb === 'up' ? null : 'up')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-secondary border-border text-muted-foreground')}>
-              👍
+              <ThumbsUp size={15} />
             </button>
             <button onClick={() => setThumb(thumb === 'down' ? null : 'down')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'down' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-secondary border-border text-muted-foreground')}>
-              👎
+              <ThumbsDown size={15} />
             </button>
             <textarea value={text} onChange={e => setText(e.target.value)}
               placeholder="Añade un comentario..."
@@ -329,7 +329,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-foreground text-sm leading-tight">{spot.title}</p>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Visitado</span>}
+                  {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1"><Check size={10} /> Visitado</span>}
                   <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
                 </div>
               </div>
@@ -381,12 +381,12 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
             className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
               spot.visited ? 'bg-green-100 text-green-700 border-green-200' : 'bg-secondary border-border text-muted-foreground hover:border-green-300'
             }`}>
-            {spot.visited ? '✅ Hecho' : 'Marcar hecho'}
+            {spot.visited ? 'Hecho' : 'Marcar hecho'}
           </button>
 
           {canDelete && (
             <button onClick={() => setShowDeleteConfirm(true)} className="text-xs text-muted-foreground hover:text-red-500 transition-colors">
-              🗑️
+              
             </button>
           )}
         </div>

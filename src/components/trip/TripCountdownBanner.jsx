@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
-import { X, CheckCircle, Circle } from 'lucide-react';
+import { CheckCircle, Circle, DollarSign, FileText, Luggage, Map, Users, X } from 'lucide-react';
 
 export default function TripCountdownBanner({
   daysUntilTrip,
@@ -53,35 +53,35 @@ export default function TripCountdownBanner({
       label: 'Docs listos',
       ok: isDocsOk,
       page: 'Documents',
-      icon: '📄'
+      icon: FileText
     },
     {
       id: 'packing',
       label: 'Maleta',
       ok: isPackingOk,
       page: 'Packing',
-      icon: '🧳'
+      icon: Luggage
     },
     {
       id: 'currency',
       label: 'Divisa',
       ok: isCurrencyOk,
       page: 'Utilities',
-      icon: '💱'
+      icon: DollarSign
     },
     {
       id: 'route',
       label: 'Ruta',
       ok: isRouteOk,
       page: 'Cities',
-      icon: '🗺️'
+      icon: Map
     },
     {
       id: 'guests',
       label: 'Invitados',
       ok: isGuestOk,
       page: null, // No link, informa solamente
-      icon: '👥'
+      icon: Users
     }
   ];
 
@@ -95,7 +95,7 @@ export default function TripCountdownBanner({
     <div className="mb-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-xl font-bold">🚀 Tu viaje empieza en {daysUntilTrip} día{daysUntilTrip !== 1 ? 's' : ''}</h3>
+          <h3 className="text-xl font-bold">Tu viaje empieza en {daysUntilTrip} día{daysUntilTrip !== 1 ? 's' : ''}</h3>
           <p className="text-white/90 text-sm mt-1">Aquí está tu checklist rápido</p>
         </div>
         <button
@@ -116,7 +116,7 @@ export default function TripCountdownBanner({
                 to={createPageUrl(`${item.page}?trip_id=${tripId}`)}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
               >
-                <span className="text-lg">{item.icon}</span>
+                <item.icon size={18} />
                 <span className="text-sm flex-1">{item.label}</span>
                 {item.ok ? (
                   <CheckCircle className="w-5 h-5 text-green-300" />
@@ -126,7 +126,7 @@ export default function TripCountdownBanner({
               </Link>
             ) : (
               <div className="flex items-center gap-3 p-2 rounded-lg opacity-75">
-                <span className="text-lg">{item.icon}</span>
+                <item.icon size={18} />
                 <span className="text-sm flex-1">{item.label}</span>
                 {item.ok ? (
                   <CheckCircle className="w-5 h-5 text-green-300" />

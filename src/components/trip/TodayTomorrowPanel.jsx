@@ -4,10 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import {
-  Calendar, MapPin, FileText, Plane, Train, Hotel, Shield,
-  Eye, ArrowRight, StickyNote
-} from 'lucide-react';
+import { ArrowRight, Bus, Calendar, CirclePlus, Eye, FileText, Hotel, Landmark, MapPin, Moon, Plane, Shield, ShoppingBag, StickyNote, Sun, Train, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TicketQuickViewer from './TicketQuickViewer';
 
@@ -74,7 +71,7 @@ function PlanCard({ itDay, cityOfDay, tripId }) {
 
 function SpotsCard({ spots, cityOfDay, tripId }) {
   const preview = spots.slice(0, 3);
-  const typeEmoji = { food: '🍜', sight: '🏯', activity: '🎯', shopping: '🛍', transport: '🚌', custom: '📍' };
+  const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: Bus, custom: CirclePlus };
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Spots</p>
@@ -83,7 +80,7 @@ function SpotsCard({ spots, cityOfDay, tripId }) {
         : <ul className="flex-1 space-y-1">
             {preview.map(s => (
               <li key={s.id} className="flex items-center gap-1.5 text-sm">
-                <span className="text-base leading-none">{typeEmoji[s.type] || '📍'}</span>
+                {(() => { const I = SPOT_ICON_MAP[s.type] || MapPin; return <I size={15} className='text-muted-foreground' />; })()}
                 <span className="truncate text-foreground">{s.title}</span>
               </li>
             ))}
@@ -227,7 +224,7 @@ export default function TodayTomorrowPanel({ tripId, cities }) {
             onClick={() => setTab(t)}
             className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${tab === t ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
           >
-            {t === 'today' ? '☀️ Hoy' : '🌙 Mañana'}
+            {t === 'today' ? <><Sun size={14} className='inline mr-1' />Hoy</> : <><Moon size={14} className='inline mr-1' />Mañana</>}
           </button>
         ))}
       </div>

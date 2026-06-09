@@ -3,7 +3,7 @@
  * Solo guarda en localStorage via hook; no toca datos de la BD.
  */
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 
 const AUTO_VALUE = '__auto__';
 
@@ -31,10 +31,10 @@ export default function ActiveCitySelector({ cities = [], overrideCityId, setOve
           <SelectValue placeholder={activeCity?.name || 'Auto'} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={AUTO_VALUE}>🗓️ Automático (por fecha)</SelectItem>
+          <SelectItem value={AUTO_VALUE}><span className="flex items-center gap-1.5"><Calendar size={13} />Automático (por fecha)</span></SelectItem>
           {cities.map((c) => (
             <SelectItem key={c.id} value={c.id}>
-              📍 {c.name}
+              {c.name}
             </SelectItem>
           ))}
         </SelectContent>
