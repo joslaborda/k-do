@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Mail, Plane } from 'lucide-react';
+import { Archive, Calendar, Mail, Map, Plane, Plus } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
@@ -47,10 +47,10 @@ function TripSummarySheet({ trip, cities, onClose }) {
   const countryList = [...new Set([trip.country, ...(cities || []).map(c => c.country)].filter(Boolean))];
 
   const shareText = [
-    `✈️ ${trip.name || trip.destination || 'Mi viaje'}`,
+    `${trip.name || trip.destination || 'Mi viaje'}`,
     countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
-    days ? `📅 ${days} días · ${startDate}` : '',
-    trip.destination ? `🗺️ ${trip.destination}` : '',
+    days ? `${days} días · ${startDate}` : '',
+    trip.destination ? `${trip.destination}` : '',
     '\nOrganizado con Kodo. Planifica tu viaje en kodo.app',
   ].filter(Boolean).join('\n');
 
@@ -86,7 +86,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
             )}
             {days && (
               <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
-                <span className="text-xl">📅</span>
+                <Calendar className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Fechas</p>
                   <p className="text-sm font-medium">{days} días · {startDate}</p>
@@ -95,7 +95,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
             )}
             {trip.destination && (
               <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
-                <span className="text-xl">🗺️</span>
+                <Map className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Ruta</p>
                   <p className="text-sm font-medium">{trip.destination}</p>
@@ -282,7 +282,7 @@ export default function TripsList() {
         <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
         <button className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium"
           onClick={() => window.location.reload()}>
-          Ya verifiqué ✓
+          Ya verifiqué
         </button>
         <button onClick={() => base44.auth.logout()}
           className="mt-3 text-xs text-muted-foreground hover:underline block mx-auto">
@@ -370,7 +370,7 @@ export default function TripsList() {
                   onClick={() => setShowPast(p => !p)}
                   className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-2xl text-sm text-muted-foreground hover:bg-secondary/30 transition-colors">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">🗂️</span>
+                    <Archive className="w-4 h-4 text-muted-foreground" />
                     <span>{pastCount} viaje{pastCount !== 1 ? 's' : ''} finalizado{pastCount !== 1 ? 's' : ''}</span>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -419,7 +419,7 @@ export default function TripsList() {
               <div className="w-9 h-1 rounded-full bg-border" />
             </div>
             <div className="px-5 py-5">
-              <p className="text-2xl mb-2">🗺️</p>
+              <Map className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-base font-medium text-foreground mb-1">
                 ¡Hay {newTripPopup.spotCount} spots en {newTripPopup.country}!
               </p>

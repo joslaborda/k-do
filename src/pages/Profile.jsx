@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Plus, Search, X, Loader2 } from 'lucide-react';
+import { Check, CirclePlus, Compass, Landmark, Loader2, MapPin, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
@@ -85,7 +85,11 @@ function OTabBar({ tabs, activeKey, onChange }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
-const TYPE_EMOJI  = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', custom:'📍', other:'📍' };
+const SPOT_ICONS_MAP = {
+  food: Utensils, sight: Landmark, activity: Ticket,
+  shopping: ShoppingBag, custom: CirclePlus, other: Compass,
+  restaurant: Utensils, museum: Landmark,
+};
 const TYPE_LABEL  = { food:'Comida', sight:'Sights', activity:'Actividades', shopping:'Compras', custom:'Otro' };
 const TYPE_FILTERS = [
   { key:'all',      label:'Todos' },
@@ -116,7 +120,7 @@ function countryFlag(country) {
 // Spot row — used in both tabs and search results
 // ─────────────────────────────────────────────────────────────────────────────
 function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
-  const emoji = TYPE_EMOJI[spot.type] || '📍';
+  const SpotTypeIcon = SPOT_ICONS_MAP[spot.type] || MapPin;
   const coverImg = spot.image_url || (spot.city_name || spot.country
     ? getTripCoverImage(spot.city_name, spot.country)
     : null);
@@ -128,7 +132,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
             onError={e => { e.currentTarget.style.display='none'; }} />
         </div>
       ) : (
-        <span className="text-base flex-shrink-0">{emoji}</span>
+        <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0"><SpotTypeIcon size={16} className="text-muted-foreground" /></div>
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
@@ -154,7 +158,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
       )}
       {onSave && isSaved && (
         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
-          ✓ Guardado
+          Guardado
         </span>
       )}
     </div>
@@ -283,7 +287,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
       {/* Toast */}
       {toastMsg && (
         <div className="bg-foreground rounded-2xl px-4 py-3 flex items-center gap-2.5">
-          <span className="text-base">✓</span>
+          <Check size={16} className="text-green-600" />
           <p className="text-xs font-medium text-white">{toastMsg}</p>
         </div>
       )}
@@ -311,7 +315,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
             </div>
           ) : results.length === 0 ? (
             <div className="bg-card border border-border rounded-2xl text-center py-8">
-              <p className="text-2xl mb-2">🔍</p>
+              <Search className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-sm text-muted-foreground">Sin resultados para "{query}"</p>
             </div>
           ) : (

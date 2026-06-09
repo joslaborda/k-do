@@ -101,13 +101,13 @@ const CAT_COLORS = {
   shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-slate-100 text-slate-600',
 };
 const CAT_CONFIG = {
-  food:          { label: 'Comida',      emoji: '🍜' },
-  transport:     { label: 'Transporte',  emoji: '🚆' },
-  accommodation: { label: 'Alojamiento', emoji: '🏨' },
-  activities:    { label: 'Actividades', emoji: '⚡' },
-  shopping:      { label: 'Compras',     emoji: '🛍️' },
-  drinks:        { label: 'Bebidas',     emoji: '🍷' },
-  other:         { label: 'Otro',        emoji: '💰' },
+  food:          { label: 'Comida'      },
+  transport:     { label: 'Transporte'  },
+  accommodation: { label: 'Alojamiento' },
+  activities:    { label: 'Actividades' },
+  shopping:      { label: 'Compras'     },
+  drinks:        { label: 'Bebidas'     },
+  other:         { label: 'Otro'        },
 };
 
 // ── Currency symbol helper ─────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
             <p style={{ fontSize: 13, fontWeight: 500, color: '#b34a1a' }}>Has llegado a {countryName}</p>
             <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: '#fbd5c0', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
-          <p style={{ fontSize: 12, color: '#c2410c', marginBottom: 10, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
             La moneda local es {currencyName} ({currencyCode}). ¿Registrar gastos en {currencyCode}?
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -160,7 +160,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
               Sí, usar {currencyCode}
             </button>
             <button onClick={onDismiss}
-              style={{ flex: 1, background: 'white', color: '#c2410c', border: '0.5px solid #fbd5c0', borderRadius: 8, padding: '7px 0', fontSize: 12, cursor: 'pointer' }}>
+              style={{ flex: 1, background: 'white', color: 'hsl(var(--primary))', border: '0.5px solid hsl(var(--primary) / 0.3)', borderRadius: 8, padding: '7px 0', fontSize: 12, cursor: 'pointer' }}>
               Mantener base
             </button>
           </div>
@@ -268,7 +268,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
             myBalance > 0 ? 'bg-green-50 text-green-700 border-green-200' :
             'bg-red-50 text-red-600 border-red-200'
           }`}>
-            {Math.abs(myBalance) < 0.5 ? 'Al día ✓' : myBalance > 0 ? 'Te deben' : 'Debes'}
+            {Math.abs(myBalance) < 0.5 ? 'Al día' : myBalance > 0 ? 'Te deben' : 'Debes'}
           </span>
         </div>
       </div>
@@ -333,7 +333,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       <div className={`rounded-2xl border p-4 ${iSettled ? 'bg-card border-border' : myBalance > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
         <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
         <p className={`text-2xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
-          {iSettled ? '✓ Al día' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
+          {iSettled ? 'Al día' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
         </p>
         {!iSettled && (
           <p className={`text-xs mt-1 font-medium ${myBalance > 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -438,7 +438,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
       {iSettled && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
-          <p className="text-sm font-medium text-green-700">✓ Todos en paz</p>
+          <p className="text-sm font-medium text-green-700">Todos en paz</p>
           <p className="text-xs text-green-600 mt-1">No hay deudas pendientes en el grupo</p>
         </div>
       )}
@@ -888,7 +888,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
               <div key={currency}
                 className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40' : ''}`}>
                 <div className="flex items-center gap-2.5">
-                  <span className="text-lg">{getCountryMeta(currency)?.flag || '💱'}</span>
+                  <span className="text-sm font-medium text-muted-foreground">{getCountryMeta(currency)?.flag || currency}</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{currency}</p>
                     {isActive && <p className="text-xs text-primary font-medium">Ciudad actual</p>}

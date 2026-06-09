@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Plus, Trash2, Pencil, Plane, Hotel, Train, Bus, Car, Ticket, Shield, FileText, CirclePlus } from 'lucide-react';
+import { Bus, Car, CirclePlus, FileText, Hotel, Lock, Pencil, Plane, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format, isToday, parseISO } from 'date-fns';
@@ -111,16 +111,16 @@ const ICON_BG = {
   other:     'bg-secondary text-muted-foreground',
 };
 const CAT_TABS = [
-  { key:'all',    icon:'📋', label:'Todos'   },
-  { key:'flight', icon:'✈️', label:'Vuelos'  },
-  { key:'hotel',  icon:'🏨', label:'Hoteles' },
-  { key:'train',  icon:'🚆', label:'Trenes'  },
-  { key:'other',  icon:'📄', label:'Otros'   },
+  { key:'all',    label:'Todos'   },
+  { key:'flight', label:'Vuelos'  },
+  { key:'hotel',  label:'Hoteles' },
+  { key:'train',  label:'Trenes'  },
+  { key:'other',  label:'Otros'   },
 ];
 const VIS = {
-  personal:       { label:'Solo yo',    icon:'🔒', cls:'bg-secondary text-muted-foreground' },
-  shared:         { label:'Grupo',      icon:'👥', cls:'bg-green-100 text-green-700'       },
-  selected_users: { label:'Compartido', icon:'👤', cls:'bg-blue-100 text-blue-700'         },
+  personal:       { label:'Solo yo',    Icon: Lock,  cls:'bg-secondary text-muted-foreground' },
+  shared:         { label:'Grupo',      Icon: Users, cls:'bg-green-100 text-green-700'       },
+  selected_users: { label:'Compartido', Icon: User,  cls:'bg-blue-100 text-blue-700'         },
 };
 
 // ── Doc row ───────────────────────────────────────────────────────────────────
@@ -182,7 +182,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
           <div className="px-4 py-3 bg-secondary/20 space-y-2">
             {/* Visibility badge */}
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${vis.cls}`}>
-              {vis.icon} {vis.label}
+              {vis.Icon && <vis.Icon size={11} className="inline mr-1" />}{vis.label}
             </span>
 
             {/* Fields */}
@@ -407,7 +407,7 @@ export default function Documents() {
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
         {grouped.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-            <p className="text-4xl mb-3">📄</p>
+            <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground/30" />
             <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
             <p className="text-xs text-muted-foreground mb-5">Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano</p>
             <button onClick={() => setAddOpen(true)}

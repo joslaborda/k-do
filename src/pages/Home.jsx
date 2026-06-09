@@ -22,7 +22,7 @@ import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysForDate, getHolidaysInRange } from '@/lib/holidaysDB';
-import { PlaneIcon, BusFront, TrainFront, Car, Hotel, Shield, Ticket, FileText, Image, Cross, Camera, Wifi, DollarSign, Star, MapPin, Calendar, Users, Settings, Trash2, ArrowRight, Bell, ChevronDown, ChevronUp, Send, UserPlus, Check, X, Clock, Copy, MessageCircle, Download, Utensils, Compass, AlertTriangle } from '@/lib/icons';
+import { AlertTriangle, ArrowRight, Bell, BusFront, Calendar, Camera, Car, Check, ChevronDown, ChevronUp, Clock, Compass, Copy, Cross, DollarSign, Download, FileText, Hotel, Image, MapPin, MessageCircle, PlaneIcon, Send, Settings, Shield, Star, Ticket, TrainFront, Trash2, UserPlus, Users, Utensils, Wifi, X } from '@/lib/icons';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { sendTripInvite } from '@/lib/invites';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
@@ -317,7 +317,7 @@ function DraggableSpotList({ spots, onReorder }) {
             ${dragOver === idx && dragging !== idx ? 'bg-accent/50 border-t-primary border-t-2' : ''}
           `}>
           <GripVertical className="w-4 h-4 text-muted-foreground/40 shrink-0 cursor-grab active:cursor-grabbing touch-none" />
-          <span className="text-base shrink-0">{SPOT_ICONS[spot.type] || '📍'}</span>
+          {(() => { const I = SPOT_ICONS[spot.type]; return I ? <I size={16} className='text-muted-foreground' /> : <MapPin size={16} className='text-muted-foreground' />; })()}
           <div className="flex-1 min-w-0">
             <p className="text-sm text-foreground truncate">{spot.title}</p>
             {spot.notes && <p className="text-xs text-muted-foreground truncate">{spot.notes}</p>}
@@ -696,7 +696,8 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
               to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
               className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-secondary/30 transition-colors"
             >
-              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0 text-lg">📍</div>
+              <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+              <MapPin size={16} className="text-muted-foreground" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Añade lugares a tu día</p>
@@ -1096,7 +1097,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
               </p>
             </div>
             {doneCount === actionableReqs.length && actionableReqs.length > 0 ? (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Todo listo ✓</span>
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Todo listo</span>
             ) : (actionableReqs.length - doneCount) > 0 ? (
               <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
                 {actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 0
@@ -1455,7 +1456,7 @@ function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail }
   return (
     <div className="space-y-3">
       <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
-        <p className="text-4xl mb-3">🌸</p>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
         {trip?.start_date && trip?.end_date && (
@@ -2628,7 +2629,7 @@ export default function Home() {
   if (isLoading || !tripId) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
-        <div className="text-6xl mb-4">🌸</div>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-muted-foreground">Cargando viaje...</p>
       </div>
     </div>
