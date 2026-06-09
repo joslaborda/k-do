@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Image, MapPin } from '@/lib/icons';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
