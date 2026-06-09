@@ -54,7 +54,7 @@ export default function ShareButton({ title, description }) {
             <DialogTitle>Compartir</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <p className="text-sm text-stone-600">
+            <p className="text-sm text-foreground">
               Copia el enlace para compartir esta página
             </p>
             <div className="flex gap-2">

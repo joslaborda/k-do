@@ -103,19 +103,19 @@ export default function MenuViewer({ foodItems = [] }) {
     <div className="space-y-6">
       {/* Buscador */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Busca un plato..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-stone-800 border-stone-700 text-stone-100 placeholder:text-stone-400"
+          className="pl-10 bg-muted border-border text-muted-foreground placeholder:text-muted-foreground"
         />
       </div>
 
       {/* Menú por categorías */}
       <div className="space-y-3">
         {filteredCategories.length === 0 ? (
-          <div className="text-center py-8 text-stone-400">
+          <div className="text-center py-8 text-muted-foreground">
             No se encontraron platos con esa búsqueda
           </div>
         ) : (
@@ -125,14 +125,14 @@ export default function MenuViewer({ foodItems = [] }) {
               open={expandedCategories[category.name]}
               onOpenChange={() => toggleCategory(category.name)}
             >
-              <div className="bg-stone-800 border border-stone-700 rounded-xl overflow-hidden">
-                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-stone-700/50 transition-colors">
-                  <span className="text-lg font-semibold text-stone-100">{category.name}</span>
-                  <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
+              <div className="bg-muted border border-border rounded-xl overflow-hidden">
+                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <span className="text-lg font-semibold text-muted-foreground">{category.name}</span>
+                  <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${expandedCategories[category.name] ? 'rotate-180' : ''}`} />
                 </CollapsibleTrigger>
 
                 <CollapsibleContent>
-                  <div className="border-t border-stone-700 bg-stone-800/50">
+                  <div className="border-t border-border bg-muted/50">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-4">
                       {category.dishes.map((dish) => {
                         const localDish = findDishLocally(dish);
@@ -143,7 +143,7 @@ export default function MenuViewer({ foodItems = [] }) {
                             className={`p-3 rounded-lg text-left text-sm font-medium transition-all ${
                               localDish
                                 ? 'bg-green-900/30 text-green-100 border border-green-700/50 hover:bg-green-900/50'
-                                : 'bg-stone-700 text-stone-200 border border-stone-600 hover:border-stone-500 hover:bg-stone-600'
+                                : 'bg-muted text-muted-foreground border border-border hover:border-border0 hover:bg-muted'
                             }`}
                           >
                             <div className="flex items-center justify-between">
@@ -164,15 +164,15 @@ export default function MenuViewer({ foodItems = [] }) {
 
       {/* Resultado de búsqueda */}
       {selectedDish && (
-        <div className="bg-stone-800 border-2 border-stone-700 rounded-xl p-6 mt-8">
+        <div className="bg-muted border-2 border-border rounded-xl p-6 mt-8">
           <div className="flex items-start justify-between mb-4">
-            <h3 className="text-xl font-bold text-stone-100">{selectedDish}</h3>
-            {isSearching && <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />}
+            <h3 className="text-xl font-bold text-muted-foreground">{selectedDish}</h3>
+            {isSearching && <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />}
           </div>
 
           {searchResults && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-xs text-stone-400 mb-2">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                 <span className={`px-2 py-1 rounded ${searchResults.source === 'app' ? 'bg-green-900/30 text-green-300' : 'bg-blue-900/30 text-blue-300'}`}>
                   {searchResults.source === 'app' ? 'En la app' : 'Online'}
                 </span>
@@ -186,7 +186,7 @@ export default function MenuViewer({ foodItems = [] }) {
                 />
               )}
               
-              <p className="text-stone-200">{searchResults.result}</p>
+              <p className="text-muted-foreground">{searchResults.result}</p>
             </div>
           )}
         </div>

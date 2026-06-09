@@ -16,7 +16,7 @@ export default function DarkModeToggle() {
         width: 52,
         height: 28,
         borderRadius: 14,
-        background: isDark ? '#c2410c' : '#e2ddd7',
+        background: isDark ? 'hsl(var(--primary))' : '#e2ddd7',
         border: 'none',
         position: 'relative',
         cursor: 'pointer',
@@ -40,7 +40,7 @@ export default function DarkModeToggle() {
         boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
       }}>
         {isDark
-          ? <Moon size={11} strokeWidth={2} color="#c2410c" />
+          ? <Moon size={11} strokeWidth={2} color="hsl(var(--primary))" />
           : <Sun size={11} strokeWidth={2} color="#9a9490" />
         }
       </span>
