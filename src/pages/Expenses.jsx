@@ -1,3 +1,4 @@
+import { BusFront } from '@/lib/icons';
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
@@ -88,7 +89,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
 // ── Category config ───────────────────────────────────────────────────────────
 const CAT_ICONS = {
   food:          Utensils,
-  transport:     Bus,
+  transport:     BusFront,
   accommodation: Hotel,
   activities:    Ticket,
   shopping:      ShoppingBag,
