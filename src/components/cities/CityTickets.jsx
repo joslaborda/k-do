@@ -31,9 +31,9 @@ export default function CityTickets({ cityId, tripId, currentUserEmail, userId, 
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <FileText className="w-5 h-5 text-orange-600" />
+        <FileText className="w-5 h-5 text-primary" />
         <h2 className="text-lg font-semibold text-foreground">Documentos de {cityName || 'esta ciudad'}</h2>
-        <span className="text-xs bg-orange-200 text-orange-800 font-semibold px-2 py-0.5 rounded-full">{cityDocs.length}</span>
+        <span className="text-xs bg-primary/20 text-accent-foreground font-semibold px-2 py-0.5 rounded-full">{cityDocs.length}</span>
       </div>
       <div className="space-y-2">
         {cityDocs.map(ticket => (

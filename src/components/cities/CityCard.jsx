@@ -464,7 +464,7 @@ export default function CityCard({ city, daysCount, tripId }) {
                 )}
               </div>
             </div>
-            <div className="w-9 h-9 rounded-full bg-orange-700 flex items-center justify-center text-white border-2 border-white/30 flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white border-2 border-white/30 flex-shrink-0">
               <ChevronRight className="w-5 h-5" />
             </div>
           </div>
