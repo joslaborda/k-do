@@ -2483,6 +2483,23 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
     if (alias) data = EMERGENCY_DB[alias];
   }
 
+  // ISO code lookup — city.country may be stored as 'CN', 'JP', 'FR' etc.
+  if (!data) {
+    const ISO_TO_ES = {
+      'cn':'China','jp':'Japón','fr':'Francia','de':'Alemania','it':'Italia',
+      'es':'España','pt':'Portugal','gb':'Reino Unido','us':'Estados Unidos',
+      'mx':'México','co':'Colombia','pe':'Perú','ar':'Argentina','br':'Brasil',
+      'cl':'Chile','th':'Tailandia','vn':'Vietnam','id':'Indonesia','in':'India',
+      'ma':'Marruecos','tr':'Turquía','gr':'Grecia','nl':'Países Bajos','be':'Bélgica',
+      'ch':'Suiza','at':'Austria','pl':'Polonia','au':'Australia','nz':'Nueva Zelanda',
+      'sg':'Singapur','my':'Malasia','ph':'Filipinas','kh':'Camboya','np':'Nepal',
+      'eg':'Egipto','ke':'Kenia','za':'Sudáfrica','ca':'Canadá','kr':'Corea del Sur',
+      'cu':'Cuba','do':'República Dominicana','cr':'Costa Rica',
+    };
+    const isoKey = ISO_TO_ES[countryLabel.toLowerCase()];
+    if (isoKey) data = EMERGENCY_DB[isoKey];
+  }
+
   if (!data) return null;
 
   // Seleccionar embajada según país de origen — cubre todos los hispanohablantes
