@@ -14,10 +14,10 @@ const TYPE = {
   doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
   expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'añadió un gasto' },
   expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'liquidó tu deuda' },
-  photo_added:     { Icon: Camera,    color: 'text-orange-500', bg: 'bg-orange-50', label: 'subió fotos' },
+  photo_added:     { Icon: Camera,    color: 'text-primary', bg: 'bg-orange-50', label: 'subió fotos' },
   member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'se unió al viaje' },
   trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'te invitó a un viaje' },
-  spot_added:      { Icon: Compass,   color: 'text-orange-500', bg: 'bg-orange-50', label: 'añadió un spot' },
+  spot_added:      { Icon: Compass,   color: 'text-primary', bg: 'bg-orange-50', label: 'añadió un spot' },
 };
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'nueva notificación' };
 
@@ -116,7 +116,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
               )}
               {trip.start_date && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="w-4 h-4 flex-shrink-0 text-center text-xs">📅</span>
+                  <Calendar size={12} className="text-muted-foreground flex-shrink-0" />
                   <span>
                     {new Date(trip.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
                     {trip.end_date && ` — ${new Date(trip.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
