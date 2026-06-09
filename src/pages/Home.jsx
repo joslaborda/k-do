@@ -1961,7 +1961,9 @@ function MemberAvatarRow({ trip, profiles, onInvite, isToday, currentUserEmail }
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
       {members.map((email, i) => {
         const u = usersData.find(x => x.email === email);
-        const profile = u ? profiles?.find(p => p.user_id === u.id) : null;
+        // Buscar perfil por user_id O directamente por email/user_email
+        const profile = (u ? profiles?.find(p => p.user_id === u.id) : null)
+          || profiles?.find(p => p.email === email || p.user_email === email);
         const name = profile?.display_name || profile?.username || (email||'').split('@')[0];
         const initials = name.slice(0,2).toUpperCase();
         const isMe = email === currentUserEmail;

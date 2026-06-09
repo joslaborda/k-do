@@ -217,7 +217,7 @@ export default function Invites() {
       {/* Header */}
       <div className="px-5 pt-14 pb-5 bg-background border-b border-border sticky top-0 z-10">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center">
+          <button onClick={() => navigate(createPageUrl('TripsList'))} className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center">
             <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
           <div>
@@ -281,7 +281,7 @@ export default function Invites() {
                       {tripData?.name || 'Cargando...'}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      De: {inv.invited_by || 'alguien'}
+                      Invitado por {(inv.invited_by || 'alguien').split('@')[0]}
                     </p>
                   </div>
                 </div>

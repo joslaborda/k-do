@@ -227,8 +227,17 @@ function RequirementsTab({ reqs, country, homeCountry }) {
     visaColor = 'bg-red-50 border-red-200'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />;
   }
 
-  const requiredVax = vaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
-  const recommendedVax = vaccines.filter(v => !requiredVax.includes(v));
+  // Filtrar COVID-19 (no es requisito de viaje) y vacunas de rutina pediátrica
+  const SKIP_VACCINES = ['COVID-19', 'COVID-19 (mRNA)'];
+  const filteredVaccines = vaccines.filter(v => !SKIP_VACCINES.includes(v.name));
+  const requiredVax = filteredVaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
+  // Limpiar labels: quitar "(check age and history)" y "(seasonal and risk based)" del texto visible
+  const cleanPriority = (p) => p
+    ?.replace(/\s*\(check age and history\)/gi, '')
+    ?.replace(/\s*\(seasonal and risk based\)/gi, ' (estacional)')
+    ?.replace(/\s*\(quimioprofilaxis\)/gi, '')
+    ?.trim() || '';
+  const recommendedVax = filteredVaccines.filter(v => !requiredVax.includes(v));
 
   // Detectar si el adaptador español es compatible
   // Usar meta.plug como fuente si adapter.type no está disponible
@@ -309,7 +318,7 @@ function RequirementsTab({ reqs, country, homeCountry }) {
                   <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
                   <div>
                     <span className="text-sm text-foreground">{v.name}</span>
-                    {v.priority && v.priority !== 'recomendada' && <span className="text-xs text-muted-foreground ml-1">({v.priority})</span>}
+                    {cleanPriority(v.priority) && cleanPriority(v.priority) !== 'recomendada' && <span className="text-xs text-muted-foreground ml-1">({cleanPriority(v.priority)})</span>}
                   </div>
                 </div>
               ))}

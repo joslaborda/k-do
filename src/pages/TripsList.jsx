@@ -267,7 +267,7 @@ export default function TripsList() {
   if (isLoading || userLoading) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
+        <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-4" />
         <p className="text-sm text-muted-foreground">Cargando viajes...</p>
       </div>
     </div>
@@ -340,9 +340,6 @@ export default function TripsList() {
 
       {/* ── Content ── */}
       <div className="max-w-3xl mx-auto px-4 py-5 pb-24 space-y-4">
-
-
-
         {trips.length === 0 ? (
           <EmptyState onCreateTrip={() => setDialogOpen(true)} />
         ) : (

@@ -375,8 +375,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                   <p className="text-xs text-red-500 font-medium mt-0.5">Debes {fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</p>
                 </div>
                 <button onClick={() => onSettle(d)}
-                  className="text-xs bg-primary text-white px-3 py-1.5 rounded-lg font-medium flex-shrink-0">
-                  He pagado
+                  className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0">
+                  Saldar deuda
                 </button>
               </div>
             ))}
@@ -558,7 +558,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
               const pct = amt / maxCat * 100;
               return (
                 <div key={cat} className="flex items-center gap-2.5">
-                  {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
+                  {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-foreground">{tc.label}</span>
@@ -588,7 +588,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
             const pct = amt / totalGroup * 100;
             return (
               <div key={cat} className="flex items-center gap-2.5">
-                {(() => { const I = CAT_ICONS[e.category] || CAT_ICONS.other; const col = CAT_COLORS[e.category] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
+                {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                 <div className="flex-1">
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-foreground">{tc.label}</span>
@@ -978,9 +978,15 @@ export default function Expenses() {
   // Build profilesByEmail: cross-reference usersData (has email) with profiles (has user_id + avatar_url)
   const profilesByEmail = useMemo(() => {
     const map = {};
+    // Primero por user_id (más preciso)
     (usersData || []).forEach(u => {
       const prof = (profiles || []).find(p => p.user_id === u.id);
       if (prof) map[u.email] = prof;
+    });
+    // Fallback: buscar por email directamente en profiles
+    (profiles || []).forEach(p => {
+      const email = p.email || p.user_email;
+      if (email && !map[email]) map[email] = p;
     });
     return map;
   }, [profiles, usersData]);
@@ -1088,7 +1094,7 @@ export default function Expenses() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
           <OTabBar
-            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},{key:'conversión',label:'Conversión'},{key:'stats',label:'Stats'}]}
+            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},...(availableCurrencies.length > 1 ? [{key:'conversión',label:'Conversión'}] : []),{key:'stats',label:'Stats'}]}
             activeKey={tab}
             onChange={setTab}
           />
