@@ -238,7 +238,7 @@ export default function SettingsDialog({ open, onClose, trip, cities, tripId, is
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
               const prof = profilesByEmail[email] || null;
-              const name = prof?.display_name || prof?.username || email?.split('@')[0] || '?';
+              const name = prof?.display_name || prof?.username || email || '?';
               const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
               return prof?.avatar_url

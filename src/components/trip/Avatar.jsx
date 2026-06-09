@@ -29,7 +29,7 @@ export default function Avatar({ email, profile: profileProp, size = 36, classNa
     return allProfiles.find(p => p.user_id === u?.id) || null;
   }, [profileProp, email, allProfiles, usersData]);
 
-  const name = profile?.display_name || profile?.username || email?.split('@')[0] || '?';
+  const name = profile?.display_name || profile?.username || email || '?';
   const initials = name.slice(0, 2).toUpperCase();
   const s = size;
 

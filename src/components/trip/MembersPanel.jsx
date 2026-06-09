@@ -80,7 +80,10 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
         role: inviteRole,
         tripName: trip.name,
         inviterEmail: currentUserEmail,
-        inviterName: currentUserEmail.split('@')[0],
+        inviterName: (() => {
+          const myProf = profiles.find(p => p.email === currentUserEmail || p.user_email === currentUserEmail);
+          return myProf?.display_name || myProf?.username || currentUserEmail;
+        })(),
       });
       if (!result?.emailSent && result?.inviteUrl) {
         setShareLink(result.inviteUrl);
@@ -133,7 +136,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
           const RoleIcon = config.icon;
           const isCurrentUser = email === currentUserEmail;
           const prof = (Array.isArray(profiles) ? null : profiles?.[email]) || null;
-          const displayName = prof?.display_name || prof?.username || email?.split('@')[0] || email;
+          const displayName = prof?.display_name || prof?.username || email || email;
           const initials = displayName.slice(0,2).toUpperCase();
 
           return (
