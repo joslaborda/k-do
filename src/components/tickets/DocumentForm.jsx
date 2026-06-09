@@ -58,7 +58,7 @@ const FIELD_PLACEHOLDERS = {
 // Personal categories that should NOT restrict to trip dates
 const PERSONAL_CATEGORIES = ['personal'];
 
-export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, onSave, onCancel, onDelete, saving }) {
+export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving }) {
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
@@ -208,7 +208,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
                   ))}
                 </select>
               ) : (
-                <Input type="date" value={fields.date} onChange={e => setField('date', e.target.value)} className="h-10 text-sm" />
+                <Input type="date" value={fields.date} onChange={e => setField('date', e.target.value)} className="h-10 text-sm" min={minDate || undefined} max={maxDate || undefined} />
               )}
             </div>
           )}
@@ -225,7 +225,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
       {hasField('end_date') && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha de salida / fin</p>
-          <Input type="date" value={fields.end_date} onChange={e => setField('end_date', e.target.value)} className="h-10 text-sm" />
+          <Input type="date" value={fields.end_date} onChange={e => setField('end_date', e.target.value)} className="h-10 text-sm" min={minDate || undefined} max={maxDate || undefined} />
         </div>
       )}
 
