@@ -433,6 +433,7 @@ export default function Documents() {
           </DialogHeader>
           <div className="px-5 py-4 overflow-y-auto flex-1">
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
+              minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
           </div>
         </DialogContent>
@@ -448,6 +449,7 @@ export default function Documents() {
             <div className="px-5 py-4 overflow-y-auto flex-1">
               <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
                 initialData={editDoc}
+                minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
                 onCancel={() => setEditDoc(null)}
                 onDelete={() => { setDeleteDoc(editDoc); setEditDoc(null); }}
