@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import {  Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
+import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
