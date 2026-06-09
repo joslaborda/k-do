@@ -21,7 +21,7 @@ const ICON_BG = {
   flight:   'bg-blue-50 text-blue-500',
   train:    'bg-emerald-50 text-emerald-500',
   hotel:    'bg-purple-50 text-purple-500',
-  event:    'bg-orange-50 text-orange-500',
+  event:    'bg-orange-50 text-primary',
   personal: 'bg-amber-50 text-amber-500',
   other:    'bg-gray-100 text-muted-foreground',
 };
@@ -66,7 +66,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           {ticket.file_url && (
             <button
               onClick={() => setViewingPDF(ticket.file_url)}
-              className="px-3 py-1.5 rounded-lg bg-orange-700 hover:bg-orange-800 text-white text-xs font-semibold transition-all flex-shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-primary hover:bg-orange-800 text-white text-xs font-semibold transition-all flex-shrink-0"
             >
               Ver
             </button>
@@ -106,14 +106,14 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
                     {dateStr}{endDateStr ? ` → ${endDateStr}` : ''}
                   </span>
                   {todayBadge && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold text-[10px] uppercase tracking-wide">Hoy</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-[10px] uppercase tracking-wide">Hoy</span>
                   )}
                 </span>
               )}
               {contextCity && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
-                  <span className="font-medium text-orange-600">{contextCity}</span>
+                  <MapPin className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
+                  <span className="font-medium text-primary">{contextCity}</span>
                 </span>
               )}
             </div>
@@ -152,7 +152,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           {ticket.file_url ? (
             <button
               onClick={() => setViewingPDF(ticket.file_url)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-orange-800 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
             >
               <FileText className="w-4 h-4" />
               Ver

@@ -268,7 +268,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
               const profile = profiles?.[email] || null;
               const name = profile?.display_name || profile?.username || email;
               const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-              const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+              const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
               const selected = sharedWith.includes(email) || i === 0;
               const isYou = i === 0;
 
