@@ -244,16 +244,16 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
           {/* Humidity / Wind / UV */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-0.5">💧 Humedad</p>
+              <p className="text-xs text-muted-foreground mb-0.5">Humedad</p>
               <p className="text-sm font-medium text-foreground">{weather.humidity}%</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-0.5">💨 Viento</p>
+              <p className="text-xs text-muted-foreground mb-0.5">Viento</p>
               <p className="text-sm font-medium text-foreground">{weather.wind} km/h</p>
             </div>
             {uvLabel && (
               <div className="bg-card border border-border rounded-xl p-2 text-center">
-                <p className="text-xs text-muted-foreground mb-0.5">🔆 UV</p>
+                <p className="text-xs text-muted-foreground mb-0.5">UV</p>
                 <p className="text-sm font-medium text-foreground">{weather.uv} <span className="text-xs font-normal text-muted-foreground">{uvLabel}</span></p>
               </div>
             )}

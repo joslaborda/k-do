@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Search, ChevronDown, Loader2 } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,38 +11,38 @@ import {
 
 const menuCategories = [
   {
-    name: '🍜 Platos principales',
+    name: 'Platos principales',
     dishes: ['Ramen', 'Shoyu ramen', 'Miso ramen', 'Tonkotsu ramen', 'Udon', 'Soba', 'Yakisoba']
   },
   {
-    name: '🍛 Curry y occidentales',
+    name: 'Curry y occidentales',
     dishes: ['Japanese curry', 'Katsu curry', 'Beef curry', 'Doria', 'Napolitan pasta', 'Gratin', 'Cream stew']
   },
   {
-    name: '🍱 Arroces y bowls',
+    name: 'Arroces y bowls',
     dishes: ['Gyudon', 'Oyakodon', 'Katsudon', 'Tendon', 'Curry rice', 'Omurice', 'Donburi']
   },
   {
-    name: '🍣 Sushi y pescado',
+    name: 'Sushi y pescado',
     dishes: ['Sushi', 'Sashimi', 'Nigiri', 'Maki', 'Chirashi', 'Tekka don', 'Unagi don']
   },
   {
-    name: '🍖 Carne y fritos',
+    name: 'Carne y fritos',
     dishes: ['Karaage', 'Tonkatsu', 'Chicken katsu', 'Yakiniku', 'Sukiyaki', 'Shabu shabu']
   },
   {
-    name: '🍢 Callejera e izakaya',
+    name: 'Callejera e izakaya',
     dishes: ['Yakitori', 'Okonomiyaki', 'Takoyaki', 'Kushikatsu', 'Taiyaki']
   },
   {
-    name: '🍡 Dulces y postres',
+    name: 'Dulces y postres',
     dishes: ['Mochi', 'Daifuku', 'Dango', 'Dorayaki', 'Matcha cake', 'Matcha ice cream']
   }
 ];
 
 export default function MenuViewer({ foodItems = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState({ '🍜 Platos principales': true });
+  const [expandedCategories, setExpandedCategories] = useState({ 'Platos principales': true });
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
@@ -148,7 +148,7 @@ export default function MenuViewer({ foodItems = [] }) {
                           >
                             <div className="flex items-center justify-between">
                               <span>{dish}</span>
-                              {localDish && <span className="text-xs">✓</span>}
+                              {localDish && <Check size={12} className="text-green-600" />}
                             </div>
                           </button>
                         );
@@ -174,7 +174,7 @@ export default function MenuViewer({ foodItems = [] }) {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-xs text-stone-400 mb-2">
                 <span className={`px-2 py-1 rounded ${searchResults.source === 'app' ? 'bg-green-900/30 text-green-300' : 'bg-blue-900/30 text-blue-300'}`}>
-                  {searchResults.source === 'app' ? '📱 En la app' : '🌐 Google'}
+                  {searchResults.source === 'app' ? 'En la app' : 'Online'}
                 </span>
               </div>
               

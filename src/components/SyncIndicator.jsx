@@ -58,7 +58,7 @@ export default function SyncIndicator() {
             {!isOnline && (
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <WifiOff className="w-5 h-5 text-orange-600" />
+                  <WifiOff className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-stone-900 dark:text-white text-sm">

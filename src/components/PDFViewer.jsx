@@ -102,7 +102,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
       <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>
         <div className="w-8" />
         <p className="text-sm font-medium truncate max-w-xs" style={{ color: 'rgba(255,255,255,.75)' }}>{fileName}</p>
-        <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center"
+        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center"
           style={{ background: 'rgba(255,255,255,.1)' }}>
           <X className="w-5 h-5" style={{ color: 'rgba(255,255,255,.8)' }} />
         </button>
@@ -162,7 +162,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
         {/* Unsupported */}
         {!loading && !error && !isPDF && !isImg && (
           <div className="text-center mt-12">
-            <p className="text-4xl mb-4">📄</p>
+            <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
             <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.4)' }}>Vista previa no disponible</p>
             <a href={fileUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white"
