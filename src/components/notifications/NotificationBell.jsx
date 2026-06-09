@@ -187,11 +187,13 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
   const notifsRef = useRef([]);
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const key = ['notifications', userId];
+  const key = ['notifications', userId, currentTripId || 'all'];
 
   const { data: notifications = [] } = useQuery({
     queryKey: key,
-    queryFn: () => base44.entities.Notification.filter({ user_id: userId }, '-created_date', 40),
+    queryFn: () => currentTripId
+      ? base44.entities.Notification.filter({ user_id: userId, trip_id: currentTripId }, '-created_date', 40)
+      : base44.entities.Notification.filter({ user_id: userId }, '-created_date', 40),
     enabled: !!userId,
     refetchInterval: open ? false : 20000,
     refetchOnWindowFocus: false,
