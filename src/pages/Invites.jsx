@@ -232,14 +232,45 @@ export default function Invites() {
 
       <div className="px-5 py-5 space-y-3">
         {pendingInvites.length === 0 ? (
-          <div className="flex flex-col items-center py-16 gap-3 text-center">
-            <div className="w-14 h-14 rounded-full bg-card border border-border flex items-center justify-center">
-              <Mail className="w-6 h-6 text-muted-foreground" />
+          <div className="flex flex-col items-center pt-8 pb-16 gap-0 text-center">
+            {/* Ilustración con iconos superpuestos */}
+            <div className="relative w-24 h-24 mb-5">
+              <div className="absolute inset-0 rounded-full bg-orange-50 border border-orange-100" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Mail className="w-10 h-10 text-primary/30" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-card border-2 border-background flex items-center justify-center shadow-sm">
+                <Check className="w-4 h-4 text-green-500" />
+              </div>
             </div>
-            <p className="text-sm font-medium text-foreground">Sin invitaciones</p>
-            <p className="text-xs text-muted-foreground max-w-xs">
-              Cuando alguien te invite a un viaje aparecerá aquí
+
+            <h2 className="text-base font-semibold text-foreground mb-1">Sin invitaciones pendientes</h2>
+            <p className="text-sm text-muted-foreground max-w-xs leading-relaxed mb-6">
+              Cuando alguien te invite a un viaje podrás aceptarlo o rechazarlo desde aquí.
             </p>
+
+            {/* Tip — cómo funciona */}
+            <div className="w-full bg-card border border-border rounded-2xl p-4 text-left space-y-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">¿Cómo funciona?</p>
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-primary">1</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">Alguien te invita a su viaje desde la sección de miembros.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-primary">2</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">Recibes una notificación y la invitación aparece aquí.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-primary">3</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">Aceptas y te unes al viaje con acceso completo.</p>
+              </div>
+            </div>
           </div>
         ) : (
           pendingInvites.map(inv => {
