@@ -14,7 +14,7 @@ const categoryConfig = {
   accommodation: { icon: Hotel, color: 'bg-purple-100 text-purple-600' },
   activities: { icon: Ticket, color: 'bg-pink-100 text-pink-600' },
   shopping: { icon: ShoppingBag, color: 'bg-emerald-100 text-emerald-600' },
-  other: { icon: MoreHorizontal, color: 'bg-slate-100 text-slate-600' }
+  other: { icon: MoreHorizontal, color: 'bg-secondary text-foreground' }
 };
 
 export default function ExpenseCard({ expense, userMap = {}, onEdit, onDelete }) {
@@ -34,18 +34,18 @@ export default function ExpenseCard({ expense, userMap = {}, onEdit, onDelete })
       </div>
       
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 truncate">{expense.description}</h3>
+        <h3 className="font-medium text-foreground truncate">{expense.description}</h3>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
           <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-primary font-semibold">
             Pagó {getName(expense.paid_by)}
           </span>
           {expense.date && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {format(new Date(expense.date), 'd MMM')}
             </span>
           )}
           {expense.split_with?.length > 0 && (
-            <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+            <span className="text-xs text-muted-foreground0 bg-secondary px-1.5 py-0.5 rounded">
               {splitInfo}
             </span>
           )}
@@ -53,7 +53,7 @@ export default function ExpenseCard({ expense, userMap = {}, onEdit, onDelete })
       </div>
       
       <div className="text-right shrink-0">
-        <p className="font-bold text-gray-900">{expense.amount?.toFixed(2)}€</p>
+        <p className="font-bold text-foreground">{expense.amount?.toFixed(2)}€</p>
       </div>
 
       <DropdownMenu>

@@ -42,7 +42,7 @@ export default function ExpenseChart({ expenses }) {
 
   if (expenses.length === 0) {
     return (
-      <div className="bg-[#ffffff] text-stone-400 py-8 text-center">
+      <div className="bg-[#ffffff] text-muted-foreground py-8 text-center">
         <p>No hay gastos registrados aún</p>
       </div>);
 
@@ -52,7 +52,7 @@ export default function ExpenseChart({ expenses }) {
     <div className="space-y-6">
       {/* Pie Chart */}
       <div className="bg-card rounded-xl border border-border p-6">
-        <h3 className="text-lg font-bold text-stone-900 mb-4">Distribución por categoría</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4">Distribución por categoría</h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
             <Pie
@@ -77,7 +77,7 @@ export default function ExpenseChart({ expenses }) {
 
       {/* Bar Chart */}
       <div className="bg-card rounded-xl border border-border p-6">
-        <h3 className="text-lg font-bold text-stone-900 mb-4">Comparación de gastos</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4">Comparación de gastos</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <XAxis dataKey="name" />

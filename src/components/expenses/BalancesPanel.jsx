@@ -72,10 +72,10 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
           return (
             <div key={i} className={`bg-gradient-to-br ${stat.color} rounded-xl p-4 border border-white/40`}>
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-600">{stat.label}</p>
-                <Icon className="w-4 h-4 text-gray-500" />
+                <p className="text-xs font-semibold text-foreground">{stat.label}</p>
+                <Icon className="w-4 h-4 text-muted-foreground0" />
               </div>
-              <p className="text-2xl font-bold text-gray-800">{stat.value}{currencySymbol}</p>
+              <p className="text-2xl font-bold text-foreground">{stat.value}{currencySymbol}</p>
             </div>
           );
         })}
@@ -97,7 +97,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                       ? debt.from === currentUserEmail
                         ? 'bg-red-50 border border-red-200'
                         : 'bg-green-50 border border-green-200'
-                      : 'bg-gray-50 border border-gray-200'
+                      : 'bg-secondary border border-border'
                   }`}
                 >
                   <div className="flex-1 flex items-center gap-3">
@@ -106,7 +106,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                         ? debt.from === currentUserEmail
                           ? 'text-red-700'
                           : 'text-green-700'
-                        : 'text-gray-700'
+                        : 'text-foreground'
                     }`}>
                       {getName(debt.from)}
                     </span>
@@ -115,14 +115,14 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                         ? debt.from === currentUserEmail
                           ? 'text-red-500'
                           : 'text-green-500'
-                        : 'text-gray-400'
+                        : 'text-muted-foreground'
                     }`} />
                     <span className={`text-sm font-semibold ${
                       isRelevant
                         ? debt.from === currentUserEmail
                           ? 'text-red-700'
                           : 'text-green-700'
-                        : 'text-gray-700'
+                        : 'text-foreground'
                     }`}>
                       {getName(debt.to)}
                     </span>
@@ -132,7 +132,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
                       ? debt.from === currentUserEmail
                         ? 'text-red-700'
                         : 'text-green-700'
-                      : 'text-gray-700'
+                      : 'text-foreground'
                   }`}>
                     {debt.amount.toFixed(baseCurrency === 'JPY' ? 0 : 2)}{currencySymbol}
                   </span>

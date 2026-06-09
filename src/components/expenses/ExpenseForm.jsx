@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2, Camera, Upload, X, Utensils, Bus, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
+import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
 
