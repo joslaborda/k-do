@@ -18,8 +18,8 @@ import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
-  flight:  hotel: Hotel, train: Train,
-  bus: Bus, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
+  flight: PlaneIcon, hotel: Hotel, train: Train,
+  bus: BusFront, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
 const SPOT_ICONS = {

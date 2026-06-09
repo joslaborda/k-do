@@ -88,10 +88,10 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 const DOC_ICONS = {
-  flight:    
+  flight:    PlaneIcon,
   train:     Train,
   hotel:     Hotel,
-  bus:       Bus,
+  bus:       BusFront,
   car:       Car,
   event:     Ticket,
   personal:  Shield,
