@@ -40,8 +40,8 @@ export default function RouteMap({ cities }) {
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
           {sortedCities.map((city, i) => (
             <span key={city.id} className="flex items-center gap-1">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                <span className="w-3.5 h-3.5 bg-primary text-white rounded-full text-[9px] font-bold flex items-center justify-center flex-shrink-0">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-accent-foreground">
+                <span className="w-3.5 h-3.5 bg-primary text-white rounded-full text-micro font-bold flex items-center justify-center flex-shrink-0">
                   {i + 1}
                 </span>
                 {city.name}
@@ -54,7 +54,7 @@ export default function RouteMap({ cities }) {
           href={openInMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 text-xs text-primary hover:text-orange-800 font-medium flex-shrink-0 ml-3"
+          className="flex items-center gap-1 text-xs text-primary hover:text-accent-foreground font-medium flex-shrink-0 ml-3"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           Abrir en Maps
