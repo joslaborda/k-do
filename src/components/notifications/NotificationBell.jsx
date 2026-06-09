@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Calendar } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
