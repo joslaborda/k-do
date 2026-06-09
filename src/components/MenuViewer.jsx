@@ -73,16 +73,10 @@ export default function MenuViewer({ foodItems = [] }) {
           image: localResult.image_url || localResult.default_image
         });
       } else {
-        // Buscar en Google
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `Dame una descripción breve y apetitosa del plato japonés "${dish}" en español. Sé conciso (máximo 2-3 líneas).`,
-          add_context_from_internet: true
-        });
-        
         setSearchResults({
           dish,
-          source: 'google',
-          result: result,
+          source: 'local',
+          result: 'Información no disponible para este plato.',
           image: null
         });
       }
