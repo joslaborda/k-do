@@ -232,14 +232,40 @@ export default function Invites() {
 
       <div className="px-5 py-5 space-y-3">
         {pendingInvites.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center px-8" style={{minHeight: 'calc(100vh - 120px)'}}>
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-muted-foreground/40" />
+          <div className="flex flex-col items-center justify-center text-center px-6" style={{minHeight: 'calc(100vh - 120px)'}}>
+            {/* Icono con acento naranja */}
+            <div className="relative mb-5">
+              <div className="w-20 h-20 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center">
+                <Mail className="w-9 h-9 text-primary" />
+              </div>
             </div>
+
             <p className="text-base font-semibold text-foreground mb-2">Sin invitaciones pendientes</p>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Cuando alguien te invite a un viaje en Kōdo aparecerá aquí para que puedas aceptar o rechazar.
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-7">
+              Cuando alguien te invite a un viaje aparecerá aquí.
             </p>
+
+            {/* Pasos — qué esperar */}
+            <div className="w-full space-y-2 text-left">
+              <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-primary">1</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Un compañero te invita desde su viaje</p>
+              </div>
+              <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-primary">2</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Recibes una notificación en el bell</p>
+              </div>
+              <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
+                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-primary">3</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Aceptas y tienes acceso completo al viaje</p>
+              </div>
+            </div>
           </div>
         ) : (
           pendingInvites.map(inv => {
