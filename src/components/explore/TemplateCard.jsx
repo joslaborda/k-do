@@ -109,7 +109,7 @@ export default function TemplateCard({ template, currentUser }) {
         {/* Content */}
         <div className="flex-1 flex flex-col p-4">
           {/* Title */}
-          <h3 className="text-lg font-bold text-foreground line-clamp-2 mb-1 group-hover:text-orange-700 transition-colors">
+          <h3 className="text-lg font-bold text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
             {template.title}
           </h3>
 
@@ -123,7 +123,7 @@ export default function TemplateCard({ template, currentUser }) {
           {/* Creator */}
           {template.creator_username && (
             <p className="text-xs text-muted-foreground mb-2">
-              por <span className="font-medium text-orange-700">@{template.creator_username}</span>
+              por <span className="font-medium text-primary">@{template.creator_username}</span>
             </p>
           )}
 
@@ -167,7 +167,7 @@ export default function TemplateCard({ template, currentUser }) {
             <button
               onClick={(e) => { e.preventDefault(); toggleLike(); }}
               className={"inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors " +
-                (isLiked ? "bg-red-50 text-red-500 border border-red-200" : "bg-slate-50 text-slate-500 border border-slate-200 hover:bg-red-50 hover:text-red-400")}
+                (isLiked ? "bg-red-50 text-red-500 border border-red-200" : "bg-secondary text-muted-foreground0 border border-border hover:bg-red-50 hover:text-red-400")}
             >
               <Heart className={"w-3.5 h-3.5 " + (isLiked ? "fill-current" : "")}/>
               {likeCount > 0 ? likeCount : ""}
@@ -178,7 +178,7 @@ export default function TemplateCard({ template, currentUser }) {
               onClick={handleSaveToggle}
               disabled={saveMutation.isPending || !currentUser}
               className={`px-3 ${
-                isSaved ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-orange-700'
+                isSaved ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-primary'
               }`}
             >
               <Heart className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} />
