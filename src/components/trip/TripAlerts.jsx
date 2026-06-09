@@ -79,7 +79,7 @@ export default function TripAlerts({ tripId, cities, trip, onUrgentCount }) {
             const hrs = Math.floor(diffMin / 60);
             const mins = diffMin % 60;
             daysText = hrs > 0 ? `Sale en ${hrs}h${mins > 0 ? ` ${mins}min` : ''}` : `Sale en ${diffMin} min`;
-            color = diffMin <= 60 ? 'text-red-600' : 'text-orange-600';
+            color = diffMin <= 60 ? 'text-red-600' : 'text-primary';
             bg = diffMin <= 60 ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200';
           } else {
             daysText = `Hoy a las ${t.time}`;

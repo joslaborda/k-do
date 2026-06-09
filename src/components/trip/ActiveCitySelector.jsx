@@ -24,7 +24,7 @@ export default function ActiveCitySelector({ cities = [], overrideCityId, setOve
 
   return (
     <div className="flex items-center gap-2 bg-white/90 border border-border rounded-xl px-3 py-2 shadow-sm">
-      <MapPin className="w-4 h-4 text-orange-600 flex-shrink-0" />
+      <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
       <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Ahora estoy en:</span>
       <Select value={value} onValueChange={handleChange}>
         <SelectTrigger className="h-7 border-0 bg-transparent shadow-none text-sm font-semibold text-foreground p-0 focus:ring-0 min-w-[120px]">

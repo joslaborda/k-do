@@ -77,7 +77,7 @@ export default function CityInput({ country, value, onChange, placeholder = 'Eli
             <li
               key={city}
               onMouseDown={() => handleSelect(city)}
-              className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-orange-700 transition-colors"
+              className="px-3 py-2 text-sm cursor-pointer hover:bg-orange-50 hover:text-primary transition-colors"
             >
               {city}
             </li>

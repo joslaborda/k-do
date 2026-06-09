@@ -7,7 +7,7 @@ import { Camera, Check, Hotel, Image, Landmark, MapPin, Moon, Navigation, Pencil
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
-  food:      { label: 'Restaurante', Icon: Utensils,   color: 'bg-orange-100 text-orange-700' },
+  food:      { label: 'Restaurante', Icon: Utensils,   color: 'bg-orange-100 text-primary' },
   sight:     { label: 'Atracción',   Icon: Landmark,   color: 'bg-blue-100 text-blue-700' },
   activity:  { label: 'Actividad',   Icon: Zap,        color: 'bg-green-100 text-green-700' },
   shopping:  { label: 'Compras',     Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
@@ -183,7 +183,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
             <div key={c.id} className="flex gap-3">
               {(c.user_avatar || c.avatar_url)
                 ? <img src={c.user_avatar || c.avatar_url} alt={c.user_display_name || ''} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                : <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-semibold text-xs flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
+                : <div className="w-8 h-8 rounded-full bg-orange-100 text-primary flex items-center justify-center font-semibold text-xs flex-shrink-0">{(c.user_display_name||'?')[0].toUpperCase()}</div>
               }
               <div className="flex-1 min-w-0">
                 <div className="bg-secondary rounded-2xl rounded-tl-none px-3 py-2">

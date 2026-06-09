@@ -156,7 +156,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
       <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col" style={{ height: '460px' }}>
         {/* Header */}
         <div className="px-4 py-3 border-b border-border flex items-center gap-2 bg-orange-50 dark:bg-orange-950/20">
-          <MessageCircle className="w-4 h-4 text-orange-700 dark:text-orange-400" />
+          <MessageCircle className="w-4 h-4 text-primary dark:text-primary/60" />
           <span className="font-semibold text-sm text-foreground">Chat del grupo</span>
           <span className="ml-auto text-xs text-muted-foreground">{messages.length} mensajes</span>
         </div>
@@ -191,7 +191,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                   {msg.avatar_url ? (
                     <img src={msg.avatar_url} className="w-7 h-7 rounded-full object-cover" alt="" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-xs font-bold text-orange-700 dark:text-orange-400">
+                    <div className="w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-xs font-bold text-primary dark:text-primary/60">
                       {(msg.display_name || msg.user_email || '?')[0].toUpperCase()}
                     </div>
                   )}
@@ -230,7 +230,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                       rel="noopener noreferrer"
                       className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm ${
                         isMe
-                          ? 'bg-orange-700 text-white rounded-br-sm'
+                          ? 'bg-primary text-white rounded-br-sm'
                           : 'bg-secondary text-foreground rounded-bl-sm'
                       }`}
                     >
@@ -244,7 +244,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                   {!isImageMsg(msg) && !isFileMsg(msg) && (
                     <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${
                       isMe
-                        ? 'bg-orange-700 text-white rounded-br-sm'
+                        ? 'bg-primary text-white rounded-br-sm'
                         : 'bg-secondary text-foreground rounded-bl-sm'
                     }`}>
                       {msg.content}
@@ -321,7 +321,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
             size="icon"
             onClick={handleSend}
             disabled={!text.trim() || sendMutation.isPending}
-            className="bg-orange-700 hover:bg-orange-800 flex-shrink-0"
+            className="bg-primary hover:bg-orange-800 flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>

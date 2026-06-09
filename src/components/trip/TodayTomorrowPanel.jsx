@@ -32,10 +32,10 @@ const catColor = {
   train: 'bg-emerald-100 text-emerald-700',
   hotel: 'bg-purple-100 text-purple-700',
   insurance: 'bg-yellow-100 text-yellow-700',
-  event: 'bg-orange-100 text-orange-700',
+  event: 'bg-orange-100 text-primary',
   personal: 'bg-blue-100 text-blue-700',
   other: 'bg-gray-100 text-gray-600',
-  freetour: 'bg-orange-100 text-orange-700',
+  freetour: 'bg-orange-100 text-primary',
 };
 
 // ── sub-components ────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ function PlanCard({ itDay, cityOfDay, tripId }) {
           {cityOfDay && <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1"><MapPin className="w-3 h-3" />{cityOfDay.name}</p>}
         </div>
         <Link to={createPageUrl(`CityDetail?trip_id=${tripId}&city_id=${itDay.city_id}`)}>
-          <Button size="sm" variant="outline" className="w-full text-xs h-7 border-orange-300 text-orange-700 hover:bg-orange-50">
+          <Button size="sm" variant="outline" className="w-full text-xs h-7 border-primary/30 text-primary hover:bg-orange-50">
             Abrir plan <ArrowRight className="w-3 h-3 ml-1" />
           </Button>
         </Link>
@@ -222,7 +222,7 @@ export default function TodayTomorrowPanel({ tripId, cities }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${tab === t ? 'bg-orange-700 text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
+            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${tab === t ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-orange-50'}`}
           >
             {t === 'today' ? <><Sun size={14} className='inline mr-1' />Hoy</> : <><Moon size={14} className='inline mr-1' />Mañana</>}
           </button>

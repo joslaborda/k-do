@@ -4,11 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import {
-  Train, Hotel, Calendar, MapPin, FileText,
-  Shield, Ticket, ChevronDown, ChevronRight, Eye,
-  Navigation, Receipt, Clock, AlertCircle
-} from 'lucide-react';
+import { AlertCircle, Bus, Calendar, ChevronDown, ChevronRight, CirclePlus, Clock, Eye, FileText, Hotel, Landmark, MapPin, Moon, Navigation, Receipt, Shield, ShoppingBag, Sun, Ticket, Train, Utensils } from 'lucide-react';
 import { PlaneIcon, TrainFront, BusFront, Car, Ship } from '@/lib/icons';
 import TicketQuickViewer from './TicketQuickViewer';
 
@@ -37,16 +33,16 @@ const DOC_COLOR = {
   train: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   hotel: 'bg-purple-100 text-purple-700 border-purple-200',
   insurance: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  event: 'bg-orange-100 text-orange-700 border-orange-200',
+  event: 'bg-orange-100 text-primary border-orange-200',
   personal: 'bg-blue-100 text-blue-700 border-blue-200',
   other: 'bg-gray-100 text-gray-600 border-gray-200',
-  freetour: 'bg-orange-100 text-orange-700 border-orange-200',
+  freetour: 'bg-orange-100 text-primary border-orange-200',
 };
 const DOC_LABEL = {
   flight: 'Vuelo', train: 'Tren', hotel: 'Hotel', insurance: 'Seguro',
   event: 'Evento', personal: 'Doc personal', other: 'Documento', freetour: 'Free Tour',
 };
-const SPOT_EMOJI = { food: '🍜', sight: '🏛️', activity: '⚡', shopping: '🛍️', transport: '🚆', custom: '📍' };
+const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: Bus, custom: CirclePlus };
 
 // ── TimelineItem ─────────────────────────────────────────────────────────────
 function DocItem({ doc, onClick }) {
@@ -73,17 +69,17 @@ function DocItem({ doc, onClick }) {
 }
 
 function SpotItem({ spot }) {
-  const emoji = SPOT_EMOJI[spot.type] || '📍';
+  const SpotIcon = SPOT_ICON_MAP[spot.type] || MapPin;
   return (
     <div className={"flex items-center gap-3 p-3 rounded-xl border border-border bg-card " + (spot.visited ? 'opacity-50' : '')}>
       <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 text-lg">
-        {emoji}
+        <SpotIcon size={14} className='text-muted-foreground' />
       </div>
       <div className="flex-1 min-w-0">
         <p className={"font-semibold text-sm truncate " + (spot.visited ? 'line-through text-muted-foreground' : 'text-foreground')}>{spot.title}</p>
         {spot.address && <p className="text-xs text-muted-foreground truncate">{spot.address}</p>}
       </div>
-      {spot.visited && <span className="text-green-600 text-xs flex-shrink-0">✅</span>}
+      {spot.visited && <span className="text-xs text-green-600 font-medium">Hecho</span>}
     </div>
   );
 }
@@ -97,19 +93,19 @@ function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaul
   const isTomorrow = date === dateStr(1);
 
   return (
-    <div className={"rounded-2xl border overflow-hidden " + (isToday ? "border-orange-300 shadow-sm" : "border-border")}>
+    <div className={"rounded-2xl border overflow-hidden " + (isToday ? "border-primary/30 shadow-sm" : "border-border")}>
       <button onClick={() => setOpen(o => !o)}
         className={"w-full flex items-center justify-between px-4 py-3.5 transition-colors " +
-          (isToday ? "bg-orange-700 text-white" : "bg-card text-foreground hover:bg-secondary")}>
+          (isToday ? "bg-primary text-white" : "bg-card text-foreground hover:bg-secondary")}>
         <div className="flex items-center gap-3">
-          <span className="text-lg">{isToday ? '☀️' : isTomorrow ? '🌙' : '📅'}</span>
+          <span className="text-lg">{isToday ? <Sun size={16} /> : isTomorrow ? <Moon size={16} /> : <Calendar size={16} />}</span>
           <div className="text-left">
             <p className={"font-bold text-sm " + (isToday ? "text-white" : "text-foreground")}>{label}</p>
             {cityOfDay && <p className={"text-xs " + (isToday ? "text-white/70" : "text-muted-foreground")}>{cityOfDay.name}</p>}
           </div>
           {hasContent && (
             <div className="flex gap-1.5">
-              {docs.length > 0 && <span className={"text-xs px-2 py-0.5 rounded-full font-medium " + (isToday ? "bg-white/20 text-white" : "bg-orange-100 text-orange-700")}>{docs.length} docs</span>}
+              {docs.length > 0 && <span className={"text-xs px-2 py-0.5 rounded-full font-medium " + (isToday ? "bg-white/20 text-white" : "bg-orange-100 text-primary")}>{docs.length} docs</span>}
               {spots.length > 0 && <span className={"text-xs px-2 py-0.5 rounded-full font-medium " + (isToday ? "bg-white/20 text-white" : "bg-blue-100 text-blue-700")}>{spots.length} spots</span>}
             </div>
           )}
@@ -128,14 +124,14 @@ function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaul
           {/* Plan del día */}
           {itDay && (
             <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 border border-orange-200">
-              <div className="w-9 h-9 rounded-xl bg-orange-100 border border-orange-300 flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-4 h-4 text-orange-700" />
+              <div className="w-9 h-9 rounded-xl bg-orange-100 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm text-foreground">{itDay.title || 'Plan del día'}</p>
                 {cityOfDay && (
                   <Link to={createPageUrl(`CityDetail?trip_id=${tripId}&city_id=${cityOfDay.id}`)}
-                    className="text-xs text-orange-700 hover:underline">Ver itinerario →</Link>
+                    className="text-xs text-primary hover:underline">Ver itinerario →</Link>
                 )}
               </div>
             </div>
@@ -161,7 +157,7 @@ function DaySection({ label, date, docs, spots, itDay, cityOfDay, tripId, defaul
           {/* Link a ciudad */}
           {cityOfDay && (
             <Link to={createPageUrl(`CityDetail?trip_id=${tripId}&city_id=${cityOfDay.id}`)}
-              className="flex items-center justify-center gap-1.5 text-xs text-orange-700 font-medium py-2 hover:underline">
+              className="flex items-center justify-center gap-1.5 text-xs text-primary font-medium py-2 hover:underline">
               <Navigation className="w-3 h-3" />Ver todo el día en detalle
             </Link>
           )}
@@ -270,9 +266,9 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
     return (
       <div className="space-y-3">
         {/* Countdown banner */}
-        <div className="bg-orange-700 rounded-2xl p-5 text-white text-center">
+        <div className="bg-primary rounded-2xl p-5 text-white text-center">
           <p className="text-4xl font-black mb-1">{daysUntilTrip}</p>
-          <p className="text-white/90 font-semibold">día{daysUntilTrip !== 1 ? 's' : ''} para el viaje ✈️</p>
+          <p className="text-white/90 font-semibold">día{daysUntilTrip !== 1 ? 's' : ''} para el viaje ️</p>
           {trip?.destination && <p className="text-white/70 text-sm mt-1">{trip.destination}</p>}
         </div>
         {/* Show upcoming docs if any */}
@@ -285,7 +281,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
                 return (
                   <div key={doc.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary">
                     <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-4 h-4 text-orange-700" />
+                      <Icon className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{doc.name}</p>
@@ -299,7 +295,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
         )}
         {/* Packing reminder */}
         <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3">
-          <span className="text-2xl">🧳</span>
+          <span className="text-2xl"></span>
           <div className="flex-1">
             <p className="font-semibold text-sm">¿Lista la maleta?</p>
             <p className="text-xs text-muted-foreground">Revisa que llevas todo lo necesario</p>
@@ -315,7 +311,7 @@ export default function IntelligentTimeline({ tripId, cities, expenses, trip }) 
       {/* Gastos de hoy si hay */}
       {todayExpenses.length > 0 && (
         <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
-          <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-orange-300 transition-colors">
+          <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-primary/30 transition-colors">
             <div className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
               <Receipt className="w-4 h-4 text-green-700" />
             </div>

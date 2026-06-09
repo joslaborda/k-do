@@ -142,7 +142,7 @@ export default function TripCountdownBanner({
       {/* CTA */}
       <div className="flex gap-2">
         <Link to={createPageUrl(`Packing?trip_id=${tripId}`)} className="flex-1">
-          <Button className="w-full bg-white text-orange-700 hover:bg-orange-50 font-bold">
+          <Button className="w-full bg-white text-primary hover:bg-orange-50 font-bold">
             Ver checklist completo
           </Button>
         </Link>

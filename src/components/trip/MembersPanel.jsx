@@ -89,7 +89,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
         setShareLink(result.inviteUrl);
         setInviteEmail('');
       } else {
-        toast({ title: '✓ Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
+        toast({ title: 'Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
         setInviteEmail('');
         setInviteRole('editor');
       }

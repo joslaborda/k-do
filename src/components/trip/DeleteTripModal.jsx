@@ -11,7 +11,7 @@ export default function DeleteTripModal({ open, onOpenChange, tripName, onConfir
     <AlertDialog open={open} onOpenChange={(v) => { onOpenChange(v); setInputValue(''); }}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-destructive">⚠️ Eliminar viaje</AlertDialogTitle>
+          <AlertDialogTitle className="text-destructive">Eliminar viaje</AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>Esta acción es <strong>irreversible</strong>. Se eliminarán todos los datos del viaje.</p>
             <p>Escribe el nombre del viaje exactamente para confirmar:</p>

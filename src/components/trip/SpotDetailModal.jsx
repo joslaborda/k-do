@@ -16,9 +16,9 @@ const SPOT_ICONS = {
   museum:   Landmark,
 };
 const SPOT_COLORS = {
-  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
-  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
 };
 const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo' };
