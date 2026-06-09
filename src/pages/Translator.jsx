@@ -37,7 +37,6 @@ const LANGUAGES = [
 const TABS = [
   { key: 'voz',      label: 'Voz' },
   { key: 'texto',    label: 'Texto' },
-  { key: 'camara',   label: 'Cámara' },
   { key: 'historial', label: 'Historial' },
 ];
 
@@ -685,8 +684,6 @@ function TranslatorContent({ tripId, inPage = false }) {
           />
         )}
 
-        {tab === 'camara' && <CamaraTab toLang={toLang} />}
-
         {tab === 'historial' && <HistorialTab />}
       </div>
     </>
@@ -694,158 +691,6 @@ function TranslatorContent({ tripId, inPage = false }) {
 }
 
 
-// ── CamaraTab — Escanear texto con Claude vision ──────────────────────────────
-function CamaraTab({ toLang }) {
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const inputRef = useRef(null);
-
-  const LANG_LABEL = {
-    es: 'Español', en: 'Inglés', fr: 'Francés', de: 'Alemán', it: 'Italiano',
-    pt: 'Portugués', ja: 'Japonés', zh: 'Chino', ko: 'Coreano', ar: 'Árabe',
-    th: 'Tailandés', vi: 'Vietnamita', id: 'Indonesio', tr: 'Turco',
-    ru: 'Ruso', nl: 'Neerlandés', pl: 'Polaco', hi: 'Hindi',
-    el: 'Griego', he: 'Hebreo', ms: 'Malayo', tl: 'Filipino',
-  };
-
-  const handleImage = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImage(file);
-    setResult(null);
-    setError(null);
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreview(ev.target.result);
-    reader.readAsDataURL(file);
-  };
-
-  const handleScan = async () => {
-    if (!image) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    try {
-      const base64 = await new Promise((res, rej) => {
-        const r = new FileReader();
-        r.onload = () => res(r.result.split(',')[1]);
-        r.onerror = rej;
-        r.readAsDataURL(image);
-      });
-
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: image.type || 'image/jpeg', data: base64 }
-              },
-              {
-                type: 'text',
-                text: `Extract ALL text visible in this image. Then translate the extracted text to ${LANG_LABEL[toLang] || toLang}. 
-Format your response EXACTLY as:
-TEXTO ORIGINAL:
-[extracted text]
-
-TRADUCCIÓN (${LANG_LABEL[toLang] || toLang}):
-[translation]`
-              }
-            ]
-          }]
-        })
-      });
-
-      const data = await response.json();
-      const text = data.content?.[0]?.text || '';
-      setResult(text);
-    } catch (e) {
-      setError('Error al procesar la imagen. Inténtalo de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const parseResult = (text) => {
-    const origMatch = text.match(/TEXTO ORIGINAL:\n([\s\S]+?)\n\nTRADUCCIÓN/);
-    const transMatch = text.match(/TRADUCCIÓN[^:]*:\n([\s\S]+)$/);
-    return {
-      original: origMatch?.[1]?.trim() || '',
-      translation: transMatch?.[1]?.trim() || text,
-    };
-  };
-
-  return (
-    <div className="space-y-4">
-      <div
-        onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-border rounded-2xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors bg-secondary/20"
-      >
-        {preview ? (
-          <img src={preview} alt="preview" className="max-h-48 mx-auto rounded-xl object-contain" />
-        ) : (
-          <>
-            <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
-              <Camera className="w-6 h-6 text-muted-foreground" />
-            </div>
-            <p className="text-sm font-medium text-foreground mb-1">Toca para fotografiar texto</p>
-            <p className="text-xs text-muted-foreground">Menú, señal, documento...</p>
-          </>
-        )}
-      </div>
-
-      <input ref={inputRef} type="file" accept="image/*" capture="environment"
-        className="hidden" onChange={handleImage} />
-
-      {preview && !loading && (
-        <button onClick={handleScan}
-          className="w-full py-3 rounded-2xl bg-primary text-white font-semibold text-sm flex items-center justify-center gap-2">
-          <Camera size={16} />Traducir imagen
-        </button>
-      )}
-
-      {loading && (
-        <div className="text-center py-6">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary mb-2" />
-          <p className="text-sm text-muted-foreground">Extrayendo y traduciendo texto...</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
-
-      {result && (() => {
-        const { original, translation } = parseResult(result);
-        return (
-          <div className="space-y-3">
-            <div className="bg-secondary/30 rounded-2xl p-4">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Texto original</p>
-              <p className="text-sm text-foreground">{original}</p>
-            </div>
-            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-              <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-2">Traducción — {LANG_LABEL[toLang] || toLang}</p>
-              <p className="text-sm font-medium text-foreground">{translation}</p>
-            </div>
-            <button onClick={() => { setImage(null); setPreview(null); setResult(null); }}
-              className="w-full py-2.5 rounded-2xl border border-border text-sm text-muted-foreground font-medium">
-              Nueva foto
-            </button>
-          </div>
-        );
-      })()}
-    </div>
-  );
-}
 
 // Export for Utilities embed
 export function TranslatorPanel({ tripId }) {
