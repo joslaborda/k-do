@@ -1456,7 +1456,7 @@ function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail }
   return (
     <div className="space-y-3">
       <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><PlaneIcon className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
         {trip?.start_date && trip?.end_date && (
@@ -2629,7 +2629,7 @@ export default function Home() {
   if (isLoading || !tripId) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><PlaneIcon className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-muted-foreground">Cargando viaje...</p>
       </div>
     </div>
