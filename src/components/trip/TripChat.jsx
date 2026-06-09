@@ -179,7 +179,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                 {showDate && msgDate && (
                   <div className="flex items-center gap-2 my-3">
                     <div className="flex-1 h-px bg-border" />
-                    <span className="text-[10px] text-muted-foreground font-medium px-2">
+                    <span className="text-label text-muted-foreground font-medium px-2">
                       {format(msgDate, 'd MMM', { locale: es })}
                     </span>
                     <div className="flex-1 h-px bg-border" />
@@ -198,7 +198,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                 </div>
                 {/* Bubble */}
                 <div className={`max-w-[72%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-0.5`}>
-                  <span className={`text-[10px] text-muted-foreground px-1 ${isMe ? 'text-right' : ''}`}>
+                  <span className={`text-label text-muted-foreground px-1 ${isMe ? 'text-right' : ''}`}>
                     {isMe ? 'Tú' : (msg.display_name || msg.user_email)}
                   </span>
 
@@ -251,7 +251,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
                     </div>
                   )}
 
-                  <span className="text-[10px] text-muted-foreground px-1">
+                  <span className="text-label text-muted-foreground px-1">
                     {format(new Date(msg.created_date), 'HH:mm')}
                   </span>
                 </div>
@@ -321,7 +321,7 @@ export default function TripChat({ tripId, myProfile, trip }) {
             size="icon"
             onClick={handleSend}
             disabled={!text.trim() || sendMutation.isPending}
-            className="bg-primary hover:bg-orange-800 flex-shrink-0"
+            className="bg-primary hover:bg-primary flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>

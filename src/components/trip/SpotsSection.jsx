@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Bus, Camera, CirclePlus, Compass, Landmark, MapPin, Navigation, PenLine, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
+import { Camera, CirclePlus, Compass, Landmark, MapPin, Navigation, PenLine, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SpotCard from './SpotCard';
@@ -73,7 +73,7 @@ function PlaceResultCard({ place, onSave, saving }) {
         <span className="text-xs text-muted-foreground">{tc.label}</span>
         {place.address && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5"><MapPin className="w-3 h-3 inline mr-0.5"/>{place.address}</p>}
         <Button size="sm" onClick={() => onSave(place)} disabled={saving}
-          className="mt-1.5 h-6 text-xs bg-primary hover:bg-orange-800 text-white px-2.5">
+          className="mt-1.5 h-6 text-xs bg-primary hover:bg-primary text-white px-2.5">
           <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
         </Button>
       </div>
@@ -119,7 +119,7 @@ function ManualForm({ onSave, saving, onClose }) {
       <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas..."
         className="w-full text-xs border border-border rounded-lg px-3 py-2 h-16 resize-none outline-none focus:border-primary/40"/>
       <Button onClick={() => onSave({ title, type, notes, address, tags })} disabled={!title.trim()||saving}
-        className="w-full bg-primary hover:bg-orange-800 text-white h-9">
+        className="w-full bg-primary hover:bg-primary text-white h-9">
         {saving ? 'Guardando...' : 'Guardar spot'}
       </Button>
     </div>

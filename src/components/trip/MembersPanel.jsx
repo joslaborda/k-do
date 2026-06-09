@@ -11,7 +11,7 @@ import { sendTripInvite } from '@/lib/invites';
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
   editor: { label: 'Editor', icon: Pencil, color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  viewer: { label: 'Lector', icon: Eye, color: 'bg-gray-100 text-gray-600 border-gray-200' },
+  viewer: { label: 'Lector', icon: Eye, color: 'bg-secondary text-foreground border-border' },
 };
 
 export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles = [] }) {

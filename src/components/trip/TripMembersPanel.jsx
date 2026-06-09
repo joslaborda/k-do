@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { UserPlus, Mail, Clock, CheckCircle, XCircle, Trash2, Phone } from 'lucide-react';
 
 const ROLE_LABELS = { admin: 'Admin', editor: 'Editor', viewer: 'Solo ver' };
-const ROLE_COLORS = { admin: 'bg-orange-100 text-primary', editor: 'bg-blue-100 text-blue-700', viewer: 'bg-gray-100 text-gray-600' };
+const ROLE_COLORS = { admin: 'bg-orange-100 text-primary', editor: 'bg-blue-100 text-blue-700', viewer: 'bg-secondary text-foreground' };
 const STATUS_ICON = { pending: Clock, accepted: CheckCircle, declined: XCircle };
 const STATUS_COLOR = { pending: 'text-yellow-600', accepted: 'text-green-600', declined: 'text-red-500' };
 
@@ -230,7 +230,7 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
               <Button
                 onClick={() => inviteMutation.mutate({ email, role, mode: 'email' })}
                 disabled={!canInviteEmail || inviteMutation.isPending}
-                className="bg-primary hover:bg-orange-800 text-sm"
+                className="bg-primary hover:bg-primary text-sm"
               >
                 {inviteMutation.isPending ? '...' : 'Invitar'}
               </Button>

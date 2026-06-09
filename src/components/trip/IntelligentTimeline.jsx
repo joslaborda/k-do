@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { AlertCircle, Bus, Calendar, ChevronDown, ChevronRight, CirclePlus, Clock, Eye, FileText, Hotel, Landmark, MapPin, Moon, Navigation, Receipt, Shield, ShoppingBag, Sun, Ticket, Train, Utensils } from 'lucide-react';
-import { PlaneIcon, TrainFront, BusFront, Car, Ship } from '@/lib/icons';
+import { AlertCircle, Calendar, ChevronDown, ChevronRight, CirclePlus, Clock, Eye, FileText, Hotel, Landmark, MapPin, Moon, Navigation, Receipt, Shield, ShoppingBag, Sun, Ticket, Train, Utensils } from 'lucide-react';
+import { BusFront, Car, PlaneIcon, Ship, TrainFront } from '@/lib/icons';
 import TicketQuickViewer from './TicketQuickViewer';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -35,14 +35,14 @@ const DOC_COLOR = {
   insurance: 'bg-yellow-100 text-yellow-700 border-yellow-200',
   event: 'bg-orange-100 text-primary border-orange-200',
   personal: 'bg-blue-100 text-blue-700 border-blue-200',
-  other: 'bg-gray-100 text-gray-600 border-gray-200',
+  other: 'bg-secondary text-foreground border-border',
   freetour: 'bg-orange-100 text-primary border-orange-200',
 };
 const DOC_LABEL = {
   flight: 'Vuelo', train: 'Tren', hotel: 'Hotel', insurance: 'Seguro',
   event: 'Evento', personal: 'Doc personal', other: 'Documento', freetour: 'Free Tour',
 };
-const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: Bus, custom: CirclePlus };
+const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: BusFront, custom: CirclePlus };
 
 // ── TimelineItem ─────────────────────────────────────────────────────────────
 function DocItem({ doc, onClick }) {

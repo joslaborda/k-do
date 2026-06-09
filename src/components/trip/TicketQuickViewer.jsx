@@ -15,18 +15,18 @@ export default function TicketQuickViewer({ ticket, open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-stone-800 border-stone-700 max-w-4xl max-h-[90vh]">
+      <DialogContent className="bg-muted border-border max-w-4xl max-h-[90vh]">
         <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className="text-stone-100 truncate pr-8">{ticket.name}</DialogTitle>
+          <DialogTitle className="text-muted-foreground truncate pr-8">{ticket.name}</DialogTitle>
         </DialogHeader>
-        <div className="mt-2 bg-stone-900 rounded-lg overflow-hidden h-[70vh] flex flex-col">
+        <div className="mt-2 bg-muted rounded-lg overflow-hidden h-[70vh] flex flex-col">
           {isPDF ? (
             <>
               <div className="flex-1 overflow-auto">
                 <Document
                   file={ticket.file_url}
                   onLoadSuccess={({ numPages }) => { setNumPages(numPages); setCurrentPage(1); }}
-                  loading={<div className="flex items-center justify-center h-40"><Loader2 className="w-8 h-8 text-stone-400 animate-spin" /></div>}
+                  loading={<div className="flex items-center justify-center h-40"><Loader2 className="w-8 h-8 text-muted-foreground animate-spin" /></div>}
                 >
                   <Page
                     pageNumber={currentPage}
@@ -36,10 +36,10 @@ export default function TicketQuickViewer({ ticket, open, onOpenChange }) {
                 </Document>
               </div>
               {numPages && numPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 bg-stone-800 border-t border-stone-700">
-                  <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} variant="ghost" size="sm" className="text-stone-400 hover:text-stone-200">← Anterior</Button>
-                  <span className="text-xs text-stone-400">Página {currentPage} de {numPages}</span>
-                  <Button onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))} disabled={currentPage === numPages} variant="ghost" size="sm" className="text-stone-400 hover:text-stone-200">Siguiente →</Button>
+                <div className="flex items-center justify-between px-4 py-3 bg-muted border-t border-border">
+                  <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} variant="ghost" size="sm" className="text-muted-foreground hover:text-muted-foreground">← Anterior</Button>
+                  <span className="text-xs text-muted-foreground">Página {currentPage} de {numPages}</span>
+                  <Button onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))} disabled={currentPage === numPages} variant="ghost" size="sm" className="text-muted-foreground hover:text-muted-foreground">Siguiente →</Button>
                 </div>
               )}
             </>

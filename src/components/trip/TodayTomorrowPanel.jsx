@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { PlaneIcon, TrainFront, BusFront, Car, Ship, Ticket } from '@/lib/icons';
+import { BusFront, Car, PlaneIcon, Ship, Ticket, TrainFront } from '@/lib/icons';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowRight, Bus, Calendar, CirclePlus, Eye, FileText, Hotel, Landmark, MapPin, Moon, Plane, Shield, ShoppingBag, StickyNote, Sun, Train, Utensils } from 'lucide-react';
+import { ArrowRight, Calendar, CirclePlus, Eye, FileText, Hotel, Landmark, MapPin, Moon, Shield, ShoppingBag, StickyNote, Sun, Train, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TicketQuickViewer from './TicketQuickViewer';
 
@@ -20,7 +20,7 @@ function tomorrowStr() {
 }
 
 const catIcon = {
-  flight: Plane, train: Train, hotel: Hotel, insurance: Shield,
+  flight:  train: Train, hotel: Hotel, insurance: Shield,
   event: Calendar, personal: FileText, other: FileText, freetour: FileText,
 };
 const catLabel = {
@@ -34,7 +34,7 @@ const catColor = {
   insurance: 'bg-yellow-100 text-yellow-700',
   event: 'bg-orange-100 text-primary',
   personal: 'bg-blue-100 text-blue-700',
-  other: 'bg-gray-100 text-gray-600',
+  other: 'bg-secondary text-foreground',
   freetour: 'bg-orange-100 text-primary',
 };
 
@@ -71,7 +71,7 @@ function PlanCard({ itDay, cityOfDay, tripId }) {
 
 function SpotsCard({ spots, cityOfDay, tripId }) {
   const preview = spots.slice(0, 3);
-  const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: Bus, custom: CirclePlus };
+  const SPOT_ICON_MAP = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag, transport: BusFront, custom: CirclePlus };
   return (
     <div className="flex flex-col gap-2">
       <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Spots</p>

@@ -72,7 +72,7 @@ export default function PublishSection({
       {/* Header */}
       <div>
         <h3 className="text-lg font-bold text-foreground mb-1 flex items-center gap-2">
-          <Share2 className="w-5 h-5 text-orange-700" />
+          <Share2 className="w-5 h-5 text-primary" />
           Publicar Itinerario
         </h3>
         <p className="text-sm text-muted-foreground">
@@ -139,7 +139,7 @@ export default function PublishSection({
         )}
         {visibility === 'public' && (
           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-xs text-orange-800">
+            <p className="text-xs text-accent-foreground">
               <strong>Público:</strong> Aparecerá en Explorar y otros viajeros podrán descubrirlo y guardarlo.
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function PublishSection({
       <Button
         onClick={handlePublish}
         disabled={loading || !isAdmin}
-        className="w-full bg-orange-700 hover:bg-orange-800 text-white font-medium"
+        className="w-full bg-primary hover:bg-primary text-white font-medium"
       >
         {loading ? (
           <>
@@ -175,7 +175,7 @@ export default function PublishSection({
 
       {/* Share Link (si está publicado y es unlisted/public) */}
       {isPublished && (visibility === 'unlisted' || visibility === 'public') && (
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+        <div className="p-4 bg-secondary border border-border rounded-lg space-y-2">
           <p className="text-sm font-medium text-foreground">Enlace para compartir</p>
           <div className="flex gap-2">
             <input

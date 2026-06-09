@@ -49,7 +49,7 @@ export default function Avatar({ email, profile: profileProp, size = 36, classNa
       className={className}
       style={{
         width: s, height: s, borderRadius: '50%', flexShrink: 0,
-        background: '#fde8df', color: '#c2410c',
+        background: '#fde8df', color: 'hsl(var(--primary))',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: Math.max(10, s * 0.35), fontWeight: 600,
       }}
