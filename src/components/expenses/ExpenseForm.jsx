@@ -31,7 +31,7 @@ export default function ExpenseForm({
   currentUserEmail = '',
   profiles = [],
 }) {
-  const getName = email => userMap[email] || email?.split('@')[0] || email || '?';
+  const getName = email => userMap[email] || email || email || '?';
 
   const orderedCurrencies = [...new Set([defaultCurrency, baseCurrency, ...availableCurrencies, ...COMMON_CURRENCIES])];
 
