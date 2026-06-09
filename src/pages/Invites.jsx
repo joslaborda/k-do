@@ -232,10 +232,14 @@ export default function Invites() {
 
       <div className="px-5 py-5 space-y-3">
         {pendingInvites.length === 0 ? (
-          <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
-            <Mail className="w-8 h-8 mx-auto mb-3 opacity-25" />
-            <p className="text-sm font-medium text-foreground mb-1">Sin invitaciones pendientes</p>
-            <p className="text-xs text-muted-foreground">Cuando alguien te invite a un viaje aparecerá aquí</p>
+          <div className="flex flex-col items-center justify-center text-center px-8" style={{minHeight: 'calc(100vh - 120px)'}}>
+            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-muted-foreground/40" />
+            </div>
+            <p className="text-base font-semibold text-foreground mb-2">Sin invitaciones pendientes</p>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+              Cuando alguien te invite a un viaje en Kōdo aparecerá aquí para que puedas aceptar o rechazar.
+            </p>
           </div>
         ) : (
           pendingInvites.map(inv => {
