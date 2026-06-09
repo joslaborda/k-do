@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X, Trash2, Utensils, Bus, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
+import { Plus, ArrowRight, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -196,7 +196,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
             {sym(expense.currency)}{fmtAmt(parseFloat(expense.amount || 0), expense.currency)}
           </p>
         )}
-        <p style={{ fontSize: isSame ? 13 : 11, fontWeight: isSame ? 500 : 400, color: isSame ? 'var(--color-text-primary)' : '#c2410c' }}>
+        <p style={{ fontSize: isSame ? 13 : 11, fontWeight: isSame ? 500 : 400, color: isSame ? 'var(--color-text-primary)' : 'hsl(var(--primary))' }}>
           {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)}
         </p>
       </div>

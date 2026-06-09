@@ -1,9 +1,10 @@
+import { PlaneIcon } from '@/lib/icons';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Archive, Calendar, Mail, Map, Plane, Plus } from 'lucide-react';
+import { Archive, Calendar, Mail, Map, Plus } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
@@ -24,7 +25,7 @@ function getGreeting() {
 function EmptyState({ onCreateTrip }) {
   return (
     <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-card">
-      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
+      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><PlaneIcon className="w-7 h-7 text-muted-foreground/50" /></div>
       <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
       <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
       <button onClick={onCreateTrip}
@@ -303,7 +304,7 @@ export default function TripsList() {
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'#c2410c'}}>ō</span>do</h1>
+              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'hsl(var(--primary))'}}>ō</span>do</h1>
               <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
               {firstName && (
                 <p className="text-sm text-muted-foreground mt-2">{getGreeting()}, {firstName}</p>
@@ -319,7 +320,7 @@ export default function TripsList() {
               >
                 <Mail className="w-5 h-5 text-foreground" />
                 {pendingInvites.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
                     {pendingInvites.length > 9 ? '9+' : pendingInvites.length}
                   </span>
                 )}

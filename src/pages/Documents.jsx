@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Bus, Car, CirclePlus, FileText, Hotel, Lock, Pencil, Plane, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
+import { Car, CirclePlus, FileText, Hotel, Lock, Pencil, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { format, isToday, parseISO } from 'date-fns';
@@ -88,7 +88,7 @@ function OTabBar({ tabs, activeKey, onChange }) {
 
 
 const DOC_ICONS = {
-  flight:    Plane,
+  flight:    
   train:     Train,
   hotel:     Hotel,
   bus:       Bus,
@@ -163,7 +163,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
           {hasFile && (
             <button onClick={() => onView(ticket.file_url)}
               className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center hover:bg-orange-100 transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
             </button>
@@ -209,11 +209,11 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
             {hasFile && (
               <button onClick={() => onView(ticket.file_url)}
                 className="w-full flex items-center gap-3 px-3 py-2 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                 </svg>
                 <span className="text-xs font-medium text-foreground flex-1">Ver documento adjunto</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
                 </svg>
               </button>

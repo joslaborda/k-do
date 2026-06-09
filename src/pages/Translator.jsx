@@ -366,7 +366,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
         ) : (
           <>
             <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="2">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                 <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
                 <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
               </svg>
@@ -505,7 +505,7 @@ function HistorialTab() {
   const recent  = history.filter(h => !h.saved);
 
   const BookmarkIcon = ({ filled }) => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? '#c2410c' : 'none'} stroke={filled ? '#c2410c' : '#d4cfc8'} strokeWidth="2">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? 'hsl(var(--primary))' : 'none'} stroke={filled ? 'hsl(var(--primary))' : '#d4cfc8'} strokeWidth="2">
       <path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/>
     </svg>
   );
@@ -520,7 +520,7 @@ function HistorialTab() {
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground leading-snug mb-1">{item.original}</p>
-          <p className="text-sm font-medium leading-snug" style={{ color: '#c2410c' }}>{item.translated}</p>
+          <p className="text-sm font-medium leading-snug" style={{ color: 'hsl(var(--primary))' }}>{item.translated}</p>
           <p className="text-xs text-muted-foreground mt-1.5">{fromL.flag} → {toL.flag} · {item.timeLabel}</p>
         </div>
         <button

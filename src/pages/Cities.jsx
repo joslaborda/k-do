@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Plane, Hotel, Train, Bus, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +18,7 @@ import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
-  flight: Plane, hotel: Hotel, train: Train,
+  flight:  hotel: Hotel, train: Train,
   bus: Bus, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
@@ -46,7 +46,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  const M = { flight: Plane, train: Train, bus: Bus }; const I = M[t] || Ship; return I;
+  const M = { flight:  train: Train, bus: Bus }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────
@@ -447,7 +447,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
         {/* Time column */}
         <div className="w-12 shrink-0 flex flex-col items-center pt-3.5 pb-1 pl-4 gap-0">
           {item._time
-            ? <span className="text-[11px] font-medium text-primary leading-none whitespace-nowrap">{item._time}</span>
+            ? <span className="text-label2 font-medium text-primary leading-none whitespace-nowrap">{item._time}</span>
             : isNoTime
             ? <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 cursor-grab touch-none mt-0.5" />
             : <div className="w-2 h-2 rounded-full bg-border mt-1" />}
@@ -696,7 +696,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
               <span className={`text-lg font-bold leading-none ${isToday_ ? 'text-primary' : 'text-foreground'}`}>
                 {format(parseISO(dateStr), 'd', { locale: es })}
               </span>
-              <span className="text-[9px] uppercase tracking-wide font-semibold text-muted-foreground mt-0.5">
+              <span className="text-micro uppercase tracking-wide font-semibold text-muted-foreground mt-0.5">
                 {format(parseISO(dateStr), 'MMM', { locale: es })}
               </span>
             </div>
@@ -710,15 +710,15 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
               {hasContent && (
                 <div className="flex gap-1.5 mt-1.5 flex-wrap">
                   {pillItems.map((p, i) => (
-                    <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.cls}`}>{p.label}</span>
+                    <span key={i} className={`text-label font-bold px-2 py-0.5 rounded-full ${p.cls}`}>{p.label}</span>
                   ))}
                 </div>
               )}
             </div>
             {/* Badges + chevron */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {isToday_ && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-semibold">Hoy</span>}
-              {isTomorrow_ && <span className="text-[10px] bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full">Mañana</span>}
+              {isToday_ && <span className="text-label bg-primary text-white px-2 py-0.5 rounded-full font-semibold">Hoy</span>}
+              {isTomorrow_ && <span className="text-label bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full">Mañana</span>}
               {open
                 ? <ChevronUp className={`w-4 h-4 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
                 : <ChevronDown className="w-4 h-4 text-muted-foreground" />}

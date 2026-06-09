@@ -193,7 +193,7 @@ export default function Packing() {
               </div>
               {/* Progress bar */}
               <div className="h-0.5 bg-secondary">
-                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${catPct}%`, background: catPct === 100 ? '#16a34a' : '#c2410c' }} />
+                <div className="h-full bg-primary transition-all duration-300" style={{ width: `${catPct}%`, background: catPct === 100 ? '#16a34a' : 'hsl(var(--primary))' }} />
               </div>
 
               {/* Items */}
@@ -222,7 +222,7 @@ export default function Packing() {
 
                   <button
                     onClick={() => deleteMutation.mutate(item.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 flex items-center justify-center rounded-lg hover:bg-secondary text-muted-foreground hover:text-destructive"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 rounded-xl flex items-center justify-center rounded-lg hover:bg-secondary text-muted-foreground hover:text-destructive"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                   </button>
@@ -303,10 +303,10 @@ export default function Packing() {
                       isOn ? 'border-primary bg-orange-50 dark:bg-orange-950/30' : 'border-border bg-card hover:bg-secondary/50'
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${isOn ? 'bg-orange-100 dark:bg-orange-900/40' : 'bg-secondary'}`}>
-                      {cat.icon(isOn ? '#c2410c' : 'var(--muted-foreground, #9a9490)')}
+                    <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${isOn ? 'bg-primary/10 dark:bg-orange-900/40' : 'bg-secondary'}`}>
+                      {cat.icon(isOn ? 'hsl(var(--primary))' : 'var(--muted-foreground, #9a9490)')}
                     </div>
-                    <span className={`text-[10px] font-medium ${isOn ? 'text-primary' : 'text-foreground'}`}>{cat.label}</span>
+                    <span className={`text-label font-medium ${isOn ? 'text-primary' : 'text-foreground'}`}>{cat.label}</span>
                   </button>
                 );
               })}

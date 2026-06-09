@@ -217,7 +217,7 @@ export default function Photos() {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
                     <div className="absolute bottom-0 left-0 right-0 px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.5))' }}>
-                      <p className="text-[9px] text-white/90 truncate">{photo.display_name || photo.user_email}</p>
+                      <p className="text-micro text-white/90 truncate">{photo.display_name || photo.user_email}</p>
                     </div>
                   </div>
                 );

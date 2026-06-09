@@ -132,7 +132,7 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
             {PACKING_CATEGORIES.map(cat => (
               <button key={cat.value} onClick={() => setCategory(cat.value)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${category === cat.value ? 'border-primary bg-orange-50' : 'border-border'}`}>
-                <cat.Icon size={14} color={category === cat.value ? '#c2410c' : '#888'} />
+                <cat.Icon size={14} color={category === cat.value ? 'hsl(var(--primary))' : '#888'} />
                 <span className={`text-xs font-medium ${category === cat.value ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
               </button>
             ))}
@@ -386,7 +386,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
       onClick={() => onChange(!checked)}
       style={{
         width: 20, height: 20, borderRadius: 5, flexShrink: 0,
-        border: checked ? 'none' : `1.5px solid ${essential ? '#c2410c' : '#d4cfc8'}`,
+        border: checked ? 'none' : `1.5px solid ${essential ? 'hsl(var(--primary))' : '#d4cfc8'}`,
         background: checked ? 'hsl(var(--primary))' : essential ? 'hsl(var(--accent))' : 'hsl(var(--card))',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'all 0.15s',
@@ -787,7 +787,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
               <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <div>
-                  <p className="text-[10px] text-muted-foreground">Emergencias 24h</p>
+                  <p className="text-label text-muted-foreground">Emergencias 24h</p>
                   <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
                 </div>
               </a>

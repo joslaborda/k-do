@@ -635,7 +635,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                   {/* Time column */}
                   <div className="w-11 shrink-0 flex flex-col items-center self-stretch justify-start pt-0.5">
                     {hasTime ? (
-                      <span className="text-[11px] font-medium text-primary leading-none whitespace-nowrap">{item.time}</span>
+                      <span className="text-label2 font-medium text-primary leading-none whitespace-nowrap">{item.time}</span>
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-border mt-1" />
                     )}
@@ -680,7 +680,7 @@ function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen,
                       const label = hrs > 0 ? `Sale en ${hrs}h${mins > 0 ? ` ${mins}min` : ''}` : `Sale en ${diffMin} min`;
                       const urgent = diffMin <= 60;
                       return (
-                        <p className="text-xs font-semibold mt-0.5" style={{color: urgent ? '#dc2626' : '#c2410c'}}>
+                        <p className="text-xs font-semibold mt-0.5" style={{color: urgent ? '#dc2626' : 'hsl(var(--primary))'}}>
                           {label}
                         </p>
                       );
@@ -969,7 +969,7 @@ function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, on
                 <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
                   <div className="flex-shrink-0 min-w-[38px] text-center bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-lg py-1.5 px-1">
                     <p className="text-base font-medium text-amber-800 dark:text-amber-300 leading-none">{day}</p>
-                    <p className="text-[9px] text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
+                    <p className="text-micro text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
                   </div>
                   <div className="flex-1 min-w-0 pt-0.5">
                     <p className="text-sm font-medium text-foreground leading-snug">{h.name}</p>
@@ -1126,8 +1126,8 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                   <button onClick={() => setCollapsedGroups(p => ({ ...p, [group.key]: !isCollapsed }))}
                     className="w-full flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-2">
-                      <div style={{height:2.5,width:24,background:'#c2410c',borderRadius:2}} />
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                      <div style={{height:2.5,width:24,background:'hsl(var(--primary))',borderRadius:2}} />
+                      <p className="text-label font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
                       {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -1204,7 +1204,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                 <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
                   <div className="flex-shrink-0 min-w-[38px] text-center bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-lg py-1.5 px-1">
                     <p className="text-base font-medium text-amber-800 dark:text-amber-300 leading-none">{day}</p>
-                    <p className="text-[9px] text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
+                    <p className="text-micro text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
                   </div>
                   <div className="flex-1 min-w-0 pt-0.5">
                     <p className="text-sm font-medium text-foreground leading-snug">{h.name}</p>
@@ -1692,7 +1692,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   {btn.icon}
                 </div>
-                <span className="text-[10px] font-medium text-foreground">{btn.label}</span>
+                <span className="text-label font-medium text-foreground">{btn.label}</span>
               </button>
             ))}
           </div>
@@ -1718,20 +1718,20 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                 {showDate && msgDate && (
                   <div className="flex items-center gap-2 my-3">
                     <div className="flex-1 h-px bg-border" />
-                    <span className="text-[10px] text-muted-foreground font-medium px-2">
+                    <span className="text-label text-muted-foreground font-medium px-2">
                       {msgDate.getDate()} {msgDate.toLocaleString('es',{month:'short'})}
                     </span>
                     <div className="flex-1 h-px bg-border" />
                   </div>
                 )}
                 <div className={`flex items-end gap-1.5 ${me ? 'flex-row-reverse' : ''}`}>
-                  <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-[10px] font-bold text-primary flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center text-label font-bold text-primary flex-shrink-0">
                     {msg.avatar_url
                       ? <img src={msg.avatar_url} className="w-6 h-6 rounded-full object-cover" alt="" />
                       : (msg.display_name||'?')[0].toUpperCase()}
                   </div>
                   <div className={`max-w-[70%] flex flex-col gap-0.5 ${me ? 'items-end' : 'items-start'}`}>
-                    <span className="text-[9px] text-muted-foreground px-1">{me ? 'Tú' : (msg.display_name||msg.user_email)}</span>
+                    <span className="text-micro text-muted-foreground px-1">{me ? 'Tú' : (msg.display_name||msg.user_email)}</span>
                     {isImage(msg) && (
                       <div className="rounded-2xl overflow-hidden cursor-pointer" style={{maxWidth:180}}
                         onClick={() => setLightbox(msg.file_url)}>
@@ -1757,7 +1757,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                             <div className={`h-1 rounded-full ${me ? 'bg-white/30' : 'bg-border'}`}>
                               <div className={`h-1 rounded-full w-0 ${me ? 'bg-white' : 'bg-primary'}`} id={`prog-${msg.id}`} />
                             </div>
-                            <span className={`text-[10px] ${me ? 'text-white/70' : 'text-muted-foreground'}`} id={`dur-${msg.id}`}>0:00</span>
+                            <span className={`text-label ${me ? 'text-white/70' : 'text-muted-foreground'}`} id={`dur-${msg.id}`}>0:00</span>
                           </div>
                           <audio id={audioId} src={msg.file_url} preload="metadata"
                             onTimeUpdate={e => {
@@ -1820,7 +1820,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                                 );
                               })}
                             </div>
-                            <p className="text-[10px] text-muted-foreground text-center pb-2">{total} voto{total !== 1 ? 's' : ''}</p>
+                            <p className="text-label text-muted-foreground text-center pb-2">{total} voto{total !== 1 ? 's' : ''}</p>
                           </div>
                         );
                       })()}
@@ -1829,7 +1829,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                         {msg.content || (msg.file_url ? 'Archivo adjunto' : '')}
                       </div>
                     )}
-                    <span className="text-[9px] text-muted-foreground px-1">
+                    <span className="text-micro text-muted-foreground px-1">
                       {msgDate ? `${msgDate.getHours()}:${String(msgDate.getMinutes()).padStart(2,'0')}` : ''}
                     </span>
                   </div>
@@ -2065,7 +2065,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
               </div>
             </div>
             <div className="bg-card border border-border rounded-2xl px-4 py-3">
-              <p className="text-[11px] text-muted-foreground mb-1.5">Enlace de invitación</p>
+              <p className="text-label2 text-muted-foreground mb-1.5">Enlace de invitación</p>
               <p className="text-xs text-foreground font-mono break-all leading-relaxed">{shareLink}</p>
             </div>
             <button
