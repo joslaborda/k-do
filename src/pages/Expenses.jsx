@@ -125,7 +125,7 @@ function fmtAmt(n, code) {
 // ── Avatar ─────────────────────────────────────────────────────────────────────
 function Avatar({ email, profiles = [], size = 28 }) {
   const profile = profiles[email] || null;  // profiles is profilesByEmail map
-  const name = profile?.display_name || profile?.username || email?.split('@')[0] || '?';
+  const name = profile?.display_name || profile?.username || email || '?';
   const initials = name.slice(0, 2).toUpperCase();
   if (profile?.avatar_url) {
     return <img src={profile.avatar_url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
@@ -174,7 +174,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
 function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
   const isSame = expense.currency === baseCurrency || !expense.currency;
-  const paidByName = userMap[expense.paid_by] || expense.paid_by?.split('@')[0] || '?';
+  const paidByName = userMap[expense.paid_by] || expense.paid_by || '?';
   const splitCount = expense.split_with?.length || 1;
 
   return (
@@ -370,7 +370,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                 <Avatar email={d.to} profiles={profilesByEmail} size={32} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {userMap[d.to] || d.to?.split('@')[0]}
+                    {userMap[d.to] || d.to}
                   </p>
                   <p className="text-xs text-red-500 font-medium mt-0.5">Debes {fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</p>
                 </div>
@@ -394,7 +394,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                 <Avatar email={d.from} profiles={profilesByEmail} size={32} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
-                    {userMap[d.from] || d.from?.split('@')[0]}
+                    {userMap[d.from] || d.from}
                   </p>
                   <p className="text-xs text-green-600 font-medium mt-0.5">Te debe {fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</p>
                 </div>
@@ -413,7 +413,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           {members.map((email, i) => {
             const bal = balances[email] || 0;
             const isMe = email === currentUserEmail;
-            const name = userMap[email] || email?.split('@')[0] || '?';
+            const name = userMap[email] || email || '?';
             const total = Math.max(...Object.values(balances).map(Math.abs), 0.01);
             const pct = Math.abs(bal) / total * 100;
             return (
@@ -665,7 +665,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
               <span className="text-xs text-muted-foreground">Pagó</span>
               <div className="flex items-center gap-2">
                 <Avatar email={expense.paid_by} profiles={profilesByEmail} size={20} />
-                <span className="text-sm text-foreground">{userMap[expense.paid_by] || expense.paid_by?.split('@')[0]}</span>
+                <span className="text-sm text-foreground">{userMap[expense.paid_by] || expense.paid_by}</span>
               </div>
             </div>
             {/* Dividido entre */}
@@ -971,7 +971,7 @@ export default function Expenses() {
     const m = {};
     (usersData || []).forEach(u => {
       const prof = (profiles || []).find(p => p.user_id === u.id);
-      m[u.email] = prof?.display_name || prof?.username || u.full_name || u.email?.split('@')[0] || u.email;
+      m[u.email] = prof?.display_name || prof?.username || u.full_name || u.email || u.email;
     });
     return m;
   }, [usersData, profiles]);
@@ -1053,7 +1053,7 @@ export default function Expenses() {
     // Mark debt as settled — create a settlement expense
     try {
       await createMutation.mutateAsync({
-        description: `Liquidación: ${userMap[debt.from] || debt.from?.split('@')[0]} → ${userMap[debt.to] || debt.to?.split('@')[0]}`,
+        description: `Liquidación: ${userMap[debt.from] || debt.from} → ${userMap[debt.to] || debt.to}`,
         amount: debt.amount, currency: baseCurrency, amount_base: debt.amount,
         category: 'other', paid_by: debt.from, split_with: [debt.to],
         split_type: 'equal', date: new Date().toISOString().slice(0, 10),

@@ -281,7 +281,7 @@ export default function Invites() {
                       {tripData?.name || 'Cargando...'}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Invitado por {(inv.invited_by || 'alguien').split('@')[0]}
+                      Invitado por {inv.invited_by || 'alguien'}
                     </p>
                   </div>
                 </div>
