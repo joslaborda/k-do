@@ -8,7 +8,7 @@ import {  Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-r
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon:   label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  flight:   { icon: PlaneIcon, label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
   train:    { icon: Train, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
   hotel:    { icon: Hotel,      label: 'Hotel',   color: 'bg-purple-50 dark:bg-purple-950/30' },
   event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
@@ -18,7 +18,7 @@ export const CATEGORY_CONFIG = {
 
 
 const CATEGORIES = [
-  { key: 'flight',   Icon:   label: 'Vuelo'   },
+  { key: 'flight',   Icon: PlaneIcon, label: 'Vuelo'   },
   { key: 'hotel',    Icon: Hotel,      label: 'Hotel'   },
   { key: 'train',    Icon: Train, label: 'Tren'    },
   { key: 'event',    Icon: Ticket,     label: 'Evento'  },
