@@ -32,9 +32,9 @@ const SPOT_ICONS = {
   museum:   Landmark,
 };
 const SPOT_COLORS = {
-  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
-  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
 };
 
@@ -210,7 +210,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
             <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center shrink-0">
+          <button onClick={onClose} className="w-9 h-9 rounded-xl border border-border flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
@@ -501,7 +501,7 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               placeholder="¿Qué harás este día?" className="flex-1 h-9 text-sm bg-secondary border-border"
               autoFocus onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }} />
             <button onClick={() => setTitleEditing(false)} className="text-muted-foreground p-1"><X className="w-4 h-4" /></button>
-            <button onClick={saveTitle} className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
+            <button onClick={saveTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
         ) : (
           <button onClick={() => setTitleEditing(true)} className="w-full flex items-center gap-2 text-left group">

@@ -194,14 +194,14 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
             </button>
             <button
               onClick={copy}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border bg-secondary transition-colors"
             >
               {copied ? <><Check className="w-3.5 h-3.5 text-green-500" />Copiado</> : <><Copy className="w-3.5 h-3.5" />Copiar</>}
             </button>
             {onSave && (
               <button
                 onClick={onSave}
-                className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-lg border border-orange-200 bg-orange-50 transition-colors ml-auto"
+                className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-full border border-orange-200 bg-orange-50 transition-colors ml-auto"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
                 Guardar
@@ -209,7 +209,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
             )}
             <button
               onClick={onClear}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border bg-secondary transition-colors"
             >
               Limpiar
             </button>
@@ -633,7 +633,7 @@ function TranslatorContent({ tripId, inPage = false }) {
       {isSameLang && !dismissed && (
         <div className={`${inPage ? 'mt-4' : 'mt-5'} bg-green-50 border border-green-200 rounded-2xl p-4`}>
           <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🤝</span>
+            
             <div className="flex-1">
               <p className="text-sm font-medium text-green-900">¡Habláis el mismo idioma!</p>
               <p className="text-sm text-green-700 mt-1 leading-relaxed">

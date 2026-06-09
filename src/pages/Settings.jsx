@@ -271,7 +271,7 @@ export default function Settings() {
         spots_public_default: spotsPublic,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
-      setSaveMsg({ type:'ok', text:'Guardado ✓' });
+      setSaveMsg({ type:'ok', text:'Guardado' });
       setTimeout(() => setSaveMsg(null), 2000);
     } catch {
       setSaveMsg({ type:'error', text:'Error al guardar' });
@@ -352,7 +352,7 @@ export default function Settings() {
                 className="w-full h-10 border border-border rounded-xl pl-7 pr-9 text-sm outline-none focus:border-primary bg-secondary" />
               {username && username !== profile.username && usernameAvailable !== null && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-                  {usernameAvailable ? '✓' : '✗'}
+                  {usernameAvailable ? 'Disponible' : 'No disponible'}
                 </span>
               )}
             </div>

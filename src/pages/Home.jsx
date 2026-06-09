@@ -156,9 +156,9 @@ const SPOT_ICONS = {
   museum:   Landmark,
 };
 const SPOT_COLORS = {
-  food: 'bg-orange-50 text-orange-600', sight: 'bg-violet-50 text-violet-600',
+  food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
-  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-orange-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
 };
 
@@ -1362,7 +1362,7 @@ function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }
             const prof = u ? profiles?.find(p => p.user_id === u.id) : null;
             const name = prof?.display_name || prof?.username || email || '?';
             const initials = name.slice(0,2).toUpperCase();
-            const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+            const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
             return (
               <div key={email} className="flex flex-col items-center gap-1">
                 {prof?.avatar_url
@@ -1955,7 +1955,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
 function MemberAvatarRow({ trip, profiles, onInvite, isToday, currentUserEmail }) {
   const members = (trip?.members || [trip?.created_by]).filter(Boolean);
-  const colors = ['bg-orange-100 text-orange-700','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
+  const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
   const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 600000 });
 
   return (

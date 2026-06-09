@@ -259,13 +259,13 @@ function RequirementsTab({ reqs, country, homeCountry }) {
             {visa.info && <p className="text-xs text-muted-foreground mt-0.5">{visa.info}</p>}
             {visaType && visaType !== 'esta' && visaType !== 'nzeta' && (
               <p className="text-xs font-medium text-amber-700 mt-1">
-                {visaType === 'evisa' && '🌐 Tramitar online antes de viajar'}
-                {visaType === 'voa' && '🛬 Se obtiene a la llegada en el aeropuerto'}
-                {visaType === 'eta' && '🌐 Autorización electrónica — tramitar online'}
+                {visaType === 'evisa' && 'Tramitar online antes de viajar'}
+                {visaType === 'voa' && 'Se obtiene a la llegada en el aeropuerto'}
+                {visaType === 'eta' && 'Autorización electrónica — tramitar online'}
               </p>
             )}
-            {visaType === 'esta' && <p className="text-xs font-medium text-amber-700 mt-1">🌐 Tramitar ESTA en esta.cbp.dhs.gov</p>}
-            {visaType === 'nzeta' && <p className="text-xs font-medium text-amber-700 mt-1">🌐 Tramitar NZeTA en nzeta.immigration.govt.nz</p>}
+            {visaType === 'esta' && <p className="text-xs font-medium text-amber-700 mt-1">Tramitar ESTA en esta.cbp.dhs.gov</p>}
+            {visaType === 'nzeta' && <p className="text-xs font-medium text-amber-700 mt-1">Tramitar NZeTA en nzeta.immigration.govt.nz</p>}
           </div>
         </div>
       </div>
@@ -609,7 +609,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                               esencial
                             </button>
                             <button onClick={commitAdd}
-                              className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                              className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             </button>
                           </div>
@@ -667,7 +667,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                   className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
                 />
                 <button onClick={commitAdd}
-                  className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                  className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </button>
               </div>
@@ -717,7 +717,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
   const numbers = data ? [
     data.police && { label:'Policía', number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50' },
     data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50' },
-    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: Flame, color: 'text-primary', bg: 'bg-orange-50' },
     data.emergency_general && !data.police && { label:'General', number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50' },
   ].filter(Boolean) : [];
 

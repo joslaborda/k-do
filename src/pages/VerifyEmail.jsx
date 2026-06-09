@@ -42,7 +42,7 @@ export default function VerifyEmail() {
           onClick={handleCheck}
           disabled={checking}
         >
-          {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Comprobando...</> : 'Ya verifiqué ✓'}
+          {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Comprobando...</> : 'Ya verifiqué '}
         </Button>
         <button
           onClick={() => base44.auth.logout()}

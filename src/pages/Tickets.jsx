@@ -131,7 +131,7 @@ export default function Tickets() {
       <div className="max-w-3xl mx-auto px-6 py-12 pb-24">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground">Documentación ✈️</h1>
+            <h1 className="text-4xl font-bold text-foreground">Documentación</h1>
             <p className="text-muted-foreground mt-2">Documentos de viaje y checklist</p>
           </div>
           {activeTab !== 'checklist' && (
@@ -232,7 +232,7 @@ export default function Tickets() {
               {isLoading ? (
                 <div className="grid md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-32 bg-stone-700/50 rounded-xl animate-pulse" />
+                    <div key={i} className="h-32 bg-secondary0/50 rounded-xl animate-pulse" />
                   ))}
                 </div>
               ) : filteredTickets.length === 0 ? (

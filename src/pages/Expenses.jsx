@@ -96,9 +96,9 @@ const CAT_ICONS = {
   other:         MoreHorizontal,
 };
 const CAT_COLORS = {
-  food: 'bg-orange-100 text-orange-600', transport: 'bg-blue-100 text-blue-600',
+  food: 'bg-orange-100 text-primary', transport: 'bg-blue-100 text-blue-600',
   accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
-  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-slate-100 text-slate-600',
+  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary0 text-muted-foreground',
 };
 const CAT_CONFIG = {
   food:          { label: 'Comida'      },
