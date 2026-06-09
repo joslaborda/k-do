@@ -11,7 +11,7 @@ import { createPageUrl } from '@/utils';
 function Avatar({ profile }) {
   const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
   if (profile?.avatar_url) return <img src={profile.avatar_url} className="w-9 h-9 rounded-full object-cover flex-shrink-0" alt={initials}/>;
-  return <div className="w-9 h-9 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm flex-shrink-0">{initials}</div>;
+  return <div className="w-9 h-9 rounded-full bg-orange-100 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">{initials}</div>;
 }
 
 function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
@@ -36,7 +36,7 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
           <Avatar profile={profile}/>
           <div className="flex-1 min-w-0">
             <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id}
-              className="text-xs font-semibold text-foreground hover:text-orange-700 block truncate">
+              className="text-xs font-semibold text-foreground hover:text-primary block truncate">
               {profile?.display_name || 'Viajero'}
               {profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
             </Link>
@@ -46,14 +46,14 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
         </div>
         {(spot.source_display_name || spot.source_username) && (
           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-            <Heart className="w-3 h-3 text-orange-400"/>Descubierto por @{spot.source_username || spot.source_display_name}
+            <Heart className="w-3 h-3 text-primary/60"/>Descubierto por @{spot.source_username || spot.source_display_name}
           </p>
         )}
         <p className="font-semibold text-sm text-foreground mb-1">{spot.title}</p>
         {spot.notes && <p className="text-xs text-muted-foreground line-clamp-2">{spot.notes}</p>}
         {spot.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1.5">
-            {spot.tags.slice(0,3).map(t => <span key={t} className="text-xs bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">#{t}</span>)}
+            {spot.tags.slice(0,3).map(t => <span key={t} className="text-xs bg-orange-50 text-primary px-1.5 py-0.5 rounded-full">#{t}</span>)}
           </div>
         )}
         <div className="flex items-center gap-2 mt-2.5">
@@ -61,7 +61,7 @@ function SpotFeedCard({ spot, profile, currentUserId, onSave }) {
           {downs > 0 && <span className="text-xs text-red-700 bg-red-50 px-2 py-0.5 rounded-full">👎 {downs}</span>}
           {comments.length > 0 && <span className="text-xs text-muted-foreground">💬 {comments.length}</span>}
           {!isOwn && currentUserId && (
-            <button onClick={() => onSave(spot)} className="ml-auto text-xs text-orange-700 font-medium hover:underline flex items-center gap-1">
+            <button onClick={() => onSave(spot)} className="ml-auto text-xs text-primary font-medium hover:underline flex items-center gap-1">
               <Bookmark className="w-3 h-3"/>Guardar
             </button>
           )}
@@ -89,7 +89,7 @@ function UserCard({ profile, currentUserId, myFollows }) {
       <Avatar profile={profile}/>
       <div className="flex-1 min-w-0">
         <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id}
-          className="font-semibold text-sm text-foreground hover:text-orange-700 block truncate">
+          className="font-semibold text-sm text-foreground hover:text-primary block truncate">
           {profile.display_name || 'Viajero'}
         </Link>
         {profile.username && <p className="text-xs text-muted-foreground">@{profile.username}</p>}
@@ -97,7 +97,7 @@ function UserCard({ profile, currentUserId, myFollows }) {
       {!isOwn && currentUserId && (
         <button onClick={() => followMutation.mutate()}
           className={"flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium transition-colors " +
-            (followRecord ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'bg-orange-700 text-white hover:bg-orange-800')}>
+            (followRecord ? 'bg-orange-50 text-primary border border-orange-200' : 'bg-primary text-white hover:bg-primary')}>
           {followRecord ? <><UserCheck className="w-3 h-3"/>Siguiendo</> : <><UserPlus className="w-3 h-3"/>Seguir</>}
         </button>
       )}
@@ -218,7 +218,7 @@ export default function TemplatesFeedTabs({ currentUserId, currentUserEmail, myP
         {tabs.map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
             className={"flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border " +
-              (activeTab === t.id ? 'bg-orange-700 text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
+              (activeTab === t.id ? 'bg-primary text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
             <span>{t.icon}</span>
             <span>{t.label}</span>
             {t.count > 0 && <span className={"text-xs " + (activeTab === t.id ? 'text-white/70' : 'text-muted-foreground')}>{t.count}</span>}

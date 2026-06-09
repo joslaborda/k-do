@@ -18,7 +18,7 @@ function Avatar({ profile, size = 8 }) {
     return <img src={profile.avatar_url} className={`w-${size} h-${size} rounded-full object-cover`} alt={initials} />;
   }
   return (
-    <div className={`w-${size} h-${size} rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+    <div className={`w-${size} h-${size} rounded-full bg-orange-100 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0`}>
       {initials}
     </div>
   );
@@ -89,7 +89,7 @@ function UserSearchBlock({ myUserId, myProfile }) {
             <Button
               size="sm"
               variant={isFollowing ? 'secondary' : 'default'}
-              className={isFollowing ? '' : 'bg-orange-700 hover:bg-orange-800 text-white'}
+              className={isFollowing ? '' : 'bg-primary hover:bg-primary text-white'}
               onClick={() => followMutation.mutate(profile)}
               disabled={followMutation.isPending}
             >
@@ -170,7 +170,7 @@ function TemplatesBlock({ myUserId }) {
                       onClick={() => saveMutation.mutate(t.id)}
                       disabled={saveMutation.isPending}
                     >
-                      {saved ? <><BookmarkCheck className="w-3 h-3 mr-1 text-orange-600" />Guardado</> : <><Bookmark className="w-3 h-3 mr-1" />Guardar</>}
+                      {saved ? <><BookmarkCheck className="w-3 h-3 mr-1 text-primary" />Guardado</> : <><Bookmark className="w-3 h-3 mr-1" />Guardar</>}
                     </Button>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ function PublishBlock({ myUserId, trips, allCities }) {
     <div>
       <h3 className="font-bold text-foreground mb-3 flex items-center gap-2"><Plus className="w-4 h-4" />Publicar itinerario</h3>
       <p className="text-sm text-muted-foreground mb-3">Comparte el resumen de uno de tus viajes (sin docs ni gastos).</p>
-      <Button onClick={() => setOpen(true)} className="bg-orange-700 hover:bg-orange-800 text-white w-full sm:w-auto">
+      <Button onClick={() => setOpen(true)} className="bg-primary hover:bg-primary text-white w-full sm:w-auto">
         <Plus className="w-4 h-4 mr-1.5" />Publicar un itinerario
       </Button>
 
@@ -240,7 +240,7 @@ function PublishBlock({ myUserId, trips, allCities }) {
             </Select>
             <div className="flex gap-3 justify-end">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button className="bg-orange-700 hover:bg-orange-800 text-white" disabled={!selectedTripId || saving} onClick={handlePublish}>
+              <Button className="bg-primary hover:bg-primary text-white" disabled={!selectedTripId || saving} onClick={handlePublish}>
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Publicar'}
               </Button>
             </div>
@@ -257,7 +257,7 @@ export default function SocialExploreSection({ myUserId, myProfile, trips, allCi
     <div className="space-y-8 mt-10">
       <div className="flex items-center gap-3">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Explorar</h2>
-        <span className="text-xs bg-orange-100 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5 font-medium">🌍 Social</span>
+        <span className="text-xs bg-orange-100 text-primary border border-orange-200 rounded-full px-2 py-0.5 font-medium">🌍 Social</span>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">

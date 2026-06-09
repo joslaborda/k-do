@@ -21,7 +21,7 @@ function Avatar({ profile, size = 8 }) {
     return <img src={profile.avatar_url} className={`w-${size} h-${size} rounded-full object-cover flex-shrink-0`} alt={initials} />;
   }
   return (
-    <div className={`w-${size} h-${size} rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+    <div className={`w-${size} h-${size} rounded-full bg-orange-100 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0`}>
       {initials}
     </div>
   );
@@ -30,8 +30,8 @@ function Avatar({ profile, size = 8 }) {
 function SectionHeader({ icon: Icon, label, count }) {
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border-b border-border">
-      <Icon className="w-4 h-4 text-orange-700" />
-      <span className="text-xs font-semibold uppercase tracking-wide text-orange-700">{label}</span>
+      <Icon className="w-4 h-4 text-primary" />
+      <span className="text-xs font-semibold uppercase tracking-wide text-primary">{label}</span>
       {count !== undefined && (
         <Badge variant="secondary" className="ml-auto text-xs">{count}</Badge>
       )}
@@ -164,7 +164,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                   <button
                     key={s}
                     onClick={() => setQuery(s)}
-                    className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-full text-sm transition-colors"
+                    className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-primary rounded-full text-sm transition-colors"
                   >
                     {s}
                   </button>

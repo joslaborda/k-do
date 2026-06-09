@@ -131,7 +131,7 @@ export default function CreateProfileModal({ user, open }) {
 
               {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button className="w-full bg-primary hover:bg-orange-800 text-white font-semibold"
+              <Button className="w-full bg-primary hover:bg-primary text-white font-semibold"
                 disabled={!canGoNext} onClick={() => setStep('origen')}>
                 Siguiente →
               </Button>
@@ -179,7 +179,7 @@ export default function CreateProfileModal({ user, open }) {
 
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setStep('perfil')}>← Volver</Button>
-              <Button className="flex-1 bg-primary hover:bg-orange-800 text-white font-semibold"
+              <Button className="flex-1 bg-primary hover:bg-primary text-white font-semibold"
                 onClick={handleSave} disabled={saving}>
                 {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : 'Crear perfil'}
               </Button>

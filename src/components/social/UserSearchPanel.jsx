@@ -135,7 +135,7 @@ export default function UserSearchPanel({ currentUserId }) {
                   variant={isFollowing ? 'default' : 'outline'}
                   onClick={() => handleToggleFollow(userProfile.user_id, isFollowing)}
                   disabled={followMutation.isPending || unfollowMutation.isPending}
-                  className={isFollowing ? 'bg-primary hover:bg-orange-800' : ''}
+                  className={isFollowing ? 'bg-primary hover:bg-primary' : ''}
                 >
                   {isFollowing ? 'Siguiendo' : 'Seguir'}
                 </Button>
