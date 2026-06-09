@@ -447,25 +447,33 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 }
 
 // ── Tab: Estadísticas ─────────────────────────────────────────────────────────
-function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
+function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip }) {
   const s = sym(baseCurrency);
 
   // Excluir liquidaciones — no son gastos reales, son transferencias contables
   const realExpenses = useMemo(() => expenses.filter(e => !e.is_settlement), [expenses]);
 
-  // Mi parte real: lo que me toca pagar de los gastos reales
+  // Mi parte real = lo que pagué adelantado - lo que me deben neto
+  // Esta fórmula es equivalente a calculateBalances pero más directa para Stats
   const mySpend = useMemo(() => {
-    return realExpenses.reduce((sum, e) => {
+    let iPaid = 0;
+    let myShare = 0;
+    realExpenses.forEach(e => {
       const amt = parseFloat(e.amount_base || e.amount) || 0;
-      if (!amt) return sum;
-      const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+      if (!amt) return;
+      // Lo que pagué yo
+      if (e.paid_by === currentUserEmail) iPaid += amt;
+      // Mi parte según el split
       if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
         const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        return sum + (total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0);
+        if (total > 0) myShare += (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt;
+      } else {
+        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+        if (parts.includes(currentUserEmail)) myShare += amt / parts.length;
       }
-      if (parts.includes(currentUserEmail)) return sum + amt / parts.length;
-      return sum;
-    }, 0);
+    });
+    // mySpend = mi parte real del gasto (no lo que adelanté para otros)
+    return myShare;
   }, [realExpenses, currentUserEmail]);
 
   // Total real del grupo (sin liquidaciones)
@@ -473,29 +481,33 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
     realExpenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0),
   [realExpenses]);
 
-  // Días: usando fechas de gastos reales únicamente
+  // Días: usar fechas reales del viaje si están disponibles
   const tripDays = useMemo(() => {
+    if (trip?.start_date && trip?.end_date) {
+      const diff = Math.round((new Date(trip.end_date + 'T00:00:00') - new Date(trip.start_date + 'T00:00:00')) / 86400000) + 1;
+      return Math.max(1, diff);
+    }
+    // Fallback: rango de fechas de gastos reales
     const dates = realExpenses.map(e => e.date).filter(Boolean).sort();
     if (!dates.length) return 1;
     return Math.max(1, Math.round((new Date(dates[dates.length - 1]) - new Date(dates[0])) / 86400000) + 1);
-  }, [realExpenses]);
+  }, [realExpenses, trip]);
 
   const myPerDay = tripDays > 0 ? mySpend / tripDays : mySpend;
 
-  // Mi gasto por categoría (solo gastos reales)
+  // Mi gasto por categoría (solo mi parte real de gastos reales)
   const myByCategory = useMemo(() => {
     const acc = {};
     realExpenses.forEach(e => {
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt) return;
-      const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-      if (!parts.includes(currentUserEmail)) return;
       let myShare = 0;
       if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
         const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
         myShare = total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0;
       } else {
-        myShare = amt / parts.length;
+        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+        if (parts.includes(currentUserEmail)) myShare = amt / parts.length;
       }
       if (myShare > 0) acc[e.category || 'other'] = (acc[e.category || 'other'] || 0) + myShare;
     });
@@ -1144,6 +1156,7 @@ export default function Expenses() {
             baseCurrency={baseCurrency}
             currentUserEmail={currentUser?.email}
             cities={cities}
+            trip={trip}
           />
         )}
 
