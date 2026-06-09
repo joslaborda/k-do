@@ -18,8 +18,8 @@ import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
-  flight: PlaneIcon, hotel: Hotel, train: Train,
-  bus: BusFront, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
+  flight: Compass, hotel: Hotel, train: Train,
+  bus: Car, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
 const SPOT_ICONS = {
@@ -46,7 +46,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  const M = { flight: PlaneIcon, train: Train, bus: BusFront }; const I = M[t] || Ship; return I;
+  const M = { flight: Compass, train: Train, bus: Car }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────
