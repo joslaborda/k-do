@@ -7,12 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Camera, Image, X, Loader2 } from 'lucide-react';
 
 const TYPES = [
-  { value: 'food',      label: 'Comida',     emoji: '🍜' },
-  { value: 'sight',     label: 'Atracción',  emoji: '🏛️' },
-  { value: 'activity',  label: 'Actividad',  emoji: '⚡' },
-  { value: 'shopping',  label: 'Compras',    emoji: '🛍️' },
-  { value: 'transport', label: 'Transporte', emoji: '🚆' },
-  { value: 'custom',    label: 'Otro',       emoji: '⭐' },
+  { value: 'food',      label: 'Comida'    },
+  { value: 'sight',     label: 'Atracción' },
+  { value: 'activity',  label: 'Actividad' },
+  { value: 'shopping',  label: 'Compras'   },
+  { value: 'transport', label: 'Transporte' },
+  { value: 'custom',    label: 'Otro' },
 ];
 
 const VISIBILITY_OPTIONS = [

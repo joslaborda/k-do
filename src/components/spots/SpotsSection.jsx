@@ -73,7 +73,7 @@ function PlaceResultCard({ place, onSave, saving }) {
         <span className="text-xs text-muted-foreground">{tc.label}</span>
         {place.address && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5"><MapPin className="w-3 h-3 inline mr-0.5"/>{place.address}</p>}
         <Button size="sm" onClick={() => onSave(place)} disabled={saving}
-          className="mt-1.5 h-6 text-xs bg-orange-700 hover:bg-orange-800 text-white px-2.5">
+          className="mt-1.5 h-6 text-xs bg-primary hover:bg-orange-800 text-white px-2.5">
           <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
         </Button>
       </div>
@@ -99,14 +99,14 @@ function ManualForm({ onSave, saving, onClose }) {
       <div className="flex flex-wrap gap-1.5">
         {ALL_TYPES.filter(t => t.value!=='all').map(t => (
           <button key={t.value} onClick={() => setType(t.value)}
-            className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-orange-700 text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-orange-300')}>
+            className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-primary text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-primary/30')}>
             {t.emoji} {t.label}
           </button>
         ))}
       </div>
       <div className="flex flex-wrap gap-1.5">
         {tags.map(t => (
-          <span key={t} className="flex items-center gap-1 text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200">
+          <span key={t} className="flex items-center gap-1 text-xs bg-orange-50 text-primary px-2 py-0.5 rounded-full border border-orange-200">
             #{t}<button onClick={() => setTags(p=>p.filter(x=>x!==t))}><X className="w-2.5 h-2.5"/></button>
           </span>
         ))}
@@ -117,9 +117,9 @@ function ManualForm({ onSave, saving, onClose }) {
         placeholder="Tags: sunset, mirador... (Enter)" className="h-8 text-xs"/>
       <Input value={address} onChange={e => setAddress(e.target.value)} placeholder="Dirección (opcional)" className="h-8 text-xs"/>
       <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas..."
-        className="w-full text-xs border border-border rounded-lg px-3 py-2 h-16 resize-none outline-none focus:border-orange-400"/>
+        className="w-full text-xs border border-border rounded-lg px-3 py-2 h-16 resize-none outline-none focus:border-primary/40"/>
       <Button onClick={() => onSave({ title, type, notes, address, tags })} disabled={!title.trim()||saving}
-        className="w-full bg-orange-700 hover:bg-orange-800 text-white h-9">
+        className="w-full bg-primary hover:bg-orange-800 text-white h-9">
         {saving ? 'Guardando...' : 'Guardar spot'}
       </Button>
     </div>
@@ -227,14 +227,14 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
           {searchQuery ? (
             <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"><X className="w-4 h-4"/></button>
           ) : (
-            <button onClick={handleNearby} className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-md font-medium">
+            <button onClick={handleNearby} className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs bg-orange-100 text-primary px-2 py-1 rounded-md font-medium">
               <Navigation className="w-3 h-3"/>Cerca
             </button>
           )}
         </div>
         <button onClick={() => setPanelMode(panelMode==='manual'?null:'manual')}
           className={"w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center border transition-all " +
-            (panelMode==='manual' ? 'bg-orange-700 text-white border-orange-700' : 'bg-card border-border hover:border-orange-300 text-muted-foreground')}>
+            (panelMode==='manual' ? 'bg-primary text-white border-orange-700' : 'bg-card border-border hover:border-primary/30 text-muted-foreground')}>
           {panelMode==='manual' ? <X className="w-5 h-5"/> : <Plus className="w-5 h-5"/>}
         </button>
       </div>
@@ -275,7 +275,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
           {ALL_TYPES.filter(t => t.value==='all' || spots.some(s => s.type===t.value)).map(t => (
             <button key={t.value} onClick={() => setActiveType(t.value)}
               className={"text-xs px-2.5 py-1 rounded-full border font-medium transition-colors " +
-                (activeType===t.value ? 'bg-orange-700 text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-orange-300')}>
+                (activeType===t.value ? 'bg-primary text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-primary/30')}>
               {t.emoji} {t.label}
               {t.value!=='all' && <span className="ml-1 opacity-60">{spots.filter(s=>s.type===t.value).length}</span>}
             </button>
