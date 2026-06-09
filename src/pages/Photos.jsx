@@ -55,14 +55,16 @@ export default function Photos() {
       const others = members.filter(e => e !== user.email);
       if (!others.length) return;
       const allProfiles = await base44.entities.UserProfile.list();
-      others.forEach(email => {
-        const profile = allProfiles.find(p =>
-          p.email === email || p.user_email === email || p.contact_email === email
-        );
-        if (profile?.user_id) {
-          
-        }
-      });
+      const myProf = allProfiles.find(p => p.user_id === user?.id);
+      const resolved = await resolveUserIds(others);
+      resolved.forEach(({ userId }) => notify({
+        userId,
+        type: 'photo_added',
+        actor: myProf,
+        tripId: trip?.id,
+        tripName: trip?.name,
+        refTitle: count > 1 ? `${count} fotos` : '1 foto',
+      }));
     } catch {}
   };
 

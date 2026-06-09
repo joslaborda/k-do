@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Mail } from 'lucide-react';
+import { Plus, Mail, Plane } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
@@ -24,7 +24,7 @@ function getGreeting() {
 function EmptyState({ onCreateTrip }) {
   return (
     <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-card">
-      <p className="text-4xl mb-3">✈️</p>
+      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
       <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
       <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
       <button onClick={onCreateTrip}
@@ -111,7 +111,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
             </button>
             <button onClick={handleShare}
               className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold">
-              Compartir ✈️
+              Compartir
             </button>
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function TripsList() {
   if (isLoading || userLoading) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
-        <p className="text-5xl mb-4">✈️</p>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Plane className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-sm text-muted-foreground">Cargando viajes...</p>
       </div>
     </div>
@@ -277,7 +277,7 @@ export default function TripsList() {
   if (user && user.is_verified === false) return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="bg-card rounded-2xl border border-border p-8 max-w-sm w-full text-center">
-        <p className="text-5xl mb-4">📧</p>
+        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Mail className="w-7 h-7 text-muted-foreground/50" /></div>
         <p className="text-lg font-medium mb-2">Verifica tu email</p>
         <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
         <button className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium"
@@ -311,6 +311,19 @@ export default function TripsList() {
             </div>
             <div className="flex items-center gap-2 mt-1">
               <NotificationBell userId={user?.id} userEmail={user?.email} />
+              {/* Icono de invitaciones con badge */}
+              <button
+                onClick={() => navigate(createPageUrl('Invites'))}
+                className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
+                aria-label="Invitaciones"
+              >
+                <Mail className="w-5 h-5 text-foreground" />
+                {pendingInvites.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+                    {pendingInvites.length > 9 ? '9+' : pendingInvites.length}
+                  </span>
+                )}
+              </button>
               {/* Avatar → directo a perfil */}
               <Link to={createPageUrl('Profile')}>
                 <div className="w-9 h-9 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-sm font-medium flex-shrink-0">
@@ -328,26 +341,7 @@ export default function TripsList() {
       {/* ── Content ── */}
       <div className="max-w-3xl mx-auto px-4 py-5 pb-24 space-y-4">
 
-        {/* Banner invitaciones pendientes */}
-        {pendingInvites.length > 0 && (
-          <button
-            onClick={() => navigate(createPageUrl('Invites'))}
-            className="w-full flex items-center gap-3 bg-orange-50 border border-primary/20 rounded-2xl px-4 py-3.5 text-left hover:bg-orange-100 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Mail className="w-4.5 h-4.5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground">
-                {pendingInvites.length === 1 ? '1 invitación pendiente' : `${pendingInvites.length} invitaciones pendientes`}
-              </p>
-              <p className="text-xs text-muted-foreground">Alguien te ha invitado a un viaje</p>
-            </div>
-            <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-[10px] font-bold">{pendingInvites.length}</span>
-            </div>
-          </button>
-        )}
+
 
         {trips.length === 0 ? (
           <EmptyState onCreateTrip={() => setDialogOpen(true)} />

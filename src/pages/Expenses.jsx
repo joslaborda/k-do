@@ -1053,6 +1053,20 @@ export default function Expenses() {
         split_type: 'equal', date: new Date().toISOString().slice(0, 10),
         is_settlement: true,
       });
+      // Notificar a quien le deben que le han liquidado
+      try {
+        const resolved = await resolveUserIds([debt.to]);
+        const allProfiles = await base44.entities.UserProfile.list();
+        const myProf = allProfiles.find(p => p.user_id === currentUser?.id);
+        resolved.forEach(({ userId }) => notify({
+          userId,
+          type: 'expense_settled',
+          actor: myProf,
+          tripId,
+          tripName: trip?.name,
+          refExtra: { amount: debt.amount, currency: baseCurrency },
+        }));
+      } catch {}
     } catch {}
   };
 
