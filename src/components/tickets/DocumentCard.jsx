@@ -12,7 +12,7 @@ const CATEGORY_FALLBACK = {
 };
 
 const VISIBILITY_BADGE = {
-  personal:       { label: 'Solo yo',    icon: EyeOff, cls: 'bg-gray-100 text-muted-foreground' },
+  personal:       { label: 'Solo yo',    icon: EyeOff, cls: 'bg-secondary text-muted-foreground' },
   shared:         { label: 'Grupo',      icon: Eye,    cls: 'bg-green-50 text-green-600' },
   selected_users: { label: 'Compartido', icon: Users,  cls: 'bg-blue-50 text-blue-500'  },
 };
@@ -23,7 +23,7 @@ const ICON_BG = {
   hotel:    'bg-purple-50 text-purple-500',
   event:    'bg-orange-50 text-primary',
   personal: 'bg-amber-50 text-amber-500',
-  other:    'bg-gray-100 text-muted-foreground',
+  other:    'bg-secondary text-muted-foreground',
 };
 
 export default function DocumentCard({ ticket, onEdit, onDelete, compact = false, cityName = '', dayTitle = '' }) {
@@ -66,7 +66,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           {ticket.file_url && (
             <button
               onClick={() => setViewingPDF(ticket.file_url)}
-              className="px-3 py-1.5 rounded-lg bg-primary hover:bg-orange-800 text-white text-xs font-semibold transition-all flex-shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary text-white text-xs font-semibold transition-all flex-shrink-0"
             >
               Ver
             </button>
@@ -106,7 +106,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
                     {dateStr}{endDateStr ? ` → ${endDateStr}` : ''}
                   </span>
                   {todayBadge && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-[10px] uppercase tracking-wide">Hoy</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-label uppercase tracking-wide">Hoy</span>
                   )}
                 </span>
               )}
@@ -125,7 +125,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
 
           {/* Row 4: visibility badge + edit/delete actions */}
           <div className="flex items-center gap-2 mt-1.5">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${vis.cls}`}>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label font-semibold ${vis.cls}`}>
               <VisIcon className="w-3 h-3" />
               {vis.label}
             </span>
@@ -133,13 +133,13 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
             <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {onEdit && (
                 <button onClick={() => onEdit(ticket)}
-                  className="p-1 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-muted-foreground transition-colors" title="Editar">
+                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-muted-foreground transition-colors" title="Editar">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
               )}
               {onDelete && (
                 <button onClick={() => onDelete(ticket)}
-                  className="p-1 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors" title="Eliminar">
+                  className="p-1 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors" title="Eliminar">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -152,13 +152,13 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           {ticket.file_url ? (
             <button
               onClick={() => setViewingPDF(ticket.file_url)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-orange-800 text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
             >
               <FileText className="w-4 h-4" />
               Ver
             </button>
           ) : (
-            <span className="text-xs text-gray-300 italic">Sin archivo</span>
+            <span className="text-xs text-muted-foreground italic">Sin archivo</span>
           )}
         </div>
 

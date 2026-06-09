@@ -23,7 +23,7 @@ const categoryConfig = {
   flight: { icon: PlaneIcon, color: 'bg-indigo-900/30 text-indigo-400 border border-indigo-700/50', label: 'Vuelo' },
   train: { icon: Train, color: 'bg-emerald-900/30 text-emerald-400 border border-emerald-700/50', label: 'Tren' },
   hotel: { icon: Hotel, color: 'bg-purple-900/30 text-purple-400 border border-purple-700/50', label: 'Hotel' },
-  freetour: { icon: FileText, color: 'bg-orange-900/30 text-orange-400 border border-orange-700/50', label: 'Free Tour' },
+  freetour: { icon: FileText, color: 'bg-primary/30 text-primary/60 border border-orange-700/50', label: 'Free Tour' },
   insurance: { icon: Shield, color: 'bg-yellow-900/30 text-yellow-400 border border-yellow-700/50', label: 'Seguro' },
   personal: { icon: FileText, color: 'bg-blue-900/30 text-blue-400 border border-blue-700/50', label: 'Documentos Personales' }
 };
@@ -99,7 +99,7 @@ export default function TicketCard({ ticket, onDelete }) {
 
       {/* File Viewer Modal */}
       <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
-        <DialogContent className="bg-stone-800 border-stone-700 max-w-4xl max-h-[90vh]">
+        <DialogContent className="bg-muted border-border max-w-4xl max-h-[90vh]">
           <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle className="text-foreground">{ticket.name}</DialogTitle>
             <button onClick={() => setViewerOpen(false)} className="text-muted-foreground hover:text-foreground">
@@ -107,7 +107,7 @@ export default function TicketCard({ ticket, onDelete }) {
             </button>
           </DialogHeader>
           
-          <div className="mt-4 bg-stone-900 rounded-lg overflow-hidden h-[70vh] flex flex-col">
+          <div className="mt-4 bg-muted rounded-lg overflow-hidden h-[70vh] flex flex-col">
            {isPDF ? (
              <>
                {isLoading && (
@@ -130,7 +130,7 @@ export default function TicketCard({ ticket, onDelete }) {
                  </Document>
                </div>
                {numPages && numPages > 1 && (
-                 <div className="flex items-center justify-between px-4 py-3 bg-stone-800 border-t border-stone-700">
+                 <div className="flex items-center justify-between px-4 py-3 bg-muted border-t border-border">
                    <Button
                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                      disabled={currentPage === 1}
@@ -156,7 +156,7 @@ export default function TicketCard({ ticket, onDelete }) {
                )}
              </>
            ) : (
-             <div className="w-full h-full flex items-center justify-center bg-stone-900">
+             <div className="w-full h-full flex items-center justify-center bg-muted">
                <img 
                  src={ticket.file_url} 
                  alt={ticket.name}

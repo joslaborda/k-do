@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import { Plane, Hotel, Train, Bus, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
+import {  Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon: Plane,  label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  flight:   { icon:   label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
   train:    { icon: Train, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
   hotel:    { icon: Hotel,      label: 'Hotel',   color: 'bg-purple-50 dark:bg-purple-950/30' },
   event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
@@ -18,7 +18,7 @@ export const CATEGORY_CONFIG = {
 
 
 const CATEGORIES = [
-  { key: 'flight',   Icon: Plane,  label: 'Vuelo'   },
+  { key: 'flight',   Icon:   label: 'Vuelo'   },
   { key: 'hotel',    Icon: Hotel,      label: 'Hotel'   },
   { key: 'train',    Icon: Train, label: 'Tren'    },
   { key: 'event',    Icon: Ticket,     label: 'Evento'  },
@@ -304,7 +304,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Archivo adjunto</p>
         {fields.file_url ? (
           <div className="flex items-center gap-3 px-4 py-3 bg-secondary/40 rounded-xl border border-border">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c2410c" strokeWidth="1.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
             </svg>
             <span className="text-sm text-foreground flex-1 truncate">Archivo adjuntado</span>

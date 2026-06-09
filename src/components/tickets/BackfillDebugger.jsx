@@ -83,7 +83,7 @@ export default function BackfillDebugger({ tripId }) {
   return (
     <div className="bg-card rounded-xl border border-border p-4 mb-6">
       <div className="flex items-start gap-3 mb-4">
-        <Database className="w-5 h-5 text-orange-600 flex-shrink-0 mt-1" />
+        <Database className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
         <div className="flex-1">
           <h3 className="font-semibold text-foreground">Debug: Vinculación de Documentos</h3>
           <p className="text-xs text-muted-foreground mt-1">
@@ -111,7 +111,7 @@ export default function BackfillDebugger({ tripId }) {
           onClick={analyzeData}
           disabled={loading}
           variant="outline"
-          className="border-orange-200 text-orange-600 hover:bg-orange-50"
+          className="border-orange-200 text-primary hover:bg-orange-50"
         >
           {loading ? 'Analizando...' : 'Analizar Vinculación'}
         </Button>
@@ -124,11 +124,11 @@ export default function BackfillDebugger({ tripId }) {
             </div>
             <div className="p-2 bg-secondary rounded-lg">
               <p className="text-muted-foreground text-xs">Con city_id</p>
-              <p className="font-bold text-lg text-orange-600">{stats.withCityId}</p>
+              <p className="font-bold text-lg text-primary">{stats.withCityId}</p>
             </div>
             <div className="p-2 bg-secondary rounded-lg">
               <p className="text-muted-foreground text-xs">Con itinerary_day_id</p>
-              <p className="font-bold text-lg text-orange-600">{stats.withItineraryDayId}</p>
+              <p className="font-bold text-lg text-primary">{stats.withItineraryDayId}</p>
             </div>
             <div className="p-2 bg-secondary rounded-lg">
               <p className="text-muted-foreground text-xs">Con ambos</p>
@@ -151,7 +151,7 @@ export default function BackfillDebugger({ tripId }) {
               onClick={analyzeData}
               disabled={loading}
               variant="outline"
-              className="border-orange-200 text-orange-600 hover:bg-orange-50 flex-1"
+              className="border-orange-200 text-primary hover:bg-orange-50 flex-1"
             >
               <RefreshCw className="w-3.5 h-3.5 mr-1" />
               Reanalizar
@@ -160,7 +160,7 @@ export default function BackfillDebugger({ tripId }) {
               <Button
                 onClick={runBackfill}
                 disabled={loading}
-                className="bg-orange-700 hover:bg-orange-800 flex-1"
+                className="bg-primary hover:bg-primary flex-1"
               >
                 Arreglar {stats.withoutAny}
               </Button>
