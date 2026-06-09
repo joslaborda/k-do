@@ -30,10 +30,10 @@ export default function PhotoGallery({ entries }) {
 
   if (allPhotos.length === 0) {
     return (
-      <div className="text-center py-24 border-2 border-dashed border-stone-200 rounded-2xl">
+      <div className="text-center py-24 border-2 border-dashed border-border rounded-2xl">
         <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-6"><Image className="w-8 h-8 text-muted-foreground/30" /></div>
-        <p className="text-stone-400">No hay fotos aún</p>
-        <p className="text-sm text-stone-400 mt-2">Añade fotos a tus entradas del diario</p>
+        <p className="text-muted-foreground">No hay fotos aún</p>
+        <p className="text-sm text-muted-foreground mt-2">Añade fotos a tus entradas del diario</p>
       </div>
     );
   }
@@ -48,7 +48,7 @@ export default function PhotoGallery({ entries }) {
               setSelectedPhoto(photo);
               setCurrentIndex(idx);
             }}
-            className="group relative aspect-square overflow-hidden rounded-xl border-2 border-stone-200 hover:border-red-400 transition-all"
+            className="group relative aspect-square overflow-hidden rounded-xl border-2 border-border hover:border-red-400 transition-all"
           >
             <img
               src={photo.url}
