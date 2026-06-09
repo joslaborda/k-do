@@ -1,3 +1,4 @@
+import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays } from 'date-fns';
