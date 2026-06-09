@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const categoryConfig = {
-  food: { icon: Utensils, color: 'bg-orange-100 text-orange-600' },
+  food: { icon: Utensils, color: 'bg-orange-100 text-primary' },
   transport: { icon: Train, color: 'bg-blue-100 text-blue-600' },
   accommodation: { icon: Hotel, color: 'bg-purple-100 text-purple-600' },
   activities: { icon: Ticket, color: 'bg-pink-100 text-pink-600' },
@@ -36,8 +36,8 @@ export default function ExpenseCard({ expense, userMap = {}, onEdit, onDelete })
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-gray-900 truncate">{expense.description}</h3>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-semibold">
-            💳 {getName(expense.paid_by)}
+          <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-primary font-semibold">
+            Pagó {getName(expense.paid_by)}
           </span>
           {expense.date && (
             <span className="text-xs text-gray-400">

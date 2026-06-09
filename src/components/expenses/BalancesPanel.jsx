@@ -27,7 +27,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
         </h2>
         <p className="text-white/80 text-sm">
           {isSettled
-            ? '✓ Estás en paz'
+            ? 'Estás en paz'
             : currentUserBalance > 0
             ? 'Te deben este dinero'
             : 'Debes este dinero'}
@@ -143,7 +143,7 @@ export default function BalancesPanel({ expenses = [], members = [], currentUser
         </div>
       ) : (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-          <p className="font-semibold text-green-700">✓ Todos en paz</p>
+          <p className="font-semibold text-green-700">Todos en paz</p>
           <p className="text-sm text-green-600">No hay deudas pendientes</p>
         </div>
       )}

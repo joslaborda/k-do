@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, DollarSign, Info, User } from 'lucide-react';
 
 export default function TricountBalance({ expenses }) {
   // Calcular saldos tipo Tricount
@@ -87,7 +87,7 @@ export default function TricountBalance({ expenses }) {
   if (balances.length === 0) {
     return (
       <Card className="p-8 text-center glass border-border">
-        <div className="text-5xl mb-4">✅</div>
+        <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-4"><Check className="w-7 h-7 text-green-600" /></div>
         <h3 className="text-xl font-bold text-foreground mb-2">¡Todo cuadrado!</h3>
         <p className="text-muted-foreground">No hay deudas pendientes entre viajeros</p>
       </Card>
@@ -98,7 +98,7 @@ export default function TricountBalance({ expenses }) {
     <Card className="p-6 glass border-border">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-primary/20 rounded-xl">
-          <span className="text-2xl">💰</span>
+          <DollarSign size={20} className="text-muted-foreground" />
         </div>
         <div>
           <h3 className="text-xl font-bold text-foreground">Balance de Grupo</h3>
@@ -141,7 +141,7 @@ export default function TricountBalance({ expenses }) {
           >
             <div className="flex-1 flex items-center gap-3">
               <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                <span className="text-lg">{balance.from === 'You' ? '👤' : '👨‍💼'}</span>
+                <span className="text-lg"><User size={16} /></span>
               </div>
               <div>
                 <p className="font-medium text-foreground">{balance.from}</p>
@@ -153,7 +153,7 @@ export default function TricountBalance({ expenses }) {
 
             <div className="flex-1 flex items-center gap-3">
               <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                <span className="text-lg">{balance.to === 'You' ? '👤' : '👨‍💼'}</span>
+                <span className="text-lg"><User size={16} /></span>
               </div>
               <div>
                 <p className="font-medium text-foreground">{balance.to}</p>
@@ -172,7 +172,7 @@ export default function TricountBalance({ expenses }) {
       {/* Info adicional */}
       <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
         <p className="text-sm text-blue-600 flex items-start gap-2">
-          <span>💡</span>
+          <Info size={14} className="text-muted-foreground" />
           <span>
             Estas transferencias minimizan el número de pagos necesarios para saldar todas las deudas del grupo.
           </span>

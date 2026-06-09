@@ -333,7 +333,7 @@ export default function ExpenseForm({
               return Math.abs(diff) > 0.01 ? (
                 <p className="text-xs text-amber-600 mt-1">Faltan {Math.abs(diff).toFixed(2)} {currency} por asignar</p>
               ) : total > 0 ? (
-                <p className="text-xs text-green-600 mt-1">✓ Total cuadra</p>
+                <p className="text-xs text-green-600 mt-1">Total cuadra</p>
               ) : null;
             })()}
           </div>
