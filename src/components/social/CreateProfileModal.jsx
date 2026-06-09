@@ -92,7 +92,7 @@ export default function CreateProfileModal({ user, open }) {
         <div className="flex gap-2 mb-2">
           {STEPS.map((s, i) => (
             <div key={s} className={"h-1 flex-1 rounded-full transition-all " +
-              (STEPS.indexOf(step) >= i ? 'bg-orange-700' : 'bg-border')} />
+              (STEPS.indexOf(step) >= i ? 'bg-primary' : 'bg-border')} />
           ))}
         </div>
 
@@ -100,7 +100,7 @@ export default function CreateProfileModal({ user, open }) {
         {step === 'perfil' && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black">Bienvenido a Kōdo ✈️</DialogTitle>
+              <DialogTitle className="text-2xl font-black">Bienvenido a Kōdo</DialogTitle>
             </DialogHeader>
             <p className="text-sm text-muted-foreground -mt-2">Crea tu perfil para empezar a viajar.</p>
 
@@ -131,7 +131,7 @@ export default function CreateProfileModal({ user, open }) {
 
               {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button className="w-full bg-orange-700 hover:bg-orange-800 text-white font-semibold"
+              <Button className="w-full bg-primary hover:bg-orange-800 text-white font-semibold"
                 disabled={!canGoNext} onClick={() => setStep('origen')}>
                 Siguiente →
               </Button>
@@ -147,8 +147,8 @@ export default function CreateProfileModal({ user, open }) {
             </DialogHeader>
 
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex gap-2 -mt-1">
-              <Info className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-orange-800 leading-relaxed">
+              <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-accent-foreground leading-relaxed">
                 Tu país de origen nos permite mostrarte los requisitos de visado correctos, tu moneda base para gastos y alertas de emergencia adaptadas. Puedes omitirlo pero algunas funciones no estarán disponibles.
               </p>
             </div>
@@ -158,12 +158,12 @@ export default function CreateProfileModal({ user, open }) {
                 <button key={country.name} onClick={() => handleCountrySelect(country)}
                   className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left " +
                     (homeCountry === country.name
-                      ? 'bg-orange-50 border-orange-400 text-orange-900'
+                      ? 'bg-orange-50 border-primary/40 text-accent-foreground'
                       : 'bg-card border-border hover:border-orange-200 text-foreground')}>
                   <span className="text-xl flex-shrink-0">{country.flag}</span>
                   <span className="flex-1 font-medium text-sm">{country.name}</span>
                   <span className="text-xs text-muted-foreground">{country.currency}</span>
-                  {homeCountry === country.name && <CheckCircle2 className="w-4 h-4 text-orange-600 flex-shrink-0" />}
+                  {homeCountry === country.name && <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />}
                 </button>
               ))}
             </div>
@@ -179,7 +179,7 @@ export default function CreateProfileModal({ user, open }) {
 
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setStep('perfil')}>← Volver</Button>
-              <Button className="flex-1 bg-orange-700 hover:bg-orange-800 text-white font-semibold"
+              <Button className="flex-1 bg-primary hover:bg-orange-800 text-white font-semibold"
                 onClick={handleSave} disabled={saving}>
                 {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : 'Crear perfil'}
               </Button>

@@ -80,7 +80,7 @@ export default function UserSearchPanel({ currentUserId }) {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-bold text-foreground mb-2">🔍 Buscar usuarios</h3>
+        <h3 className="text-lg font-bold text-foreground mb-2">Buscar usuarios</h3>
         <Input
           placeholder="Busca por username, nombre o país..."
           value={searchQuery}
@@ -91,7 +91,7 @@ export default function UserSearchPanel({ currentUserId }) {
 
       {usersLoading ? (
         <div className="flex justify-center py-6">
-          <Loader2 className="w-5 h-5 animate-spin text-orange-700" />
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
         </div>
       ) : filteredUsers.length === 0 && searchQuery.trim() ? (
         <div className="text-center py-8 text-muted-foreground">
@@ -118,8 +118,8 @@ export default function UserSearchPanel({ currentUserId }) {
                       className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center flex-shrink-0">
-                      <User className="w-5 h-5 text-orange-700" />
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-primary" />
                     </div>
                   )}
                   <div className="min-w-0">
@@ -135,7 +135,7 @@ export default function UserSearchPanel({ currentUserId }) {
                   variant={isFollowing ? 'default' : 'outline'}
                   onClick={() => handleToggleFollow(userProfile.user_id, isFollowing)}
                   disabled={followMutation.isPending || unfollowMutation.isPending}
-                  className={isFollowing ? 'bg-orange-700 hover:bg-orange-800' : ''}
+                  className={isFollowing ? 'bg-primary hover:bg-orange-800' : ''}
                 >
                   {isFollowing ? 'Siguiendo' : 'Seguir'}
                 </Button>
