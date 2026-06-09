@@ -342,7 +342,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
         )}
         {/* Mi gasto real */}
         {(() => {
-          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail).reduce((s, e) => s + (e.amount_base || e.amount || 0), 0);
+          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail && !e.description?.startsWith('Liquidación:')).reduce((s, e) => s + (e.amount_base || e.amount || 0), 0);
           const iOweTotal = debts.filter(d => d.from === currentUserEmail).reduce((s, d) => s + d.amount, 0);
           const myRealSpend = iPaid - Math.max(0, myBalance);
           return iPaid > 0 ? (
@@ -451,7 +451,9 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
   const s = sym(baseCurrency);
 
   // Excluir liquidaciones — no son gastos reales, son transferencias contables
-  const realExpenses = useMemo(() => expenses.filter(e => !e.is_settlement), [expenses]);
+  // Usamos el patrón de descripción porque is_settlement puede no estar en el schema de base44
+  const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
+  const realExpenses = useMemo(() => expenses.filter(e => !isSettlement(e)), [expenses]);
 
   // Mi parte real = lo que pagué adelantado - lo que me deben neto
   // Esta fórmula es equivalente a calculateBalances pero más directa para Stats
