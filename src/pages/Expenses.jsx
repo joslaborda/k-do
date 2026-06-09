@@ -450,79 +450,79 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [] }) {
   const s = sym(baseCurrency);
 
-  // My spend (what I owe, my share of all expenses)
+  // Excluir liquidaciones — no son gastos reales, son transferencias contables
+  const realExpenses = useMemo(() => expenses.filter(e => !e.is_settlement), [expenses]);
+
+  // Mi parte real: lo que me toca pagar de los gastos reales
   const mySpend = useMemo(() => {
-    return expenses.reduce((sum, e) => {
+    return realExpenses.reduce((sum, e) => {
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt) return sum;
-      if (e.split_type === 'equal') {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        if (parts.includes(currentUserEmail)) return sum + amt / parts.length;
-      } else if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+      const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+      if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
         const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        const ratio = total > 0 ? parseFloat(e.amounts_by_user[currentUserEmail]) / total : 0;
-        return sum + amt * ratio;
-      } else if (e.split_with?.includes(currentUserEmail) || e.paid_by === currentUserEmail) {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        return sum + amt / parts.length;
+        return sum + (total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0);
       }
+      if (parts.includes(currentUserEmail)) return sum + amt / parts.length;
       return sum;
     }, 0);
-  }, [expenses, currentUserEmail]);
+  }, [realExpenses, currentUserEmail]);
 
-  const totalGroup = useMemo(() => expenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0), [expenses]);
+  // Total real del grupo (sin liquidaciones)
+  const totalGroup = useMemo(() =>
+    realExpenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0),
+  [realExpenses]);
 
-  // Days of trip
+  // Días: usando fechas de gastos reales únicamente
   const tripDays = useMemo(() => {
-    if (!expenses.length) return 1;
-    const dates = expenses.map(e => e.date).filter(Boolean).sort();
+    const dates = realExpenses.map(e => e.date).filter(Boolean).sort();
     if (!dates.length) return 1;
-    const diff = Math.max(1, Math.round((new Date(dates[dates.length - 1]) - new Date(dates[0])) / 86400000) + 1);
-    return diff;
-  }, [expenses]);
+    return Math.max(1, Math.round((new Date(dates[dates.length - 1]) - new Date(dates[0])) / 86400000) + 1);
+  }, [realExpenses]);
 
   const myPerDay = tripDays > 0 ? mySpend / tripDays : mySpend;
 
-  // My spend by category
+  // Mi gasto por categoría (solo gastos reales)
   const myByCategory = useMemo(() => {
     const acc = {};
-    expenses.forEach(e => {
+    realExpenses.forEach(e => {
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt) return;
+      const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+      if (!parts.includes(currentUserEmail)) return;
       let myShare = 0;
-      if (e.split_type === 'equal') {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        if (parts.includes(currentUserEmail)) myShare = amt / parts.length;
+      if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+        const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
+        myShare = total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0;
       } else {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        if (parts.includes(currentUserEmail) || e.paid_by === currentUserEmail) myShare = amt / parts.length;
+        myShare = amt / parts.length;
       }
       if (myShare > 0) acc[e.category || 'other'] = (acc[e.category || 'other'] || 0) + myShare;
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
-  }, [expenses, currentUserEmail]);
+  }, [realExpenses, currentUserEmail]);
 
   const maxCat = myByCategory[0]?.[1] || 1;
 
-  // Group spend by category (curiosity)
+  // Grupo por categoría (sin liquidaciones)
   const groupByCategory = useMemo(() => {
     const acc = {};
-    expenses.forEach(e => {
+    realExpenses.forEach(e => {
       const cat = e.category || 'other';
       acc[cat] = (acc[cat] || 0) + (parseFloat(e.amount_base || e.amount) || 0);
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
-  }, [expenses]);
+  }, [realExpenses]);
 
-  // By city
+  // Por ciudad (sin liquidaciones)
   const byCity = useMemo(() => {
     const acc = {};
-    expenses.forEach(e => {
+    realExpenses.forEach(e => {
       const city = e.city_name || 'Sin ciudad';
       acc[city] = (acc[city] || 0) + (parseFloat(e.amount_base || e.amount) || 0);
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
-  }, [expenses]);
+  }, [realExpenses]);
 
   if (expenses.length === 0) {
     return (

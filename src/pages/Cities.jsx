@@ -584,6 +584,8 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
                 profiles={profiles || []}
                 tripCities={cities || []}
                 initialData={{ date: dayDate }}
+                minDate={trip?.start_date || undefined}
+                maxDate={trip?.end_date || undefined}
                 onSave={handleDocCreate}
                 onCancel={() => setAddingDoc(false)}
                 saving={savingNewDoc}
