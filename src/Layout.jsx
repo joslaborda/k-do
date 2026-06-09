@@ -182,10 +182,10 @@ export default function Layout({ children, currentPageName }) {
                         >
                           <item.icon
                             className="w-5 h-5 flex-shrink-0 transition-colors"
-                            style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
+                            style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}
                             strokeWidth={isActive ? 2.5 : 1.75}
                           />
-                          <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
+                          <span className="text-micro font-medium" style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}>
                             {item.name}
                           </span>
                         </Link>
@@ -206,7 +206,7 @@ export default function Layout({ children, currentPageName }) {
                     style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}
                     strokeWidth={1.75}
                   />
-                  <span className="text-[9px] font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}>
+                  <span className="text-micro font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}>
                     Más
                   </span>
                 </button>
@@ -223,13 +223,13 @@ export default function Layout({ children, currentPageName }) {
                   >
                     <item.icon
                       className="w-5 h-5 flex-shrink-0"
-                      style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}
+                      style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}
                       strokeWidth={isActive ? 2.5 : 1.75}
                     />
-                    <span className="text-[9px] font-medium" style={{color: isActive ? '#c2410c' : 'var(--kodo-nav-inactive)'}}>
+                    <span className="text-micro font-medium" style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}>
                       {item.name}
                     </span>
-                    <div style={{height:2.5,borderRadius:2,background:isActive?'#c2410c':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
+                    <div style={{height:2.5,borderRadius:2,background:isActive?'hsl(var(--primary))':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
                 );
               })}
@@ -266,7 +266,7 @@ export default function Layout({ children, currentPageName }) {
                     className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                     strokeWidth={isActive ? 2.5 : 2}
                   />
-                  <span className={`text-[9px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <span className={`text-micro font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                     {item.name}
                   </span>
                 </Link>
@@ -291,7 +291,7 @@ export default function Layout({ children, currentPageName }) {
                         className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
                         strokeWidth={isActive ? 2.5 : 2}
                       />
-                      <span className={`text-[9px] font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                      <span className={`text-micro font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
                         {item.name}
                       </span>
                     </Link>
