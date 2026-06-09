@@ -46,7 +46,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  const M = { flight:  train: Train, bus: Bus }; const I = M[t] || Ship; return I;
+  const M = { flight: PlaneIcon, train: Train, bus: BusFront }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────
