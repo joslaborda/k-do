@@ -129,7 +129,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                     {members.slice(0, 4).map(m => (
                       m.avatar
                         ? <img key={m.email} src={m.avatar} className="w-6 h-6 rounded-full object-cover border-2 border-card" alt={m.name} />
-                        : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-[9px] font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
+                        : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-micro font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">{members.length} viajero{members.length !== 1 ? 's' : ''}</span>
@@ -261,7 +261,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
         aria-label="Notificaciones">
         <Bell className="w-5 h-5 text-foreground" />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 border-2 border-background">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
