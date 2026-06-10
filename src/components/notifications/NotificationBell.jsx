@@ -185,6 +185,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
   const [open, setOpen] = useState(false);
   const [inviteNotif, setInviteNotif] = useState(null);
   const ref = useRef();
+  const bellRef = useRef();
   const notifsRef = useRef([]);
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -258,7 +259,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
   return (
     <div className="relative" ref={ref}>
       <div className="relative">
-      <button onClick={handleToggle}
+      <button ref={bellRef} onClick={handleToggle}
         className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
         aria-label="Notificaciones">
         <Bell className="w-5 h-5 text-foreground" />
@@ -270,7 +271,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
+        <div style={{position:"fixed", top: bellRef.current ? bellRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <span className="font-semibold text-sm text-foreground">Notificaciones</span>
             <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
