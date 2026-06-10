@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
   const containerRef = useRef(null);
@@ -12,9 +12,8 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
     const btn = buttons[idx];
     if (!btn) return;
     const containerRect = containerRef.current.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
     const labelEl = btn.querySelector('.tab-label');
-    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
+    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btn.getBoundingClientRect();
     setLineStyle({
       left: labelRect.left - containerRect.left,
       width: labelRect.width,
@@ -27,19 +26,25 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
   }, [updateLine, mounted]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative flex"
-      style={{ position: 'relative' }}
-    >
-
+    <div ref={containerRef} className="relative flex" style={{ position: 'relative' }}>
+      {/* Single sliding line — top */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: lineStyle.left,
+        width: lineStyle.width,
+        height: 3,
+        background: 'hsl(var(--primary))',
+        borderRadius: 2,
+        transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
+      }} />
       {tabs.map(tab => {
         const isOn = tab.key === activeKey;
         return (
           <button
             key={tab.key}
             onClick={() => onChange(tab.key)}
-            className="flex-1 flex flex-col items-center pt-2.5 pb-2.5 gap-0"
+            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
           >
             <span
               className="tab-label"
@@ -49,7 +54,6 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
                 color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
                 transition: 'color 0.2s',
                 lineHeight: 1,
-                position: 'relative',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 4,
@@ -67,19 +71,10 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
                 <span style={{
                   width: 7, height: 7, borderRadius: '50%',
                   background: 'hsl(var(--primary))',
-                  display: 'inline-block',
-                  flexShrink: 0,
+                  display: 'inline-block', flexShrink: 0,
                 }} />
               )}
             </span>
-            {/* Ō line — sits tight BELOW the label */}
-            <div style={{
-              height: 3, borderRadius: 2,
-              background: isOn ? 'hsl(var(--primary))' : 'transparent',
-              width: isOn ? lineStyle.width : 0,
-              marginTop: 5,
-              transition: mounted ? 'width 0.2s cubic-bezier(.4,0,.2,1)' : 'none',
-            }} />
           </button>
         );
       })}
