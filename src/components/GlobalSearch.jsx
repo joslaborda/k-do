@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Receipt, Calendar, Package, BookOpen } from 'lucide-react';
+import { Search, MapPin, Receipt, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -13,50 +13,31 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
   const { data: cities = [] } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => tripId ? base44.entities.City.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
+    enabled: !!tripId && open,
   });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', tripId],
     queryFn: () => tripId ? base44.entities.Expense.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
-  });
-
-  const { data: diaryEntries = [] } = useQuery({
-    queryKey: ['diaryEntries', tripId],
-    queryFn: () => tripId ? base44.entities.DiaryEntry.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
+    enabled: !!tripId && open,
   });
 
   const { data: packingItems = [] } = useQuery({
     queryKey: ['packingItems', tripId],
     queryFn: () => tripId ? base44.entities.PackingItem.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
-  });
-
-  const { data: tickets = [] } = useQuery({
-    queryKey: ['tickets', tripId],
-    queryFn: () => tripId ? base44.entities.Ticket.filter({ trip_id: tripId }) : [],
-    enabled: !!tripId
+    enabled: !!tripId && open,
   });
 
   const filteredResults = {
     cities: cities.filter(c => c.name?.toLowerCase().includes(query.toLowerCase())),
     expenses: expenses.filter(e => e.description?.toLowerCase().includes(query.toLowerCase())),
-    diaries: diaryEntries.filter(d => 
-      d.title?.toLowerCase().includes(query.toLowerCase()) || 
-      d.content?.toLowerCase().includes(query.toLowerCase())
-    ),
     packing: packingItems.filter(p => p.name?.toLowerCase().includes(query.toLowerCase())),
-    tickets: tickets.filter(t => t.name?.toLowerCase().includes(query.toLowerCase())),
   };
 
   const hasResults = query.length > 0 && (
     filteredResults.cities.length > 0 ||
     filteredResults.expenses.length > 0 ||
-    filteredResults.diaries.length > 0 ||
-    filteredResults.packing.length > 0 ||
-    filteredResults.tickets.length > 0
+    filteredResults.packing.length > 0
   );
 
   return (
@@ -66,7 +47,7 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-               placeholder="Buscar ciudades, gastos, diario..."
+               placeholder="Buscar ciudades, gastos, maleta..."
                value={query}
                onChange={(e) => setQuery(e.target.value)}
                className="pl-10"
@@ -85,7 +66,7 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
 
           {query && !hasResults && (
             <div className="text-center py-12 text-muted-foreground">
-              <p>No se encontraron resultados para "{query}"</p>
+              <p>No se encontraron resultados para &quot;{query}&quot;</p>
             </div>
           )}
 
@@ -131,27 +112,6 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
                 />
               )}
 
-              {filteredResults.diaries.length > 0 && (
-                <ResultSection
-                  title="Diario"
-                  icon={BookOpen}
-                  items={filteredResults.diaries.slice(0, 3)}
-                  renderItem={(entry) => (
-                    <Link
-                      key={entry.id}
-                      to={createPageUrl(`Diary?trip_id=${tripId}`)}
-                      onClick={() => onOpenChange(false)}
-                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
-                    >
-                      <div className="font-medium text-foreground">{entry.title || 'Sin título'}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-2">
-                        {entry.content}
-                      </div>
-                    </Link>
-                  )}
-                />
-              )}
-
               {filteredResults.packing.length > 0 && (
                 <ResultSection
                   title="Maleta"
@@ -160,31 +120,12 @@ export default function GlobalSearch({ open, onOpenChange, tripId }) {
                   renderItem={(item) => (
                     <Link
                       key={item.id}
-                      to={createPageUrl(`Packing?trip_id=${tripId}`)}
+                      to={createPageUrl(`Utilities?trip_id=${tripId}`)}
                       onClick={() => onOpenChange(false)}
                       className="block p-3 hover:bg-secondary rounded-lg transition-colors"
                     >
                       <div className="font-medium text-foreground">{item.name}</div>
                       <div className="text-sm text-muted-foreground">{item.category}</div>
-                    </Link>
-                  )}
-                />
-              )}
-
-              {filteredResults.tickets.length > 0 && (
-                <ResultSection
-                  title="Documentos"
-                  icon={Calendar}
-                  items={filteredResults.tickets.slice(0, 3)}
-                  renderItem={(ticket) => (
-                    <Link
-                      key={ticket.id}
-                      to={createPageUrl(`Documents?trip_id=${tripId}`)}
-                      onClick={() => onOpenChange(false)}
-                      className="block p-3 hover:bg-secondary rounded-lg transition-colors"
-                    >
-                      <div className="font-medium text-foreground">{ticket.name}</div>
-                      <div className="text-sm text-muted-foreground">{ticket.category}</div>
                     </Link>
                   )}
                 />
