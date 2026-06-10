@@ -2472,18 +2472,6 @@ export default function Home() {
   const [formData, setFormData] = useState({});
   const [tab, setTab] = useState(() => 'inicio');
   const [tabDir, setTabDir] = useState(1);
-
-  // Ajusta el tab inicial según el estado del viaje una vez que trip carga
-  useEffect(() => {
-    if (!trip?.start_date) return;
-    const today = new Date(); today.setHours(0,0,0,0);
-    const start = new Date(trip.start_date + 'T00:00:00');
-    const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
-    if (today < start) { setTab('previaje'); return; }
-    if (end && today > end) { setTab('resumen'); return; }
-    setTab('hoy');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip?.start_date, trip?.end_date]);
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -2536,6 +2524,17 @@ export default function Home() {
       currency: trip.currency || 'EUR', members: trip.members || []
     });
   }, [trip]);
+
+  // Tab inicial inteligente según estado del viaje
+  useEffect(() => {
+    if (!trip?.start_date) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(trip.start_date + 'T00:00:00');
+    const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
+    if (today < start) { setTab('previaje'); return; }
+    if (end && today > end) { setTab('resumen'); return; }
+    setTab('hoy');
+  }, [trip?.start_date, trip?.end_date]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateMutation = useMutation({
     mutationFn: (d) => base44.entities.Trip.update(tripId, d),
