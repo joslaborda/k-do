@@ -2143,7 +2143,7 @@ function InviteModal({ open, onClose, trip, tripId, queryClient }) {
 // ── Settings Dialog ───────────────────────────────────────────────────────────
 function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
   const queryClient = useQueryClient();
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 0 });
+  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 10 * 60 * 1000 });
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -2470,8 +2470,20 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [formData, setFormData] = useState({});
-  const [tab, setTab] = useState(() => 'hoy');
+  const [tab, setTab] = useState(() => 'inicio');
   const [tabDir, setTabDir] = useState(1);
+
+  // Ajusta el tab inicial según el estado del viaje una vez que trip carga
+  useEffect(() => {
+    if (!trip?.start_date) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(trip.start_date + 'T00:00:00');
+    const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
+    if (today < start) { setTab('previaje'); return; }
+    if (end && today > end) { setTab('resumen'); return; }
+    setTab('hoy');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip?.start_date, trip?.end_date]);
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');

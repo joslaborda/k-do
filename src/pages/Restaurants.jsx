@@ -97,12 +97,12 @@ const OSM_MAP = {
 };
 function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
 
-async function searchPlaces(query, city, country) {
+async function searchPlaces(query, city, country, signal) {
   const q = [query, city, country].filter(Boolean).join(', ');
   const params = new URLSearchParams({ q, format:'json', limit:8, addressdetails:1, namedetails:1 });
   const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
     headers: { 'Accept-Language':'es,en', 'User-Agent':'KodoTravelApp/1.0' },
-    signal: (() => { const c = new AbortController(); setTimeout(() => c.abort(), 8000); return c.signal; })(),
+    signal: signal || (() => { const c = new AbortController(); setTimeout(() => c.abort(), 8000); return c.signal; })(),
   });
   if (!res.ok) throw new Error('search failed');
   const data = await res.json();
@@ -1329,6 +1329,7 @@ export default function Restaurants() {
   const [showCityInput, setShowCityInput] = useState(false);
   const [customCity, setCustomCity] = useState('');
   const searchTimer = useRef(null);
+  const searchAbortRef = useRef(null);
   const toastTimer = useRef(null);
 
   useEffect(() => {
@@ -1379,11 +1380,14 @@ export default function Restaurants() {
     if (!searchQuery.trim() || searchQuery.length < 2) { setOsmResults([]); return; }
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(async () => {
+      if (searchAbortRef.current) searchAbortRef.current.abort();
+      searchAbortRef.current = new AbortController();
+      const signal = searchAbortRef.current.signal;
       setSearching(true);
       addRecentSearch(searchQuery.trim());
       setRecentSearches(getRecentSearches());
-      try { setOsmResults(await searchPlaces(searchQuery, selectedCity || city, country)); }
-      catch { setOsmResults([]); }
+      try { setOsmResults(await searchPlaces(searchQuery, selectedCity || city, country, signal)); }
+      catch (e) { if (e?.name !== 'AbortError') setOsmResults([]); }
       finally { setSearching(false); }
     }, 700);
     return () => clearTimeout(searchTimer.current);
