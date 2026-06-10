@@ -269,7 +269,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 w-80 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
+        <div className="fixed right-3 top-16 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <span className="font-semibold text-sm text-foreground">Notificaciones</span>
             <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
