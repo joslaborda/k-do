@@ -53,12 +53,10 @@ import CityDetail from './pages/CityDetail';
 
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
-import Packing from './pages/Packing';
 import Restaurants from './pages/Restaurants';
 import Translator from './pages/Translator';
 import TripsList from './pages/TripsList';
 import Utilities from './pages/Utilities';
-import Tickets from './pages/Tickets';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import VerifyEmail from './pages/VerifyEmail';
@@ -74,12 +72,10 @@ export const PAGES = {
 
     "Expenses": Expenses,
     "Home": Home,
-    "Packing": Packing,
     "Restaurants": Restaurants,
     "Translator": Translator,
     "TripsList": TripsList,
     "Utilities": Utilities,
-    "Tickets": Tickets,
     "Profile": Profile,
     "Settings": Settings,
     "VerifyEmail": VerifyEmail,

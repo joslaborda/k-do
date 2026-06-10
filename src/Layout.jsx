@@ -27,10 +27,10 @@ const globalNavItems = [
   { name: 'Perfil', page: 'Profile',   icon: User },
 ];
 
-const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile'];
+const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile', 'Settings', 'VerifyEmail', 'Invites'];
 const globalPages     = ['Explore'];
 const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Photos',
-                         'Expenses', 'Utilities', 'Translator', 'Packing', 'Diary'];
+                         'Expenses', 'Utilities', 'Translator'];
 
 export default function Layout({ children, currentPageName }) {
   const getTripId = () => { const p = new URLSearchParams(window.location.search); return p.get('trip_id') || p.get('id') || null; };
