@@ -936,6 +936,12 @@ const EMERGENCY_DB = {
       hours: 'Lun-Vie 9:00-12:00',
       web: 'https://www.exteriores.gob.es/Embajadas/pekin',
     },
+    useful_apps: [
+      { name: 'DiDi', description: 'Taxi por app (equivalente a Uber). Esencial.' },
+      { name: 'WeChat / Alipay', description: 'Para pagos — el efectivo apenas se usa en ciudades.' },
+      { name: 'VPN', description: 'Google, WhatsApp, Instagram bloqueados. Instala VPN ANTES de llegar.' },
+    ],
+    safety_tips: ['Instala VPN antes de entrar — Google, WhatsApp, YouTube e Instagram están bloqueados.', 'WeChat o Alipay son imprescindibles para pagar (muchos sitios no aceptan efectivo ni tarjeta extranjera).', 'No fotografíes instalaciones militares, policía o protestas.'],
     embassy_AR: { address: '11 Dongwu Jie, Sanlitun, Pekín', phone: '+86 10 6532 2090', hours: 'Lun-Vie 9:00-12:30', web: null },
     embassy_CO: { address: 'Ritan Dongyi Jie 34, Chaoyang, Pekín', phone: '+86 10 6532 3377', hours: 'Lun-Vie 9:00-12:30', web: null },
     embassy_MX: { address: 'Dong Zhi Men Wai Da Jie, Sanlitun, Pekín', phone: '+86 10 6532 2574', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -1921,16 +1927,7 @@ const EMERGENCY_DB = {
   },
 
   // ══ ASIA ADICIONAL ════════════════════════════════════════════════════════
-  'China': {
-    emergency_general: '120/110', police: '110', ambulance: '120', fire: '119',
-    embassy_ES: 'Embajada de España en Pekín: +86 10 6532 3629',
-    useful_apps: [
-      { name: 'DiDi', icon: '🚗', description: 'Taxi por app (equivalente a Uber). Esencial.' },
-      { name: 'WeChat / Alipay', icon: '💳', description: 'Para pagos — el efectivo apenas se usa en ciudades.' },
-      { name: 'VPN', icon: '🔒', description: 'Google, WhatsApp, Instagram bloqueados. Instala VPN ANTES de llegar.' },
-    ],
-    safety_tips: ['Instala VPN antes de entrar — Google, WhatsApp, YouTube e Instagram están bloqueados.', 'WeChat o Alipay son imprescindibles para pagar (muchos sitios no aceptan efectivo ni tarjeta extranjera).', 'No fotografíes instalaciones militares, policía o protestas.'],
-  },
+
   'Malasia': {
     emergency_general: '999', police: '999', ambulance: '999', fire: '994',
     embassy_ES: 'Embajada de España en Kuala Lumpur: +60 3 2148 4868',
