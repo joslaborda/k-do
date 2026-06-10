@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { MapPin, Navigation, Pencil, Send, Trash2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import { TYPE_CONFIG } from './spotsHelpers';

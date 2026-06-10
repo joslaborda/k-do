@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle, MapPin, Navigation, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, MapPin, Navigation, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TYPE_CONFIG, reverseGeocode } from './spotsHelpers';
