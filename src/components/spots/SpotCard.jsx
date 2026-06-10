@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 
 const TYPE_CONFIG = {
@@ -79,13 +79,13 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
           <button onClick={() => setThumb('up')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'up' ? 'bg-green-50 border-green-300' : 'bg-secondary border-border hover:border-green-200')}>
-            <span className="text-xl">👍</span>
+            <ThumbsUp className={"w-5 h-5 " + (thumb === 'up' ? 'text-green-600' : 'text-muted-foreground')} />
             <span className={"text-sm font-medium " + (thumb === 'up' ? 'text-green-700' : 'text-muted-foreground')}>Me gustó</span>
           </button>
           <button onClick={() => setThumb('down')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'down' ? 'bg-red-50 border-red-300' : 'bg-secondary border-border hover:border-red-200')}>
-            <span className="text-xl">👎</span>
+            <ThumbsDown className={"w-5 h-5 " + (thumb === 'down' ? 'text-red-600' : 'text-muted-foreground')} />
             <span className={"text-sm font-medium " + (thumb === 'down' ? 'text-red-700' : 'text-muted-foreground')}>No tanto</span>
           </button>
         </div>
@@ -165,8 +165,8 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
             <div>
               <p className="font-semibold text-foreground text-sm">Comentarios</p>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">👍 {ups}</span>
-                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full">👎 {downs}</span>
+                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {ups}</span>
+                <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsDown className="w-3 h-3" /> {downs}</span>
               </div>
             </div>
             <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
@@ -203,11 +203,11 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           <div className="flex gap-2">
             <button onClick={() => setThumb(thumb === 'up' ? null : 'up')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-secondary border-border text-muted-foreground')}>
-              👍
+              <ThumbsUp className="w-4 h-4" />
             </button>
             <button onClick={() => setThumb(thumb === 'down' ? null : 'down')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'down' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-secondary border-border text-muted-foreground')}>
-              👎
+              <ThumbsDown className="w-4 h-4" />
             </button>
             <textarea value={text} onChange={e => setText(e.target.value)}
               placeholder="Añade un comentario..."
