@@ -2235,7 +2235,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
       await base44.entities.City.create({
         trip_id: tripId,
         name: cityDraft.name.trim(),
-        country: cityDraft.country || '',
+        country: normalizeCountry(cityDraft.country || ''),
         start_date: cityDraft.start_date || '',
         end_date: cityDraft.end_date || '',
       });
