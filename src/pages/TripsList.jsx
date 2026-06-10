@@ -126,6 +126,7 @@ export default function TripsList() {
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
   const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
+  const [showInvites, setShowInvites] = useState(false);
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
