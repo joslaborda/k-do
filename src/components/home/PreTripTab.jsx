@@ -13,21 +13,71 @@ import MemberAvatarRow from './MemberAvatarRow';
 function buildRequirements(countries, originCountry, secondNationality = null) {
   const requirements = [];
   countries.forEach(country => {
-    const reqs = COUNTRY_REQUIREMENTS[country] || [];
-    reqs.forEach(req => {
-      if (req.type === 'visa') {
-        const visaInfo = getVisaInfo(originCountry, country);
-        const secondary = secondNationality ? getVisaInfo(secondNationality, country) : null;
-        const best = (secondary && secondary.required === false) ? secondary : visaInfo;
-        requirements.push({
-          ...req, id: `visa-${country}`, country,
-          level: best?.required ? 'required' : (best?.required === false ? 'ok' : 'info'),
-          description: best?.notes || req.description,
-        });
-      } else {
-        requirements.push({ ...req, id: `${req.type}-${country}-${req.title}`, country });
-      }
+    const countryData = COUNTRY_REQUIREMENTS[country];
+    if (!countryData) return;
+
+    // Visa
+    const visaInfo = getVisaInfo(originCountry, country);
+    const secondary = secondNationality ? getVisaInfo(secondNationality, country) : null;
+    const best = (secondary && secondary.required === false) ? secondary : visaInfo;
+    requirements.push({
+      id: `visa-${country}`, type: 'visa', country,
+      title: best?.required === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
+      description: best?.notes || countryData.visa?.info || '',
+      level: best?.required ? 'required' : (best?.required === false ? 'ok' : 'info'),
     });
+
+    // Adapter
+    if (countryData.adapter?.needed !== false) {
+      requirements.push({
+        id: `tech-${country}`, type: 'tech', country,
+        title: `Adaptador — ${countryData.adapter?.type || 'revisar tipo'}`,
+        description: countryData.adapter?.info || '',
+        level: 'info',
+      });
+    }
+
+    // Vaccines
+    if (countryData.vaccines?.length) {
+      const required = countryData.vaccines.filter(v => v.priority === 'obligatoria para entrada');
+      const recommended = countryData.vaccines.filter(v => v.priority !== 'obligatoria para entrada');
+      if (required.length) {
+        requirements.push({
+          id: `vaccine-req-${country}`, type: 'vaccine', country,
+          title: `Vacunas obligatorias — ${country}`,
+          description: required.map(v => v.name).join(', '),
+          level: 'required',
+        });
+      }
+      if (recommended.length) {
+        requirements.push({
+          id: `vaccine-rec-${country}`, type: 'vaccine', country,
+          title: `Vacunas recomendadas — ${country}`,
+          description: recommended.slice(0, 3).map(v => v.name).join(', '),
+          level: 'info',
+        });
+      }
+    }
+
+    // Currency
+    if (countryData.currency?.info) {
+      requirements.push({
+        id: `money-${country}`, type: 'money', country,
+        title: `Divisa — ${country}`,
+        description: countryData.currency.info,
+        level: 'info',
+      });
+    }
+
+    // Tips
+    if (countryData.tips?.length) {
+      requirements.push({
+        id: `safety-${country}`, type: 'safety', country,
+        title: `Consejos — ${country}`,
+        description: countryData.tips.slice(0, 2).join(' · '),
+        level: 'info',
+      });
+    }
   });
   return requirements;
 }
