@@ -313,18 +313,50 @@ export default function TripsList() {
             <div className="flex items-center gap-2 mt-1">
               <NotificationBell userId={user?.id} userEmail={user?.email} />
               {/* Icono de invitaciones con badge */}
-              <button
-                onClick={() => navigate(createPageUrl('Invites'))}
-                className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
-                aria-label="Invitaciones"
-              >
-                <Mail className="w-5 h-5 text-foreground" />
-                {pendingInvites.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
-                    {pendingInvites.length > 9 ? '9+' : pendingInvites.length}
-                  </span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowInvites(v => !v)}
+                  className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
+                  aria-label="Invitaciones"
+                >
+                  <Mail className="w-5 h-5 text-foreground" />
+                  {pendingInvites.length > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
+                      {pendingInvites.length > 9 ? '9+' : pendingInvites.length}
+                    </span>
+                  )}
+                </button>
+
+                {showInvites && (
+                  <div className="fixed right-3 top-16 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                      <span className="font-semibold text-sm text-foreground">Invitaciones</span>
+                      <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+                    </div>
+                    <div className="max-h-[70vh] overflow-y-auto">
+                      {pendingInvites.length === 0 ? (
+                        <div className="py-12 text-center">
+                          <Mail className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
+                          <p className="text-sm text-muted-foreground">Sin invitaciones pendientes</p>
+                        </div>
+                      ) : pendingInvites.map(inv => (
+                        <div key={inv.id} className="px-4 py-3 border-b border-border last:border-0">
+                          <p className="text-sm font-medium text-foreground">{inv.trip_name || 'Viaje'}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Invitado por {inv.invited_by || 'un compañero'}</p>
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={() => navigate(createPageUrl('Invites'))}
+                              className="flex-1 py-1.5 rounded-full bg-primary text-white text-xs font-semibold"
+                            >
+                              Ver invitación
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </button>
+              </div>
               {/* Avatar → directo a perfil */}
               <Link to={createPageUrl('Profile')}>
                 <div className="w-9 h-9 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-sm font-medium flex-shrink-0">

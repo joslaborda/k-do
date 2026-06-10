@@ -1033,8 +1033,15 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
     try { localStorage.setItem(`kodo_checklist_${tripId}`, JSON.stringify(next)); } catch {}
   };
 
+  // Visa siempre se muestra (info importante aunque no sea necesario)
+  const visaReqs = requirements.filter(r => r.type === 'visa');
   const actionableReqs = requirements.filter(r => r.level !== 'ok');
-  const doneCount = actionableReqs.filter(r => checkedItems[r.id]).length;
+  // Combinar: todos los visados + los demás actionables sin duplicar visas
+  const displayReqs = [
+    ...visaReqs,
+    ...actionableReqs.filter(r => r.type !== 'visa'),
+  ];
+  const doneCount = displayReqs.filter(r => r.level !== 'ok' && checkedItems[r.id]).length;
   const packedCount = packingItems.filter(i => i.packed).length;
   const packedPct = packingItems.length ? Math.round(packedCount / packingItems.length * 100) : 0;
   const docsCount = documents?.length || 0;
@@ -1087,7 +1094,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
       </div>
 
       {/* Checklist */}
-      {actionableReqs.length > 0 && (
+      {displayReqs.length > 0 && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
@@ -1096,12 +1103,12 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
                 pasaporte de {originCountry}
               </p>
             </div>
-            {doneCount === actionableReqs.length && actionableReqs.length > 0 ? (
+            {doneCount === displayReqs.filter(r => r.level !== 'ok').length && displayReqs.filter(r => r.level !== 'ok').length > 0 ? (
               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Todo listo</span>
-            ) : (actionableReqs.length - doneCount) > 0 ? (
+            ) : (displayReqs.filter(r => r.level !== 'ok').length - doneCount) > 0 ? (
               <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
-                {actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 0
-                  ? `${actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length} pendiente${actionableReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 1 ? 's' : ''}`
+                {displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 0
+                  ? `${displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length} pendiente${displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 1 ? 's' : ''}`
                   : null}
               </span>
             ) : null}
@@ -1115,7 +1122,7 @@ function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles
               { key: 'safety',  label: 'Consejos',     types: ['safety', 'info'] },
             ];
             return GROUPS.map(group => {
-              const items = actionableReqs.filter(r => group.types.includes(r.type));
+              const items = displayReqs.filter(r => group.types.includes(r.type));
               if (!items.length) return null;
               const doneCount = items.filter(r => checkedItems[r.id]).length;
               const allDone = doneCount === items.length;

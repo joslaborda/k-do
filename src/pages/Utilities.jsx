@@ -228,7 +228,16 @@ function RequirementsTab({ reqs, country, homeCountry }) {
   }
 
   // Filtrar COVID-19 (no es requisito de viaje) y vacunas de rutina pediátrica
-  const SKIP_VACCINES = ['COVID-19', 'COVID-19 (mRNA)'];
+  // Filtrar vacunas rutinarias (todos las tenemos de niños) — solo mostrar las específicas de viaje
+  const SKIP_VACCINES = [
+    'COVID-19', 'COVID-19 (mRNA)',
+    'MMR', 'Measles', 'Mumps', 'Rubella',
+    'Varicella', 'Chickenpox',
+    'Polio', 'IPV', 'OPV',
+    'Tetanus', 'Td', 'Td/Tdap', 'Tdap', 'DTP', 'DTaP',
+    'Influenza', 'Flu',
+    'Pneumococcal', 'Meningococcal ACWY',
+  ];
   const filteredVaccines = vaccines.filter(v => !SKIP_VACCINES.includes(v.name));
   const requiredVax = filteredVaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
   // Limpiar labels: quitar "(check age and history)" y "(seasonal and risk based)" del texto visible
