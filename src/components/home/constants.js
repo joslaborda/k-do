@@ -1,23 +1,25 @@
-import { AlertTriangle, BusFront, Car, CirclePlus, Cross, DollarSign, FileText, Hotel, Landmark, PlaneIcon, Shield, ShoppingBag, Ticket, TrainFront, Utensils, Wifi } from '@/lib/icons';
+import React from 'react';
+import { AlertTriangle, BusFront, Car, Cross, DollarSign, FileText, Hotel, PlaneIcon, Shield, TrainFront, Utensils, Wifi } from '@/lib/icons';
+import { CirclePlus, Landmark, ShoppingBag, Ticket } from 'lucide-react';
 
 export const REQ_ICON_MAP = {
-  visa:    (p) => <Shield size={14} {...p} />,
-  vaccine: (p) => <Cross size={14} {...p} />,
-  tech:    (p) => <Wifi size={14} {...p} />,
-  money:   (p) => <DollarSign size={14} {...p} />,
-  safety:  (p) => <AlertTriangle size={14} {...p} />,
-  health:  (p) => <Cross size={14} {...p} />,
+  visa:    (p) => React.createElement(Shield, Object.assign({ size: 14 }, p)),
+  vaccine: (p) => React.createElement(Cross, Object.assign({ size: 14 }, p)),
+  tech:    (p) => React.createElement(Wifi, Object.assign({ size: 14 }, p)),
+  money:   (p) => React.createElement(DollarSign, Object.assign({ size: 14 }, p)),
+  safety:  (p) => React.createElement(AlertTriangle, Object.assign({ size: 14 }, p)),
+  health:  (p) => React.createElement(Cross, Object.assign({ size: 14 }, p)),
 };
 
 export const DOC_ICONS = {
-  flight: (p) => <PlaneIcon size={13} {...p} />,
-  hotel: (p) => <Hotel size={13} {...p} />,
-  train: (p) => <TrainFront size={13} {...p} />,
-  bus: (p) => <BusFront size={13} {...p} />,
-  car: (p) => <Car size={13} {...p} />,
-  ticket: (p) => <Ticket size={13} {...p} />,
-  insurance: (p) => <Shield size={13} {...p} />,
-  other: (p) => <FileText size={13} {...p} />,
+  flight:    (p) => React.createElement(PlaneIcon, Object.assign({ size: 13 }, p)),
+  hotel:     (p) => React.createElement(Hotel, Object.assign({ size: 13 }, p)),
+  train:     (p) => React.createElement(TrainFront, Object.assign({ size: 13 }, p)),
+  bus:       (p) => React.createElement(BusFront, Object.assign({ size: 13 }, p)),
+  car:       (p) => React.createElement(Car, Object.assign({ size: 13 }, p)),
+  ticket:    (p) => React.createElement(Ticket, Object.assign({ size: 13 }, p)),
+  insurance: (p) => React.createElement(Shield, Object.assign({ size: 13 }, p)),
+  other:     (p) => React.createElement(FileText, Object.assign({ size: 13 }, p)),
 };
 
 export const SPOT_ICONS = {
