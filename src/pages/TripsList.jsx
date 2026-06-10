@@ -128,6 +128,7 @@ export default function TripsList() {
   const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
   const [showInvites, setShowInvites] = useState(false);
+  const inviteBtnRef = useRef();
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -317,6 +318,7 @@ export default function TripsList() {
               {/* Icono de invitaciones con badge */}
               <div className="relative">
                 <button
+                  ref={inviteBtnRef}
                   onClick={() => setShowInvites(v => !v)}
                   className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
                   aria-label="Invitaciones"
@@ -330,7 +332,7 @@ export default function TripsList() {
                 </button>
 
                 {showInvites && (
-                  <div className="absolute right-0 top-12 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
+                  <div style={{position:"fixed", top: inviteBtnRef.current ? inviteBtnRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                       <span className="font-semibold text-sm text-foreground">Invitaciones</span>
                       <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><XIcon className="w-4 h-4" /></button>
