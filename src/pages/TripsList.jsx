@@ -4,13 +4,14 @@ import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Archive, Calendar, Mail, Map, Plus } from 'lucide-react';
+import { Archive, Calendar, Check, Mail, Map, Plus, X as XIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
+import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { getSeedSpotsForCountry } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 
@@ -329,7 +330,7 @@ export default function TripsList() {
                 </button>
 
                 {showInvites && (
-                  <div className="fixed right-3 top-16 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
+                  <div className="absolute right-0 top-12 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                       <span className="font-semibold text-sm text-foreground">Invitaciones</span>
                       <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
@@ -346,10 +347,29 @@ export default function TripsList() {
                           <p className="text-xs text-muted-foreground mt-0.5">Invitado por {inv.invited_by || 'un compañero'}</p>
                           <div className="flex gap-2 mt-2">
                             <button
-                              onClick={() => navigate(createPageUrl('Invites'))}
-                              className="flex-1 py-1.5 rounded-full bg-primary text-white text-xs font-semibold"
+                              onClick={async () => {
+                                try {
+                                  await acceptTripInvite(inv.id, inv.invite_token, inv.trip_id, user?.email);
+                                  queryClient.invalidateQueries({ queryKey: ['myPendingInvites'] });
+                                  queryClient.invalidateQueries({ queryKey: ['myTrips'] });
+                                  setShowInvites(false);
+                                  navigate(createPageUrl('Home') + '?trip_id=' + inv.trip_id);
+                                } catch(e) { console.error(e); }
+                              }}
+                              className="flex-1 py-1.5 rounded-full bg-primary text-white text-xs font-semibold flex items-center justify-center gap-1"
                             >
-                              Ver invitación
+                              <Check className="w-3 h-3" /> Aceptar
+                            </button>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await declineTripInvite(inv.id);
+                                  queryClient.invalidateQueries({ queryKey: ['myPendingInvites'] });
+                                } catch(e) { console.error(e); }
+                              }}
+                              className="flex-1 py-1.5 rounded-full border border-border text-xs font-semibold text-muted-foreground flex items-center justify-center gap-1"
+                            >
+                              <XIcon className="w-3 h-3" /> Declinar
                             </button>
                           </div>
                         </div>
