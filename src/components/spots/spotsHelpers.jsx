@@ -1,3 +1,4 @@
+import { CirclePlus, Compass, Landmark, ShoppingBag, Ticket, Utensils } from 'lucide-react';
 // ── OSM helpers ───────────────────────────────────────────────────────────────
 export const OSM_MAP = {
   restaurant:'food', cafe:'food', bar:'food', fast_food:'food', pub:'food', bakery:'food',
@@ -105,7 +106,6 @@ export async function loadLeaflet() {
 }
 
 // ── Type config ───────────────────────────────────────────────────────────────
-import { CirclePlus, Compass, Landmark, ShoppingBag, Ticket, Utensils } from 'lucide-react';
 
 export const TYPE_CONFIG = {
   food:      { label:'Comer',      Icon: Utensils,    color:'bg-orange-100 text-primary' },
