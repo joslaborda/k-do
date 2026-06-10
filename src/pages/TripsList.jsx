@@ -333,7 +333,7 @@ export default function TripsList() {
                   <div className="absolute right-0 top-12 w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                       <span className="font-semibold text-sm text-foreground">Invitaciones</span>
-                      <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+                      <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><XIcon className="w-4 h-4" /></button>
                     </div>
                     <div className="max-h-[70vh] overflow-y-auto">
                       {pendingInvites.length === 0 ? (
