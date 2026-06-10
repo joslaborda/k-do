@@ -1,5 +1,5 @@
 import { createPageUrl } from '@/utils';
-import { useState, useEffect, useRef, useCallback} from 'react';
+import { useState, useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,78 +14,7 @@ import { getCountryRequirements } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
-
-
-function OTabBar({ tabs, activeKey, onChange }) {
-  const containerRef = useRef(null);
-  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
-  const [mounted, setMounted] = useState(false);
-
-  const updateLine = useCallback(() => {
-    if (!containerRef.current) return;
-    const idx = tabs.findIndex(t => t.key === activeKey);
-    const buttons = containerRef.current.querySelectorAll('button');
-    const btn = buttons[idx];
-    if (!btn) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
-    const labelEl = btn.querySelector('.tab-label');
-    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
-    setLineStyle({
-      left: labelRect.left - containerRect.left,
-      width: labelRect.width,
-    });
-  }, [activeKey, tabs]);
-
-  useEffect(() => {
-    updateLine();
-    if (!mounted) setTimeout(() => setMounted(true), 50);
-  }, [updateLine, mounted]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative flex overflow-x-auto"
-      style={{ position: 'relative' }}>
-      {/* Animated sliding line */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: lineStyle.left,
-          width: lineStyle.width,
-          height: 3,
-          background: 'hsl(var(--primary))',
-          borderRadius: 2,
-          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
-        }}
-      />
-      {tabs.map(tab => {
-        const isOn = tab.key === activeKey;
-        return (
-          <button
-            key={tab.key}
-            onClick={() => onChange(tab.key)}
-            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1 min-w-0"
-          >
-            <span
-              className="tab-label"
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
-                transition: 'color 0.2s',
-                lineHeight: 1,
-              }}
-            >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+import OTabBar from '@/components/trip/OTabBar';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
