@@ -224,12 +224,15 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
       description: data.currency.info,
       level: 'info'
     });
-    (data?.vaccines || []).forEach((v, i) => {
+    // Mismo filtro que Utilities — excluir vacunas rutinarias de infancia
+    const SKIP_VAX = new Set([
+      'COVID-19','COVID-19 (mRNA)','MMR','Measles','Mumps','Rubella',
+      'Varicella','Chickenpox','Polio','IPV','OPV',
+      'Tetanus','Td','Td/Tdap','Tdap','DTP','DTaP',
+      'Influenza','Flu','Pneumococcal','Meningococcal ACWY',
+    ]);
+    (data?.vaccines || []).filter(v => !SKIP_VAX.has(v.name)).forEach((v, i) => {
       const p = v.priority?.toLowerCase() || '';
-      // "obligatoria para entrada" → nivel required (bloquea entrada al país)
-      // "obligatoria si vienes de..." → info (condicional según origen)
-      // "quimioprofilaxis" → info (recomendación médica, no bloquea entrada)
-      // "recomendada..." → info
       const isHardRequired = p === 'obligatoria para entrada';
       reqs.push({
         id: `${country}-vax-${i}`, type: 'vaccine', country,
