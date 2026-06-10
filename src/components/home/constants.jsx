@@ -1,4 +1,5 @@
-import { AlertTriangle, BusFront, Car, CirclePlus, Cross, DollarSign, FileText, Hotel, Landmark, PlaneIcon, Shield, ShoppingBag, Ticket, TrainFront, Utensils, Wifi } from '@/lib/icons';
+import { AlertTriangle, BusFront, Car, Cross, DollarSign, FileText, Hotel, PlaneIcon, Shield, TrainFront, Utensils, Wifi } from '@/lib/icons';
+import { CirclePlus, Landmark, ShoppingBag, Ticket, ShoppingCart, Compass } from 'lucide-react';
 
 export const REQ_ICON_MAP = {
   visa:    (p) => <Shield size={14} {...p} />,

@@ -44,7 +44,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
     const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const seen = {};
     const all = cities.length > 0 ? cities.map(c => c.country).filter(Boolean) : [trip?.country].filter(Boolean);
-    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[k] = c; });
+    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
     return Object.values(seen);
   }, [trip, cities]);
 

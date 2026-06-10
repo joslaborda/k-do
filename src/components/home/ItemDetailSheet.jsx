@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { X, Clock, ArrowRight } from 'lucide-react';
-import { CirclePlus } from '@/lib/icons';
+import { X, Clock, ArrowRight , CirclePlus } from 'lucide-react';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS } from './constants';
 
 export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
