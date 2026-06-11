@@ -322,7 +322,8 @@ export default function Documents() {
               <Plus className="w-4 h-4" />Documento
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Documentos</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">Documentos</h1>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.</p>
           {/* Category tabs */}
           <OTabBar
               tabs={CAT_TABS.map(t => ({key:t.key,label:t.label}))}

@@ -946,7 +946,8 @@ export default function Cities() {
             </Link>
           </div>
 
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Ruta</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">Ruta</h1>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">La base de tu viaje en Kōdo. Construye con el grupo el itinerario completo día a día con Documentos, Spots y Notas. Tu tab Hoy en Home mostrará el día a día de tu viaje.</p>
 
           {/* Progress */}
           <div className="flex items-center justify-between mb-1.5">

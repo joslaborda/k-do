@@ -1634,9 +1634,8 @@ export default function Restaurants() {
               <Plus className="w-4 h-4" />Crear spot
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Compass className="w-5 h-5 text-primary" />Spots
-          </h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">Spots</h1>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Busca y guarda los sitios que quieres visitar: restaurantes, museos, parques... y asígnales día y hora para completar tu itinerario. Tu tab Hoy en Home los mostrará cuando toca.</p>
           <OTabBar
             tabs={[{key:'buscar',label:'Buscar'},{key:'mis',label:'Mis spots'}]}
             activeKey={tab}
