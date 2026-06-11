@@ -27,7 +27,7 @@ const globalNavItems = [
   { name: 'Perfil', page: 'Profile',   icon: User },
 ];
 
-const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile', 'Settings', 'VerifyEmail', 'Invites'];
+const pagesWithoutNav = ['TripsList', 'Explore', 'Profile', 'Settings', 'VerifyEmail', 'Invites'];
 const globalPages     = ['Explore'];
 const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Photos',
                          'Expenses', 'Utilities', 'Translator'];
@@ -147,7 +147,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* ── Bottom Navigation Mobile — pill oscura flotante ──────────────── */}
       {showNav && (showTripNav || showGlobalNav) && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
           <div className="mx-3 mb-3">
             <nav className="bg-card border border-border rounded-2xl flex items-center shadow-sm dark:shadow-none relative overflow-hidden">
               {showTripNav && (() => {
@@ -314,7 +314,7 @@ export default function Layout({ children, currentPageName }) {
       {showNav && (showTripNav || showGlobalNav) && (
         <style>{`
           @media (min-width: 768px) { .min-h-screen { margin-left: 64px; } }
-          @media (max-width: 767px) { .min-h-screen { padding-bottom: 88px; } }
+          @media (max-width: 767px) { .min-h-screen { padding-bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px))); } }
         `}</style>
       )}
     </div>
