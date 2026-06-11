@@ -28,7 +28,7 @@ const CAT_ICONS = {
 const CAT_COLORS = {
   food: 'bg-orange-100 text-primary', transport: 'bg-blue-100 text-blue-600',
   accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
-  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary0 text-muted-foreground',
+  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary text-muted-foreground',
 };
 const CAT_CONFIG = {
   food:          { label: 'Comida'      },
@@ -73,13 +73,13 @@ function Avatar({ email, profiles = [], size = 28 }) {
 // ── CurrencyBanner — shown when active city changes ───────────────────────────
 function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccept, onDismiss }) {
   return (
-    <div style={{ background: '#fff3ee', border: '0.5px solid #fbd5c0', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
+    <div style={{ background: 'hsl(var(--accent))', border: '0.5px solid hsl(var(--primary)/0.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0 }}>{flag}</span>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 3 }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: '#b34a1a' }}>Has llegado a {countryName}</p>
-            <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: '#fbd5c0', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'hsl(var(--primary))' }}>Has llegado a {countryName}</p>
+            <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'hsl(var(--muted-foreground))', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
           <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
             La moneda local es {currencyName} ({currencyCode}). ¿Registrar gastos en {currencyCode}?
@@ -90,7 +90,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
               Sí, usar {currencyCode}
             </button>
             <button onClick={onDismiss}
-              style={{ flex: 1, background: 'white', color: 'hsl(var(--primary))', border: '0.5px solid hsl(var(--primary) / 0.3)', borderRadius: 8, padding: '7px 0', fontSize: 12, cursor: 'pointer' }}>
+              style={{ flex: 1, background: 'hsl(var(--card))', color: 'hsl(var(--primary))', border: '0.5px solid hsl(var(--primary)/0.3)', borderRadius: 8, padding: '7px 0', fontSize: 12, cursor: 'pointer' }}>
               Mantener base
             </button>
           </div>
@@ -113,20 +113,20 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
         {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--foreground)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {expense.description}
         </p>
-        <p style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 1 }}>
+        <p style={{ fontSize: 11, color: 'var(--muted-foreground)', marginTop: 1 }}>
           Pagó {paidByName} · ÷ {splitCount}
         </p>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         {!isSame && (
-          <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+          <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--foreground)' }}>
             {sym(expense.currency)}{fmtAmt(parseFloat(expense.amount || 0), expense.currency)}
           </p>
         )}
-        <p style={{ fontSize: isSame ? 13 : 11, fontWeight: isSame ? 500 : 400, color: isSame ? 'var(--color-text-primary)' : 'hsl(var(--primary))' }}>
+        <p style={{ fontSize: isSame ? 13 : 11, fontWeight: isSame ? 500 : 400, color: isSame ? 'var(--foreground)' : 'hsl(var(--primary))' }}>
           {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)}
         </p>
       </div>
@@ -356,8 +356,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                       {Math.abs(bal) < 0.01 ? '0' : `${bal > 0 ? '+' : ''}${fmtAmt(bal, baseCurrency)}`} {sym(baseCurrency)}
                     </span>
                   </div>
-                  <div style={{ height: 4, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? '#d1d5db' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
+                  <div style={{ height: 4, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? 'hsl(var(--muted-foreground))' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
                   </div>
                 </div>
               </div>
@@ -508,7 +508,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                       <span className="text-foreground">{tc.label}</span>
                       <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                     </div>
-                    <div style={{ height: 5, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: 5, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'hsl(var(--primary))', borderRadius: 4 }} />
                     </div>
                   </div>
@@ -538,8 +538,8 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                     <span className="text-foreground">{tc.label}</span>
                     <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                   </div>
-                  <div style={{ height: 4, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: '#f97316', borderRadius: 4 }} />
+                  <div style={{ height: 4, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: 'hsl(var(--primary))', borderRadius: 4 }} />
                   </div>
                 </div>
               </div>
@@ -580,7 +580,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-4" />
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
-              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: 'hsl(var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>
                 {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
               </div>
               <div>

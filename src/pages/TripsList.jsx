@@ -158,12 +158,10 @@ export default function TripsList() {
     queryKey: ['trips', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
+      // Fetch trips created by user
       let myTrips = [];
       try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch {}
-      if (myTrips.length === 0) {
-        const all = await base44.entities.Trip.list('-created_date');
-        myTrips = all.filter(t => t.created_by === user.email);
-      }
+      // Fetch trips where user is a member (single call, filter client-side)
       let memberTrips = [];
       try {
         const all = await base44.entities.Trip.list('-created_date');
@@ -179,9 +177,18 @@ export default function TripsList() {
     staleTime: 30000,
   });
 
+  // Only fetch cities for the user's own trips, not all cities globally
   const { data: allCities = [] } = useQuery({
-    queryKey: ['allCities'],
-    queryFn: () => base44.entities.City.list('order'),
+    queryKey: ['allCities', trips.map(t => t.id).join(',')],
+    queryFn: async () => {
+      if (!trips.length) return [];
+      const tripIds = trips.map(t => t.id);
+      const results = await Promise.all(
+        tripIds.map(id => base44.entities.City.filter({ trip_id: id }).catch(() => []))
+      );
+      return results.flat();
+    },
+    enabled: trips.length > 0,
     staleTime: 60000,
   });
 
@@ -218,7 +225,7 @@ export default function TripsList() {
       return trip;
     },
     onSuccess: (trip) => {
-      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips', user?.email] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
       setDialogOpen(false);
       // Show spot discovery popup if we have seed spots for this destination
@@ -353,7 +360,7 @@ export default function TripsList() {
                                 try {
                                   await acceptTripInvite(inv.id, inv.invite_token, inv.trip_id, user?.email);
                                   queryClient.invalidateQueries({ queryKey: ['myPendingInvites'] });
-                                  queryClient.invalidateQueries({ queryKey: ['myTrips'] });
+                                  queryClient.invalidateQueries({ queryKey: ['trips', user?.email] });
                                   setShowInvites(false);
                                   navigate(createPageUrl('Home') + '?trip_id=' + inv.trip_id);
                                 } catch(e) { console.error(e); }

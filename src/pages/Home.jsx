@@ -149,15 +149,6 @@ export default function Home() {
     ).length;
   }, [tripMessages, currentUserId, currentUserEmail, chatLastRead]);
 
-  // Auto-correct tab when trip status changes
-  useEffect(() => {
-    if (!trip) return;
-    const validKeys = homeTabs.map(t => t.key);
-    if (!validKeys.includes(tab)) {
-      setTab(validKeys[0]);
-    }
-  }, [trip?.start_date, trip?.end_date]);
-
   const sortedCities = useMemo(() =>
     [...cities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || '')),
     [cities]
@@ -194,6 +185,15 @@ export default function Home() {
       { key: 'chat', label: 'Chat', badge: unreadMessages },
     ];
   }, [tripFinished, isDeparture, tripInProgress, isDMinus1, unreadMessages]);
+
+  // Auto-correct tab when trip status changes (homeTabs now defined above)
+  useEffect(() => {
+    if (!trip) return;
+    const validKeys = homeTabs.map(t => t.key);
+    if (!validKeys.includes(tab)) {
+      setTab(validKeys[0]);
+    }
+  }, [trip?.start_date, trip?.end_date]);
 
   if (isLoading || !tripId) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
