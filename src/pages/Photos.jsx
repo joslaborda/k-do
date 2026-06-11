@@ -5,7 +5,9 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Download, X, ArrowRight, Camera, Upload } from 'lucide-react';
+import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -31,6 +33,7 @@ export default function Photos() {
 
   const [lbIdx, setLbIdx] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
   const { data: messages = [] } = useQuery({
     queryKey: ['tripMessages', tripId],
@@ -71,7 +74,9 @@ export default function Photos() {
   const uploadMutation = useMutation({
     mutationFn: async (files) => {
       const results = [];
-      for (const file of files) {
+      setUploadProgress({ current: 0, total: files.length });
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         const takenAt = await getExifDate(file);
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         await base44.entities.TripMessage.create({
@@ -87,6 +92,7 @@ export default function Photos() {
           taken_at: takenAt || new Date().toISOString(),
         });
         results.push(file_url);
+        setUploadProgress({ current: i + 1, total: files.length });
       }
       return results;
     },
@@ -94,11 +100,14 @@ export default function Photos() {
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
       await notifyMembers(files.length);
     },
-    onSettled: () => setUploading(false),
+    onSettled: () => {
+      setUploading(false);
+      setUploadProgress({ current: 0, total: 0 });
+    },
   });
 
   const handleFiles = async (e) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []).slice(0, 10);
     if (!files.length) return;
     e.target.value = '';
     setUploading(true);
@@ -107,7 +116,7 @@ export default function Photos() {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).slice(0, 10);
     if (!files.length) return;
     setUploading(true);
     uploadMutation.mutate(files);
@@ -130,33 +139,27 @@ export default function Photos() {
   return (
     <div className="bg-background min-h-screen pb-32">
       {/* Header */}
-      <div className="bg-background sticky top-0 z-20 border-b border-border">
+      <div className="bg-background sticky top-0 z-20">
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-foreground">Fotos</h1>
-            <div className="flex items-center gap-2">
-              {photos.length > 0 && (
-                <a
-                  href={photos[0]?.file_url}
-                  className="h-9 px-3 rounded-xl border border-border bg-secondary flex items-center gap-1.5 text-sm text-muted-foreground hover:bg-border/40 transition-colors"
-                  onClick={e => { e.preventDefault(); downloadAll(photos); }}
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">Descargar todo</span>
-                </a>
-              )}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="h-9 px-3 rounded-xl bg-primary text-white flex items-center gap-1.5 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-              >
-                {uploading
-                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <Upload className="w-4 h-4" />}
-                <span>Subir</span>
+            <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+              <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Inicio
               </button>
-            </div>
+            </Link>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors disabled:opacity-50"
+            >
+              {uploading
+                ? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                : <Plus className="w-4 h-4" />}
+              Fotos
+            </button>
           </div>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Fotos</h1>
         </div>
       </div>
 
@@ -171,7 +174,29 @@ export default function Photos() {
 
       <div className="max-w-3xl mx-auto">
         {/* Empty state */}
-        {photos.length === 0 && !uploading && (
+        {/* Barra de progreso de subida */}
+      {uploading && uploadProgress.total > 0 && (
+        <div className="max-w-3xl mx-auto px-5 py-3">
+          <div className="bg-card border border-border rounded-2xl px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-foreground">
+                Subiendo fotos...
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {uploadProgress.current} de {uploadProgress.total}
+              </p>
+            </div>
+            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-300"
+                style={{ width: `${Math.round((uploadProgress.current / uploadProgress.total) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {photos.length === 0 && !uploading && (
           <div
             className="mx-4 mt-8 border border-border rounded-2xl p-12 flex flex-col items-center gap-3 cursor-pointer hover:bg-secondary/40 transition-colors"
             onClick={() => fileInputRef.current?.click()}
