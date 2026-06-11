@@ -928,7 +928,6 @@ export default function Utilities() {
     { key: 'tiempo',      label: 'Clima' },
     { key: 'emergencias', label: 'Emergencias' },
     { key: 'maleta',      label: 'Maleta' },
-    { key: 'requisitos',  label: 'Requisitos' },
   ];
   
   // Requisitos del país activo
