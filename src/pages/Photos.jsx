@@ -130,35 +130,32 @@ export default function Photos() {
   return (
     <div className="bg-background min-h-screen pb-32">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">Fotos</h1>
-            {photos.length > 0 && (
-              <p className="text-xs text-muted-foreground">{photos.length} foto{photos.length !== 1 ? 's' : ''} · {trip?.name || ''}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {photos.length > 0 && (
-              <a
-                href={photos[0]?.file_url}
-                className="h-9 px-3 rounded-xl border border-border bg-secondary flex items-center gap-1.5 text-sm text-muted-foreground hover:bg-border/40 transition-colors"
-                onClick={e => { e.preventDefault(); downloadAll(photos); }}
+      <div className="bg-background sticky top-0 z-20 border-b border-border">
+        <div className="max-w-3xl mx-auto px-5 pt-12 pb-0">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-semibold text-foreground">Fotos</h1>
+            <div className="flex items-center gap-2">
+              {photos.length > 0 && (
+                <a
+                  href={photos[0]?.file_url}
+                  className="h-9 px-3 rounded-xl border border-border bg-secondary flex items-center gap-1.5 text-sm text-muted-foreground hover:bg-border/40 transition-colors"
+                  onClick={e => { e.preventDefault(); downloadAll(photos); }}
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Descargar todo</span>
+                </a>
+              )}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="h-9 px-3 rounded-xl bg-primary text-white flex items-center gap-1.5 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Descargar todo</span>
-              </a>
-            )}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="h-9 px-3 rounded-xl bg-primary text-white flex items-center gap-1.5 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {uploading
-                ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                : <Upload className="w-4 h-4" />}
-              <span>Subir</span>
-            </button>
+                {uploading
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <Upload className="w-4 h-4" />}
+                <span>Subir</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
