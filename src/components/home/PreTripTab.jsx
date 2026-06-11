@@ -195,8 +195,10 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   <button onClick={() => setCollapsedGroups(p => ({ ...p, [group.key]: !isCollapsed }))}
                     className="w-full flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-2">
-                      <div style={{height:2.5,width:24,background:'hsl(var(--primary))',borderRadius:2}} />
-                      <p className="text-label font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                      <div className="flex flex-col items-start gap-0.5">
+                        <div style={{height:2.5,width:24,background:'hsl(var(--primary))',borderRadius:2}} />
+                        <p className="text-label font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                      </div>
                       {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
