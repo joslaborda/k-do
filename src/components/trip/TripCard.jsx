@@ -130,9 +130,9 @@ export default function TripCard({ trip, cities = [] }) {
     : status?.label;
 
   return (
-    <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
-      <div className={`bg-card border border-border rounded-2xl p-4 flex items-center gap-3 transition-colors relative shadow-sm ${isPast ? 'opacity-65' : ''}`}>
-        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-secondary flex items-center justify-center text-2xl">
+    <Link to={createPageUrl(`Home?trip_id=${trip.id}`)} className="block" style={{marginBottom: '16px'}}>
+      <div className={`bg-card border border-border rounded-2xl p-3 flex items-center gap-3 transition-colors relative shadow-sm ${isPast ? 'opacity-65' : ''}`}>
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-secondary flex items-center justify-center text-2xl">
           <img src={coverImage} alt={trip.name}
             className={`w-full h-full object-cover ${isPast?'grayscale-[30%]':''}`}
             onError={e=>{
