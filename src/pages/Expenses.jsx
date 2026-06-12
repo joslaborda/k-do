@@ -854,7 +854,17 @@ export default function Expenses() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [detailExpense, setDetailExpense] = useState(null);
   const [currencyBannerDismissed, setCurrencyBannerDismissed] = useState(false);
-  const [activeCurrencyOverride, setActiveCurrencyOverride] = useState(null);
+  const overrideKey = (cityId) => `kodo_currency_override_${tripId}_${cityId}`;
+  const getStoredOverride = (cityId) => {
+    try { return localStorage.getItem(overrideKey(cityId)) || null; } catch { return null; }
+  };
+  const setStoredOverride = (cityId, currency) => {
+    try { localStorage.setItem(overrideKey(cityId), currency); } catch {}
+  };
+
+  const [activeCurrencyOverride, setActiveCurrencyOverride] = useState(
+    () => getStoredOverride(null)
+  );
   const [prevCityId, setPrevCityId] = useState(null);
 
   const { data: trip } = useQuery({
@@ -889,11 +899,13 @@ export default function Expenses() {
   const showCurrencyBanner = !currencyBannerDismissed &&
     activeLocalCurrency && activeLocalCurrency !== baseCurrency;
 
-  // When city changes, reset banner
+  // When city changes, load stored override + banner state for that city
   useEffect(() => {
     if (activeCity?.id && activeCity.id !== prevCityId) {
       setPrevCityId(activeCity.id);
-      setCurrencyBannerDismissed(false);
+      setCurrencyBannerDismissed(isBannerDismissed(activeCity.id));
+      const stored = getStoredOverride(activeCity.id);
+      setActiveCurrencyOverride(stored);
     }
   }, [activeCity?.id]);
 
@@ -1036,8 +1048,7 @@ export default function Expenses() {
               <Plus className="w-4 h-4" />Gasto
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-1">Gastos</h1>
-          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Apunta lo que pagas y selecciona con qué viajeros del grupo te gustaría compartir el gasto. Kōdo divide, convierte divisas y salda las cuentas.</p>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
           <OTabBar
             tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},...(availableCurrencies.length > 1 ? [{key:'conversión',label:'Conversión'}] : []),{key:'stats',label:'Stats'}]}
             activeKey={tab}
@@ -1054,8 +1065,16 @@ export default function Expenses() {
             currencyCode={activeLocalCurrency}
             currencyName={activeMeta?.languageLabel || activeLocalCurrency}
             flag={activeMeta?.flag || '🌍'}
-            onAccept={() => { setActiveCurrencyOverride(activeLocalCurrency); setCurrencyBannerDismissed(true); }}
-            onDismiss={() => setCurrencyBannerDismissed(true)}
+            onAccept={() => {
+              setActiveCurrencyOverride(activeLocalCurrency);
+              setStoredOverride(activeCity?.id, activeLocalCurrency);
+              setCurrencyBannerDismissed(true);
+              dismissBanner(activeCity?.id);
+            }}
+            onDismiss={() => {
+              setCurrencyBannerDismissed(true);
+              dismissBanner(activeCity?.id);
+            }}
           />
         )}
 
