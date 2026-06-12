@@ -15,74 +15,92 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
   const requirements = [];
   const originISO = getCountryMeta(originCountry)?.iso || originCountry;
   const secondISO = secondNationality ? getCountryMeta(secondNationality)?.iso : null;
+  const originMeta = getCountryMeta(originCountry);
+  const originPlugs = (originMeta?.plug || '').split('/').map(p => p.trim()).filter(Boolean);
+  const originCurrency = originMeta?.currency || '';
 
   countries.forEach(country => {
     const countryData = COUNTRY_REQUIREMENTS[country];
     if (!countryData) return;
     const destISO = getCountryMeta(country)?.iso || country;
+    const destMeta = getCountryMeta(country);
 
-    // Visa
+    // ── Visa ──────────────────────────────────────────────────────────────
     const visaInfo = getVisaInfo(destISO, originISO);
     const secondary = secondISO ? getVisaInfo(destISO, secondISO) : null;
     const best = (secondary && secondary.needed === false) ? secondary : visaInfo;
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
       origin: originCountry,
-      title: best?.needed === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
-      description: best?.notes || countryData.visa?.info || '',
+      title: `${originCountry} → ${country}`,
+      description: best?.notes || best?.info || countryData.visa?.info || '',
       level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
     });
 
-    // Adapter
-    if (countryData.adapter?.needed !== false) {
+    // ── Enchufe ───────────────────────────────────────────────────────────
+    const destPlugRaw = countryData.adapter?.type || destMeta?.plug || '';
+    const destPlugs = destPlugRaw.split(/[/·,]/).map(p => p.trim().replace(/^Tipo\s*/i, '')).filter(Boolean);
+    // Check if origin plugs overlap with destination plugs
+    const needsAdapter = destPlugs.length > 0 && !destPlugs.some(p => originPlugs.includes(p));
+    if (destPlugs.length > 0) {
       requirements.push({
         id: `tech-${country}`, type: 'tech', country,
-        title: `Adaptador — ${countryData.adapter?.type || 'revisar tipo'}`,
-        description: countryData.adapter?.info || '',
-        level: 'info',
+        title: destPlugRaw.startsWith('Tipo') ? destPlugRaw : `Tipo ${destPlugRaw}`,
+        description: countryData.adapter?.info
+          ? `Voltaje: ${countryData.adapter.info}`
+          : destMeta?.plug ? `Tipo ${destMeta.plug}` : '',
+        level: needsAdapter ? 'required' : 'ok',
       });
     }
 
-    // Vaccines
+    // ── Vacunas ───────────────────────────────────────────────────────────
     if (countryData.vaccines?.length) {
       const required = countryData.vaccines.filter(v => v.priority === 'obligatoria para entrada');
       const recommended = countryData.vaccines.filter(v => v.priority !== 'obligatoria para entrada');
       if (required.length) {
         requirements.push({
           id: `vaccine-req-${country}`, type: 'vaccine', country,
-          title: `Vacunas obligatorias — ${country}`,
-          description: required.map(v => v.name).join(', '),
+          title: required.map(v => v.name).join(', '),
+          description: '',
           level: 'required',
         });
       }
       if (recommended.length) {
         requirements.push({
           id: `vaccine-rec-${country}`, type: 'vaccine', country,
-          title: `Vacunas recomendadas — ${country}`,
-          description: recommended.slice(0, 3).map(v => v.name).join(', '),
+          title: recommended.slice(0, 4).map(v => v.name).join(', '),
+          description: '',
           level: 'info',
         });
       }
     }
 
-    // Currency
-    if (countryData.currency?.info) {
+    // ── Divisa ────────────────────────────────────────────────────────────
+    const destCurrency = destMeta?.currency || '';
+    if (destCurrency && destCurrency !== originCurrency && countryData.currency?.info) {
       requirements.push({
         id: `money-${country}`, type: 'money', country,
-        title: `Divisa — ${country}`,
+        title: countryData.currency.info.split('.')[0], // e.g. "Peso colombiano (COP)"
         description: countryData.currency.info,
-        level: 'info',
+        level: 'required',
       });
     }
 
-    // Tips
+    // ── Consejos ─────────────────────────────────────────────────────────
     if (countryData.tips?.length) {
-      requirements.push({
-        id: `safety-${country}`, type: 'safety', country,
-        title: `Consejos — ${country}`,
-        description: countryData.tips.slice(0, 2).join(' · '),
-        level: 'info',
+      // Filter out tips that are about adapters/plugs since we already show that
+      const filteredTips = countryData.tips.filter(tip => {
+        const t = tip.toLowerCase();
+        return !t.includes('adaptador') && !t.includes('enchufe') && !t.includes('plug') && !t.includes('voltaje');
       });
+      if (filteredTips.length) {
+        requirements.push({
+          id: `safety-${country}`, type: 'safety', country,
+          title: filteredTips.slice(0, 2).join(' · '),
+          description: '',
+          level: 'info',
+        });
+      }
     }
   });
   return requirements;
@@ -185,11 +203,11 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           </div>
           {(() => {
             const GROUPS = [
-              { key: 'visa',    label: 'Visados',      types: ['visa'] },
-              { key: 'vaccine', label: 'Salud',        types: ['vaccine'] },
-              { key: 'tech',    label: 'Equipamiento', types: ['tech'] },
-              { key: 'money',   label: 'Dinero',       types: ['money'] },
-              { key: 'safety',  label: 'Consejos',     types: ['safety', 'info'] },
+              { key: 'visa',    label: 'Visados', types: ['visa'] },
+              { key: 'vaccine', label: 'Vacunas', types: ['vaccine'] },
+              { key: 'tech',    label: 'Enchufe', types: ['tech'] },
+              { key: 'money',   label: 'Divisa',  types: ['money'] },
+              { key: 'safety',  label: 'Consejos',types: ['safety', 'info'] },
             ];
             return GROUPS.map(group => {
               const items = displayReqs.filter(r => group.types.includes(r.type));
@@ -212,6 +230,9 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   {!isCollapsed && items.map(req => {
                     const isInfo = req.level === 'info';
                     const isOk   = req.level === 'ok';
+                    // Enchufe igual al de origen → no mostrar
+                    if (isOk && req.type === 'tech') return null;
+                    // Sin visado → chip verde
                     if (isOk) return (
                       <div key={req.id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
@@ -222,32 +243,39 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                         <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
                       </div>
                     );
-                    return !isInfo ? (
-                      <button key={req.id} onClick={() => toggleCheck(req.id)}
+                    // Obligatorio (visa required, tech diferente, money diferente)
+                    if (!isInfo) return (
+                      <button key={req.id} onClick={() => req.type === 'visa' ? toggleCheck(req.id) : null}
                         className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                          {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
-                        </div>
+                        {req.type === 'visa' && (
+                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                            {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        )}
                         <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-primary'}) : null}</span>
                         <div className="flex-1 min-w-0">
                           <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{req.title}</p>
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
-                        {req.level === 'required' && !checkedItems[req.id] && (
-                          <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium shrink-0">!</span>
+                        {!checkedItems[req.id] && (
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">Obligatorio</span>
                         )}
                       </button>
-                    ) : (
+                    );
+                    // Info: Recomendado (vacunas, consejos) o Verificar (visa sin datos)
+                    return (
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground leading-tight">{req.title}</p>
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
-                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">recomendado</span>
+                        {req.type === 'visa'
+                          ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Verificar</span>
+                          : <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Recomendado</span>
+                        }
                       </div>
                     );
-                  })}
                 </div>
               );
             });
