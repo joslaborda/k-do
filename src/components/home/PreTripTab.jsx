@@ -206,6 +206,9 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   {!isCollapsed && items.map(req => {
                     const isInfo = req.level === 'info';
                     const isOk   = req.level === 'ok';
+                    // For info-level visa items, badge depends on title content
+                    const isVisaFree = isInfo && req.type === 'visa' && req.title.startsWith('Sin visado');
+                    const isVisaCheck = isInfo && req.type === 'visa' && !isVisaFree;
                     return (!isInfo && !isOk) ? (
                       <button key={req.id} onClick={() => toggleCheck(req.id)}
                         className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
@@ -221,8 +224,8 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                           <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium shrink-0">Obligatorio</span>
                         )}
                       </button>
-                    ) : isOk ? (
-                      /* level='ok' — acceso libre, badge verde */
+                    ) : isOk || isVisaFree ? (
+                      /* Sin visado — badge verde */
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
                         <div className="flex-1 min-w-0">
@@ -231,8 +234,18 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                         </div>
                         <span className="text-xs bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
                       </div>
+                    ) : isVisaCheck ? (
+                      /* Visado requerido con info incompleta — badge naranja "Verificar" */
+                      <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
+                        <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-amber-600'}) : null}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground leading-tight">{req.title}</p>
+                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                        </div>
+                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Verificar</span>
+                      </div>
                     ) : (
-                      /* level='info' — recomendado, solo para salud/equipamiento */
+                      /* level='info' salud/equipamiento — Recomendado */
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
                         <div className="flex-1 min-w-0">
