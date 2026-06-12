@@ -30,9 +30,11 @@ export default function ExpenseForm({
   saving = false,
   userMap = {},
   currentUserEmail = '',
-  profiles = [],
+  profiles = {},
+  profilesByEmail,
 }) {
   const getName = email => userMap[email] || email || email || '?';
+  const profileMap = profilesByEmail || profiles || {};
 
   const orderedCurrencies = [...new Set([defaultCurrency, baseCurrency, ...availableCurrencies, ...COMMON_CURRENCIES])];
 
@@ -261,7 +263,7 @@ export default function ExpenseForm({
                 form.paid_by === email ? 'bg-orange-50 dark:bg-orange-950/20 border-orange-200' : 'bg-card border-border hover:border-primary/40'
               }`}>
               {(() => {
-                const prof = profiles?.[email] || null;
+                const prof = profileMap?.[email] || null;
                 return prof?.avatar_url
                   ? <img src={prof.avatar_url} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
                   : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'#fbd5c0':'#f0ede8',color:form.paid_by===email?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
@@ -313,7 +315,7 @@ export default function ExpenseForm({
                 ? (parseFloat(form.amount) / form.split_with.length) : null;
               const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(currency);
               const shareStr = share ? (isZeroDecimal ? Math.round(share).toLocaleString('es') : share.toFixed(2)) : null;
-              const sp = profiles?.[email];
+              const sp = profileMap?.[email];
               return (
                 <button key={email} type="button" onClick={() => toggleMember(email)}
                   className={`flex-1 min-w-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${
@@ -336,7 +338,7 @@ export default function ExpenseForm({
         {form.split_type === 'custom' && (
           <div className="space-y-2">
             {members.map(email => {
-              const sp = profiles?.[email];
+              const sp = profileMap?.[email];
               return (
                 <div key={email} className="flex items-center gap-3 px-3 py-2 rounded-xl border border-border bg-card">
                   {sp?.avatar_url
