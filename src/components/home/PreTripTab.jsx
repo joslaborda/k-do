@@ -19,12 +19,12 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
     // Visa
     const visaInfo = getVisaInfo(originCountry, country);
     const secondary = secondNationality ? getVisaInfo(secondNationality, country) : null;
-    const best = (secondary && secondary.required === false) ? secondary : visaInfo;
+    const best = (secondary && secondary.needed === false) ? secondary : visaInfo;
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
-      title: best?.required === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
-      description: best?.notes || countryData.visa?.info || '',
-      level: best?.required ? 'required' : (best?.required === false ? 'ok' : 'info'),
+      title: best?.needed === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
+      description: best?.notes || best?.info || countryData.visa?.info || '',
+      level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
     });
 
     // Adapter
