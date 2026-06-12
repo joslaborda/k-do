@@ -362,11 +362,19 @@ export function getCountryMeta(countryLabelOrCode) {
     if (byIso) return { ...byIso };
   }
 
-  // Exact label match
+  // Exact label match (Spanish)
   const exact = KNOWN_META[countryLabelOrCode];
   if (exact) return { ...exact };
 
-  // Case-insensitive
+  // Try English → Spanish translation first (OSM returns English names)
+  const esName = EN_TO_ES[countryLabelOrCode];
+  if (esName && KNOWN_META[esName]) return { ...KNOWN_META[esName] };
+  // Case-insensitive English match
+  const lcInput = countryLabelOrCode.toLowerCase();
+  const engKey = Object.keys(EN_TO_ES).find(k => k.toLowerCase() === lcInput);
+  if (engKey && KNOWN_META[EN_TO_ES[engKey]]) return { ...KNOWN_META[EN_TO_ES[engKey]] };
+
+  // Case-insensitive Spanish match
   const n = normalizeText(countryLabelOrCode);
   const ci = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
   if (ci) return { ...KNOWN_META[ci] };
