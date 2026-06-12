@@ -7,23 +7,28 @@ import { Calendar, Check, Users } from 'lucide-react';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
+import { getCountryMeta } from '@/lib/countryConfig';
 import { REQ_ICON_MAP } from './constants';
 import MemberAvatarRow from './MemberAvatarRow';
 
 function buildRequirements(countries, originCountry, secondNationality = null) {
   const requirements = [];
+  const originISO = getCountryMeta(originCountry)?.iso || originCountry;
+  const secondISO = secondNationality ? getCountryMeta(secondNationality)?.iso : null;
+
   countries.forEach(country => {
     const countryData = COUNTRY_REQUIREMENTS[country];
     if (!countryData) return;
+    const destISO = getCountryMeta(country)?.iso || country;
 
     // Visa
-    const visaInfo = getVisaInfo(originCountry, country);
-    const secondary = secondNationality ? getVisaInfo(secondNationality, country) : null;
+    const visaInfo = getVisaInfo(destISO, originISO);
+    const secondary = secondISO ? getVisaInfo(destISO, secondISO) : null;
     const best = (secondary && secondary.needed === false) ? secondary : visaInfo;
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
       title: best?.needed === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
-      description: best?.notes || best?.info || countryData.visa?.info || '',
+      description: best?.notes || countryData.visa?.info || '',
       level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
     });
 
@@ -195,7 +200,10 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   <button onClick={() => setCollapsedGroups(p => ({ ...p, [group.key]: !isCollapsed }))}
                     className="w-full flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-2">
-                      <p className="text-label font-semibold text-foreground/70 uppercase tracking-wider">{group.label}</p>
+                      <div className="flex flex-col items-start gap-0.5">
+                        <div style={{height:2.5,width:24,background:'hsl(var(--primary))',borderRadius:2}} />
+                        <p className="text-label font-medium text-muted-foreground uppercase tracking-wider">{group.label}</p>
+                      </div>
                       {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -205,11 +213,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   </button>
                   {!isCollapsed && items.map(req => {
                     const isInfo = req.level === 'info';
-                    const isOk   = req.level === 'ok';
-                    // For info-level visa items, badge depends on title content
-                    const isVisaFree = isInfo && req.type === 'visa' && req.title.startsWith('Sin visado');
-                    const isVisaCheck = isInfo && req.type === 'visa' && !isVisaFree;
-                    return (!isInfo && !isOk) ? (
+                    return !isInfo ? (
                       <button key={req.id} onClick={() => toggleCheck(req.id)}
                         className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
@@ -221,38 +225,17 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
                         {req.level === 'required' && !checkedItems[req.id] && (
-                          <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium shrink-0">Obligatorio</span>
+                          <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium shrink-0">!</span>
                         )}
                       </button>
-                    ) : isOk || isVisaFree ? (
-                      /* Sin visado — badge verde */
-                      <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
-                        <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground leading-tight">{req.title}</p>
-                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
-                        </div>
-                        <span className="text-xs bg-green-50 text-green-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
-                      </div>
-                    ) : isVisaCheck ? (
-                      /* Visado requerido con info incompleta — badge naranja "Verificar" */
-                      <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
-                        <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-amber-600'}) : null}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground leading-tight">{req.title}</p>
-                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
-                        </div>
-                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Verificar</span>
-                      </div>
                     ) : (
-                      /* level='info' salud/equipamiento — Recomendado */
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground leading-tight">{req.title}</p>
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
-                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Recomendado</span>
+                        <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">recomendado</span>
                       </div>
                     );
                   })}
