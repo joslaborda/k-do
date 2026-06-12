@@ -42,7 +42,15 @@
     },
     "time": {
       "type": "string",
-      "description": "Hora de salida/llegada en formato HH:MM (vuelos, trenes, buses)"
+      "description": "Hora de salida en formato HH:MM (vuelos, trenes)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hora de llegada en formato HH:MM (vuelos, trenes)"
+    },
+    "note_time": {
+      "type": "string",
+      "description": "Hora opcional asociada a las notas HH:MM"
     },
     "notes": {
       "type": "string"
