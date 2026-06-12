@@ -14,7 +14,7 @@ const CATEGORIES = [
 ];
 
 const COMMON_CURRENCIES = [
-  'EUR','USD','GBP','JPY','CNY','CHF','MXN','ARS','BRL','THB','KRW','VND','MAD',
+  'EUR','GBP','JPY','CNY','CHF','MXN','ARS','BRL','THB','KRW','VND','MAD',
   'TRY','SGD','IDR','CAD','AUD','INR','MYR','PHP','ZAR','CLP','PEN','AED','SAR',
   'NOK','SEK','DKK','PLN','CZK','HUF','NZD','KES','RUB','EGP','CRC','COP',
 ];
