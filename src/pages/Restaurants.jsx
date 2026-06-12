@@ -10,80 +10,10 @@ import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle } from 'lucide-react';
+import OTabBar from '@/components/trip/OTabBar';
 import { Link } from 'react-router-dom';
 import SpotCard from '@/components/spots/SpotCard';
 
-function OTabBar({ tabs, activeKey, onChange }) {
-  const containerRef = useRef(null);
-  const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
-  const [mounted, setMounted] = useState(false);
-
-  const updateLine = useCallback(() => {
-    if (!containerRef.current) return;
-    const idx = tabs.findIndex(t => t.key === activeKey);
-    const buttons = containerRef.current.querySelectorAll('button');
-    const btn = buttons[idx];
-    if (!btn) return;
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
-    const labelEl = btn.querySelector('.tab-label');
-    const labelRect = labelEl ? labelEl.getBoundingClientRect() : btnRect;
-    setLineStyle({
-      left: labelRect.left - containerRect.left,
-      width: labelRect.width,
-    });
-  }, [activeKey, tabs]);
-
-  useEffect(() => {
-    updateLine();
-    if (!mounted) setTimeout(() => setMounted(true), 50);
-  }, [updateLine, mounted]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative flex"
-      style={{ position: 'relative' }}
-    >
-      {/* Animated sliding line */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: lineStyle.left,
-          width: lineStyle.width,
-          height: 3,
-          background: 'hsl(var(--primary))',
-          borderRadius: 2,
-          transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',
-        }}
-      />
-      {tabs.map(tab => {
-        const isOn = tab.key === activeKey;
-        return (
-          <button
-            key={tab.key}
-            onClick={() => onChange(tab.key)}
-            className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
-          >
-            <span
-              className="tab-label"
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: isOn ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
-                transition: 'color 0.2s',
-                lineHeight: 1,
-              }}
-            >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 
 // ── OSM helpers ───────────────────────────────────────────────────────────────
@@ -1894,10 +1824,13 @@ export default function Restaurants() {
 
             {spots.length === 0 ? (
               <div className="text-center py-16">
-                
-                <p className="text-muted-foreground mb-4">Aún no tienes spots en este viaje</p>
+                <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-7 h-7 text-muted-foreground/50" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">Aún no tienes spots en este viaje</p>
+                <p className="text-xs text-muted-foreground mb-5">Busca restaurantes, museos o cualquier plan y guárdalos aquí</p>
                 <button onClick={() => setShowCreate(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-full font-medium">
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
                   <Plus className="w-4 h-4" />Crear primer spot
                 </button>
               </div>
