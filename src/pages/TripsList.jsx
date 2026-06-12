@@ -412,7 +412,7 @@ export default function TripsList() {
 
             {/* Upcoming (excluding hero) */}
             {upcomingTrips.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Próximos</p>
                 {upcomingTrips.map(({ t, cities }) => (
                   <TripCard key={t.id} trip={t} cities={cities} />
@@ -442,7 +442,7 @@ export default function TripsList() {
                   </svg>
                 </button>
                 {showPast && (
-                  <div className="mt-3 space-y-3">
+                  <div className="mt-3 space-y-4">
                     {pastTrips.map(({ t, cities }) => (
                       <div key={t.id}>
                         <TripCard trip={t} cities={cities} />
