@@ -7,7 +7,7 @@ import { Calendar, Check, Users } from 'lucide-react';
 import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
 import { getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 import { REQ_ICON_MAP } from './constants';
 import MemberAvatarRow from './MemberAvatarRow';
 
@@ -118,7 +118,11 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
     const norm = (c) => (c || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const seen = {};
     const all = cities.length > 0 ? cities.map(c => c.country).filter(Boolean) : [trip?.country].filter(Boolean);
-    all.forEach(c => { const key = norm(c); if (!seen[key]) seen[key] = c; });
+    all.forEach(c => {
+      const normalized = normalizeCountry(c) || c; // convert English → Spanish if needed
+      const key = norm(normalized);
+      if (!seen[key]) seen[key] = normalized;
+    });
     return Object.values(seen);
   }, [trip, cities]);
 
