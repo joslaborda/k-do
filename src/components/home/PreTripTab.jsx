@@ -191,15 +191,6 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
               <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
               <p className="text-xs text-muted-foreground mt-0.5">pasaporte de {originCountry}</p>
             </div>
-            {doneCount === displayReqs.filter(r => r.level !== 'ok').length && displayReqs.filter(r => r.level !== 'ok').length > 0 ? (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Todo listo</span>
-            ) : (displayReqs.filter(r => r.level !== 'ok').length - doneCount) > 0 ? (
-              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
-                {displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 0
-                  ? `${displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length} pendiente${displayReqs.filter(r => r.level === 'required' && !checkedItems[r.id]).length > 1 ? 's' : ''}`
-                  : null}
-              </span>
-            ) : null}
           </div>
           {(() => {
             const GROUPS = [
