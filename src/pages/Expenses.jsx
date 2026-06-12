@@ -853,8 +853,16 @@ export default function Expenses() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [detailExpense, setDetailExpense] = useState(null);
-  const [currencyBannerDismissed, setCurrencyBannerDismissed] = useState(false);
-  const overrideKey = (cityId) => `kodo_currency_override_${tripId}_${cityId}`;
+  // ── localStorage helpers para banner y override de moneda ──────────────────
+  const bannerKey    = (cityId) => `kodo_currency_banner_${tripId}_${cityId}`;
+  const overrideKey  = (cityId) => `kodo_currency_override_${tripId}_${cityId}`;
+
+  const isBannerDismissed = (cityId) => {
+    try { return !!localStorage.getItem(bannerKey(cityId)); } catch { return false; }
+  };
+  const dismissBanner = (cityId) => {
+    try { localStorage.setItem(bannerKey(cityId), '1'); } catch {}
+  };
   const getStoredOverride = (cityId) => {
     try { return localStorage.getItem(overrideKey(cityId)) || null; } catch { return null; }
   };
@@ -862,9 +870,8 @@ export default function Expenses() {
     try { localStorage.setItem(overrideKey(cityId), currency); } catch {}
   };
 
-  const [activeCurrencyOverride, setActiveCurrencyOverride] = useState(
-    () => getStoredOverride(null)
-  );
+  const [currencyBannerDismissed, setCurrencyBannerDismissed] = useState(false);
+  const [activeCurrencyOverride, setActiveCurrencyOverride] = useState(null);
   const [prevCityId, setPrevCityId] = useState(null);
 
   const { data: trip } = useQuery({
