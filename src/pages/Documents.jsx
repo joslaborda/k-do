@@ -71,10 +71,10 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
     : null;
 
   const timeLabel = ticket.time
-    ? ticket.time
+    ? (ticket.end_time ? `${ticket.time} → ${ticket.end_time}` : ticket.time)
     : cat === 'hotel' && ticket.date
     ? `Check-in ${format(parseISO(ticket.date), 'dd MMM', { locale: es })}`
-    : null;
+    : ticket.note_time || null;
 
   return (
     <div className={`bg-card rounded-xl overflow-hidden mb-2 border transition-all ${todayDoc ? 'border-orange-200' : 'border-border'}`}>
@@ -364,7 +364,8 @@ export default function Documents() {
           <div className="px-5 py-4 overflow-y-auto flex-1">
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
               minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
-              onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending} />
+              onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending}
+              onView={(url) => setViewFile(url)} />
           </div>
         </DialogContent>
       </Dialog>
@@ -383,7 +384,8 @@ export default function Documents() {
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
                 onCancel={() => setEditDoc(null)}
                 onDelete={() => { setDeleteDoc(editDoc); setEditDoc(null); }}
-                saving={updateMutation.isPending} />
+                saving={updateMutation.isPending}
+                onView={(url) => setViewFile(url)} />
             </div>
           )}
         </DialogContent>
