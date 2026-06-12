@@ -27,6 +27,7 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
     const best = (secondary && secondary.needed === false) ? secondary : visaInfo;
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
+      origin: originCountry,
       title: best?.needed === false ? `Sin visado — ${country}` : `Visado requerido — ${country}`,
       description: best?.notes || countryData.visa?.info || '',
       level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
@@ -211,12 +212,11 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   {!isCollapsed && items.map(req => {
                     const isInfo = req.level === 'info';
                     const isOk   = req.level === 'ok';
-                    // level 'ok' (sin visado) → info visual con chip verde
                     if (isOk) return (
                       <div key={req.id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground leading-tight line-through text-muted-foreground">{req.title}</p>
+                          <p className="text-sm font-medium text-foreground leading-tight">{req.origin} → {req.country}</p>
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
                         <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
