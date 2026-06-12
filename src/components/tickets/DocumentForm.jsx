@@ -34,32 +34,32 @@ const VISIBILITY_OPTS = [
 ];
 
 const SHOW_FIELDS = {
-  flight:   ['name','origin','destination','airline','date','time','end_date','notes'],
-  hotel:    ['name','city','date','time','end_date','notes'],
-  train:    ['name','origin','destination','date','time','notes'],
-  event:    ['name','city','date','time','notes'],
-  personal: ['name','date','end_date','notes'],
-  other:    ['name','city','date','time','notes'],
+  flight:   ['name','origin','destination','airline','date','time','end_time','notes','note_time'],
+  hotel:    ['name','city','date','time','end_date','notes','note_time'],
+  train:    ['name','origin','destination','date','time','end_time','notes','note_time'],
+  event:    ['name','city','date','time','notes','note_time'],
+  personal: ['name','date','end_date','notes','note_time'],
+  other:    ['name','city','date','time','notes','note_time'],
 };
 
 const FIELD_LABELS = {
   name: 'Nombre', origin: 'Origen', destination: 'Destino',
   airline: 'Compañía / Nº vuelo', city: 'Ciudad',
-  date: 'Fecha', end_date: 'Fecha fin', time: 'Hora',
-  notes: 'Notas',
+  date: 'Fecha', end_date: 'Fecha fin', time: 'Hora salida', end_time: 'Hora llegada',
+  notes: 'Notas', note_time: 'Hora de la nota',
 };
 
 const FIELD_PLACEHOLDERS = {
   name: 'Ej. Vuelo Madrid-Tokyo', origin: 'MAD', destination: 'NRT',
   airline: 'IB-6832', city: 'Tokyo',
-  date: 'yyyy-mm-dd', end_date: 'yyyy-mm-dd', time: '08:45',
-  notes: 'Notas adicionales...',
+  date: 'yyyy-mm-dd', end_date: 'yyyy-mm-dd', time: '08:45', end_time: '13:20',
+  notes: 'Notas adicionales...', note_time: '14:00',
 };
 
 // Personal categories that should NOT restrict to trip dates
 const PERSONAL_CATEGORIES = ['personal'];
 
-export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving }) {
+export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
@@ -73,6 +73,8 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
     date:        initialData?.date        || '',
     end_date:    initialData?.end_date    || '',
     time:        initialData?.time        || '',
+    end_time:    initialData?.end_time    || '',
+    note_time:   initialData?.note_time   || '',
     notes:       initialData?.notes       || '',
     file_url:    initialData?.file_url    || '',
     city_id:     initialData?.city_id     || '',
@@ -215,10 +217,20 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
           )}
           {hasField('time') && (
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Hora</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{FIELD_LABELS.time}</p>
               <Input type="time" value={fields.time} onChange={e => setField('time', e.target.value)} className="h-10 text-sm" />
             </div>
           )}
+        </div>
+      )}
+
+      {/* End time — hora de llegada para vuelos y trenes */}
+      {hasField('end_time') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+            {FIELD_LABELS.end_time} <span className="font-normal normal-case tracking-normal text-muted-foreground">— opcional</span>
+          </p>
+          <Input type="time" value={fields.end_time} onChange={e => setField('end_time', e.target.value)} className="h-10 text-sm" placeholder={FIELD_PLACEHOLDERS.end_time} />
         </div>
       )}
 
@@ -236,6 +248,16 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Notas</p>
           <Textarea value={fields.notes} onChange={e => setField('notes', e.target.value)}
             placeholder={FIELD_PLACEHOLDERS.notes} className="text-sm resize-none" rows={2} />
+        </div>
+      )}
+
+      {/* Note time — hora opcional para notas */}
+      {hasField('note_time') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+            Hora de la nota <span className="font-normal normal-case tracking-normal text-muted-foreground">— opcional</span>
+          </p>
+          <Input type="time" value={fields.note_time} onChange={e => setField('note_time', e.target.value)} className="h-10 text-sm" />
         </div>
       )}
 
@@ -300,16 +322,39 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
         )}
       </div>
 
-      {/* File upload */}
+      {/* File upload + preview */}
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Archivo adjunto</p>
         {fields.file_url ? (
-          <div className="flex items-center gap-3 px-4 py-3 bg-secondary/40 rounded-xl border border-border">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-            </svg>
-            <span className="text-sm text-foreground flex-1 truncate">Archivo adjuntado</span>
-            <button onClick={() => setField('file_url', '')} className="text-xs text-muted-foreground hover:text-red-500 transition-colors">Quitar</button>
+          <div className="border border-border rounded-xl overflow-hidden">
+            {/* Preview row */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-secondary/40 border-b border-border">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <span className="text-sm text-foreground flex-1 truncate">Archivo adjuntado</span>
+              {onView && (
+                <button onClick={() => onView(fields.file_url)}
+                  className="text-xs text-primary font-medium hover:text-primary/80 transition-colors flex-shrink-0">
+                  Ver →
+                </button>
+              )}
+              <button onClick={() => setField('file_url', '')}
+                className="text-xs text-muted-foreground hover:text-red-500 transition-colors ml-2">
+                Quitar
+              </button>
+            </div>
+            {/* Inline preview for images */}
+            {fields.file_url.match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i) && (
+              <img src={fields.file_url} alt="preview"
+                className="w-full max-h-48 object-contain bg-secondary/20" />
+            )}
+            {/* PDF hint */}
+            {fields.file_url.match(/\.pdf(\?|$)/i) && (
+              <div className="px-4 py-2.5 bg-orange-50 border-t border-orange-100">
+                <p className="text-xs text-primary">Toca "Ver →" para consultar el PDF y copiar los horarios</p>
+              </div>
+            )}
           </div>
         ) : (
           <label className={`flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-5 cursor-pointer hover:border-primary/40 hover:bg-secondary/20 transition-all ${fileUploading ? 'opacity-50' : ''}`}>
