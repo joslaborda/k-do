@@ -230,39 +230,43 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                   {!isCollapsed && items.map(req => {
                     const isInfo = req.level === 'info';
                     const isOk   = req.level === 'ok';
-                    // Enchufe igual al de origen → no mostrar
+
                     if (isOk && req.type === 'tech') return null;
-                    // Sin visado → chip verde
-                    if (isOk) return (
-                      <div key={req.id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
-                        <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground leading-tight">{req.origin} → {req.country}</p>
-                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
-                        </div>
-                        <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
-                      </div>
-                    );
-                    // Obligatorio (visa required, tech diferente, money diferente)
-                    if (!isInfo) return (
-                      <button key={req.id} onClick={() => req.type === 'visa' ? toggleCheck(req.id) : null}
-                        className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
-                        {req.type === 'visa' && (
-                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                            {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+
+                    if (isOk) {
+                      return (
+                        <div key={req.id} className="flex items-center gap-3 px-4 py-3 border-b border-border last:border-0">
+                          <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-green-600'}) : null}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground leading-tight">{req.origin} → {req.country}</p>
+                            {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                           </div>
-                        )}
-                        <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-primary'}) : null}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{req.title}</p>
-                          {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                          <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
                         </div>
-                        {!checkedItems[req.id] && (
-                          <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">Obligatorio</span>
-                        )}
-                      </button>
-                    );
-                    // Info: Recomendado (vacunas, consejos) o Verificar (visa sin datos)
+                      );
+                    }
+
+                    if (!isInfo) {
+                      return (
+                        <button key={req.id} onClick={() => req.type === 'visa' ? toggleCheck(req.id) : null}
+                          className="w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/20 transition-colors text-left">
+                          {req.type === 'visa' && (
+                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${checkedItems[req.id] ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                              {checkedItems[req.id] && <Check className="w-3 h-3 text-white" />}
+                            </div>
+                          )}
+                          <span className="text-base shrink-0">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-primary'}) : null}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium leading-tight ${checkedItems[req.id] ? 'line-through text-muted-foreground' : 'text-foreground'}`}>{req.title}</p>
+                            {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
+                          </div>
+                          {!checkedItems[req.id] && (
+                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">Obligatorio</span>
+                          )}
+                        </button>
+                      );
+                    }
+
                     return (
                       <div key={req.id} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
                         <span className="text-base shrink-0 mt-0.5">{REQ_ICON_MAP[req.type] ? REQ_ICON_MAP[req.type]({className:'text-muted-foreground'}) : 'ℹ️'}</span>
@@ -276,6 +280,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                         }
                       </div>
                     );
+                  })}
                 </div>
               );
             });
