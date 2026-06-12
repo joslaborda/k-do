@@ -110,6 +110,18 @@ export default function ExpenseForm({
   );
 
   const handleSave = async () => {
+    if (!form.amount || parseFloat(form.amount) <= 0) {
+      alert('Introduce un importe para guardar el gasto.');
+      return;
+    }
+    if (!form.description.trim()) {
+      alert('Añade una descripción al gasto.');
+      return;
+    }
+    if (!form.paid_by) {
+      alert('Indica quién pagó el gasto.');
+      return;
+    }
     let amountBase = parseFloat(form.amount);
     let fxRate = 1, fxSource = 'same', fxTimestamp = new Date().toISOString();
     if (!isSameCurrency) {
@@ -131,32 +143,48 @@ export default function ExpenseForm({
   return (
     <div className="space-y-5">
 
-      {/* Importe + conversión */}
-      <div className="bg-secondary rounded-2xl p-4 text-center">
-        <p className="text-xs text-muted-foreground mb-3">Importe</p>
-        <div className="flex items-center justify-center gap-3 mb-3">
-          {/* Currency selector inline */}
-          <select value={currency} onChange={e => set('currency', e.target.value)}
-            className="border border-border rounded-xl px-2 py-1.5 text-sm bg-card outline-none focus:border-primary h-9">
-            {orderedCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <input
-            type="number" placeholder="0" value={form.amount} onChange={e => set('amount', e.target.value)}
-            step="any"
-            className="text-2xl font-medium text-center border-none bg-transparent outline-none text-foreground w-32"
-          />
-        </div>
-        {/* FX preview */}
-        {!isSameCurrency && form.amount && parseFloat(form.amount) > 0 && (
-          <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">
-            {converting
-              ? <><Loader2 className="w-3 h-3 animate-spin text-primary" /><span className="text-xs text-primary">Calculando...</span></>
-              : fxInfo
-                ? <span className="text-xs text-primary font-medium">= {fxInfo.amountConverted.toLocaleString('es')} {baseCurrency}</span>
-                : <span className="text-xs text-muted-foreground">tipo real</span>
-            }
+      {/* Importe + conversión — cantidad domina, moneda secundaria */}
+      <div className="bg-secondary rounded-2xl py-6 px-4 text-center">
+        {/* Cantidad — grande y centrada */}
+        <input
+          type="text"
+          inputMode="decimal"
+          placeholder="0"
+          value={form.amount}
+          onChange={e => {
+            const val = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+            set('amount', val);
+          }}
+          autoFocus
+          className="text-5xl font-bold text-center bg-transparent outline-none text-foreground placeholder:text-border w-full mb-1"
+          style={{ letterSpacing: '-1px' }}
+        />
+        <div className="w-16 h-0.5 bg-primary rounded-full mx-auto mb-4" />
+
+        {/* Moneda — píldora pequeña como selector secundario */}
+        <div className="flex items-center justify-center gap-3">
+          <div className="relative inline-flex items-center">
+            <select
+              value={currency}
+              onChange={e => set('currency', e.target.value)}
+              className="appearance-none bg-card border border-border rounded-full pl-3 pr-7 py-1.5 text-xs font-semibold text-muted-foreground outline-none focus:border-primary cursor-pointer"
+            >
+              {orderedCurrencies.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <svg className="absolute right-2 pointer-events-none" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-        )}
+
+          {/* FX inline */}
+          {!isSameCurrency && form.amount && parseFloat(form.amount) > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {converting
+                ? '...'
+                : fxInfo
+                  ? `≈ ${fxInfo.amountConverted.toLocaleString('es')} ${baseCurrency}`
+                  : ''}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Descripción + recibos */}
