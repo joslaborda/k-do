@@ -28,7 +28,7 @@ const CAT_ICONS = {
 const CAT_COLORS = {
   food: 'bg-orange-100 text-primary', transport: 'bg-blue-100 text-blue-600',
   accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
-  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary0 text-muted-foreground',
+  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary text-muted-foreground',
 };
 const CAT_CONFIG = {
   food:          { label: 'Comida'      },
@@ -112,23 +112,22 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${CAT_COLORS[expense.category] || CAT_COLORS.other}`}>
         {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {expense.description}
-        </p>
-        <p style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 1 }}>
-          Pagó {paidByName} · ÷ {splitCount}
-        </p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-foreground truncate">{expense.description}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Pagó {paidByName} · ÷ {splitCount}</p>
       </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+      <div className="text-right flex-shrink-0">
+        {/* Moneda original — siempre visible y prominente */}
+        <p className="text-sm font-semibold text-foreground">
+          {sym(expense.currency || baseCurrency)}{fmtAmt(parseFloat(expense.amount || 0), expense.currency || baseCurrency)}
+          {' '}<span className="text-xs font-normal text-muted-foreground">{expense.currency || baseCurrency}</span>
+        </p>
+        {/* Equivalente en base — solo si moneda diferente */}
         {!isSame && (
-          <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--color-text-primary)' }}>
-            {sym(expense.currency)}{fmtAmt(parseFloat(expense.amount || 0), expense.currency)}
+          <p className="text-xs text-muted-foreground mt-0.5">
+            ≈ {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)} {baseCurrency}
           </p>
         )}
-        <p style={{ fontSize: isSame ? 13 : 11, fontWeight: isSame ? 500 : 400, color: isSame ? 'var(--color-text-primary)' : 'hsl(var(--primary))' }}>
-          {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)}
-        </p>
       </div>
     </button>
   );
@@ -242,10 +241,36 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
   const myBalance = balances[currentUserEmail] || 0;
   const iSettled = Math.abs(myBalance) < 0.01;
 
-  // Debts where I owe someone
-  const iOwe = debts.filter(d => d.from === currentUserEmail);
-  // Debts where someone owes me
-  const owesMe = debts.filter(d => d.to === currentUserEmail);
+  const iOwe   = debts.filter(d => d.from === currentUserEmail);
+  const owesMe = debts.filter(d => d.to   === currentUserEmail);
+
+  // Convert each debt to debtor's home_currency for display
+  const [convertedDebts, setConvertedDebts] = useState({});
+  useEffect(() => {
+    if (!debts.length) return;
+    const run = async () => {
+      const results = {};
+      await Promise.all(debts.map(async (d, i) => {
+        const debtorCurrency  = profilesByEmail?.[d.from]?.home_currency || baseCurrency;
+        const creditorCurrency = profilesByEmail?.[d.to]?.home_currency  || baseCurrency;
+        let debtorAmount = d.amount;
+        let creditorAmount = d.amount;
+        try {
+          if (debtorCurrency !== baseCurrency) {
+            const fx = await getFxRate(baseCurrency, debtorCurrency);
+            debtorAmount = parseFloat((d.amount * fx.rate).toFixed(2));
+          }
+          if (creditorCurrency !== baseCurrency) {
+            const fx = await getFxRate(baseCurrency, creditorCurrency);
+            creditorAmount = parseFloat((d.amount * fx.rate).toFixed(2));
+          }
+        } catch {}
+        results[i] = { debtorAmount, debtorCurrency, creditorAmount, creditorCurrency };
+      }));
+      setConvertedDebts(results);
+    };
+    run();
+  }, [debts.map(d => `${d.from}-${d.to}-${d.amount}`).join(','), profilesByEmail, baseCurrency]);
 
   if (expenses.length === 0) {
     return (
@@ -256,6 +281,25 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       </div>
     );
   }
+
+  // from=true → muestra moneda del deudor (quien paga)
+  // from=false → muestra moneda del acreedor (quien recibe)
+  const DebtAmount = ({ idx, d, from }) => {
+    const cv = convertedDebts[idx];
+    if (!cv) return <span>{fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</span>;
+    const primaryCurrency = from ? cv.debtorCurrency  : cv.creditorCurrency;
+    const primaryAmount   = from ? cv.debtorAmount    : cv.creditorAmount;
+    const otherCurrency   = from ? cv.creditorCurrency : cv.debtorCurrency;
+    const otherAmount     = from ? cv.creditorAmount   : cv.debtorAmount;
+    return (
+      <>
+        <span className="font-semibold">{sym(primaryCurrency)}{fmtAmt(primaryAmount, primaryCurrency)} {primaryCurrency}</span>
+        {primaryCurrency !== otherCurrency && (
+          <span className="text-muted-foreground font-normal"> ≈ {sym(otherCurrency)}{fmtAmt(otherAmount, otherCurrency)} {otherCurrency}</span>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -270,77 +314,77 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
             {myBalance > 0 ? 'Te deben este dinero' : 'Debes este dinero'}
           </p>
         )}
-        {/* Mi gasto real */}
         {(() => {
-          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail && !e.description?.startsWith('Liquidación:')).reduce((s, e) => s + (e.amount_base || e.amount || 0), 0);
-          const iOweTotal = debts.filter(d => d.from === currentUserEmail).reduce((s, d) => s + d.amount, 0);
+          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail && !e.description?.startsWith('Liquidación:')).reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
           const myRealSpend = iPaid - Math.max(0, myBalance);
           return iPaid > 0 ? (
             <div className="mt-3 pt-3 border-t border-border/50 flex gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">He pagado</p>
-                <p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Mi parte real</p>
-                <p className="text-sm font-medium text-foreground">{fmtAmt(Math.max(0, myRealSpend), baseCurrency)} {sym(baseCurrency)}</p>
-              </div>
+              <div><p className="text-xs text-muted-foreground">He pagado</p><p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Mi parte real</p><p className="text-sm font-medium text-foreground">{fmtAmt(Math.max(0, myRealSpend), baseCurrency)} {sym(baseCurrency)}</p></div>
             </div>
           ) : null;
         })()}
       </div>
 
-      {/* Lo que debo yo — botón "He pagado" para saldar */}
+      {/* Lo que debo */}
       {iOwe.length > 0 && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tienes que pagar</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
-            {iOwe.map((d, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={d.to} profiles={profilesByEmail} size={32} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {userMap[d.to] || d.to}
-                  </p>
-                  <p className="text-xs text-red-500 font-medium mt-0.5">Debes {fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</p>
+            {iOwe.map((d, i) => {
+              const idx = debts.indexOf(d);
+              const cv = convertedDebts[idx];
+              return (
+                <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
+                  <Avatar email={d.to} profiles={profilesByEmail} size={32} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.to] || d.to}</p>
+                    <p className="text-xs text-red-500 font-medium mt-0.5">
+                      Debes <DebtAmount idx={idx} d={d} from={true} />
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => onSettle({ ...d, displayAmount: cv?.debtorAmount || d.amount, displayCurrency: cv?.debtorCurrency || baseCurrency })}
+                    className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0">
+                    Saldar
+                  </button>
                 </div>
-                <button onClick={() => onSettle(d)}
-                  className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0">
-                  Saldar deuda
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Lo que me deben a mí — solo informativo */}
+      {/* Lo que me deben */}
       {owesMe.length > 0 && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Te deben</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
-            {owesMe.map((d, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={d.from} profiles={profilesByEmail} size={32} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {userMap[d.from] || d.from}
-                  </p>
-                  <p className="text-xs text-green-600 font-medium mt-0.5">Te debe {fmtAmt(d.amount, baseCurrency)} {sym(baseCurrency)}</p>
+            {owesMe.map((d, i) => {
+              const idx = debts.indexOf(d);
+              return (
+                <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
+                  <Avatar email={d.from} profiles={profilesByEmail} size={32} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.from] || d.from}</p>
+                    <p className="text-xs text-green-600 font-medium mt-0.5">
+                      Te debe <DebtAmount idx={idx} d={d} from={false} />
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground flex-shrink-0">Pendiente</span>
                 </div>
-                <span className="text-xs text-muted-foreground flex-shrink-0">Pendiente</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">Ellos verán el botón "He pagado" en su vista</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">Ellos verán el botón "Saldar" en su vista</p>
         </div>
       )}
 
-      {/* Todos los saldos */}
+      {/* Saldo de todos */}
       <div>
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
-          {members.map((email, i) => {
+          {members.map((email) => {
             const bal = balances[email] || 0;
             const isMe = email === currentUserEmail;
             const name = userMap[email] || email || '?';
@@ -356,8 +400,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                       {Math.abs(bal) < 0.01 ? '0' : `${bal > 0 ? '+' : ''}${fmtAmt(bal, baseCurrency)}`} {sym(baseCurrency)}
                     </span>
                   </div>
-                  <div style={{ height: 4, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? '#d1d5db' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
+                  <div style={{ height: 4, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? 'hsl(var(--muted-foreground))' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
                   </div>
                 </div>
               </div>
@@ -375,6 +419,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     </div>
   );
 }
+
 
 // ── Tab: Estadísticas ─────────────────────────────────────────────────────────
 function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip }) {
@@ -702,7 +747,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             saving={saving}
             userMap={userMap}
             currentUserEmail={currentUserEmail}
-            profiles={profilesByEmail}
+            profilesByEmail={profilesByEmail}
           />
         </div>
         {/* Buttons — outside scroll, always visible */}
@@ -742,8 +787,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
       const meta = getCountryMeta(c.country_code || c.country || '');
       if (meta?.currency) set.add(meta.currency);
     });
-    // Always show at least EUR and USD
-    set.add('EUR'); set.add('USD');
+    // baseCurrency always included via initialisation above
     return Array.from(set);
   }, [cities, homeCurrency, baseCurrency]);
 
@@ -902,8 +946,13 @@ export default function Expenses() {
   const availableCurrencies = computeAvailableCurrencies(cities, baseCurrency);
   const members = trip?.members || [];
 
-  // Show banner when active city changes and local currency differs from base
+  // Show banner only when trip is actually in progress
+  const tripStarted   = trip?.start_date ? new Date() >= new Date(trip.start_date + 'T00:00:00') : false;
+  const tripEnded     = trip?.end_date   ? new Date() >  new Date(trip.end_date   + 'T23:59:59') : false;
+  const tripInProgress = tripStarted && !tripEnded;
+
   const showCurrencyBanner = !currencyBannerDismissed &&
+    tripInProgress &&
     activeLocalCurrency && activeLocalCurrency !== baseCurrency;
 
   // When city changes, load stored override + banner state for that city
@@ -1013,11 +1062,12 @@ export default function Expenses() {
   const openEdit = e => { setEditingExpense(e); setSheetOpen(true); };
 
   const handleSettle = async (debt) => {
-    // Mark debt as settled — create a settlement expense
+    const settleCurrency = debt.displayCurrency || baseCurrency;
+    const settleAmount   = debt.displayAmount   || debt.amount;
     try {
       await createMutation.mutateAsync({
         description: `Liquidación: ${userMap[debt.from] || debt.from} → ${userMap[debt.to] || debt.to}`,
-        amount: debt.amount, currency: baseCurrency, amount_base: debt.amount,
+        amount: settleAmount, currency: settleCurrency, amount_base: debt.amount,
         category: 'other', paid_by: debt.from, split_with: [debt.to],
         split_type: 'equal', date: new Date().toISOString().slice(0, 10),
         is_settlement: true,
@@ -1156,7 +1206,7 @@ export default function Expenses() {
         onSave={handleSave}
         saving={createMutation.isPending || updateMutation.isPending}
         currentUserEmail={currentUserEmail}
-        profiles={profilesByEmail}
+        profilesByEmail={profilesByEmail}
       />
     </div>
   );
