@@ -10,7 +10,7 @@ import { Plus, Trash2, ExternalLink, Loader2, X, Minus, AlertTriangle, Landmark,
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
-import { getCountryRequirements } from '@/lib/packingDB';
+import { getCountryRequirements, SKIP_VACCINES } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -118,7 +118,7 @@ function PlugIcon({ type }) {
   );
 }
 
-function RequirementsTab({ reqs, country, homeCountry }) {
+function RequirementsTab({ reqs, country, homeCountry, meta }) {
   const [showAllVaccines, setShowAllVaccines] = useState(false);
 
   if (!country) return (
@@ -158,17 +158,8 @@ function RequirementsTab({ reqs, country, homeCountry }) {
 
   // Filtrar COVID-19 (no es requisito de viaje) y vacunas de rutina pediátrica
   // Filtrar vacunas rutinarias (todos las tenemos de niños) — solo mostrar las específicas de viaje
-  const SKIP_VACCINES = [
-    'COVID-19', 'COVID-19 (mRNA)',
-    'MMR', 'Measles', 'Mumps', 'Rubella',
-    'Varicella', 'Chickenpox',
-    'Polio', 'IPV', 'OPV',
-    'Tetanus', 'Td', 'Td/Tdap', 'Tdap', 'DTP', 'DTaP',
-    'Influenza', 'Flu',
-    'Pneumococcal', 'Meningococcal ACWY',
-  ];
   const filteredVaccines = vaccines.filter(v => !SKIP_VACCINES.includes(v.name));
-  const requiredVax = filteredVaccines.filter(v => v.priority === 'obligatoria' || v.priority?.includes('obligatori'));
+  const requiredVax = filteredVaccines.filter(v => v.priority?.includes('obligatori'));
   // Limpiar labels: quitar "(check age and history)" y "(seasonal and risk based)" del texto visible
   const cleanPriority = (p) => p
     ?.replace(/\s*\(check age and history\)/gi, '')
@@ -963,7 +954,7 @@ export default function Utilities() {
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
         {activeTab === 'requisitos' && (
-          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} />
+          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} />
         )}
         {activeTab === 'tiempo' && (
           <div className="space-y-4">

@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, MapPin, Settings } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
@@ -51,7 +52,7 @@ export default function Home() {
   const handleTabChange = (key) => {
     // Note: uses tab state ref via closure — homeTabs resolved at call time
     setTabDir(prev => {
-      const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat','fotos'];
+      const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat'];
       return tabOrder.indexOf(key) >= tabOrder.indexOf(tab) ? 1 : -1;
     });
     setTab(key);
@@ -91,7 +92,8 @@ export default function Home() {
 
   const deleteMutation = useMutation({
     mutationFn: () => base44.entities.Trip.delete(tripId),
-    onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); }
+    onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
+    onError: () => toast({ title: 'Error al eliminar el viaje', description: 'Inténtalo de nuevo.', variant: 'destructive' }),
   });
 
   const currentUserEmail = currentUser?.email;

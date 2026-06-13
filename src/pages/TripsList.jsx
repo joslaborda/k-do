@@ -289,24 +289,7 @@ export default function TripsList() {
     </div>
   );
 
-  // Email verification
-  if (user && user.is_verified === false) return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="bg-card rounded-2xl border border-border p-8 max-w-sm w-full text-center">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><Mail className="w-7 h-7 text-muted-foreground/50" /></div>
-        <p className="text-lg font-medium mb-2">Verifica tu email</p>
-        <p className="text-sm text-muted-foreground mb-6">Revisa tu bandeja de entrada para continuar.</p>
-        <button className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium"
-          onClick={() => window.location.reload()}>
-          Ya verifiqué
-        </button>
-        <button onClick={() => base44.auth.logout()}
-          className="mt-3 text-xs text-muted-foreground hover:underline block mx-auto">
-          Cerrar sesión
-        </button>
-      </div>
-    </div>
-  );
+
 
   const pastCount = pastTrips.length;
 
@@ -427,7 +410,7 @@ export default function TripsList() {
 
             {/* New trip button */}
             <button onClick={() => setDialogOpen(true)}
-              className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-card hover:bg-orange-50 transition-colors">
+              className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-card hover:bg-orange-50 dark:hover:bg-primary/10 transition-colors">
               <Plus className="w-4 h-4" />Nuevo viaje
             </button>
 
