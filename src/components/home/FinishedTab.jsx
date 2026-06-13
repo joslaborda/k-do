@@ -6,7 +6,7 @@ import { ArrowRight, Calendar, Compass, DollarSign, MapPin, Users } from 'lucide
 import { PlaneIcon } from '@/lib/icons';
 import { base44 } from '@/api/base44Client';
 
-export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail }) {
+export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail, profiles = [] }) {
   const { data: allTripSpots = spots } = useQuery({
     queryKey: ['allTripSpots', tripId],
     queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
@@ -49,9 +49,9 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
 
   return (
     <div className="space-y-3">
-      <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
-          <PlaneIcon className="w-7 h-7 text-muted-foreground/50" />
+      <div className="bg-orange-50 rounded-2xl border border-orange-200 p-6 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center mx-auto mb-3">
+          <PlaneIcon className="w-7 h-7 text-primary" />
         </div>
         <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
@@ -65,18 +65,34 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
       <div className="grid grid-cols-2 gap-3">
         {[
           { label: 'Días de viaje', value: totalDays || '—', Icon: Calendar },
-          { label: members === 1 ? 'Viajero' : 'Viajeros', value: members, Icon: Users },
           { label: 'Ciudades', value: cities.length, Icon: MapPin },
           { label: 'Spots visitados', value: visitedSpots, Icon: Compass },
         ].map(s => (
           <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
-            <s.Icon className="w-4 h-4 text-muted-foreground mb-2" />
+            <s.Icon className="w-4 h-4 text-primary mb-2" />
             <p className="text-xl font-semibold text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
+
+        {/* Viajeros — avatares */}
+        <div className="bg-card rounded-2xl border border-border p-4">
+          <Users className="w-4 h-4 text-primary mb-2" />
+          <div className="flex items-center gap-1.5 flex-wrap mt-1">
+            {(trip?.members || []).map((email, i) => {
+              const prof = profiles.find(p => p.email === email || p.user_email === email);
+              const name = prof?.display_name || prof?.username || email;
+              const initials = name.slice(0, 2).toUpperCase();
+              const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700','bg-pink-100 text-pink-700'];
+              return prof?.avatar_url
+                ? <img key={email} src={prof.avatar_url} alt={name} title={name} className="w-8 h-8 rounded-full object-cover border-2 border-background" style={{marginLeft: i > 0 ? -8 : 0}} />
+                : <div key={email} title={name} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-background ${colors[i % colors.length]}`} style={{marginLeft: i > 0 ? -8 : 0}}>{initials}</div>;
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">{members} {members === 1 ? 'viajero' : 'viajeros'}</p>
+        </div>
         <div className="bg-card rounded-2xl border border-border p-4 col-span-2">
-          <DollarSign className="w-4 h-4 text-muted-foreground mb-2" />
+          <DollarSign className="w-4 h-4 text-primary mb-2" />
           <p className="text-xs text-muted-foreground mb-0.5">Tu parte</p>
           {(() => {
             const myShare = expenses.reduce((s, e) => {
