@@ -66,7 +66,7 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
           <div style={{ position: 'absolute', top: 14, right: 16, fontSize: 32, zIndex: 1 }}>{countryMeta.flag}</div>
         )}
         <div style={{ position: 'relative', zIndex: 1, padding: '16px 16px 18px' }}>
-          <p style={{ fontSize: 10, fontWeight: 500, color: '#f8a07a', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: 10, fontWeight: 500, color: 'var(--kodo-hero-eyebrow)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>
             {isDeparture ? '¡Hoy empieza!' : '¡Mañana empieza!'}
           </p>
           <p style={{ fontSize: 22, fontWeight: 500, color: 'white', lineHeight: 1.2, marginBottom: 6 }}>

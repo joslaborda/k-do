@@ -14,7 +14,6 @@ import { normalizeCountry } from '@/lib/countryConfig';
 export default
 function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
   const queryClient = useQueryClient();
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 10 * 60 * 1000 });
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -296,8 +295,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex gap-2">
             {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const u = usersData?.find(x => x.email === email);
-              const prof = u ? profiles?.find(p => p.user_id === u.id) : null;
+              const prof = profiles?.find(p => p.email === email || p.user_email === email);
               const name = prof?.display_name || prof?.username || email || '?';
               const initials = name.slice(0,2).toUpperCase();
               const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
