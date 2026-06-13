@@ -49,7 +49,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
 
   return (
     <div className="space-y-3">
-      <div className="bg-orange-50 rounded-2xl border border-orange-200 p-6 text-center">
+      <div className="bg-card rounded-2xl border border-orange-200 p-6 text-center">
         <div className="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center mx-auto mb-3">
           <PlaneIcon className="w-7 h-7 text-primary" />
         </div>
@@ -86,7 +86,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
               const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700','bg-pink-100 text-pink-700'];
               return prof?.avatar_url
                 ? <img key={email} src={prof.avatar_url} alt={name} title={name} className="w-8 h-8 rounded-full object-cover border-2 border-background" style={{marginLeft: i > 0 ? -8 : 0}} />
-                : <div key={email} title={name} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-background ${colors[i % colors.length]}`} style={{marginLeft: i > 0 ? -8 : 0}}>{initials}</div>;
+                : <div key={email} title={name} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-background ${colors[i % colors.length]}`} style={{marginLeft: i > 0 ? -8 : 0}}>{prof?.username?.[0]?.toUpperCase() || prof?.display_name?.[0]?.toUpperCase() || email?.[0]?.toUpperCase() || '?'}</div>;
             })}
           </div>
           <p className="text-xs text-muted-foreground mt-2">{members} {members === 1 ? 'viajero' : 'viajeros'}</p>
