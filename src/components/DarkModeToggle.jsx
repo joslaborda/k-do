@@ -16,7 +16,7 @@ export default function DarkModeToggle() {
         width: 52,
         height: 28,
         borderRadius: 14,
-        background: isDark ? 'hsl(var(--primary))' : '#e2ddd7',
+        background: isDark ? 'hsl(var(--primary))' : 'var(--kodo-progress-track)',
         border: 'none',
         position: 'relative',
         cursor: 'pointer',
