@@ -266,7 +266,7 @@ export default function ExpenseForm({
                 const prof = profileMap?.[email] || null;
                 return prof?.avatar_url
                   ? <img src={prof.avatar_url} alt="" style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
-                  : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'#fbd5c0':'#f0ede8',color:form.paid_by===email?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
+                  : <div style={{width:24,height:24,borderRadius:'50%',background:form.paid_by===email?'var(--kodo-bg-orange-mid)':'var(--kodo-progress-track)',color:form.paid_by===email?'hsl(var(--primary))':'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:500,flexShrink:0}}>
                       {getName(email).slice(0,2).toUpperCase()}
                     </div>;
               })()}
@@ -323,7 +323,7 @@ export default function ExpenseForm({
                   }`}>
                   {sp?.avatar_url
                     ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover'}} />
-                    : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'#fbd5c0':'#f0ede8',color:selected?'#b34a1a':'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
+                    : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'var(--kodo-bg-orange-mid)':'var(--kodo-progress-track)',color:selected?'hsl(var(--primary))':'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
                     {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
@@ -343,7 +343,7 @@ export default function ExpenseForm({
                 <div key={email} className="flex items-center gap-3 px-3 py-2 rounded-xl border border-border bg-card">
                   {sp?.avatar_url
                     ? <img src={sp.avatar_url} alt="" style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
-                    : <div style={{width:28,height:28,borderRadius:'50%',background:'#f0ede8',color:'#888',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500,flexShrink:0}}>
+                    : <div style={{width:28,height:28,borderRadius:'50%',background:'var(--kodo-progress-track)',color:'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500,flexShrink:0}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className="text-xs font-medium text-foreground flex-1 truncate">
                     {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
