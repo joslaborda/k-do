@@ -42,6 +42,16 @@ const DEST_NAME_TO_ISO = {
   'Nigeria':'NG','Congo':'CG','Zambia':'ZM','Kenia':'KE',
 };
 
+export const SKIP_VACCINES = [
+  'COVID-19', 'COVID-19 (mRNA)',
+  'MMR', 'Measles', 'Mumps', 'Rubella',
+  'Varicella', 'Chickenpox',
+  'Polio', 'IPV', 'OPV',
+  'Tetanus', 'Td', 'Td/Tdap', 'Tdap', 'DTP', 'DTaP',
+  'Influenza', 'Flu',
+  'Pneumococcal', 'Meningococcal ACWY',
+];
+
 export const COUNTRY_REQUIREMENTS = {
 
   'España': {
