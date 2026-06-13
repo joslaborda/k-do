@@ -103,7 +103,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
       <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>
         <div className="w-8" />
         <p className="text-sm font-medium truncate max-w-xs" style={{ color: 'rgba(255,255,255,.75)' }}>{fileName}</p>
-        <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center"
+        <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center"
           style={{ background: 'rgba(255,255,255,.1)' }}>
           <X className="w-5 h-5" style={{ color: 'rgba(255,255,255,.8)' }} />
         </button>
@@ -178,11 +178,11 @@ export default function PDFViewer({ fileUrl, onClose }) {
       <div className="shrink-0 px-5 py-3 flex items-center justify-between" style={{ background: 'rgba(0,0,0,.5)' }}>
         <div className="flex items-center gap-1">
           <button onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-light"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg font-light"
             style={{ background: 'rgba(255,255,255,.1)' }}>−</button>
           <span className="text-xs w-10 text-center" style={{ color: 'rgba(255,255,255,.5)' }}>{Math.round(zoom * 100)}%</span>
           <button onClick={() => setZoom(z => Math.min(4, z + 0.25))}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-lg font-light"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-lg font-light"
             style={{ background: 'rgba(255,255,255,.1)' }}>+</button>
         </div>
         {isPDF && pageCount > 0 && (
