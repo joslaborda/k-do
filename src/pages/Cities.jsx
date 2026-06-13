@@ -210,7 +210,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
             <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-xl border border-border flex items-center justify-center shrink-0">
+          <button onClick={onClose} className="w-9 h-9 rounded-full border border-border flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
