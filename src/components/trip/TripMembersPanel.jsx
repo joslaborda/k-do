@@ -32,9 +32,14 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
   // Perfiles solo de miembros del viaje — sin list() completas
   const { data: allProfiles = [] } = useQuery({
     queryKey: ['memberProfiles', members.join(',')],
-    queryFn: () => members.length
-      ? base44.entities.UserProfile.filter({ email: { $in: members } })
-      : [],
+    queryFn: async () => {
+      if (!members.length) return [];
+      const users = await base44.entities.User.filter({ email: { $in: members } });
+      const ids = users.map(u => u.id).filter(Boolean);
+      if (!ids.length) return [];
+      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
+    },
     enabled: members.length > 0,
     staleTime: 60000,
   });
