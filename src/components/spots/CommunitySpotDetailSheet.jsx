@@ -41,7 +41,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
                   <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
                 </div>
               </div>
-              <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
