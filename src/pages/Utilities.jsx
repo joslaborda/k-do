@@ -51,7 +51,7 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
       <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-4" onClick={e => e.stopPropagation()}>
         <div className="w-9 h-1 bg-border rounded-full mx-auto" />
         <p className="text-sm font-medium text-foreground">Nuevo artículo</p>
-        <input autoFocus placeholder="Nombre del artículo..." value={name}
+        <input autoFocus aria-label="Nombre del artículo" placeholder="Nombre del artículo..." value={name}
           onChange={e => setName(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSave()}
           className="w-full px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none" />

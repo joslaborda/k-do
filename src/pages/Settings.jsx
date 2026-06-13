@@ -137,7 +137,7 @@ function PasswordSection({ user }) {
           return (
             <div key={label}>
               <p className="text-xs text-muted-foreground mb-1">{label}</p>
-              <input type="password" value={val} onChange={e => setVal(e.target.value)} placeholder="••••••••"
+              <input type="password" value={val} onChange={e => setVal(e.target.value)} aria-label="Nueva contraseña" placeholder="••••••••"
                 className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
             </div>
           );
@@ -339,7 +339,7 @@ export default function Settings() {
           {/* Name */}
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs text-muted-foreground mb-1.5">Nombre</p>
-            <input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Tu nombre"
+            <input value={displayName} onChange={e => setDisplayName(e.target.value)} aria-label="Nombre completo" placeholder="Tu nombre"
               className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
           </div>
 
@@ -348,7 +348,7 @@ export default function Settings() {
             <p className="text-xs text-muted-foreground mb-1.5">Usuario</p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
-              <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} placeholder="tuusuario"
+              <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} aria-label="Nombre de usuario" placeholder="tuusuario"
                 className="w-full h-10 border border-border rounded-xl pl-7 pr-9 text-sm outline-none focus:border-primary bg-secondary" />
               {username && username !== profile.username && usernameAvailable !== null && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
