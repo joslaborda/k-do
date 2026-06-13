@@ -196,7 +196,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Ciudad</p>
-                    <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" placeholder="Ciudad" />
+                    <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" aria-label="Ciudad de origen" placeholder="Ciudad" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">País</p>
@@ -248,7 +248,7 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Ciudad</p>
-                <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" placeholder="Ciudad" autoFocus />
+                <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} aria-label="Ciudad" className="h-8 text-sm" placeholder="Ciudad" autoFocus />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">País</p>
