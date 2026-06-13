@@ -301,7 +301,7 @@ export default function Home() {
         )}
 
         {tab === 'resumen' && (
-          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} tripId={tripId} currentUserEmail={currentUserEmail} />
+          <FinishedTab trip={trip} cities={sortedCities} expenses={expenses} spots={allSpots} tripId={tripId} currentUserEmail={currentUserEmail} profiles={profiles} />
         )}
         {tab === 'chat' && (
           <ChatTab
