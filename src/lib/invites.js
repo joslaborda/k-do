@@ -95,10 +95,11 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
   });
 
   const trip = await base44.entities.Trip.get(tripId);
+  const normalizedUserEmail = userEmail.toLowerCase();
   const members = trip.members || [];
-  const newMembers = members.includes(userEmail) ? members : [...members, userEmail];
+  const newMembers = members.includes(normalizedUserEmail) ? members : [...members, normalizedUserEmail];
   const roles = trip.roles || {};
-  const newRoles = { ...roles, [userEmail]: invite.role || 'editor' };
+  const newRoles = { ...roles, [normalizedUserEmail]: invite.role || 'editor' };
 
   await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
 
