@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, Check, Users } from 'lucide-react';
-import { COUNTRY_REQUIREMENTS } from '@/lib/packingDB';
+import { COUNTRY_REQUIREMENTS, SKIP_VACCINES } from '@/lib/packingDB';
 import { getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
@@ -55,8 +55,9 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
 
     // ── Vacunas ───────────────────────────────────────────────────────────
     if (countryData.vaccines?.length) {
-      const required = countryData.vaccines.filter(v => v.priority === 'obligatoria para entrada');
-      const recommended = countryData.vaccines.filter(v => v.priority !== 'obligatoria para entrada');
+      const travelVaccines = countryData.vaccines.filter(v => !SKIP_VACCINES.includes(v.name));
+      const required = travelVaccines.filter(v => v.priority === 'obligatoria para entrada');
+      const recommended = travelVaccines.filter(v => v.priority !== 'obligatoria para entrada');
       if (required.length) {
         requirements.push({
           id: `vaccine-req-${country}`, type: 'vaccine', country,
