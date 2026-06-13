@@ -200,24 +200,24 @@ export default function Documents() {
     queryFn: () => base44.entities.Trip.get(tripId),
     enabled: !!tripId, staleTime: 60000,
   });
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
+  // Perfiles solo de miembros del viaje — sin list() completas
+  const tripMembers = trip?.members || [];
+  const { data: memberProfiles = [] } = useQuery({
+    queryKey: ['memberProfiles', tripMembers.join(',')],
+    queryFn: () => tripMembers.length
+      ? base44.entities.UserProfile.filter({ email: { $in: tripMembers } })
+      : [],
+    enabled: tripMembers.length > 0,
     staleTime: 5 * 60 * 1000,
-  });
-  const { data: usersData = [] } = useQuery({
-    queryKey: ['allUsers'],
-    queryFn: () => base44.entities.User.list(),
-    staleTime: 10 * 60 * 1000,
   });
   const profilesByEmail = useMemo(() => {
     const map = {};
-    (usersData || []).forEach(u => {
-      const p = profiles.find(x => x.user_id === u.id);
-      if (p) map[u.email] = p;
+    memberProfiles.forEach(p => {
+      const email = p.email || p.user_email;
+      if (email) map[email] = p;
     });
     return map;
-  }, [profiles, usersData]);
+  }, [memberProfiles]);
 
 
   // Backfill auto-links

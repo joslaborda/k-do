@@ -119,8 +119,15 @@ export default function Home() {
   });
   const { data: allSpots = [] } = useQuery({ queryKey: ['spots', tripId], queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 30000 });
   const { data: tripMessages = [] } = useQuery({ queryKey: ['tripMessages', tripId], queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }), enabled: !!tripId, staleTime: 10000, refetchInterval: 30000 });
-  const { data: profiles = [] } = useQuery({ queryKey: ['allProfilesHome'], queryFn: () => base44.entities.UserProfile.list(), staleTime: 5 * 60 * 1000 });
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 10 * 60 * 1000 });
+  const tripMembers = trip?.members || [];
+  const { data: profiles = [] } = useQuery({
+    queryKey: ['profilesHome', tripMembers.join(',')],
+    queryFn: () => tripMembers.length
+      ? base44.entities.UserProfile.filter({ email: { $in: tripMembers } })
+      : [],
+    enabled: tripMembers.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
   const { data: myProfile } = useQuery({
     queryKey: ['myProfile', currentUserId],
     queryFn: async () => {

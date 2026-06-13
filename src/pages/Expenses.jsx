@@ -967,41 +967,33 @@ export default function Expenses() {
 
   const defaultCurrency = activeCurrencyOverride || activeLocalCurrency || baseCurrency;
 
-  const { data: usersData = [] } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+  // Cargar perfiles solo de los miembros del viaje — sin User.list() completa
+  const { data: memberProfiles = [] } = useQuery({
+    queryKey: ['memberProfiles', members.join(',')],
+    queryFn: () => members.length
+      ? base44.entities.UserProfile.filter({ email: { $in: members } })
+      : [],
+    enabled: members.length > 0,
     staleTime: 120000,
-  });
-
-  const { data: profiles = [] } = useQuery({
-    queryKey: ['profiles'],
-    queryFn: () => base44.entities.UserProfile.filter({}),
-    staleTime: 0,
   });
 
   const userMap = useMemo(() => {
     const m = {};
-    (usersData || []).forEach(u => {
-      const prof = (profiles || []).find(p => p.user_id === u.id);
-      m[u.email] = prof?.display_name || prof?.username || u.full_name || u.email || u.email;
+    members.forEach(email => {
+      const prof = memberProfiles.find(p => p.email === email || p.user_email === email);
+      m[email] = prof?.display_name || prof?.username || email;
     });
     return m;
-  }, [usersData, profiles]);
-  // Build profilesByEmail: cross-reference usersData (has email) with profiles (has user_id + avatar_url)
+  }, [memberProfiles, members]);
+
   const profilesByEmail = useMemo(() => {
     const map = {};
-    // Primero por user_id (más preciso)
-    (usersData || []).forEach(u => {
-      const prof = (profiles || []).find(p => p.user_id === u.id);
-      if (prof) map[u.email] = prof;
-    });
-    // Fallback: buscar por email directamente en profiles
-    (profiles || []).forEach(p => {
+    memberProfiles.forEach(p => {
       const email = p.email || p.user_email;
-      if (email && !map[email]) map[email] = p;
+      if (email) map[email] = p;
     });
     return map;
-  }, [profiles, usersData]);
+  }, [memberProfiles]);
 
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ['expenses', tripId],
@@ -1075,7 +1067,7 @@ export default function Expenses() {
       // Notificar a quien le deben que le han liquidado
       try {
         const resolved = await resolveUserIds([debt.to]);
-        const allProfiles = await base44.entities.UserProfile.list();
+        const allProfiles = memberProfiles;
         const myProf = allProfiles.find(p => p.user_id === currentUser?.id);
         resolved.forEach(({ userId }) => notify({
           userId,
