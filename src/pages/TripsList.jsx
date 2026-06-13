@@ -4,14 +4,13 @@ import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Archive, Calendar, Check, Mail, Map, Plus, X as XIcon } from 'lucide-react';
+import { Archive, Calendar, Map, Plus, X as XIcon } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';
 import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
-import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { normalizeCountry } from '@/lib/countryConfig';
 
 function getGreeting() {
@@ -126,22 +125,9 @@ export default function TripsList() {
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
   const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
-  const [showInvites, setShowInvites] = useState(false);
-  const inviteBtnRef = useRef();
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  // Invitaciones pendientes
-  const { data: pendingInvites = [] } = useQuery({
-    queryKey: ['myPendingInvites', user?.email],
-    queryFn: async () => {
-      if (!user?.email) return [];
-      return base44.entities.TripInvite.filter({ email: user.email, status: 'pending' });
-    },
-    enabled: !!user?.email,
-    refetchInterval: 30000,
-  });
 
   const { data: myProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
@@ -310,71 +296,7 @@ export default function TripsList() {
             </div>
             <div className="flex items-center gap-2 mt-1">
               <NotificationBell userId={user?.id} userEmail={user?.email} />
-              {/* Icono de invitaciones con badge */}
-              <div className="relative">
-                <button
-                  ref={inviteBtnRef}
-                  onClick={() => setShowInvites(v => !v)}
-                  className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
-                  aria-label="Invitaciones"
-                >
-                  <Mail className="w-5 h-5 text-foreground" />
-                  {pendingInvites.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
-                      {pendingInvites.length > 9 ? '9+' : pendingInvites.length}
-                    </span>
-                  )}
-                </button>
 
-                {showInvites && (
-                  <div style={{position:"fixed", top: inviteBtnRef.current ? inviteBtnRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                      <span className="font-semibold text-sm text-foreground">Invitaciones</span>
-                      <button onClick={() => setShowInvites(false)} className="text-muted-foreground hover:text-foreground"><XIcon className="w-4 h-4" /></button>
-                    </div>
-                    <div className="max-h-[70vh] overflow-y-auto">
-                      {pendingInvites.length === 0 ? (
-                        <div className="py-12 text-center">
-                          <Mail className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
-                          <p className="text-sm text-muted-foreground">Sin invitaciones pendientes</p>
-                        </div>
-                      ) : pendingInvites.map(inv => (
-                        <div key={inv.id} className="px-4 py-3 border-b border-border last:border-0">
-                          <p className="text-sm font-medium text-foreground">{inv.trip_name || 'Viaje'}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Invitado por {inv.invited_by || 'un compañero'}</p>
-                          <div className="flex gap-2 mt-2">
-                            <button
-                              onClick={async () => {
-                                try {
-                                  await acceptTripInvite(inv.id, inv.invite_token, inv.trip_id, user?.email);
-                                  queryClient.invalidateQueries({ queryKey: ['myPendingInvites'] });
-                                  queryClient.invalidateQueries({ queryKey: ['trips', user?.email] });
-                                  setShowInvites(false);
-                                  navigate(createPageUrl('Home') + '?trip_id=' + inv.trip_id);
-                                } catch(e) { console.error(e); }
-                              }}
-                              className="flex-1 py-1.5 rounded-full bg-primary text-white text-xs font-semibold flex items-center justify-center gap-1"
-                            >
-                              <Check className="w-3 h-3" /> Aceptar
-                            </button>
-                            <button
-                              onClick={async () => {
-                                try {
-                                  await declineTripInvite(inv.id);
-                                  queryClient.invalidateQueries({ queryKey: ['myPendingInvites'] });
-                                } catch(e) { console.error(e); }
-                              }}
-                              className="flex-1 py-1.5 rounded-full border border-border text-xs font-semibold text-muted-foreground flex items-center justify-center gap-1"
-                            >
-                              <XIcon className="w-3 h-3" /> Declinar
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
               {/* Avatar → directo a perfil */}
               <Link to={createPageUrl('Profile')}>
                 <div className="w-9 h-9 rounded-full overflow-hidden border border-border flex items-center justify-center bg-primary text-white text-sm font-medium flex-shrink-0">

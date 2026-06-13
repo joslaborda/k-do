@@ -319,7 +319,7 @@ export default function Profile() {
     queryKey: ['myTrips', user?.id, user?.email],
     queryFn: async () => {
       const [created, asMember] = await Promise.all([
-        base44.entities.Trip.filter({ created_by: user.id }),
+        base44.entities.Trip.filter({ created_by: user.email }),
         base44.entities.Trip.filter(
           { members: { $elemMatch: { $eq: user.email } } },
           '-created_date'
