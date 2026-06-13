@@ -42,13 +42,12 @@ function TripInviteModal({ notif, onClose, onAccept }) {
           const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email, status: 'pending' });
           setInvite(invs[0] || null);
         }
-        const [profiles, users] = await Promise.all([
-          base44.entities.UserProfile.list(),
-          base44.entities.User.list(),
+        const memberEmails = t.members || [];
+        const [profiles] = await Promise.all([
+          base44.entities.UserProfile.filter({ email: { $in: memberEmails } }),
         ]);
-        setMembers((t.members || []).map(email => {
-          const u = users.find(x => x.email === email);
-          const p = profiles.find(x => x.user_id === u?.id);
+        setMembers(memberEmails.map(email => {
+          const p = profiles.find(x => x.email === email || x.user_email === email);
           return { email, name: p?.display_name || p?.username || email, avatar: p?.avatar_url };
         }));
       } catch {}
@@ -63,8 +62,8 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       await acceptTripInvite(invite.id, invite.invite_token, invite.trip_id, currentUser.email);
       // Notificar a todos los miembros del viaje
       try {
-        const allProfiles = await base44.entities.UserProfile.list();
-        const myProf = allProfiles.find(p => p.user_id === currentUser.id);
+        const myProfArr = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+        const myProf = myProfArr[0] || null;
         const tripData = await base44.entities.Trip.get(invite.trip_id);
         const others = (tripData?.members || []).filter(e => e !== currentUser.email);
         const resolved = await resolveUserIds(others);
