@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { format, differenceInDays, parseISO } from 'date-fns';
+import { normalizeCountry } from '@/lib/countryConfig';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, Compass, DollarSign, MapPin, Users } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
@@ -26,9 +27,12 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
     const sources = cities.length > 0
       ? cities.map(c => c.country).filter(Boolean)
       : [trip?.country].filter(Boolean);
-    const norm = (s) => (s || '').trim().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     const seen = {};
-    sources.forEach(s => { const k = norm(s); if (!seen[k]) seen[k] = s; });
+    sources.forEach(s => {
+      // normalizeCountry traduce inglés→español (Japan→Japón, France→Francia, etc.)
+      const esName = normalizeCountry(s) || s;
+      if (esName && !seen[esName]) seen[esName] = esName;
+    });
     return Object.values(seen);
   }, [trip, cities]);
 
