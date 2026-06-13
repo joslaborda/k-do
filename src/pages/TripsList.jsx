@@ -160,14 +160,14 @@ export default function TripsList() {
       // Fetch trips created by user
       let myTrips = [];
       try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch {}
-      // Fetch trips where user is a member (single call, filter client-side)
+      // Fetch trips where user is a member — filtrado server-side con $elemMatch
       let memberTrips = [];
       try {
-        const all = await base44.entities.Trip.list('-created_date');
-        memberTrips = all.filter(t =>
-          t.created_by !== user.email &&
-          Array.isArray(t.members) && t.members.includes(user.email)
+        const all = await base44.entities.Trip.filter(
+          { members: { $elemMatch: { $eq: user.email } } },
+          '-created_date'
         );
+        memberTrips = all.filter(t => t.created_by !== user.email);
       } catch {}
       const seen = new Set(myTrips.map(t => t.id));
       return [...myTrips, ...memberTrips.filter(t => !seen.has(t.id))]

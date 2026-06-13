@@ -73,13 +73,13 @@ function Avatar({ email, profiles = [], size = 28 }) {
 // ── CurrencyBanner — shown when active city changes ───────────────────────────
 function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccept, onDismiss }) {
   return (
-    <div style={{ background: '#fff3ee', border: '0.5px solid #fbd5c0', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
+    <div style={{ background: 'var(--kodo-bg-orange)', border: '0.5px solid var(--kodo-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0 }}>{flag}</span>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 3 }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: '#b34a1a' }}>Has llegado a {countryName}</p>
-            <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: '#fbd5c0', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'hsl(var(--primary))' }}>Has llegado a {countryName}</p>
+            <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'var(--kodo-border)', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
           <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
             La moneda local es {currencyName} ({currencyCode}). ¿Registrar gastos en {currencyCode}?
@@ -553,7 +553,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                       <span className="text-foreground">{tc.label}</span>
                       <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                     </div>
-                    <div style={{ height: 5, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ height: 5, background: 'var(--kodo-progress-track)', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'hsl(var(--primary))', borderRadius: 4 }} />
                     </div>
                   </div>
@@ -583,8 +583,8 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                     <span className="text-foreground">{tc.label}</span>
                     <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                   </div>
-                  <div style={{ height: 4, background: '#f0ede8', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: '#f97316', borderRadius: 4 }} />
+                  <div style={{ height: 4, background: 'var(--kodo-progress-track)', borderRadius: 4, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: 'hsl(var(--primary))', borderRadius: 4 }} />
                   </div>
                 </div>
               </div>
@@ -625,7 +625,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
           <div className="w-9 h-1 bg-border rounded-full mx-auto mt-4 mb-4" />
           <div className="flex items-start justify-between px-5 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
-              <div style={{ width: 40, height: 40, borderRadius: 11, background: '#fff3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 11, background: 'var(--kodo-bg-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>
                 {(() => { const I = CAT_ICONS[expense.category] || CAT_ICONS.other; return <I size={16} />; })()}
               </div>
               <div>

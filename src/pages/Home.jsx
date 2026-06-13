@@ -12,7 +12,6 @@ import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 import NotificationBell from '@/components/notifications/NotificationBell';
-import GlobalSearch from '@/components/GlobalSearch';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import OTabBar from '@/components/trip/OTabBar';
@@ -41,7 +40,6 @@ if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-
 export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [tab, setTab] = useState(() => 'inicio');
   const [tabDir, setTabDir] = useState(1);
@@ -267,7 +265,6 @@ export default function Home() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-5 pt-5 pb-2 space-y-3">
-        <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} tripId={tripId} />
         <TripAlerts tripId={tripId} cities={cities} trip={trip} onUrgentCount={setUrgentCount} />
         <div key={tab} className={tabDir >= 0 ? 'kodo-slide-right' : 'kodo-slide-left'}>
 

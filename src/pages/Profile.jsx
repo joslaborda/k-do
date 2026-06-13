@@ -318,15 +318,16 @@ export default function Profile() {
   const { data: myTrips = [] } = useQuery({
     queryKey: ['myTrips', user?.id, user?.email],
     queryFn: async () => {
-      const [created, all] = await Promise.all([
+      const [created, asMember] = await Promise.all([
         base44.entities.Trip.filter({ created_by: user.id }),
-        base44.entities.Trip.list(),
+        base44.entities.Trip.filter(
+          { members: { $elemMatch: { $eq: user.email } } },
+          '-created_date'
+        ),
       ]);
-      const asMember = all.filter(t =>
-        !created.find(c => c.id === t.id) &&
-        Array.isArray(t.members) && t.members.includes(user.email)
-      );
-      return [...created, ...asMember].sort((a, b) =>
+      const createdIds = new Set(created.map(t => t.id));
+      const memberOnly = asMember.filter(t => !createdIds.has(t.id));
+      return [...created, ...memberOnly].sort((a, b) =>
         (b.start_date || '').localeCompare(a.start_date || '')
       );
     },
