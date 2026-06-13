@@ -95,7 +95,7 @@ function ManualForm({ onSave, saving, onClose }) {
         <p className="font-semibold text-sm">Crear spot</p>
         <button onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
       </div>
-      <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nombre del lugar *" className="h-9 text-sm"/>
+      <Input value={title} onChange={e => setTitle(e.target.value)} aria-label="Nombre del lugar" placeholder="Nombre del lugar *" className="h-9 text-sm"/>
       <div className="flex flex-wrap gap-1.5">
         {ALL_TYPES.filter(t => t.value!=='all').map(t => (
           <button key={t.value} onClick={() => setType(t.value)}
@@ -115,8 +115,8 @@ function ManualForm({ onSave, saving, onClose }) {
         onKeyDown={e => { if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(tagInput);} }}
         onBlur={() => tagInput && addTag(tagInput)}
         placeholder="Tags: sunset, mirador... (Enter)" className="h-8 text-xs"/>
-      <Input value={address} onChange={e => setAddress(e.target.value)} placeholder="Dirección (opcional)" className="h-8 text-xs"/>
-      <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas..."
+      <Input value={address} onChange={e => setAddress(e.target.value)} aria-label="Dirección" placeholder="Dirección (opcional)" className="h-8 text-xs"/>
+      <textarea value={notes} onChange={e => setNotes(e.target.value)} aria-label="Notas" placeholder="Notas..."
         className="w-full text-xs border border-border rounded-lg px-3 py-2 h-16 resize-none outline-none focus:border-primary/40"/>
       <Button onClick={() => onSave({ title, type, notes, address, tags })} disabled={!title.trim()||saving}
         className="w-full bg-primary hover:bg-orange-800 text-white h-9">
