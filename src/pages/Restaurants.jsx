@@ -342,7 +342,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Ubicación</p>
             {/* Map placeholder / real map */}
-            <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: '#f0f4f8', position: 'relative' }}>
+            <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: 'var(--kodo-bg-subtle)', position: 'relative' }}>
               {showMap
                 ? <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
                 : (
@@ -645,7 +645,6 @@ export default function Restaurants() {
   const [showCreate, setShowCreate] = useState(false);
   const [savingId, setSavingId] = useState(null);
   const [stateFilter, setStateFilter] = useState('all');
-  const [communityFilter, setCommunityFilter] = useState('all');
   const [assignDateSpot, setAssignDateSpot] = useState(null); // spot to assign date after saving
   const [selectedCity, setSelectedCity] = useState('');
   const [toast, setToast] = useState({ visible: false, spot: null });
@@ -898,51 +897,6 @@ export default function Restaurants() {
       return inTitle || inNotes || inTags;
     }).slice(0, 6);
   }, [searchQuery, seedSpots]);
-
-  // Community spots — include own public spots too (so their likes show)
-  const communitySpots = useMemo(() => {
-    const myIds = new Set(spots.map(s => s.title?.toLowerCase()));
-    const targetCity = (selectedCity || city).toLowerCase();
-    const normStr = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-    const fromUsers = publicSpots.filter(s =>
-      !targetCity || normStr(s.city_name) === normStr(targetCity)
-    );
-    // Seed spots are already filtered by city via getSeedSpotsForCity (which uses selectedCity or city)
-    const fromSeed = seedSpots.filter(s => !myIds.has(s.title?.toLowerCase()));
-    const all = [
-      ...fromUsers.map(s => ({ ...s, _source: 'user' })),
-      ...fromSeed.map(s => ({ ...s, _source: 'seed', id: `seed_${s.title}` })),
-    ];
-    // Category filter
-    const COMMUNITY_FILTER_TYPES = {
-      restaurant: ['food'],
-      bar: ['food'],
-      sight: ['sight'],
-      shopping: ['shopping'],
-      activity: ['activity'],
-      custom: ['custom'],
-    };
-    const COMMUNITY_FILTER_KEYWORDS = {
-      restaurant: ['restaurant', 'ramen', 'sushi', 'pizza', 'tapas', 'comida', 'comer', 'food'],
-      bar: ['bar', 'pub', 'nightlife', 'club', 'cocktail', 'cerveza', 'noche', 'fiesta'],
-      nightlife: ['nightlife', 'club', 'disco', 'karaoke', 'bar', 'noche', 'fiesta'],
-      vistas: ['vistas', 'mirador', 'viewpoint', 'panorama', 'torre', 'sky', 'view'],
-      museos: ['museo', 'museum', 'galeria', 'arte', 'history', 'history', 'cultura'],
-      lgtbq: ['lgtbq', 'gay', 'pride', 'queer', 'lgbtq'],
-      naturaleza: ['naturaleza', 'parque', 'park', 'jardín', 'garden', 'bosque', 'playa', 'beach'],
-      templos: ['templo', 'temple', 'shrine', 'iglesia', 'church', 'mezquita', 'catedral'],
-    };
-
-    const filtered = communityFilter === 'all' ? all : all.filter(s => {
-      const kws = COMMUNITY_FILTER_KEYWORDS[communityFilter] || [];
-      const types = COMMUNITY_FILTER_TYPES[communityFilter] || [];
-      const titleLower = (s.title || '').toLowerCase();
-      const notesLower = (s.notes || '').toLowerCase();
-      return types.includes(s.type) || kws.some(k => titleLower.includes(k) || notesLower.includes(k));
-    });
-
-    return filtered.sort((a, b) => (b.visits||0) - (a.visits||0));
-  }, [publicSpots, seedSpots, spots, communityFilter, selectedCity, city]);
 
   // Hashtags
   const hashtags = useMemo(() => buildHashtags(spots, tripCities), [spots, tripCities]);
