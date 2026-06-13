@@ -80,7 +80,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Ubicación</p>
             {/* Map placeholder / real map */}
-            <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: '#f0f4f8', position: 'relative' }}>
+            <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: 'var(--kodo-bg-subtle)', position: 'relative' }}>
               {showMap
                 ? <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
                 : (
