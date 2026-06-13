@@ -39,7 +39,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
               {item.time && <span className="text-primary font-medium"> · {item.time}</span>}
             </p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
@@ -112,7 +112,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
             </a>
           )}
           <button onClick={onClose}
-            className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground">
+            className="flex-1 py-3 bg-secondary border border-border rounded-full text-sm text-muted-foreground">
             Cerrar
           </button>
         </div>
