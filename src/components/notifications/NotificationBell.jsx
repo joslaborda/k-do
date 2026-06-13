@@ -43,11 +43,15 @@ function TripInviteModal({ notif, onClose, onAccept }) {
           setInvite(invs[0] || null);
         }
         const memberEmails = t.members || [];
-        const [profiles] = await Promise.all([
-          base44.entities.UserProfile.filter({ email: { $in: memberEmails } }),
-        ]);
+        // UserProfile no tiene campo email — resolver via User primero
+        const users = await base44.entities.User.filter({ email: { $in: memberEmails } });
+        const ids = users.map(u => u.id).filter(Boolean);
+        const profiles = ids.length
+          ? await base44.entities.UserProfile.filter({ user_id: { $in: ids } })
+          : [];
         setMembers(memberEmails.map(email => {
-          const p = profiles.find(x => x.email === email || x.user_email === email);
+          const u = users.find(x => x.email === email);
+          const p = profiles.find(x => x.user_id === u?.id);
           return { email, name: p?.display_name || p?.username || email, avatar: p?.avatar_url };
         }));
       } catch {}
