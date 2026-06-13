@@ -550,7 +550,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                         ) : null
                       ) : dateMode === 'nights' ? (
                         <div className="flex items-center gap-2 pl-1">
-                          <input type="number" min="1" placeholder="noches"
+                          <input type="number" min="1" aria-label="Número de noches" placeholder="noches"
                             value={stop.nights}
                             onChange={e => updateStop(idx, { nights: e.target.value })}
                             className="w-20 h-8 border border-border rounded-lg px-2 text-sm outline-none focus:border-primary bg-secondary"
