@@ -77,5 +77,19 @@
     "user_id",
     "title",
     "type"
-  ]
+  ],
+  "access_control": {
+    "read": {
+      "formula": "entity.user_id == currentUser.id"
+    },
+    "create": {
+      "formula": "data.user_id == currentUser.id"
+    },
+    "update": {
+      "formula": "entity.user_id == currentUser.id"
+    },
+    "delete": {
+      "formula": "entity.user_id == currentUser.id"
+    }
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "VisaRequirement",
+  "type": "object",
+  "properties": {
+    "passport_country": {
+      "type": "string",
+      "description": "Pa\u00eds del pasaporte del viajero"
+    },
+    "destination_country": {
+      "type": "string",
+      "description": "Pa\u00eds de destino"
+    },
+    "visa_type": {
+      "type": "string",
+      "description": "Tipo de visado requerido"
+    }
+  },
+  "required": []
+}

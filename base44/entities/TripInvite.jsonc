@@ -1,0 +1,35 @@
+{
+  "name": "TripInvite",
+  "type": "object",
+  "properties": {
+    "trip_id": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "invite_token": {
+      "type": "string"
+    },
+    "invited_by": {
+      "type": "string"
+    },
+    "responded_date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "trip_id",
+    "email",
+    "role",
+    "status",
+    "invite_token",
+    "invited_by"
+  ]
+}
