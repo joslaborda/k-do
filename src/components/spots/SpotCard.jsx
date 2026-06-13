@@ -70,19 +70,19 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
             <p className="font-semibold text-foreground text-sm">¿Qué te pareció?</p>
             <p className="text-xs text-muted-foreground mt-0.5">{spot.title}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <button onClick={() => setThumb('up')}
+          <button aria-label="Me gusta" onClick={() => setThumb('up')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'up' ? 'bg-green-50 border-green-300' : 'bg-secondary border-border hover:border-green-200')}>
             <ThumbsUp className={"w-5 h-5 " + (thumb === 'up' ? 'text-green-600' : 'text-muted-foreground')} />
             <span className={"text-sm font-medium " + (thumb === 'up' ? 'text-green-700' : 'text-muted-foreground')}>Me gustó</span>
           </button>
-          <button onClick={() => setThumb('down')}
+          <button aria-label="No me gusta" onClick={() => setThumb('down')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'down' ? 'bg-red-50 border-red-300' : 'bg-secondary border-border hover:border-red-200')}>
             <ThumbsDown className={"w-5 h-5 " + (thumb === 'down' ? 'text-red-600' : 'text-muted-foreground')} />
@@ -116,7 +116,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
         )}
 
         <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
-          className="w-full py-3 rounded-xl bg-green-600 text-white font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition-colors">
+          className="w-full py-3 rounded-full bg-green-600 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition-colors">
           {mutation.isPending ? 'Guardando...' : 'Guardar valoración'}
         </button>
       </div>
@@ -169,7 +169,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
                 <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsDown className="w-3 h-3" /> {downs}</span>
               </div>
             </div>
-            <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+            <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -201,11 +201,11 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 
         <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
           <div className="flex gap-2">
-            <button onClick={() => setThumb(thumb === 'up' ? null : 'up')}
+            <button aria-label="Me gusta" onClick={() => setThumb(thumb === 'up' ? null : 'up')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-secondary border-border text-muted-foreground')}>
               <ThumbsUp className="w-4 h-4" />
             </button>
-            <button onClick={() => setThumb(thumb === 'down' ? null : 'down')}
+            <button aria-label="No me gusta" onClick={() => setThumb(thumb === 'down' ? null : 'down')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'down' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-secondary border-border text-muted-foreground')}>
               <ThumbsDown className="w-4 h-4" />
             </button>
@@ -385,7 +385,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
           </button>
 
           {canDelete && (
-            <button onClick={() => setShowDeleteConfirm(true)} className="text-xs text-muted-foreground hover:text-red-500 transition-colors">
+            <button onClick={() => setShowDeleteConfirm(true)} className="text-xs text-red-500 hover:text-red-700 transition-colors">
               🗑️
             </button>
           )}

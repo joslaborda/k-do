@@ -35,7 +35,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
           {/* Close button */}
           <button
             onClick={onSkip}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -94,7 +94,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
         <div className="flex gap-3 px-5 pb-5">
           <button
             onClick={onUndo}
-            className="flex-1 py-3 border border-border rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+            className="flex-1 py-3 rounded-full text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
           >
             Deshacer
           </button>

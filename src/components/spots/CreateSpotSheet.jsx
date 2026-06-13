@@ -67,7 +67,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
             <p className="font-semibold text-foreground text-base">Crear spot</p>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -91,7 +91,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
                 )
               }
             </div>
-            <button onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
+            <button aria-label="Usar mi ubicación" onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
               className="w-full flex items-center justify-between px-4 py-2.5 border border-border rounded-2xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors mb-2">
               <span className="flex items-center gap-2"><Navigation className="w-4 h-4"/>{locating ? 'Localizando...' : 'Usar mi ubicación actual'}</span>
               <ArrowRight className="w-4 h-4" />
