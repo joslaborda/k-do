@@ -341,16 +341,20 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
                 Eliminar
               </button>
             </div>
-            {/* Inline preview for images */}
+            {/* Inline preview for images — clickable to open viewer */}
             {fields.file_url.match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i) && (
-              <img src={fields.file_url} alt="preview"
-                className="w-full max-h-48 object-contain bg-secondary/20" />
+              <button onClick={() => onView && onView(fields.file_url)}
+                className="w-full block cursor-pointer">
+                <img src={fields.file_url} alt="preview"
+                  className="w-full max-h-48 object-contain bg-secondary/20" />
+              </button>
             )}
-            {/* PDF hint */}
+            {/* PDF preview — clickable hint */}
             {fields.file_url.match(/\.pdf(\?|$)/i) && (
-              <div className="px-4 py-2.5 bg-orange-50 border-t border-orange-100">
-                <p className="text-xs text-primary">Toca el nombre del archivo para consultar el PDF</p>
-              </div>
+              <button onClick={() => onView && onView(fields.file_url)}
+                className="w-full px-4 py-3 bg-orange-50 border-t border-orange-100 text-left hover:bg-orange-100 transition-colors">
+                <p className="text-xs text-primary">Toca para ver el PDF a pantalla completa</p>
+              </button>
             )}
           </div>
         ) : (
