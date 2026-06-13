@@ -122,9 +122,19 @@ export default function Home() {
   const tripMembers = trip?.members || [];
   const { data: profiles = [] } = useQuery({
     queryKey: ['profilesHome', tripMembers.join(',')],
-    queryFn: () => tripMembers.length
-      ? base44.entities.UserProfile.filter({ email: { $in: tripMembers } })
-      : [],
+    queryFn: async () => {
+      if (!tripMembers.length) return [];
+      // UserProfile solo tiene user_id — hay que resolver email→user_id primero
+      const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
+      const ids = users.map(u => u.id).filter(Boolean);
+      if (!ids.length) return [];
+      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      // Enriquecer cada perfil con el email del usuario para poder buscarlo luego
+      return profs.map(p => {
+        const u = users.find(u => u.id === p.user_id);
+        return { ...p, user_email: u?.email || p.user_email || '' };
+      });
+    },
     enabled: tripMembers.length > 0,
     staleTime: 5 * 60 * 1000,
   });
