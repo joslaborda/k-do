@@ -785,7 +785,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
       <button onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-1 py-2 text-left">
         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-          isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
+          isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-orange-100 text-primary'
         }`}>
           {isPast ? <Check size={10} className='text-green-700' /> : idx + 1}
         </div>
@@ -801,7 +801,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
         </div>
         {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">Visitada</span>}
         {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-semibold">Ahora</span>}
-        {!isActive && !isPast && <span className="text-xs bg-secondary text-muted-foreground px-2 py-0.5 rounded-full shrink-0">Próxima</span>}
+        {!isActive && !isPast && <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full shrink-0 font-medium">Próxima</span>}
         {open
           ? <ChevronUp className="w-4 h-4 shrink-0 text-muted-foreground" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
