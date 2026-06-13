@@ -29,27 +29,30 @@ export default function TripMembersPanel({ trip, currentUserEmail }) {
     enabled: !!tripId,
   });
 
-  const { data: usersData = [] } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
-  });
-
+  // Perfiles solo de miembros del viaje — sin list() completas
   const { data: allProfiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
+    queryKey: ['memberProfiles', members.join(',')],
+    queryFn: () => members.length
+      ? base44.entities.UserProfile.filter({ email: { $in: members } })
+      : [],
+    enabled: members.length > 0,
     staleTime: 60000,
   });
 
-  const userMap = usersData.reduce((m, u) => { m[u.email] = u.full_name || u.email; return m; }, {});
-  // Map email → avatar via UserProfile
+  const userMap = members.reduce((m, email) => {
+    const p = allProfiles.find(x => x.email === email || x.user_email === email);
+    m[email] = p?.display_name || p?.username || email;
+    return m;
+  }, {});
+
   const profileByEmail = useMemo(() => {
     const map = {};
-    usersData.forEach(u => {
-      const profile = allProfiles.find(p => p.user_id === u.id);
-      if (profile) map[u.email] = profile;
+    allProfiles.forEach(p => {
+      const email = p.email || p.user_email;
+      if (email) map[email] = p;
     });
     return map;
-  }, [usersData, allProfiles]);
+  }, [allProfiles]);
 
   const inviteMutation = useMutation({
     mutationFn: async ({ email: inv_email, phone: inv_phone, role: inv_role, mode }) => {
