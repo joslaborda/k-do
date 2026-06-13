@@ -290,7 +290,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
             {members.map((email, i) => {
               const profile = profiles?.[email] || null;
               const name = profile?.display_name || profile?.username || email;
-              const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+              const initials = (profile?.display_name?.[0] || profile?.username?.[0] || email?.[0] || '?').toUpperCase();
               const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
               const selected = sharedWith.includes(email) || i === 0;
               const isYou = i === 0;
@@ -332,16 +332,13 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
               </svg>
-              <span className="text-sm text-foreground flex-1 truncate">Archivo adjuntado</span>
-              {onView && (
-                <button onClick={() => onView(fields.file_url)}
-                  className="text-xs text-primary font-medium hover:text-primary/80 transition-colors flex-shrink-0">
-                  Ver →
-                </button>
-              )}
+              <button onClick={() => onView && onView(fields.file_url)}
+                className="text-sm text-foreground flex-1 truncate text-left hover:text-primary transition-colors">
+                Archivo adjuntado
+              </button>
               <button onClick={() => setField('file_url', '')}
                 className="text-xs text-muted-foreground hover:text-red-500 transition-colors ml-2">
-                Quitar
+                Eliminar
               </button>
             </div>
             {/* Inline preview for images */}
@@ -352,7 +349,7 @@ export default function DocumentForm({ initialData, cities, itineraryDays, membe
             {/* PDF hint */}
             {fields.file_url.match(/\.pdf(\?|$)/i) && (
               <div className="px-4 py-2.5 bg-orange-50 border-t border-orange-100">
-                <p className="text-xs text-primary">Toca "Ver →" para consultar el PDF y copiar los horarios</p>
+                <p className="text-xs text-primary">Toca el nombre del archivo para consultar el PDF</p>
               </div>
             )}
           </div>
