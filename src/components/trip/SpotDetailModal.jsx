@@ -117,7 +117,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
             <p className="text-base font-medium text-foreground leading-snug">{spot.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
