@@ -1207,6 +1207,7 @@ function Toast({ spot, city, onUndo, visible }) {
 export default function Restaurants() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
+  const importSavedParam = urlParams.get('import_saved') === '1';
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { trip, activeCity } = useTripContext(tripId);
@@ -1239,6 +1240,7 @@ export default function Restaurants() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const [tab, setTab] = useState('buscar'); // 'buscar' | 'mis'
+  const [showImportPanel, setShowImportPanel] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState(() => getRecentSearches());
   const [osmResults, setOsmResults] = useState([]);
@@ -1290,6 +1292,30 @@ export default function Restaurants() {
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 60000,
   });
+
+  // Wishlist personal del usuario — para el panel de importación
+  const { data: userSavedSpots = [] } = useQuery({
+    queryKey: ['savedSpots', user?.id],
+    queryFn: () => base44.entities.SavedSpot.filter({ user_id: user.id }),
+    enabled: !!user?.id,
+    staleTime: 60000,
+  });
+
+  // Spots de la wishlist que coinciden con el país/destino de este viaje
+  const importableSpots = useMemo(() => {
+    if (!userSavedSpots.length) return [];
+    const tripCountry = normalizeCountry(country || trip?.country || '');
+    if (!tripCountry) return [];
+    return userSavedSpots.filter(s => normalizeCountry(s.country || '') === tripCountry);
+  }, [userSavedSpots, country, trip?.country]);
+
+  // Activar panel de importación si viene desde el popup de creación de viaje
+  useEffect(() => {
+    if (importSavedParam && importableSpots.length > 0) {
+      setShowImportPanel(true);
+      setTab('mis');
+    }
+  }, [importSavedParam, importableSpots.length]);
 
   // Mutations
   const createMutation = useMutation({
@@ -1404,6 +1430,29 @@ export default function Restaurants() {
       if (created?.id) setAssignDateSpot(created);
       notifyMembers('spot_added', '', form.title, { spotId: created?.id, spotDate: created?.assigned_date });
     } finally { setSavingId(null); }
+  };
+
+  // Importar un spot de la wishlist personal al viaje actual
+  const importSavedSpot = async (savedSpot) => {
+    const dup = spots.find(s => s.title?.toLowerCase().trim() === savedSpot.title?.toLowerCase().trim());
+    if (dup) return;
+    setSavingId('import_' + savedSpot.id);
+    try {
+      const created = await createMutation.mutateAsync({
+        trip_id: tripId, city_id: cityId || undefined,
+        city_name: selectedCity || city, country: normalizeCountry(country),
+        title: savedSpot.title, type: savedSpot.type || 'custom',
+        address: savedSpot.address || '', lat: savedSpot.lat, lng: savedSpot.lng,
+        notes: savedSpot.notes || '', image_url: savedSpot.image_url || null,
+        visibility: 'trip_members', visited: false,
+        created_by: user?.email, created_by_user_id: user?.id,
+        source: 'saved_import',
+      });
+      setLastSavedId(created?.id);
+      showToastFor({ title: savedSpot.title }, city);
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const saveCommunitySpot = async spot => {
@@ -1794,6 +1843,50 @@ export default function Restaurants() {
                 {/* ── MIS SPOTS TAB ── */}
         {tab === 'mis' && (
           <div>
+            {/* Panel de importación desde wishlist personal */}
+            {showImportPanel && importableSpots.length > 0 && (
+              <div className="mb-4 bg-orange-50 dark:bg-primary/10 border border-orange-200 dark:border-primary/30 rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-orange-200 dark:border-primary/20">
+                  <div>
+                    <p className="text-sm font-medium text-primary">
+                      {importableSpots.length} spot{importableSpots.length !== 1 ? 's' : ''} guardado{importableSpots.length !== 1 ? 's' : ''} en {normalizeCountry(country || trip?.country || '')}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">De tu lista personal — ¿los añadimos a este viaje?</p>
+                  </div>
+                  <button onClick={() => setShowImportPanel(false)} className="text-muted-foreground hover:text-foreground p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                {importableSpots.map((savedSpot, i) => {
+                  const alreadyInTrip = spots.some(s => s.title?.toLowerCase().trim() === savedSpot.title?.toLowerCase().trim());
+                  const isSaving = savingId === 'import_' + savedSpot.id;
+                  const SpotIcon = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag }[savedSpot.type] || CirclePlus;
+                  return (
+                    <div key={savedSpot.id} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-orange-200 dark:border-primary/20' : ''}`}>
+                      <div className="w-8 h-8 rounded-xl bg-orange-100 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <SpotIcon size={14} className="text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{savedSpot.title}</p>
+                        {savedSpot.city_name && <p className="text-xs text-muted-foreground">{savedSpot.city_name}</p>}
+                      </div>
+                      {alreadyInTrip ? (
+                        <span className="text-xs text-muted-foreground px-2 py-1 bg-secondary rounded-full flex-shrink-0">Ya añadido</span>
+                      ) : (
+                        <button
+                          onClick={() => importSavedSpot(savedSpot)}
+                          disabled={isSaving}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full flex-shrink-0 disabled:opacity-50"
+                        >
+                          {isSaving ? '...' : <><Plus className="w-3 h-3" />Añadir</>}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Search bar */}
             <div className="relative mb-3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

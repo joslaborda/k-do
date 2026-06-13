@@ -305,16 +305,12 @@ export default function Profile() {
     staleTime: 60000,
   });
 
-  // Saved spots: spots created by user that are in a trip (saved to library)
-  // We use a separate query for saved spots without trip_id filter
+  // Saved spots — wishlist personal del usuario, guardados desde el buscador de perfil
+  // Usa SavedSpot (una fila por spot guardado) en lugar de mutar el Spot original
   const { data: savedSpots = [] } = useQuery({
-    queryKey: ['savedSpots', user?.email],
-    queryFn: async () => {
-      // Saved = spots user explicitly saved from community (not created themselves)
-      const all = await base44.entities.Spot.list();
-      return all.filter(s => s.created_by !== user.email && s.saved_by?.includes(user.email));
-    },
-    enabled: !!user?.email,
+    queryKey: ['savedSpots', user?.id],
+    queryFn: () => base44.entities.SavedSpot.filter({ user_id: user.id }),
+    enabled: !!user?.id,
     staleTime: 60000,
   });
 
@@ -353,7 +349,8 @@ export default function Profile() {
 
   const tripsCount = myTrips.length;
 
-  const savedSpotIds = useMemo(() => new Set(savedSpots.map(s => s.id)), [savedSpots]);
+  // Set de source_spot_id para saber qué spots ya están en la wishlist
+  const savedSpotIds = useMemo(() => new Set(savedSpots.map(s => s.source_spot_id).filter(Boolean)), [savedSpots]);
 
   // Count unique countries visited — from trip cities
   const countriesCount = useMemo(() => {
@@ -362,18 +359,27 @@ export default function Profile() {
     return new Set([...fromCities, ...fromSpots]).size;
   }, [myTripCities, mySpots]);
 
-  // Save a spot to library
+  // Guardar spot en la wishlist personal — crea una fila SavedSpot, no toca el Spot original
   const saveMutation = useMutation({
     mutationFn: async (spot) => {
-      const existing = await base44.entities.Spot.filter({ id: spot.id });
-      if (existing[0]) {
-        const savedBy = existing[0].saved_by || [];
-        if (!savedBy.includes(user.email)) {
-          await base44.entities.Spot.update(spot.id, { saved_by: [...savedBy, user.email] });
-        }
-      }
+      // Evitar duplicados
+      const already = savedSpots.find(s => s.source_spot_id === spot.id);
+      if (already) return;
+      await base44.entities.SavedSpot.create({
+        user_id: user.id,
+        source_spot_id: spot.id,
+        title: spot.title,
+        type: spot.type || 'custom',
+        address: spot.address || '',
+        city_name: spot.city_name || '',
+        country: normalizeCountry(spot.country || ''),
+        lat: spot.lat || null,
+        lng: spot.lng || null,
+        image_url: spot.image_url || null,
+        notes: spot.notes || '',
+      });
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', user?.email] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', user?.id] }),
   });
 
   if (profileLoading) return (

@@ -12,7 +12,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
-import { getSeedSpotsForCountry } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 
 function getGreeting() {
@@ -224,18 +223,24 @@ export default function TripsList() {
       }
       return trip;
     },
-    onSuccess: (trip) => {
+    onSuccess: async (trip) => {
       queryClient.invalidateQueries({ queryKey: ['trips', user?.email] });
       queryClient.invalidateQueries({ queryKey: ['allCities'] });
       setDialogOpen(false);
-      // Show spot discovery popup if we have seed spots for this destination
-      const country = normalizeCountry(trip.country || '');
-      if (country) {
-        const seeds = getSeedSpotsForCountry(country);
-        const spotCount = Object.values(seeds).flat().length;
-        if (spotCount > 0) {
-          setNewTripPopup({ trip, spotCount, country });
+      // Buscar en la wishlist personal del usuario si tiene spots guardados para este destino
+      try {
+        const countries = [
+          normalizeCountry(trip.country || ''),
+          normalizeCountry(trip.destination || ''),
+        ].filter(Boolean);
+        if (!countries.length || !user?.id) return;
+        const mySaved = await base44.entities.SavedSpot.filter({ user_id: user.id });
+        const matching = mySaved.filter(s => s.country && countries.includes(normalizeCountry(s.country)));
+        if (matching.length > 0) {
+          setNewTripPopup({ trip, spotCount: matching.length, country: countries[0] });
         }
+      } catch {
+        // silencioso — el popup es una mejora, no crítico
       }
     },
   });
@@ -484,10 +489,10 @@ export default function TripsList() {
             <div className="px-5 py-5">
               <Map className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-base font-medium text-foreground mb-1">
-                ¡Hay {newTripPopup.spotCount} spots en {newTripPopup.country}!
+                Tienes {newTripPopup.spotCount} spot{newTripPopup.spotCount !== 1 ? 's' : ''} guardado{newTripPopup.spotCount !== 1 ? 's' : ''} en {newTripPopup.country}
               </p>
               <p className="text-sm text-muted-foreground mb-5">
-                Tenemos spots recomendados para este destino. ¿Los exploramos ahora en Kōdo?
+                Los tienes en tu perfil. ¿Los importamos a este viaje?
               </p>
               <div className="flex gap-3">
                 <button
@@ -497,11 +502,11 @@ export default function TripsList() {
                   Ahora no
                 </button>
                 <Link
-                  to={createPageUrl('Restaurants') + '?trip_id=' + newTripPopup.trip.id}
+                  to={createPageUrl('Restaurants') + '?trip_id=' + newTripPopup.trip.id + '&import_saved=1'}
                   onClick={() => setNewTripPopup(null)}
                   className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold text-center"
                 >
-                  Ver spots →
+                  Importar →
                 </Link>
               </div>
             </div>
