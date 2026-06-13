@@ -3,13 +3,18 @@ import { UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 export default function MemberAvatarRow({ trip, profiles, onInvite, currentUserEmail }) {
-  const members = (trip?.members || [trip?.created_by]).filter(Boolean);
   const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
-  const { data: usersData = [] } = useQuery({ queryKey: ['allUsers'], queryFn: () => base44.entities.User.list(), staleTime: 10 * 60 * 1000 });
+  const memberEmails = (trip?.members || [trip?.created_by]).filter(Boolean);
+  const { data: usersData = [] } = useQuery({
+    queryKey: ['memberUsers', memberEmails.join(',')],
+    queryFn: () => base44.entities.User.filter({ email: { $in: memberEmails } }),
+    enabled: memberEmails.length > 0,
+    staleTime: 10 * 60 * 1000,
+  });
 
   return (
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
-      {members.map((email, i) => {
+      {memberEmails.map((email, i) => {
         const u = usersData.find(x => x.email === email);
         const profile = (u ? profiles?.find(p => p.user_id === u.id) : null)
           || profiles?.find(p => p.email === email || p.user_email === email);
