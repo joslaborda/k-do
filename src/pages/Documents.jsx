@@ -204,9 +204,14 @@ export default function Documents() {
   const tripMembers = trip?.members || [];
   const { data: memberProfiles = [] } = useQuery({
     queryKey: ['memberProfiles', tripMembers.join(',')],
-    queryFn: () => tripMembers.length
-      ? base44.entities.UserProfile.filter({ email: { $in: tripMembers } })
-      : [],
+    queryFn: async () => {
+      if (!tripMembers.length) return [];
+      const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
+      const ids = users.map(u => u.id).filter(Boolean);
+      if (!ids.length) return [];
+      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
+    },
     enabled: tripMembers.length > 0,
     staleTime: 5 * 60 * 1000,
   });
@@ -365,7 +370,7 @@ export default function Documents() {
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
               minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending}
-              onView={(url) => setViewFile(url)} />
+              onView={(url) => { setEditDoc(null); setTimeout(() => setViewFile(url), 150); }} />
           </div>
         </DialogContent>
       </Dialog>
@@ -385,7 +390,7 @@ export default function Documents() {
                 onCancel={() => setEditDoc(null)}
                 onDelete={() => { setDeleteDoc(editDoc); setEditDoc(null); }}
                 saving={updateMutation.isPending}
-                onView={(url) => setViewFile(url)} />
+                onView={(url) => { setEditDoc(null); setTimeout(() => setViewFile(url), 150); }} />
             </div>
           )}
         </DialogContent>

@@ -967,12 +967,17 @@ export default function Expenses() {
 
   const defaultCurrency = activeCurrencyOverride || activeLocalCurrency || baseCurrency;
 
-  // Cargar perfiles solo de los miembros del viaje — sin User.list() completa
+  // Perfiles de miembros: email→user_id→UserProfile (UserProfile no tiene campo email)
   const { data: memberProfiles = [] } = useQuery({
     queryKey: ['memberProfiles', members.join(',')],
-    queryFn: () => members.length
-      ? base44.entities.UserProfile.filter({ email: { $in: members } })
-      : [],
+    queryFn: async () => {
+      if (!members.length) return [];
+      const users = await base44.entities.User.filter({ email: { $in: members } });
+      const ids = users.map(u => u.id).filter(Boolean);
+      if (!ids.length) return [];
+      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
+    },
     enabled: members.length > 0,
     staleTime: 120000,
   });
