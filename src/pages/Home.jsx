@@ -237,6 +237,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <NotificationBell userId={currentUserId} userEmail={currentUserEmail} currentTripId={tripId} />
               <button onClick={() => setSettingsOpen(true)}
+                aria-label="Configuración del viaje"
                 className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-secondary/60 transition-colors">
                 <Settings className="w-5 h-5 text-foreground" />
               </button>
