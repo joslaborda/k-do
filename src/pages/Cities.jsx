@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +19,7 @@ import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
-  flight: Compass, hotel: Hotel, train: Train,
+  flight: PlaneIcon, hotel: Hotel, train: Train,
   bus: Car, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
@@ -46,7 +47,7 @@ function getTransportIcon(docs, cityStartDate) {
   });
   if (!doc) return null;
   const t = doc.type || doc.doc_type;
-  const M = { flight: Compass, train: Train, bus: Car }; const I = M[t] || Ship; return I;
+  const M = { flight: PlaneIcon, train: Train, bus: Car }; const I = M[t] || Ship; return I;
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────

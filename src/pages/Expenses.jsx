@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowRight, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
 import { getFxRate } from '@/lib/fxRates';
@@ -885,10 +885,17 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
 
 
 export default function Expenses() {
+  const navigate = useNavigate();
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
+
+  useEffect(() => {
+    if (!tripId || tripId === 'null') {
+      navigate(createPageUrl('TripsList'), { replace: true });
+    }
+  }, [tripId, navigate]);
   const { user: currentUser } = useAuth();
   const currentUserEmail = currentUser?.email ?? '';
   const queryClient = useQueryClient();

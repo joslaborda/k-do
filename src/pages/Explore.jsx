@@ -17,7 +17,7 @@ const SPOT_TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping
 const TYPE_COLORS = {
   food:'bg-orange-50 text-primary', sight:'bg-blue-100 text-blue-700',
   activity:'bg-green-100 text-green-700', shopping:'bg-purple-100 text-purple-700',
-  transport:'bg-secondary0 text-foreground', custom:'bg-yellow-100 text-yellow-700',
+  transport:'bg-secondary text-foreground', custom:'bg-yellow-100 text-yellow-700',
 };
 
 function Avatar({ profile, size }) {
@@ -176,7 +176,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
             return (
               <div key={spot.id} className="bg-card border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-shadow">
                 <div className={"w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 " +
-                  (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-secondary0 text-muted-foreground' : idx === 2 ? 'bg-orange-50 text-primary' : 'bg-secondary text-muted-foreground')}>
+                  (idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-secondary text-muted-foreground' : idx === 2 ? 'bg-orange-50 text-primary' : 'bg-secondary text-muted-foreground')}>
                   {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`}
                 </div>
                 <div className="flex-1 min-w-0">

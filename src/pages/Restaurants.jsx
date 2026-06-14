@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
 import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 
@@ -139,7 +139,7 @@ const TYPE_CONFIG = {
   sight:     { label:'Cultura',    Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
   activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
   shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
-  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary0 text-muted-foreground' },
+  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
   custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
@@ -599,9 +599,16 @@ function Toast({ spot, city, onUndo, visible }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Restaurants() {
+  const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
   const importSavedParam = urlParams.get('import_saved') === '1';
+
+  useEffect(() => {
+    if (!tripId || tripId === 'null') {
+      navigate(createPageUrl('TripsList'), { replace: true });
+    }
+  }, [tripId, navigate]);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { trip, activeCity } = useTripContext(tripId);
@@ -783,7 +790,7 @@ export default function Restaurants() {
   };
 
   const saveOsmPlace = async place => {
-    if (!tripId) { alert('No hay viaje seleccionado'); return; }
+    if (!tripId) return;
     const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim());
     if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
     setSavingId(place.id);
@@ -804,12 +811,12 @@ export default function Restaurants() {
       if (created?.id) setAssignDateSpot(created);
       notifyMembers('spot_added', '', place.name, { spotId: created?.id, spotDate: created?.assigned_date });
     } catch(e) {
-      alert('Error al guardar: ' + e.message);
+      console.error('Error al guardar spot:', e);
     } finally { setSavingId(null); }
   };
 
   const saveManualSpot = async form => {
-    if (!tripId) { alert('No hay viaje seleccionado'); return; }
+    if (!tripId) return;
     setSavingId('manual');
     try {
       const created = await createMutation.mutateAsync(baseData({
