@@ -31,6 +31,17 @@ const AuthenticatedApp = () => {
     }
   }, [isLoadingAuth, authError]);
 
+  // Migración silenciosa: añadir email a UserProfile si no lo tiene
+  useEffect(() => {
+    if (!authUser?.id || !authUser?.email) return;
+    base44.entities.UserProfile.filter({ user_id: authUser.id }).then(results => {
+      const prof = results?.[0];
+      if (prof && !prof.email) {
+        base44.entities.UserProfile.update(prof.id, { email: authUser.email }).catch(() => {});
+      }
+    }).catch(() => {});
+  }, [authUser?.id, authUser?.email]);
+
   if (isLoadingPublicSettings || isLoadingAuth || !userLoaded) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
