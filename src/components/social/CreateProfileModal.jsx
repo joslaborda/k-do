@@ -433,6 +433,7 @@ export default function CreateProfileModal({ user, open }) {
       if (!ok) { setError('Username ya en uso'); setSaving(false); setAvailable(false); return; }
       await base44.entities.UserProfile.create({
         user_id: user.id,
+        email: user.email,
         username,
         username_normalized: username,
         display_name: displayName.trim(),
