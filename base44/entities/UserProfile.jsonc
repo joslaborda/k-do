@@ -6,13 +6,17 @@
       "type": "string",
       "description": "ID del usuario (base44 user.id)"
     },
+    "email": {
+      "type": "string",
+      "description": "Email del usuario — copia del User.email para evitar joins"
+    },
     "username": {
       "type": "string",
-      "description": "Username \u00fanico (min\u00fasculas, a-z0-9_)"
+      "description": "Username único (minúsculas, a-z0-9_)"
     },
     "username_normalized": {
       "type": "string",
-      "description": "Username normalizado en min\u00fasculas para unicidad"
+      "description": "Username normalizado en minúsculas para unicidad"
     },
     "display_name": {
       "type": "string",
@@ -28,7 +32,7 @@
     },
     "bio": {
       "type": "string",
-      "description": "Biograf\u00eda corta (hasta 300 caracteres)"
+      "description": "Biografía corta (hasta 300 caracteres)"
     },
     "website": {
       "type": "string",
@@ -40,8 +44,8 @@
     },
     "home_country": {
       "type": "string",
-      "default": "Espa\u00f1a",
-      "description": "Pa\u00eds de origen"
+      "default": "España",
+      "description": "País de origen"
     },
     "home_currency": {
       "type": "string",
@@ -55,7 +59,7 @@
         "lujo",
         "aventura",
         "cultural",
-        "gastron\u00f3mico"
+        "gastronómico"
       ],
       "description": "Estilo de viaje preferido"
     },
@@ -77,7 +81,7 @@
     },
     "nationality": {
       "type": "string",
-      "description": "Nacionalidad del usuario \u2014 determina requisitos de visado"
+      "description": "Nacionalidad del usuario — determina requisitos de visado"
     }
   },
   "required": [
