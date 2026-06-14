@@ -26,7 +26,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
   }, [updateLine, mounted]);
 
   return (
-    <div ref={containerRef} className="relative flex" style={{ position: 'relative' }}>
+    <div ref={containerRef} role="tablist" aria-label="Secciones del viaje" className="relative flex" style={{ position: 'relative' }}>
       {/* Single sliding line — top */}
       <div style={{
         position: 'absolute',
@@ -43,6 +43,8 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
         return (
           <button
             key={tab.key}
+            role="tab"
+            aria-selected={isOn}
             onClick={() => onChange(tab.key)}
             className="flex-1 flex flex-col items-center pt-3 pb-2.5 gap-1"
           >
