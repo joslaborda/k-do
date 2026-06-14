@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { BarChart2, Camera, Check, Copy, Download, FileText, Image, MessageCircle, Send, Star, Trash2, Volume, X } from 'lucide-react';
+import { BarChart2, Camera, Check, Copy, Download, FileText, Image, MessageCircle, Send, Star, Trash2, X } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -190,9 +190,12 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         {/* Messages */}
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-2">
           {messages.length === 0 && (
-            <div className="text-center text-muted-foreground py-10">
-              <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-25" />
-              <p className="text-sm">Sin mensajes aún</p>
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+                <MessageCircle className="w-6 h-6 text-muted-foreground/50" />
+              </div>
+              <p className="text-sm font-medium text-foreground mb-1">Todavía no hay mensajes</p>
+              <p className="text-xs text-muted-foreground">Sé el primero en escribir algo al grupo</p>
             </div>
           )}
           {messages.map((msg, idx) => {
