@@ -58,8 +58,8 @@ export default function Invites() {
   // ── Helpers ─────────────────────────────────────────────────────────────────
   const notifyMembers = async (tripId, tripName, acceptingEmail, acceptingUserId) => {
     try {
-      const allProfiles = await base44.entities.UserProfile.list();
-      const myProf = allProfiles.find(p => p.user_id === acceptingUserId);
+      const myProfArr = await base44.entities.UserProfile.filter({ email: acceptingEmail });
+      const myProf = myProfArr[0] || null;
       const tripData = await base44.entities.Trip.get(tripId);
       const others = (tripData?.members || []).filter(e => e !== acceptingEmail);
       const resolved = await resolveUserIds(others);

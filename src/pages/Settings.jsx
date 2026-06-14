@@ -259,6 +259,7 @@ export default function Settings() {
     setSaving(true);
     try {
       await base44.entities.UserProfile.update(profile.id, {
+        email: user.email,
         display_name: displayName.trim(),
         username,
         username_normalized: username.toLowerCase(),

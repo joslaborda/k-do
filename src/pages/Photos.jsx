@@ -57,8 +57,8 @@ export default function Photos() {
       const members = trip?.members || [];
       const others = members.filter(e => e !== user.email);
       if (!others.length) return;
-      const allProfiles = await base44.entities.UserProfile.list();
-      const myProf = allProfiles.find(p => p.user_id === user?.id);
+      const myProfArr = await base44.entities.UserProfile.filter({ email: user.email });
+      const myProf = myProfArr[0] || null;
       const resolved = await resolveUserIds(others);
       resolved.forEach(({ userId }) => notify({
         userId,
