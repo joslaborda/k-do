@@ -112,7 +112,7 @@ export const TYPE_CONFIG = {
   sight:     { label:'Cultura',    Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
   activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
   shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
-  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary0 text-muted-foreground' },
+  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
   custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
