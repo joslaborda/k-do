@@ -8,10 +8,14 @@ import { PlaneIcon } from '@/lib/icons';
 export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail, profiles = [] }) {
   const allTripSpots = spots;
 
+  const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
+  const realExpenses = expenses.filter(e => !isSettlement(e));
+
   const totalDays = (trip?.start_date && trip?.end_date)
     ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1
     : null;
-  const totalSpent  = expenses.reduce((s, e) => s + (e.amount || 0), 0);
+  // Total grupo: suma amount_base (normalizado a moneda base), excluye liquidaciones
+  const totalSpent  = realExpenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
   const avgPerDay   = totalDays ? totalSpent / totalDays : 0;
   const visitedSpots = allTripSpots.filter(s => !!s.assigned_date).length;
   const currency    = trip?.currency || 'EUR';
@@ -93,18 +97,23 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
           <DollarSign className="w-4 h-4 text-primary mb-2" />
           <p className="text-xs text-muted-foreground mb-0.5">Tu parte</p>
           {(() => {
-            const myShare = expenses.reduce((s, e) => {
-              if (!e.split_with?.includes(currentUserEmail) && e.paid_by !== currentUserEmail) return s;
-              if (e.split_type === 'custom') return s + parseFloat(e.amounts_by_user?.[currentUserEmail] || 0);
-              const n = (e.split_with?.length || 1);
-              return s + (e.amount || 0) / n;
+            const myShare = realExpenses.reduce((s, e) => {
+              const amt = parseFloat(e.amount_base || e.amount) || 0;
+              if (!amt) return s;
+              if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+                const total = Object.values(e.amounts_by_user).reduce((t, v) => t + parseFloat(v || 0), 0);
+                return s + (total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0);
+              }
+              const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+              if (!parts.includes(currentUserEmail)) return s;
+              return s + amt / parts.length;
             }, 0);
             return (
               <>
                 <p className="text-xl font-semibold text-foreground">{myShare.toFixed(0)} {currency}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Total grupo: <span className="font-medium text-foreground">{totalSpent.toFixed(0)} {currency}</span>
-                  {' · '}{avgPerDay.toFixed(0)} {currency}/día
+                  {avgPerDay > 0 && <>{' · '}{avgPerDay.toFixed(0)} {currency}/día</>}
                 </p>
               </>
             );
