@@ -144,9 +144,14 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt || !e.paid_by) return;
       balances[e.paid_by] = (balances[e.paid_by] || 0) + amt;
-      const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-      const share = amt / parts.length;
-      parts.forEach(p => { balances[p] = (balances[p] || 0) - share; });
+      if (e.split_type === 'solo') {
+        // Gasto personal: neto 0 para el grupo
+        balances[e.paid_by] = (balances[e.paid_by] || 0) - amt;
+      } else {
+        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+        const share = amt / parts.length;
+        parts.forEach(p => { balances[p] = (balances[p] || 0) - share; });
+      }
     });
     return balances[currentUserEmail] || 0;
   }, [expenses, currentUserEmail]);

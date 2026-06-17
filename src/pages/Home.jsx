@@ -367,6 +367,7 @@ export default function Home() {
         trip={trip}
         tripId={tripId}
         queryClient={queryClient}
+        profiles={profiles}
       />
     </div>
   );

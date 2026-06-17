@@ -25,8 +25,13 @@ export default function Invites() {
     queryKey: ['invite', token],
     queryFn: async () => {
       if (!token) return null;
-      const invites = await base44.entities.TripInvite.filter({ invite_token: token, status: 'pending' });
-      return invites[0] || null;
+      // Buscar pendiente primero
+      const pending = await base44.entities.TripInvite.filter({ invite_token: token, status: 'pending' });
+      if (pending[0]) return { ...pending[0], _status: 'pending' };
+      // Si no hay pendiente, puede estar ya aceptada — buscar sin filtro de status
+      const accepted = await base44.entities.TripInvite.filter({ invite_token: token });
+      if (accepted[0]) return { ...accepted[0], _status: accepted[0].status };
+      return null;
     },
     enabled: !!token,
   });
@@ -72,7 +77,7 @@ export default function Invites() {
 
   // ── Aceptar desde token ──────────────────────────────────────────────────────
   const handleAccept = async () => {
-    if (!invite || !currentUser?.email) return;
+    if (!invite || !currentUser?.email || invite._status !== 'pending') return;
     setProcessing(true);
     try {
       await acceptTripInvite(invite.id, token, invite.trip_id, currentUser.email);
@@ -144,6 +149,28 @@ export default function Invites() {
           <button onClick={() => navigate(createPageUrl('TripsList'))}
             className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
             Ir a mis viajes
+          </button>
+        </div>
+      );
+    }
+
+    // Invitación ya aceptada — detectar si el usuario ya es miembro
+    const alreadyMember = invite._status !== 'pending' ||
+      (currentUser?.email && trip?.members?.includes(currentUser.email.toLowerCase()));
+
+    if (alreadyMember && trip) {
+      return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
+          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+            <Check className="w-7 h-7 text-green-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">Ya eres miembro</h2>
+          <p className="text-sm text-muted-foreground text-center">
+            Ya formas parte de <span className="font-medium text-foreground">{trip.name}</span>.
+          </p>
+          <button onClick={() => navigate(createPageUrl('Home') + `?trip_id=${trip.id}`)}
+            className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
+            Ir al viaje →
           </button>
         </div>
       );
