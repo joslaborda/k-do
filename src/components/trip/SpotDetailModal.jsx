@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { getMapsUrl } from '@/components/spots/spotsHelpers';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -23,13 +24,6 @@ const SPOT_COLORS = {
 };
 const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo' };
 
-function getMapsUrl(spot) {
-  if (spot.lat && spot.lng) return `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
-  const q = encodeURIComponent(spot.address || spot.title);
-  return /iP(hone|ad|od)/.test(navigator.userAgent)
-    ? `https://maps.apple.com/?q=${q}`
-    : `https://www.google.com/maps/search/?api=1&query=${q}`;
-}
 
 export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
   const [notes, setNotes]         = useState(spot?.notes || '');

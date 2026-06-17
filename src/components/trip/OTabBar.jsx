@@ -25,6 +25,12 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
     if (!mounted) setTimeout(() => setMounted(true), 50);
   }, [updateLine, mounted]);
 
+  useEffect(() => {
+    const observer = new ResizeObserver(() => updateLine());
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [updateLine]);
+
   return (
     <div ref={containerRef} role="tablist" aria-label="Secciones del viaje" className="relative flex" style={{ position: 'relative' }}>
       {/* Single sliding line — top */}

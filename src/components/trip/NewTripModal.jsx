@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Shuffle, ChevronDown, Loader2, AlertTriangle } from 'lucide-react';
 import { getCountryMeta, getTopCities, normalizeCountry } from '@/lib/countryConfig';
@@ -28,7 +27,7 @@ const CURRENCY_OPTIONS = [
   { value: 'COP', label: 'COP ($)' }, { value: 'PEN', label: 'PEN (S/)' },
   { value: 'AED', label: 'AED (د.إ)' }, { value: 'SAR', label: 'SAR (﷼)' },
   { value: 'EGP', label: 'EGP (£)' }, { value: 'RUB', label: 'RUB (₽)' },
-  { value: 'CRC', label: 'CRC (₡)' }, { value: 'COP', label: 'COP ($)' },
+  { value: 'CRC', label: 'CRC (₡)' },
 ];
 
 function currencySymbol(code) {
