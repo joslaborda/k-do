@@ -1,10 +1,34 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, Copy, Send, UserPlus } from 'lucide-react';
+import { Check, Clock, Copy, Send, UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { sendTripInvite } from '@/lib/invites';
+import { useQuery } from '@tanstack/react-query';
 
-export default function InviteModal({ open, onClose, trip, tripId, queryClient }) {
+const AVATAR_COLORS = [
+  'bg-orange-100 text-primary',
+  'bg-violet-100 text-violet-700',
+  'bg-blue-100 text-blue-700',
+  'bg-green-100 text-green-700',
+  'bg-pink-100 text-pink-700',
+];
+
+function MiniAvatar({ email, profiles = [], index = 0 }) {
+  const prof = profiles.find(p => p.email === email || p.user_email === email);
+  const name = prof?.display_name || prof?.username || email || '?';
+  const initials = name.slice(0, 2).toUpperCase();
+  const color = AVATAR_COLORS[index % AVATAR_COLORS.length];
+  if (prof?.avatar_url) {
+    return <img src={prof.avatar_url} alt={name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />;
+  }
+  return (
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${color}`}>
+      {initials}
+    </div>
+  );
+}
+
+export default function InviteModal({ open, onClose, trip, tripId, queryClient, profiles = [] }) {
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -12,6 +36,21 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
   const [error, setError] = useState('');
   const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
+
+  const members = trip?.members || [];
+
+  // Invitaciones pendientes para este viaje
+  const { data: pendingInvites = [] } = useQuery({
+    queryKey: ['tripPendingInvites', tripId],
+    queryFn: () => base44.entities.TripInvite.filter({ trip_id: tripId, status: 'pending' }),
+    enabled: !!tripId && open,
+    staleTime: 30000,
+  });
+
+  // Validación en tiempo real: comprobar si el email introducido ya está
+  const emailLower = email.trim().toLowerCase();
+  const isAlreadyMember = emailLower && members.some(m => m.toLowerCase() === emailLower);
+  const isAlreadyInvited = emailLower && pendingInvites.some(i => i.email?.toLowerCase() === emailLower);
 
   const handleInvite = async () => {
     const raw = email.trim();
@@ -27,7 +66,6 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
         }
         const profile = found[0] || null;
         if (!profile) { setError(`No existe el usuario @${query}`); setSending(false); return; }
-        // Resolver email: campo directo si backfilled, sino via User.filter
         if (profile.email) {
           resolvedEmail = profile.email;
         } else {
@@ -37,8 +75,14 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
           resolvedEmail = user.email;
         }
       }
-      const currentMembers = trip?.members || [];
-      if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
+      if (members.includes(resolvedEmail.toLowerCase())) {
+        setError('Este usuario ya es miembro del viaje');
+        setSending(false); return;
+      }
+      if (pendingInvites.some(i => i.email?.toLowerCase() === resolvedEmail.toLowerCase())) {
+        setError('Ya hay una invitación pendiente para este email');
+        setSending(false); return;
+      }
       const result = await sendTripInvite({
         tripId, email: resolvedEmail, role: 'editor',
         tripName: trip?.name || 'el viaje',
@@ -46,6 +90,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
         inviterName: trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
       if (!result?.emailSent && result?.inviteUrl) {
         setShareLink(result.inviteUrl);
       } else {
@@ -62,6 +107,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
+
         {done ? (
           <div className="flex flex-col items-center py-6 gap-3">
             <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
@@ -78,11 +124,11 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Invitación creada</p>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">No podemos enviar email a usuarios que aún no están en Kōdo. Comparte este enlace por WhatsApp o iMessage.</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">No podemos enviar email a usuarios externos. Comparte este enlace por WhatsApp o iMessage.</p>
               </div>
             </div>
             <div className="bg-card border border-border rounded-2xl px-4 py-3">
-              <p className="text-label2 text-muted-foreground mb-1.5">Enlace de invitación</p>
+              <p className="text-xs text-muted-foreground mb-1.5">Enlace de invitación</p>
               <p className="text-xs text-foreground font-mono break-all leading-relaxed">{shareLink}</p>
             </div>
             <button onClick={() => { navigator.clipboard.writeText(shareLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
@@ -93,28 +139,82 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-2 mb-5">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
                 <UserPlus className="w-4 h-4 text-primary" />
               </div>
               <h2 className="text-base font-semibold text-foreground">Invitar al viaje</h2>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">Introduce el email de quien quieres añadir. Le llegará un email con el enlace de acceso.</p>
-            <div className="bg-card border border-border rounded-2xl px-4 py-3 flex items-center gap-2">
+
+            {/* Input */}
+            <div className={`bg-card border rounded-2xl px-4 py-3 flex items-center gap-2 transition-colors ${
+              isAlreadyMember || isAlreadyInvited ? 'border-amber-300' : 'border-border'
+            }`}>
               <Send className="w-4 h-4 text-muted-foreground flex-shrink-0" />
               <input value={email} onChange={e => { setEmail(e.target.value); setError(''); }}
                 onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
-                placeholder="email@ejemplo.com" type="email" autoFocus
+                placeholder="email@ejemplo.com o @usuario" type="email" autoFocus
                 className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none" />
             </div>
-            {error && (
+
+            {/* Validación inline en tiempo real */}
+            {isAlreadyMember && (
+              <p className="text-xs text-amber-700 mt-2 px-1">Ya es miembro del viaje</p>
+            )}
+            {isAlreadyInvited && !isAlreadyMember && (
+              <p className="text-xs text-amber-700 mt-2 px-1">Ya tiene una invitación pendiente</p>
+            )}
+
+            {/* Error de envío */}
+            {error && !isAlreadyMember && !isAlreadyInvited && (
               <div className="mt-3 bg-red-50 border border-red-200 rounded-2xl px-4 py-2.5">
                 <p className="text-xs text-red-600">{error}</p>
               </div>
             )}
-            <div className="flex gap-3 mt-5">
+
+            {/* Lista de miembros y pendientes */}
+            {(members.length > 0 || pendingInvites.length > 0) && (
+              <div className="mt-4 border border-border rounded-2xl overflow-hidden">
+                {/* Miembros aceptados */}
+                {members.map((memberEmail, i) => {
+                  const prof = profiles.find(p => p.email === memberEmail || p.user_email === memberEmail);
+                  const name = prof?.display_name || prof?.username || memberEmail;
+                  return (
+                    <div key={memberEmail} className={`flex items-center gap-3 px-4 py-2.5 ${i > 0 || pendingInvites.length > 0 ? 'border-t border-border' : ''}`}>
+                      <MiniAvatar email={memberEmail} profiles={profiles} index={i} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{memberEmail}</p>
+                      </div>
+                      <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full flex-shrink-0 flex items-center gap-1">
+                        <Check className="w-3 h-3" />Miembro
+                      </span>
+                    </div>
+                  );
+                })}
+
+                {/* Invitaciones pendientes */}
+                {pendingInvites.map((inv, i) => (
+                  <div key={inv.id} className="flex items-center gap-3 px-4 py-2.5 border-t border-border">
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-foreground truncate">{inv.email}</p>
+                      <p className="text-xs text-muted-foreground">Invitado por {inv.invited_by || 'admin'}</p>
+                    </div>
+                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex-shrink-0">
+                      Pendiente
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-4">
               <button onClick={onClose} className="flex-1 h-11 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">Cancelar</button>
-              <button onClick={handleInvite} disabled={!email.trim() || sending}
+              <button onClick={handleInvite}
+                disabled={!email.trim() || sending || isAlreadyMember || isAlreadyInvited}
                 className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50">
                 {sending ? 'Enviando...' : 'Enviar invitación'}
               </button>
