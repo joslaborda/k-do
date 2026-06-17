@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Camera, Image, X, Loader2 } from 'lucide-react';
 
@@ -63,13 +64,13 @@ export default function SpotForm({ open, onOpenChange, onSubmit, isPending, trip
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = '';
-    if (file.size > 10 * 1024 * 1024) { alert('Máximo 10MB'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast({ title: 'Archivo demasiado grande', description: 'Máximo 10MB', variant: 'destructive' }); return; }
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm(f => ({ ...f, image_url: file_url }));
     } catch (err) {
-      alert('Error al subir: ' + err.message);
+      toast({ title: 'Error al subir', description: err.message, variant: 'destructive' });
     } finally {
       setUploading(false);
     }

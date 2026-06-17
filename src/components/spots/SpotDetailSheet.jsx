@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { MapPin, Navigation, Pencil, Send, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
 import { TYPE_CONFIG } from './spotsHelpers';
@@ -70,7 +71,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
       if (timeChanged && assignedTime) onNotify?.('spot_time', `${spot.title}: hora cambiada a ${assignedTime}`, spot.title);
       onClose();
     } catch (e) {
-      alert('Error al guardar: ' + e.message);
+      toast({ title: 'Error al guardar', description: e.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
