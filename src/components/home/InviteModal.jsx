@@ -8,6 +8,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
+  const [sentTo, setSentTo] = useState('');
   const [error, setError] = useState('');
   const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
@@ -20,14 +21,21 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
       let resolvedEmail = raw;
       if (!raw.includes('@') || raw.startsWith('@')) {
         const query = raw.startsWith('@') ? raw.slice(1) : raw;
-        const found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
-        const profile = found[0] || (await base44.entities.UserProfile.filter({}))
-          .find(p => p.username?.toLowerCase() === query.toLowerCase() || p.display_name?.toLowerCase() === query.toLowerCase());
+        let found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
+        if (!found.length) {
+          found = await base44.entities.UserProfile.filter({ username: query });
+        }
+        const profile = found[0] || null;
         if (!profile) { setError(`No existe el usuario @${query}`); setSending(false); return; }
-        const users = await base44.entities.User.filter({ id: profile.user_id });
-        const user = users[0] || null;
-        if (!user?.email) { setError('No se pudo resolver el email'); setSending(false); return; }
-        resolvedEmail = user.email;
+        // Resolver email: campo directo si backfilled, sino via User.filter
+        if (profile.email) {
+          resolvedEmail = profile.email;
+        } else {
+          const users = await base44.entities.User.filter({ id: profile.user_id });
+          const user = users[0] || null;
+          if (!user?.email) { setError('No se pudo resolver el email'); setSending(false); return; }
+          resolvedEmail = user.email;
+        }
       }
       const currentMembers = trip?.members || [];
       if (currentMembers.includes(resolvedEmail)) { setError('Este usuario ya es miembro del viaje'); setSending(false); return; }
@@ -41,7 +49,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
       if (!result?.emailSent && result?.inviteUrl) {
         setShareLink(result.inviteUrl);
       } else {
-        setDone(true); setEmail('');
+        setDone(true); setSentTo(resolvedEmail); setEmail('');
         setTimeout(() => { setDone(false); onClose(); }, 2500);
       }
     } catch (e) { setError(e?.message || 'Error al enviar la invitación. Inténtalo de nuevo.'); }
@@ -60,7 +68,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
               <Check className="w-7 h-7 text-green-600" />
             </div>
             <p className="text-base font-semibold text-foreground">¡Invitación enviada!</p>
-            <p className="text-sm text-muted-foreground text-center">Hemos enviado un email a {email}</p>
+            <p className="text-sm text-muted-foreground text-center">Hemos enviado un email a {sentTo}</p>
           </div>
         ) : shareLink ? (
           <div className="flex flex-col gap-4 py-2">

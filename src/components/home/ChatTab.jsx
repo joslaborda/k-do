@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { BarChart2, Camera, Check, Copy, Download, FileText, Image, MessageCircle, Send, Star, Trash2, X } from 'lucide-react';
+import { BarChart2, Camera, Check, Download, FileText, Image, MessageCircle, Send, X } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
@@ -88,7 +89,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
   const handleUpload = async (file) => {
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) { alert('Máximo 20MB'); return; }
+    if (file.size > 20 * 1024 * 1024) { toast({ title: 'Archivo demasiado grande', description: 'Máximo 20MB', variant: 'destructive' }); return; }
     const isImage = file.type.startsWith('image/');
     const isAudio = file.type.startsWith('audio/');
     setUploading(true);
@@ -101,7 +102,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         file_type: isImage ? 'image' : isAudio ? 'audio' : 'file',
         file_name: file.name,
       });
-    } catch (err) { alert('Error: ' + err.message); }
+    } catch (err) { toast({ title: 'Error al subir', description: err.message, variant: 'destructive' }); }
     finally { setUploading(false); }
   };
 
@@ -141,7 +142,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       setRecording(true);
       // Auto-stop after 60s
       setTimeout(() => { if (mr.state === 'recording') stopRecording(); }, 60000);
-    } catch { alert('Activa el micrófono en la configuración del navegador'); }
+    } catch { toast({ title: 'Micrófono no disponible', description: 'Activa el micrófono en la configuración del navegador', variant: 'destructive' }); }
   };
 
   const stopRecording = () => {
@@ -186,7 +187,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         </div>
       )}
 
-      <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col mx-4 mb-4" style={{minHeight:'360px',maxHeight:'500px'}}>
+      <div className="bg-card rounded-2xl border border-border overflow-hidden flex flex-col mb-4" style={{minHeight:'360px',maxHeight:'500px'}}>
         {/* Messages */}
         <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-2">
           {messages.length === 0 && (

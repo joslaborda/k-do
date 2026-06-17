@@ -1,16 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { base44 } from '@/api/base44Client';
 import { ArrowRight } from 'lucide-react';
-import PDFViewer from '@/components/PDFViewer';
 import DayCard from './DayCard';
 import MemberAvatarRow from './MemberAvatarRow';
 
 export default function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }) {
-  const [lightbox, setLightbox] = useState(null);
   const queryClient = useQueryClient();
   const today = new Date();
   const todayStr    = format(today, 'yyyy-MM-dd');
@@ -121,10 +119,6 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} currentUserEmail={currentUserEmail} />
       </div>
-
-      {lightbox && (
-        <PDFViewer fileUrl={lightbox} onClose={() => setLightbox(null)} />
-      )}
     </div>
   );
 }

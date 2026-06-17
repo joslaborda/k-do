@@ -1,6 +1,6 @@
 import React from 'react';
-import { AlertTriangle, BusFront, Car, Cross, DollarSign, FileText, Hotel, PlaneIcon, Shield, TrainFront, Utensils, Wifi } from '@/lib/icons';
-import { CirclePlus, Landmark, ShoppingBag, Ticket } from 'lucide-react';
+import { PlaneIcon, BusFront } from '@/lib/icons';
+import { AlertTriangle, Car, Cross, DollarSign, FileText, Hotel, Shield, TrainFront, Utensils, Wifi, CirclePlus, Landmark, ShoppingBag, Ticket } from 'lucide-react';
 
 export const REQ_ICON_MAP = {
   visa:    (p) => React.createElement(Shield, Object.assign({ size: 14 }, p)),

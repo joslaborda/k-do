@@ -1,18 +1,12 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, Compass, DollarSign, MapPin, Users } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
-import { base44 } from '@/api/base44Client';
 
 export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail, profiles = [] }) {
-  const { data: allTripSpots = spots } = useQuery({
-    queryKey: ['allTripSpots', tripId],
-    queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
-    enabled: !!tripId, staleTime: 0,
-  });
+  const allTripSpots = spots;
 
   const totalDays = (trip?.start_date && trip?.end_date)
     ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1

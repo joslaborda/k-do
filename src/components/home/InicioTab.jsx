@@ -2,10 +2,9 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
-import { Calendar, Users } from 'lucide-react';
-import { BusFront, Car, FileText, Hotel, PlaneIcon, TrainFront } from '@/lib/icons';
+import { Users, Car, FileText, Hotel, TrainFront } from 'lucide-react';
+import { BusFront, PlaneIcon } from '@/lib/icons';
 import { getCountryMeta } from '@/lib/countryConfig';
-import { getHolidaysInRange } from '@/lib/holidaysDB';
 import MemberAvatarRow from './MemberAvatarRow';
 
 export default function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, onInvite, currentUserEmail }) {
@@ -117,47 +116,6 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
           <p className="text-xs text-muted-foreground">{packedCount} de {packingItems.length} listos</p>
         </div>
       )}
-
-      {(() => {
-        if (!trip?.start_date || !trip?.end_date) return null;
-        const allCountries = [...new Set(sortedCities.map(c => c.country).filter(Boolean))];
-        const tripHolidays = getHolidaysInRange(allCountries, trip.start_date, trip.end_date, sortedCities);
-        if (!tripHolidays.length) return null;
-        return (
-          <div className="bg-card rounded-2xl border border-border overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <p className="text-sm font-medium text-foreground flex items-center gap-2">
-                <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center"><Calendar size={11} className="text-amber-700" /></span>
-                Festivos en tu viaje
-              </p>
-              <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
-                {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
-              </span>
-            </div>
-            {tripHolidays.map((h, i) => {
-              const d = new Date(h.date + 'T12:00:00');
-              const day = d.toLocaleDateString('es-ES', { day: 'numeric' });
-              const mon = d.toLocaleDateString('es-ES', { month: 'short' });
-              return (
-                <div key={i} className={`flex items-start gap-3 px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
-                  <div className="flex-shrink-0 min-w-[38px] text-center bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 rounded-lg py-1.5 px-1">
-                    <p className="text-base font-medium text-amber-800 dark:text-amber-300 leading-none">{day}</p>
-                    <p className="text-micro text-amber-600 dark:text-amber-500 uppercase tracking-wide mt-1">{mon}</p>
-                  </div>
-                  <div className="flex-1 min-w-0 pt-0.5">
-                    <p className="text-sm font-medium text-foreground leading-snug">{h.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {h.city ? h.city : h.country || ''}
-                      {(h.city || h.country) && h.scope ? ` · ${h.scope}` : ''}
-                    </p>
-                    {h.note && <p className="text-xs text-amber-700 dark:text-amber-500 mt-1.5 pl-2 border-l-2 border-amber-300 dark:border-amber-700 leading-relaxed">{h.note}</p>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        );
-      })()}
 
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
