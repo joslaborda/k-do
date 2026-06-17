@@ -4,12 +4,7 @@ import { useMemo } from 'react';
 
 /**
  * Shared Avatar component — shows profile photo if available, else initials.
- * Usage: <Avatar email="user@example.com" size={36} />
- *    OR: <Avatar profile={profileObj} size={36} />
- *    OR: <Avatar email="user@example.com" profiles={profilesByEmailMap} size={36} />
- *        profiles = { email → profileObj } — evita queries globales
- *
- * UserProfile tiene campo email (desde build 86) — lookup directo sin cruzar User.
+ * Lookup: primero por UserProfile.email (build 86+), fallback via User→user_id.
  */
 export default function Avatar({ email, profile: profileProp, profiles: profilesMap, size = 36, className = "" }) {
   const profileFromMap = profilesMap && email ? (profilesMap[email] || null) : null;
@@ -17,7 +12,17 @@ export default function Avatar({ email, profile: profileProp, profiles: profiles
 
   const { data: profileData = [] } = useQuery({
     queryKey: ['profileByEmail', email],
-    queryFn: () => base44.entities.UserProfile.filter({ email }),
+    queryFn: async () => {
+      if (!email) return [];
+      // Intento directo por email (funciona si el usuario tiene email backfilled)
+      const direct = await base44.entities.UserProfile.filter({ email });
+      if (direct.length > 0) return direct;
+      // Fallback: resolver via User → user_id
+      const users = await base44.entities.User.filter({ email: { $in: [email] } });
+      if (!users.length) return [];
+      const profs = await base44.entities.UserProfile.filter({ user_id: users[0].id });
+      return profs;
+    },
     staleTime: 5 * 60 * 1000,
     enabled: !skipQueries && !!email,
   });
