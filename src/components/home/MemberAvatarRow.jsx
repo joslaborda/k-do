@@ -7,15 +7,33 @@ export default function MemberAvatarRow({ trip, profiles, onInvite, currentUserE
   const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
   const memberEmails = (trip?.members || [trip?.created_by]).filter(Boolean);
 
-  // UserProfile ahora tiene email — lookup directo sin cruzar con User
   const { data: memberProfiles = [] } = useQuery({
     queryKey: ['memberProfiles', memberEmails.join(',')],
-    queryFn: () => base44.entities.UserProfile.filter({ email: { $in: memberEmails } }),
+    queryFn: async () => {
+      if (!memberEmails.length) return [];
+      // Intento directo por email (funciona si el usuario tiene email backfilled)
+      const direct = await base44.entities.UserProfile.filter({ email: { $in: memberEmails } });
+      // Emails que no encontramos por email directo
+      const foundEmails = new Set(direct.map(p => p.email).filter(Boolean));
+      const missing = memberEmails.filter(e => !foundEmails.has(e));
+      if (!missing.length) return direct;
+      // Fallback para los que faltan: User → user_id → UserProfile
+      const users = await base44.entities.User.filter({ email: { $in: missing } });
+      const ids = users.map(u => u.id).filter(Boolean);
+      const extra = ids.length
+        ? await base44.entities.UserProfile.filter({ user_id: { $in: ids } })
+        : [];
+      // Enriquecer con user_email para poder lookupear
+      const enriched = extra.map(p => ({
+        ...p,
+        email: users.find(u => u.id === p.user_id)?.email || '',
+      }));
+      return [...direct, ...enriched];
+    },
     enabled: memberEmails.length > 0,
     staleTime: 10 * 60 * 1000,
   });
 
-  // Mapa email → profile (profiles prop de Home tiene precedencia por ser más fresco)
   const profileMap = useMemo(() => {
     const map = {};
     memberProfiles.forEach(p => { if (p.email) map[p.email] = p; });
