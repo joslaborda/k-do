@@ -38,8 +38,9 @@ export function calculateBalances(expenses, members) {
         balances[email] = (balances[email] || 0) - (amount * ratio);
       });
     } else if (split_type === 'solo') {
-      // Solo para el que paga, nadie más debe nada
-      // No restamos nada a nadie
+      // Gasto personal: solo afecta al pagador, neto 0 para el grupo
+      // El pagador adelanta y se lo descuenta a sí mismo → no crea deuda entre miembros
+      balances[paid_by] = (balances[paid_by] || 0) - amount;
     }
   });
 

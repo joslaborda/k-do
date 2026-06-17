@@ -10,6 +10,12 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
   const inviteToken = generateInviteToken();
   const normalizedEmail = email.trim().toLowerCase();
 
+  // Verificar que el usuario no sea ya miembro del viaje
+  const trip = await base44.entities.Trip.get(tripId);
+  if (trip?.members?.includes(normalizedEmail)) {
+    throw new Error('Este usuario ya es miembro del viaje');
+  }
+
   // Crear o reusar invitación pending
   const existing = await base44.entities.TripInvite.filter({
     trip_id: tripId,
@@ -97,9 +103,19 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
   const trip = await base44.entities.Trip.get(tripId);
   const normalizedUserEmail = userEmail.toLowerCase();
   const members = trip.members || [];
-  const newMembers = members.includes(normalizedUserEmail) ? members : [...members, normalizedUserEmail];
   const roles = trip.roles || {};
-  const newRoles = { ...roles, [normalizedUserEmail]: invite.role || 'editor' };
+
+  // Si ya es miembro, no duplicar ni degradar rol
+  const alreadyMember = members.includes(normalizedUserEmail);
+  const newMembers = alreadyMember ? members : [...members, normalizedUserEmail];
+  const roleHierarchy = { admin: 3, editor: 2, viewer: 1 };
+  const existingRole = roles[normalizedUserEmail];
+  const inviteRole = invite.role || 'editor';
+  // Solo asignar rol si no tiene uno más alto ya
+  const finalRole = existingRole && (roleHierarchy[existingRole] || 0) >= (roleHierarchy[inviteRole] || 0)
+    ? existingRole
+    : inviteRole;
+  const newRoles = { ...roles, [normalizedUserEmail]: finalRole };
 
   await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
 
