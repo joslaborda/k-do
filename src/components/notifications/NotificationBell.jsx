@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Calendar } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Users } from 'lucide-react';
+import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Users, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
