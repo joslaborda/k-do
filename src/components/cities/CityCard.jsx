@@ -3,6 +3,7 @@ import { createPageUrl } from '@/utils';
 import { ChevronRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { normalizeCountry } from '@/lib/countryConfig';
 
 const cityImages = {
   // ── JAPÓN ──────────────────────────────────────────────────────────────────
@@ -434,6 +435,7 @@ export default function CityCard({ city, daysCount, tripId }) {
   const imageUrl =
     city.image_url ||
     cityImages[city.name] ||
+    countryImages[normalizeCountry(city.country || '')] ||
     countryImages[city.country] ||
     'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800';
 
