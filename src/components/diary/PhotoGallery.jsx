@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Image, MapPin } from '@/lib/icons';
+import { Image, MapPin, X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
