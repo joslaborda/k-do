@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
+import { toast } from '@/components/ui/use-toast';
 
 const CATEGORIES = [
   { value: 'food',          label: 'Comida',      Icon: Utensils    },
@@ -113,15 +114,15 @@ export default function ExpenseForm({
 
   const handleSave = async () => {
     if (!form.amount || parseFloat(form.amount) <= 0) {
-      alert('Introduce un importe para guardar el gasto.');
+      toast({ title: 'Importe requerido', description: 'Introduce un importe para guardar el gasto.', variant: 'destructive' });
       return;
     }
     if (!form.description.trim()) {
-      alert('Añade una descripción al gasto.');
+      toast({ title: 'Descripción requerida', description: 'Añade una descripción al gasto.', variant: 'destructive' });
       return;
     }
     if (!form.paid_by) {
-      alert('Indica quién pagó el gasto.');
+      toast({ title: 'Pagador requerido', description: 'Indica quién pagó el gasto.', variant: 'destructive' });
       return;
     }
     let amountBase = parseFloat(form.amount);
