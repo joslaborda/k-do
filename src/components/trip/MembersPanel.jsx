@@ -39,28 +39,23 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
       // If not an email, search by username
       if (!raw.includes('@')) {
         const query = raw.startsWith('@') ? raw.slice(1) : raw;
-        const found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
+        // Buscar por username_normalized primero, luego por username exacto
+        let found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
         if (!found.length) {
-          // Try display_name search fallback
-          const all = await base44.entities.UserProfile.filter({});
-          const match = all.find(p => p.username?.toLowerCase() === query.toLowerCase() || p.display_name?.toLowerCase() === query.toLowerCase());
-          if (!match) {
-            toast({ title: 'Usuario no encontrado', description: `No existe el usuario @${query}` });
-            setInviting(false);
-            return;
-          }
-          // Get email from Users
-          const users = await base44.entities.User.list();
-          const user = users.find(u => u.id === match.user_id);
-          if (!user?.email) {
-            toast({ title: 'Error', description: 'No se pudo resolver el email del usuario' });
-            setInviting(false);
-            return;
-          }
-          resolvedEmail = user.email;
+          found = await base44.entities.UserProfile.filter({ username: query });
+        }
+        if (!found.length) {
+          toast({ title: 'Usuario no encontrado', description: `No existe el usuario @${query}` });
+          setInviting(false);
+          return;
+        }
+        const profile = found[0];
+        // Resolver email: primero desde el campo email del perfil (backfilled), luego via User.filter
+        if (profile.email) {
+          resolvedEmail = profile.email;
         } else {
-          const users = await base44.entities.User.list();
-          const user = users.find(u => u.id === found[0].user_id);
+          const users = await base44.entities.User.filter({ id: profile.user_id });
+          const user = users[0];
           if (!user?.email) {
             toast({ title: 'Error', description: 'No se pudo resolver el email del usuario' });
             setInviting(false);
@@ -104,7 +99,7 @@ export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles
   const handleRoleChange = (email, newRole) => {
     const adminCount = Object.values(roles).filter(r => r === 'admin').length;
     if (roles[email] === 'admin' && adminCount <= 1 && newRole !== 'admin') {
-      alert('Debe haber al menos un admin en el viaje.');
+      toast({ title: 'No permitido', description: 'Debe haber al menos un admin en el viaje.', variant: 'destructive' });
       return;
     }
     updateTripMutation.mutate({ roles: { ...roles, [email]: newRole } });
