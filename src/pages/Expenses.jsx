@@ -400,35 +400,37 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
         </div>
       )}
 
-      {/* Saldo de todos */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
-        <div className="bg-card rounded-2xl border border-border overflow-hidden">
-          {members.map((email) => {
-            const bal = balances[email] || 0;
-            const isMe = email === currentUserEmail;
-            const name = userMap[email] || email || '?';
-            const total = Math.max(...Object.values(balances).map(Math.abs), 0.01);
-            const pct = Math.abs(bal) / total * 100;
-            return (
-              <div key={email} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
-                <Avatar email={email} profiles={profilesByEmail} size={30} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between mb-1.5">
-                    <span className="text-sm font-medium text-foreground">{isMe ? 'Tú' : name}</span>
-                    <span className={`text-sm font-medium ${Math.abs(bal) < 0.01 ? 'text-muted-foreground' : bal > 0 ? 'text-green-700' : 'text-red-600'}`}>
-                      {Math.abs(bal) < 0.01 ? '0' : `${bal > 0 ? '+' : ''}${fmtAmt(bal, baseCurrency)}`} {sym(baseCurrency)}
-                    </span>
-                  </div>
-                  <div style={{ height: 4, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? 'hsl(var(--muted-foreground))' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
+      {/* Saldo de todos — solo si hay deudas */}
+      {!iSettled && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            {members.map((email) => {
+              const bal = balances[email] || 0;
+              const isMe = email === currentUserEmail;
+              const name = userMap[email] || email || '?';
+              const total = Math.max(...Object.values(balances).map(Math.abs), 0.01);
+              const pct = Math.abs(bal) / total * 100;
+              return (
+                <div key={email} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
+                  <Avatar email={email} profiles={profilesByEmail} size={30} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-sm font-medium text-foreground">{isMe ? 'Tú' : name}</span>
+                      <span className={`text-sm font-medium ${Math.abs(bal) < 0.01 ? 'text-muted-foreground' : bal > 0 ? 'text-green-700' : 'text-red-600'}`}>
+                        {Math.abs(bal) < 0.01 ? '0' : `${bal > 0 ? '+' : ''}${fmtAmt(bal, baseCurrency)}`} {sym(baseCurrency)}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: 'hsl(var(--secondary))', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: Math.abs(bal) < 0.01 ? 'hsl(var(--muted-foreground))' : bal > 0 ? '#16a34a' : '#dc2626', borderRadius: 4 }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {iSettled && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
