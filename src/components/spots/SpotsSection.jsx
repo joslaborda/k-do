@@ -193,7 +193,16 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
   const saveOsmPlace = async place => {
     setSavingId(place.id);
     try {
-      await createMutation.mutateAsync(baseData({ title:place.name, type:place.type||'sight', address:place.address||'', lat:place.lat, lng:place.lng, tags:[] }));
+      await createMutation.mutateAsync({
+        trip_id: tripId, city_id: cityId, city_name: city, country,
+        visibility: 'trip_members', visited: false,
+        created_by: null, created_by_user_id: null,
+        saved_by: [currentUserEmail].filter(Boolean),
+        creator_username: myProfile?.username || '',
+        creator_display_name: myProfile?.display_name || '',
+        title: place.name, type: place.type || 'sight',
+        address: place.address || '', lat: place.lat, lng: place.lng, tags: [],
+      });
       setSearchResults([]); setNearbyResults([]); setSearchQuery(''); setPanelMode(null);
     } finally { setSavingId(null); }
   };

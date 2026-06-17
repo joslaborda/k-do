@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
+import { getMapsUrl } from './spotsHelpers';
 
 const TYPE_CONFIG = {
   food:      { label: 'Restaurante', Icon: Utensils,   color: 'bg-orange-100 text-primary' },
@@ -16,14 +17,6 @@ const TYPE_CONFIG = {
   nightlife: { label: 'Bares/Noche',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
   custom:    { label: 'Otro',        Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
-
-function getMapsUrl(spot) {
-  if (spot.lat && spot.lng) return `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
-  const q = encodeURIComponent(spot.address || spot.title);
-  return /iPad|iPhone|iPod/.test(navigator.userAgent)
-    ? `https://maps.apple.com/?q=${q}`
-    : `https://www.google.com/maps/search/?api=1&query=${q}`;
-}
 
 // ── Popup de valoración ───────────────────────────────────────────────────────
 // ── Upload helper ─────────────────────────────────────────────────────────────

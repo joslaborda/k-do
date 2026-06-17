@@ -1,4 +1,13 @@
 import { CirclePlus, Compass, Landmark, ShoppingBag, Ticket, Utensils } from 'lucide-react';
+// ── Maps URL helper ───────────────────────────────────────────────────────────
+export function getMapsUrl(spot) {
+  if (spot.lat && spot.lng) return `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
+  const q = encodeURIComponent(spot.address || spot.title);
+  return /iPad|iPhone|iPod/.test(navigator.userAgent)
+    ? `https://maps.apple.com/?q=${q}`
+    : `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
 // ── OSM helpers ───────────────────────────────────────────────────────────────
 export const OSM_MAP = {
   restaurant:'food', cafe:'food', bar:'food', fast_food:'food', pub:'food', bakery:'food',
