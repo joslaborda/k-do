@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlaneIcon, TrainFront, BusFront, Car, Ship, Ticket, Shield, FileText } from '@/lib/icons';
+import { PlaneIcon, BusFront } from '@/lib/icons';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,8 @@ import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { 
   ArrowLeft, Plus, Calendar, ChevronDown, ChevronUp, 
-  Edit2, Trash2, Save, MapPin, RefreshCw, Hotel
+  Edit2, Trash2, Save, MapPin, RefreshCw, Hotel,
+  TrainFront, Car, Ship, Ticket, Shield, FileText
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import CitySettingsModal from '@/components/cities/CitySettingsModal';

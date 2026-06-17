@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
@@ -42,17 +42,16 @@ export default function Home() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [tab, setTab] = useState(() => 'inicio');
+  const tabRef = useRef('inicio');
   const [tabDir, setTabDir] = useState(1);
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [chatLastRead, setChatLastRead] = useState(new Date());
 
   const handleTabChange = (key) => {
-    // Note: uses tab state ref via closure — homeTabs resolved at call time
-    setTabDir(prev => {
-      const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat'];
-      return tabOrder.indexOf(key) >= tabOrder.indexOf(tab) ? 1 : -1;
-    });
+    const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat'];
+    setTabDir(tabOrder.indexOf(key) >= tabOrder.indexOf(tabRef.current) ? 1 : -1);
+    tabRef.current = key;
     setTab(key);
     if (key === 'chat') setChatLastRead(new Date());
   };
@@ -83,9 +82,12 @@ export default function Home() {
     const today = new Date(); today.setHours(0,0,0,0);
     const start = new Date(trip.start_date + 'T00:00:00');
     const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
-    if (today < start) { setTab('previaje'); return; }
-    if (end && today > end) { setTab('resumen'); return; }
-    setTab('hoy');
+    let next;
+    if (today < start) next = 'previaje';
+    else if (end && today > end) next = 'resumen';
+    else next = 'hoy';
+    tabRef.current = next;
+    setTab(next);
   }, [trip?.start_date, trip?.end_date]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const deleteMutation = useMutation({
@@ -175,42 +177,52 @@ export default function Home() {
   const daysToStart = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
   const isDeparture = daysToStart === 0;       // today IS the start date
   const isDMinus1   = daysToStart === 1;       // tomorrow is start
-  const isPreTrip   = tripNotStarted && !isDeparture;
 
   const homeTabs = useMemo(() => {
-    const tabs = [];
     if (tripFinished) {
       return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
     }
-    if (isDeparture || tripInProgress) {
-      tabs.push({ key: 'hoy', label: 'Hoy', urgent: true });
-      tabs.push({ key: 'manana', label: 'Mañana' });
-      // 'Inicio' tab only on day of departure, not during trip
-      tabs.push({ key: 'chat', label: 'Chat', badge: unreadMessages });
-      return tabs;
-    }
-    if (isDMinus1) {
+    if (tripInProgress && !isDeparture) {
+      // Viaje en curso (no el primer día) — sin tab Salida
       return [
-        { key: 'previaje', label: 'Pre-viaje' },
-        { key: 'inicio', label: 'Inicio' },
+        { key: 'hoy', label: 'Hoy', urgent: true },
+        { key: 'manana', label: 'Mañana' },
         { key: 'chat', label: 'Chat', badge: unreadMessages },
       ];
     }
-    // Normal pre-trip
+    if (isDeparture) {
+      // Día de salida — Salida + Mañana (primer día en destino)
+      return [
+        { key: 'inicio', label: 'Salida' },
+        { key: 'manana', label: 'Mañana' },
+        { key: 'chat', label: 'Chat', badge: unreadMessages },
+      ];
+    }
+    if (isDMinus1) {
+      // Víspera — Pre-viaje + Salida
+      return [
+        { key: 'previaje', label: 'Pre-viaje' },
+        { key: 'inicio', label: 'Salida' },
+        { key: 'chat', label: 'Chat', badge: unreadMessages },
+      ];
+    }
+    // Pre-viaje normal
     return [
       { key: 'previaje', label: 'Pre-viaje' },
       { key: 'chat', label: 'Chat', badge: unreadMessages },
     ];
   }, [tripFinished, isDeparture, tripInProgress, isDMinus1, unreadMessages]);
 
-  // Auto-correct tab when trip status changes (homeTabs now defined above)
+  // Auto-correct tab when trip status changes
   useEffect(() => {
-    if (!trip) return;
+    if (!trip || !homeTabs.length) return;
     const validKeys = homeTabs.map(t => t.key);
-    if (!validKeys.includes(tab)) {
-      setTab(validKeys[0]);
+    if (!validKeys.includes(tabRef.current)) {
+      const next = validKeys[0];
+      tabRef.current = next;
+      setTab(next);
     }
-  }, [trip?.start_date, trip?.end_date]);
+  }, [homeTabs]);
 
   if (isLoading || !tripId) return (
     <div className="min-h-screen bg-background flex items-center justify-center">

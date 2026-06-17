@@ -1,5 +1,6 @@
 import { BusFront } from '@/lib/icons';
 import { createPageUrl } from '@/utils';
+import { toast } from '@/components/ui/use-toast';
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
@@ -1015,7 +1016,7 @@ export default function Expenses() {
 
   const createMutation = useMutation({
     mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount) }),
-    onError: () => alert('Error al guardar el gasto. Inténtalo de nuevo.'),
+    onError: () => toast({ title: 'Error al guardar', description: 'Inténtalo de nuevo.', variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setSheetOpen(false); setEditingExpense(null);
@@ -1038,7 +1039,7 @@ export default function Expenses() {
   const updateMutation = useMutation({
     mutationFn: ({ id, d }) => base44.entities.Expense.update(id, { ...d, amount: parseFloat(d.amount) }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }); setSheetOpen(false); setEditingExpense(null); window.scrollTo({ top: 0, behavior: 'smooth' }); },
-    onError: () => alert('Error al actualizar el gasto.'),
+    onError: () => toast({ title: 'Error al actualizar el gasto', variant: 'destructive' }),
   });
 
   const [pendingDeleteClose, setPendingDeleteClose] = useState(null);
@@ -1049,7 +1050,7 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setDetailExpense(null); // close sheet after confirmed delete
     },
-    onError: () => alert('Error al eliminar el gasto.'),
+    onError: () => toast({ title: 'Error al eliminar el gasto', variant: 'destructive' }),
   });
 
   const handleSave = d => {

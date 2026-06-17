@@ -6,6 +6,7 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, MapPin, Calendar, Mail, Check, X, ChevronLeft } from 'lucide-react';
 import { createPageUrl } from '@/utils';
+import { toast } from '@/components/ui/use-toast';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -79,7 +80,7 @@ export default function Invites() {
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${invite.trip_id}`));
     } catch (e) {
-      alert(e.message || 'No se pudo aceptar la invitación');
+      toast({ title: 'Error', description: e.message || 'No se pudo aceptar la invitación', variant: 'destructive' });
       setProcessing(false);
     }
   };
@@ -91,7 +92,7 @@ export default function Invites() {
       await declineTripInvite(invite.id, token);
       navigate(createPageUrl('TripsList'));
     } catch (e) {
-      alert(e.message || 'No se pudo rechazar');
+      toast({ title: 'Error', description: e.message || 'No se pudo rechazar', variant: 'destructive' });
       setProcessing(false);
     }
   };
@@ -106,7 +107,7 @@ export default function Invites() {
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${inv.trip_id}`));
     } catch (e) {
-      alert(e.message || 'Error al aceptar');
+      toast({ title: 'Error', description: e.message || 'Error al aceptar', variant: 'destructive' });
       setProcessing(false);
     }
   };
