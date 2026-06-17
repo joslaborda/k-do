@@ -23,12 +23,13 @@ export async function notify({ userId, type, actor, tripId, tripName, refId, ref
 }
 
 /**
- * Resuelve userIds de una lista de emails via User.list().
+ * Resuelve userIds de una lista de emails via User.filter().
+ * NO usa User.list() global — compatible con permisos de producción.
  */
 export async function resolveUserIds(emails) {
   if (!emails?.length) return [];
   try {
-    const users = await base44.entities.User.list();
+    const users = await base44.entities.User.filter({ email: { $in: emails } });
     return emails
       .map(email => ({ email, userId: users.find(u => u.email === email)?.id }))
       .filter(x => x.userId);
