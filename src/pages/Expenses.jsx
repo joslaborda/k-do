@@ -316,12 +316,26 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           </p>
         )}
         {(() => {
-          const iPaid = expenses.filter(e => e.paid_by === currentUserEmail && !e.description?.startsWith('Liquidación:')).reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
-          const myRealSpend = iPaid - Math.max(0, myBalance);
+          const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
+          const realExpenses = expenses.filter(e => !isSettlement(e));
+          let iPaid = 0;
+          let myShare = 0;
+          realExpenses.forEach(e => {
+            const amt = parseFloat(e.amount_base || e.amount) || 0;
+            if (!amt) return;
+            if (e.paid_by === currentUserEmail) iPaid += amt;
+            if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+              const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
+              if (total > 0) myShare += (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt;
+            } else {
+              const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
+              if (parts.includes(currentUserEmail)) myShare += amt / parts.length;
+            }
+          });
           return iPaid > 0 ? (
             <div className="mt-3 pt-3 border-t border-border/50 flex gap-4">
               <div><p className="text-xs text-muted-foreground">He pagado</p><p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p></div>
-              <div><p className="text-xs text-muted-foreground">Mi parte real</p><p className="text-sm font-medium text-foreground">{fmtAmt(Math.max(0, myRealSpend), baseCurrency)} {sym(baseCurrency)}</p></div>
+              <div><p className="text-xs text-muted-foreground">Mi parte real</p><p className="text-sm font-medium text-foreground">{fmtAmt(myShare, baseCurrency)} {sym(baseCurrency)}</p></div>
             </div>
           ) : null;
         })()}
