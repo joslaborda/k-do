@@ -24,8 +24,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient }
         const profile = found[0] || (await base44.entities.UserProfile.filter({}))
           .find(p => p.username?.toLowerCase() === query.toLowerCase() || p.display_name?.toLowerCase() === query.toLowerCase());
         if (!profile) { setError(`No existe el usuario @${query}`); setSending(false); return; }
-        const users = await base44.entities.User.list();
-        const user = users.find(u => u.id === profile.user_id);
+        const users = await base44.entities.User.filter({ id: profile.user_id });
+        const user = users[0] || null;
         if (!user?.email) { setError('No se pudo resolver el email'); setSending(false); return; }
         resolvedEmail = user.email;
       }

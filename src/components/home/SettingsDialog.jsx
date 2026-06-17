@@ -6,7 +6,6 @@ import { es } from 'date-fns/locale';
 import { Check, ChevronDown, Trash2, UserPlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CountryInput from '@/components/trip/CountryInput';
 import { normalizeCountry } from '@/lib/countryConfig';
