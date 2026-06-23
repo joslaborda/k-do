@@ -142,24 +142,6 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
   const { t } = useTranslation();
   const [catFilter, setCatFilter] = useState('all');
 
-  const myBalance = useMemo(() => {
-    const balances = {};
-    expenses.forEach(e => {
-      const amt = parseFloat(e.amount_base || e.amount) || 0;
-      if (!amt || !e.paid_by) return;
-      balances[e.paid_by] = (balances[e.paid_by] || 0) + amt;
-      if (e.split_type === 'solo') {
-        // Gasto personal: neto 0 para el grupo
-        balances[e.paid_by] = (balances[e.paid_by] || 0) - amt;
-      } else {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        const share = amt / parts.length;
-        parts.forEach(p => { balances[p] = (balances[p] || 0) - share; });
-      }
-    });
-    return balances[currentUserEmail] || 0;
-  }, [expenses, currentUserEmail]);
-
   const filtered = catFilter === 'all' ? expenses : expenses.filter(e => e.category === catFilter);
 
   // Group by date
@@ -195,23 +177,6 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 
   return (
     <div className="space-y-4">
-      {/* Mi balance */}
-      <div className="bg-card rounded-2xl border border-border p-4">
-        <p className="text-xs text-muted-foreground mb-1">{t('expenses.balance.yourBalance')}</p>
-        <div className="flex items-baseline justify-between">
-          <p className={`text-2xl font-medium ${Math.abs(myBalance) < 0.5 ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
-            {Math.abs(myBalance) < 0.5 ? '0' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)}`} {sym(baseCurrency)}
-          </p>
-          <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
-            Math.abs(myBalance) < 0.5 ? 'bg-secondary text-muted-foreground border-border' :
-            myBalance > 0 ? 'bg-green-50 text-green-700 border-green-200' :
-            'bg-red-50 text-red-600 border-red-200'
-          }`}>
-            {Math.abs(myBalance) < 0.5 ? t('expenses.balance.upToDate') : myBalance > 0 ? t('expenses.balance.theyOweYou') : t('expenses.balance.youOwe')}
-          </span>
-        </div>
-      </div>
-
       {/* Categorías */}
       <div className="flex flex-wrap gap-2">
         {[['all', null, t('common.all')], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, k, t(v.label)])].map(([k, catKey, l]) => (
@@ -314,14 +279,20 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
   return (
     <div className="space-y-4">
-      {/* Mi balance */}
-      <div className={`rounded-2xl border p-4 ${iSettled ? 'bg-card border-border' : myBalance > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-        <p className="text-xs text-muted-foreground mb-1">{t('expenses.balance.yourBalance')}</p>
-        <p className={`text-2xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
+      {/* Mi balance — card prominente */}
+      <div className={`rounded-2xl border p-4 ${
+        iSettled ? 'bg-card border-border' :
+        myBalance > 0 ? 'bg-green-50 border-green-200' :
+        'bg-red-50 border-red-200'
+      }`}>
+        <p className={`text-xs font-medium mb-2 ${iSettled ? 'text-muted-foreground' : myBalance > 0 ? 'text-green-800' : 'text-red-800'}`}>
+          {t('expenses.balance.yourBalance')}
+        </p>
+        <p className={`text-3xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
           {iSettled ? t('expenses.balance.upToDate') : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
         </p>
         {!iSettled && (
-          <p className={`text-xs mt-1 font-medium ${myBalance > 0 ? 'text-green-600' : 'text-red-500'}`}>
+          <p className={`text-xs mt-1 font-medium ${myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
             {myBalance > 0 ? t('expenses.balance.theyOweYouThis') : t('expenses.balance.youOweThis')}
           </p>
         )}
@@ -354,7 +325,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {/* Lo que debo */}
       {iOwe.length > 0 && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tienes que pagar</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.balance.youNeedToPay')}</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {iOwe.map((d, i) => {
               const idx = debts.indexOf(d);
@@ -365,7 +336,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{userMap[d.to] || d.to}</p>
                     <p className="text-xs text-red-500 font-medium mt-0.5">
-                      Debes <DebtAmount idx={idx} d={d} from={true} />
+                      {t('expenses.balance.youOwe')} <DebtAmount idx={idx} d={d} from={true} />
                     </p>
                   </div>
                   <button
@@ -393,22 +364,22 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{userMap[d.from] || d.from}</p>
                     <p className="text-xs text-green-600 font-medium mt-0.5">
-                      Te debe <DebtAmount idx={idx} d={d} from={false} />
+                      {t('expenses.balance.owesYou')} <DebtAmount idx={idx} d={d} from={false} />
                     </p>
                   </div>
-                  <span className="text-xs text-muted-foreground flex-shrink-0">Pendiente</span>
+                  <span className="text-xs text-muted-foreground flex-shrink-0">{t('expenses.balance.pending')}</span>
                 </div>
               );
             })}
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">Ellos verán el botón "Saldar" en su vista</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">Ellos verán el botón t('expenses.balance.settle') en su vista</p>
         </div>
       )}
 
       {/* Saldo de todos */}
       {!iSettled && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.balance.groupBalance')}</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {members.map((email) => {
               const bal = balances[email] || 0;
@@ -421,7 +392,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                   <Avatar email={email} profiles={profilesByEmail} size={30} />
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between mb-1.5">
-                      <span className="text-sm font-medium text-foreground">{isMe ? 'Tú' : name}</span>
+                      <span className="text-sm font-medium text-foreground">{isMe ? t('expenses.balance.you') : name}</span>
                       <span className={`text-sm font-medium ${Math.abs(bal) < 0.01 ? 'text-muted-foreground' : bal > 0 ? 'text-green-700' : 'text-red-600'}`}>
                         {Math.abs(bal) < 0.01 ? '0' : `${bal > 0 ? '+' : ''}${fmtAmt(bal, baseCurrency)}`} {sym(baseCurrency)}
                       </span>
@@ -578,7 +549,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                   {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                   <div className="flex-1">
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-foreground">{tc.label}</span>
+                      <span className="text-foreground">{t(tc.label)}</span>
                       <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                     </div>
                     <div style={{ height: 5, background: 'var(--kodo-progress-track)', borderRadius: 4, overflow: 'hidden' }}>
@@ -608,7 +579,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
                 {(() => { const I = CAT_ICONS[cat] || CAT_ICONS.other; const col = CAT_COLORS[cat] || CAT_COLORS.other; return <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${col}`}><I size={15} /></div>; })()}
                 <div className="flex-1">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-foreground">{tc.label}</span>
+                    <span className="text-foreground">{t(tc.label)}</span>
                     <span className="text-muted-foreground">{fmtAmt(amt, baseCurrency)} {s}</span>
                   </div>
                   <div style={{ height: 4, background: 'var(--kodo-progress-track)', borderRadius: 4, overflow: 'hidden' }}>
