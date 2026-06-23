@@ -16,7 +16,9 @@ const roleConfig = {
 };
 
 export default function MembersPanel({
-  const { t } = useTranslation(); trip, currentUserEmail, isAdmin, profiles = [] }) {
+  trip, currentUserEmail, isAdmin, profiles = []
+}) {
+  const { t } = useTranslation();
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);

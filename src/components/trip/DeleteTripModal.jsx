@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 
 export default function DeleteTripModal({
-  const { t } = useTranslation(); open, onOpenChange, tripName, onConfirm, isPending }) {
+  open, onOpenChange, tripName, onConfirm, isPending
+}) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const matches = inputValue === tripName;
 
