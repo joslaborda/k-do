@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import { getTripCoverImage } from '@/lib/tripImage';
 import { getCountryMeta } from '@/lib/countryConfig';
 

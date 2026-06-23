@@ -277,6 +277,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ ...DEFAULT_FORM });
   const [mode, setMode] = useState('multi');
   const [dateMode, setDateMode] = useState('nights');
