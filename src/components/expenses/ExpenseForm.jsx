@@ -35,6 +35,7 @@ export default function ExpenseForm({
   profiles = {},
   profilesByEmail,
 }) {
+  const { t } = useTranslation();
   const getName = email => userMap[email] || email || email || '?';
   const profileMap = profilesByEmail || profiles || {};
 
