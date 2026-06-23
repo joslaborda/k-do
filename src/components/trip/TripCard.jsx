@@ -64,9 +64,15 @@ export function HeroTripCard({ trip, cities = [] }) {
       ? 'bg-orange-50/90 text-primary border border-orange-200'
       : 'bg-secondary text-muted-foreground border border-border';
 
+  const statusLabel = status?.type === 'active'
+    ? t('trip.statusActive')
+    : status?.type === 'upcoming'
+      ? t('trip.statusUpcoming')
+      : t('trip.statusPast');
+
   // Only show top-left badge for active trips (day counter). Upcoming countdown is top-right only.
   const topLeft = status?.type==='active' && status.dayNum
-    ? `Día ${status.dayNum} de ${status.total}`
+    ? t('trip.dayOf', { day: status.dayNum, total: status.total })
     : null;
 
   return (
@@ -87,7 +93,7 @@ export function HeroTripCard({ trip, cities = [] }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"/>
           {status && (
             <div className={`absolute top-2.5 right-2.5 text-xs font-medium px-2.5 py-1 rounded-full ${badgeCls}`}>
-              {status.label}
+              {statusLabel}
             </div>
           )}
           {topLeft && (
@@ -106,8 +112,8 @@ export function HeroTripCard({ trip, cities = [] }) {
           </div>
         </div>
         <div className="bg-card px-3 py-2.5 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{dateRange || 'Sin fechas'}</p>
-          <p className="text-xs text-primary font-medium">Abrir →</p>
+          <p className="text-xs text-muted-foreground">{dateRange || t('trip.noDates')}</p>
+          <p className="text-xs text-primary font-medium">{t('trip.open')} →</p>
         </div>
       </div>
     </Link>
@@ -128,9 +134,11 @@ export default function TripCard({ trip, cities = [] }) {
     ? 'bg-secondary text-muted-foreground border border-border'
     : 'bg-orange-50 text-primary border border-orange-200';
 
-  const badgeLabel = isPast ? 'Finalizado'
-    : status?.days != null ? `${status.days} días`
-    : status?.label;
+  const badgeLabel = isPast
+    ? t('trip.statusPast')
+    : status?.days != null
+      ? t('trip.daysLeft', { count: status.days })
+      : t('trip.statusActive');
 
   return (
     <Link to={createPageUrl(`Home?trip_id=${trip.id}`)}>
