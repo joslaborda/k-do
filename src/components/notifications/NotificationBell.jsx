@@ -23,7 +23,7 @@ const TYPE = {
 // ── NotificationBell — i18n ready ────────────────────────────────────────────
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'notifications.new' };
 
-function TripInviteModal({notif, onClose, onAccept }) {
+function TripInviteModal({ notif, onClose, onAccept }) {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const [trip, setTrip] = useState(null);
@@ -160,7 +160,7 @@ function TripInviteModal({notif, onClose, onAccept }) {
   );
 }
 
-function NotifItem({n, currentTripId, onRead, onNavigate }) {
+function NotifItem({ n, currentTripId, onRead, onNavigate }) {
   const cfg = TYPE[n.type] ?? FALLBACK;
   const { Icon } = cfg;
   const name = n.actor_display_name || n.actor_username || 'Alguien';
@@ -186,7 +186,7 @@ function NotifItem({n, currentTripId, onRead, onNavigate }) {
   );
 }
 
-export default function NotificationBell({userId, userEmail, currentTripId }) {
+export default function NotificationBell({ userId, userEmail, currentTripId }) {
   const [open, setOpen] = useState(false);
   const [inviteNotif, setInviteNotif] = useState(null);
   const ref = useRef();
