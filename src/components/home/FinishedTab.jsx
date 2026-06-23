@@ -166,21 +166,21 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
           { label: 'Ciudades',      value: cities.length,    Icon: MapPin },
           { label: 'Spots visitados', value: visitedSpots,  Icon: Compass },
         ].map(s => (
-          <div key={s.label} className="bg-card rounded-2xl border border-border p-4">
+          <div key={s.label} className="bg-card rounded-2xl border border-border p-4" style={{ minHeight: 120 }}>
             <s.Icon className="w-4 h-4 text-primary mb-2" />
             <p className="text-2xl font-medium text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
           </div>
         ))}
 
-        {/* Viajeros */}
+        {/* Viajeros — avatares como protagonistas */}
         <button
           className="bg-card rounded-2xl border border-border p-4 text-left hover:bg-secondary/30 transition-colors"
+          style={{ minHeight: 120 }}
           onClick={() => setShowTravelers(true)}
         >
           <Users className="w-4 h-4 text-primary mb-2" />
-          <p className="text-2xl font-medium text-foreground">{memberCount}</p>
-          <div className="flex items-center mt-1.5">
+          <div className="flex items-center">
             {visibleMembers.map((email, i) => {
               const prof = profiles.find(p => p.email === email || p.user_email === email);
               const name = prof?.display_name || prof?.username || email;
@@ -188,23 +188,23 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
               const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
               return prof?.avatar_url
                 ? <img key={email} src={prof.avatar_url} alt={name} title={name}
-                    className="w-5 h-5 rounded-full object-cover border-2 border-card flex-shrink-0"
-                    style={{ marginLeft: i > 0 ? -5 : 0 }} />
+                    className="w-9 h-9 rounded-full object-cover border-2 border-card flex-shrink-0"
+                    style={{ marginLeft: i > 0 ? -8 : 0 }} />
                 : <div key={email} title={name}
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-micro font-semibold border-2 border-card flex-shrink-0 ${color}`}
-                    style={{ marginLeft: i > 0 ? -5 : 0 }}>
-                    {initials[0]}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-card flex-shrink-0 ${color}`}
+                    style={{ marginLeft: i > 0 ? -8 : 0 }}>
+                    {initials}
                   </div>;
             })}
             {overflow > 0 && (
               <div
-                className="w-5 h-5 rounded-full bg-secondary border-2 border-card flex items-center justify-center flex-shrink-0"
-                style={{ marginLeft: -5 }}>
-                <span className="text-muted-foreground" style={{ fontSize: 8, fontWeight: 500 }}>+{overflow}</span>
+                className="w-9 h-9 rounded-full bg-secondary border-2 border-card flex items-center justify-center flex-shrink-0"
+                style={{ marginLeft: -8 }}>
+                <span className="text-muted-foreground text-xs font-medium">+{overflow}</span>
               </div>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">{memberCount === 1 ? 'viajero' : 'viajeros'}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{memberCount} {memberCount === 1 ? 'viajero' : 'viajeros'}</p>
         </button>
 
         {/* Gastos */}
