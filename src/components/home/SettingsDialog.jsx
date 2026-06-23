@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 
 export default
 function SettingsDialog({
-  const { t } = useTranslation(); open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
+  open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = []
+}) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');

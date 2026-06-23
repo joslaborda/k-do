@@ -5,7 +5,9 @@ import { base44 } from '@/api/base44Client';
 import { useTranslation } from 'react-i18next';
 
 export default function MemberAvatarRow({
-  const { t } = useTranslation(); trip, profiles, onInvite, currentUserEmail }) {
+  trip, profiles, onInvite, currentUserEmail
+}) {
+  const { t } = useTranslation();
   const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
   const memberEmails = (trip?.members || [trip?.created_by]).filter(Boolean);
 
