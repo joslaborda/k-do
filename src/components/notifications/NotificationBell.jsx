@@ -24,7 +24,7 @@ const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary
 
 function TripInviteModal({ notif, onClose, onAccept }) {
   const { user: currentUser } = useAuth();
-  const { t } = useTranslation();
+  const { t: translate } = useTranslation();
   const [tripData, setTripData] = useState(null);
   const [invite, setInvite] = useState(null);
   const [members, setMembers] = useState([]);
@@ -96,7 +96,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
         {loading ? (
-          <div className="py-10 text-center text-sm text-muted-foreground">{t('common.loading')}</div>
+          <div className="py-10 text-center text-sm text-muted-foreground">{translate('common.loading')}</div>
         ) : tripData ? (
           <>
             <div className="flex items-center gap-3 mb-5">
@@ -133,22 +133,22 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                         : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-micro font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
                     ))}
                   </div>
-                  <span className="text-xs text-muted-foreground">{members.length} {members.length !== 1 ? t('common.travelers') : t('common.traveler')}</span>
+                  <span className="text-xs text-muted-foreground">{members.length} {members.length !== 1 ? translate('common.travelers') : translate('common.traveler')}</span>
                 </div>
               )}
             </div>
             <div className="flex gap-3">
               <button onClick={handleDecline} disabled={processing}
                 className="flex-1 h-11 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
-                {t('invites.reject')}
+                {translate('invites.reject')}
               </button>
               <button onClick={handleAccept} disabled={processing || !invite}
                 className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50">
-                {processing ? t('common.loading') : t('notifications.joinTrip')}
+                {processing ? translate('common.loading') : translate('notifications.joinTrip')}
               </button>
             </div>
           </>
-        ) : <div className="py-8 text-center text-sm text-muted-foreground">{t('errors.generic')}</div>}
+        ) : <div className="py-8 text-center text-sm text-muted-foreground">{translate('errors.generic')}</div>}
       </div>
     </div>
   );
