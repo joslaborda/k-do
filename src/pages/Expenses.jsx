@@ -755,7 +755,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <p className="text-base font-medium text-foreground">{editingExpense ? '{t('expenses.editExpense')}' : '{t('expenses.addExpense')}'}</p>
+            <p className="text-base font-medium text-foreground">{editingExpense ? t('expenses.editExpense') : t('expenses.addExpense')}</p>
             <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
