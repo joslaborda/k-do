@@ -15,6 +15,7 @@ import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
 import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
 import OTabBar from '@/components/trip/OTabBar';
+import { useTranslation } from 'react-i18next';
 
 const DOC_ICONS = {
   flight:    PlaneIcon,
@@ -125,7 +126,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
               <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fin</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
             )}
             {ticket.airline && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Vuelo</span><span className="text-foreground">{ticket.airline}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.types.flight')}</span><span className="text-foreground">{ticket.airline}</span></div>
             )}
             {ticket.city && (
               <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ciudad</span><span className="text-foreground">{ticket.city}</span></div>
@@ -168,6 +169,7 @@ function DocRow({ ticket, onEdit, onDelete, onView }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Documents() {
+  const { t } = useTranslation();
   const tripId = new URLSearchParams(window.location.search).get('trip_id');
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -327,7 +329,7 @@ export default function Documents() {
               <Plus className="w-4 h-4" />Documento
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-1">Documentos</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">{t('documents.title')}</h1>
           <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.</p>
           {/* Category tabs */}
           <OTabBar
@@ -364,7 +366,7 @@ export default function Documents() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
           <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-            <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
+            <DialogTitle className="text-base font-semibold">{t('documents.add')}</DialogTitle>
           </DialogHeader>
           <div className="px-5 py-4 overflow-y-auto flex-1">
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
@@ -409,8 +411,8 @@ export default function Documents() {
             </div>
             <p className="text-xs text-muted-foreground mb-5 ml-11">{deleteDoc?.name} se eliminará permanentemente.</p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
-              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
+              <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
+              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
             </div>
           </div>
         </div>

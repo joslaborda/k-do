@@ -1,4 +1,5 @@
 import { BusFront } from '@/lib/icons';
+import { useTranslation } from 'react-i18next';
 import { createPageUrl } from '@/utils';
 import { toast } from '@/components/ui/use-toast';
 import { useState, useEffect, useMemo } from 'react';
@@ -32,13 +33,13 @@ const CAT_COLORS = {
   shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary text-muted-foreground',
 };
 const CAT_CONFIG = {
-  food:          { label: 'Comida'      },
-  transport:     { label: 'Transporte'  },
-  accommodation: { label: 'Alojamiento' },
-  activities:    { label: 'Actividades' },
-  shopping:      { label: 'Compras'     },
-  drinks:        { label: 'Bebidas'     },
-  other:         { label: 'Otro'        },
+  food:          { label: 'expenses.categories.food'          },
+  transport:     { label: 'expenses.categories.transport'      },
+  accommodation: { label: 'expenses.categories.accommodation'  },
+  activities:    { label: 'expenses.categories.activities'     },
+  shopping:      { label: 'expenses.categories.shopping'       },
+  drinks:        { label: 'expenses.categories.drinks'         },
+  other:         { label: 'expenses.categories.other'          },
 };
 
 // ── Currency symbol helper ─────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
             <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'var(--kodo-border)', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
           <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
-            La moneda local es {currencyName} ({currencyCode}). ¿Registrar gastos en {currencyCode}?
+            {t('expenses.localCurrencyPrompt', { currencyName, currencyCode })}
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onAccept}
@@ -115,7 +116,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{expense.description}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">Pagó {paidByName} · ÷ {splitCount}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{t('expenses.paidBy')} {paidByName} · ÷ {splitCount}</p>
       </div>
       <div className="text-right flex-shrink-0">
         {/* Moneda original — siempre visible y prominente */}
@@ -136,6 +137,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
 
 // ── Tab: Gastos ───────────────────────────────────────────────────────────────
 function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, currentUserEmail }) {
+  const { t } = useTranslation();
   const [catFilter, setCatFilter] = useState('all');
 
   const myBalance = useMemo(() => {
@@ -162,7 +164,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
   const grouped = useMemo(() => {
     const g = {};
     filtered.forEach(e => {
-      const d = e.date || e.created_date?.slice(0, 10) || 'Sin fecha';
+      const d = e.date || e.created_date?.slice(0, 10) || t('expenses.noDate');
       if (!g[d]) g[d] = [];
       g[d].push(e);
     });
@@ -170,9 +172,9 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
   }, [filtered]);
 
   const formatDate = (d) => {
-    if (d === 'Sin fecha') return d;
+    if (d === t('expenses.noDate')) return d;
     try {
-      return new Date(d + 'T12:00:00').toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' });
+      return new Date(d + 'T12:00:00').toLocaleDateString(i18n?.language === 'en' ? 'en-GB' : 'es', { weekday: 'short', day: 'numeric', month: 'short' });
     } catch { return d; }
   };
 
@@ -180,10 +182,10 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
         <DollarSign className="w-8 h-8 mx-auto mb-3 opacity-25" />
-        <p className="text-sm font-medium text-foreground mb-1">Sin gastos todavía</p>
-        <p className="text-xs text-muted-foreground mb-5">Registra los gastos para llevar la cuenta entre todos</p>
+        <p className="text-sm font-medium text-foreground mb-1">{t('expenses.noExpensesYet')}</p>
+        <p className="text-xs text-muted-foreground mb-5">{t('expenses.noExpensesSubtitle')}</p>
         <button onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
-          <Plus className="w-4 h-4" />Añadir primer gasto
+          <Plus className="w-4 h-4" />{t('expenses.addFirst')}
         </button>
       </div>
     );
@@ -193,7 +195,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
     <div className="space-y-4">
       {/* Mi balance */}
       <div className="bg-card rounded-2xl border border-border p-4">
-        <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
+        <p className="text-xs text-muted-foreground mb-1">{t('expenses.balance.yourBalance')}</p>
         <div className="flex items-baseline justify-between">
           <p className={`text-2xl font-medium ${Math.abs(myBalance) < 0.5 ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
             {Math.abs(myBalance) < 0.5 ? '0' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)}`} {sym(baseCurrency)}
@@ -203,14 +205,14 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
             myBalance > 0 ? 'bg-green-50 text-green-700 border-green-200' :
             'bg-red-50 text-red-600 border-red-200'
           }`}>
-            {Math.abs(myBalance) < 0.5 ? 'Al día' : myBalance > 0 ? 'Te deben' : 'Debes'}
+            {Math.abs(myBalance) < 0.5 ? t('expenses.balance.upToDate') : myBalance > 0 ? t('expenses.balance.theyOweYou') : t('expenses.balance.youOwe')}
           </span>
         </div>
       </div>
 
       {/* Categorías */}
       <div className="flex flex-wrap gap-2">
-        {[['all', null, 'Todos'], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, k, v.label])].map(([k, catKey, l]) => (
+        {[['all', null, t('common.all')], ...Object.entries(CAT_CONFIG).map(([k, v]) => [k, k, t(v.label)])].map(([k, catKey, l]) => (
           <button key={k} onClick={() => setCatFilter(k)}
             className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${
               catFilter === k ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
@@ -222,7 +224,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 
       {/* Lista agrupada por fecha */}
       {grouped.length === 0 ? (
-        <div className="text-center py-8 text-sm text-muted-foreground">Sin gastos en esta categoría</div>
+        <div className="text-center py-8 text-sm text-muted-foreground">{t('expenses.noCategoryExpenses')}</div>
       ) : (
         grouped.map(([date, exps]) => (
           <div key={date}>
@@ -241,6 +243,7 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 
 // ── Tab: Balances ─────────────────────────────────────────────────────────────
 function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrency, profilesByEmail, onSettle }) {
+  const { t } = useTranslation();
   const balances = useMemo(() => calculateBalances(expenses, members), [expenses, members]);
   const debts = useMemo(() => getDebts(balances), [balances]);
 
@@ -283,7 +286,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       <div className="bg-card rounded-2xl border border-border text-center py-16">
         <Scale className="w-8 h-8 mx-auto mb-3 opacity-25" />
         <p className="text-sm font-medium text-foreground mb-1">Sin datos aún</p>
-        <p className="text-xs text-muted-foreground">Añade gastos para ver los balances del grupo</p>
+        <p className="text-xs text-muted-foreground">{t('expenses.addToSeeBalances')}</p>
       </div>
     );
   }
@@ -311,13 +314,13 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     <div className="space-y-4">
       {/* Mi balance */}
       <div className={`rounded-2xl border p-4 ${iSettled ? 'bg-card border-border' : myBalance > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-        <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
+        <p className="text-xs text-muted-foreground mb-1">{t('expenses.balance.yourBalance')}</p>
         <p className={`text-2xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
-          {iSettled ? 'Al día' : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
+          {iSettled ? t('expenses.balance.upToDate') : `${myBalance > 0 ? '+' : ''}${fmtAmt(myBalance, baseCurrency)} ${sym(baseCurrency)}`}
         </p>
         {!iSettled && (
           <p className={`text-xs mt-1 font-medium ${myBalance > 0 ? 'text-green-600' : 'text-red-500'}`}>
-            {myBalance > 0 ? 'Te deben este dinero' : 'Debes este dinero'}
+            {myBalance > 0 ? t('expenses.balance.theyOweYouThis') : t('expenses.balance.youOweThis')}
           </p>
         )}
         {(() => {
@@ -339,8 +342,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           });
           return iPaid > 0 ? (
             <div className="mt-3 pt-3 border-t border-border/50 flex gap-4">
-              <div><p className="text-xs text-muted-foreground">He pagado</p><p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p></div>
-              <div><p className="text-xs text-muted-foreground">Mi parte real</p><p className="text-sm font-medium text-foreground">{fmtAmt(myShare, baseCurrency)} {sym(baseCurrency)}</p></div>
+              <div><p className="text-xs text-muted-foreground">{t('expenses.balance.iPaid')}</p><p className="text-sm font-medium text-foreground">{fmtAmt(iPaid, baseCurrency)} {sym(baseCurrency)}</p></div>
+              <div><p className="text-xs text-muted-foreground">{t('expenses.balance.myShare')}</p><p className="text-sm font-medium text-foreground">{fmtAmt(myShare, baseCurrency)} {sym(baseCurrency)}</p></div>
             </div>
           ) : null;
         })()}
@@ -378,7 +381,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {/* Lo que me deben */}
       {owesMe.length > 0 && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Te deben</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.balance.theyOweYou')}</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {owesMe.map((d, i) => {
               const idx = debts.indexOf(d);
@@ -400,7 +403,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
         </div>
       )}
 
-      {/* Saldo de todos — solo si hay deudas */}
+      {/* Saldo de todos */}
       {!iSettled && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Saldo de todos</p>
@@ -434,8 +437,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
       {iSettled && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
-          <p className="text-sm font-medium text-green-700">Todos en paz</p>
-          <p className="text-xs text-green-600 mt-1">No hay deudas pendientes en el grupo</p>
+          <p className="text-sm font-medium text-green-700">{t('expenses.balance.everyoneSettled')}</p>
+          <p className="text-xs text-green-600 mt-1">{t('expenses.balance.noDebts')}</p>
         </div>
       )}
     </div>
@@ -445,6 +448,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 
 // ── Tab: Estadísticas ─────────────────────────────────────────────────────────
 function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip }) {
+  const { t } = useTranslation();
   const s = sym(baseCurrency);
 
   // Excluir liquidaciones — no son gastos reales, son transferencias contables
@@ -452,7 +456,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
   const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
   const realExpenses = useMemo(() => expenses.filter(e => !isSettlement(e)), [expenses]);
 
-  // Mi parte real = lo que pagué adelantado - lo que me deben neto
+  // {t('expenses.balance.myShare')} = lo que pagué adelantado - lo que me deben neto
   // Esta fórmula es equivalente a calculateBalances pero más directa para Stats
   const mySpend = useMemo(() => {
     let iPaid = 0;
@@ -494,7 +498,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
 
   const myPerDay = tripDays > 0 ? mySpend / tripDays : mySpend;
 
-  // Mi gasto por categoría (solo mi parte real de gastos reales)
+  // {t('expenses.myExpense')} por categoría (solo mi parte real de gastos reales)
   const myByCategory = useMemo(() => {
     const acc = {};
     realExpenses.forEach(e => {
@@ -529,7 +533,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
   const byCity = useMemo(() => {
     const acc = {};
     realExpenses.forEach(e => {
-      const city = e.city_name || 'Sin ciudad';
+      const city = e.city_name || t('expenses.noCity');
       acc[city] = (acc[city] || 0) + (parseFloat(e.amount_base || e.amount) || 0);
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
@@ -540,15 +544,15 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       <div className="bg-card rounded-2xl border border-border text-center py-16">
         <BarChart2 className="w-8 h-8 mx-auto mb-3 opacity-25" />
         <p className="text-sm font-medium text-foreground mb-1">Sin estadísticas</p>
-        <p className="text-xs text-muted-foreground">Añade gastos para ver el desglose</p>
+        <p className="text-xs text-muted-foreground">{t('expenses.addToSeeStats')}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Mi gasto — PRIMERO */}
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mi gasto</p>
+      {/* {t('expenses.myExpense')} — PRIMERO */}
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('expenses.myExpense')}</p>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-card rounded-2xl border border-border p-4">
           <p className="text-xs text-muted-foreground mb-1">Total mío</p>
@@ -562,7 +566,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
 
       {myByCategory.length > 0 && (
         <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs text-muted-foreground mb-3">Por categoría (mi parte)</p>
+          <p className="text-xs text-muted-foreground mb-3">{t('expenses.byCategory')}</p>
           <div className="space-y-3">
             {myByCategory.map(([cat, amt]) => {
               const tc = CAT_CONFIG[cat] || CAT_CONFIG.other;
@@ -661,9 +665,9 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
           </div>
 
           <div className="px-5 py-4 space-y-3">
-            {/* Importe */}
+            {/* {t('common.amount')} */}
             <div className="flex justify-between items-center">
-              <span className="text-xs text-muted-foreground">Importe</span>
+              <span className="text-xs text-muted-foreground">{t('common.amount')}</span>
               <div className="text-right">
                 {!isSame && <p className="text-sm font-medium text-foreground">{sym(expense.currency)}{fmtAmt(parseFloat(expense.amount || 0), expense.currency)}</p>}
                 <p className={`${isSame ? 'text-base' : 'text-xs'} font-medium ${isSame ? 'text-foreground' : 'text-primary'}`}>
@@ -671,18 +675,18 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
                 </p>
               </div>
             </div>
-            {/* Pagó */}
+            {/* {t('expenses.paidBy')} */}
             <div className="flex justify-between items-center">
-              <span className="text-xs text-muted-foreground">Pagó</span>
+              <span className="text-xs text-muted-foreground">{t('expenses.paidBy')}</span>
               <div className="flex items-center gap-2">
                 <Avatar email={expense.paid_by} profiles={profilesByEmail} size={20} />
                 <span className="text-sm text-foreground">{userMap[expense.paid_by] || expense.paid_by}</span>
               </div>
             </div>
-            {/* Dividido entre */}
+            {/* {t('expenses.splitWith')} */}
             {expense.split_with?.length > 0 && (
               <div className="flex justify-between items-start">
-                <span className="text-xs text-muted-foreground">Dividido entre</span>
+                <span className="text-xs text-muted-foreground">{t('expenses.splitWith')}</span>
                 <div className="flex gap-1.5">
                   {expense.split_with.map(email => (
                     <Avatar key={email} email={email} profiles={profilesByEmail} size={22} />
@@ -708,7 +712,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
           {/* Actions */}
           <div className="border-t border-border">
             <button onClick={() => setConfirmDelete(true)} className="w-full text-xs text-red-400 hover:text-red-600 py-2.5 text-center">
-              Eliminar gasto
+              {t('expenses.deleteExpense')}
             </button>
           </div>
           <div className="flex gap-3 px-5 pb-5 pt-2">
@@ -728,11 +732,11 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
               <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
-              <p className="text-sm font-medium text-foreground">¿Eliminar este gasto?</p>
+              <p className="text-sm font-medium text-foreground">{t('expenses.deleteConfirm')}</p>
             </div>
             <p className="text-xs text-muted-foreground mb-5 ml-11">{expense.description} — Se eliminará permanentemente.</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
+              <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
               <button onClick={() => { setConfirmDelete(false); onDelete(expense); }} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
             </div>
           </div>
@@ -751,7 +755,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <p className="text-base font-medium text-foreground">{editingExpense ? 'Editar gasto' : 'Nuevo gasto'}</p>
+            <p className="text-base font-medium text-foreground">{editingExpense ? '{t('expenses.editExpense')}' : '{t('expenses.addExpense')}'}</p>
             <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -776,13 +780,13 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
         <div className="flex-shrink-0 flex gap-3 px-5 pt-4 pb-8 border-t border-border" style={{paddingBottom:"max(2rem, env(safe-area-inset-bottom, 2rem))"}}>
           <button onClick={onClose}
             className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground hover:bg-secondary/50 transition-colors">
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button
             form="expense-form"
             onClick={() => document.getElementById('expense-form-submit')?.click()}
             className="py-3 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-colors" style={{flex:2}}>
-            {saving ? 'Guardando...' : (editingExpense ? 'Guardar cambios' : 'Guardar gasto')}
+            {saving ? t('common.loading') : (editingExpense ? t('expenses.saveChanges') : t('expenses.saveExpense'))}
           </button>
         </div>
       </div>
@@ -793,6 +797,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 // ── Tab: Conversión de divisa ─────────────────────────────────────────────────
 function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' }) {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState('1');
   const [fromCurrency, setFromCurrency] = useState(homeCurrency || baseCurrency);
   const [rates, setRates] = useState({});
@@ -907,6 +912,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
 
 
 export default function Expenses() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -1133,7 +1139,7 @@ export default function Expenses() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
           <OTabBar
-            tabs={[{key:'gastos',label:'Gastos'},{key:'balances',label:'Balances'},...(availableCurrencies.length > 1 ? [{key:'conversión',label:'Conversión'}] : []),{key:'stats',label:'Stats'}]}
+            tabs={[{key:'gastos',label:t('expenses.tabs.expenses')},{key:'balances',label:t('expenses.tabs.balances')},...(availableCurrencies.length > 1 ? [{key:'conversión',label:t('expenses.tabs.conversion')}] : []),{key:'stats',label:t('expenses.tabs.stats')}]}
             activeKey={tab}
             onChange={setTab}
           />

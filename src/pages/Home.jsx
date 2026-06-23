@@ -39,6 +39,7 @@ if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Home() {
+  const { t } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [tripId, setTripId] = useState(null);

@@ -16,6 +16,7 @@ import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
+import { useTranslation } from 'react-i18next';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const DOC_ICON_MAP = {
@@ -178,9 +179,9 @@ function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
             <Trash2 className="w-3 h-3" />Quitar del día
           </button>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" size="sm" onClick={onClose}>{t('common.cancel')}</Button>
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
-              onClick={() => onSave(spot, notes, time)}>Guardar</Button>
+              onClick={() => onSave(spot, notes, time)}>{t('common.save')}</Button>
           </div>
         </div>
       </DialogContent>
@@ -543,9 +544,9 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
             <span className="text-xs text-muted-foreground">hora opcional</span>
             <div className="ml-auto flex gap-2">
-              <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
+              <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
               <button onClick={handleAddNote} disabled={!newNoteText.trim()}
-                className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">Guardar</button>
+                className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">{t('common.save')}</button>
             </div>
           </div>
         </div>
@@ -563,8 +564,8 @@ function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTom
               <Trash2 className="w-3 h-3" />Eliminar
             </button>
             <div className="ml-auto flex gap-2">
-              <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">Cancelar</button>
-              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors">Guardar</button>
+              <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
+              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors">{t('common.save')}</button>
             </div>
           </div>
         </div>
@@ -854,6 +855,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Cities() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -947,7 +949,7 @@ export default function Cities() {
             </Link>
           </div>
 
-          <h1 className="text-2xl font-semibold text-foreground mb-1">Ruta</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">{t('cities.title')}</h1>
           <p className="text-xs text-muted-foreground mb-3 leading-relaxed">La base de tu viaje en Kōdo. Construye con el grupo el itinerario completo día a día con Documentos, Spots y Notas. Tu tab Hoy en Home mostrará el día a día de tu viaje.</p>
 
           {/* Progress */}
