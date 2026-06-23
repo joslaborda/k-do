@@ -6,25 +6,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
 import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
+import { useTranslation } from 'react-i18next';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon: PlaneIcon, label: 'Vuelo',   color: 'bg-blue-50 dark:bg-blue-950/30'   },
-  train:    { icon: Train, label: 'Tren',    color: 'bg-green-50 dark:bg-green-950/30'  },
-  hotel:    { icon: Hotel,      label: 'Hotel',   color: 'bg-purple-50 dark:bg-purple-950/30' },
+  flight:   { icon: PlaneIcon, label: t('documents.types.flight'),   color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  train:    { icon: Train, label: t('documents.types.train'),    color: 'bg-green-50 dark:bg-green-950/30'  },
+  hotel:    { icon: Hotel,      label: t('documents.types.hotel'),   color: 'bg-purple-50 dark:bg-purple-950/30' },
   event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
-  personal: { icon: Shield,     label: 'Seguro',  color: 'bg-amber-50 dark:bg-amber-950/30'  },
-  other:    { icon: CirclePlus,   label: 'Otro',    color: 'bg-secondary' },
+  personal: { icon: Shield,     label: t('documents.types.insurance'),  color: 'bg-amber-50 dark:bg-amber-950/30'  },
+  other:    { icon: CirclePlus,   label: t('documents.types.other'),    color: 'bg-secondary' },
 };
 
 
 const CATEGORIES = [
-  { key: 'flight',   Icon: PlaneIcon, label: 'Vuelo'   },
-  { key: 'hotel',    Icon: Hotel,      label: 'Hotel'   },
-  { key: 'train',    Icon: Train, label: 'Tren'    },
+  { key: 'flight',   Icon: PlaneIcon, label: t('documents.types.flight')   },
+  { key: 'hotel',    Icon: Hotel,      label: t('documents.types.hotel')   },
+  { key: 'train',    Icon: Train, label: t('documents.types.train')    },
   { key: 'event',    Icon: Ticket,     label: 'Evento'  },
-  { key: 'personal', Icon: Shield,     label: 'Seguro'  },
-  { key: 'other',    Icon: CirclePlus,   label: 'Otro'    },
+  { key: 'personal', Icon: Shield,     label: t('documents.types.insurance')  },
+  { key: 'other',    Icon: CirclePlus,   label: t('documents.types.other')    },
 ];
 
 const VISIBILITY_OPTS = [
@@ -59,7 +60,8 @@ const FIELD_PLACEHOLDERS = {
 // Personal categories that should NOT restrict to trip dates
 const PERSONAL_CATEGORIES = ['personal'];
 
-export default function DocumentForm({ initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
+export default function DocumentForm({
+  const { t } = useTranslation(); initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
