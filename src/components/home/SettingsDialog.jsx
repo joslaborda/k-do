@@ -135,7 +135,7 @@ function SettingsDialog({
               value={name}
               onChange={e => setName(e.target.value)}
               className="h-8 text-sm font-medium border-0 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-              placeholder=t('trip.tripName')
+              placeholder={t('trip.tripName')}
             />
           </div>
         </div>
