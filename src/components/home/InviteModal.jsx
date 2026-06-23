@@ -130,35 +130,45 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     }
   }, [open]);
 
-  // Live search with debounce
+  // Precargar todos los perfiles al abrir el modal — búsqueda client-side inmediata
+  const { data: allProfiles = [] } = useQuery({
+    queryKey: ['allUserProfiles'],
+    queryFn: () => base44.entities.UserProfile.filter({}),
+    enabled: open,
+    staleTime: 120000, // 2 min cache
+  });
+
+  // Live search con debounce — filtra client-side sobre allProfiles
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim() || query.trim().length < 2) {
       setSearchResults([]); setSearching(false); return;
     }
     setSearching(true);
-    debounceRef.current = setTimeout(async () => {
+    debounceRef.current = setTimeout(() => {
       try {
         const q = query.trim().toLowerCase().replace(/^@/, '');
-        // Fetch by username_normalized (exact) + by username prefix client-side
-        const [byNorm, byUsername] = await Promise.all([
-          base44.entities.UserProfile.filter({ username_normalized: q }),
-          base44.entities.UserProfile.filter({ username: q }),
-        ]);
-        // Merge, deduplicate, then also filter profiles already loaded that start with query
-        const fromLoaded = profiles.filter(p =>
-          p.username?.toLowerCase().startsWith(q) ||
-          p.display_name?.toLowerCase().startsWith(q)
-        );
-        const merged = new Map();
-        [...byNorm, ...byUsername, ...fromLoaded].forEach(p => {
-          if (p.user_id || p.email) merged.set(p.user_id || p.email, p);
+        const pool = allProfiles.length > 0 ? allProfiles : profiles;
+        const results = pool.filter(p => {
+          const un = (p.username || '').toLowerCase();
+          const un_norm = (p.username_normalized || '').toLowerCase();
+          const dn = (p.display_name || '').toLowerCase();
+          return un.startsWith(q) || un_norm.startsWith(q) || dn.startsWith(q) ||
+                 un.includes(q) || dn.includes(q);
         });
-        setSearchResults(Array.from(merged.values()));
+        // Ordenar: primero startsWith username, luego el resto
+        results.sort((a, b) => {
+          const aStarts = (a.username || '').toLowerCase().startsWith(q);
+          const bStarts = (b.username || '').toLowerCase().startsWith(q);
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          return 0;
+        });
+        setSearchResults(results.slice(0, 10));
       } catch { setSearchResults([]); }
       setSearching(false);
-    }, 300);
-  }, [query]);
+    }, 150); // más rápido porque es client-side
+  }, [query, allProfiles, profiles]);
 
   const getStatus = (email) => {
     if (members.includes(email?.toLowerCase())) return 'member';
