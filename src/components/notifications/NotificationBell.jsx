@@ -20,6 +20,7 @@ const TYPE = {
   trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'notifications.tripInvite' },
   spot_added:      { Icon: Compass,   color: 'text-primary', bg: 'bg-orange-50', label: 'notifications.spotAdded' },
 };
+// ── NotificationBell — i18n ready ────────────────────────────────────────────
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'notifications.new' };
 
 function TripInviteModal({notif, onClose, onAccept }) {
