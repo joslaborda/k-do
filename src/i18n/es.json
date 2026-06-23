@@ -62,7 +62,8 @@
     "total": "Total",
     "group": "Grupo",
     "personal": "Personal",
-    "all": "Todos"
+    "all": "Todos",
+    "country": "País"
   },
   "language": {
     "select": "Elige tu idioma",
@@ -214,7 +215,9 @@
     "daysLeft": "{{count}} día",
     "daysLeft_other": "{{count}} días",
     "noDates": "Sin fechas",
-    "open": "Abrir"
+    "open": "Abrir",
+    "deleteConfirmPrompt": "Escribe el nombre del viaje exactamente para confirmar:",
+    "deleteConfirmPlaceholder": "Escribe el nombre del viaje..."
   },
   "expenses": {
     "title": "Gastos",
@@ -392,7 +395,8 @@
     "visibility": {
       "group": "Grupo",
       "personal": "Solo yo"
-    }
+    },
+    "titlePlaceholder": "Título del documento"
   },
   "profile": {
     "title": "Perfil",
@@ -406,7 +410,7 @@
     "instagram": "Instagram",
     "website": "Web",
     "save": "Guardar cambios",
-    "saved": "Cambios guardados",
+    "saved": "Guardados",
     "travelStyles": {
       "mochilero": "Mochilero",
       "confort": "Confort",
@@ -414,7 +418,13 @@
       "aventura": "Aventura",
       "cultural": "Cultural",
       "gastronomico": "Gastronómico"
-    }
+    },
+    "searchSpots": "Buscar spots para guardar...",
+    "myTrips": "Mis viajes",
+    "trips": "Viajes",
+    "mySpots": "Mis spots",
+    "created": "Creados",
+    "showMore": "Ver {{count}} más →"
   },
   "settings": {
     "title": "Ajustes",
@@ -433,7 +443,8 @@
     "nights": "{{count}} noches",
     "night": "{{count}} noche",
     "from": "Del",
-    "to": "al"
+    "to": "al",
+    "cityName": "Nombre de la ciudad"
   },
   "restaurants": {
     "title": "Restaurantes",
@@ -449,7 +460,17 @@
   },
   "notifications": {
     "noNotifications": "Sin notificaciones",
-    "markAllRead": "Marcar todo como leído"
+    "markAllRead": "Marcar todo como leído",
+    "title": "Notificaciones",
+    "docAdded": "subió un documento",
+    "expenseAdded": "añadió un gasto",
+    "expenseSettled": "liquidó tu deuda",
+    "photoAdded": "subió fotos",
+    "memberJoined": "se unió al viaje",
+    "tripInvite": "te invitó a un viaje",
+    "spotAdded": "añadió un spot",
+    "new": "nueva notificación",
+    "joinTrip": "Unirme al viaje"
   },
   "invites": {
     "title": "Invitaciones",
@@ -480,5 +501,16 @@
     "network": "Sin conexión. Comprueba tu internet.",
     "notFound": "No encontrado",
     "unauthorized": "No autorizado"
+  },
+  "photos": {
+    "uploading": "Subiendo fotos...",
+    "uploaded": "{{count}} foto",
+    "uploaded_other": "{{count}} fotos"
+  },
+  "translator": {
+    "translate": "Traducir",
+    "clear": "Limpiar",
+    "placeholder": "Escribe aquí...",
+    "result": "Traducción"
   }
 }

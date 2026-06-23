@@ -62,7 +62,8 @@
     "total": "Total",
     "group": "Group",
     "personal": "Personal",
-    "all": "All"
+    "all": "All",
+    "country": "Country"
   },
   "language": {
     "select": "Choose your language",
@@ -214,7 +215,9 @@
     "daysLeft": "{{count}} day",
     "daysLeft_other": "{{count}} days",
     "noDates": "No dates",
-    "open": "Open"
+    "open": "Open",
+    "deleteConfirmPrompt": "Type the trip name exactly to confirm:",
+    "deleteConfirmPlaceholder": "Type the trip name..."
   },
   "expenses": {
     "title": "Expenses",
@@ -392,7 +395,8 @@
     "visibility": {
       "group": "Group",
       "personal": "Just me"
-    }
+    },
+    "titlePlaceholder": "Document title"
   },
   "profile": {
     "title": "Profile",
@@ -406,7 +410,7 @@
     "instagram": "Instagram",
     "website": "Website",
     "save": "Save changes",
-    "saved": "Changes saved",
+    "saved": "Saved",
     "travelStyles": {
       "mochilero": "Backpacker",
       "confort": "Comfort",
@@ -414,7 +418,13 @@
       "aventura": "Adventure",
       "cultural": "Cultural",
       "gastronomico": "Gastronomic"
-    }
+    },
+    "searchSpots": "Search spots to save...",
+    "myTrips": "My trips",
+    "trips": "Trips",
+    "mySpots": "My spots",
+    "created": "Created",
+    "showMore": "Show {{count}} more →"
   },
   "settings": {
     "title": "Settings",
@@ -433,7 +443,8 @@
     "nights": "{{count}} nights",
     "night": "{{count}} night",
     "from": "From",
-    "to": "to"
+    "to": "to",
+    "cityName": "City name"
   },
   "restaurants": {
     "title": "Restaurants",
@@ -449,7 +460,17 @@
   },
   "notifications": {
     "noNotifications": "No notifications",
-    "markAllRead": "Mark all as read"
+    "markAllRead": "Mark all as read",
+    "title": "Notifications",
+    "docAdded": "uploaded a document",
+    "expenseAdded": "added an expense",
+    "expenseSettled": "settled your debt",
+    "photoAdded": "uploaded photos",
+    "memberJoined": "joined the trip",
+    "tripInvite": "invited you to a trip",
+    "spotAdded": "added a spot",
+    "new": "new notification",
+    "joinTrip": "Join trip"
   },
   "invites": {
     "title": "Invitations",
@@ -480,5 +501,16 @@
     "network": "No connection. Check your internet.",
     "notFound": "Not found",
     "unauthorized": "Unauthorized"
+  },
+  "photos": {
+    "uploading": "Uploading photos...",
+    "uploaded": "{{count}} photo",
+    "uploaded_other": "{{count}} photos"
+  },
+  "translator": {
+    "translate": "Translate",
+    "clear": "Clear",
+    "placeholder": "Type here...",
+    "result": "Translation"
   }
 }
