@@ -6,6 +6,7 @@ import { Users, Car, FileText, Hotel, TrainFront } from 'lucide-react';
 import { BusFront, PlaneIcon } from '@/lib/icons';
 import { getCountryMeta } from '@/lib/countryConfig';
 import MemberAvatarRow from './MemberAvatarRow';
+import { useTranslation } from 'react-i18next';
 
 export default function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, onInvite, currentUserEmail }) {
   const todayStr  = format(new Date(), 'yyyy-MM-dd');

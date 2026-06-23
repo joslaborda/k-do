@@ -5,6 +5,7 @@ import { normalizeCountry } from '@/lib/countryConfig';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, Compass, DollarSign, MapPin, Users, X } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
+import { useTranslation } from 'react-i18next';
 
 const MAX_AVATARS = 4;
 const AVATAR_COLORS = [
@@ -16,6 +17,7 @@ const AVATAR_COLORS = [
 ];
 
 function TravelersSheet({ open, onClose, trip, profiles }) {
+  const { t } = useTranslation();
   if (!open) return null;
   const memberEmails = trip?.members || [];
   const roles = trip?.roles || {};
@@ -31,7 +33,7 @@ function TravelersSheet({ open, onClose, trip, profiles }) {
         <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3 mb-0" />
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
-            <p className="text-base font-semibold text-foreground">Viajeros</p>
+            <p className="text-base font-semibold text-foreground">{t('home.finished.travelers')}</p>
             {dateRange && (
               <p className="text-xs text-muted-foreground mt-0.5">
                 {trip?.name} · {dateRange}
@@ -85,6 +87,7 @@ function TravelersSheet({ open, onClose, trip, profiles }) {
 
 export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail, profiles = [] }) {
   const [showTravelers, setShowTravelers] = useState(false);
+  const { t } = useTranslation();
   const allTripSpots = spots;
 
   const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
@@ -150,7 +153,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
         <div className="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center mx-auto mb-3">
           <PlaneIcon className="w-7 h-7 text-primary" />
         </div>
-        <p className="text-sm text-muted-foreground mb-1">Gracias por visitar</p>
+        <p className="text-sm text-muted-foreground mb-1">{t('home.finished.thanksForVisiting')}</p>
         <p className="text-2xl font-semibold text-foreground">{countriesLabel}</p>
         {trip?.start_date && trip?.end_date && (
           <p className="text-xs text-muted-foreground mt-2">
@@ -204,13 +207,13 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
               </div>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-1.5">{memberCount} {memberCount === 1 ? 'viajero' : 'viajeros'}</p>
+          <p className="text-xs text-muted-foreground mt-1.5">{memberCount} {memberCount === 1 ? t('home.finished.traveler') : t('home.finished.travelers')}</p>
         </button>
 
         {/* Gastos */}
         <div className="bg-card rounded-2xl border border-border p-4 col-span-2">
           <DollarSign className="w-4 h-4 text-primary mb-2" />
-          <p className="text-xs text-muted-foreground mb-0.5">Tu parte</p>
+          <p className="text-xs text-muted-foreground mb-0.5">{t('home.finished.yourPart')}</p>
           <p className="text-2xl font-medium text-foreground">{myShare.toFixed(0)} {currency}</p>
           <p className="text-xs text-muted-foreground mt-1">
             Total grupo: <span className="font-medium text-foreground">{totalSpent.toFixed(0)} {currency}</span>
@@ -222,7 +225,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
       {/* Ruta */}
       {sortedCities.length > 0 && (
         <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs text-muted-foreground mb-3">Ruta del viaje</p>
+          <p className="text-xs text-muted-foreground mb-3">{t('home.finished.tripRoute')}</p>
           <div className="flex items-center gap-2 flex-wrap">
             {sortedCities.map((city, i) => (
               <span key={city.id} className="flex items-center gap-2">

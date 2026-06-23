@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import { ArrowRight } from 'lucide-react';
 import DayCard from './DayCard';
 import MemberAvatarRow from './MemberAvatarRow';
+import { useTranslation } from 'react-i18next';
 
 export default function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }) {
   const queryClient = useQueryClient();

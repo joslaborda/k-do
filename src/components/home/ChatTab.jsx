@@ -6,9 +6,11 @@ import PDFViewer from '@/components/PDFViewer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -367,7 +369,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
           <Input value={message} onChange={e => setMessage(e.target.value)}
             onKeyDown={e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}}
-            placeholder="Escribe un mensaje..."
+            placeholder={t('home.typeMessage')}
             className="flex-1 text-sm bg-background border-border rounded-full px-4"
             disabled={sendMutation.isPending || recording} />
 
