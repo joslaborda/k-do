@@ -213,9 +213,10 @@
     "tabs": {
       "expenses": "Gastos",
       "balances": "Balances",
-      "stats": "Stats"
+      "stats": "Stats",
+      "conversion": "Conversión"
     },
-    "addExpense": "Añadir gasto",
+    "addExpense": "Nuevo gasto",
     "editExpense": "Editar gasto",
     "description": "Descripción",
     "amount": "Importe",
@@ -241,7 +242,9 @@
       "balanceOfAll": "Saldo de todos",
       "settle": "Liquidar",
       "settleDebt": "Liquidar deuda",
-      "settlement": "Liquidación"
+      "settlement": "Liquidación",
+      "theyOweYouThis": "Te deben este dinero",
+      "youOweThis": "Debes este dinero"
     },
     "stats": {
       "yourPart": "Tu parte",
@@ -265,8 +268,25 @@
       "activities": "Actividades",
       "shopping": "Compras",
       "health": "Salud",
-      "other": "Otros"
-    }
+      "other": "Otro",
+      "drinks": "Bebidas"
+    },
+    "noDate": "Sin fecha",
+    "noCity": "Sin ciudad",
+    "noExpensesYet": "Sin gastos todavía",
+    "noExpensesSubtitle": "Registra los gastos para llevar la cuenta entre todos",
+    "addFirst": "Añadir primer gasto",
+    "noCategoryExpenses": "Sin gastos en esta categoría",
+    "addToSeeBalances": "Añade gastos para ver los balances del grupo",
+    "addToSeeStats": "Añade gastos para ver el desglose",
+    "myExpense": "Mi gasto",
+    "byCategory": "Por categoría (mi parte)",
+    "deleteExpense": "Eliminar gasto",
+    "deleteConfirm": "¿Eliminar este gasto?",
+    "saveChanges": "Guardar cambios",
+    "saveExpense": "Guardar gasto",
+    "paidByShort": "Pagó {{name}} · ÷ {{count}}",
+    "localCurrencyPrompt": "La moneda local es {{currencyName}} ({{currencyCode}}). ¿Registrar gastos en {{currencyCode}}?"
   },
   "pretrip": {
     "title": "Pre-viaje",

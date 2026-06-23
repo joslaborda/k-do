@@ -213,9 +213,10 @@
     "tabs": {
       "expenses": "Expenses",
       "balances": "Balances",
-      "stats": "Stats"
+      "stats": "Stats",
+      "conversion": "Conversion"
     },
-    "addExpense": "Add expense",
+    "addExpense": "New expense",
     "editExpense": "Edit expense",
     "description": "Description",
     "amount": "Amount",
@@ -241,7 +242,9 @@
       "balanceOfAll": "Everyone's balance",
       "settle": "Settle up",
       "settleDebt": "Settle debt",
-      "settlement": "Settlement"
+      "settlement": "Settlement",
+      "theyOweYouThis": "They owe you this",
+      "youOweThis": "You owe this"
     },
     "stats": {
       "yourPart": "Your share",
@@ -265,8 +268,25 @@
       "activities": "Activities",
       "shopping": "Shopping",
       "health": "Health",
-      "other": "Other"
-    }
+      "other": "Other",
+      "drinks": "Drinks"
+    },
+    "noDate": "No date",
+    "noCity": "No city",
+    "noExpensesYet": "No expenses yet",
+    "noExpensesSubtitle": "Record expenses to keep track between everyone",
+    "addFirst": "Add first expense",
+    "noCategoryExpenses": "No expenses in this category",
+    "addToSeeBalances": "Add expenses to see group balances",
+    "addToSeeStats": "Add expenses to see the breakdown",
+    "myExpense": "My expenses",
+    "byCategory": "By category (my share)",
+    "deleteExpense": "Delete expense",
+    "deleteConfirm": "Delete this expense?",
+    "saveChanges": "Save changes",
+    "saveExpense": "Save expense",
+    "paidByShort": "Paid by {{name}} · ÷ {{count}}",
+    "localCurrencyPrompt": "Local currency is {{currencyName}} ({{currencyCode}}). Record expenses in {{currencyCode}}?"
   },
   "pretrip": {
     "title": "Pre-trip",
