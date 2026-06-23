@@ -4,6 +4,8 @@ import { Loader2, CheckCircle2, XCircle, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { getCountryMeta } from '@/lib/countryConfig';
+import { useTranslation } from 'react-i18next';
+import { setLanguage, getLanguage } from '@/i18n/index.js';
 
 // ── País list ─────────────────────────────────────────────────────────────────
 const HISPANO_FIRST = ['España','México','Colombia','Argentina','Perú','Venezuela','Chile','Ecuador','Guatemala','Cuba','Bolivia','República Dominicana','Honduras','Paraguay','El Salvador','Nicaragua','Costa Rica','Panamá','Uruguay','Puerto Rico','Guinea Ecuatorial'];
@@ -89,7 +91,72 @@ function CountryPicker({ value, onChange, placeholder = 'Selecciona un país' })
   );
 }
 
-// ── Barra de progreso / dots ──────────────────────────────────────────────────
+// ── Slide idioma (slide -1, antes de todo) ────────────────────────────────────
+function SlideIdioma({ onSelect }) {
+  const [selected, setSelected] = useState(getLanguage());
+
+  const handleContinue = () => {
+    setLanguage(selected);
+    onSelect(selected);
+  };
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center px-4">
+      <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mb-6">
+        <span className="text-3xl">🌍</span>
+      </div>
+      <h2 className="text-2xl font-black text-foreground text-center leading-tight mb-2">
+        {selected === 'es' ? 'Elige tu idioma' : 'Choose your language'}
+      </h2>
+      <p className="text-sm text-muted-foreground text-center mb-10">
+        {selected === 'es' ? 'Puedes cambiarlo después en ajustes' : 'You can change this later in settings'}
+      </p>
+
+      <div className="w-full space-y-3 mb-10">
+        <button
+          onClick={() => setSelected('es')}
+          className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all ${
+            selected === 'es'
+              ? 'border-primary bg-orange-50'
+              : 'border-border bg-card'
+          }`}
+        >
+          <span className="text-2xl">🇪🇸</span>
+          <div className="flex-1 text-left">
+            <p className="text-base font-semibold text-foreground">Español</p>
+            <p className="text-xs text-muted-foreground">Spanish</p>
+          </div>
+          {selected === 'es' && <Check className="w-5 h-5 text-primary flex-shrink-0" />}
+        </button>
+
+        <button
+          onClick={() => setSelected('en')}
+          className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all ${
+            selected === 'en'
+              ? 'border-primary bg-orange-50'
+              : 'border-border bg-card'
+          }`}
+        >
+          <span className="text-2xl">🇬🇧</span>
+          <div className="flex-1 text-left">
+            <p className="text-base font-semibold text-foreground">English</p>
+            <p className="text-xs text-muted-foreground">Inglés</p>
+          </div>
+          {selected === 'en' && <Check className="w-5 h-5 text-primary flex-shrink-0" />}
+        </button>
+      </div>
+
+      <button
+        onClick={handleContinue}
+        className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold transition-colors"
+      >
+        {selected === 'es' ? 'Continuar' : 'Continue'}
+      </button>
+    </div>
+  );
+}
+
+
 function ProgressDots({ current, total }) {
   return (
     <div className="flex items-center gap-1.5">
@@ -373,9 +440,10 @@ function SlideHoy() {
 
 // ── Componente principal ──────────────────────────────────────────────────────
 export default function CreateProfileModal({ user, open }) {
-  // slide: 0=perfil, 1=pasaporte, 2..5=features
-  const [slide, setSlide] = useState(0);
-  const TOTAL_SLIDES = 6;
+  const { t } = useTranslation();
+  // slide: -1=idioma, 0=perfil, 1=pasaporte, 2..5=features
+  const [slide, setSlide] = useState(-1);
+  const TOTAL_SLIDES = 6; // profile slides only (sin idioma en dots)
 
   // Step 1
   const [displayName, setDisplayName] = useState(user?.full_name || '');
@@ -430,7 +498,7 @@ export default function CreateProfileModal({ user, open }) {
     setError('');
     try {
       const ok = await checkUsernameAvailability(username, user?.id);
-      if (!ok) { setError('Username ya en uso'); setSaving(false); setAvailable(false); return; }
+      if (!ok) { setError(t('onboarding.slide0.usernameTaken')); setSaving(false); setAvailable(false); return; }
       await base44.entities.UserProfile.create({
         user_id: user.id,
         email: user.email,
@@ -441,21 +509,32 @@ export default function CreateProfileModal({ user, open }) {
         home_currency: homeCurrency,
         nationality,
         second_nationality: secondNationality || null,
+        language: getLanguage(),
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
       setSlide(2); // go to features
     } catch {
-      setError('Error al crear el perfil. Inténtalo de nuevo.');
+      setError(t('errors.generic'));
       setSaving(false);
     }
   };
 
   const featureSlides = [SlideGrupo, SlidePreparativos, SlideGastos, SlideHoy];
+  const isLanguageSlide = slide === -1;
   const isFeatureSlide = slide >= 2;
   const isLastSlide = slide === TOTAL_SLIDES - 1;
   const FeatureComponent = isFeatureSlide ? featureSlides[slide - 2] : null;
 
   if (!open) return null;
+
+  // Language slide — fullscreen, no header/dots
+  if (isLanguageSlide) {
+    return (
+      <div className="fixed inset-0 z-[200] bg-background flex flex-col">
+        <SlideIdioma onSelect={() => setSlide(0)} />
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[200] bg-background flex flex-col">
@@ -467,11 +546,11 @@ export default function CreateProfileModal({ user, open }) {
             onClick={() => setSlide(TOTAL_SLIDES - 1)}
             className="text-sm text-muted-foreground font-medium"
           >
-            Saltar
+            {t('common.skip')}
           </button>
         )}
         {!isFeatureSlide && (
-          <span className="text-xs text-muted-foreground font-medium">Obligatorio</span>
+          <span className="text-xs text-muted-foreground font-medium">{t('onboarding.mandatory')}</span>
         )}
         {isLastSlide && <div className="w-10" />}
       </div>
@@ -482,15 +561,15 @@ export default function CreateProfileModal({ user, open }) {
         {/* SLIDE 0: Perfil */}
         {slide === 0 && (
           <div className="flex-1 flex flex-col">
-            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">1 / 6</p>
-            <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Cuéntanos un<br />poco sobre ti</h2>
+            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">{t('onboarding.step', { current: 1, total: 6 })}</p>
+            <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.slide0.title')}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              Ayúdanos a conocerte mejor para ofrecerte una experiencia personalizada.
+              {t('onboarding.slide0.subtitle')}
             </p>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Nombre y apellidos</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('onboarding.slide0.nameLabel')}</p>
                 <input
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
@@ -500,7 +579,7 @@ export default function CreateProfileModal({ user, open }) {
               </div>
 
               <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">@usuario</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('onboarding.slide0.usernameLabel')}</p>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-semibold">@</span>
                   <input
@@ -518,13 +597,13 @@ export default function CreateProfileModal({ user, open }) {
                     {!checking && available === false && <XCircle className="w-4 h-4 text-red-500" />}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1.5">Letras, números y _ · mín. 3 caracteres</p>
+                <p className="text-xs text-muted-foreground mt-1.5">{t('onboarding.slide0.usernameHint')}</p>
                 {usernameError && <p className="text-xs text-red-500 mt-0.5">{usernameError}</p>}
                 {!checking && !usernameError && available === false && (
-                  <p className="text-xs text-red-500 mt-0.5">Este @usuario ya está en uso, prueba con otro</p>
+                  <p className="text-xs text-red-500 mt-0.5">{t('onboarding.slide0.usernameTaken')}</p>
                 )}
                 {!checking && !usernameError && available === true && (
-                  <p className="text-xs text-green-600 mt-0.5">¡Disponible!</p>
+                  <p className="text-xs text-green-600 mt-0.5">{t('onboarding.slide0.usernameAvailable')}</p>
                 )}
               </div>
             </div>
@@ -534,50 +613,50 @@ export default function CreateProfileModal({ user, open }) {
         {/* SLIDE 1: Pasaporte */}
         {slide === 1 && (
           <div className="flex-1 flex flex-col">
-            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">2 / 6</p>
-            <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Cuéntanos un<br />poco sobre ti</h2>
+            <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">{t('onboarding.step', { current: 2, total: 6 })}</p>
+            <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.slide1.title')}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              Esta información se usa para calcular visados, vacunas obligatorias e información consular si estás en el extranjero.
+              {t('onboarding.slide1.subtitle')}
             </p>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Nacionalidad del pasaporte</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('onboarding.slide1.nationalityLabel')}</p>
                 <CountryPicker
                   value={nationality}
                   onChange={handleNationalitySelect}
-                  placeholder="Selecciona tu nacionalidad"
+                  placeholder={t('onboarding.slide1.nationalityPlaceholder')}
                 />
               </div>
 
               <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">País de residencia</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('onboarding.slide1.residenceLabel')}</p>
                 <CountryPicker
                   value={homeCountry}
                   onChange={handleResidenceSelect}
-                  placeholder="¿Dónde vives?"
+                  placeholder={t('onboarding.slide1.residencePlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground mt-1.5">La moneda se detecta automáticamente de tu país.</p>
+                <p className="text-xs text-muted-foreground mt-1.5">{t('onboarding.slide1.residenceHint')}</p>
               </div>
 
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                  Segundo pasaporte <span className="font-normal text-muted-foreground normal-case tracking-normal">— opcional</span>
+                  {t('onboarding.slide1.secondPassportLabel')} <span className="font-normal text-muted-foreground normal-case tracking-normal">— {t('common.optional')}</span>
                 </p>
                 <CountryPicker
                   value={secondNationality}
                   onChange={handleSecondNationalitySelect}
-                  placeholder="No tengo"
+                  placeholder={t('onboarding.slide1.secondPassportPlaceholder')}
                 />
                 {secondNationality && (
                   <button
                     onClick={() => setSecondNationality('')}
                     className="text-xs text-muted-foreground mt-1.5 underline"
                   >
-                    Quitar segundo pasaporte
+                    {t('onboarding.slide1.removeSecond')}
                   </button>
                 )}
-                <p className="text-xs text-muted-foreground mt-1.5">Si tienes dos pasaportes, Kōdo los compara para facilitarte el trámite de visado.</p>
+                <p className="text-xs text-muted-foreground mt-1.5">{t('onboarding.slide1.secondPassportHint')}</p>
               </div>
 
               {error && <p className="text-sm text-red-500">{error}</p>}
@@ -600,10 +679,10 @@ export default function CreateProfileModal({ user, open }) {
               disabled={!canStep1}
               className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold disabled:bg-border disabled:text-muted-foreground transition-colors"
             >
-              Siguiente
+              {t('common.next')}
             </button>
             {!canStep1 && (
-              <p className="text-xs text-muted-foreground text-center mt-2">Rellena todos los campos para continuar</p>
+              <p className="text-xs text-muted-foreground text-center mt-2">{t('onboarding.slide0.fillAll')}</p>
             )}
           </>
         )}
@@ -614,7 +693,7 @@ export default function CreateProfileModal({ user, open }) {
             disabled={!canStep2 || saving}
             className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold disabled:bg-border disabled:text-muted-foreground transition-colors flex items-center justify-center gap-2"
           >
-            {saving ? <><Loader2 className="w-4 h-4 animate-spin" />Guardando...</> : 'Siguiente'}
+            {saving ? <><Loader2 className="w-4 h-4 animate-spin" />{t('common.loading')}</> : t('common.next')}
           </button>
         )}
 
@@ -623,16 +702,16 @@ export default function CreateProfileModal({ user, open }) {
             onClick={() => setSlide(s => s + 1)}
             className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold transition-colors"
           >
-            Siguiente
+            {t('common.next')}
           </button>
         )}
 
         {isLastSlide && (
           <button
-            onClick={() => {/* el queryClient ya invalidó → TripsList se refresca y needsOnboarding = false */}}
+            onClick={() => {/* queryClient ya invalidó → TripsList se refresca */}}
             className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold transition-colors"
           >
-            Empezar →
+            {t('common.start')}
           </button>
         )}
       </div>
