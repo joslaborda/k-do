@@ -155,7 +155,23 @@
     "upcoming": "Upcoming",
     "past": "Past",
     "active": "Active",
-    "language": "Language"
+    "language": "Language",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "whereAreWeGoing": "Where are we going?",
+    "loading": "Loading trips...",
+    "myTrip": "My trip",
+    "tripSummary": "Trip summary",
+    "destinations": "Destinations",
+    "route": "Route",
+    "pastTrips": "{{count}} completed trip",
+    "pastTrips_other": "{{count}} completed trips",
+    "savedSpots": "You have {{count}} saved spot in {{country}}",
+    "savedSpots_other": "You have {{count}} saved spots in {{country}}",
+    "importSpots": "They're in your profile. Shall we import them to this trip?",
+    "notNow": "Not now",
+    "importNow": "Import →"
   },
   "trip": {
     "newTrip": "New trip",
@@ -189,7 +205,8 @@
     "trips": "trips",
     "inviteByEmailBack": "← Back to username search",
     "emailPlaceholder": "email@example.com",
-    "invitedBy": "Invited · pending"
+    "invitedBy": "Invited · pending",
+    "tripNamePlaceholder": "E.g. Japan 2025"
   },
   "expenses": {
     "title": "Expenses",
@@ -296,7 +313,9 @@
       "yourPart": "Your share",
       "groupTotal": "Group total",
       "perDay": "{{amount}} {{currency}}/day"
-    }
+    },
+    "travelers": "Travelers",
+    "traveler": "Traveler"
   },
   "spots": {
     "title": "Spots",
