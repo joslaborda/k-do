@@ -22,7 +22,6 @@ const COMMON_CURRENCIES = [
 ];
 
 export default function ExpenseForm({
-  const { t } = useTranslation();
   members = [],
   initialData = null,
   defaultCurrency = 'EUR',
