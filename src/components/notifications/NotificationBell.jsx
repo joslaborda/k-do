@@ -12,21 +12,20 @@ import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
 
 const TYPE = {
-  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'notifications.docAdded' },
-  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'notifications.expenseAdded' },
-  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'notifications.expenseSettled' },
-  photo_added:     { Icon: Camera,    color: 'text-primary', bg: 'bg-orange-50', label: 'notifications.photoAdded' },
-  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'notifications.memberJoined' },
-  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'notifications.tripInvite' },
-  spot_added:      { Icon: Compass,   color: 'text-primary', bg: 'bg-orange-50', label: 'notifications.spotAdded' },
+  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   labelKey: 'notifications.docAdded' },
+  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  labelKey: 'notifications.expenseAdded' },
+  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  labelKey: 'notifications.expenseSettled' },
+  photo_added:     { Icon: Camera,    color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.photoAdded' },
+  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', labelKey: 'notifications.memberJoined' },
+  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.tripInvite' },
+  spot_added:      { Icon: Compass,   color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.spotAdded' },
 };
-// ── NotificationBell — i18n ready ────────────────────────────────────────────
-const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'notifications.new' };
+const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', labelKey: 'notifications.new' };
 
 function TripInviteModal({ notif, onClose, onAccept }) {
   const { user: currentUser } = useAuth();
   const { t } = useTranslation();
-  const [trip, setTrip] = useState(null);
+  const [tripData, setTripData] = useState(null);
   const [invite, setInvite] = useState(null);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,15 +36,13 @@ function TripInviteModal({ notif, onClose, onAccept }) {
     if (!notif?.trip_id) { setLoading(false); return; }
     (async () => {
       try {
-        const t = await base44.entities.Trip.get(notif.trip_id);
-        setTrip(t);
-        // Buscar la invitación pendiente de este usuario
+        const fetchedTrip = await base44.entities.Trip.get(notif.trip_id);
+        setTripData(fetchedTrip);
         if (currentUser?.email) {
           const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email, status: 'pending' });
           setInvite(invs[0] || null);
         }
-        const memberEmails = t.members || [];
-        // UserProfile no tiene campo email — resolver via User primero
+        const memberEmails = fetchedTrip.members || [];
         const users = await base44.entities.User.filter({ email: { $in: memberEmails } });
         const ids = users.map(u => u.id).filter(Boolean);
         const profiles = ids.length
@@ -66,17 +63,16 @@ function TripInviteModal({ notif, onClose, onAccept }) {
     setProcessing(true);
     try {
       await acceptTripInvite(invite.id, invite.invite_token, invite.trip_id, currentUser.email);
-      // Notificar a todos los miembros del viaje
       try {
         const myProfArr = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
         const myProf = myProfArr[0] || null;
-        const tripData = await base44.entities.Trip.get(invite.trip_id);
-        const others = (tripData?.members || []).filter(e => e !== currentUser.email);
+        const latestTrip = await base44.entities.Trip.get(invite.trip_id);
+        const others = (latestTrip?.members || []).filter(e => e !== currentUser.email);
         const resolved = await resolveUserIds(others);
-        resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId: invite.trip_id, tripName: tripData?.name }));
+        resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId: invite.trip_id, tripName: latestTrip?.name }));
       } catch {}
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
-      onAccept(trip);
+      onAccept(tripData);
     } catch (e) {
       console.error('Error aceptando invitación:', e);
     }
@@ -101,31 +97,30 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
         {loading ? (
           <div className="py-10 text-center text-sm text-muted-foreground">{t('common.loading')}</div>
-        ) : trip ? (
+        ) : tripData ? (
           <>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Invitación de <span className="font-medium text-foreground">{notif.actor_display_name || notif.actor_username || (notif.actor_avatar ? 'Tu contacto' : 'Alguien')}</span></p>
-                <p className="text-base font-semibold text-foreground">{trip.name || trip.destination}</p>
+                <p className="text-xs text-muted-foreground">Invitación de <span className="font-medium text-foreground">{notif.actor_display_name || notif.actor_username || 'Alguien'}</span></p>
+                <p className="text-base font-semibold text-foreground">{tripData.name || tripData.destination}</p>
               </div>
             </div>
-
             <div className="bg-card border border-border rounded-2xl p-4 space-y-3 mb-5">
-              {trip.destination && (
+              {tripData.destination && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span>{trip.destination}{trip.country ? `, ${trip.country}` : ''}</span>
+                  <span>{tripData.destination}{tripData.country ? `, ${tripData.country}` : ''}</span>
                 </div>
               )}
-              {trip.start_date && (
+              {tripData.start_date && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar size={12} className="text-muted-foreground flex-shrink-0" />
                   <span>
-                    {new Date(trip.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    {trip.end_date && ` — ${new Date(trip.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                    {new Date(tripData.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {tripData.end_date && ` — ${new Date(tripData.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
                   </span>
                 </div>
               )}
@@ -142,11 +137,10 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                 </div>
               )}
             </div>
-
             <div className="flex gap-3">
               <button onClick={handleDecline} disabled={processing}
                 className="flex-1 h-11 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
-                Rechazar
+                {t('invites.reject')}
               </button>
               <button onClick={handleAccept} disabled={processing || !invite}
                 className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50">
@@ -154,13 +148,14 @@ function TripInviteModal({ notif, onClose, onAccept }) {
               </button>
             </div>
           </>
-        ) : <div className="py-8 text-center text-sm text-muted-foreground">No se pudo cargar el viaje</div>}
+        ) : <div className="py-8 text-center text-sm text-muted-foreground">{t('errors.generic')}</div>}
       </div>
     </div>
   );
 }
 
 function NotifItem({ n, currentTripId, onRead, onNavigate }) {
+  const { t } = useTranslation();
   const cfg = TYPE[n.type] ?? FALLBACK;
   const { Icon } = cfg;
   const name = n.actor_display_name || n.actor_username || 'Alguien';
@@ -176,7 +171,7 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground leading-snug">
-          <span className="font-semibold">{name}</span>{' '}{cfg.label}
+          <span className="font-semibold">{name}</span>{' '}{t(cfg.labelKey)}
           {n.ref_title ? <span className="text-muted-foreground"> · {n.ref_title}</span> : ''}
           {showTrip ? <span className="text-muted-foreground"> · {n.trip_name}</span> : ''}
         </p>
@@ -187,6 +182,7 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
 }
 
 export default function NotificationBell({ userId, userEmail, currentTripId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [inviteNotif, setInviteNotif] = useState(null);
   const ref = useRef();
@@ -207,16 +203,12 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
     staleTime: 0,
   });
 
-  // Keep ref always current — avoids stale closure in async functions
   notifsRef.current = notifications;
-
   const unread = notifications.filter(n => !n.read).length;
 
   const markAll = async () => {
     const items = notifsRef.current.filter(n => !n.read);
-    // Optimistic — update cache immediately
     qc.setQueryData(key, (old = []) => old.map(n => ({ ...n, read: true })));
-    // Server — fire and forget
     if (items.length) {
       items.forEach(n => base44.entities.Notification.update(n.id, { read: true }).catch(() => {}));
     }
@@ -229,7 +221,6 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
 
   const doClose = () => {
     setOpen(false);
-    // Refetch after close to sync with server
     setTimeout(() => qc.invalidateQueries({ queryKey: key }), 500);
   };
 
@@ -251,49 +242,49 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
     const extra = (() => { try { return n.ref_extra ? JSON.parse(n.ref_extra) : {}; } catch { return {}; } })();
     const trip = `?trip_id=${n.trip_id}`;
     switch (n.type) {
-      case 'doc_added':      return navigate(createPageUrl('Documents') + trip + (n.ref_id ? `&doc_id=${n.ref_id}` : ''));
-      case 'expense_added':  return navigate(createPageUrl('Expenses') + trip);
-      case 'expense_settled':return navigate(createPageUrl('Expenses') + trip + '&tab=balances');
-      case 'photo_added':    return navigate(createPageUrl('Photos') + trip);
-      case 'member_joined':  return navigate(createPageUrl('Home') + trip + '&scroll=members');
-      case 'spot_added':     return navigate(createPageUrl('Cities') + trip + (extra.spotDate ? `&date=${extra.spotDate}` : ''));
-      default:               return navigate(createPageUrl('Home') + trip);
+      case 'doc_added':       return navigate(createPageUrl('Documents') + trip + (n.ref_id ? `&doc_id=${n.ref_id}` : ''));
+      case 'expense_added':   return navigate(createPageUrl('Expenses') + trip);
+      case 'expense_settled': return navigate(createPageUrl('Expenses') + trip + '&tab=balances');
+      case 'photo_added':     return navigate(createPageUrl('Photos') + trip);
+      case 'member_joined':   return navigate(createPageUrl('Home') + trip + '&scroll=members');
+      case 'spot_added':      return navigate(createPageUrl('Cities') + trip + (extra.spotDate ? `&date=${extra.spotDate}` : ''));
+      default:                return navigate(createPageUrl('Home') + trip);
     }
   };
 
   return (
     <div className="relative" ref={ref}>
       <div className="relative">
-      <button ref={bellRef} onClick={handleToggle}
-        className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
-        aria-label="Notificaciones">
-        <Bell className="w-5 h-5 text-foreground" />
-        {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
-            {unread > 9 ? '9+' : unread}
-          </span>
+        <button ref={bellRef} onClick={handleToggle}
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-card border border-border hover:bg-secondary/60 transition-colors"
+          aria-label={t('notifications.title')}>
+          <Bell className="w-5 h-5 text-foreground" />
+          {unread > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-label font-bold flex items-center justify-center px-1 border-2 border-background">
+              {unread > 9 ? '9+' : unread}
+            </span>
+          )}
+        </button>
+
+        {open && (
+          <div style={{position:"fixed", top: bellRef.current ? bellRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <span className="font-semibold text-sm text-foreground">{t('notifications.title')}</span>
+              <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto">
+              {notifications.length === 0
+                ? <div className="py-12 text-center"><Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" /><p className="text-sm text-muted-foreground">{t('notifications.noNotifications')}</p></div>
+                : notifications.map(n => <NotifItem key={n.id} n={n} currentTripId={currentTripId} onRead={markOne} onNavigate={handleNavigate} />)
+              }
+            </div>
+          </div>
         )}
-      </button>
 
-      {open && (
-        <div style={{position:"fixed", top: bellRef.current ? bellRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <span className="font-semibold text-sm text-foreground">{t('notifications.title')}</span>
-            <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
-          </div>
-          <div className="max-h-[70vh] overflow-y-auto">
-            {notifications.length === 0
-              ? <div className="py-12 text-center"><Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" /><p className="text-sm text-muted-foreground">{t('notifications.noNotifications')}</p></div>
-              : notifications.map(n => <NotifItem key={n.id} n={n} currentTripId={currentTripId} onRead={markOne} onNavigate={handleNavigate} />)
-            }
-          </div>
-        </div>
-      )}
-
-      {inviteNotif && (
-        <TripInviteModal notif={inviteNotif} onClose={() => setInviteNotif(null)}
-          onAccept={(trip) => { setInviteNotif(null); doClose(); navigate(createPageUrl('Home') + `?trip_id=${trip.id}`); }} />
-      )}
+        {inviteNotif && (
+          <TripInviteModal notif={inviteNotif} onClose={() => setInviteNotif(null)}
+            onAccept={(trip) => { setInviteNotif(null); doClose(); navigate(createPageUrl('Home') + `?trip_id=${trip.id}`); }} />
+        )}
       </div>
     </div>
   );
