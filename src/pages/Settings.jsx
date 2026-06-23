@@ -4,10 +4,51 @@ import DarkModeToggle from '@/components/DarkModeToggle';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Loader2, Camera } from 'lucide-react';
+import { Loader2, Camera, Check } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { getCountryMeta } from '@/lib/countryConfig';
+import { useTranslation } from 'react-i18next';
+import { setLanguage, getLanguage } from '@/i18n/index.js';
+
+// ── Language Switcher ──────────────────────────────────────────────────────────
+function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  const current = getLanguage();
+
+  const handleChange = (lang) => {
+    setLanguage(lang);
+    // Force re-render
+    window.location.reload();
+  };
+
+  return (
+    <div className="flex items-center justify-between px-4 py-4">
+      <div>
+        <p className="text-sm font-medium text-foreground">{current === 'es' ? 'Idioma' : 'Language'}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{current === 'es' ? 'Español / English' : 'Spanish / English'}</p>
+      </div>
+      <div className="flex items-center gap-1 bg-secondary rounded-full p-1">
+        <button
+          onClick={() => handleChange('es')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            current === 'es' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+          }`}
+        >
+          🇪🇸 ES
+        </button>
+        <button
+          onClick={() => handleChange('en')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            current === 'en' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
+          }`}
+        >
+          🇬🇧 EN
+        </button>
+      </div>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -364,13 +405,14 @@ export default function Settings() {
         {/* ── APARIENCIA ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Apariencia</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-4">
+          <div className="flex items-center justify-between px-4 py-4 border-b border-border">
             <div>
               <p className="text-sm font-medium text-foreground">Modo oscuro</p>
               <p className="text-xs text-muted-foreground mt-0.5">Se guarda automáticamente</p>
             </div>
             <DarkModeToggle />
           </div>
+          <LanguageSwitcher />
         </div>
 
         {/* ── PREFERENCIAS ── */}
