@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 } from '@/components/ui/dialog';
 
 export default function CitySettingsModal({
-  const { t } = useTranslation(); city, tripId }) {
+  city, tripId
+}) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
