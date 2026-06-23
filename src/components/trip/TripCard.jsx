@@ -20,9 +20,9 @@ export function getTripStatus(trip) {
   if (end) {
     const dayNum = differenceInDays(today, start) + 1;
     const total  = differenceInDays(end, start) + 1;
-    return { label:'En curso', dayNum, total, type:'active' };
+    return { label: 'active', dayNum, total, type:'active' };
   }
-  return { label:'En curso', type:'active' };
+  return { label: 'active', type:'active' };
 }
 
 function getTripDuration(trip) {
@@ -50,6 +50,7 @@ function getFlag(trip, cities) {
 
 // ── Hero card ─────────────────────────────────────────────────────────────────
 export function HeroTripCard({ trip, cities = [] }) {
+  const { t } = useTranslation();
   const coverImage = getTripCoverImage(trip, cities);
   const status     = getTripStatus(trip);
   const dateRange  = formatDateRange(trip);
@@ -97,7 +98,7 @@ export function HeroTripCard({ trip, cities = [] }) {
             <p className="text-base font-medium text-white mb-1">{trip.name}</p>
             {subtitle && <p className="text-xs text-white/70 truncate mb-2">{subtitle}</p>}
             <div className="flex gap-1.5">
-              {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{duration} días</div>}
+              {duration && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{duration} {t('common.days')}</div>}
               {trip.members?.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90 flex items-center gap-1"><Users size={11} />{trip.members.length}</div>}
               {cities.length > 0 && <div className="bg-white/15 rounded-lg px-2 py-1 text-xs text-white/90">{cities[0].name}</div>}
             </div>
@@ -114,6 +115,7 @@ export function HeroTripCard({ trip, cities = [] }) {
 
 // ── Compact card ──────────────────────────────────────────────────────────────
 export default function TripCard({ trip, cities = [] }) {
+  const { t } = useTranslation();
   const coverImage = getTripCoverImage(trip, cities);
   const status     = getTripStatus(trip);
   const dateRange  = formatDateRange(trip);

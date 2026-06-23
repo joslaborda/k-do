@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, X, Shuffle, ChevronDown, Loader2, AlertTriangle } from 'lucide-react';
 import { getCountryMeta, getTopCities, normalizeCountry } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
 const CURRENCY_OPTIONS = [
@@ -419,7 +420,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-foreground text-2xl">Nuevo viaje</DialogTitle>
+          <DialogTitle className="text-foreground text-2xl">{t('trip.newTrip')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
@@ -607,14 +608,14 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={handleClose}>Cancelar</Button>
+            <Button type="button" variant="outline" onClick={handleClose}>{t('common.cancel')}</Button>
             <Button
               type="button"
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90 text-white"
               disabled={isPending}
             >
-              {isPending ? 'Creando...' : 'Crear viaje'}
+              {isPending ? 'Creando...' : t('trip.create')}
             </Button>
           </div>
         </div>
