@@ -27,7 +27,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-import { useTranslation } from 'react-i18next';
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,

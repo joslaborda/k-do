@@ -97,8 +97,8 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
 // ─────────────────────────────────────────────────────────────────────────────
 // Spot collection grouped by country
 // ─────────────────────────────────────────────────────────────────────────────
-function SpotCollection({
-  const { t } = useTranslation(); spots, showLikes = false, showVisibility = false }) {
+function SpotCollection({spots, showLikes = false, showVisibility = false }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState({});
   const [showAll, setShowAll] = useState({});
 
@@ -157,8 +157,8 @@ function SpotCollection({
 // ─────────────────────────────────────────────────────────────────────────────
 // Spot search panel
 // ─────────────────────────────────────────────────────────────────────────────
-function SpotSearchPanel({
-  const { t } = useTranslation(); savedSpotIds, onSave }) {
+function SpotSearchPanel({savedSpotIds, onSave }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [toastMsg, setToastMsg] = useState(null);

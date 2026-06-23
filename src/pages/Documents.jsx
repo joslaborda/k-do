@@ -54,8 +54,8 @@ const VIS = {
 };
 
 // ── Doc row ───────────────────────────────────────────────────────────────────
-function DocRow({
-  const { t } = useTranslation(); ticket, onEdit, onDelete, onView }) {
+function DocRow({ticket, onEdit, onDelete, onView }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const cat  = ticket.category || 'other';
   const IconComp = DOC_ICONS[cat] || DOC_ICONS.other;
