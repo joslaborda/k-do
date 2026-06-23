@@ -9,19 +9,21 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 const TYPE = {
-  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'subió un documento' },
-  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'añadió un gasto' },
-  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'liquidó tu deuda' },
-  photo_added:     { Icon: Camera,    color: 'text-primary', bg: 'bg-orange-50', label: 'subió fotos' },
-  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'se unió al viaje' },
-  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'te invitó a un viaje' },
-  spot_added:      { Icon: Compass,   color: 'text-primary', bg: 'bg-orange-50', label: 'añadió un spot' },
+  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'notifications.docAdded' },
+  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'notifications.expenseAdded' },
+  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  label: 'notifications.expenseSettled' },
+  photo_added:     { Icon: Camera,    color: 'text-primary', bg: 'bg-orange-50', label: 'notifications.photoAdded' },
+  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', label: 'notifications.memberJoined' },
+  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', label: 'notifications.tripInvite' },
+  spot_added:      { Icon: Compass,   color: 'text-primary', bg: 'bg-orange-50', label: 'notifications.spotAdded' },
 };
-const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'nueva notificación' };
+const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', label: 'notifications.new' };
 
-function TripInviteModal({ notif, onClose, onAccept }) {
+function TripInviteModal({
+  const { t } = useTranslation(); notif, onClose, onAccept }) {
   const { user: currentUser } = useAuth();
   const [trip, setTrip] = useState(null);
   const [invite, setInvite] = useState(null);
@@ -97,7 +99,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
         {loading ? (
-          <div className="py-10 text-center text-sm text-muted-foreground">Cargando...</div>
+          <div className="py-10 text-center text-sm text-muted-foreground">{t('common.loading')}</div>
         ) : trip ? (
           <>
             <div className="flex items-center gap-3 mb-5">
@@ -135,7 +137,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                         : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-micro font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
                     ))}
                   </div>
-                  <span className="text-xs text-muted-foreground">{members.length} viajero{members.length !== 1 ? 's' : ''}</span>
+                  <span className="text-xs text-muted-foreground">{members.length} {members.length !== 1 ? t('common.travelers') : t('common.traveler')}</span>
                 </div>
               )}
             </div>
@@ -147,7 +149,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
               </button>
               <button onClick={handleAccept} disabled={processing || !invite}
                 className="flex-1 h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50">
-                {processing ? 'Aceptando...' : 'Unirme al viaje'}
+                {processing ? t('common.loading') : t('notifications.joinTrip')}
               </button>
             </div>
           </>
@@ -157,7 +159,8 @@ function TripInviteModal({ notif, onClose, onAccept }) {
   );
 }
 
-function NotifItem({ n, currentTripId, onRead, onNavigate }) {
+function NotifItem({
+  const { t } = useTranslation(); n, currentTripId, onRead, onNavigate }) {
   const cfg = TYPE[n.type] ?? FALLBACK;
   const { Icon } = cfg;
   const name = n.actor_display_name || n.actor_username || 'Alguien';
@@ -183,7 +186,8 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
   );
 }
 
-export default function NotificationBell({ userId, userEmail, currentTripId }) {
+export default function NotificationBell({
+  const { t } = useTranslation(); userId, userEmail, currentTripId }) {
   const [open, setOpen] = useState(false);
   const [inviteNotif, setInviteNotif] = useState(null);
   const ref = useRef();
@@ -275,12 +279,12 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       {open && (
         <div style={{position:"fixed", top: bellRef.current ? bellRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <span className="font-semibold text-sm text-foreground">Notificaciones</span>
+            <span className="font-semibold text-sm text-foreground">{t('notifications.title')}</span>
             <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
           </div>
           <div className="max-h-[70vh] overflow-y-auto">
             {notifications.length === 0
-              ? <div className="py-12 text-center"><Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" /><p className="text-sm text-muted-foreground">Sin notificaciones</p></div>
+              ? <div className="py-12 text-center"><Bell className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" /><p className="text-sm text-muted-foreground">{t('notifications.noNotifications')}</p></div>
               : notifications.map(n => <NotifItem key={n.id} n={n} currentTripId={currentTripId} onRead={markOne} onNavigate={handleNavigate} />)
             }
           </div>
