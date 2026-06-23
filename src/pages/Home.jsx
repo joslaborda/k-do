@@ -368,6 +368,7 @@ export default function Home() {
         tripId={tripId}
         queryClient={queryClient}
         profiles={profiles}
+        currentUserEmail={currentUserEmail}
       />
     </div>
   );
