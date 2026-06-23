@@ -206,7 +206,15 @@
     "inviteByEmailBack": "← Volver a búsqueda por usuario",
     "emailPlaceholder": "email@ejemplo.com",
     "invitedBy": "Invitado · pendiente",
-    "tripNamePlaceholder": "Ej: Japón 2025"
+    "tripNamePlaceholder": "Ej: Japón 2025",
+    "statusActive": "En curso",
+    "statusUpcoming": "Próximo",
+    "statusPast": "Finalizado",
+    "dayOf": "Día {{day}} de {{total}}",
+    "daysLeft": "{{count}} día",
+    "daysLeft_other": "{{count}} días",
+    "noDates": "Sin fechas",
+    "open": "Abrir"
   },
   "expenses": {
     "title": "Gastos",

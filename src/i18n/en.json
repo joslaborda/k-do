@@ -206,7 +206,15 @@
     "inviteByEmailBack": "← Back to username search",
     "emailPlaceholder": "email@example.com",
     "invitedBy": "Invited · pending",
-    "tripNamePlaceholder": "E.g. Japan 2025"
+    "tripNamePlaceholder": "E.g. Japan 2025",
+    "statusActive": "Active",
+    "statusUpcoming": "Upcoming",
+    "statusPast": "Past",
+    "dayOf": "Day {{day}} of {{total}}",
+    "daysLeft": "{{count}} day",
+    "daysLeft_other": "{{count}} days",
+    "noDates": "No dates",
+    "open": "Open"
   },
   "expenses": {
     "title": "Expenses",
