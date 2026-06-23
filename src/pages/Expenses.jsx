@@ -74,6 +74,7 @@ function Avatar({ email, profiles = [], size = 28 }) {
 
 // ── CurrencyBanner — shown when active city changes ───────────────────────────
 function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccept, onDismiss }) {
+  const { t } = useTranslation();
   return (
     <div style={{ background: 'var(--kodo-bg-orange)', border: '0.5px solid var(--kodo-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -104,6 +105,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
 
 // ── Expense row ───────────────────────────────────────────────────────────────
 function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
+  const { t } = useTranslation();
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
   const isSame = expense.currency === baseCurrency || !expense.currency;
   const paidByName = userMap[expense.paid_by] || expense.paid_by || '?';
@@ -638,6 +640,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
 
 // ── Expense detail sheet ──────────────────────────────────────────────────────
 function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, onClose, onEdit, onDelete }) {
+  const { t } = useTranslation();
   const [confirmDelete, setConfirmDelete] = useState(false);
   if (!expense) return null;
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
@@ -748,6 +751,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
 
 // ── Expense add/edit sheet ────────────────────────────────────────────────────
 function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail }) {
+  const { t } = useTranslation();
   if (!open) return null;
   return (
     <div className="fixed inset-0 flex items-end justify-center bg-black/40" onClick={onClose} style={{zIndex:70}}>
