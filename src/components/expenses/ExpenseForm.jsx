@@ -4,6 +4,7 @@ import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, Circl
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
 import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORIES = [
   { value: 'food',          label: 'Comida',      Icon: Utensils    },
@@ -21,6 +22,7 @@ const COMMON_CURRENCIES = [
 ];
 
 export default function ExpenseForm({
+  const { t } = useTranslation();
   members = [],
   initialData = null,
   defaultCurrency = 'EUR',
@@ -134,7 +136,12 @@ export default function ExpenseForm({
         try {
           const r = await convertAmount(parseFloat(form.amount), currency, baseCurrency, form.date || null);
           amountBase = r.amountConverted; fxRate = r.rate; fxSource = r.source; fxTimestamp = r.fetchedAt;
-        } catch {}
+          if (r.source === 'unavailable') {
+            toast({ title: 'Sin tipo de cambio', description: `No se pudo convertir ${currency} → ${baseCurrency}. El importe se guarda en ${currency} sin convertir.`, variant: 'destructive' });
+          }
+        } catch {
+          toast({ title: 'Sin tipo de cambio', description: `No se pudo convertir ${currency} → ${baseCurrency}. Revisa tu conexión.`, variant: 'destructive' });
+        }
       }
     }
     const splitWith = form.split_type === 'custom'
@@ -234,14 +241,14 @@ export default function ExpenseForm({
 
       {/* Fecha */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('common.date')}</p>
         <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
           className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground" />
       </div>
 
       {/* Categoría */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Categoría</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('common.type')}</p>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map(c => (
             <button key={c.value} type="button" onClick={() => set('category', c.value)}
@@ -285,8 +292,8 @@ export default function ExpenseForm({
         {/* Mode selector */}
         <div className="flex rounded-xl border border-border overflow-hidden mb-3 text-sm">
           {[
-            { key: 'equal', label: 'A partes iguales' },
-            { key: 'custom', label: 'Personalizado' },
+            { key: 'equal', label: t('expenses.splitType.equal') },
+            { key: 'custom', label: t('expenses.splitType.custom') },
             { key: 'solo', label: 'Solo yo' },
           ].map(m => (
             <button key={m.key} type="button"
