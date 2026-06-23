@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
@@ -180,36 +181,36 @@ export default function Home() {
 
   const homeTabs = useMemo(() => {
     if (tripFinished) {
-      return [{ key: 'resumen', label: 'Resumen' }, { key: 'chat', label: 'Chat', badge: unreadMessages }];
+      return [{ key: 'resumen', label: t('tabs.summary') }, { key: 'chat', label: t('tabs.chat'), badge: unreadMessages }];
     }
     if (tripInProgress && !isDeparture) {
       // Viaje en curso (no el primer día) — sin tab Salida
       return [
-        { key: 'hoy', label: 'Hoy', urgent: true },
-        { key: 'manana', label: 'Mañana' },
-        { key: 'chat', label: 'Chat', badge: unreadMessages },
+        { key: 'hoy', label: t('tabs.today'), urgent: true },
+        { key: 'manana', label: t('tabs.tomorrow') },
+        { key: 'chat', label: t('tabs.chat'), badge: unreadMessages },
       ];
     }
     if (isDeparture) {
       // Día de salida — Salida + Mañana (primer día en destino)
       return [
-        { key: 'inicio', label: 'Salida' },
-        { key: 'manana', label: 'Mañana' },
-        { key: 'chat', label: 'Chat', badge: unreadMessages },
+        { key: 'inicio', label: t('tabs.departure') },
+        { key: 'manana', label: t('tabs.tomorrow') },
+        { key: 'chat', label: t('tabs.chat'), badge: unreadMessages },
       ];
     }
     if (isDMinus1) {
       // Víspera — Pre-viaje + Salida
       return [
-        { key: 'previaje', label: 'Pre-viaje' },
-        { key: 'inicio', label: 'Salida' },
-        { key: 'chat', label: 'Chat', badge: unreadMessages },
+        { key: 'previaje', label: t('tabs.pretrip') },
+        { key: 'inicio', label: t('tabs.departure') },
+        { key: 'chat', label: t('tabs.chat'), badge: unreadMessages },
       ];
     }
     // Pre-viaje normal
     return [
-      { key: 'previaje', label: 'Pre-viaje' },
-      { key: 'chat', label: 'Chat', badge: unreadMessages },
+      { key: 'previaje', label: t('tabs.pretrip') },
+      { key: 'chat', label: t('tabs.chat'), badge: unreadMessages },
     ];
   }, [tripFinished, isDeparture, tripInProgress, isDMinus1, unreadMessages]);
 

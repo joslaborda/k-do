@@ -12,24 +12,26 @@ import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
 import { normalizeCountry } from '@/lib/countryConfig';
+import { useTranslation } from 'react-i18next';
 
-function getGreeting() {
+function getGreeting(t) {
   const h = new Date().getHours();
-  if (h < 13) return 'Buenos días';
-  if (h < 21) return 'Buenas tardes';
-  return 'Buenas noches';
+  if (h < 13) return t('tripslist.goodMorning');
+  if (h < 21) return t('tripslist.goodAfternoon');
+  return t('tripslist.goodEvening');
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────
 function EmptyState({ onCreateTrip }) {
+  const { t } = useTranslation();
   return (
     <div className="border border-dashed border-border rounded-2xl p-8 text-center bg-card">
       <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3"><PlaneIcon className="w-7 h-7 text-muted-foreground/50" /></div>
-      <p className="text-sm font-medium text-foreground mb-1">¿A dónde viajamos?</p>
-      <p className="text-xs text-muted-foreground mb-5">Crea un viaje para empezar a planificar</p>
+      <p className="text-sm font-medium text-foreground mb-1">{t('tripslist.whereAreWeGoing')}</p>
+      <p className="text-xs text-muted-foreground mb-5">{t('tripslist.noTripsSubtitle')}</p>
       <button onClick={onCreateTrip}
         className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
-        <Plus className="w-4 h-4" />Nuevo viaje
+        <Plus className="w-4 h-4" />{t('tripslist.newTrip')}
       </button>
     </div>
   );
@@ -38,16 +40,17 @@ function EmptyState({ onCreateTrip }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 // ── Trip summary share sheet ──────────────────────────────────────────────────
 function TripSummarySheet({ trip, cities, onClose }) {
+  const { t } = useTranslation();
   if (!trip) return null;
-  const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const endDate   = trip.end_date   ? new Date(trip.end_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString(i18n?.language === 'en' ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const endDate   = trip.end_date   ? new Date(trip.end_date).toLocaleDateString(i18n?.language === 'en' ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const days = trip.start_date && trip.end_date
     ? Math.round((new Date(trip.end_date) - new Date(trip.start_date)) / 86400000) + 1
     : null;
   const countryList = [...new Set([trip.country, ...(cities || []).map(c => c.country)].filter(Boolean))];
 
   const shareText = [
-    `${trip.name || trip.destination || 'Mi viaje'}`,
+    `${trip.name || trip.destination || t('tripslist.myTrip')}`,
     countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
     days ? `${days} días · ${startDate}` : '',
     trip.destination ? `${trip.destination}` : '',
@@ -56,7 +59,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({ title: trip.name || 'Mi viaje en Kōdo', text: shareText }).catch(() => {});
+      navigator.share({ title: trip.name || t('tripslist.myTrip'), text: shareText }).catch(() => {});
     } else {
       navigator.clipboard?.writeText(shareText).then(() => {});
     }
@@ -71,15 +74,15 @@ function TripSummarySheet({ trip, cities, onClose }) {
           <div className="w-9 h-1 rounded-full bg-border" />
         </div>
         <div className="px-5 py-5">
-          <p className="text-xl font-semibold text-foreground mb-1">{trip.name || trip.destination || 'Mi viaje'}</p>
-          <p className="text-sm text-muted-foreground mb-5">Resumen del viaje</p>
+          <p className="text-xl font-semibold text-foreground mb-1">{trip.name || trip.destination || t('tripslist.myTrip')}</p>
+          <p className="text-sm text-muted-foreground mb-5">{t('tripslist.tripSummary')}</p>
 
           <div className="space-y-3 mb-6">
             {countryList.length > 0 && (
               <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
                 <span className="text-xl">🌍</span>
                 <div>
-                  <p className="text-xs text-muted-foreground">Destinos</p>
+                  <p className="text-xs text-muted-foreground">{t('tripslist.destinations')}</p>
                   <p className="text-sm font-medium">{countryList.join(' · ')}</p>
                 </div>
               </div>
@@ -88,7 +91,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
               <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
                 <Calendar className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Fechas</p>
+                  <p className="text-xs text-muted-foreground">{t('common.date')}</p>
                   <p className="text-sm font-medium">{days} días · {startDate}</p>
                 </div>
               </div>
@@ -97,7 +100,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
               <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
                 <Map className="w-5 h-5 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Ruta</p>
+                  <p className="text-xs text-muted-foreground">{t('tripslist.route')}</p>
                   <p className="text-sm font-medium">{trip.destination}</p>
                 </div>
               </div>
@@ -107,11 +110,11 @@ function TripSummarySheet({ trip, cities, onClose }) {
           <div className="flex gap-3">
             <button onClick={onClose}
               className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground">
-              Cerrar
+              {t('common.close')}
             </button>
             <button onClick={handleShare}
               className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold">
-              Compartir
+              {t('common.share')}
             </button>
           </div>
         </div>
@@ -121,6 +124,7 @@ function TripSummarySheet({ trip, cities, onClose }) {
 }
 
 export default function TripsList() {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen]           = useState(false);
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
   const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
@@ -270,7 +274,7 @@ export default function TripsList() {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-4" />
-        <p className="text-sm text-muted-foreground">Cargando viajes...</p>
+        <p className="text-sm text-muted-foreground">{t('tripslist.loading')}</p>
       </div>
     </div>
   );
@@ -291,7 +295,7 @@ export default function TripsList() {
               <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'hsl(var(--primary))'}}>ō</span>do</h1>
               <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
               {firstName && (
-                <p className="text-sm text-muted-foreground mt-2">{getGreeting()}, {firstName}</p>
+                <p className="text-sm text-muted-foreground mt-2">{getGreeting(t)}, {firstName}</p>
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
@@ -323,7 +327,7 @@ export default function TripsList() {
             {/* Upcoming (excluding hero) */}
             {upcomingTrips.length > 0 && (
               <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Próximos</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('tripslist.upcoming')}</p>
                 {upcomingTrips.map(({ t, cities }) => (
                   <TripCard key={t.id} trip={t} cities={cities} />
                 ))}
@@ -333,7 +337,7 @@ export default function TripsList() {
             {/* New trip button */}
             <button onClick={() => setDialogOpen(true)}
               className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-border rounded-2xl text-sm text-primary font-medium bg-card hover:bg-orange-50 dark:hover:bg-primary/10 transition-colors">
-              <Plus className="w-4 h-4" />Nuevo viaje
+              <Plus className="w-4 h-4" />{t('tripslist.newTrip')}
             </button>
 
             {/* Past trips — collapsible */}
@@ -344,7 +348,7 @@ export default function TripsList() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-2xl text-sm text-muted-foreground hover:bg-secondary/30 transition-colors">
                   <div className="flex items-center gap-2">
                     <Archive className="w-4 h-4 text-muted-foreground" />
-                    <span>{pastCount} viaje{pastCount !== 1 ? 's' : ''} finalizado{pastCount !== 1 ? 's' : ''}</span>
+                    <span>{t('tripslist.pastTrips', { count: pastCount })}</span>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                     className={`transition-transform ${showPast ? 'rotate-90' : ''}`}>
@@ -394,24 +398,24 @@ export default function TripsList() {
             <div className="px-5 py-5">
               <Map className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-base font-medium text-foreground mb-1">
-                Tienes {newTripPopup.spotCount} spot{newTripPopup.spotCount !== 1 ? 's' : ''} guardado{newTripPopup.spotCount !== 1 ? 's' : ''} en {newTripPopup.country}
+                {t('tripslist.savedSpots', { count: newTripPopup.spotCount, country: newTripPopup.country })}
               </p>
               <p className="text-sm text-muted-foreground mb-5">
-                Los tienes en tu perfil. ¿Los importamos a este viaje?
+                {t('tripslist.importSpots')}
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setNewTripPopup(null)}
                   className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground"
                 >
-                  Ahora no
+                  {t('tripslist.notNow')}
                 </button>
                 <Link
                   to={createPageUrl('Restaurants') + '?trip_id=' + newTripPopup.trip.id + '&import_saved=1'}
                   onClick={() => setNewTripPopup(null)}
                   className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold text-center"
                 >
-                  Importar →
+                  {t('tripslist.importNow')}
                 </Link>
               </div>
             </div>
