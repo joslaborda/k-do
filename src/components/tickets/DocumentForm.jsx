@@ -61,7 +61,8 @@ const FIELD_PLACEHOLDERS = {
 const PERSONAL_CATEGORIES = ['personal'];
 
 export default function DocumentForm({
-  const { t } = useTranslation(); initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
+  initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
+  const { t } = useTranslation();
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
