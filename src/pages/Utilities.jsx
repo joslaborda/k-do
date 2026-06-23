@@ -15,6 +15,7 @@ import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDo
 import { useTripContext } from '@/hooks/useTripContext';
 import { Link, useSearchParams } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -119,6 +120,7 @@ function PlugIcon({ type }) {
 }
 
 function RequirementsTab({ reqs, country, homeCountry, meta }) {
+  const { t } = useTranslation();
   const [showAllVaccines, setShowAllVaccines] = useState(false);
 
   if (!country) return (
@@ -145,7 +147,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
   // Determinar estado del visado usando nuevo campo type/label
   const visaNeeded = visa.needed;
   const visaType = visa.type;
-  const visaLabel = visa.label || (visaNeeded === false ? 'Sin visado' : visaNeeded === true ? 'Visado requerido' : 'Verificar con consulado');
+  const visaLabel = visa.label || (visaNeeded === false ? t('pretrip.visaFree') : visaNeeded === true ? t('pretrip.visaRequired') : 'Verificar con consulado');
 
   let visaColor, visaIcon;
   if (visaNeeded === false) {
@@ -226,7 +228,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
             <Syringe className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Vacunas</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('utilities.vaccines')}</p>
           </div>
           {requiredVax.length > 0 && (
             <div className="px-4 py-3 border-b border-border">
@@ -876,6 +878,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
 // Utilities — wrapper principal con tabs
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Utilities() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tripId = searchParams.get('trip_id');
@@ -917,7 +920,7 @@ export default function Utilities() {
 
   const tabs = [
     { key: 'tiempo',      label: 'Clima' },
-    { key: 'emergencias', label: 'Emergencias' },
+    { key: 'emergencias', label: t('utilities.emergency') },
     { key: 'maleta',      label: 'Maleta' },
   ];
   

@@ -9,6 +9,7 @@ import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 import { getTripCoverImage } from '@/lib/tripImage';
 import TripCard from '@/components/trip/TripCard';
 import OTabBar from '@/components/trip/OTabBar';
+import { useTranslation } from 'react-i18next';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -96,7 +97,8 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
 // ─────────────────────────────────────────────────────────────────────────────
 // Spot collection grouped by country
 // ─────────────────────────────────────────────────────────────────────────────
-function SpotCollection({ spots, showLikes = false, showVisibility = false }) {
+function SpotCollection({
+  const { t } = useTranslation(); spots, showLikes = false, showVisibility = false }) {
   const [expanded, setExpanded] = useState({});
   const [showAll, setShowAll] = useState({});
 
@@ -142,7 +144,7 @@ function SpotCollection({ spots, showLikes = false, showVisibility = false }) {
             {isExp && !showAll[country] && cSpots.length > previewCount && (
               <button onClick={() => setShowAll(p => ({ ...p, [country]: true }))}
                 className="w-full text-left px-3 py-2 text-xs text-primary font-medium border-t border-border hover:bg-secondary/20 transition-colors">
-                Ver {cSpots.length - previewCount} más →
+                {t('profile.showMore', { count: cSpots.length - previewCount })}
               </button>
             )}
           </div>
@@ -155,7 +157,8 @@ function SpotCollection({ spots, showLikes = false, showVisibility = false }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Spot search panel
 // ─────────────────────────────────────────────────────────────────────────────
-function SpotSearchPanel({ savedSpotIds, onSave }) {
+function SpotSearchPanel({
+  const { t } = useTranslation(); savedSpotIds, onSave }) {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [toastMsg, setToastMsg] = useState(null);
@@ -200,7 +203,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Buscar spots para guardar..."
+          placeholder={t('profile.searchSpots')}
           value={query}
           onChange={e => setQuery(e.target.value)}
           className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder-muted-foreground"
@@ -276,6 +279,7 @@ function SpotSearchPanel({ savedSpotIds, onSave }) {
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState('guardados');
@@ -448,8 +452,8 @@ export default function Profile() {
           {/* Stats */}
           <div className="flex border-t border-border pt-3">
             {[
-              { value: tripsCount, label: 'Viajes' },
-              { value: mySpots.length, label: 'Mis spots' },
+              { value: tripsCount, label: t('profile.trips') },
+              { value: mySpots.length, label: t('profile.mySpots') },
               { value: countriesCount, label: 'Países' },
             ].map((stat, i) => (
               <div key={stat.label} className={`flex-1 text-center ${i > 0 ? 'border-l border-border' : ''}`}>
@@ -469,7 +473,7 @@ export default function Profile() {
         {/* ── Tabs ── */}
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <OTabBar
-            tabs={[{key:'guardados',label:'Guardados'},{key:'creados',label:'Creados'},{key:'viajes',label:`Viajes${tripsCount ? ' ('+tripsCount+')' : ''}`}]}
+            tabs={[{key:'guardados',label: t('profile.saved')},{key:'creados',label: t('profile.created')},{key:'viajes',label: `${t('profile.trips')}${tripsCount ? ' ('+tripsCount+')' : ''}`}]}
             activeKey={tab}
             onChange={setTab}
           />

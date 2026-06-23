@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+import { useTranslation } from 'react-i18next';
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -318,6 +319,7 @@ const countryImages = {
 };
 
 export default function CityDetail() {
+  const { t } = useTranslation();
    const urlParams = new URLSearchParams(window.location.search);
    const cityId = urlParams.get('id');
    const tripId = urlParams.get('trip_id');

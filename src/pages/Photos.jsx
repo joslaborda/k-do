@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 function groupByDate(photos) {
   const groups = {};
@@ -24,6 +25,7 @@ function groupByDate(photos) {
 }
 
 export default function Photos() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -66,7 +68,7 @@ export default function Photos() {
         actor: myProf,
         tripId: trip?.id,
         tripName: trip?.name,
-        refTitle: count > 1 ? `${count} fotos` : '1 foto',
+        refTitle: t('photos.uploaded', { count }),
       }));
     } catch {}
   };
@@ -159,7 +161,7 @@ export default function Photos() {
               Fotos
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Fotos</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('documents.types.photo', 'Fotos')}</h1>
         </div>
       </div>
 
@@ -216,7 +218,7 @@ export default function Photos() {
           <div key={date} className="mt-4">
             <div className="px-4 mb-2 flex items-center gap-3">
               <span className="text-xs font-medium text-muted-foreground">
-                {date ? format(parseISO(date), "d 'de' MMMM", { locale: es }) : 'Sin fecha'}
+                {date ? format(parseISO(date), i18n?.language === 'en' ? 'd MMMM' : "d 'de' MMMM", { locale: i18n?.language === 'en' ? undefined : es }) : t('expenses.noDate')}
               </span>
               <div className="flex-1 h-px bg-border" />
               <span className="text-xs text-muted-foreground">{items.length}</span>

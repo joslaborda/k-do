@@ -134,7 +134,8 @@ function DraggableSpots({ spots, onReorder, onEdit }) {
 }
 
 // ── Spot edit modal ───────────────────────────────────────────────────────────
-function SpotEditModal({ spot, open, onClose, onSave, onRemove }) {
+function SpotEditModal({
+  const { t } = useTranslation(); spot, open, onClose, onSave, onRemove }) {
   const [notes, setNotes] = useState(spot?.notes || '');
   const [time, setTime] = useState(spot?.assigned_time || '');
   useEffect(() => { if (spot) { setNotes(spot.notes || ''); setTime(spot.assigned_time || ''); } }, [spot]);
@@ -276,7 +277,8 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
 }
 
 // ── Day expanded content ──────────────────────────────────────────────────────
-function DayContent({ day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId }) {
+function DayContent({
+  const { t } = useTranslation(); day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId }) {
   const [editingSpot, setEditingSpot] = useState(null);   // spot object — view+edit modal
   const [viewingDoc,  setViewingDoc]  = useState(null);   // doc object — view modal
   const [viewingFile, setViewingFile] = useState(null);   // file url — PDFViewer

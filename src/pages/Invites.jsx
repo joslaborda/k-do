@@ -10,8 +10,10 @@ import { toast } from '@/components/ui/use-toast';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 export default function Invites() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();

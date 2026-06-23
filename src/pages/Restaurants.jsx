@@ -14,6 +14,7 @@ import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
 import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -599,6 +600,7 @@ function Toast({ spot, city, onUndo, visible }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Restaurants() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
@@ -1260,7 +1262,7 @@ export default function Restaurants() {
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">
-              {[['all','Todos'],['created','Creados'],['saved','Guardados'],['assigned','Asignados']].map(([v,l]) => (
+              {[['all','Todos'],['created','Creados'],['saved',t('restaurants.filters.saved')],['assigned','Asignados']].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                     stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'

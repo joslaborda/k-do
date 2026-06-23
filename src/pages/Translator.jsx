@@ -8,6 +8,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
+import { useTranslation } from 'react-i18next';
 
 // ── Languages ─────────────────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -627,6 +628,7 @@ export function TranslatorPanel({ tripId }) {
 
 // Standalone page
 export default function Translator() {
+  const { t } = useTranslation();
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
   const { trip, activeCity } = useTripContext(tripId);
@@ -653,7 +655,7 @@ export default function Translator() {
               <span className="text-sm text-muted-foreground">{meta.flag} {countryRaw}</span>
             )}
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Traductor</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('utilities.translator')}</h1>
         </div>
       </div>
       <div className="max-w-3xl mx-auto px-5 pb-24">
