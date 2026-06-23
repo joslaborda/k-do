@@ -31,19 +31,19 @@ function LanguageSwitcher() {
       <div className="flex items-center gap-1 bg-secondary rounded-full p-1">
         <button
           onClick={() => handleChange('es')}
-          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
             current === 'es' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
           }`}
         >
-          🇪🇸 ES
+          ES
         </button>
         <button
           onClick={() => handleChange('en')}
-          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
             current === 'en' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
           }`}
         >
-          🇬🇧 EN
+          EN
         </button>
       </div>
     </div>
@@ -424,7 +424,7 @@ export default function Settings() {
               const c = COUNTRIES.find(x => x.name === e.target.value) || COUNTRIES[0];
               setHomeCountry(c.name); setHomeCurrency(c.currency);
             }} className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
-              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.flag} {c.name}</option>)}
+              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
             </select>
           </div>
           <div className="px-4 py-3 border-b border-border">
@@ -457,12 +457,11 @@ export default function Settings() {
                     return !secondNatQuery || name.toLowerCase().includes(secondNatQuery.toLowerCase());
                   }).map(c => {
                     const name = typeof c === 'string' ? c : c.name;
-                    const flag = typeof c === 'string' ? '' : (c.flag || '');
                     return (
                       <button key={name}
-                        className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary flex items-center gap-2"
+                        className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary"
                         onMouseDown={() => { setSecondNationality(name); setSecondNatQuery(''); setShowSecondNatList(false); }}>
-                        {flag && <span>{flag}</span>}{name}
+                        {name}
                       </button>
                     );
                   })}
