@@ -9,9 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CountryInput from '@/components/trip/CountryInput';
 import { normalizeCountry } from '@/lib/countryConfig';
+import { useTranslation } from 'react-i18next';
 
 export default
-function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
+function SettingsDialog({
+  const { t } = useTranslation(); open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = [] }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -120,18 +122,18 @@ function SettingsDialog({ open, onClose, trip, cities, tripId, isAdmin, onDelete
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-card border-border p-0 max-w-md max-h-[90vh] overflow-y-auto gap-0">
         <DialogHeader className="px-5 py-4 border-b border-border">
-          <DialogTitle className="text-foreground text-base font-semibold">Ajustes del viaje</DialogTitle>
+          <DialogTitle className="text-foreground text-base font-semibold">{t('trip.settings')}</DialogTitle>
         </DialogHeader>
 
         {/* Nombre */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground mb-1">Nombre del viaje</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('trip.tripName')}</p>
             <Input
               value={name}
               onChange={e => setName(e.target.value)}
               className="h-8 text-sm font-medium border-0 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-              placeholder="Nombre del viaje"
+              placeholder=t('trip.tripName')
             />
           </div>
         </div>

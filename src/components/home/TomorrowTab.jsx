@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Calendar } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DayCard from './DayCard';
+import { useTranslation } from 'react-i18next';
 
 export default function TomorrowTab({ trip, cities, tripId }) {
   const queryClient = useQueryClient();
