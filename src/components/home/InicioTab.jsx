@@ -9,6 +9,7 @@ import MemberAvatarRow from './MemberAvatarRow';
 import { useTranslation } from 'react-i18next';
 
 export default function InicioTab({ trip, cities, documents, packingItems, profiles, tripId, onInvite, currentUserEmail }) {
+  const { t } = useTranslation();
   const todayStr  = format(new Date(), 'yyyy-MM-dd');
   const tripStart = trip?.start_date || '';
   const daysLeft  = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
@@ -108,6 +109,7 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
 }
 
 export default function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite, currentUserEmail }) {
+  const { t } = useTranslation();
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
   const [collapsedGroups, setCollapsedGroups] = useState({});
@@ -172,7 +174,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
       <div className="grid grid-cols-2 gap-3">
         <Link to={createPageUrl('Utilities') + '?trip_id=' + tripId + '&tab=maleta'}>
           <div className="bg-card rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
-            <p className="text-xs text-muted-foreground mb-1">Maleta</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('pretrip.suitcase')}</p>
             <p className="text-2xl font-semibold text-foreground">{packedPct}%</p>
             <div className="mt-2 h-1 bg-secondary rounded-full overflow-hidden">
               <div className="h-full bg-primary rounded-full transition-all" style={{ width: packedPct + '%' }} />
@@ -200,7 +202,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           {(() => {
             const GROUPS = [
               { key: 'visa',    label: 'Visados', types: ['visa'] },
-              { key: 'vaccine', label: 'Vacunas', types: ['vaccine'] },
+              { key: 'vaccine', label: t('pretrip.vaccines'), types: ['vaccine'] },
               { key: 'tech',    label: 'Enchufe', types: ['tech'] },
               { key: 'money',   label: 'Divisa',  types: ['money'] },
               { key: 'safety',  label: 'Consejos',types: ['safety', 'info'] },
@@ -237,7 +239,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                             <p className="text-sm font-medium text-foreground leading-tight">{req.origin} → {req.country}</p>
                             {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                           </div>
-                          <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">Sin visado</span>
+                          <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">{t('pretrip.visaFree')}</span>
                         </div>
                       );
                     }
@@ -255,7 +257,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                             {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                           </div>
                           {!checkedItems[req.id] && (
-                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">Obligatorio</span>
+                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">{t('common.required')}</span>
                           )}
                         </button>
                       );
@@ -270,7 +272,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                         </div>
                         {req.type === 'visa'
                           ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Verificar</span>
-                          : <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Recomendado</span>
+                          : <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">{t('common.recommended')}</span>
                         }
                       </div>
                     );
