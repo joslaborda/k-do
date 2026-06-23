@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { sendTripInvite } from '@/lib/invites';
+import { useTranslation } from 'react-i18next';
 
 const roleConfig = {
   admin: { label: 'Admin', icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -14,7 +15,8 @@ const roleConfig = {
   viewer: { label: 'Lector', icon: Eye, color: 'bg-secondary text-foreground border-border' },
 };
 
-export default function MembersPanel({ trip, currentUserEmail, isAdmin, profiles = [] }) {
+export default function MembersPanel({
+  const { t } = useTranslation(); trip, currentUserEmail, isAdmin, profiles = [] }) {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
