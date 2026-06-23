@@ -5,13 +5,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+import { useTranslation } from 'react-i18next';
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function CitySettingsModal({ city, tripId }) {
+export default function CitySettingsModal({
+  const { t } = useTranslation(); city, tripId }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
