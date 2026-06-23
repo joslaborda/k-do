@@ -202,7 +202,7 @@ function buildHashtags(spots, tripCities) {
   const countries = [...new Set(tripCities.map(c => c.country).filter(Boolean))];
   countries.forEach(c => {
     const tags = COUNTRY_SPECIAL_TAGS[c] || [];
-    tags.forEach(t => countryTags.push(t));
+    tags.forEach(_trip=> countryTags.push(t));
   });
   // Combine: type tags + country-specific + generic, deduplicated
   const all = [...typeSet, ...countryTags, ...genericTags];
@@ -902,7 +902,7 @@ export default function Restaurants() {
     return seedSpots.filter(s => {
       const inTitle = s.title?.toLowerCase().includes(q);
       const inNotes = s.notes?.toLowerCase().includes(q);
-      const inTags = s.tags?.some(t => t.toLowerCase().includes(q));
+      const inTags = s.tags?.some(_trip=> t.toLowerCase().includes(q));
       return inTitle || inNotes || inTags;
     }).slice(0, 6);
   }, [searchQuery, seedSpots]);

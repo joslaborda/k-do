@@ -275,7 +275,7 @@ export default function Documents() {
   });
 
   // Filter
-  const filtered = useMemo(() => tickets.filter(t => {
+  const filtered = useMemo(() => tickets.filter(_trip=> {
     const vis = t.visibility || 'personal';
     const isOwner = t.created_by === currentUserEmail || t.user_id === userId;
     // personal: only owner sees it
@@ -297,7 +297,7 @@ export default function Documents() {
     const map = {};
     [...filtered]
       .sort((a, b) => ((a.date||'9999') < (b.date||'9999') ? -1 : (a.date||'9999') > (b.date||'9999') ? 1 : (a.time||'99:99').localeCompare(b.time||'99:99')))
-      .forEach(t => { const k = t.date || '__none__'; (map[k] = map[k] || []).push(t); });
+      .forEach(_trip=> { const k = t.date || '__none__'; (map[k] = map[k] || []).push(t); });
 
     return Object.entries(map).map(([date, items]) => ({
       date, items,
@@ -334,7 +334,7 @@ export default function Documents() {
           <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.</p>
           {/* Category tabs */}
           <OTabBar
-              tabs={CAT_TABS.map(t => ({key:t.key,label:t.label}))}
+              tabs={CAT_TABS.map(_trip=> ({key:t.key,label:t.label}))}
               activeKey={catFilter}
               onChange={setCatFilter}
             />
@@ -356,7 +356,7 @@ export default function Documents() {
         ) : grouped.map(({ date, label, items, isToday }) => (
           <div key={date} className="mb-6">
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 px-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>{label}</p>
-            {items.map(t => (
+            {items.map(_trip=> (
               <DocRow key={t.id} ticket={t} onEdit={setEditDoc} onDelete={setDeleteDoc} onView={setViewFile} />
             ))}
           </div>

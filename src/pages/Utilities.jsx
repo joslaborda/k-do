@@ -174,7 +174,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
   // Usar meta.plug como fuente si adapter.type no está disponible
   const plugTypeRaw = adapter.type || (meta?.plug ? meta.plug.split('/').map(p => `Tipo ${p}`).join(' · ') : '');
   const spanishPlugs = ['C', 'E', 'F'];
-  const destPlugs = plugTypeRaw.match(/Tipo ([A-N])/g)?.map(t => t.replace('Tipo ', '')) || [];
+  const destPlugs = plugTypeRaw.match(/Tipo ([A-N])/g)?.map(_trip=> t.replace('Tipo ', '')) || [];
   const needsAdapter = adapter.needed ?? (destPlugs.length > 0 && !destPlugs.every(p => spanishPlugs.includes(p)));
 
   return (
@@ -417,7 +417,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
       {tripInProgress && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex">
-            {innerTabs.map(t => (
+            {innerTabs.map(_trip=> (
               <button key={t.key} onClick={() => setActiveInnerTab(t.key)}
                 className="flex-1 flex flex-col items-center py-3 gap-1.5">
                 <div style={{

@@ -299,7 +299,7 @@ export default function Invites() {
           </div>
         ) : (
           pendingInvites.map(inv => {
-            const tripData = pendingTrips.find(t => t?.id === inv.trip_id);
+            const tripData = pendingTrips.find(tripItem => tripItem?.id === inv.trip_id);
             return (
               <div key={inv.id} className="bg-card border border-border rounded-2xl p-4 space-y-3">
                 <div className="flex items-start gap-3">
