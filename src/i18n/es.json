@@ -252,14 +252,23 @@
       "settleDebt": "Liquidar deuda",
       "settlement": "Liquidación",
       "theyOweYouThis": "Te deben este dinero",
-      "youOweThis": "Debes este dinero"
+      "youOweThis": "Debes este dinero",
+      "youNeedToPay": "Tienes que pagar",
+      "pending": "Pendiente",
+      "theyWillSettle": "Ellos verán el botón \"Saldar\" en su vista",
+      "groupBalance": "Saldo del grupo",
+      "owesYou": "Te debe",
+      "you": "Tú"
     },
     "stats": {
       "yourPart": "Tu parte",
       "groupTotal": "Total grupo",
-      "perDay": "{{amount}} {{currency}}/día",
+      "perDay": "Media/día",
       "byCategory": "Por categoría",
-      "noExpenses": "Sin gastos registrados"
+      "noExpenses": "Sin gastos registrados",
+      "myTotal": "Total mío",
+      "noStats": "Sin estadísticas",
+      "byCity": "Por ciudad"
     },
     "errors": {
       "amountRequired": "Introduce un importe para guardar el gasto.",

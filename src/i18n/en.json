@@ -252,14 +252,23 @@
       "settleDebt": "Settle debt",
       "settlement": "Settlement",
       "theyOweYouThis": "They owe you this",
-      "youOweThis": "You owe this"
+      "youOweThis": "You owe this",
+      "youNeedToPay": "You need to pay",
+      "pending": "Pending",
+      "theyWillSettle": "They'll see a \"Settle\" button on their end",
+      "groupBalance": "Group balance",
+      "owesYou": "Owes you",
+      "you": "You"
     },
     "stats": {
       "yourPart": "Your share",
       "groupTotal": "Group total",
-      "perDay": "{{amount}} {{currency}}/day",
+      "perDay": "Avg/day",
       "byCategory": "By category",
-      "noExpenses": "No expenses recorded"
+      "noExpenses": "No expenses recorded",
+      "myTotal": "My total",
+      "noStats": "No stats yet",
+      "byCity": "By city"
     },
     "errors": {
       "amountRequired": "Enter an amount to save the expense.",
