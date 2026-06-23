@@ -12,6 +12,8 @@ import { base44 } from '@/api/base44Client';
 import Explore from './pages/Explore';
 import TemplateDetail from './pages/TemplateDetail';
 import TripsList from './pages/TripsList';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '@/i18n/index.js';
 
 const { Pages, Layout } = pagesConfig;
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
@@ -89,15 +91,17 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <NavigationTracker />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <I18nextProvider i18n={i18n}>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <NavigationTracker />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </I18nextProvider>
   )
 }
 
