@@ -181,7 +181,7 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
         s.title?.toLowerCase().includes(q) ||
         s.city_name?.toLowerCase().includes(q) ||
         s.country?.toLowerCase().includes(q) ||
-        s.tags?.some(_trip=> tr.toLowerCase().includes(q));
+        s.tags?.some(tag => tag.toLowerCase().includes(q));
       const matchesType = typeFilter === 'all' || s.type === typeFilter;
       return matchesText && matchesType;
     }).slice(0, 20);
@@ -329,8 +329,8 @@ export default function Profile() {
           '-created_date'
         ),
       ]);
-      const createdIds = new Set(created.map(_trip=> tr.id));
-      const memberOnly = asMember.filter(_trip=> !createdIds.has(tr.id));
+      const createdIds = new Set(created.map(item => item.id));
+      const memberOnly = asMember.filter(item => !createdIds.has(item.id));
       return [...created, ...memberOnly].sort((a, b) =>
         (b.start_date || '').localeCompare(a.start_date || '')
       );
@@ -340,11 +340,11 @@ export default function Profile() {
   });
 
   const { data: myTripCities = [] } = useQuery({
-    queryKey: ['myTripCities', myTrips.map(_trip=> tr.id).join(',')],
+    queryKey: ['myTripCities', myTrips.map(item => item.id).join(',')],
     queryFn: async () => {
       if (!myTrips.length) return [];
       const all = await Promise.all(
-        myTrips.map(_trip=> base44.entities.City.filter({ trip_id: tr.id }))
+        myTrips.map(item => base44.entities.City.filter({ trip_id: item.id }))
       );
       return all.flat();
     },

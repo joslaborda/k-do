@@ -275,9 +275,9 @@ export default function Documents() {
   });
 
   // Filter
-  const filtered = useMemo(() => tickets.filter(_trip=> {
-    const vis = tr.visibility || 'personal';
-    const isOwner = tr.created_by === currentUserEmail || tr.user_id === userId;
+  const filtered = useMemo(() => tickets.filter(ticket => {
+    const vis = ticket.visibility || 'personal';
+    const isOwner = ticket.created_by === currentUserEmail || ticket.user_id === userId;
     // personal: only owner sees it
     if (vis === 'personal' && !isOwner) return false;
     // selected_users: owner or explicitly shared
@@ -297,7 +297,7 @@ export default function Documents() {
     const map = {};
     [...filtered]
       .sort((a, b) => ((a.date||'9999') < (b.date||'9999') ? -1 : (a.date||'9999') > (b.date||'9999') ? 1 : (a.time||'99:99').localeCompare(b.time||'99:99')))
-      .forEach(_trip=> { const k = tr.date || '__none__'; (map[k] = map[k] || []).push(t); });
+      .forEach(ticket => { const k = ticket.date || '__none__'; (map[k] = map[k] || []).push(ticket); });
 
     return Object.entries(map).map(([date, items]) => ({
       date, items,
@@ -334,7 +334,7 @@ export default function Documents() {
           <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.</p>
           {/* Category tabs */}
           <OTabBar
-              tabs={CAT_TABS.map(_trip=> ({key:tr.key,label:tr.label}))}
+              tabs={CAT_TABS.map(tab => ({key:tab.key,label:tab.label}))}
               activeKey={catFilter}
               onChange={setCatFilter}
             />
@@ -356,8 +356,8 @@ export default function Documents() {
         ) : grouped.map(({ date, label, items, isToday }) => (
           <div key={date} className="mb-6">
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 px-1 ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>{label}</p>
-            {items.map(_trip=> (
-              <DocRow key={tr.id} ticket={t} onEdit={setEditDoc} onDelete={setDeleteDoc} onView={setViewFile} />
+            {items.map(ticket => (
+              <DocRow key={ticket.id} ticket={ticket} onEdit={setEditDoc} onDelete={setDeleteDoc} onView={setViewFile} />
             ))}
           </div>
         ))}

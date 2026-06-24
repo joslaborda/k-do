@@ -174,7 +174,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
   // Usar meta.plug como fuente si adapter.type no está disponible
   const plugTypeRaw = adapter.type || (meta?.plug ? meta.plug.split('/').map(p => `Tipo ${p}`).join(' · ') : '');
   const spanishPlugs = ['C', 'E', 'F'];
-  const destPlugs = plugTypeRaw.match(/Tipo ([A-N])/g)?.map(_trip=> tr.replace('Tipo ', '')) || [];
+  const destPlugs = plugTypeRaw.match(/Tipo ([A-N])/g)?.map(item => item.replace('Tipo ', '')) || [];
   const needsAdapter = adapter.needed ?? (destPlugs.length > 0 && !destPlugs.every(p => spanishPlugs.includes(p)));
 
   return (
@@ -417,12 +417,12 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
       {tripInProgress && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex">
-            {innerTabs.map(_trip=> (
-              <button key={tr.key} onClick={() => setActiveInnerTab(t.key)}
+            {innerTabs.map(tab => (
+              <button key={tab.key} onClick={() => setActiveInnerTab(tab.key)}
                 className="flex-1 flex flex-col items-center py-3 gap-1.5">
                 <div style={{
                   height: 3, borderRadius: 2, width: 18,
-                  background: activeInnerTab === t.key ? 'hsl(var(--primary))' : 'transparent',
+                  background: activeInnerTab === tab.key ? 'hsl(var(--primary))' : 'transparent',
                   marginBottom: 2,
                 }} />
                 <span style={{

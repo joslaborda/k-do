@@ -902,7 +902,7 @@ export default function Restaurants() {
     return seedSpots.filter(s => {
       const inTitle = s.title?.toLowerCase().includes(q);
       const inNotes = s.notes?.toLowerCase().includes(q);
-      const inTags = s.tags?.some(_trip=> tr.toLowerCase().includes(q));
+      const inTags = s.tags?.some(tag => tag.toLowerCase().includes(q));
       return inTitle || inNotes || inTags;
     }).slice(0, 6);
   }, [searchQuery, seedSpots]);
