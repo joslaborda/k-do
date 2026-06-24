@@ -136,7 +136,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
         const blob = new Blob(audioChunksRef.current, { type: mimeType });
         const file = new File([blob], `audio_${Date.now()}.${ext}`, { type: mimeType });
-        stream.getTracks().forEach(_trip=> t.stop());
+        stream.getTracks().forEach(_trip=> tr.stop());
         await handleUpload(file);
       };
       mediaRecorderRef.current = mr;
