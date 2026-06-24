@@ -10,22 +10,21 @@ import { useTranslation } from 'react-i18next';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
-  flight:   { icon: PlaneIcon, label: t('documents.types.flight'),   color: 'bg-blue-50 dark:bg-blue-950/30'   },
-  train:    { icon: Train, label: t('documents.types.train'),    color: 'bg-green-50 dark:bg-green-950/30'  },
-  hotel:    { icon: Hotel,      label: t('documents.types.hotel'),   color: 'bg-purple-50 dark:bg-purple-950/30' },
-  event:    { icon: Ticket,     label: 'Evento',  color: 'bg-orange-50 dark:bg-orange-950/30' },
-  personal: { icon: Shield,     label: t('documents.types.insurance'),  color: 'bg-amber-50 dark:bg-amber-950/30'  },
-  other:    { icon: CirclePlus,   label: t('documents.types.other'),    color: 'bg-secondary' },
+  flight:   { icon: PlaneIcon, label: 'Vuelo',    labelKey: 'documents.types.flight',    color: 'bg-blue-50 dark:bg-blue-950/30'   },
+  train:    { icon: Train,     label: 'Tren',     labelKey: 'documents.types.train',     color: 'bg-green-50 dark:bg-green-950/30'  },
+  hotel:    { icon: Hotel,     label: 'Hotel',    labelKey: 'documents.types.hotel',     color: 'bg-purple-50 dark:bg-purple-950/30' },
+  event:    { icon: Ticket,    label: 'Evento',   labelKey: 'documents.types.ticket',    color: 'bg-orange-50 dark:bg-orange-950/30' },
+  personal: { icon: Shield,    label: 'Seguro',   labelKey: 'documents.types.insurance', color: 'bg-amber-50 dark:bg-amber-950/30'  },
+  other:    { icon: CirclePlus, label: 'Otro',    labelKey: 'documents.types.other',     color: 'bg-secondary' },
 };
 
-
 const CATEGORIES = [
-  { key: 'flight',   Icon: PlaneIcon, label: t('documents.types.flight')   },
-  { key: 'hotel',    Icon: Hotel,      label: t('documents.types.hotel')   },
-  { key: 'train',    Icon: Train, label: t('documents.types.train')    },
-  { key: 'event',    Icon: Ticket,     label: 'Evento'  },
-  { key: 'personal', Icon: Shield,     label: t('documents.types.insurance')  },
-  { key: 'other',    Icon: CirclePlus,   label: t('documents.types.other')    },
+  { key: 'flight',   Icon: PlaneIcon,  labelKey: 'documents.types.flight'   },
+  { key: 'hotel',    Icon: Hotel,      labelKey: 'documents.types.hotel'    },
+  { key: 'train',    Icon: Train,      labelKey: 'documents.types.train'    },
+  { key: 'event',    Icon: Ticket,     labelKey: 'documents.types.ticket'   },
+  { key: 'personal', Icon: Shield,     labelKey: 'documents.types.insurance' },
+  { key: 'other',    Icon: CirclePlus, labelKey: 'documents.types.other'    },
 ];
 
 const VISIBILITY_OPTS = [
@@ -145,7 +144,7 @@ export default function DocumentForm({
             <button key={cat.key} onClick={() => setCategory(cat.key)}
               className={`flex-1 flex flex-col items-center py-2 pb-2.5 gap-0.5 border-b-2 transition-colors ${category === cat.key ? 'border-primary' : 'border-transparent'}`}>
               <cat.Icon size={16} className="flex-shrink-0" />
-              <span className={`text-xs font-medium leading-none ${category === cat.key ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
+              <span className={`text-xs font-medium leading-none ${category === cat.key ? 'text-primary' : 'text-muted-foreground'}`}>{t(cat.labelKey)}</span>
             </button>
           ))}
         </div>
