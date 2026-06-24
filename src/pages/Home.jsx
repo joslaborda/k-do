@@ -113,7 +113,7 @@ export default function Home() {
     queryFn: async () => {
       const tickets = await base44.entities.Ticket.filter({ trip_id: tripId });
       return tickets.filter(_trip=> {
-        const vis = t.visibility || 'personal';
+        const vis = tr.visibility || 'personal';
         if (vis === 'shared') return true;
         return t.created_by === currentUserEmail || t.user_id === currentUserId;
       });
@@ -218,7 +218,7 @@ export default function Home() {
   // Auto-correct tab when trip status changes
   useEffect(() => {
     if (!trip || !homeTabs.length) return;
-    const validKeys = homeTabs.map(_trip=> t.key);
+    const validKeys = homeTabs.map(_trip=> tr.key);
     if (!validKeys.includes(tabRef.current)) {
       const next = validKeys[0];
       tabRef.current = next;

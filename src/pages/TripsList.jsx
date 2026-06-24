@@ -157,10 +157,10 @@ export default function TripsList() {
           { members: { $elemMatch: { $eq: user.email } } },
           '-created_date'
         );
-        memberTrips = all.filter(_trip=> t.created_by !== user.email);
+        memberTrips = all.filter(tr => tr.created_by !== user.email);
       } catch {}
-      const seen = new Set(myTrips.map(_trip=> t.id));
-      return [...myTrips, ...memberTrips.filter(_trip=> !seen.has(t.id))]
+      const seen = new Set(myTrips.map(tr => tr.id));
+      return [...myTrips, ...memberTrips.filter(tr => !seen.has(tr.id))]
         .sort((a,b) => new Date(b.created_date||0) - new Date(a.created_date||0));
     },
     staleTime: 30000,
@@ -168,10 +168,10 @@ export default function TripsList() {
 
   // Only fetch cities for the user's own trips, not all cities globally
   const { data: allCities = [] } = useQuery({
-    queryKey: ['allCities', trips.map(_trip=> t.id).join(',')],
+    queryKey: ['allCities', trips.map(tr => tr.id).join(',')],
     queryFn: async () => {
       if (!trips.length) return [];
-      const tripIds = trips.map(_trip=> t.id);
+      const tripIds = trips.map(tr => tr.id);
       const results = await Promise.all(
         tripIds.map(id => base44.entities.City.filter({ trip_id: id }).catch(() => []))
       );
@@ -237,10 +237,10 @@ export default function TripsList() {
 
   // Classify trips
   const { heroTrip, heroCities, upcomingTrips, pastTrips } = useMemo(() => {
-    const withStatus = trips.map(_trip=> ({
-      t,
-      cities: allCities.filter(c => c.trip_id === t.id),
-      status: getTripStatus(t),
+    const withStatus = trips.map(tr => ({
+      t: tr,
+      cities: allCities.filter(c => c.trip_id === tr.id),
+      status: getTripStatus(tr),
     }));
 
     const active   = withStatus.filter(x => x.status?.type === 'active');
