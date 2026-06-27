@@ -151,7 +151,7 @@ function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
         </DialogHeader>
         <div className="px-4 py-4 space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Hora</p>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">{t('cities.day.time')}</p>
             <div className="flex items-center gap-2">
               <input
                 type="time"
@@ -159,16 +159,16 @@ function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
                 onChange={e => setTime(e.target.value)}
                 className="h-9 border border-border rounded-xl px-3 text-sm text-foreground bg-secondary outline-none focus:border-primary w-[120px]"
               />
-              {time && <button onClick={() => setTime('')} className="text-xs text-muted-foreground hover:text-foreground">Quitar</button>}
-              {!time && <span className="text-xs text-muted-foreground">opcional</span>}
+              {time && <button onClick={() => setTime('')} className="text-xs text-muted-foreground hover:text-foreground">{t('cities.day.remove')}</button>}
+              {!time && <span className="text-xs text-muted-foreground">{t('cities.day.optional')}</span>}
             </div>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">Nota personal</p>
+            <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide font-medium">{t('cities.day.personalNote')}</p>
             <Textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="Añade una nota para este spot..."
+              placeholder={t('cities.day.notePlaceholder')}
               className="text-sm bg-secondary border-border resize-none"
               rows={3}
             />
@@ -177,7 +177,7 @@ function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
         <div className="flex items-center justify-between px-4 py-3 border-t border-border">
           <button onClick={() => onRemove(spot)}
             className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
-            <Trash2 className="w-3 h-3" />Quitar del día
+            <Trash2 className="w-3 h-3" />{t('cities.day.removeFromDay')}
           </button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={onClose}>{t('common.cancel')}</Button>
@@ -195,6 +195,7 @@ function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
 const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50', bus:'bg-amber-50', car:'bg-orange-50', ticket:'bg-rose-50', insurance:'bg-teal-50', other:'bg-secondary' };
 
 function DocViewerModal({ doc, open, onClose, onEdit }) {
+  const { t } = useTranslation();
   const type = doc?.category || doc?.type || doc?.doc_type || 'other';
   const DocIcon = DOC_ICON_MAP[type] || FileText;
   const bgColor = DOC_BG[type] || 'bg-secondary';
@@ -225,49 +226,49 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">Ver documento</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Toca para abrir en el navegador</p>
+              <p className="text-sm font-medium text-foreground">{t('cities.doc.view')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('cities.doc.tapToOpen')}</p>
             </div>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </button>
         ) : (
           <div className="mx-4 my-3 border-2 border-dashed border-border rounded-xl p-4 text-center">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/40 mx-auto mb-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p className="text-xs text-muted-foreground">Sin archivo adjunto</p>
+            <p className="text-xs text-muted-foreground">{t('cities.doc.noFile')}</p>
           </div>
         )}
 
         {/* Fields */}
         <div className="px-4 pb-3 flex flex-col gap-2 border-t border-border pt-3">
           {doc?.time && (
-            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Hora</span><span className="text-sm text-primary font-medium">{doc.time}</span></div>
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">{t('cities.doc.time')}</span><span className="text-sm text-primary font-medium">{doc.time}</span></div>
           )}
           {doc?.origin && (
-            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Origen</span><span className="text-sm text-foreground">{doc.origin}</span></div>
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">{t('cities.doc.origin')}</span><span className="text-sm text-foreground">{doc.origin}</span></div>
           )}
           {doc?.destination && (
-            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Destino</span><span className="text-sm text-foreground">{doc.destination}</span></div>
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">{t('cities.doc.destination')}</span><span className="text-sm text-foreground">{doc.destination}</span></div>
           )}
           {doc?.notes && (
-            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">Notas</span><span className="text-sm text-foreground">{doc.notes}</span></div>
+            <div className="flex gap-3"><span className="text-xs text-muted-foreground w-14 shrink-0 pt-0.5">{t('cities.doc.notes')}</span><span className="text-sm text-foreground">{doc.notes}</span></div>
           )}
           {doc?.visibility === 'shared' && (
-            <div className="flex gap-3 items-center"><span className="text-xs text-muted-foreground w-14 shrink-0">Con</span><span className="text-xs bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">Grupo</span></div>
+            <div className="flex gap-3 items-center"><span className="text-xs text-muted-foreground w-14 shrink-0">{t('cities.doc.with')}</span><span className="text-xs bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">{t('cities.doc.group')}</span></div>
           )}
         </div>
 
         <div className="px-4 py-3 border-t border-border flex justify-between items-center">
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onClose}>Cerrar</Button>
+            <Button variant="outline" size="sm" onClick={onClose}>{t('cities.doc.close')}</Button>
             {doc?.file_url && (
               <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" onClick={openFile}>
-                Abrir
+                {t('cities.doc.open')}
               </Button>
             )}
           </div>
           {onEdit && (
             <Button size="sm" variant="outline" onClick={onEdit} className="flex items-center gap-1.5">
-              <Pencil className="w-3.5 h-3.5" />Editar
+              <Pencil className="w-3.5 h-3.5" />{t('cities.doc.edit')}
             </Button>
           )}
         </div>
@@ -381,8 +382,8 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
   // Build timeline
   const { withTime, noTime } = useMemo(() => {
-    const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _title: d.name || d.title || 'Documento', _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
-    const spotItems = spots.map(s   => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _title: s.title || 'Spot', _sub: s.notes || null }));
+    const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
+    const spotItems = spots.map(s   => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
     const noteItems = notesList.filter(n => n.text?.trim()).map((n, i) => ({
       id: 'note-' + i, _kind: 'note', _time: n.time || null, _title: n.text, _sub: null, _noteIdx: i,
     }));
@@ -502,7 +503,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
         {titleEditing ? (
           <div className="flex items-center gap-2">
             <Input value={titleVal} onChange={e => setTitleVal(e.target.value)}
-              placeholder="¿Qué harás este día?" className="flex-1 h-9 text-sm bg-secondary border-border"
+              placeholder={t('cities.day.titlePlaceholder')} className="flex-1 h-9 text-sm bg-secondary border-border"
               autoFocus onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }} />
             <button onClick={() => setTitleEditing(false)} className="text-muted-foreground p-1"><X className="w-4 h-4" /></button>
             <button onClick={saveTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
@@ -510,7 +511,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
         ) : (
           <button onClick={() => setTitleEditing(true)} className="w-full flex items-center gap-2 text-left group">
             <span className={`flex-1 text-sm ${titleVal ? 'font-medium text-foreground' : 'text-muted-foreground italic'}`}>
-              {titleVal || 'Añadir título al día...'}
+              {titleVal || t('cities.day.addTitle')}
             </span>
             <Pencil className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
           </button>
@@ -524,15 +525,15 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
       <div className="flex border-t border-border">
         <button onClick={() => setAddingDoc(true)}
           className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors border-r border-border">
-          + Doc
+          {t('cities.day.addDoc')}
         </button>
         <Link to={createPageUrl('Restaurants') + '?trip_id=' + tripId}
           className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors border-r border-border">
-          + Spot
+          {t('cities.day.addSpot')}
         </Link>
         <button onClick={() => { setAddingNote(true); setNewNoteText(''); setNewNoteTime(''); }}
           className="flex-1 flex items-center justify-center py-3 text-sm font-semibold text-primary hover:bg-accent transition-colors">
-          + Nota
+          {t('cities.day.addNote')}
         </button>
       </div>
 
@@ -540,11 +541,11 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
       {addingNote && (
         <div className="border-t border-border p-4 bg-secondary/30">
           <Textarea value={newNoteText} onChange={e => setNewNoteText(e.target.value)}
-            placeholder="Escribe una nota..." className="text-sm bg-card border-border resize-none w-full mb-3" rows={3} autoFocus />
+            placeholder={t('cities.day.writeNotePlaceholder')} className="text-sm bg-card border-border resize-none w-full mb-3" rows={3} autoFocus />
           <div className="flex items-center gap-3 flex-wrap">
             <input type="time" value={newNoteTime} onChange={e => setNewNoteTime(e.target.value)}
               className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
-            <span className="text-xs text-muted-foreground">hora opcional</span>
+            <span className="text-xs text-muted-foreground">{t('cities.day.hourOptional')}</span>
             <div className="ml-auto flex gap-2">
               <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
               <button onClick={handleAddNote} disabled={!newNoteText.trim()}
@@ -563,7 +564,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
             <input type="time" value={notesList[editingNote].time || ''} onChange={e => updateNote(editingNote, 'time', e.target.value)}
               className="h-8 border border-border rounded-lg px-2 text-xs bg-card text-foreground outline-none focus:border-primary w-[100px]" />
             <button onClick={() => handleDeleteNote(editingNote)} className="text-xs text-red-500 flex items-center gap-1">
-              <Trash2 className="w-3 h-3" />Eliminar
+              <Trash2 className="w-3 h-3" />{t('cities.day.delete')}
             </button>
             <div className="ml-auto flex gap-2">
               <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
@@ -578,7 +579,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
         <Dialog open={addingDoc} onOpenChange={o => { if (!o) setAddingDoc(false); }}>
           <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
             <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-              <DialogTitle className="text-base font-semibold">Añadir documento</DialogTitle>
+              <DialogTitle className="text-base font-semibold">{t('cities.day.addDocument')}</DialogTitle>
             </DialogHeader>
             <div className="px-5 py-4 overflow-y-auto flex-1">
               <DocumentForm
@@ -628,7 +629,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
         <Dialog open={!!editingDoc} onOpenChange={o => { if (!o) setEditingDoc(null); }}>
           <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
             <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-              <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
+              <DialogTitle className="text-base font-semibold">{t('cities.day.editDocument')}</DialogTitle>
             </DialogHeader>
             <div className="px-5 py-4 overflow-y-auto flex-1">
               <DocumentForm
@@ -652,6 +653,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
 // ── Day row ───────────────────────────────────────────────────────────────────
 function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen, trip, cities, itineraryDays, profiles, userId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(defaultOpen);
 
   const docs = useMemo(() =>
@@ -709,7 +711,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
               <p className={`text-sm font-semibold truncate ${!day?.title && !hasContent ? 'text-muted-foreground italic font-normal' : 'text-foreground'}`}>
                 {day?.title || (hasContent
                 ? pillItems.map(p => p.label).join(' · ')
-                : 'Toca para planificar')}
+                : t('cities.day.tapToPlan'))}
               </p>
               {hasContent && (
                 <div className="flex gap-1.5 mt-1.5 flex-wrap">
@@ -721,8 +723,8 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
             </div>
             {/* Badges + chevron */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {isToday_ && <span className="text-label bg-primary text-white px-2 py-0.5 rounded-full font-semibold">Hoy</span>}
-              {isTomorrow_ && <span className="text-label bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full">Mañana</span>}
+              {isToday_ && <span className="text-label bg-primary text-white px-2 py-0.5 rounded-full font-semibold">{t('cities.day.today')}</span>}
+              {isTomorrow_ && <span className="text-label bg-secondary text-muted-foreground border border-border px-2 py-0.5 rounded-full">{t('cities.day.tomorrow')}</span>}
               {open
                 ? <ChevronUp className={`w-4 h-4 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`} />
                 : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -757,6 +759,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
 
 // ── City block ────────────────────────────────────────────────────────────────
 function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(isActive);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -800,12 +803,12 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
           <span className="text-xs text-muted-foreground ml-2">
             {city.start_date && city.end_date
               ? `${format(parseISO(city.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: es })}`
-              : 'Sin fechas'}
+              : t('cities.noDates')}
           </span>
         </div>
-        {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">Visitada</span>}
-        {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-semibold">Ahora</span>}
-        {!isActive && !isPast && <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full shrink-0 font-medium">Próxima</span>}
+        {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">{t('cities.block.visited')}</span>}
+        {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-semibold">{t('cities.block.now')}</span>}
+        {!isActive && !isPast && <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full shrink-0 font-medium">{t('cities.block.next')}</span>}
         {open
           ? <ChevronUp className="w-4 h-4 shrink-0 text-muted-foreground" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
@@ -816,8 +819,8 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
         <div className="flex flex-col gap-2 mt-2">
           {cityDays.length === 0 && (
             <div className="bg-card border border-border rounded-2xl px-4 py-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Sin fechas asignadas</p>
-              <p className="text-xs text-primary">Edita el viaje para añadir fechas →</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('cities.noDatesAssigned')}</p>
+              <p className="text-xs text-primary">{t('cities.editTripForDates')}</p>
             </div>
           )}
           {cityDays.map(dateStr => (
@@ -941,26 +944,26 @@ export default function Cities() {
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-                <ArrowRight className="w-4 h-4 rotate-180" />Inicio
+                <ArrowRight className="w-4 h-4 rotate-180" />{t('cities.backHome')}
               </button>
             </Link>
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
               <button className="text-sm text-primary flex items-center gap-1 font-semibold">
-                <Plus className="w-4 h-4" />Ciudad
+                <Plus className="w-4 h-4" />{t('cities.cityShort')}
               </button>
             </Link>
           </div>
 
           <h1 className="text-2xl font-semibold text-foreground mb-1">{t('cities.title')}</h1>
-          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">La base de tu viaje en Kōdo. Construye con el grupo el itinerario completo día a día con Documentos, Spots y Notas. Tu tab Hoy en Home mostrará el día a día de tu viaje.</p>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{t('cities.intro')}</p>
 
           {/* Progress */}
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-muted-foreground">
-              {tripNotStarted && daysLeft !== null ? `Faltan ${daysLeft} días` :
-               tripFinished ? 'Viaje completado' :
-               dayNumber && totalDays ? `Día ${dayNumber} de ${totalDays}${activeCityName ? ` · ${activeCityName}` : ''}` :
-               'Sin fechas'}
+              {tripNotStarted && daysLeft !== null ? t('cities.progress.daysLeft', { count: daysLeft }) :
+               tripFinished ? t('cities.tripCompleted') :
+               dayNumber && totalDays ? t('cities.progress.dayOf', { day: dayNumber, total: totalDays }) + (activeCityName ? ` · ${activeCityName}` : '') :
+               t('cities.noDates')}
             </span>
             <span className={`text-xs font-medium ${tripFinished ? 'text-green-700' : 'text-primary'}`}>
               {tripFinished ? '100%' : progress > 0 ? `${progress}%` : ''}
@@ -981,10 +984,10 @@ export default function Cities() {
         {sortedCities.length === 0 ? (
           <div className="text-center py-16">
             <div className='w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4'><Map className='w-7 h-7 text-muted-foreground/50' /></div>
-            <p className="text-muted-foreground mb-4">Aún no hay ciudades en la ruta</p>
+            <p className="text-muted-foreground mb-4">{t('cities.noCitiesYet')}</p>
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
               <Button className="bg-primary hover:bg-primary/90 text-white">
-                <Plus className="w-4 h-4 mr-2" />Añadir ciudad
+                <Plus className="w-4 h-4 mr-2" />{t('cities.addCity')}
               </Button>
             </Link>
           </div>
@@ -1006,8 +1009,8 @@ export default function Cities() {
               itineraryDays.filter(d => d.city_id === city.id).forEach(d => { if (d.date) daysByDate[d.date] = d; });
               if (cityDays.length === 0) return (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-xs text-muted-foreground mb-2">Sin fechas asignadas</p>
-                  <p className="text-xs text-primary">Edita el viaje para añadir fechas →</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('cities.noDatesAssigned')}</p>
+                  <p className="text-xs text-primary">{t('cities.editTripForDates')}</p>
                 </div>
               );
               return cityDays.map(dateStr => (

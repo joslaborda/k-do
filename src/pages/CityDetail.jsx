@@ -443,7 +443,7 @@ export default function CityDetail() {
   if (!city) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Cargando...</div>
+        <div className="animate-pulse text-muted-foreground">{t('cities.detail.loading')}</div>
       </div>
     );
   }
@@ -465,7 +465,7 @@ export default function CityDetail() {
              className="inline-flex items-center gap-2 px-4 py-2 bg-primary rounded-full text-white text-sm font-semibold hover:bg-primary/90 transition-all duration-200"
            >
              <ArrowLeft className="w-4 h-4" />
-             Ruta
+             {t('cities.detail.route')}
            </Link>
          </div>
 
@@ -506,12 +506,12 @@ export default function CityDetail() {
 
       <div className="max-w-3xl mx-auto px-6 pt-6 pb-12 md:pb-6">
          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-           <h2 className="text-xl font-semibold text-foreground">Itinerario</h2>
+           <h2 className="text-xl font-semibold text-foreground">{t('cities.detail.itinerary')}</h2>
            <div className="flex items-center gap-2 flex-wrap">
 
              <Button onClick={openNewDialog} className="bg-primary hover:bg-primary/90">
                <Plus className="w-4 h-4 mr-2" />
-               Añadir Día
+               {t('cities.detail.addDay')}
              </Button>
            </div>
         </div>
@@ -525,11 +525,11 @@ export default function CityDetail() {
          ) : days.length === 0 ? (
            <div className="text-center py-16 glass border-2 border-dashed border-border rounded-2xl">
              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-             <h3 className="text-lg font-medium text-foreground mb-2">Sin itinerario todavía</h3>
-             <p className="text-muted-foreground mb-4">Empieza a planificar tus días en {city.name}</p>
+             <h3 className="text-lg font-medium text-foreground mb-2">{t('cities.detail.emptyTitle')}</h3>
+             <p className="text-muted-foreground mb-4">{t('cities.detail.emptyHint', { city: city.name })}</p>
              <Button onClick={openNewDialog} className="bg-primary hover:bg-primary/90">
                <Plus className="w-4 h-4 mr-2" />
-               Añadir primer día
+               {t('cities.detail.addFirstDay')}
              </Button>
            </div>
         ) : (
@@ -566,7 +566,7 @@ export default function CityDetail() {
                             e.stopPropagation();
                             openEditDialog(day);
                           }}
-                          aria-label="Editar día"
+                          aria-label={t('cities.detail.editDayAria')}
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
@@ -578,7 +578,7 @@ export default function CityDetail() {
                             e.stopPropagation();
                             handleDeleteClick(day);
                           }}
-                          aria-label="Eliminar día"
+                          aria-label={t('cities.detail.deleteDayAria')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -594,7 +594,7 @@ export default function CityDetail() {
                     <CollapsibleContent>
                       <div className="px-5 pb-5 pt-0 border-t border-border bg-card/50">
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
-                          <ReactMarkdown>{day.content || 'No details added yet.'}</ReactMarkdown>
+                          <ReactMarkdown>{day.content || t('cities.detail.noDetails')}</ReactMarkdown>
                         </div>
                         <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} dayTitle={day.title} />
                       </div>
@@ -623,20 +623,20 @@ export default function CityDetail() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
            <DialogHeader>
-             <DialogTitle className="text-foreground">{editingDay ? 'Editar Día' : 'Añadir Nuevo Día'}</DialogTitle>
+             <DialogTitle className="text-foreground">{editingDay ? t('cities.detail.editDay') : t('cities.detail.addNewDay')}</DialogTitle>
            </DialogHeader>
            <div className="space-y-4 pt-4">
              <div>
-               <label className="text-sm font-medium text-foreground mb-1.5 block">Título</label>
+               <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.detail.title')}</label>
               <Input
-                placeholder="ej. Llegada + Dotonbori nocturno"
+                placeholder={t('cities.detail.titlePlaceholder')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="bg-input border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.detail.date')}</label>
               <Input
                 type="date"
                 value={formData.date}
@@ -646,10 +646,10 @@ export default function CityDetail() {
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Detalles (soporta Markdown)
+                {t('cities.detail.detailsLabel')}
               </label>
               <Textarea
-                placeholder="Añade los detalles del itinerario aquí..."
+                placeholder={t('cities.detail.detailsPlaceholder')}
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={12}
@@ -658,7 +658,7 @@ export default function CityDetail() {
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-secondary/50">
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button 
                 onClick={handleSave}
@@ -667,8 +667,8 @@ export default function CityDetail() {
               >
                 <Save className="w-4 h-4 mr-2" />
                 {(updateMutation.isPending || createMutation.isPending) 
-                  ? 'Guardando...' 
-                  : editingDay ? 'Actualizar' : 'Guardar'}
+                  ? t('cities.detail.saving') 
+                  : editingDay ? t('cities.detail.update') : t('common.save')}
               </Button>
             </div>
           </div>
@@ -684,12 +684,12 @@ export default function CityDetail() {
               <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
-              <p className="text-sm font-medium text-foreground">¿Eliminar este día?</p>
+              <p className="text-sm font-medium text-foreground">{t('cities.detail.deleteConfirm')}</p>
             </div>
-            <p className="text-xs text-muted-foreground mb-5 ml-11">{dayToDelete?.title} se eliminará permanentemente.</p>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{t('cities.detail.deletePermanent', { title: dayToDelete?.title })}</p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteDialogOpen(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">Cancelar</button>
-              <button onClick={confirmDelete} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
+              <button onClick={() => setDeleteDialogOpen(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
+              <button onClick={confirmDelete} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('cities.detail.delete')}</button>
             </div>
           </div>
         </div>
