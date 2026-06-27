@@ -270,6 +270,7 @@ function LeafletMap({ lat, lng, onMove }) {
 
 // ── Create spot bottom sheet ──────────────────────────────────────────────────
 function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [type, setType] = useState('food');
   const [notes, setNotes] = useState('');
@@ -329,8 +330,8 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
         <div className="flex-shrink-0 px-5 pt-4 pb-4 border-b border-border">
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <p className="font-semibold text-foreground text-base">Crear spot</p>
-            <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <p className="font-semibold text-foreground text-base">{t('spots.create.title')}</p>
+            <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -341,7 +342,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
           {/* Location FIRST (map at top) */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Ubicación</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.location')}</p>
             {/* Map placeholder / real map */}
             <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: 'var(--kodo-bg-subtle)', position: 'relative' }}>
               {showMap
@@ -349,27 +350,27 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
                 : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <MapPin className="w-8 h-8 text-muted-foreground/40" />
-                    <p className="text-xs">Toca para añadir ubicación</p>
+                    <p className="text-xs">{t('spots.create.tapToAddLocation')}</p>
                   </div>
                 )
               }
             </div>
-            <button aria-label="Usar mi ubicación" onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
+            <button aria-label={t('spots.create.useMyLocation')} onClick={() => { if (!pinLat) handleGPS(); setShowMap(true); }}
               className="w-full flex items-center justify-between px-4 py-2.5 border border-border rounded-2xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors mb-2">
-              <span className="flex items-center gap-2"><Navigation className="w-4 h-4"/>{locating ? 'Localizando...' : 'Usar mi ubicación actual'}</span>
+              <span className="flex items-center gap-2"><Navigation className="w-4 h-4"/>{locating ? t('spots.create.locating') : t('spots.create.useMyLocationFull')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <Input value={address} onChange={e => setAddress(e.target.value)}
-              placeholder="o escribe la dirección..." className="h-9 text-sm" />
+              placeholder={t('spots.create.addressPlaceholder')} className="h-9 text-sm" />
           </div>
 
           {/* Name + duplicate check */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('spots.create.name')}</p>
             <Input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="ej. Ichiran Ramen Shinjuku"
+              placeholder={t('spots.create.namePlaceholder')}
               className="h-10 text-sm"
               autoFocus
             />
@@ -377,8 +378,8 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
               <div className="mt-2 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2.5 flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
                 <div>
-                  <p className="text-xs font-medium text-amber-800">Ya existe este spot en {city}</p>
-                  <p className="text-xs text-amber-700 mt-0.5">"{duplicate.title}" ya está en tu lista.</p>
+                  <p className="text-xs font-medium text-amber-800">{t('spots.create.duplicateExists', { city })}</p>
+                  <p className="text-xs text-amber-700 mt-0.5">{t('spots.create.alreadyInListQuoted', { title: duplicate.title })}</p>
                 </div>
               </div>
             )}
@@ -386,7 +387,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
           {/* Type */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.type')}</p>
             <div className="flex flex-wrap gap-2">
               {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
                 <button key={val} onClick={() => setType(val)}
@@ -401,18 +402,18 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
           {/* Notes */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nota</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('spots.create.note')}</p>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="¿Algo que recordar sobre este lugar?"
+              placeholder={t('spots.create.notePlaceholder')}
               className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary"
             />
           </div>
 
           {/* Visibility toggle */}
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.visibility')}</p>
             <div className="flex rounded-xl border border-border overflow-hidden">
               <button onClick={() => setIsPublic(true)}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
@@ -420,23 +421,23 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
               </button>
               <button onClick={() => setIsPublic(false)}
                 className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
-                Solo mi viaje
+                {t('spots.create.tripOnly')}
               </button>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5 px-1">
-              {isPublic ? 'Otros viajeros podrán descubrirlo y guardarlo' : 'Solo tú y tu grupo lo verán'}
+              {isPublic ? t('spots.create.publicHint') : t('spots.create.privateHint')}
             </p>
           </div>
         </div>
 
         {/* Sticky footer buttons */}
         <div className="flex-shrink-0 flex gap-3 px-5 py-4 border-t border-border bg-card">
-          <Button variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+          <Button variant="outline" onClick={onClose} className="flex-1">{t('common.cancel')}</Button>
           <Button
             onClick={handleSave}
             disabled={!title.trim() || saving || !!duplicate}
             className="flex-1 bg-primary hover:bg-primary/90 text-white">
-            {saving ? 'Guardando...' : 'Guardar spot'}
+            {saving ? t('spots.saving') : t('spots.create.save')}
           </Button>
         </div>
       </div>
@@ -446,6 +447,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
 
 // ── OSM result card ───────────────────────────────────────────────────────────
 function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
+  const { t } = useTranslation();
   const tc = TYPE_CONFIG[place.type] || TYPE_CONFIG.custom;
   return (
     <div className={`bg-card rounded-2xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
@@ -456,11 +458,11 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
         <p className="font-semibold text-sm text-foreground leading-tight">{place.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{tc.label}{place.address ? ' · ' + place.address : ''}</p>
         {isDuplicate ? (
-          <p className="text-xs text-amber-600 mt-1.5 font-medium">Ya en tu lista</p>
+          <p className="text-xs text-amber-600 mt-1.5 font-medium">{t('spots.inYourList')}</p>
         ) : (
           <Button size="sm" onClick={() => onSave(place)} disabled={saving}
             className="mt-2 h-7 text-xs bg-primary hover:bg-primary/90 text-white px-3">
-            <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
+            <Plus className="w-3 h-3 mr-1"/>{saving ? t('spots.saving') : t('spots.addShort')}
           </Button>
         )}
       </div>
@@ -470,6 +472,7 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
 
 // ── Assign date modal (shown after saving a spot) ─────────────────────────────
 function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
 
   const tripDates = useMemo(() => {
@@ -511,20 +514,20 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div>
-              <p className="font-semibold text-foreground text-sm">¡Guardado!</p>
+              <p className="font-semibold text-foreground text-sm">{t('spots.assign.saved')}</p>
               <p className="text-xs text-muted-foreground truncate max-w-[220px]">{spot.title}</p>
             </div>
           </div>
 
           {/* Date picker — trip days only */}
-          <p className="text-sm font-semibold text-foreground mb-2">¿Cuándo quieres visitar este spot?</p>
+          <p className="text-sm font-semibold text-foreground mb-2">{t('spots.assign.whenVisit')}</p>
           {tripDates.size > 0 ? (
             <select
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
               className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
             >
-              <option value="">Sin asignar</option>
+              <option value="">{t('spots.assign.unassigned')}</option>
               {(() => {
                 const days = [];
                 const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
@@ -561,7 +564,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             onClick={onUndo}
             className="flex-1 py-3 border border-border rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
           >
-            Deshacer
+            {t('spots.undo')}
           </button>
           <button
             onClick={() => {
@@ -573,7 +576,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             }}
             className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold transition-colors"
           >
-            {selectedDate && isAllowed(selectedDate) ? 'Confirmar' : 'Ahora no'}
+            {selectedDate && isAllowed(selectedDate) ? t('spots.assign.confirm') : t('spots.assign.notNow')}
           </button>
         </div>
       </div>
@@ -583,16 +586,17 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function Toast({ spot, city, onUndo, visible }) {
+  const { t } = useTranslation();
   if (!visible || !spot) return null;
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 max-w-sm mx-auto">
       <div className="bg-foreground rounded-xl px-4 py-3 flex items-center gap-3">
         <CheckCircle2 className="w-5 h-5 text-green-500" />
         <div className="flex-1 min-w-0">
-          <p className="text-white text-sm font-medium truncate">Guardado{city ? ' en ' + city : ''}</p>
+          <p className="text-white text-sm font-medium truncate">{city ? t('spots.toast.savedIn', { city }) : t('spots.toast.saved')}</p>
           <p className="text-white/60 text-xs truncate">{spot.title}</p>
         </div>
-        <button onClick={onUndo} className="text-amber-400 text-xs font-medium flex-shrink-0">Deshacer</button>
+        <button onClick={onUndo} className="text-amber-400 text-xs font-medium flex-shrink-0">{t('spots.undo')}</button>
       </div>
     </div>
   );
@@ -753,7 +757,7 @@ export default function Restaurants() {
 
   const handleNearby = async (cats = nearbyFilter) => {
     if (!navigator.geolocation) {
-      setNearbyResults([{ id:'err', name:'Geolocalización no disponible', address:'Tu navegador no soporta geolocalización', type:'custom' }]);
+      setNearbyResults([{ id:'err', name:t('spots.errors.geoUnavailable'), address:t('spots.errors.geoNotSupported'), type:'custom' }]);
       return;
     }
     setLoadingNearby(true); setNearbyResults([]);
@@ -763,15 +767,15 @@ export default function Restaurants() {
           const res = await nearbyPlaces(pos.coords.latitude, pos.coords.longitude, cats.length ? cats : null);
           setNearbyResults(res);
         } catch(e) {
-          setNearbyResults([{ id:'err', name:'Sin resultados cerca', address: e.message || 'Intenta buscar por nombre', type:'custom' }]);
+          setNearbyResults([{ id:'err', name:t('spots.errors.noNearby'), address: e.message || t('spots.errors.tryByName'), type:'custom' }]);
         } finally { setLoadingNearby(false); }
       },
       (err) => {
         setLoadingNearby(false);
-        const msg = err.code === 1 ? 'Permite el acceso a tu ubicación en el navegador'
-          : err.code === 2 ? 'Ubicación no disponible en este momento'
-          : 'Tiempo de espera agotado. Intenta de nuevo.';
-        setNearbyResults([{ id:'err', name:'No se pudo obtener tu ubicación', address: msg, type:'custom' }]);
+        const msg = err.code === 1 ? t('spots.errors.permission')
+          : err.code === 2 ? t('spots.errors.locUnavailable')
+          : t('spots.errors.timeout');
+        setNearbyResults([{ id:'err', name:t('spots.errors.cantGetLocation'), address: msg, type:'custom' }]);
       },
       { timeout: 10000, enableHighAccuracy: false, maximumAge: 60000 }
     );
@@ -794,7 +798,7 @@ export default function Restaurants() {
   const saveOsmPlace = async place => {
     if (!tripId) return;
     const dup = spots.find(s => s.title?.toLowerCase().trim() === place.name?.toLowerCase().trim());
-    if (dup) { showToastFor({ title: `"${place.name}" ya está en tu lista` }, city); return; }
+    if (dup) { showToastFor({ title: t('spots.create.alreadyInListQuoted', { title: place.name }) }, city); return; }
     setSavingId(place.id);
     try {
       const created = await createMutation.mutateAsync({
@@ -962,18 +966,18 @@ export default function Restaurants() {
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inicio
+                {t('spots.backHome')}
               </button>
             </Link>
             <button onClick={() => setShowCreate(true)}
               className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
-              <Plus className="w-4 h-4" />Crear spot
+              <Plus className="w-4 h-4" />{t('spots.create.title')}
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-1">Spots</h1>
-          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Busca y guarda los sitios que quieres visitar: restaurantes, museos, parques... y asígnales día y hora para completar tu itinerario. Tu tab Hoy en Home los mostrará cuando toca.</p>
+          <h1 className="text-2xl font-semibold text-foreground mb-1">{t('spots.title')}</h1>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">{t('spots.intro')}</p>
           <OTabBar
-            tabs={[{key:'buscar',label:'Buscar'},{key:'mis',label:'Mis spots'}]}
+            tabs={[{key:'buscar',label:t('spots.tabSearch')},{key:'mis',label:t('spots.mySpots')}]}
             activeKey={tab}
             onChange={setTab}
           />
@@ -994,11 +998,11 @@ export default function Restaurants() {
                 <input
                   value={searchQuery}
                   onChange={e => { setSearchQuery(e.target.value); setNearbyResults([]); }}
-                  placeholder="Buscar lugares..."
+                  placeholder={t('spots.search')}
                   className="flex-1 text-sm outline-none bg-transparent text-foreground min-w-0"
                 />
                 {searchQuery && (
-                  <button aria-label="Limpiar búsqueda" onClick={() => { setSearchQuery(''); setOsmResults([]); setNearbyResults([]); }} className="text-muted-foreground flex-shrink-0">
+                  <button aria-label={t('spots.clearSearch')} onClick={() => { setSearchQuery(''); setOsmResults([]); setNearbyResults([]); }} className="text-muted-foreground flex-shrink-0">
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -1007,7 +1011,7 @@ export default function Restaurants() {
                 onClick={() => handleNearby(nearbyFilter)}
                 className="flex items-center gap-1.5 bg-accent text-primary px-3 py-2.5 rounded-full text-sm font-semibold flex-shrink-0 border border-orange-200"
               >
-                <Navigation className="w-3.5 h-3.5" />Cerca
+                <Navigation className="w-3.5 h-3.5" />{t('spots.near')}
               </button>
             </div>
 
@@ -1027,7 +1031,7 @@ export default function Restaurants() {
                 {!showCityInput ? (
                   <button onClick={() => setShowCityInput(true)}
                     className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-full border border-dashed border-primary/40 text-primary bg-accent font-medium">
-                    <Plus className="w-3.5 h-3.5" />Ciudad
+                    <Plus className="w-3.5 h-3.5" />{t('spots.cityShort')}
                   </button>
                 ) : (
                   <div className="flex items-center gap-1">
@@ -1039,10 +1043,10 @@ export default function Restaurants() {
                         if (e.key === 'Enter' && customCity.trim()) { setSelectedCity(customCity.trim()); setShowCityInput(false); setCustomCity(''); }
                         if (e.key === 'Escape') { setShowCityInput(false); setCustomCity(''); }
                       }}
-                      placeholder="Ej: Rivas..."
+                      placeholder={t('spots.cityPlaceholder')}
                       className="text-sm px-3 py-1.5 rounded-full border border-primary outline-none bg-card text-foreground w-28"
                     />
-                    <button aria-label="Cancelar" onClick={() => { setShowCityInput(false); setCustomCity(''); }} className="text-muted-foreground">
+                    <button aria-label={t('common.cancel')} onClick={() => { setShowCityInput(false); setCustomCity(''); }} className="text-muted-foreground">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -1054,11 +1058,11 @@ export default function Restaurants() {
             {!searchQuery && (
               <div className="flex flex-wrap gap-2">
                 {[
-                  { key: 'food',      Icon: Utensils,    label: 'Comer' },
-                  { key: 'cultural',  Icon: Landmark,    label: 'Cultural' },
-                  { key: 'interest',  Icon: Ticket,      label: 'Interés' },
-                  { key: 'shop',      Icon: ShoppingBag, label: 'Compras' },
-                  { key: 'nightlife', Icon: Moon,        label: 'Noche' },
+                  { key: 'food',      Icon: Utensils,    label: t('spots.cat.food') },
+                  { key: 'cultural',  Icon: Landmark,    label: t('spots.cat.cultural') },
+                  { key: 'interest',  Icon: Ticket,      label: t('spots.cat.interest') },
+                  { key: 'shop',      Icon: ShoppingBag, label: t('spots.cat.shopping') },
+                  { key: 'nightlife', Icon: Moon,        label: t('spots.cat.nightlife') },
                 ].map(({ key: k, Icon, label }) => (
                   <button key={k} type="button"
                     onClick={() => {
@@ -1082,7 +1086,7 @@ export default function Restaurants() {
                 <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
                   <Compass className="w-6 h-6 text-muted-foreground/50" />
                 </div>
-                <p className="text-sm text-muted-foreground">Busca un lugar o usa Cerca<br />para descubrir alrededor</p>
+                <p className="text-sm text-muted-foreground">{t('spots.emptySearchLine1')}<br />{t('spots.emptySearchLine2')}</p>
               </div>
             )}
 
@@ -1101,7 +1105,7 @@ export default function Restaurants() {
                   if (!matched.length) return null;
                   return (
                     <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tus spots</p>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t('spots.yourSpots')}</p>
                       <div className="space-y-2">
                         {matched.map(spot => (
                           <button key={spot.id} onClick={() => setSelectedSpot(spot)}
@@ -1114,7 +1118,7 @@ export default function Restaurants() {
                               <p className="text-xs text-muted-foreground truncate">{spot.city_name || city}</p>
                             </div>
                             <span className={`text-xs font-semibold px-2 py-1 rounded-lg flex-shrink-0 ${spot.assigned_date ? 'bg-orange-100 text-primary' : 'bg-green-50 text-green-700'}`}>
-                              {spot.assigned_date ? 'Asignado' : 'Guardado'}
+                              {spot.assigned_date ? t('spots.assignedBadge') : t('spots.savedBadge')}
                             </span>
                           </button>
                         ))}
@@ -1124,10 +1128,10 @@ export default function Restaurants() {
                 })()}
 
                 {/* Resultados OSM */}
-                {searching && <p className="text-sm text-muted-foreground text-center py-4">Buscando...</p>}
+                {searching && <p className="text-sm text-muted-foreground text-center py-4">{t('spots.searching')}</p>}
                 {!searching && osmResults.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Más resultados</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t('spots.moreResults')}</p>
                     <div className="bg-card border border-border rounded-2xl overflow-hidden">
                       {osmResults.map((p, i) => {
                         const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
@@ -1141,7 +1145,7 @@ export default function Restaurants() {
                               {p.address && <p className="text-xs text-muted-foreground truncate">{p.address}</p>}
                             </div>
                             {isDuplicate
-                              ? <span className="text-xs text-muted-foreground flex-shrink-0">Guardado</span>
+                              ? <span className="text-xs text-muted-foreground flex-shrink-0">{t('spots.savedBadge')}</span>
                               : <button onClick={() => saveOsmPlace(p)} disabled={savingId === p.id} className="flex-shrink-0 text-primary hover:text-primary/70 transition-colors">
                                   <Plus className="w-5 h-5" />
                                 </button>
@@ -1154,10 +1158,10 @@ export default function Restaurants() {
                 )}
                 {!searching && searchQuery.length >= 2 && osmResults.length === 0 && (
                   <div className="text-center py-8 bg-card border border-border rounded-2xl">
-                    <p className="text-sm text-muted-foreground">Sin resultados para "{searchQuery}"</p>
+                    <p className="text-sm text-muted-foreground">{t('spots.noResultsFor', { query: searchQuery })}</p>
                     <button onClick={() => setShowCreate(true)}
                       className="mt-3 flex items-center gap-1.5 mx-auto text-sm text-primary font-medium">
-                      <Plus className="w-4 h-4" />Crear manualmente
+                      <Plus className="w-4 h-4" />{t('spots.createManually')}
                     </button>
                   </div>
                 )}
@@ -1165,10 +1169,10 @@ export default function Restaurants() {
             )}
 
             {/* Resultados Cerca */}
-            {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">Obteniendo tu ubicación...</p>}
+            {loadingNearby && <p className="text-sm text-muted-foreground text-center py-4">{t('spots.gettingLocation')}</p>}
             {nearbyResults.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{nearbyResults.length} lugares cerca</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t('spots.nearbyCount', { count: nearbyResults.length })}</p>
                 <div className="bg-card border border-border rounded-2xl overflow-hidden">
                   {nearbyResults.map((p, i) => {
                     const isDuplicate = spots.some(s => s.title?.toLowerCase().trim() === p.name?.toLowerCase().trim());
@@ -1182,7 +1186,7 @@ export default function Restaurants() {
                           <p className="text-xs text-muted-foreground">{p.address || ''}{p.dist ? ` · ${p.dist < 1000 ? p.dist + 'm' : (p.dist/1000).toFixed(1) + 'km'}` : ''}</p>
                         </div>
                         {isDuplicate
-                          ? <span className="text-xs text-muted-foreground flex-shrink-0">Guardado</span>
+                          ? <span className="text-xs text-muted-foreground flex-shrink-0">{t('spots.savedBadge')}</span>
                           : <button onClick={() => saveOsmPlace(p)} disabled={savingId === p.id} className="flex-shrink-0 text-primary hover:text-primary/70 transition-colors">
                               <Plus className="w-5 h-5" />
                             </button>
@@ -1206,9 +1210,9 @@ export default function Restaurants() {
                 <div className="flex items-center justify-between px-4 py-3 border-b border-orange-200 dark:border-primary/20">
                   <div>
                     <p className="text-sm font-medium text-primary">
-                      {importableSpots.length} spot{importableSpots.length !== 1 ? 's' : ''} guardado{importableSpots.length !== 1 ? 's' : ''} en {normalizeCountry(country || trip?.country || '')}
+                      {t('spots.importCount', { count: importableSpots.length, country: normalizeCountry(country || trip?.country || '') })}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">De tu lista personal — ¿los añadimos a este viaje?</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t('spots.importHint')}</p>
                   </div>
                   <button onClick={() => setShowImportPanel(false)} className="text-muted-foreground hover:text-foreground p-1">
                     <X className="w-4 h-4" />
@@ -1228,14 +1232,14 @@ export default function Restaurants() {
                         {savedSpot.city_name && <p className="text-xs text-muted-foreground">{savedSpot.city_name}</p>}
                       </div>
                       {alreadyInTrip ? (
-                        <span className="text-xs text-muted-foreground px-2 py-1 bg-secondary rounded-full flex-shrink-0">Ya añadido</span>
+                        <span className="text-xs text-muted-foreground px-2 py-1 bg-secondary rounded-full flex-shrink-0">{t('spots.alreadyAdded')}</span>
                       ) : (
                         <button
                           onClick={() => importSavedSpot(savedSpot)}
                           disabled={isSaving}
                           className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full flex-shrink-0 disabled:opacity-50"
                         >
-                          {isSaving ? '...' : <><Plus className="w-3 h-3" />Añadir</>}
+                          {isSaving ? '...' : <><Plus className="w-3 h-3" />{t('spots.addShort')}</>}
                         </button>
                       )}
                     </div>
@@ -1250,7 +1254,7 @@ export default function Restaurants() {
               <input
                 value={mySpotSearch}
                 onChange={e => setMySpotSearch(e.target.value)}
-                placeholder="Buscar en mis spots..."
+                placeholder={t('spots.searchMine')}
                 className="w-full pl-9 pr-9 py-2.5 rounded-2xl text-sm outline-none bg-card border border-border focus:border-primary text-foreground"
               />
               {mySpotSearch && (
@@ -1262,7 +1266,7 @@ export default function Restaurants() {
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">
-              {[['all','Todos'],['created','Creados'],['saved',t('restaurants.filters.saved')],['assigned','Asignados']].map(([v,l]) => (
+              {[['all',t('spots.filterAll')],['created',t('spots.filterCreated')],['saved',t('restaurants.filters.saved')],['assigned',t('spots.filterAssigned')]].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                     stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
@@ -1277,11 +1281,11 @@ export default function Restaurants() {
                 <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
                   <MapPin className="w-7 h-7 text-muted-foreground/50" />
                 </div>
-                <p className="text-sm font-medium text-foreground mb-1">Aún no tienes spots en este viaje</p>
-                <p className="text-xs text-muted-foreground mb-5">Busca restaurantes, museos o cualquier plan y guárdalos aquí</p>
+                <p className="text-sm font-medium text-foreground mb-1">{t('spots.emptyTitle')}</p>
+                <p className="text-xs text-muted-foreground mb-5">{t('spots.emptySubtitle')}</p>
                 <button onClick={() => setShowCreate(true)}
                   className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm rounded-full font-medium">
-                  <Plus className="w-4 h-4" />Crear primer spot
+                  <Plus className="w-4 h-4" />{t('spots.createFirst')}
                 </button>
               </div>
             ) : filteredSpots.length === 0 && mySpotSearch.trim().length >= 1 ? (
@@ -1289,8 +1293,8 @@ export default function Restaurants() {
               <div className="space-y-4">
                 <div className="text-center py-6 bg-card rounded-2xl border border-border">
                   <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-foreground mb-1">No tienes ese spot todavía</p>
-                  <p className="text-xs text-muted-foreground">Resultados de búsqueda para <strong>"{mySpotSearch}"</strong></p>
+                  <p className="text-sm font-medium text-foreground mb-1">{t('spots.noLocalTitle')}</p>
+                  <p className="text-xs text-muted-foreground">{t('spots.searchResultsFor')} <strong>"{mySpotSearch}"</strong></p>
                 </div>
                 {/* Show seed matches as suggestions */}
                 {seedSpots.filter(s => s.title?.toLowerCase().includes(mySpotSearch.toLowerCase())).slice(0, 5).map((p, i) => {
@@ -1299,12 +1303,12 @@ export default function Restaurants() {
                 })}
                 <button onClick={() => { setTab('buscar'); setSearchQuery(mySpotSearch); }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-card border border-dashed border-border rounded-2xl text-sm text-primary font-medium hover:bg-orange-50 transition-colors">
-                  <Search className="w-4 h-4" />Buscar "{mySpotSearch}" en el mapa
+                  <Search className="w-4 h-4" />{t('spots.searchOnMap', { query: mySpotSearch })}
                 </button>
               </div>
             ) : filteredSpots.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-muted-foreground text-sm">Sin spots con ese filtro</p>
+                <p className="text-muted-foreground text-sm">{t('spots.noFilterMatch')}</p>
               </div>
             ) : (
               <div className="bg-card rounded-2xl border border-border overflow-hidden">
