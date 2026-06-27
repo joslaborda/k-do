@@ -75,7 +75,7 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
   );
 }
 
-export default function InviteModal({ open, onClose, trip, tripId, queryClient, profiles = [], currentUserEmail = '' }) {
+export default function InviteModal({ open, onClose, trip, tripId, queryClient, profiles = [], currentUserEmail = '', currentUserName = '' }) {
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState('search'); // 'search' | 'email'
   const [emailInput, setEmailInput] = useState('');
@@ -183,8 +183,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       const result = await sendTripInvite({
         tripId, email: resolvedEmail, role: 'editor',
         tripName: trip?.name || 'el viaje',
-        inviterEmail: trip?.created_by || '',
-        inviterName: trip?.created_by || '',
+        inviterEmail: currentUserEmail || trip?.created_by || '',
+        inviterName: currentUserName || currentUserEmail || trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
@@ -205,8 +205,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       const result = await sendTripInvite({
         tripId, email: raw, role: 'editor',
         tripName: trip?.name || 'el viaje',
-        inviterEmail: trip?.created_by || '',
-        inviterName: trip?.created_by || '',
+        inviterEmail: currentUserEmail || trip?.created_by || '',
+        inviterName: currentUserName || currentUserEmail || trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
