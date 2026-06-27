@@ -814,6 +814,47 @@
     "translate": "Traducir",
     "clear": "Limpiar",
     "placeholder": "Escribe aquí...",
-    "result": "Traducción"
+    "result": "Traducción",
+    "original": "Original",
+    "read": "Leer",
+    "copied": "Copiado",
+    "copy": "Copiar",
+    "now": "ahora",
+    "backHome": "Inicio",
+    "offline": "Sin conexión",
+    "errors": {
+      "translate": "No se pudo traducir. Comprueba tu conexión.",
+      "noText": "No se detectó texto. Intenta hablar más claro.",
+      "noMic": "Tu navegador no soporta el micrófono. Usa Chrome o Safari.",
+      "micDenied": "Permiso de micrófono denegado.",
+      "noSpeech": "No se detectó voz. Inténtalo de nuevo.",
+      "recordError": "Error al grabar. Inténtalo de nuevo.",
+      "micStart": "No se pudo iniciar el micrófono."
+    },
+    "voz": {
+      "recording": "Grabando · pulsa para parar",
+      "tapMic": "Pulsa el micrófono y habla",
+      "readsAloud": "Lee la traducción en voz alta"
+    },
+    "texto": {
+      "placeholder": "Escribe en {{lang}}...",
+      "clearInput": "Borrar"
+    },
+    "hist": {
+      "emptyTitle": "Sin traducciones aún",
+      "emptySubtitle": "Tus traducciones aparecerán aquí. Guarda las que más uses.",
+      "saved": "Guardadas",
+      "recent": "Recientes",
+      "clearAll": "Borrar todo"
+    },
+    "tabs": {
+      "voz": "Voz",
+      "texto": "Texto",
+      "historial": "Historial"
+    },
+    "sameLang": {
+      "title": "¡Habláis el mismo idioma!",
+      "body": "En {{flag}} {{country}} hablan {{language}}."
+    }
   }
 }

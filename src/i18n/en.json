@@ -814,6 +814,47 @@
     "translate": "Translate",
     "clear": "Clear",
     "placeholder": "Type here...",
-    "result": "Translation"
+    "result": "Translation",
+    "original": "Original",
+    "read": "Read",
+    "copied": "Copied",
+    "copy": "Copy",
+    "now": "now",
+    "backHome": "Home",
+    "offline": "Offline",
+    "errors": {
+      "translate": "Couldn't translate. Check your connection.",
+      "noText": "No text detected. Try speaking more clearly.",
+      "noMic": "Your browser doesn't support the microphone. Use Chrome or Safari.",
+      "micDenied": "Microphone permission denied.",
+      "noSpeech": "No voice detected. Try again.",
+      "recordError": "Recording error. Try again.",
+      "micStart": "Couldn't start the microphone."
+    },
+    "voz": {
+      "recording": "Recording · tap to stop",
+      "tapMic": "Tap the microphone and speak",
+      "readsAloud": "Reads the translation aloud"
+    },
+    "texto": {
+      "placeholder": "Write in {{lang}}...",
+      "clearInput": "Clear"
+    },
+    "hist": {
+      "emptyTitle": "No translations yet",
+      "emptySubtitle": "Your translations will appear here. Save the ones you use most.",
+      "saved": "Saved",
+      "recent": "Recent",
+      "clearAll": "Clear all"
+    },
+    "tabs": {
+      "voz": "Voice",
+      "texto": "Text",
+      "historial": "History"
+    },
+    "sameLang": {
+      "title": "You speak the same language!",
+      "body": "In {{flag}} {{country}} they speak {{language}}."
+    }
   }
 }
