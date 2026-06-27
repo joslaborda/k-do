@@ -1022,6 +1022,9 @@ export default function Expenses() {
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setSheetOpen(false); setEditingExpense(null);
+      // Las liquidaciones notifican solo al acreedor (en handleSettle), no a todo el grupo
+      const isSettlement = d?.is_settlement === true || (d?.description || '').startsWith('Liquidación:');
+      if (isSettlement) return;
       const others = (trip?.members || []).filter(e => e !== currentUser?.email);
       if (others.length > 0) {
         resolveUserIds(others).then(resolved => {

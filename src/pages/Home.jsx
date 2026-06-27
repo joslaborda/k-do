@@ -101,7 +101,7 @@ export default function Home() {
   const currentUserEmail = currentUser?.email;
   const currentUserId = currentUser?.id;
   const roles = trip?.roles || {};
-  const isAdmin = !trip || roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail || Object.keys(roles).length === 0;
+  const isAdmin = !trip || roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail;
 
   const { activeCity, activeMeta, countryRoute } = useTripContext(tripId);
 
