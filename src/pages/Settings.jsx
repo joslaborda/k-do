@@ -13,7 +13,7 @@ import { setLanguage, getLanguage } from '@/i18n/index.js';
 
 // ── Language Switcher ──────────────────────────────────────────────────────────
 function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const current = getLanguage();
 
   const handleChange = (lang) => {
@@ -25,8 +25,8 @@ function LanguageSwitcher() {
   return (
     <div className="flex items-center justify-between px-4 py-4">
       <div>
-        <p className="text-sm font-medium text-foreground">{current === 'es' ? 'Idioma' : 'Language'}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{current === 'es' ? 'Español / English' : 'Spanish / English'}</p>
+        <p className="text-sm font-medium text-foreground">{t('settings.language')}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{t('settings.languageSub')}</p>
       </div>
       <div className="flex items-center gap-1 bg-secondary rounded-full p-1">
         <button
@@ -141,6 +141,7 @@ function SettingRow({ label, sublabel, right, onClick, isLast = false }) {
 // Password section
 // ─────────────────────────────────────────────────────────────────────────────
 function PasswordSection({ user }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
@@ -149,22 +150,22 @@ function PasswordSection({ user }) {
   const [msg, setMsg] = useState(null);
 
   const handleSave = async () => {
-    if (!current || !next || !repeat) { setMsg({ type:'error', text:'Rellena todos los campos' }); return; }
-    if (next !== repeat) { setMsg({ type:'error', text:'Las contraseñas no coinciden' }); return; }
-    if (next.length < 8) { setMsg({ type:'error', text:'Mínimo 8 caracteres' }); return; }
+    if (!current || !next || !repeat) { setMsg({ type:'error', text:t('settings.pwd.fillAll') }); return; }
+    if (next !== repeat) { setMsg({ type:'error', text:t('settings.pwd.mismatch') }); return; }
+    if (next.length < 8) { setMsg({ type:'error', text:t('settings.pwd.min8') }); return; }
     setSaving(true);
     try {
       await base44.auth.changePassword({ currentPassword: current, newPassword: next });
-      setMsg({ type:'ok', text:'Contraseña actualizada' });
+      setMsg({ type:'ok', text:t('settings.pwd.updated') });
       setCurrent(''); setNext(''); setRepeat('');
       setTimeout(() => { setOpen(false); setMsg(null); }, 1500);
     } catch {
-      setMsg({ type:'error', text:'Contraseña actual incorrecta' });
+      setMsg({ type:'error', text:t('settings.pwd.wrongCurrent') });
     } finally { setSaving(false); }
   };
 
   if (!open) return (
-    <SettingRow label="Cambiar contraseña" isLast
+    <SettingRow label={t('settings.pwd.change')} isLast
       right={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c4bfb9" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}
       onClick={() => setOpen(true)} />
   );
@@ -172,23 +173,23 @@ function PasswordSection({ user }) {
   return (
     <div className="border-t border-border">
       <div className="px-4 py-3 space-y-3">
-        {['Contraseña actual', 'Nueva contraseña', 'Repetir nueva'].map((label, i) => {
+        {[t('settings.pwd.current'), t('settings.pwd.new'), t('settings.pwd.repeat')].map((label, i) => {
           const val = i === 0 ? current : i === 1 ? next : repeat;
           const setVal = i === 0 ? setCurrent : i === 1 ? setNext : setRepeat;
           return (
             <div key={label}>
               <p className="text-xs text-muted-foreground mb-1">{label}</p>
-              <input type="password" value={val} onChange={e => setVal(e.target.value)} aria-label="Nueva contraseña" placeholder="••••••••"
+              <input type="password" value={val} onChange={e => setVal(e.target.value)} aria-label={t('settings.pwd.new')} placeholder="••••••••"
                 className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
             </div>
           );
         })}
         {msg && <p className={`text-xs ${msg.type === 'ok' ? 'text-green-600' : 'text-red-500'}`}>{msg.text}</p>}
         <div className="flex gap-2">
-          <button onClick={() => setOpen(false)} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">Cancelar</button>
+          <button onClick={() => setOpen(false)} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">{t('common.cancel')}</button>
           <button onClick={handleSave} disabled={saving}
             className="flex-1 py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar'}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('common.save')}
           </button>
         </div>
 
@@ -205,16 +206,17 @@ function PasswordSection({ user }) {
 // Delete account confirmation
 // ─────────────────────────────────────────────────────────────────────────────
 function DeleteAccountRow() {
+  const { t } = useTranslation();
   const [confirm, setConfirm] = useState(false);
   if (!confirm) return (
-    <SettingRow label={<span className="text-muted-foreground text-sm">Eliminar cuenta</span>} isLast onClick={() => setConfirm(true)} />
+    <SettingRow label={<span className="text-muted-foreground text-sm">{t('settings.deleteAccount')}</span>} isLast onClick={() => setConfirm(true)} />
   );
   return (
     <div className="px-4 py-3 space-y-2">
-      <p className="text-xs text-red-500">¿Seguro? Esta acción es permanente e irreversible.</p>
+      <p className="text-xs text-red-500">{t('settings.delete.confirm')}</p>
       <div className="flex gap-2">
-        <button onClick={() => setConfirm(false)} className="flex-1 py-2 border border-border rounded-xl text-xs text-muted-foreground">Cancelar</button>
-        <button onClick={() => base44.auth.logout()} className="flex-1 py-2 bg-red-500 text-white rounded-xl text-xs font-medium">Sí, eliminar</button>
+        <button onClick={() => setConfirm(false)} className="flex-1 py-2 border border-border rounded-xl text-xs text-muted-foreground">{t('common.cancel')}</button>
+        <button onClick={() => base44.auth.logout()} className="flex-1 py-2 bg-red-500 text-white rounded-xl text-xs font-medium">{t('settings.delete.yes')}</button>
 
 
       </div>
@@ -226,6 +228,7 @@ function DeleteAccountRow() {
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Settings() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -277,11 +280,11 @@ export default function Settings() {
     if (!username || username === profile?.username) { setUsernameAvailable(null); return; }
     const err = validateUsername(username);
     if (err) { setUsernameAvailable(false); return; }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       const ok = await checkUsernameAvailability(username, user?.id);
       setUsernameAvailable(ok);
     }, 600);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [username, profile?.username, user?.id]);
 
   const handleAvatarUpload = async (file) => {
@@ -294,9 +297,9 @@ export default function Settings() {
   };
 
   const handleSave = async () => {
-    if (!displayName.trim()) { setSaveMsg({ type:'error', text:'El nombre no puede estar vacío' }); return; }
+    if (!displayName.trim()) { setSaveMsg({ type:'error', text:t('settings.errors.nameEmpty') }); return; }
     if (username && validateUsername(username)) { setSaveMsg({ type:'error', text: validateUsername(username) }); return; }
-    if (usernameAvailable === false) { setSaveMsg({ type:'error', text:'Username no disponible' }); return; }
+    if (usernameAvailable === false) { setSaveMsg({ type:'error', text:t('settings.errors.usernameTaken') }); return; }
     setSaving(true);
     try {
       await base44.entities.UserProfile.update(profile.id, {
@@ -313,10 +316,10 @@ export default function Settings() {
         spots_public_default: spotsPublic,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
-      setSaveMsg({ type:'ok', text:'Guardado' });
+      setSaveMsg({ type:'ok', text:t('settings.errors.saved') });
       setTimeout(() => setSaveMsg(null), 2000);
     } catch {
-      setSaveMsg({ type:'error', text:'Error al guardar' });
+      setSaveMsg({ type:'error', text:t('settings.errors.saveError') });
     } finally { setSaving(false); }
   };
 
@@ -342,17 +345,17 @@ export default function Settings() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 12H5M12 5l-7 7 7 7"/>
               </svg>
-              Perfil
+              {t('settings.backProfile')}
             </Link>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Configuración</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('settings.heading')}</h1>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24 space-y-5">
 
         {/* ── PERFIL ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Perfil</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.sectionProfile')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
 
           {/* Avatar */}
@@ -372,7 +375,7 @@ export default function Settings() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground">{displayName}</p>
               <button onClick={() => avatarInputRef.current?.click()}
-                className="text-xs text-primary font-medium">Cambiar foto</button>
+                className="text-xs text-primary font-medium">{t('settings.changePhoto')}</button>
             </div>
             <input ref={avatarInputRef} type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
@@ -380,21 +383,21 @@ export default function Settings() {
 
           {/* Name */}
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs text-muted-foreground mb-1.5">Nombre</p>
-            <input value={displayName} onChange={e => setDisplayName(e.target.value)} aria-label="Nombre completo" placeholder="Tu nombre"
+            <p className="text-xs text-muted-foreground mb-1.5">{t('settings.name')}</p>
+            <input value={displayName} onChange={e => setDisplayName(e.target.value)} aria-label={t('settings.nameAria')} placeholder={t('settings.namePlaceholder')}
               className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
           </div>
 
           {/* Username */}
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs text-muted-foreground mb-1.5">Usuario</p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t('settings.username')}</p>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
-              <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} aria-label="Nombre de usuario" placeholder="tuusuario"
+              <input value={username} onChange={e => setUsername(normalizeUsername(e.target.value))} aria-label={t('settings.usernameAria')} placeholder={t('settings.usernamePlaceholder')}
                 className="w-full h-10 border border-border rounded-xl pl-7 pr-9 text-sm outline-none focus:border-primary bg-secondary" />
               {username && username !== profile.username && usernameAvailable !== null && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-                  {usernameAvailable ? 'Disponible' : 'No disponible'}
+                  {usernameAvailable ? t('settings.available') : t('settings.unavailable')}
                 </span>
               )}
             </div>
@@ -403,12 +406,12 @@ export default function Settings() {
         </div>
 
         {/* ── APARIENCIA ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Apariencia</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.appearance')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="flex items-center justify-between px-4 py-4 border-b border-border">
             <div>
-              <p className="text-sm font-medium text-foreground">Modo oscuro</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Se guarda automáticamente</p>
+              <p className="text-sm font-medium text-foreground">{t('settings.darkMode')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('settings.darkModeSub')}</p>
             </div>
             <DarkModeToggle />
           </div>
@@ -416,10 +419,10 @@ export default function Settings() {
         </div>
 
         {/* ── PREFERENCIAS ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Preferencias</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.preferences')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs text-muted-foreground mb-1.5">País de origen <span className="text-muted-foreground/60">· Embajadas y emergencias</span></p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t('settings.homeCountry')} <span className="text-muted-foreground/60">{t('settings.homeCountrySub')}</span></p>
             <select value={homeCountry} onChange={e => {
               const c = COUNTRIES.find(x => x.name === e.target.value) || COUNTRIES[0];
               setHomeCountry(c.name); setHomeCurrency(c.currency);
@@ -428,12 +431,12 @@ export default function Settings() {
             </select>
           </div>
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs text-muted-foreground mb-1.5">Segunda nacionalidad <span className="text-muted-foreground/60">· Opcional</span></p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t('settings.secondNat')} <span className="text-muted-foreground/60">{t('settings.secondNatSub')}</span></p>
             {/* Searchable second nationality */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar país..."
+                placeholder={t('settings.searchCountry')}
                 value={showSecondNatList ? secondNatQuery : secondNationality || ''}
                 onChange={e => { setSecondNatQuery(e.target.value); setShowSecondNatList(true); }}
                 onFocus={() => { setSecondNatQuery(''); setShowSecondNatList(true); }}
@@ -450,7 +453,7 @@ export default function Settings() {
                 <div className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 max-h-48 overflow-y-auto">
                   <button className="w-full text-left px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
                     onMouseDown={() => { setSecondNationality(''); setSecondNatQuery(''); setShowSecondNatList(false); }}>
-                    Sin segunda nacionalidad
+                    {t('settings.noSecondNat')}
                   </button>
                   {COUNTRIES.filter(c => {
                     const name = typeof c === 'string' ? c : c.name;
@@ -469,11 +472,11 @@ export default function Settings() {
               )}
             </div>
             {secondNationality && (
-              <p className="text-xs text-muted-foreground mt-1.5">En emergencias Kōdo mostrará también la embajada de {secondNationality}</p>
+              <p className="text-xs text-muted-foreground mt-1.5">{t('settings.secondNatHint', { country: secondNationality })}</p>
             )}
           </div>
           <div className="px-4 py-3">
-            <p className="text-xs text-muted-foreground mb-1.5">Moneda base <span className="text-muted-foreground/60">· Gastos y conversiones</span></p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t('settings.baseCurrency')} <span className="text-muted-foreground/60">{t('settings.baseCurrencySub')}</span></p>
             <select value={homeCurrency} onChange={e => setHomeCurrency(e.target.value)}
               className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
               {CURRENCIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
@@ -482,47 +485,47 @@ export default function Settings() {
         </div>
 
         {/* ── NOTIFICACIONES ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Notificaciones</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.notifications')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
-            label="Invitaciones a viajes"
+            label={t('settings.notifInvites')}
             right={<Toggle value={notifInvites} onChange={setNotifInvites} />}
           />
           <SettingRow
-            label="Gastos del grupo"
-            sublabel="Cuando alguien añade un gasto"
+            label={t('settings.notifExpenses')}
+            sublabel={t('settings.notifExpensesSub')}
             right={<Toggle value={notifExpenses} onChange={setNotifExpenses} />}
           />
           <SettingRow
-            label="Comentarios en spots"
+            label={t('settings.notifComments')}
             right={<Toggle value={notifComments} onChange={setNotifComments} />}
             isLast
           />
         </div>
 
         {/* ── PRIVACIDAD ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Privacidad</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.privacy')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
-            label="Spots públicos por defecto"
-            sublabel="Los spots que crees serán visibles para la comunidad"
+            label={t('settings.spotsPublic')}
+            sublabel={t('settings.spotsPublicSub')}
             right={<Toggle value={spotsPublic} onChange={setSpotsPublic} />}
             isLast
           />
         </div>
 
         {/* ── CUENTA ── */}
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">Cuenta</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.account')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <SettingRow
-            label="Email"
+            label={t('settings.email')}
             right={<span className="text-xs text-muted-foreground">{user.email}</span>}
           />
           <PasswordSection user={user} />
           <div className="border-t border-border">
             <button onClick={() => base44.auth.logout()}
               className="w-full text-left px-4 py-3.5 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors border-b border-border">
-              Cerrar sesión
+              {t('settings.logout')}
             </button>
             <DeleteAccountRow />
           </div>
@@ -538,7 +541,7 @@ export default function Settings() {
         )}
         <button onClick={handleSave} disabled={saving}
           className="w-full py-3 bg-primary text-white rounded-full text-sm font-semibold disabled:opacity-40 hover:bg-primary/90 transition-colors">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar cambios'}
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('settings.saveChanges')}
         </button>
       </div>
     </div>
