@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, forwardRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,7 +93,7 @@ function defaultStops(mode) {
 }
 
 // ─── Inline country autocomplete (free-text + suggestions from catalog) ───────
-function CountryField({ value, onChange, hasError, ref: externalRef }) {
+const CountryField = forwardRef(function CountryField({ value, onChange, hasError }, externalRef) {
   const countries = useMemo(() => {
     // All countries from our curated list — guaranteed to work everywhere
     const list = [
@@ -202,7 +202,7 @@ function CountryField({ value, onChange, hasError, ref: externalRef }) {
       )}
     </div>
   );
-}
+});
 
 // ─── Inline city autocomplete ─────────────────────────────────────────────────
 function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
