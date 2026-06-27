@@ -371,6 +371,7 @@ export default function Home() {
         queryClient={queryClient}
         profiles={profiles}
         currentUserEmail={currentUserEmail}
+        currentUserName={myProfile?.display_name || myProfile?.username || currentUserEmail}
       />
     </div>
   );

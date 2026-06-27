@@ -178,6 +178,28 @@ export default function Invites() {
       );
     }
 
+    // El enlace está atado al email invitado: si la sesión es de otra cuenta, avisar.
+    const emailMismatch = currentUser?.email && invite.email &&
+      currentUser.email.toLowerCase() !== invite.email.toLowerCase();
+
+    if (emailMismatch) {
+      return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
+          <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+            <Mail className="w-7 h-7 text-amber-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">Esta invitación es para otra cuenta</h2>
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            La invitación se envió a <span className="font-medium text-foreground">{invite.email}</span>, pero has iniciado sesión como <span className="font-medium text-foreground">{currentUser.email}</span>. Entra con la cuenta invitada para unirte al viaje.
+          </p>
+          <button onClick={() => navigate(createPageUrl('TripsList'))}
+            className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
+            Ir a mis viajes
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-background flex flex-col">
         {/* Header Kōdo */}
