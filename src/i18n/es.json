@@ -481,9 +481,85 @@
     },
     "visibility": {
       "group": "Grupo",
-      "personal": "Solo yo"
+      "personal": "Solo yo",
+      "selected": "Compartido"
     },
-    "titlePlaceholder": "Título del documento"
+    "titlePlaceholder": "Título del documento",
+    "backHome": "Inicio",
+    "new": "Documento",
+    "intro": "Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.",
+    "editTitle": "Editar documento",
+    "deleteConfirm": "¿Eliminar documento?",
+    "deletePermanent": "{{name}} se eliminará permanentemente.",
+    "docFallback": "documento",
+    "cat": {
+      "all": "Todos",
+      "flight": "Vuelos",
+      "hotel": "Hoteles",
+      "train": "Trenes",
+      "other": "Otros"
+    },
+    "row": {
+      "noName": "Sin nombre",
+      "checkIn": "Check-in {{date}}",
+      "route": "Ruta",
+      "date": "Fecha",
+      "end": "Fin",
+      "city": "Ciudad",
+      "notes": "Notas",
+      "viewAttached": "Ver documento adjunto"
+    },
+    "group": {
+      "noDate": "Sin fecha",
+      "today": "Hoy · {{date}}",
+      "tomorrow": "Mañana · {{date}}"
+    },
+    "empty": {
+      "titleAll": "Sin documentos todavía",
+      "titleCat": "Sin documentos en esta categoría",
+      "subtitle": "Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano"
+    },
+    "form": {
+      "type": "Tipo *",
+      "name": "Nombre *",
+      "optional": "— opcional",
+      "selectDay": "Seleccionar día",
+      "visibility": "Visibilidad",
+      "alwaysIncluded": "Siempre incluido",
+      "file": "Archivo adjunto",
+      "fileAttached": "Archivo adjuntado",
+      "removeFile": "Eliminar",
+      "pdfHint": "Toca para ver el PDF a pantalla completa",
+      "uploading": "Subiendo...",
+      "tapToAttach": "Toca para adjuntar",
+      "fileTypes": "PDF, JPG, PNG...",
+      "deleteDoc": "Eliminar documento",
+      "saving": "Guardando...",
+      "fields": {
+        "origin": "Origen",
+        "destination": "Destino",
+        "airline": "Compañía / Nº vuelo",
+        "city": "Ciudad",
+        "date": "Fecha *",
+        "time": "Hora salida",
+        "endTime": "Hora llegada",
+        "endDate": "Fecha de salida / fin",
+        "notes": "Notas",
+        "noteTime": "Hora de la nota"
+      },
+      "ph": {
+        "name": "Ej. Vuelo Madrid-Tokyo",
+        "notes": "Notas adicionales..."
+      },
+      "vis": {
+        "onlyMe": "Solo yo",
+        "onlyMeDesc": "Nadie más puede verlo",
+        "group": "Todo el grupo",
+        "groupDesc": "Visible para todos",
+        "choose": "Elegir",
+        "chooseDesc": "Selecciona quién lo ve"
+      }
+    }
   },
   "profile": {
     "title": "Perfil",
