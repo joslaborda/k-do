@@ -28,9 +28,9 @@ const CATEGORIES = [
 ];
 
 const VISIBILITY_OPTS = [
-  { key: 'personal',       label: 'Solo yo',       desc: 'Nadie más puede verlo'   },
-  { key: 'shared',         label: 'Todo el grupo', desc: 'Visible para todos'      },
-  { key: 'selected_users', label: 'Elegir',        desc: 'Selecciona quién lo ve'  },
+  { key: 'personal',       tk: 'documents.form.vis.onlyMe', dk: 'documents.form.vis.onlyMeDesc' },
+  { key: 'shared',         tk: 'documents.form.vis.group',  dk: 'documents.form.vis.groupDesc'  },
+  { key: 'selected_users', tk: 'documents.form.vis.choose', dk: 'documents.form.vis.chooseDesc' },
 ];
 
 const SHOW_FIELDS = {
@@ -138,7 +138,7 @@ export default function DocumentForm({
 
       {/* Category tabs */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Tipo *</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('documents.form.type')}</p>
         <div className="flex border-b border-border">
           {CATEGORIES.map(cat => (
             <button key={cat.key} onClick={() => setCategory(cat.key)}
@@ -152,9 +152,9 @@ export default function DocumentForm({
 
       {/* Name */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Nombre *</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.name')}</p>
         <Input value={fields.name} onChange={e => setField('name', e.target.value)}
-          placeholder={FIELD_PLACEHOLDERS.name} className="h-10 text-sm" />
+          placeholder={t('documents.form.ph.name')} className="h-10 text-sm" />
       </div>
 
       {/* Origin / Destination */}
@@ -162,14 +162,14 @@ export default function DocumentForm({
         <div className="grid grid-cols-2 gap-3">
           {hasField('origin') && (
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Origen</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.origin')}</p>
               <Input value={fields.origin} onChange={e => setField('origin', e.target.value)}
                 placeholder={FIELD_PLACEHOLDERS.origin} className="h-10 text-sm" />
             </div>
           )}
           {hasField('destination') && (
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Destino</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.destination')}</p>
               <Input value={fields.destination} onChange={e => setField('destination', e.target.value)}
                 placeholder={FIELD_PLACEHOLDERS.destination} className="h-10 text-sm" />
             </div>
@@ -180,7 +180,7 @@ export default function DocumentForm({
       {/* Airline */}
       {hasField('airline') && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Compañía / Nº vuelo</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.airline')}</p>
           <Input value={fields.airline} onChange={e => setField('airline', e.target.value)}
             placeholder={FIELD_PLACEHOLDERS.airline} className="h-10 text-sm" />
         </div>
@@ -189,7 +189,7 @@ export default function DocumentForm({
       {/* City */}
       {hasField('city') && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Ciudad</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.city')}</p>
           <Input value={fields.city} onChange={e => setField('city', e.target.value)}
             placeholder={FIELD_PLACEHOLDERS.city} className="h-10 text-sm" />
         </div>
@@ -200,14 +200,14 @@ export default function DocumentForm({
         <div className={`grid gap-3 ${hasField('date') && hasField('time') ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {hasField('date') && (
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha *</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.date')}</p>
               {useTripDays ? (
                 <select
                   value={fields.date}
                   onChange={e => setField('date', e.target.value)}
                   className="w-full h-10 border border-border rounded-md px-3 text-sm outline-none focus:border-primary bg-input"
                 >
-                  <option value="">Seleccionar día</option>
+                  <option value="">{t('documents.form.selectDay')}</option>
                   {tripDayOptions.map(d => (
                     <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
                   ))}
@@ -219,7 +219,7 @@ export default function DocumentForm({
           )}
           {hasField('time') && (
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{FIELD_LABELS.time}</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.time')}</p>
               <Input type="time" value={fields.time} onChange={e => setField('time', e.target.value)} className="h-10 text-sm" />
             </div>
           )}
@@ -230,7 +230,7 @@ export default function DocumentForm({
       {hasField('end_time') && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
-            {FIELD_LABELS.end_time} <span className="font-normal normal-case tracking-normal text-muted-foreground">— opcional</span>
+            {t('documents.form.fields.endTime')} <span className="font-normal normal-case tracking-normal text-muted-foreground">{t('documents.form.optional')}</span>
           </p>
           <Input type="time" value={fields.end_time} onChange={e => setField('end_time', e.target.value)} className="h-10 text-sm" placeholder={FIELD_PLACEHOLDERS.end_time} />
         </div>
@@ -239,7 +239,7 @@ export default function DocumentForm({
       {/* End date */}
       {hasField('end_date') && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Fecha de salida / fin</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.endDate')}</p>
           <Input type="date" value={fields.end_date} onChange={e => setField('end_date', e.target.value)} className="h-10 text-sm" min={minDate || undefined} max={maxDate || undefined} />
         </div>
       )}
@@ -247,9 +247,9 @@ export default function DocumentForm({
       {/* Notes */}
       {hasField('notes') && (
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">Notas</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.notes')}</p>
           <Textarea value={fields.notes} onChange={e => setField('notes', e.target.value)}
-            placeholder={FIELD_PLACEHOLDERS.notes} className="text-sm resize-none" rows={2} />
+            placeholder={t('documents.form.ph.notes')} className="text-sm resize-none" rows={2} />
         </div>
       )}
 
@@ -257,7 +257,7 @@ export default function DocumentForm({
       {hasField('note_time') && (
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
-            Hora de la nota <span className="font-normal normal-case tracking-normal text-muted-foreground">— opcional</span>
+            {t('documents.form.fields.noteTime')} <span className="font-normal normal-case tracking-normal text-muted-foreground">{t('documents.form.optional')}</span>
           </p>
           <Input type="time" value={fields.note_time} onChange={e => setField('note_time', e.target.value)} className="h-10 text-sm" />
         </div>
@@ -265,7 +265,7 @@ export default function DocumentForm({
 
       {/* Visibility — stacked with description */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Visibilidad</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('documents.form.visibility')}</p>
         <div className="flex flex-col gap-2">
           {VISIBILITY_OPTS.map(opt => (
             <button key={opt.key} onClick={() => setVisibility(opt.key)}
@@ -274,8 +274,8 @@ export default function DocumentForm({
               }`}>
               
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${visibility === opt.key ? 'text-primary' : 'text-foreground'}`}>{opt.label}</p>
-                <p className={`text-xs mt-0.5 ${visibility === opt.key ? 'text-primary/70' : 'text-muted-foreground'}`}>{opt.desc}</p>
+                <p className={`text-sm font-medium ${visibility === opt.key ? 'text-primary' : 'text-foreground'}`}>{t(opt.tk)}</p>
+                <p className={`text-xs mt-0.5 ${visibility === opt.key ? 'text-primary/70' : 'text-muted-foreground'}`}>{t(opt.dk)}</p>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                 visibility === opt.key ? 'bg-primary border-primary' : 'border-border'
@@ -310,7 +310,7 @@ export default function DocumentForm({
                   }
                   <div className="flex-1 min-w-0 text-left">
                     <p className={`text-sm font-medium truncate ${selected ? 'text-primary' : 'text-foreground'}`}>{name}</p>
-                    {isYou && <p className="text-xs text-muted-foreground">Siempre incluido</p>}
+                    {isYou && <p className="text-xs text-muted-foreground">{t('documents.form.alwaysIncluded')}</p>}
                   </div>
                   <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
                     selected ? 'bg-primary' : 'bg-secondary border border-border'
@@ -326,7 +326,7 @@ export default function DocumentForm({
 
       {/* File upload + preview */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Archivo adjunto</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('documents.form.file')}</p>
         {fields.file_url ? (
           <div className="border border-border rounded-xl overflow-hidden">
             {/* Preview row */}
@@ -336,11 +336,11 @@ export default function DocumentForm({
               </svg>
               <button onClick={() => onView && onView(fields.file_url)}
                 className="text-sm text-foreground flex-1 truncate text-left hover:text-primary transition-colors">
-                Archivo adjuntado
+                {t('documents.form.fileAttached')}
               </button>
               <button onClick={() => setField('file_url', '')}
                 className="text-xs text-muted-foreground hover:text-red-500 transition-colors ml-2">
-                Eliminar
+                {t('documents.form.removeFile')}
               </button>
             </div>
             {/* Inline preview for images — clickable to open viewer */}
@@ -355,7 +355,7 @@ export default function DocumentForm({
             {fields.file_url.match(/\.pdf(\?|$)/i) && (
               <button onClick={() => onView && onView(fields.file_url)}
                 className="w-full px-4 py-3 bg-orange-50 border-t border-orange-100 text-left hover:bg-orange-100 transition-colors">
-                <p className="text-xs text-primary">Toca para ver el PDF a pantalla completa</p>
+                <p className="text-xs text-primary">{t('documents.form.pdfHint')}</p>
               </button>
             )}
           </div>
@@ -364,8 +364,8 @@ export default function DocumentForm({
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground mb-2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            <p className="text-sm font-medium text-muted-foreground">{fileUploading ? 'Subiendo...' : 'Toca para adjuntar'}</p>
-            <p className="text-xs text-muted-foreground/60 mt-0.5">PDF, JPG, PNG...</p>
+            <p className="text-sm font-medium text-muted-foreground">{fileUploading ? t('documents.form.uploading') : t('documents.form.tapToAttach')}</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">{t('documents.form.fileTypes')}</p>
             <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif" onChange={handleFileUpload} className="hidden" disabled={fileUploading} />
           </label>
         )}
@@ -374,13 +374,13 @@ export default function DocumentForm({
       {/* Actions */}
       {onDelete && (
         <button onClick={onDelete} className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full border border-red-200 transition-colors">
-          <Trash2 className="w-4 h-4" />Eliminar documento
+          <Trash2 className="w-4 h-4" />{t('documents.form.deleteDoc')}
         </button>
       )}
       <div className="flex gap-3 pt-2">
-        <Button variant="outline" onClick={onCancel} className="flex-1">Cancelar</Button>
+        <Button variant="outline" onClick={onCancel} className="flex-1">{t('common.cancel')}</Button>
         <Button onClick={handleSave} disabled={!fields.name.trim() || saving} className="flex-1 bg-primary hover:bg-primary/90 text-white">
-          {saving ? 'Guardando...' : 'Guardar'}
+          {saving ? t('documents.form.saving') : t('common.save')}
         </Button>
       </div>
     </div>
