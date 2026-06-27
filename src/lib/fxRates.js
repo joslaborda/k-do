@@ -111,7 +111,7 @@ export async function getFxRate(from, to, dateStr = null) {
   if (dateStr) {
     try {
       const result = await fromHistoricalFrankfurter(from, to, dateStr);
-      lsSet(from, to, result.rate, result.source);
+      // No escribir en la caché LS: es una tasa con fecha, no la actual.
       return { ...result, fetchedAt: new Date().toISOString() };
     } catch {}
   }
