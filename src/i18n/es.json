@@ -747,7 +747,13 @@
   "photos": {
     "uploading": "Subiendo fotos...",
     "uploaded": "{{count}} foto",
-    "uploaded_other": "{{count}} fotos"
+    "uploaded_other": "{{count}} fotos",
+    "backHome": "Inicio",
+    "addButton": "Fotos",
+    "title": "Fotos",
+    "progress": "{{current}} de {{total}}",
+    "emptyTitle": "Sin fotos aún",
+    "emptySubtitle": "Sube fotos del viaje o envíalas por el chat del grupo"
   },
   "translator": {
     "translate": "Traducir",

@@ -747,7 +747,13 @@
   "photos": {
     "uploading": "Uploading photos...",
     "uploaded": "{{count}} photo",
-    "uploaded_other": "{{count}} photos"
+    "uploaded_other": "{{count}} photos",
+    "backHome": "Home",
+    "addButton": "Photos",
+    "title": "Photos",
+    "progress": "{{current}} of {{total}}",
+    "emptyTitle": "No photos yet",
+    "emptySubtitle": "Upload trip photos or send them via the group chat"
   },
   "translator": {
     "translate": "Translate",
