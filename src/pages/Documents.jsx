@@ -41,16 +41,16 @@ const ICON_BG = {
   other:     'bg-secondary text-muted-foreground',
 };
 const CAT_TABS = [
-  { key:'all',    label:'Todos'   },
-  { key:'flight', label:'Vuelos'  },
-  { key:'hotel',  label:'Hoteles' },
-  { key:'train',  label:'Trenes'  },
-  { key:'other',  label:'Otros'   },
+  { key:'all',    tk:'documents.cat.all'    },
+  { key:'flight', tk:'documents.cat.flight' },
+  { key:'hotel',  tk:'documents.cat.hotel'  },
+  { key:'train',  tk:'documents.cat.train'  },
+  { key:'other',  tk:'documents.cat.other'  },
 ];
 const VIS = {
-  personal:       { label:'Solo yo',    Icon: Lock,  cls:'bg-secondary text-muted-foreground' },
-  shared:         { label:'Grupo',      Icon: Users, cls:'bg-green-100 text-green-700'       },
-  selected_users: { label:'Compartido', Icon: User,  cls:'bg-blue-100 text-blue-700'         },
+  personal:       { tk:'documents.visibility.personal', Icon: Lock,  cls:'bg-secondary text-muted-foreground' },
+  shared:         { tk:'documents.visibility.group',    Icon: Users, cls:'bg-green-100 text-green-700'       },
+  selected_users: { tk:'documents.visibility.selected', Icon: User,  cls:'bg-blue-100 text-blue-700'         },
 };
 
 // ── Doc row ───────────────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
 
   const displayName = ticket.name || (ticket.origin && ticket.destination
     ? `${ticket.origin} → ${ticket.destination}`
-    : 'Sin nombre');
+    : t('documents.row.noName'));
   const routeLabel = ticket.origin && ticket.destination
     ? `${ticket.origin} → ${ticket.destination}`
     : null;
@@ -75,7 +75,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
   const timeLabel = ticket.time
     ? (ticket.end_time ? `${ticket.time} → ${ticket.end_time}` : ticket.time)
     : cat === 'hotel' && ticket.date
-    ? `Check-in ${format(parseISO(ticket.date), 'dd MMM', { locale: es })}`
+    ? t('documents.row.checkIn', { date: format(parseISO(ticket.date), 'dd MMM', { locale: es }) })
     : ticket.note_time || null;
 
   return (
@@ -113,27 +113,27 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
           <div className="px-4 py-3 bg-secondary/20 space-y-2">
             {/* Visibility badge */}
             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${vis.cls}`}>
-              {vis.Icon && <vis.Icon size={11} className="inline mr-1" />}{vis.label}
+              {vis.Icon && <vis.Icon size={11} className="inline mr-1" />}{t(vis.tk)}
             </span>
 
             {/* Fields */}
             {ticket.origin && ticket.destination && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ruta</span><span className="text-foreground">{ticket.origin} → {ticket.destination}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.route')}</span><span className="text-foreground">{ticket.origin} → {ticket.destination}</span></div>
             )}
             {ticket.date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fecha</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: es })}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.date')}</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: es })}</span></div>
             )}
             {ticket.end_date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Fin</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.end')}</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
             )}
             {ticket.airline && (
               <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.types.flight')}</span><span className="text-foreground">{ticket.airline}</span></div>
             )}
             {ticket.city && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Ciudad</span><span className="text-foreground">{ticket.city}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.city')}</span><span className="text-foreground">{ticket.city}</span></div>
             )}
             {ticket.notes && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">Notas</span><span className="text-foreground">{ticket.notes}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.notes')}</span><span className="text-foreground">{ticket.notes}</span></div>
             )}
 
             {/* File */}
@@ -143,7 +143,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
                 </svg>
-                <span className="text-xs font-medium text-foreground flex-1">Ver documento adjunto</span>
+                <span className="text-xs font-medium text-foreground flex-1">{t('documents.row.viewAttached')}</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
                 </svg>
@@ -155,11 +155,11 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
           <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-card">
             <button onClick={() => onDelete(ticket)}
               className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
-              <Trash2 className="w-3.5 h-3.5" />Eliminar
+              <Trash2 className="w-3.5 h-3.5" />{t('common.delete')}
             </button>
             <button onClick={() => { onEdit(ticket); setOpen(false); }}
               className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground flex items-center gap-1.5 hover:bg-secondary/50 transition-colors">
-              <Pencil className="w-3 h-3" />Editar
+              <Pencil className="w-3 h-3" />{t('common.edit')}
             </button>
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function Documents() {
               tripId,
               tripName: trip?.name,
               refId: newDoc?.id,
-              refTitle: data.name || 'documento',
+              refTitle: data.name || t('documents.docFallback'),
             }));
           });
         }
@@ -302,9 +302,9 @@ export default function Documents() {
     return Object.entries(map).map(([date, items]) => ({
       date, items,
       isToday: date === todayStr,
-      label: date === '__none__' ? 'Sin fecha'
-        : date === todayStr    ? `Hoy · ${format(parseISO(date), 'dd MMM', { locale: es })}`
-        : date === tomorrowStr ? `Mañana · ${format(parseISO(date), 'dd MMM', { locale: es })}`
+      label: date === '__none__' ? t('documents.group.noDate')
+        : date === todayStr    ? t('documents.group.today', { date: format(parseISO(date), 'dd MMM', { locale: es }) })
+        : date === tomorrowStr ? t('documents.group.tomorrow', { date: format(parseISO(date), 'dd MMM', { locale: es }) })
         : format(parseISO(date), "dd MMM · eeee", { locale: es }),
     }));
   }, [filtered]);
@@ -322,19 +322,19 @@ export default function Documents() {
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inicio
+                {t('documents.backHome')}
               </button>
             </Link>
             <button onClick={() => setAddOpen(true)}
               className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
-              <Plus className="w-4 h-4" />Documento
+              <Plus className="w-4 h-4" />{t('documents.new')}
             </button>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-1">{t('documents.title')}</h1>
-          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">Sube a Kōdo vuelos, hoteles, entradas... compártelos con quien quieras en el viaje y asígnales fecha y hora. Tu tab Hoy en Home los mostrará cuando toca.</p>
+          <p className="text-xs text-muted-foreground mb-4 leading-relaxed">{t('documents.intro')}</p>
           {/* Category tabs */}
           <OTabBar
-              tabs={CAT_TABS.map(tab => ({key:tab.key,label:tab.label}))}
+              tabs={CAT_TABS.map(tab => ({key:tab.key,label:t(tab.tk)}))}
               activeKey={catFilter}
               onChange={setCatFilter}
             />
@@ -346,11 +346,11 @@ export default function Documents() {
         {grouped.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border text-center py-16 px-6">
             <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground/30" />
-            <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? 'Sin documentos todavía' : 'Sin documentos en esta categoría'}</p>
-            <p className="text-xs text-muted-foreground mb-5">Sube vuelos, hoteles, entradas y todo lo que necesites tener a mano</p>
+            <p className="text-sm font-medium text-foreground mb-1">{catFilter === 'all' ? t('documents.empty.titleAll') : t('documents.empty.titleCat')}</p>
+            <p className="text-xs text-muted-foreground mb-5">{t('documents.empty.subtitle')}</p>
             <button onClick={() => setAddOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary/90 transition-colors">
-              <Plus className="w-4 h-4" />Añadir documento
+              <Plus className="w-4 h-4" />{t('documents.add')}
             </button>
           </div>
         ) : grouped.map(({ date, label, items, isToday }) => (
@@ -382,7 +382,7 @@ export default function Documents() {
       <Dialog open={!!editDoc} onOpenChange={(o) => { if (!o) setEditDoc(null); }}>
         <DialogContent className="bg-card border-border max-w-lg max-h-[92vh] p-0 gap-0 flex flex-col">
           <DialogHeader className="px-5 py-4 border-b border-border flex-shrink-0">
-            <DialogTitle className="text-base font-semibold">Editar documento</DialogTitle>
+            <DialogTitle className="text-base font-semibold">{t('documents.editTitle')}</DialogTitle>
           </DialogHeader>
           {editDoc && (
             <div className="px-5 py-4 overflow-y-auto flex-1">
@@ -408,9 +408,9 @@ export default function Documents() {
               <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
-              <p className="text-sm font-medium text-foreground">¿Eliminar documento?</p>
+              <p className="text-sm font-medium text-foreground">{t('documents.deleteConfirm')}</p>
             </div>
-            <p className="text-xs text-muted-foreground mb-5 ml-11">{deleteDoc?.name} se eliminará permanentemente.</p>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{t('documents.deletePermanent', { name: deleteDoc?.name })}</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
               <button onClick={() => deleteMutation.mutate(deleteDoc.id)} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
