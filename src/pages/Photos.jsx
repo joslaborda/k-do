@@ -25,7 +25,7 @@ function groupByDate(photos) {
 }
 
 export default function Photos() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -147,7 +147,7 @@ export default function Photos() {
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inicio
+                {t('photos.backHome')}
               </button>
             </Link>
             <button
@@ -158,10 +158,10 @@ export default function Photos() {
               {uploading
                 ? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 : <Plus className="w-4 h-4" />}
-              Fotos
+              {t('photos.addButton')}
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('documents.types.photo', 'Fotos')}</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('photos.title')}</h1>
         </div>
       </div>
 
@@ -182,10 +182,10 @@ export default function Photos() {
           <div className="bg-card border border-border rounded-2xl px-4 py-3">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-foreground">
-                Subiendo fotos...
+                {t('photos.uploading')}
               </p>
               <p className="text-xs text-muted-foreground">
-                {uploadProgress.current} de {uploadProgress.total}
+                {t('photos.progress', { current: uploadProgress.current, total: uploadProgress.total })}
               </p>
             </div>
             <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
@@ -206,8 +206,8 @@ export default function Photos() {
             <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
               <Camera className="w-6 h-6 text-muted-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground">Sin fotos aún</p>
-            <p className="text-xs text-muted-foreground text-center">Sube fotos del viaje o envíalas por el chat del grupo</p>
+            <p className="text-sm font-medium text-foreground">{t('photos.emptyTitle')}</p>
+            <p className="text-xs text-muted-foreground text-center">{t('photos.emptySubtitle')}</p>
           </div>
         )}
 
