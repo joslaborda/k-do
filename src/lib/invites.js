@@ -95,13 +95,21 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
     throw new Error('Invitación inválida o expirada');
   }
 
+  // Seguridad: el enlace de invitación está atado al email invitado.
+  // Evita que un enlace reenviado deje entrar a una cuenta distinta.
+  const normalizedUserEmail = (userEmail || '').toLowerCase();
+  if (invite.email && invite.email.toLowerCase() !== normalizedUserEmail) {
+    const err = new Error(`Esta invitación es para ${invite.email}. Inicia sesión con esa cuenta para unirte al viaje.`);
+    err.code = 'email_mismatch';
+    throw err;
+  }
+
   await base44.entities.TripInvite.update(inviteId, {
     status: 'accepted',
     responded_date: new Date().toISOString()
   });
 
   const trip = await base44.entities.Trip.get(tripId);
-  const normalizedUserEmail = userEmail.toLowerCase();
   const members = trip.members || [];
   const roles = trip.roles || {};
 
