@@ -38,96 +38,11 @@ function EmptyState({ onCreateTrip }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-// ── Trip summary share sheet ──────────────────────────────────────────────────
-function TripSummarySheet({ trip, cities, onClose }) {
-  const { t } = useTranslation();
-  if (!trip) return null;
-  const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString(i18n?.language === 'en' ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const endDate   = trip.end_date   ? new Date(trip.end_date).toLocaleDateString(i18n?.language === 'en' ? 'en-GB' : 'es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const days = trip.start_date && trip.end_date
-    ? Math.round((new Date(trip.end_date) - new Date(trip.start_date)) / 86400000) + 1
-    : null;
-  const countryList = [...new Set([trip.country, ...(cities || []).map(c => c.country)].filter(Boolean))];
-
-  const shareText = [
-    `${trip.name || trip.destination || t('tripslist.myTrip')}`,
-    countryList.length ? `🌍 ${countryList.join(' · ')}` : '',
-    days ? `${days} días · ${startDate}` : '',
-    trip.destination ? `${trip.destination}` : '',
-    '\nOrganizado con Kodo. Planifica tu viaje en kodo.app',
-  ].filter(Boolean).join('\n');
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({ title: trip.name || t('tripslist.myTrip'), text: shareText }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(shareText).then(() => {});
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-[80px]"
-      onClick={onClose}>
-      <div className="bg-card w-full max-w-lg rounded-t-3xl overflow-hidden"
-        onClick={e => e.stopPropagation()}>
-        <div className="pt-3 pb-0 flex justify-center">
-          <div className="w-9 h-1 rounded-full bg-border" />
-        </div>
-        <div className="px-5 py-5">
-          <p className="text-xl font-semibold text-foreground mb-1">{trip.name || trip.destination || t('tripslist.myTrip')}</p>
-          <p className="text-sm text-muted-foreground mb-5">{t('tripslist.tripSummary')}</p>
-
-          <div className="space-y-3 mb-6">
-            {countryList.length > 0 && (
-              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
-                <span className="text-xl">🌍</span>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('tripslist.destinations')}</p>
-                  <p className="text-sm font-medium">{countryList.join(' · ')}</p>
-                </div>
-              </div>
-            )}
-            {days && (
-              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
-                <Calendar className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('common.date')}</p>
-                  <p className="text-sm font-medium">{days} días · {startDate}</p>
-                </div>
-              </div>
-            )}
-            {trip.destination && (
-              <div className="flex items-center gap-3 bg-secondary/50 rounded-xl p-3">
-                <Map className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('tripslist.route')}</p>
-                  <p className="text-sm font-medium">{trip.destination}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-3">
-            <button onClick={onClose}
-              className="flex-1 py-3 bg-secondary border border-border rounded-xl text-sm text-muted-foreground">
-              {t('common.close')}
-            </button>
-            <button onClick={handleShare}
-              className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold">
-              {t('common.share')}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function TripsList() {
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen]           = useState(false);
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
-  const [summaryTrip, setSummaryTrip]         = useState(null); // trip for share summary
   const [showPast, setShowPast] = useState(false);
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
@@ -377,14 +292,6 @@ export default function TripsList() {
         onSubmit={data => createMutation.mutate(data)}
         isPending={createMutation.isPending}
       />
-      {/* ── Trip summary sheet ───────────────────────────────────────── */}
-      {summaryTrip && (
-        <TripSummarySheet
-          trip={summaryTrip.trip}
-          cities={summaryTrip.cities}
-          onClose={() => setSummaryTrip(null)}
-        />
-      )}
 
       {/* ── Post-creation spot discovery popup ─────────────────────── */}
       {newTripPopup && (
