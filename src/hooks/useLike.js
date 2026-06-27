@@ -34,15 +34,10 @@ export function useLike({ targetId, targetType, userId, targetOwnerId }) {
           target_type: targetType,
           target_owner_id: targetOwnerId || null,
         });
-        if (targetOwnerId && targetOwnerId !== userId) {
-          try {
-            
-          } catch {}
-        }
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
   });
 
-  return { isLiked, count, toggle: () => mutation.mutate(), loading: mutation.isPending };
+  return { isLiked, count, toggle: () => { if (!mutation.isPending) mutation.mutate(); }, loading: mutation.isPending };
 }
