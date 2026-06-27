@@ -28,6 +28,6 @@ function useLikeSimple(spotId, userId) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['likes', 'spot', spotId] }),
   });
 
-  return { isLiked, count, toggle: () => { if (isReal && userId) mutation.mutate(); } };
+  return { isLiked, count, toggle: () => { if (isReal && userId && !mutation.isPending) mutation.mutate(); } };
 }
 
