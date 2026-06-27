@@ -37,9 +37,9 @@ const LANGUAGES = [
 ];
 
 const TABS = [
-  { key: 'voz',      label: 'Voz' },
-  { key: 'texto',    label: 'Texto' },
-  { key: 'historial', label: 'Historial' },
+  { key: 'voz',      tk: 'translator.tabs.voz' },
+  { key: 'texto',    tk: 'translator.tabs.texto' },
+  { key: 'historial', tk: 'translator.tabs.historial' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -92,6 +92,7 @@ function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
 
 // ── Result card ───────────────────────────────────────────────────────────────
 function ResultCard({ original, translated, fromLang, toLang, onClear, onSave }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const fromL = LANGUAGES.find(l => l.code === fromLang) || LANGUAGES[0];
   const toL   = LANGUAGES.find(l => l.code === toLang)   || LANGUAGES[1];
@@ -106,26 +107,26 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       {original && (
         <div className="px-4 py-3 border-b border-border">
-          <p className="text-xs text-muted-foreground mb-1">{fromL.flag} Original</p>
+          <p className="text-xs text-muted-foreground mb-1">{fromL.flag} {t('translator.original')}</p>
           <p className="text-sm text-foreground">{original}</p>
         </div>
       )}
       {translated && (
         <div className="px-4 py-3">
-          <p className="text-xs text-muted-foreground mb-1">{toL.flag} Traducción</p>
+          <p className="text-xs text-muted-foreground mb-1">{toL.flag} {t('translator.result')}</p>
           <p className="text-base font-medium text-foreground">{translated}</p>
           <div className="flex gap-2 mt-3 flex-wrap">
             <button
               onClick={() => speakText(translated, toL.bcp)}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg border border-border bg-secondary transition-colors"
             >
-              <Volume2 className="w-3.5 h-3.5" />Leer
+              <Volume2 className="w-3.5 h-3.5" />{t('translator.read')}
             </button>
             <button
               onClick={copy}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border bg-secondary transition-colors"
             >
-              {copied ? <><Check className="w-3.5 h-3.5 text-green-500" />Copiado</> : <><Copy className="w-3.5 h-3.5" />Copiar</>}
+              {copied ? <><Check className="w-3.5 h-3.5 text-green-500" />{t('translator.copied')}</> : <><Copy className="w-3.5 h-3.5" />{t('translator.copy')}</>}
             </button>
             {onSave && (
               <button
@@ -133,14 +134,14 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
                 className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-full border border-orange-200 bg-orange-50 transition-colors ml-auto"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
-                Guardar
+                {t('common.save')}
               </button>
             )}
             <button
               onClick={onClear}
               className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border bg-secondary transition-colors"
             >
-              Limpiar
+              {t('translator.clear')}
             </button>
           </div>
         </div>
@@ -151,6 +152,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
 
 // ── Voice tab ─────────────────────────────────────────────────────────────────
 function VozTab({ fromLang, toLang, onSaveToHistory }) {
+  const { t } = useTranslation();
   const [recording, setRecording] = useState(false);
   const [interim, setInterim]     = useState('');
   const [error, setError]         = useState('');
@@ -173,7 +175,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
         if (translation) speakText(translation, toL.bcp);
       }
     } catch {
-      setError('No se pudo traducir. Comprueba tu conexión.');
+      setError(t('translator.errors.translate'));
     }
   };
 
@@ -188,7 +190,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
         doTranslate(textToTranslate);
         pendingTextRef.current = '';
       } else {
-        setError('No se detectó texto. Intenta hablar más claro.');
+        setError(t('translator.errors.noText'));
       }
       return;
     }
@@ -196,7 +198,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
     // START
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      setError('Tu navegador no soporta el micrófono. Usa Chrome o Safari.');
+      setError(t('translator.errors.noMic'));
       return;
     }
     setError('');
@@ -220,19 +222,19 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
     recognition.onerror = e => {
       recognitionRef.current = null;
       setRecording(false);
-      if (e.error === 'not-allowed') setError('Permiso de micrófono denegado.');
-      else if (e.error === 'no-speech') setError('No se detectó voz. Inténtalo de nuevo.');
+      if (e.error === 'not-allowed') setError(t('translator.errors.micDenied'));
+      else if (e.error === 'no-speech') setError(t('translator.errors.noSpeech'));
       else if (e.error === 'aborted') return;
-      else setError('Error al grabar. Inténtalo de nuevo.');
+      else setError(t('translator.errors.recordError'));
     };
 
     recognition.onresult = e => {
       let interim = '';
       let final = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) final += t;
-        else interim += t;
+        const seg = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += seg;
+        else interim += seg;
       }
       // accumulate finals
       if (final) pendingTextRef.current += ' ' + final;
@@ -246,7 +248,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
     catch {
       recognitionRef.current = null;
       setRecording(false);
-      setError('No se pudo iniciar el micrófono.');
+      setError(t('translator.errors.micStart'));
     }
   };
 
@@ -287,7 +289,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
             <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
               <div className="w-6 h-6 bg-background rounded-md" />
             </div>
-            <p className="text-sm font-medium text-white">Grabando · pulsa para parar</p>
+            <p className="text-sm font-medium text-white">{t('translator.voz.recording')}</p>
             {interim && (
               <p className="text-xs text-white/80 text-center max-w-xs leading-relaxed">{interim}</p>
             )}
@@ -300,8 +302,8 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
                 <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
               </svg>
             </div>
-            <p className="text-sm font-medium text-foreground">Pulsa el micrófono y habla</p>
-            <p className="text-xs text-muted-foreground">{fromL.flag} → {toL.flag} · Lee la traducción en voz alta</p>
+            <p className="text-sm font-medium text-foreground">{t('translator.voz.tapMic')}</p>
+            <p className="text-xs text-muted-foreground">{fromL.flag} → {toL.flag} · {t('translator.voz.readsAloud')}</p>
           </>
         )}
         <style>{`@keyframes wave{from{opacity:.3}to{opacity:1}}`}</style>
@@ -330,6 +332,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
 
 // ── Texto tab ─────────────────────────────────────────────────────────────────
 function TextoTab({ fromLang, toLang, onSaveToHistory }) {
+  const { t } = useTranslation();
   const [input, setInput]       = useState('');
   const [result, setResult]     = useState({ original: '', translated: '' });
   const [loading, setLoading]   = useState(false);
@@ -341,10 +344,10 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
     if (!input.trim()) return;
     setLoading(true); setError(''); setResult({ original: '', translated: '' });
     try {
-      const t = fromLang === toLang ? input : await translateText(input, fromLang, toLang);
-      setResult({ original: input, translated: t });
+      const tr = fromLang === toLang ? input : await translateText(input, fromLang, toLang);
+      setResult({ original: input, translated: tr });
     } catch {
-      setError('No se pudo traducir. Comprueba tu conexión.');
+      setError(t('translator.errors.translate'));
     } finally {
       setLoading(false);
     }
@@ -356,7 +359,7 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
         <div className="px-4 pt-3 pb-1">
           <p className="text-xs text-muted-foreground mb-1.5">{fromL.flag} {fromL.label}</p>
           <textarea
-            placeholder={`Escribe en ${fromL.label}...`}
+            placeholder={t('translator.texto.placeholder', { lang: fromL.label })}
             value={input}
             onChange={e => { setInput(e.target.value); setResult({ original: '', translated: '' }); setError(''); }}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); translate(); } }}
@@ -366,7 +369,7 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
         </div>
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-secondary/30">
           {input
-            ? <button onClick={() => { setInput(''); setResult({ original: '', translated: '' }); }} className="text-xs text-muted-foreground hover:text-foreground">Borrar</button>
+            ? <button onClick={() => { setInput(''); setResult({ original: '', translated: '' }); }} className="text-xs text-muted-foreground hover:text-foreground">{t('translator.texto.clearInput')}</button>
             : <span />
           }
           <div className="flex items-center gap-2">
@@ -383,7 +386,7 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
               className="h-8 px-4 rounded-full bg-primary text-white text-xs font-medium disabled:opacity-40 hover:bg-primary/90 flex items-center gap-1.5 transition-colors"
             >
               {loading && <Loader2 className="w-3 h-3 animate-spin" />}
-              Traducir
+              {t('translator.translate')}
             </button>
           </div>
         </div>
@@ -421,6 +424,7 @@ function saveHistory(h) {
 }
 
 function HistorialTab() {
+  const { t } = useTranslation();
   const [history, setHistory] = useState(() => loadHistory());
 
   const toggle = (id) => {
@@ -470,8 +474,8 @@ function HistorialTab() {
             <path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/>
           </svg>
         </div>
-        <p className="text-sm font-medium text-foreground mb-1">Sin traducciones aún</p>
-        <p className="text-xs text-muted-foreground">Tus traducciones aparecerán aquí. Guarda las que más uses.</p>
+        <p className="text-sm font-medium text-foreground mb-1">{t('translator.hist.emptyTitle')}</p>
+        <p className="text-xs text-muted-foreground">{t('translator.hist.emptySubtitle')}</p>
       </div>
     );
   }
@@ -483,7 +487,7 @@ function HistorialTab() {
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
               <div style={{ height: 3, width: 48, background: 'hsl(var(--primary))', borderRadius: 2, marginBottom: 4 }} />
-              <p className="text-sm font-medium text-foreground">Guardadas</p>
+              <p className="text-sm font-medium text-foreground">{t('translator.hist.saved')}</p>
             </div>
           </div>
           <div className="px-4">
@@ -497,9 +501,9 @@ function HistorialTab() {
           <div className="flex items-end justify-between px-4 pt-4 pb-2 border-b border-border">
             <div>
               <div style={{ height: 3, width: 30, background: 'hsl(var(--primary))', borderRadius: 2, marginBottom: 4 }} />
-              <p className="text-sm font-medium text-foreground">Recientes</p>
+              <p className="text-sm font-medium text-foreground">{t('translator.hist.recent')}</p>
             </div>
-            <button onClick={clearAll} className="text-xs" style={{ color: 'hsl(var(--primary))' }}>Borrar todo</button>
+            <button onClick={clearAll} className="text-xs" style={{ color: 'hsl(var(--primary))' }}>{t('translator.hist.clearAll')}</button>
           </div>
           <div className="px-4">
             {recent.map(item => <HistItem key={item.id} item={item} />)}
@@ -512,6 +516,7 @@ function HistorialTab() {
 
 // ── Main content ──────────────────────────────────────────────────────────────
 function TranslatorContent({ tripId, inPage = false }) {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { trip, activeCity } = useTripContext(tripId);
   const countryRaw = activeCity?.country || trip?.country || '';
@@ -528,7 +533,12 @@ function TranslatorContent({ tripId, inPage = false }) {
   const homeCountry = myProfile?.home_country || 'España';
   const homeMeta = getCountryMeta(homeCountry);
   const homeLangCode = homeMeta.languageCode?.split('-')[0] || 'es';
-  const userLang = LANGUAGES.find(l => l.code === homeLangCode) ? homeLangCode : 'es';
+  // Idioma de origen por defecto: el idioma de la app (elección explícita del
+  // usuario). Si por lo que sea no está en la lista, se usa el país de origen.
+  const uiLangCode = (i18n.language || 'es').split('-')[0];
+  const userLang = LANGUAGES.find(l => l.code === uiLangCode)
+    ? uiLangCode
+    : (LANGUAGES.find(l => l.code === homeLangCode) ? homeLangCode : 'es');
 
   const [tab, setTab]         = useState('voz');
   const [fromLang, setFromLang] = useState(userLang);
@@ -551,7 +561,7 @@ function TranslatorContent({ tripId, inPage = false }) {
       original, translated,
       fromLang: fl, toLang: tl,
       saved: false,
-      timeLabel: 'ahora',
+      timeLabel: t('translator.now'),
     };
     const next = [entry, ...history];
     saveHistory(next);
@@ -564,9 +574,9 @@ function TranslatorContent({ tripId, inPage = false }) {
           <div className="flex items-start gap-3">
             
             <div className="flex-1">
-              <p className="text-sm font-medium text-green-900">¡Habláis el mismo idioma!</p>
+              <p className="text-sm font-medium text-green-900">{t('translator.sameLang.title')}</p>
               <p className="text-sm text-green-700 mt-1 leading-relaxed">
-                En {meta.flag} <strong>{countryRaw}</strong> hablan <strong>{meta.languageLabel}</strong>.
+                {t('translator.sameLang.body', { flag: meta.flag, country: countryRaw, language: meta.languageLabel })}
               </p>
             </div>
             <button
@@ -582,7 +592,7 @@ function TranslatorContent({ tripId, inPage = false }) {
       )}
 
       <div className={isSameLang && !dismissed ? 'mt-4' : inPage ? '' : 'mt-5'}>
-        <OTabBar tabs={TABS} activeKey={tab} onChange={setTab} />
+        <OTabBar tabs={TABS.map(tb => ({ key: tb.key, label: t(tb.tk) }))} activeKey={tab} onChange={setTab} />
       </div>
 
       <div className="py-5 space-y-4">
@@ -648,7 +658,7 @@ export default function Translator() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 12H5M12 5l-7 7 7 7"/>
                 </svg>
-                Inicio
+                {t('translator.backHome')}
               </button>
             </Link>
             {countryRaw && (
@@ -665,7 +675,7 @@ export default function Translator() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" className="flex-shrink-0">
               <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
             </svg>
-            <p className="text-sm text-amber-800 font-medium">Sin conexión</p>
+            <p className="text-sm text-amber-800 font-medium">{t('translator.offline')}</p>
           </div>
         )}
         <TranslatorContent tripId={tripId} inPage={true} />
