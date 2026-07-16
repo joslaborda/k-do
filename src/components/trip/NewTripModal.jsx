@@ -92,7 +92,7 @@ function defaultStops(mode) {
 
 // ─── Inline country autocomplete (free-text + suggestions from catalog) ───────
 const CountryField = forwardRef(function CountryField({ value, onChange, hasError }, externalRef) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   // Lista de países en el idioma activo. `value` es siempre el canónico en
   // español (lo que se guarda en BD); `label` es lo que ve el usuario.
   const countries = useMemo(() => getCountryOptions(i18n.language), [i18n.language]);
@@ -178,7 +178,8 @@ const CountryField = forwardRef(function CountryField({ value, onChange, hasErro
 });
 
 // ─── Inline city autocomplete ─────────────────────────────────────────────────
-function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
+function CityField({ country, value, onChange, placeholder }) {
+  const { t } = useTranslation();
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -212,7 +213,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
           value={q}
           onChange={e => { setQ(e.target.value); onChange(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          placeholder={loading ? 'Cargando...' : placeholder}
+          placeholder={loading ? t('utilities.loading') : (placeholder || t('trip.new.cityPlaceholder'))}
           autoComplete="off"
           className="w-full h-9 border border-border rounded-xl px-3 pr-7 text-sm outline-none focus:border-primary bg-card"
         />
@@ -506,7 +507,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                         country={stop.country}
                         value={stop.city}
                         onChange={v => updateStop(idx, { city: v })}
-                        placeholder={`Ciudad ${idx + 1}...`}
+                        placeholder={t('trip.new.cityN', { n: idx + 1 })}
                       />
                     </div>
                     {mode === 'multi' && stops.length > 1 && (
