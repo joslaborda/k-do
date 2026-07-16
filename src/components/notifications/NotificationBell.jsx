@@ -23,6 +23,7 @@ const TYPE = {
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', labelKey: 'notifications.new' };
 
 function TripInviteModal({ notif, onClose, onAccept }) {
+  const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const { t: translate } = useTranslation();
   const [tripData, setTripData] = useState(null);
