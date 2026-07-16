@@ -191,6 +191,7 @@ function ProgressDots({ current, total }) {
 
 // ── Slide feature: Grupo ──────────────────────────────────────────────────────
 function SlideGrupo() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">3 / 6</p>
@@ -239,6 +240,7 @@ function SlideGrupo() {
 
 // ── Slide feature: Preparativos ───────────────────────────────────────────────
 function SlidePreparativos() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">4 / 6</p>
@@ -314,6 +316,7 @@ function SlidePreparativos() {
 
 // ── Slide feature: Gastos ─────────────────────────────────────────────────────
 function SlideGastos() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">5 / 6</p>
@@ -378,6 +381,7 @@ function SlideGastos() {
 
 // ── Slide feature: Hoy + Spots ────────────────────────────────────────────────
 function SlideHoy() {
+  const { t } = useTranslation();
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">6 / 6</p>
