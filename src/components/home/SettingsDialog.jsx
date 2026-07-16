@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Check, ChevronDown, Trash2, UserPlus, X } from 'lucide-react';
+import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CountryInput from '@/components/trip/CountryInput';
-import { normalizeCountry } from '@/lib/countryConfig';
+import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 
 export default
 function SettingsDialog({
   open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = []
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -143,7 +143,7 @@ function SettingsDialog({
         {/* Fechas */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground mb-1.5">Fechas del viaje</p>
+            <p className="text-xs text-muted-foreground mb-1.5">{t('trip.dialog.tripDates')}</p>
             <div className="flex items-center gap-2">
               <Input
                 type="date"
@@ -170,7 +170,7 @@ function SettingsDialog({
         {/* Paradas */}
         <div className="bg-secondary/50 px-5 py-2 border-b border-border">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Paradas · {cities.length} ciudad{cities.length !== 1 ? 'es' : ''}
+            {t('trip.dialog.stops', { count: cities.length })}
           </p>
         </div>
 
@@ -186,8 +186,8 @@ function SettingsDialog({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">{city.name}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {city.country}
-                  {city.start_date && city.end_date && ` · ${format(parseISO(city.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: es })}`}
+                  {getCountryLabel(city.country, i18n.language)}
+                  {city.start_date && city.end_date && ` · ${format(parseISO(city.start_date), 'dd MMM', { locale: i18n.language === 'en' ? undefined : es })} – ${format(parseISO(city.end_date), 'dd MMM', { locale: i18n.language === 'en' ? undefined : es })}`}
                 </p>
               </div>
               <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${editingCity === city.id ? 'rotate-180' : ''}`} />
@@ -198,21 +198,21 @@ function SettingsDialog({
               <div className="bg-secondary/40 border-b border-border px-5 py-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Ciudad</p>
-                    <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" aria-label="Ciudad de origen" placeholder="Ciudad" />
+                    <p className="text-xs text-muted-foreground mb-1">{t('common.city')}</p>
+                    <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" aria-label={t('trip.dialog.cityAria')} placeholder={t('common.city')} />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">País</p>
-                    <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder="País" />
+                    <p className="text-xs text-muted-foreground mb-1">{t('common.country')}</p>
+                    <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder={t('common.country')} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Fecha inicio</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.startDate')}</p>
                     <Input type="date" value={cityDraft.start_date || ''} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">Fecha fin</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.endDate')}</p>
                     <Input type="date" value={cityDraft.end_date || ''} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
                   </div>
                 </div>
@@ -223,19 +223,19 @@ function SettingsDialog({
                       disabled={cityLoading === city.id}
                       className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors disabled:opacity-50">
                       <Trash2 className="w-3.5 h-3.5" />
-                      {cityLoading === city.id ? 'Eliminando...' : 'Eliminar parada'}
+                      {cityLoading === city.id ? t('trip.dialog.deleting') : t('trip.dialog.deleteStop')}
                     </button>
                   ) : (
-                    <span className="text-xs text-muted-foreground">Mínimo una parada</span>
+                    <span className="text-xs text-muted-foreground">{t('trip.dialog.minOneStop')}</span>
                   )}
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="h-7 text-xs" onClick={closeCityEdit}>
-                      Cancelar
+                      {t('common.cancel')}
                     </Button>
                     <Button size="sm" className="h-7 text-xs bg-primary hover:bg-primary/90 text-white"
                       onClick={() => saveCityEdit(city.id)}
                       disabled={!cityDraft.name?.trim() || cityLoading === city.id}>
-                      {cityLoading === city.id ? 'Guardando...' : 'Listo'}
+                      {cityLoading === city.id ? t('trip.dialog.saving') : t('trip.dialog.done')}
                     </Button>
                   </div>
                 </div>
@@ -247,24 +247,24 @@ function SettingsDialog({
         {/* Nueva parada */}
         {editingCity === 'new' ? (
           <div className="bg-secondary/40 border-b border-border px-5 py-4 space-y-3">
-            <p className="text-xs font-medium text-primary">Nueva parada</p>
+            <p className="text-xs font-medium text-primary">{t('trip.dialog.newStop')}</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Ciudad</p>
-                <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} aria-label="Ciudad" className="h-8 text-sm" placeholder="Ciudad" autoFocus />
+                <p className="text-xs text-muted-foreground mb-1">{t('common.city')}</p>
+                <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} aria-label={t('common.city')} className="h-8 text-sm" placeholder={t('common.city')} autoFocus />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">País</p>
-                <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder="País" />
+                <p className="text-xs text-muted-foreground mb-1">{t('common.country')}</p>
+                <CountryInput value={cityDraft.country || ''} onChange={v => setCityDraft(p => ({ ...p, country: v }))} placeholder={t('common.country')} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Fecha inicio</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.startDate')}</p>
                 <Input type="date" value={cityDraft.start_date || ''} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Fecha fin</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.endDate')}</p>
                 <Input type="date" value={cityDraft.end_date || ''} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
               </div>
             </div>
@@ -275,7 +275,7 @@ function SettingsDialog({
               <Button size="sm" className="h-7 text-xs bg-primary hover:bg-primary/90 text-white"
                 onClick={saveNewCity}
                 disabled={!cityDraft.name?.trim() || cityLoading === 'new'}>
-                {cityLoading === 'new' ? 'Añadiendo...' : 'Añadir'}
+                {cityLoading === 'new' ? t('trip.dialog.adding') : t('common.add')}
               </Button>
             </div>
           </div>
@@ -285,7 +285,7 @@ function SettingsDialog({
             <div className="w-5 h-5 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0">
               <span className="text-muted-foreground text-xs">+</span>
             </div>
-            <span className="text-sm text-muted-foreground">Añadir parada</span>
+            <span className="text-sm text-muted-foreground">{t('trip.dialog.addStop')}</span>
           </button>
         )}
 
@@ -318,15 +318,15 @@ function SettingsDialog({
           {isAdmin && (
             <button onClick={onDelete}
               className="text-sm text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
-              <Trash2 className="w-4 h-4" />Eliminar viaje
+              <Trash2 className="w-4 h-4" />{t('trip.dialog.deleteTrip')}
             </button>
           )}
           <div className="flex gap-2 ml-auto">
-            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
+            <Button variant="outline" size="sm" onClick={onClose}>{t('common.cancel')}</Button>
             <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
               onClick={handleSaveTrip}
               disabled={!name.trim() || saving}>
-              {saving ? 'Guardando...' : 'Guardar'}
+              {saving ? t('trip.dialog.saving') : t('common.save')}
             </Button>
           </div>
         </div>

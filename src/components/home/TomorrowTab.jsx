@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { Calendar } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DayCard from './DayCard';
-import { useTranslation } from 'react-i18next';
 
 export default function TomorrowTab({ trip, cities, tripId }) {
   const queryClient = useQueryClient();
@@ -50,8 +49,8 @@ export default function TomorrowTab({ trip, cities, tripId }) {
       <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
         <Calendar className="w-6 h-6 text-muted-foreground/50" />
       </div>
-      <p className="text-sm font-medium text-foreground mb-1">Nada planificado para mañana</p>
-      <p className="text-xs text-muted-foreground">Añade spots o documentos para el día de mañana</p>
+      <p className="text-sm font-medium text-foreground mb-1">{t('home.tomorrow.emptyTitle')}</p>
+      <p className="text-xs text-muted-foreground">{t('home.tomorrow.emptyHint')}</p>
     </div>
   );
 

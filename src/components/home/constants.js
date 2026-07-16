@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlaneIcon, BusFront } from '@/lib/icons';
-import { AlertTriangle, Car, Cross, DollarSign, FileText, Hotel, Shield, TrainFront, Utensils, Wifi, CirclePlus, Landmark, ShoppingBag, Ticket } from 'lucide-react';
+import { AlertTriangle, Car, Cross, DollarSign, FileText, Hotel, Shield, TrainFront, Utensils, Wifi, CirclePlus, Landmark, ShoppingBag, Ticket, Sun, Cloud, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, CloudFog } from 'lucide-react';
 
 export const REQ_ICON_MAP = {
   visa:    (p) => React.createElement(Shield, Object.assign({ size: 14 }, p)),
@@ -39,4 +39,6 @@ export const SPOT_COLORS = {
   museum: 'bg-violet-50 text-violet-600',
 };
 
-export const WMO_EMOJI = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'🌨️',75:'❄️',80:'🌧️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
+
+// Códigos WMO → icono Lucide (sistema Kōdo: solo Lucide, sin emojis).
+export const WMO_ICON = {0:Sun,1:Sun,2:Cloud,3:Cloud,45:CloudFog,48:CloudFog,51:CloudDrizzle,53:CloudDrizzle,55:CloudRain,61:CloudRain,63:CloudRain,65:CloudRain,71:CloudSnow,73:CloudSnow,75:CloudSnow,80:CloudRain,81:CloudRain,82:CloudLightning,95:CloudLightning,99:CloudLightning};

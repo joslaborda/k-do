@@ -4,6 +4,7 @@ import { Check, Clock, Mail, Search, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { sendTripInvite } from '@/lib/invites';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const AVATAR_COLORS = [
   'bg-orange-100 text-primary',
@@ -31,6 +32,7 @@ function Avatar({ email, profile, size = 36, colorIndex = 0 }) {
 }
 
 function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) {
+  const { t } = useTranslation();
   // status: 'member' | 'pending' | 'available'
   const name = profile?.display_name || profile?.username || email;
   const username = profile?.username ? `@${profile.username}` : email;
@@ -49,7 +51,7 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
           <p className="text-sm font-medium text-foreground truncate">{name}</p>
           {triplesCount > 0 && (
             <span className="text-xs bg-orange-50 text-primary border border-orange-200 rounded-full px-2 py-0.5 flex-shrink-0">
-              {triplesCount} {triplesCount === 1 ? 'viaje' : 'viajes'}
+              {t('invites.modal.tripCount', { count: triplesCount })}
             </span>
           )}
         </div>
@@ -57,25 +59,26 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
       </div>
       {status === 'member' && (
         <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5 flex-shrink-0 flex items-center gap-1">
-          <Check className="w-3 h-3" />Miembro
+          <Check className="w-3 h-3" />{t('common.member')}
         </span>
       )}
       {status === 'pending' && (
         <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 flex-shrink-0 flex items-center gap-1">
-          <Clock className="w-3 h-3" />Pendiente
+          <Clock className="w-3 h-3" />{t('common.pending')}
         </span>
       )}
       {status === 'available' && !sending && (
-        <span className="text-xs text-primary font-medium flex-shrink-0">Invitar →</span>
+        <span className="text-xs text-primary font-medium flex-shrink-0">{t('invites.modal.invite')}</span>
       )}
       {status === 'available' && sending && (
-        <span className="text-xs text-muted-foreground flex-shrink-0">Enviando…</span>
+        <span className="text-xs text-muted-foreground flex-shrink-0">{t('invites.modal.sending')}</span>
       )}
     </button>
   );
 }
 
 export default function InviteModal({ open, onClose, trip, tripId, queryClient, profiles = [], currentUserEmail = '', currentUserName = '' }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState('search'); // 'search' | 'email'
   const [emailInput, setEmailInput] = useState('');
@@ -182,7 +185,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     try {
       const result = await sendTripInvite({
         tripId, email: resolvedEmail, role: 'editor',
-        tripName: trip?.name || 'el viaje',
+        tripName: trip?.name || t('invites.modal.theTrip'),
         inviterEmail: currentUserEmail || trip?.created_by || '',
         inviterName: currentUserName || currentUserEmail || trip?.created_by || '',
       });
@@ -192,19 +195,19 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       setDone(true);
       setTimeout(() => { setDone(false); onClose(); }, 2000);
     } catch (e) {
-      setError(e?.message || 'Error al enviar. Inténtalo de nuevo.');
+      setError(e?.message || t('invites.modal.sendError'));
     }
     setSending(false);
   };
 
   const handleEmailInvite = async () => {
     const raw = emailInput.trim();
-    if (!raw || !raw.includes('@') || raw.startsWith('@')) { setError('Introduce un email válido'); return; }
+    if (!raw || !raw.includes('@') || raw.startsWith('@')) { setError(t('invites.modal.invalidEmail')); return; }
     setSending(true); setError('');
     try {
       const result = await sendTripInvite({
         tripId, email: raw, role: 'editor',
-        tripName: trip?.name || 'el viaje',
+        tripName: trip?.name || t('invites.modal.theTrip'),
         inviterEmail: currentUserEmail || trip?.created_by || '',
         inviterName: currentUserName || currentUserEmail || trip?.created_by || '',
       });
@@ -214,7 +217,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       setDone(true);
       setTimeout(() => { setDone(false); onClose(); }, 2000);
     } catch (e) {
-      setError(e?.message || 'Error al enviar. Inténtalo de nuevo.');
+      setError(e?.message || t('invites.modal.sendError'));
     }
     setSending(false);
   };
@@ -241,10 +244,10 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
-          <p className="text-base font-semibold text-foreground">Invitar al viaje</p>
+          <p className="text-base font-semibold text-foreground">{t('invites.modal.title')}</p>
           <button onClick={onClose}
             className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
-            aria-label="Cerrar">
+            aria-label={t('common.close')}>
             <X className="w-4 h-4 text-foreground" />
           </button>
         </div>
@@ -254,16 +257,16 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
             <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
               <Check className="w-7 h-7 text-green-600" />
             </div>
-            <p className="text-base font-semibold text-foreground">¡Invitación enviada!</p>
+            <p className="text-base font-semibold text-foreground">{t('invites.modal.sent')}</p>
             <p className="text-sm text-muted-foreground text-center">
-              {sentTo} recibirá un enlace para unirse al viaje
+              {t('invites.modal.sentHint', { name: sentTo })}
             </p>
           </div>
         ) : mode === 'email' ? (
           <div className="px-5 pb-8 flex flex-col gap-4 flex-shrink-0">
             <button onClick={() => { setMode('search'); setError(''); }}
               className="text-sm text-primary font-medium text-left">
-              ← Volver a búsqueda por usuario
+              {t('invites.modal.backToSearch')}
             </button>
             <div className={`bg-card border rounded-2xl px-4 py-3 flex items-center gap-2 ${error ? 'border-red-300' : 'border-border'}`}>
               <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -275,7 +278,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
             {error && <p className="text-xs text-red-600 px-1">{error}</p>}
             <button onClick={handleEmailInvite} disabled={!emailInput.trim() || sending}
               className="w-full h-11 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
-              {sending ? 'Enviando…' : 'Enviar invitación'}
+              {sending ? t('invites.modal.sending') : t('invites.modal.sendInvite')}
             </button>
           </div>
         ) : (
@@ -288,7 +291,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                   ref={inputRef}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Buscar por @usuario…"
+                  placeholder={t('invites.modal.searchPlaceholder')}
                   className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                 />
                 {query ? (
@@ -335,8 +338,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-sm text-muted-foreground">Ningún usuario con ese @</p>
-                      <p className="text-xs text-muted-foreground mt-1 opacity-70">¿Aún no está en Kōdo?</p>
+                      <p className="text-sm text-muted-foreground">{t('invites.modal.noUser')}</p>
+                      <p className="text-xs text-muted-foreground mt-1 opacity-70">{t('invites.modal.notYetInKodo')}</p>
                     </div>
                   )}
                 </div>
@@ -345,7 +348,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
               {/* Recommendations — only when not searching */}
               {query.trim().length < 2 && coTravelerProfiles.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Con quién ya has viajado</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('invites.modal.traveledWith')}</p>
                   <div className="bg-card rounded-2xl border border-border overflow-hidden">
                     {coTravelerProfiles.map(({ profile, email, count }) => (
                       <ResultRow key={email}
@@ -362,7 +365,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
               {/* Current members + pending */}
               {query.trim().length < 2 && (members.length > 0 || pendingInvites.length > 0) && (
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">En el viaje</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('invites.modal.onTrip')}</p>
                   <div className="bg-card rounded-2xl border border-border overflow-hidden">
                     {members.map((email, i) => {
                       const prof = profiles.find(p => p.email === email || p.user_email === email);
@@ -378,8 +381,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                             </p>
                           </div>
                           {isAdmin
-                            ? <span className="text-xs bg-orange-50 text-primary border border-orange-200 rounded-full px-2 py-0.5 flex-shrink-0">Admin</span>
-                            : <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5 flex-shrink-0 flex items-center gap-1"><Check className="w-3 h-3" />Miembro</span>
+                            ? <span className="text-xs bg-orange-50 text-primary border border-orange-200 rounded-full px-2 py-0.5 flex-shrink-0">{t('common.admin')}</span>
+                            : <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5 flex-shrink-0 flex items-center gap-1"><Check className="w-3 h-3" />{t('common.member')}</span>
                           }
                         </div>
                       );
@@ -391,9 +394,9 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-foreground truncate">{inv.email}</p>
-                          <p className="text-xs text-muted-foreground">Invitado · pendiente</p>
+                          <p className="text-xs text-muted-foreground">{t('invites.modal.invitedPending')}</p>
                         </div>
-                        <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 flex-shrink-0">Pendiente</span>
+                        <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 flex-shrink-0">{t('common.pending')}</span>
                       </div>
                     ))}
                   </div>
@@ -410,8 +413,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                 className="w-full flex items-center gap-3 px-4 py-3 bg-card border border-dashed border-border rounded-2xl hover:bg-secondary/30 transition-colors">
                 <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-foreground">Invitar por email</p>
-                  <p className="text-xs text-muted-foreground">Para quien no tiene cuenta en Kōdo</p>
+                  <p className="text-sm font-medium text-foreground">{t('invites.modal.byEmail')}</p>
+                  <p className="text-xs text-muted-foreground">{t('invites.modal.byEmailHint')}</p>
                 </div>
                 <span className="text-xs text-muted-foreground">→</span>
               </button>

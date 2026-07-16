@@ -1,18 +1,19 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Clock, FileText, MapPin , CirclePlus } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, FileText, MapPin , CirclePlus, Thermometer } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import ItemDetailSheet from './ItemDetailSheet';
-import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_EMOJI } from './constants';
+import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_ICON } from './constants';
 import { getHolidaysForDate } from '@/lib/holidaysDB';
+import { useTranslation } from 'react-i18next';
 
 export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime }) {
+  const { t } = useTranslation();
   const [open, setOpen]         = useState(defaultOpen);
   const [viewFile, setViewFile] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -86,7 +87,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
           {hasContent && <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>}
         </div>
         {isToday_ && weather && (
-          <span className="text-sm shrink-0 mr-1">{WMO_EMOJI[weather.code] || '🌡️'} <span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>
+          <span className="inline-flex items-center gap-1 shrink-0 mr-1">{(() => { const I = WMO_ICON[weather.code] || Thermometer; return <I className="w-3.5 h-3.5 text-muted-foreground" />; })()}<span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>
         )}
         {open ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
       </button>
@@ -147,7 +148,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                     <p className="text-sm font-medium text-foreground truncate">{item.title || item.name || 'Sin título'}</p>
                     {!isDoc && !isNote && item.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.notes}</p>}
                     {isNote && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.content}</p>}
-                    {isDoc && !hasTime && <p className="text-xs text-muted-foreground mt-0.5">Sin hora · toca para añadir</p>}
+                    {isDoc && !hasTime && <p className="text-xs text-muted-foreground mt-0.5">{t('home.dayCard.noTime')}</p>}
                     {isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
@@ -170,7 +171,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
               <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0"><MapPin size={16} className="text-muted-foreground" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Añade lugares a tu día</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{t('home.dayCard.addPlaces')}</p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>

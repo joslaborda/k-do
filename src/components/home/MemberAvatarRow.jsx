@@ -69,7 +69,7 @@ export default function MemberAvatarRow({
         <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center hover:border-primary/40 transition-colors">
           <UserPlus className="w-4 h-4 text-muted-foreground/50" />
         </div>
-        <span className="text-xs text-muted-foreground">Añadir</span>
+        <span className="text-xs text-muted-foreground">{t('common.add')}</span>
       </button>
     </div>
   );

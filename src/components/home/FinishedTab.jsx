@@ -43,7 +43,7 @@ function TravelersSheet({ open, onClose, trip, profiles }) {
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors"
-            aria-label="Cerrar"
+            aria-label={t('common.close')}
           >
             <X className="w-4 h-4 text-foreground" />
           </button>

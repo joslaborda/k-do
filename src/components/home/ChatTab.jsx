@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { BarChart2, Camera, Check, Download, FileText, Image, MessageCircle, Send, X } from 'lucide-react';
-import PDFViewer from '@/components/PDFViewer';
+import { BarChart2, Camera, Download, FileText, Image, MessageCircle, Send, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
@@ -91,7 +90,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
 
   const handleUpload = async (file) => {
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) { toast({ title: 'Archivo demasiado grande', description: 'Máximo 20MB', variant: 'destructive' }); return; }
+    if (file.size > 20 * 1024 * 1024) { toast({ title: t('chat.fileTooLarge'), description: t('chat.max20mb'), variant: 'destructive' }); return; }
     const isImage = file.type.startsWith('image/');
     const isAudio = file.type.startsWith('audio/');
     setUploading(true);
@@ -104,7 +103,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         file_type: isImage ? 'image' : isAudio ? 'audio' : 'file',
         file_name: file.name,
       });
-    } catch (err) { toast({ title: 'Error al subir', description: err.message, variant: 'destructive' }); }
+    } catch (err) { toast({ title: t('chat.uploadError'), description: err.message, variant: 'destructive' }); }
     finally { setUploading(false); }
   };
 
@@ -144,7 +143,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       setRecording(true);
       // Auto-stop after 60s
       setTimeout(() => { if (mr.state === 'recording') stopRecording(); }, 60000);
-    } catch { toast({ title: 'Micrófono no disponible', description: 'Activa el micrófono en la configuración del navegador', variant: 'destructive' }); }
+    } catch { toast({ title: t('chat.micUnavailable'), description: t('chat.micHint'), variant: 'destructive' }); }
   };
 
   const stopRecording = () => {
@@ -172,10 +171,10 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
           <div className="absolute bottom-36 left-4 bg-card border border-border rounded-2xl shadow-xl p-3 flex gap-3"
             onClick={e => e.stopPropagation()}>
             {[
-              { label: 'Foto', icon: <Image className="w-5 h-5" />, action: () => openPicker('photo') },
-              { label: 'Cámara', icon: <Camera className="w-5 h-5" />, action: () => openPicker('camera') },
-              { label: 'Archivo', icon: <FileText className="w-5 h-5" />, action: () => openPicker('doc') },
-              { label: 'Encuesta', icon: <BarChart2 className="w-5 h-5" />, action: () => { setAttachOpen(false); setPollOpen(true); } },
+              { label: t('common.photo'), icon: <Image className="w-5 h-5" />, action: () => openPicker('photo') },
+              { label: t('chat.camera'), icon: <Camera className="w-5 h-5" />, action: () => openPicker('camera') },
+              { label: t('chat.file'), icon: <FileText className="w-5 h-5" />, action: () => openPicker('doc') },
+              { label: t('chat.poll'), icon: <BarChart2 className="w-5 h-5" />, action: () => { setAttachOpen(false); setPollOpen(true); } },
             ].map(btn => (
               <button key={btn.label} onClick={btn.action}
                 className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl hover:bg-secondary transition-colors">
@@ -197,8 +196,8 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
               <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mb-4">
                 <MessageCircle className="w-6 h-6 text-muted-foreground/50" />
               </div>
-              <p className="text-sm font-medium text-foreground mb-1">Todavía no hay mensajes</p>
-              <p className="text-xs text-muted-foreground">Sé el primero en escribir algo al grupo</p>
+              <p className="text-sm font-medium text-foreground mb-1">{t('chat.emptyTitle')}</p>
+              <p className="text-xs text-muted-foreground">{t('chat.emptyHint')}</p>
             </div>
           )}
           {messages.map((msg, idx) => {
@@ -279,7 +278,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                       <a href={msg.file_url} download={msg.file_name} target="_blank" rel="noopener noreferrer"
                         className={`flex items-center gap-2 px-3 py-2 rounded-2xl text-sm ${me ? 'bg-primary text-white' : 'bg-secondary text-foreground'}`}>
                         <FileText className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate max-w-[110px] text-xs">{msg.file_name||'Archivo'}</span>
+                        <span className="truncate max-w-[110px] text-xs">{msg.file_name||t('chat.file')}</span>
                         <Download className="w-3 h-3" />
                       </a>
                     )}
@@ -292,7 +291,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                             <div className="px-3 pt-2.5 pb-2 border-b border-border">
                               <div className="flex items-center gap-1.5 mb-1">
                                 <BarChart2 className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-xs font-medium text-primary">Encuesta</span>
+                                <span className="text-xs font-medium text-primary">{t('chat.poll')}</span>
                               </div>
                               <p className="text-sm font-medium text-foreground leading-snug">{pd.question}</p>
                             </div>
@@ -340,7 +339,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" className="flex-shrink-0">
               <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
             </svg>
-            <p className="text-xs text-amber-800 font-medium">Sin conexión</p>
+            <p className="text-xs text-amber-800 font-medium">{t('translator.offline')}</p>
           </div>
         )}
         <div className="border-t border-border p-2.5 flex gap-2 items-center">
@@ -403,10 +402,10 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
             <div className="w-9 h-1 bg-border rounded-full mx-auto" />
             <div className="flex items-center gap-2 pb-1">
               <BarChart2 className="w-4 h-4 text-primary" />
-              <p className="text-sm font-medium text-foreground">Nueva encuesta</p>
+              <p className="text-sm font-medium text-foreground">{t('chat.newPoll')}</p>
             </div>
             <input
-              placeholder="¿Cuál es la pregunta?"
+              placeholder={t('chat.pollQuestion')}
               value={pollQuestion}
               onChange={e => setPollQuestion(e.target.value)}
               className="w-full px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50"
@@ -415,7 +414,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
               {pollOptions.map((opt, i) => (
                 <div key={i} className="flex gap-2 items-center">
                   <input
-                    placeholder={`Opción ${i + 1}`}
+                    placeholder={t('chat.pollOption', { n: i + 1 })}
                     value={opt}
                     onChange={e => { const o=[...pollOptions]; o[i]=e.target.value; setPollOptions(o); }}
                     className="flex-1 px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50"
@@ -432,18 +431,18 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
             {pollOptions.length < 5 && (
               <button onClick={() => setPollOptions([...pollOptions, ''])}
                 className="w-full py-2.5 rounded-2xl border border-dashed border-border text-xs text-primary">
-                + Añadir opción
+                {t('chat.addOption')}
               </button>
             )}
             <div className="flex gap-3 pt-1">
               <button onClick={() => setPollOpen(false)}
                 className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">
-                Cancelar
+                {t('common.cancel')}
               </button>
               <button onClick={sendPoll}
                 disabled={!pollQuestion.trim() || pollOptions.filter(o=>o.trim()).length < 2}
                 className="flex-[2] py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
-                Enviar encuesta
+                {t('chat.sendPoll')}
               </button>
             </div>
           </div>

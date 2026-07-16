@@ -8,11 +8,11 @@ import { Calendar, Check, Users } from 'lucide-react';
 import { COUNTRY_REQUIREMENTS, SKIP_VACCINES } from '@/lib/packingDB';
 import { getHolidaysInRange } from '@/lib/holidaysDB';
 import { getVisaInfo } from '@/lib/visaMatrix';
-import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { REQ_ICON_MAP } from './constants';
 import MemberAvatarRow from './MemberAvatarRow';
 
-function buildRequirements(countries, originCountry, secondNationality = null) {
+function buildRequirements(countries, originCountry, secondNationality = null, lang = 'es') {
   const requirements = [];
   const originISO = getCountryMeta(originCountry)?.iso || originCountry;
   const secondISO = secondNationality ? getCountryMeta(secondNationality)?.iso : null;
@@ -33,7 +33,7 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
       origin: originCountry,
-      title: `${originCountry} → ${country}`,
+      title: `${getCountryLabel(originCountry, lang)} → ${getCountryLabel(country, lang)}`,
       description: best?.notes || best?.info || countryData.visa?.info || '',
       level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
     });
@@ -109,7 +109,7 @@ function buildRequirements(countries, originCountry, secondNationality = null) {
 }
 
 export default function PreTripTab({ trip, cities, packingItems, documents, myProfile, profiles, onInvite, currentUserEmail }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const tripId = trip?.id;
   const originCountry = myProfile?.home_country || 'España';
   const [collapsedGroups, setCollapsedGroups] = useState({});
@@ -130,8 +130,8 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
   }, [trip, cities]);
 
   const requirements = useMemo(() =>
-    buildRequirements([...allCountries], originCountry, myProfile?.second_nationality || null),
-    [allCountries, originCountry]
+    buildRequirements([...allCountries], originCountry, myProfile?.second_nationality || null, i18n.language),
+    [allCountries, originCountry, myProfile?.second_nationality, i18n.language]
   );
 
   const toggleCheck = (id) => {
@@ -161,7 +161,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
       {daysLeft !== null && daysLeft >= 0 && (
         <div className="bg-card rounded-2xl border border-border p-5 text-center">
           <p className="text-5xl font-semibold text-primary leading-none">{daysLeft}</p>
-          <p className="text-sm text-muted-foreground mt-1">días para el viaje</p>
+          <p className="text-sm text-muted-foreground mt-1">{t('onboarding.s4.daysToTrip')}</p>
           {sortedCities.length > 0 && (
             <p className="text-xs text-primary mt-2">
               Primera parada: {sortedCities[0].name}
@@ -184,7 +184,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
         </Link>
         <Link to={createPageUrl('Documents') + '?trip_id=' + tripId}>
           <div className="bg-card rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
-            <p className="text-xs text-muted-foreground mb-1">Documentos</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('documents.title')}</p>
             <p className="text-2xl font-semibold text-foreground">{docsCount}</p>
             <p className="text-xs text-muted-foreground mt-1">{docsCount === 0 ? 'Ninguno subido' : `${docsCount} subido${docsCount > 1 ? 's' : ''}`}</p>
           </div>
@@ -195,7 +195,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
-              <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
+              <p className="text-sm font-semibold text-foreground">{t('onboarding.s4.todo')}</p>
               <p className="text-xs text-muted-foreground mt-0.5">pasaporte de {originCountry}</p>
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
                         {req.type === 'visa'
-                          ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">Verificar</span>
+                          ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">{t('pretrip.verify')}</span>
                           : <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">{t('common.recommended')}</span>
                         }
                       </div>
