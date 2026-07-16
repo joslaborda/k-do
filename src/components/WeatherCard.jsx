@@ -1,39 +1,49 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const WMO_CONDITIONS = {
-  0:  { label:'Despejado',             emoji:'☀️',  icon:'sun'     },
-  1:  { label:'Casi despejado',        emoji:'🌤️', icon:'sun'     },
-  2:  { label:'Parcialmente nublado',  emoji:'⛅',  icon:'cloud'   },
-  3:  { label:'Nublado',               emoji:'☁️',  icon:'cloud'   },
-  45: { label:'Niebla',                emoji:'🌫️', icon:'cloud'   },
-  48: { label:'Niebla helada',         emoji:'🌫️', icon:'cloud'   },
-  51: { label:'Llovizna',              emoji:'🌦️', icon:'drizzle' },
-  53: { label:'Llovizna',              emoji:'🌦️', icon:'drizzle' },
-  55: { label:'Llovizna intensa',      emoji:'🌧️', icon:'rain'    },
-  61: { label:'Lluvia',                emoji:'🌧️', icon:'rain'    },
-  63: { label:'Lluvia',                emoji:'🌧️', icon:'rain'    },
-  65: { label:'Lluvia intensa',        emoji:'🌧️', icon:'rain'    },
-  71: { label:'Nieve',                 emoji:'❄️',  icon:'snow'    },
-  73: { label:'Nieve',                 emoji:'🌨️', icon:'snow'    },
-  75: { label:'Nevada intensa',        emoji:'❄️',  icon:'snow'    },
-  80: { label:'Chubascos',             emoji:'🌧️', icon:'rain'    },
-  81: { label:'Chubascos',             emoji:'🌧️', icon:'rain'    },
-  82: { label:'Chubascos fuertes',     emoji:'⛈️',  icon:'thunder' },
-  95: { label:'Tormenta',              emoji:'⛈️',  icon:'thunder' },
-  96: { label:'Granizo',               emoji:'⛈️',  icon:'thunder' },
-  99: { label:'Tormenta con granizo',  emoji:'⛈️',  icon:'thunder' },
+// Códigos WMO → clave i18n + icono Lucide. El campo `icon` ya existía en el
+// código pero no se usaba: ahora es la fuente del icono (antes se pintaba emoji).
+import { Sun, Cloud, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, CloudFog } from 'lucide-react';
+
+// nombre corto → componente Lucide
+const WMO_ICON = {
+  sun: Sun, cloud: Cloud, fog: CloudFog, drizzle: CloudDrizzle,
+  rain: CloudRain, snow: CloudSnow, thunder: CloudLightning,
 };
 
-const DAYS_ES = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const WMO_CONDITIONS = {
+  0:  { tk:'weather.wmo.clear',        icon:'sun'     },
+  1:  { tk:'weather.wmo.mostlyClear',  icon:'sun'     },
+  2:  { tk:'weather.wmo.partlyCloudy', icon:'cloud'   },
+  3:  { tk:'weather.wmo.cloudy',       icon:'cloud'   },
+  45: { tk:'weather.wmo.fog',          icon:'fog'     },
+  48: { tk:'weather.wmo.freezingFog',  icon:'fog'     },
+  51: { tk:'weather.wmo.drizzle',      icon:'drizzle' },
+  53: { tk:'weather.wmo.drizzle',      icon:'drizzle' },
+  55: { tk:'weather.wmo.heavyDrizzle', icon:'rain'    },
+  61: { tk:'weather.wmo.rain',         icon:'rain'    },
+  63: { tk:'weather.wmo.rain',         icon:'rain'    },
+  65: { tk:'weather.wmo.heavyRain',    icon:'rain'    },
+  71: { tk:'weather.wmo.snow',         icon:'snow'    },
+  73: { tk:'weather.wmo.snow',         icon:'snow'    },
+  75: { tk:'weather.wmo.heavySnow',    icon:'snow'    },
+  80: { tk:'weather.wmo.showers',      icon:'rain'    },
+  81: { tk:'weather.wmo.showers',      icon:'rain'    },
+  82: { tk:'weather.wmo.heavyShowers', icon:'thunder' },
+  95: { tk:'weather.wmo.storm',        icon:'thunder' },
+  96: { tk:'weather.wmo.hail',         icon:'thunder' },
+  99: { tk:'weather.wmo.stormHail',    icon:'thunder' },
+};
 
-function fmtDate(dateStr) {
+// Días y meses vienen de Intl según el idioma activo (antes eran tablas en español)
+function fmtDate(dateStr, lang = 'es') {
   const d = new Date(dateStr + 'T12:00:00');
-  return `${d.getDate()} ${MONTHS_ES[d.getMonth()]}`;
+  return d.toLocaleDateString(lang, { day: 'numeric', month: 'short' });
 }
-function fmtDay(dateStr) {
+function fmtDay(dateStr, lang = 'es') {
   const d = new Date(dateStr + 'T12:00:00');
-  return DAYS_ES[d.getDay()];
+  const s = d.toLocaleDateString(lang, { weekday: 'short' });
+  return s.charAt(0).toUpperCase() + s.slice(1).replace('.', '');
 }
 function isToday(dateStr) {
   return dateStr === new Date().toISOString().slice(0, 10);
@@ -68,16 +78,16 @@ async function fetchWeather(lat, lon, timezone) {
 
 function processWeather(data) {
   const code = data.current.weathercode;
-  const cond = WMO_CONDITIONS[code] || { label:'Variable', emoji:'⛅', icon:'cloud' };
+  const cond = WMO_CONDITIONS[code] || { tk:'weather.wmo.variable', icon:'cloud' };
 
   // Daily forecast (5 days)
   const daily = (data.daily.time || []).slice(0, 5).map((date, i) => {
     const dc = data.daily.weathercode[i];
-    const dcond = WMO_CONDITIONS[dc] || { label:'Variable', emoji:'⛅', icon:'cloud' };
+    const dcond = WMO_CONDITIONS[dc] || { tk:'weather.wmo.variable', icon:'cloud' };
     return {
       date,
-      emoji: dcond.emoji,
-      label: dcond.label,
+      icon: dcond.icon,
+      tk: dcond.tk,
       max: Math.round(data.daily.temperature_2m_max[i]),
       min: Math.round(data.daily.temperature_2m_min[i]),
       rain: data.daily.precipitation_probability_max?.[i] ?? 0,
@@ -95,15 +105,15 @@ function processWeather(data) {
     return {
       hour: h,
       temp: idx >= 0 ? Math.round(data.hourly.temperature_2m[idx]) : Math.round(data.current.temperature_2m),
-      emoji: hcond.emoji,
+      icon: hcond.icon,
     };
   });
 
   return {
     temp: Math.round(data.current.temperature_2m),
     feels_like: Math.round(data.current.apparent_temperature),
-    condition: cond.label,
-    emoji: cond.emoji,
+    conditionTk: cond.tk,
+    icon: cond.icon,
     humidity: data.current.relative_humidity_2m,
     wind: Math.round(data.current.windspeed_10m),
     uv: data.current.uv_index ? Math.round(data.current.uv_index) : null,
@@ -113,6 +123,7 @@ function processWeather(data) {
 }
 
 export default function WeatherCard({ city, tripCountry, showCityName = false }) {
+  const { t, i18n } = useTranslation();
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -154,8 +165,8 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
 
   if (error || !weather) return (
     <div className="bg-card rounded-2xl border border-border p-4 flex flex-col items-center justify-center gap-2 min-h-[120px]">
-      <span className="text-3xl">☁️</span>
-      <p className="text-sm text-muted-foreground text-center">{city.name}<br/>Clima no disponible</p>
+      <Cloud className="w-8 h-8 text-border" strokeWidth={1.5} />
+      <p className="text-sm text-muted-foreground text-center">{city.name}<br/>{t('weather.unavailable')}</p>
     </div>
   );
 
@@ -175,14 +186,14 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
         <div className="flex items-start justify-between">
           <div>
             <p className={showCityName ? "text-base font-semibold text-foreground" : "text-sm font-medium text-foreground"}>{city.name || city}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{weather.condition}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t(weather.conditionTk)}</p>
           </div>
           <div className="text-right">
             <div className="flex items-baseline gap-1 justify-end">
               <span className="text-3xl font-medium text-foreground leading-none">{weather.temp}°</span>
-              <span className="text-xl leading-none">{weather.emoji}</span>
+              {(() => { const I = WMO_ICON[weather.icon] || Cloud; return <I className="w-6 h-6 text-primary" strokeWidth={1.5} />; })()}
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">Sensación {weather.feels_like}°</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('weather.feelsLike', { temp: weather.feels_like })}</p>
           </div>
         </div>
       </div>
@@ -203,12 +214,12 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
               }`}
             >
               <span className={`text-xs font-medium leading-none ${isSelected ? 'text-primary' : todayDay ? 'text-primary' : 'text-muted-foreground'}`}>
-                {todayDay ? 'Hoy' : fmtDay(day.date)}
+                {todayDay ? t('cities.day.today') : fmtDay(day.date, i18n.language)}
               </span>
               <span className={`text-xs leading-none ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
-                {fmtDate(day.date)}
+                {fmtDate(day.date, i18n.language)}
               </span>
-              <span className="text-base leading-none mt-0.5">{day.emoji}</span>
+              {(() => { const I = WMO_ICON[day.icon] || Cloud; return <I className="w-4 h-4 my-0.5 text-muted-foreground" strokeWidth={1.5} />; })()}
               <span className={`text-xs font-medium leading-none ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                 {day.max}°
               </span>
@@ -228,15 +239,15 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
           {/* Max / Min / Rain */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Máxima</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('weather.max')}</p>
               <p className="text-base font-medium text-primary">{sel.max}°</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Mínima</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('weather.min')}</p>
               <p className="text-base font-medium text-foreground">{sel.min}°</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Lluvia</p>
+              <p className="text-xs text-muted-foreground mb-1">{t('weather.rain')}</p>
               <p className="text-base font-medium text-foreground">{sel.rain}%</p>
             </div>
           </div>
@@ -244,11 +255,11 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
           {/* Humidity / Wind / UV */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-0.5">Humedad</p>
+              <p className="text-xs text-muted-foreground mb-0.5">{t('weather.humidity')}</p>
               <p className="text-sm font-medium text-foreground">{weather.humidity}%</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-2 text-center">
-              <p className="text-xs text-muted-foreground mb-0.5">Viento</p>
+              <p className="text-xs text-muted-foreground mb-0.5">{t('weather.wind')}</p>
               <p className="text-sm font-medium text-foreground">{weather.wind} km/h</p>
             </div>
             {uvLabel && (
@@ -267,7 +278,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
                 {weather.hourly.map(h => (
                   <div key={h.hour} className="flex-1 text-center bg-card border border-border rounded-lg py-1.5">
                     <p className="text-xs text-muted-foreground mb-1">{h.hour}h</p>
-                    <p className="text-xs leading-none mb-1">{h.emoji}</p>
+                    {(() => { const I = WMO_ICON[h.icon] || Cloud; return <I className="w-3.5 h-3.5 mx-auto mb-1 text-muted-foreground" strokeWidth={1.5} />; })()}
                     <p className="text-xs font-medium text-foreground">{h.temp}°</p>
                   </div>
                 ))}
