@@ -311,7 +311,9 @@
       "nightsExtra_one": "Sobra {{count}} noche respecto al rango",
       "nightsExtra_other": "Sobran {{count}} noches respecto al rango",
       "nightsMissing_one": "Falta {{count}} noche para completar el viaje",
-      "nightsMissing_other": "Faltan {{count}} noches para completar el viaje"
+      "nightsMissing_other": "Faltan {{count}} noches para completar el viaje",
+      "cityPlaceholder": "Ciudad...",
+      "cityN": "Ciudad {{n}}..."
     },
     "activeCity": {
       "nowIn": "Ahora estoy en:",

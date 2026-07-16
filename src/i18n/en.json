@@ -311,7 +311,9 @@
       "nightsExtra_one": "{{count}} night too many for the range",
       "nightsExtra_other": "{{count}} nights too many for the range",
       "nightsMissing_one": "{{count}} night missing to complete the trip",
-      "nightsMissing_other": "{{count}} nights missing to complete the trip"
+      "nightsMissing_other": "{{count}} nights missing to complete the trip",
+      "cityPlaceholder": "City...",
+      "cityN": "City {{n}}..."
     },
     "activeCity": {
       "nowIn": "I'm now in:",
