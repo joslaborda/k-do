@@ -15,6 +15,9 @@ const EMERGENCY_DB = {
   // ── EUROPA ────────────────────────────────────────────────────────────────
 
   'España': {
+    embassy_NZ: { address: 'Pinar 7, 3Rd Floor Madrid 28006', phone: '+34 915 230 226', web: 'https://embassies.net/new-zealand-in-spain/madrid' },
+    embassy_NI: { address: 'Paseo De La Castellana, 127 1º B. 28046 Madrid Spain', phone: '+34 91-555-5510', web: 'https://embassies.net/nicaragua-in-spain/madrid' },
+    embassy_SV: { address: 'Paseo De La Castellana, 178, 1º- D, 28046 Madrid, T Spain', phone: '+34 915 62 80 02', web: 'https://embassies.net/el-salvador-in-spain/madrid' },
     emergency_general: '112',
     police: '091',
     ambulance: '061',
@@ -67,6 +70,10 @@ const EMERGENCY_DB = {
   },
 
   'Francia': {
+    embassy_NZ: { address: 'Ambassade De Nouvelle-Zélande, 103 Rue De Grenelle Paris 75007', phone: '+33 (0)1 45 01 43 43', web: 'https://embassies.net/new-zealand-in-france/paris' },
+    embassy_NI: { address: 'Show map 34 Avenue Bugeaud, 75116 Paris, France', web: 'https://embassies.net/nicaragua-in-france/paris' },
+    embassy_SV: { address: '12 Rue Galilée, 75116 Paris, France', phone: '+33 1 47 20 42 02', web: 'https://embassies.net/el-salvador-in-france/paris' },
+    embassy_CR: { address: '78 Avenue Emile Zola 75007 Paris France', phone: '+33 (1) 4 578 9696', web: 'https://embassies.net/costa-rica-in-france/paris' },
     emergency_general: '112',
     police: '17',
     ambulance: '15',
@@ -126,6 +133,13 @@ const EMERGENCY_DB = {
   },
 
   'Italia': {
+    embassy_NZ: { address: 'Via Clitunno 44 Rome 00198', phone: '+39 06 853 7501', web: 'https://embassies.net/new-zealand-in-italy/rome' },
+    embassy_NI: { address: 'Via Ruffini, 2A, 00195 Roma Rm, Italy', phone: '+39 06 3211 0020', web: 'https://embassies.net/nicaragua-in-italy/rome' },
+    embassy_HN: { address: 'Show map Via Giambattista Vice 40 00196 Roma Italy', phone: '+39 06-320-7236', web: 'https://embassies.net/honduras-in-italy/rome' },
+    embassy_GT: { address: 'Show map Via Giambattista Vico, 20, 00196 Roma Rm, Italy', web: 'https://embassies.net/guatemala-in-italy/rome' },
+    embassy_PA: { address: 'Largo Di Torre Argentina, 11, 00186 Roma Rm, Italy', phone: '+39 06 4425 2173', web: 'https://embassies.net/panama-in-italy/rome' },
+    embassy_DO: { address: 'Show map Via Ludovisi, 16/Piano , Interno 6, 00187 Roma Rm, Italy', phone: '+39 064 543 4789', web: 'https://embassies.net/dominican-republic-in-italy/rome' },
+    embassy_CU: { address: 'Show map Via Licinia No. 7 00153 Roma Italy', phone: '+39-06-5717-24299', web: 'https://embassies.net/cuba-in-italy/rome' },
     emergency_general: '112',
     police: '113',
     ambulance: '118',
@@ -180,6 +194,9 @@ const EMERGENCY_DB = {
   },
 
   'Portugal': {
+    embassy_NZ: { address: 'Rua Do Periquito, Lote A-13Quinta Da Bicuda2750-712 Cascaisportugal', phone: '+351 21 3705779', web: 'https://embassies.net/new-zealand-in-portugal/lisbon' },
+    embassy_CR: { address: 'Casa Escondida Travessa Das Rolas No.25 2705-333 Alto Do Rodizio Colares Sintra Portugal', phone: '+351 219 290 581', web: 'https://embassies.net/costa-rica-in-portugal/lisbon' },
+    embassy_CU: { address: 'Show map R. Pêro Da Covilhã 14, Lisboa, Portugal', web: 'https://embassies.net/cuba-in-portugal/lisbon' },
     emergency_general: '112',
     police: '213 421 634',
     ambulance: '112',
@@ -232,6 +249,7 @@ const EMERGENCY_DB = {
   },
 
   'Alemania': {
+    embassy_NZ: { address: 'Atrium, 4Th Floor, Friedrichstrasse 60 Berlin 10117', phone: '+49 30 206 210', web: 'https://embassies.net/new-zealand-in-germany/berlin' },
     emergency_general: '112',
     police: '110',
     ambulance: '112',
@@ -291,6 +309,14 @@ const EMERGENCY_DB = {
   },
 
   'Reino Unido': {
+    embassy_NZ: { address: 'The Ballance House, 118A Lisburn Road', phone: '+44 28 126 9400', web: 'https://embassies.net/new-zealand-in-united-kingdom/belfast' },
+    embassy_NI: { address: 'Vicarage House, Suites 2 & 3 58-60, Kensington Church St, London W8 4Db, United Kingdom', phone: '+44 20 7938 2373', web: 'https://embassies.net/nicaragua-in-united-kingdom/london' },
+    embassy_HN: { address: 'Show map 4Th Floor, 136 Baker St, Marylebone, London W1U 6Ud, United Kingdom', phone: '+44 20 7486 4880', web: 'https://embassies.net/honduras-in-united-kingdom/london' },
+    embassy_GT: { address: 'Show map 105A Westbourne Grove, Bayswater, London W2 4Uw, United Kingdom', phone: '+44 20 7221 7448', web: 'https://embassies.net/guatemala-in-united-kingdom/london' },
+    embassy_PA: { address: '40 Hertford Street London United Kingdom', phone: '+44 20 7493 4646', web: 'https://embassies.net/panama-in-united-kingdom/london' },
+    embassy_CR: { address: 'Flat 1, 14 Lancaster Gate London W1C 2As United Kingdom', phone: '+44 207 706 8844', web: 'https://embassies.net/costa-rica-in-united-kingdom/london' },
+    embassy_DO: { address: 'Show map 139 Inverness Terrace, Bayswater W2-6Jf London United Kingdom', web: 'https://embassies.net/dominican-republic-in-united-kingdom/london' },
+    embassy_CU: { address: 'Show map 167 High Holborn, Holborn, London Wc1V 6Pa, United Kingdom', phone: '+44 20 7240 2488', web: 'https://embassies.net/cuba-in-united-kingdom/london' },
     emergency_general: '999',
     police: '101 (no urgencias) / 999',
     ambulance: '999',
@@ -341,6 +367,16 @@ const EMERGENCY_DB = {
   },
 
   'Países Bajos': {
+    embassy_NZ: { address: 'Eisenhowerlaan 77N The Hague 2517 Kk', phone: '+31 70 346 9324', web: 'https://embassies.net/new-zealand-in-netherlands/the-hague' },
+    embassy_CA: { address: 'Sophialaan 7, 2514 Jp The Hague, The Netherlands', phone: '+ 31 (0) 70 311-1600', web: 'https://embassies.net/canada-in-netherlands/the-hague' },
+    embassy_IT: { address: 'Alexanderstraat, 12 - 2514 Jl - L’Aja', phone: '+0031703021030', web: 'https://embassies.net/italy-in-netherlands/the-hague' },
+    embassy_DE: { address: 'Show map Groot Hertoginnelaan 18-20 2517 Eg S-Gravenhage Netherlands', phone: '+31 70 342 0600', web: 'https://embassies.net/germany-in-netherlands/the-hague' },
+    embassy_NI: { address: 'Eisenhowerlaan 112, 2517 Km Den Haag, Netherlands', phone: '+31 70 322 5063', web: 'https://embassies.net/nicaragua-in-netherlands/the-hague' },
+    embassy_SV: { address: 'Riouwstraat 137, 2585 Hp Den Haag, The Hague Netherlands', phone: '+31 70 324 9855', web: 'https://embassies.net/el-salvador-in-netherlands/the-hague' },
+    embassy_GT: { address: 'Show map De Ruijterstraat 36, 2518 As Den Haag, Netherlands', phone: '+31 70 302 0253', web: 'https://embassies.net/guatemala-in-netherlands/the-hague' },
+    embassy_PA: { address: 'Amaliastraat 3 2514 Jc The Hague Netherlands', phone: '+31 0 700-211-0580', web: 'https://embassies.net/panama-in-netherlands/the-hague' },
+    embassy_CU: { address: 'Show map Scheveningseweg 9 2517 The Hague Netherlands', phone: '+31-70-360-6061', web: 'https://embassies.net/cuba-in-netherlands/the-hague' },
+    embassy_UY: { address: 'Mauritskade 33, 2514 Hd The Hague Netherlands', phone: '+31 70 360 98 15', web: 'https://embassies.net/uruguay-in-netherlands/the-hague' },
     emergency_general: '112',
     police: '0900-8844',
     ambulance: '112',
@@ -384,6 +420,12 @@ const EMERGENCY_DB = {
   },
 
   'Suiza': {
+    embassy_NZ: { address: '2 Chemin Des Fins Grand-Saconnex 1218 Geneva, Geneva Geneva', phone: '+41 22 929 0350', web: 'https://embassies.net/new-zealand-in-switzerland/geneva' },
+    embassy_NI: { address: 'Rue De Vermont 37/39 1202 Genève Switzerland', phone: '+41 22 736 87 26', web: 'https://embassies.net/nicaragua-in-switzerland/geneva' },
+    embassy_SV: { address: 'Rue De Lausanne 65, 1202 Geneva Switzerland', phone: '+41 22 732 70 36', web: 'https://embassies.net/el-salvador-in-switzerland/geneva' },
+    embassy_GT: { address: 'Show map Jubiläumsstrasse 41, 3005 Bern, Switzerland', phone: '+41 31 351 1070', web: 'https://embassies.net/guatemala-in-switzerland/bern' },
+    embassy_PA: { address: 'Rue De Lausanne 72 1202 Genève Switzerland', phone: '+41 22 715 04 51', web: 'https://embassies.net/panama-in-switzerland/geneva' },
+    embassy_BO: { address: 'Rue De Lausanne 72 1202 Genève Switzerland', phone: '+41 22 731 7189', web: 'https://embassies.net/bolivia-in-switzerland/geneva' },
     emergency_general: '112',
     police: '117',
     ambulance: '144',
@@ -436,6 +478,20 @@ const EMERGENCY_DB = {
   },
 
   'Austria': {
+    embassy_NZ: { address: 'Mattiellistrasse 2-4/3 A-1040 Vienna 1040 Austria', phone: '+43 1 505 3021', web: 'https://embassies.net/new-zealand-in-austria/vienna' },
+    embassy_CA: { address: 'Laurenzenberg 2, A-1010, Vienna, Austria', phone: '+43 (1) 531-38-3000', web: 'https://embassies.net/canada-in-austria/vienna' },
+    embassy_NI: { address: 'Ebendorferstraße 10, 1010 Wien, Austria', phone: '+43 14031838', web: 'https://embassies.net/nicaragua-in-austria/vienna' },
+    embassy_SV: { address: 'Deutschstrasse 1 1040 Wien Austria', phone: '+43 (1) 699 64 94', web: 'https://embassies.net/el-salvador-in-austria/vienna' },
+    embassy_HN: { address: 'Show map Schwindgasse 5, 1040 Wien, Austria', phone: '+43 1 888 7077', web: 'https://embassies.net/honduras-in-austria/vienna' },
+    embassy_GT: { address: 'Show map Landstrasser Hauptstrasse 21/9 1040 Wien Austria', phone: '+43 1 714-3570', web: 'https://embassies.net/guatemala-in-austria/vienna' },
+    embassy_PA: { address: 'Goldschmiedgasse 10/403, 1010 Wien, Austria', web: 'https://embassies.net/panama-in-austria/vienna' },
+    embassy_CR: { address: 'Floßgasse 7, 1020 Wien, Austria', phone: '+43 1 263 3824', web: 'https://embassies.net/costa-rica-in-austria/vienna' },
+    embassy_DO: { address: 'Show map Prinz Eugen Strasse 18/1/33 A-1040 Wien Austria', phone: '+43 1-505-8555', web: 'https://embassies.net/dominican-republic-in-austria/vienna' },
+    embassy_CU: { address: 'Show map Kaiserstrasse No. 84/1/1, A-1070 Viena Austria', phone: '+43 1-877-8198', web: 'https://embassies.net/cuba-in-austria/vienna' },
+    embassy_UY: { address: 'Mahlerstraße 11, 1010 Wien, Austria', phone: '+43 1 5356636', web: 'https://embassies.net/uruguay-in-austria/vienna' },
+    embassy_PY: { address: 'Prinz - Eugen Strasse 18 / 3A Cp1040 - Vienna, Austria', phone: '+ 43 1 505 4674', web: 'https://embassies.net/paraguay-in-austria/vienna' },
+    embassy_BO: { address: 'Prinz Eugen-Straße 18, 1040 Wien, Austria', phone: '+43 1 5874675', web: 'https://embassies.net/bolivia-in-austria/vienna' },
+    embassy_EC: { address: 'Goldschmiedgasse 10, 1010 Wien, Austria', phone: '+43 1 8904434', web: 'https://embassies.net/ecuador-in-austria/vienna' },
     emergency_general: '112',
     police: '133',
     ambulance: '144',
@@ -476,6 +532,12 @@ const EMERGENCY_DB = {
   },
 
   'Grecia': {
+    embassy_NZ: { address: 'Leof. Kifisias 76, Menemeni 115 26, Athens, Greece', phone: '+30 210 6924 136', web: 'https://embassies.net/new-zealand-in-greece/athens' },
+    embassy_SV: { address: '35, Rue Voulis, 1Er Etage Place Syndagma 105 57 Athens Greece', phone: '+30 210.32.22.093', web: 'https://embassies.net/el-salvador-in-greece/athens' },
+    embassy_DO: { address: 'Show map 4 Koumbari Street, Kolonaki Square, Athens, 10674 Greece', web: 'https://embassies.net/dominican-republic-in-greece/athens' },
+    embassy_UY: { address: 'Menandrou 1, Kifisia 145 61, Athens Greece', phone: '+30 21 0360 2635', web: 'https://embassies.net/uruguay-in-greece/athens' },
+    embassy_EC: { address: 'Nikis 4, Athina 105 63, Greece', phone: '+30 21 0756 1675', web: 'https://embassies.net/ecuador-in-greece/athens' },
+    embassy_VE: { address: 'Grecia, Charitos 8, Athina 106 75, Athens Greece', phone: '+30 2106729169', web: 'https://embassies.net/venezuela-in-greece/athens' },
     emergency_general: '112',
     police: '100',
     ambulance: '166',
@@ -525,6 +587,14 @@ const EMERGENCY_DB = {
   },
 
   'Turquía': {
+    embassy_NZ: { address: 'Kizkulesi Sokak No.11 Gaziosmanpaşa Ankara', phone: '+90 312 446 3333', web: 'https://embassies.net/new-zealand-in-turkey/ankara' },
+    embassy_GT: { address: 'Show map Kader Sokak No:42/2 Gaziosmanpasa Ankara Turkey', phone: '+90 312 426 2036', web: 'https://embassies.net/guatemala-in-turkey/ankara' },
+    embassy_PA: { address: 'Portacal Ciecegi Residence Azizlye Mah., Pak Sok N. 1/23 Cankaya, Ankara', phone: '+90 312-439-0220', web: 'https://embassies.net/panama-in-turkey/ankara' },
+    embassy_CR: { address: 'Sheraton Hotel - Suite 515 Ankara Turkey', phone: '+90 722 0066', web: 'https://embassies.net/costa-rica-in-turkey/ankara' },
+    embassy_DO: { address: 'Show map Meclisi Mebusan Cad. No. 31, Kat 6, Murat Han Apt. 34427,Findikli Istanbul Turkey', web: 'https://embassies.net/dominican-republic-in-turkey/istanbul' },
+    embassy_UY: { address: 'Cinnah Caddesi 102/7 Cankaya 06550 Ankara Turkey', phone: '+90 312 440.94.00', web: 'https://embassies.net/uruguay-in-turkey/ankara' },
+    embassy_BO: { address: 'Altan Erbulak Sokak No 3 Kat: 2 80300 Mediciyekoy Istanbul Turkey', web: 'https://embassies.net/bolivia-in-turkey/istanbul' },
+    embassy_EC: { address: 'Show map Kelebek Sok. No: 21/1 Ankara Turkey', phone: '+90 312 446 0160', web: 'https://embassies.net/ecuador-in-turkey/ankara' },
     emergency_general: '112',
     police: '155',
     ambulance: '112',
@@ -575,6 +645,8 @@ const EMERGENCY_DB = {
   },
 
   'República Checa': {
+    embassy_AU: { address: '6Th Floor, Solitaire Bldg Klimentska Ul. 10 Prague 110 00 - 1 Czech Republic', phone: '+420 2 2172 9260', web: 'https://embassies.net/australia-in-czech-republic/prague' },
+    embassy_IT: { address: 'Nerudova, 20 - 118 00 Praha 1', phone: '+ 00420233080111', web: 'https://embassies.net/italy-in-czech-republic/prague' },
     emergency_general: '112',
     police: '158',
     ambulance: '155',
@@ -618,6 +690,12 @@ const EMERGENCY_DB = {
   },
 
   'Hungría': {
+    embassy_NZ: { address: 'Budapest, Nagymező U. 47, 1065 Hungary', phone: '+36 1 302 2484', web: 'https://embassies.net/new-zealand-in-hungary/budapest' },
+    embassy_AU: { address: 'Kiralyhago Ter 8-9 Budapest 1126 Hungary.', phone: '+36 1 457 9777', web: 'https://embassies.net/australia-in-hungary/budapest' },
+    embassy_PA: { address: 'Endrodi Sandor Utca 49 B 1026 Budapest Hungary', web: 'https://embassies.net/panama-in-hungary/budapest' },
+    embassy_BO: { address: 'Szilegyi Dezso Ter 7 Mfsz 4. 1011 Budapest Hungary', phone: '+36 (1) 214 7551', web: 'https://embassies.net/bolivia-in-hungary/budapest' },
+    embassy_EC: { address: 'Budapest, Andrássy Út 20, 1061 Hungary', web: 'https://embassies.net/ecuador-in-hungary/budapest' },
+    embassy_VE: { address: 'Vérhalom U. 12-16. I/14 1063 Budapest Hungary', phone: '+36 233 331 568', web: 'https://embassies.net/venezuela-in-hungary/budapest' },
     emergency_general: '112',
     police: '107',
     ambulance: '104',
@@ -664,6 +742,9 @@ const EMERGENCY_DB = {
   },
 
   'Polonia': {
+    embassy_NZ: { address: 'Al. Ujazdowskie 51 Warsaw 00-536', phone: '+48 22 521 0500', web: 'https://embassies.net/new-zealand-in-poland/warsaw' },
+    embassy_CR: { address: 'Ul. Kubickiego 9, M.5 02-954 Warsaw, Poland', phone: '(0048) 22 858 9112', web: 'https://embassies.net/costa-rica-in-poland/warsaw' },
+    embassy_EC: { address: 'Ulica Rejtana 15/15, 02-516 Warszawa, Warsaw (Warszawa)', phone: '(48 22) 848 81 96', web: 'https://embassies.net/ecuador-in-poland/warsaw' },
     emergency_general: '112',
     police: '997',
     ambulance: '999',
@@ -713,6 +794,11 @@ const EMERGENCY_DB = {
   // ── ASIA ──────────────────────────────────────────────────────────────────
 
   'Japón': {
+    embassy_NZ: { address: 'C/O Home Kikaku Centre Co Ltd. - 1-26 West 2-Chome North 38-Jo, Kita-Ku - Sapporo 001-0038 - Japan', phone: '+81 (11) 802-9272', web: 'https://embassies.net/new-zealand-in-japan/sapporo' },
+    embassy_CA: { address: '7-3-38 Akasaka, Minato-Ku Tokyo 107-8503 Japan', phone: '+81 3 5412 6200', web: 'https://embassies.net/canada-in-japan/tokyo' },
+    embassy_NI: { address: 'No. 38 Kowa Building, 9F, Room 903, 4-12-24, Nishi-Azabu, Minato-Ku, Tokyo. Post Code: 106-0031, Japan', phone: '+81 334 990 400', web: 'https://embassies.net/nicaragua-in-japan/tokyo' },
+    embassy_SV: { address: '38 Kowa Building, N° 803, 4-12-24, Nishi Azabu, Minato-Ku Tokyo 106-0031 Japan', phone: '+81 3 3499 4461', web: 'https://embassies.net/el-salvador-in-japan/tokyo' },
+    embassy_GT: { address: 'No. 38 Kowa Building, 9F, Room 905, 4-12-24, Nishi-Azabu, Minato-Ku, Tokyo. Post Code: 106-0031 Japan', phone: '+ 81 3 3400 1830', web: 'https://embassies.net/guatemala-in-japan/tokyo' },
     emergency_general: '110 (policía) / 119 (bomberos y ambulancia)',
     police: '110',
     ambulance: '119',
@@ -773,6 +859,11 @@ const EMERGENCY_DB = {
   },
 
   'Tailandia': {
+    embassy_NZ: { address: 'M Thai Tower, 14Th Floor, All Seasons Place 87 Wireless Road 10330 Bangkok', phone: '+66 (0)2 2542530', web: 'https://embassies.net/new-zealand-in-thailand/bangkok' },
+    embassy_GT: { address: 'Show map 23Rd Floor, M. Thai Tower, All Seasons Place, 87 Witthayu Rd, Lumphini, Pathum Wan District, Bangkok 10330, Thailand', phone: '+66 2 627 9545', web: 'https://embassies.net/guatemala-in-thailand/bangkok' },
+    embassy_CR: { address: '93/3 Baan Tepalit Wireless Rd Pathumwan Bangkok Thailand', phone: '+66 (2) 651-4487', web: 'https://embassies.net/costa-rica-in-thailand/bangkok' },
+    embassy_CU: { address: 'Show map Mela Mansión, Apartamento 3B, Sukhumvit Soi 27, Sukhumvit Road, Bangkok.', phone: '+66 2-665 2803', web: 'https://embassies.net/cuba-in-thailand/bangkok' },
+    embassy_UY: { address: 'Soi Sukhumvit 7 (Loet Sin 2) Khlong Toei Nuae, Watthana Bangkok 10110, Thailand', web: 'https://embassies.net/uruguay-in-thailand/bangkok' },
     emergency_general: '191 (policía) / 1669 (ambulancia)',
     police: '191',
     ambulance: '1669',
@@ -825,6 +916,9 @@ const EMERGENCY_DB = {
   },
 
   'Vietnam': {
+    embassy_NZ: { address: 'Level 5, 63 Ly Thai To Street Hoan Kiem District Ha Noi', phone: '+84 24 382 41481', web: 'https://embassies.net/new-zealand-in-vietnam/hanoi' },
+    embassy_PT: { address: 'C/O Hotel Pullman Hanoi - 40 Cat Linh Street - Hanoi 010000 - Vietnam', phone: '(+84) 903 915 713', web: 'https://embassies.net/portugal-in-vietnam/hanoi' },
+    embassy_PA: { address: 'Hanoi Central Office Building 44B Ly Thuong Kiet St. 9Th Floor, Suite 9-04 Hoan Kiem District Hanoi, Vietnam', phone: '+84-4 3936-5213', web: 'https://embassies.net/panama-in-vietnam/hanoi' },
     emergency_general: '113 (policía) / 115 (ambulancia)',
     police: '113',
     ambulance: '115',
@@ -871,6 +965,13 @@ const EMERGENCY_DB = {
   },
 
   'India': {
+    embassy_NZ: { address: 'Level 2, 3 North Avenue, Maker Maxity, Bandra Kurla Complex', phone: '+91 22-6131 6666', web: 'https://embassies.net/new-zealand-in-india/mumbai' },
+    embassy_NI: { address: '43-A, Prithviraj Road New Delhi-110011', web: 'https://embassies.net/nicaragua-in-india/new-delhi' },
+    embassy_GT: { address: 'F-2/3, Ground Floor Vasant Vihar New Delhi-110057', phone: '+91 11-4699-9000', web: 'https://embassies.net/guatemala-in-india/new-delhi' },
+    embassy_PA: { address: 'D-6/19 Ground Floor Vasant Vihar New Delhi-110057', web: 'https://embassies.net/panama-in-india/new-delhi' },
+    embassy_CR: { address: 'C-6/15 Vasant Vihar New Delhi-110021', phone: '+91-11-4108 0810', web: 'https://embassies.net/costa-rica-in-india/new-delhi' },
+    embassy_DO: { address: 'B-1/20, Ground Floor,Vasant Vihar New Delhi-110057', phone: '+91-11-4342 5000', web: 'https://embassies.net/dominican-republic-in-india/new-delhi' },
+    embassy_UY: { address: 'B-8/3, Vasant Vihar New Delhi-110057', web: 'https://embassies.net/uruguay-in-india/new-delhi' },
     emergency_general: '112',
     police: '100',
     ambulance: '102',
@@ -926,6 +1027,22 @@ const EMERGENCY_DB = {
   },
 
   'China': {
+    embassy_NZ: { address: 'No. 1 Ritan Dongerjie, (1 Ritan East 2Nd Street) Chaoyang District 100600 Beijing, Beijing', phone: '+86 (10) 8532 7000', web: 'https://embassies.net/new-zealand-in-china/beijing' },
+    embassy_AU: { address: '21 Dongzhimenwai Dajie Sanlitun Beijing 100600 China (People\'S Republic Of)', phone: '+86 10 5140 4111', web: 'https://embassies.net/australia-in-china/beijing' },
+    embassy_CA: { address: '19 Dongzhimenwai Dajie, Chaoyang District, Beijing 100600 Prc', phone: '+86 (10) 5139-4000', web: 'https://embassies.net/canada-in-china/beijing' },
+    embassy_US: { address: '55 Anjialou Rd, Chaoyang District Beijing, China, 100600', phone: '+86 10 8531 3000', web: 'https://embassies.net/united-states-in-china/beijing' },
+    embassy_GB: { address: '11 Guang Hua Lu, Jian Guo Men Wai 100600 Beijing China', phone: '+86 (0) 10 5192 4000', web: 'https://embassies.net/united-kingdom-in-china/beijing' },
+    embassy_IT: { address: '2, 2Nd Street East San Li Tun Beijing China', phone: '+86.10.8532.7600', web: 'https://embassies.net/italy-in-china/beijing' },
+    embassy_DE: { address: '17, Dong Zhi Men Wai Da Jie, Chaoyang District, Beijing, 100600., China', phone: '+86 10 85 32 90 00', web: 'https://embassies.net/germany-in-china/beijing' },
+    embassy_FR: { address: '60 Tianze Lu Chaoyang District Beijing 100600 China', phone: '+ 86 10 85 31 20 00', web: 'https://embassies.net/france-in-china/beijing' },
+    embassy_PT: { address: '8, Dong Wu Jie, San Li Tun, Chaoyang District, Beijing 100600', phone: '(+86) 10 6532 3242', web: 'https://embassies.net/portugal-in-china/beijing' },
+    embassy_SV: { address: 'Show map 10Th Floor, Building 15-1 Xiushui Street Jianguomenwai Diplomatic Residential Compound, I Chaoyang District 100020 Beijing China', phone: '+81 10 8532 6057', web: 'https://embassies.net/el-salvador-in-china/beijing' },
+    embassy_PA: { address: '6-1-11 Tayuan Diplomatic Compound 1, Xindonglu Dongzhimen Wai Chao Yang District Beijing 100600 China', phone: '(+86) (10) 6532-5981', web: 'https://embassies.net/panama-in-china/beijing' },
+    embassy_CR: { address: 'Show map Jianguomenwai Waijiao Gong Yu 1-5-41 Beijing 100600 China', web: 'https://embassies.net/costa-rica-in-china/beijing' },
+    embassy_DO: { address: 'Show map King’S Garden Villa G-37 No. 18 Xiaoyun Road, Chaoyang District 100125-P.R.C Beijing China', web: 'https://embassies.net/dominican-republic-in-china/beijing' },
+    embassy_CU: { address: 'Show map No. 1 Xiu Shui Nan Jie Jian Guo Men Wai Beijing 100600 China', phone: '+86 10 6532 1714', web: 'https://embassies.net/cuba-in-china/beijing' },
+    embassy_UY: { address: 'Tayuan Building 1-11-2 Beijing 100600 China', phone: '+86 10 6532 4445', web: 'https://embassies.net/uruguay-in-china/beijing' },
+    embassy_BO: { address: 'Liang Ma He(South)No.14 2-3-2 Tayuan Diplomatic Building Chaoyang Dist.', phone: '+86 10 6532 3074', web: 'https://embassies.net/bolivia-in-china/beijing' },
     emergency_general: '110 (policía) / 120 (ambulancia)',
     police: '110',
     ambulance: '120',
@@ -963,6 +1080,16 @@ const EMERGENCY_DB = {
   },
 
   'Corea del Sur': {
+    embassy_NZ: { address: '8Th Floor, Jeong Dong Building , 21-15, Jeongdong-Gil, Jung-Gu 04518 Seoul, Republic Of Korea', phone: '+82 2 370 17700', web: 'https://embassies.net/new-zealand-in-south-korea/seoul' },
+    embassy_CA: { address: '21 Jeongdong-Gil (Jeong-Dong), Jung-Gu, Seoul (04518), Republic Of Korea', phone: '+82 2 3783 6000', web: 'https://embassies.net/canada-in-south-korea/seoul' },
+    embassy_NI: { address: 'Show map Danam Tower, 23Rd Fl. 10, Sowol-Ro Jung-Gu Seoul 100-704 South Korea', phone: '+82 2 6272 1670', web: 'https://embassies.net/nicaragua-in-south-korea/seoul' },
+    embassy_HN: { address: 'Show map Cheongye Hangook Building, 9Th Floor, Cheongyechon-Ro 11 (Sorin-Dong), Jongro-Gu Seoul, South Korea 03187', web: 'https://embassies.net/honduras-in-south-korea/seoul' },
+    embassy_GT: { address: 'Show map Sejong-Daero 55, Jung-Gu, 04513 Booyoung Taepyeong Building, 20Th Floor Seoul 100-271 South Korea', web: 'https://embassies.net/guatemala-in-south-korea/seoul' },
+    embassy_CR: { address: 'Iljin Bldg. # 8, 50-1,, Dohwa-Dong, Mapo-Gu, Seoul,, 121-040, Korea', web: 'https://embassies.net/costa-rica-in-south-korea/seoul' },
+    embassy_DO: { address: '19Th Fl., Taepyungro Bldg., #73 Sejong-Daero, Jung-Gu, Seoul, Korea (04514)', phone: '+82-2-756-3513', web: 'https://embassies.net/dominican-republic-in-south-korea/seoul' },
+    embassy_UY: { address: '# 402, 4Th Floor, Hannam Hillside Building 653-30, Hannam-Dong Yongsan-Gu, Seoul 140-887 Korea (Republic)', web: 'https://embassies.net/uruguay-in-south-korea/seoul' },
+    embassy_BO: { address: 'Piso 20, 55, Sejong-Daero, Jung-Gu, Seúl, República De Corea', phone: '+82 2-3181-767', web: 'https://embassies.net/bolivia-in-south-korea/seoul' },
+    embassy_EC: { address: '16Th Fl., Sc Bank Bldg., 47 Jongno, Jongno-Gu Seoul 03160 South Korea', web: 'https://embassies.net/ecuador-in-south-korea/seoul' },
     emergency_general: '112 (policía) / 119 (bomberos y ambulancia)',
     police: '112',
     ambulance: '119',
@@ -1013,6 +1140,12 @@ const EMERGENCY_DB = {
   },
 
   'Singapur': {
+    embassy_NZ: { address: '1 George Street #21-04 049145', phone: '+65 6235 9966', web: 'https://embassies.net/new-zealand-in-singapore/singapore-city' },
+    embassy_AU: { address: '25 Napier Road Singapore 258507 Singapore', phone: '+65 6836 4100', web: 'https://embassies.net/australia-in-singapore/singapore-city' },
+    embassy_PA: { address: '16 Raffles Quay # 41 - Offic. 06 Hong Leong Building Singapore 048581', web: 'https://embassies.net/panama-in-singapore/singapore-city' },
+    embassy_CU: { address: 'Show map 390 Havelock Road Unit 08-04, Kings Centre Singapore 169662 Singapore', phone: '+65 6635 8172', web: 'https://embassies.net/cuba-in-singapore/singapore-city' },
+    embassy_UY: { address: '80 Robinson Road, #08-01/02 Singapore', phone: '+65 6225 5111', web: 'https://embassies.net/uruguay-in-singapore/singapore-city' },
+    embassy_EC: { address: '101 Thomson Road, United Square # 16-05 307591 Singapore Singapore', phone: '(+65) 6720 0587', web: 'https://embassies.net/ecuador-in-singapore/singapore-city' },
     emergency_general: '999 (policía) / 995 (ambulancia)',
     police: '999',
     ambulance: '995',
@@ -1059,6 +1192,12 @@ const EMERGENCY_DB = {
   },
 
   'Indonesia': {
+    embassy_NZ: { address: 'Jalan Asia Afrika No 8, Gelora Bung Karno Jakarta 10270', phone: '+62 21 299 55800', web: 'https://embassies.net/new-zealand-in-indonesia/jakarta' },
+    embassy_GT: { address: 'Show map Jakarta Indonesia', phone: '+62 21 5211078', web: 'https://embassies.net/guatemala-in-indonesia/jakarta' },
+    embassy_PA: { address: 'World Trade Center Lt. 13, Jl. Jend. Sudirman, Rt.8/Rw.3, Kuningan, Karet, Kecamatan Setiabudi, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12920, Indonesia', phone: '+62 21 5711867', web: 'https://embassies.net/panama-in-indonesia/jakarta' },
+    embassy_CR: { address: 'Show map Wisma Keiai 7Th Floor, Suite 706, Jalan Jenderal Sudirman Kav. 3 Jakarta 10220 Indonesia', phone: '+62 21 572 3165', web: 'https://embassies.net/costa-rica-in-indonesia/jakarta' },
+    embassy_PY: { address: 'Menara Anugrah, Jalan Mega Kuningan, Kantor Taman E3.3, Ground Floor, Unit C6, Jakarta 12950, ​​Indonesia', phone: '+ 62 21 579 50279', web: 'https://embassies.net/paraguay-in-indonesia/jakarta' },
+    embassy_VE: { address: 'Wisma Mulia 20Th Floor Suite 2005, Jalan Jendral Gatot Subroto Kav. 9-11, Mampang Prapatan, Rt.3/Rw.2, Kuningan Bar., Kec. Mampang Prpt., Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12930, Indonesia', phone: '+62 21 52275489', web: 'https://embassies.net/venezuela-in-indonesia/jakarta' },
     emergency_general: '112',
     police: '110',
     ambulance: '118',
@@ -1110,6 +1249,18 @@ const EMERGENCY_DB = {
   // ── AMERICA ───────────────────────────────────────────────────────────────
 
   'México': {
+    embassy_NZ: { address: 'Corporativo Polanco, 8 Avenida Jaime Balmes Polanco I Sección 11510 Mexico City, Miguel Hidalgo Distrito Federal', phone: '+52 55 528 39460', web: 'https://embassies.net/new-zealand-in-mexico/mexico-city' },
+    embassy_NI: { address: 'Fernando Alencastre 136, Lomas Virreyes, Lomas De Chapultepec, Miguel Hidalgo, 11000 Ciudad De México, Cdmx, Mexico', phone: '+52 55 5202 6449', web: 'https://embassies.net/nicaragua-in-mexico/mexico-city' },
+    embassy_SV: { address: 'Temístocles 88, Polanco, Polanco Iv Secc, Miguel Hidalgo, 11560 Ciudad De México, Cdmx, Mexico', phone: '+52 55 5281 5725', web: 'https://embassies.net/el-salvador-in-mexico/mexico-city' },
+    embassy_HN: { address: 'Show map Alfonso Reyes 220, Hipódromo, Cuauhtémoc, 06170 Ciudad De México, Cdmx, Mexico', web: 'https://embassies.net/honduras-in-mexico/mexico-city' },
+    embassy_GT: { address: 'Show map Av. Explanada 1025, Lomas De Chapultepec, Miguel Hidalgo, 11000 Ciudad De México, Cdmx, Mexico', web: 'https://embassies.net/guatemala-in-mexico/mexico-city' },
+    embassy_PA: { address: 'Calle Sócrates No.339 Colonia Polanco Delegación Miguel Hidalgo 11560 México, Df Mexico', phone: '+52 55-5280-8222', web: 'https://embassies.net/panama-in-mexico/mexico-city' },
+    embassy_CU: { address: 'Show map No. 554 Colonia Polanco Delegacion Miguel Hidalgo 11560, Mexico, D.F. Mexico', web: 'https://embassies.net/cuba-in-mexico/mexico-city' },
+    embassy_UY: { address: 'Hegel 149, Polanco, Polanco V Secc, Miguel Hidalgo, 11560 Ciudad De México, Cdmx, Mexico', phone: '+52 55 5531 0880', web: 'https://embassies.net/uruguay-in-mexico/mexico-city' },
+    embassy_PY: { address: 'Homero Nº 415 Esq. Hegel 1St. Apartment - Colonia Polanco, Miguel Hidalgo Delegation - 11570 Mexico Df', phone: '+ 52 55 5545 0405', web: 'https://embassies.net/paraguay-in-mexico/mexico-city' },
+    embassy_BO: { address: 'Goethe No. 104, Verónica Anzures Delegación Miguel Hidalgo Mexico D.F. 11590 Mexico', web: 'https://embassies.net/bolivia-in-mexico/mexico-city' },
+    embassy_EC: { address: 'De Los Pipitos 1 1/2 Cuadras Oeste Barrio Bolonia Apartado C-33 11560 México D.F. Mexico', phone: '+52 55 5545-3141', web: 'https://embassies.net/ecuador-in-mexico/mexico-city' },
+    embassy_VE: { address: 'Schiller No. 326, Chapultepec Morales, Polanco V Secc, Miguel Hidalgo, 11560 Ciudad De México, Cdmx, Mexico', phone: '+52 55 5203 4233', web: 'https://embassies.net/venezuela-in-mexico/mexico-city' },
     emergency_general: '911',
     police: '911',
     ambulance: '911',
@@ -1159,6 +1310,13 @@ const EMERGENCY_DB = {
   },
 
   'Argentina': {
+    embassy_NZ: { address: 'Carlos Pellegrini 1427 - 5Th Floor Buenos Aires C1011Aac', phone: '+54 (11) 5070 0700', web: 'https://embassies.net/new-zealand-in-argentina/buenos-aires' },
+    embassy_NI: { address: 'C1123Aaa, Av. Santa Fe 1845, C1123Aaa Caba, Argentina', phone: '+54 11 48110973', web: 'https://embassies.net/nicaragua-in-argentina/buenos-aires' },
+    embassy_CR: { address: 'Av. Córdoba 612 1054 Buenos Aires, Autonomous City Of Buenos Aires, Argentina', phone: '+54 11 2150 7180', web: 'https://embassies.net/costa-rica-in-argentina/buenos-aires' },
+    embassy_DO: { address: 'Show map Ave. Santa Fe No 830/ Piso 7O Buenos Aires Argentina', phone: '+54 11 4312-9378', web: 'https://embassies.net/dominican-republic-in-argentina/buenos-aires' },
+    embassy_BO: { address: 'Av. Corrientes 545 - 2º Piso C1043Aaf Cp. Buenos Aires Argentina', phone: '+54 11 4394 1463', web: 'https://embassies.net/bolivia-in-argentina/buenos-aires' },
+    embassy_VE: { address: 'Av. Luis María Campos 170, Buenos Aires, Argentina', phone: '+54 11 41290800', web: 'https://embassies.net/venezuela-in-argentina/buenos-aires' },
+    embassy_CL: { address: 'Tagle 2762 Capital Federal (1425) Buenos Aires Argentina', phone: '+54 11 4808 8601', web: 'https://embassies.net/chile-in-argentina/buenos-aires' },
     emergency_general: '911',
     police: '101',
     ambulance: '107',
@@ -1211,6 +1369,16 @@ const EMERGENCY_DB = {
   },
 
   'Colombia': {
+    embassy_NZ: { address: 'Edf. 8111, Calle 81 # 11 - 08 Of. 802 Chapinero 110221 Bogotá, Colombia', phone: '+57 1 439 1666', web: 'https://embassies.net/new-zealand-in-colombia/bogota' },
+    embassy_NI: { address: 'Calle 108 A No. 25-44 Bogotá Colombia', phone: '+57 1-619-8934', web: 'https://embassies.net/nicaragua-in-colombia/bogota' },
+    embassy_SV: { address: 'Cra. 12 ##119-51, Bogotá Colombia', phone: '+57 1 7433787', web: 'https://embassies.net/el-salvador-in-colombia/bogota' },
+    embassy_GT: { address: 'Show map Calle 86A No. 13-42 Piso 6 Bogotá Colombia', phone: '+57 1 257 6133', web: 'https://embassies.net/guatemala-in-colombia/bogota' },
+    embassy_PA: { address: 'Cl. 92 #7A 40, Bogotá, Colombia', phone: '+57 1 2575067', web: 'https://embassies.net/panama-in-colombia/bogota' },
+    embassy_CR: { address: 'Cra. 12 #114-37, Usaquén, Bogotá, Colombia', phone: '+57 1 629 5095', web: 'https://embassies.net/costa-rica-in-colombia/bogota' },
+    embassy_UY: { address: 'Cra. 9 #80-45, Bogotá, Colombia', phone: '+57 2351462', web: 'https://embassies.net/uruguay-in-colombia/bogota' },
+    embassy_PY: { address: 'Calle 70 N ° 4-17 Bogota Colombia', web: 'https://embassies.net/paraguay-in-colombia/bogota' },
+    embassy_EC: { address: 'Cra. 7 #14-52, Ipiales, Nariño, Colombia', phone: '(+57) 1 212 6549', web: 'https://embassies.net/ecuador-in-colombia/bogota' },
+    embassy_VE: { address: 'Carrera 4 Nº 75-02 Apartado Aéreo: 90600 Bogotá Colombia', phone: '+57 1 640 1213', web: 'https://embassies.net/venezuela-in-colombia/bogota' },
     emergency_general: '123',
     police: '112',
     ambulance: '125',
@@ -1262,6 +1430,13 @@ const EMERGENCY_DB = {
   },
 
   'Perú': {
+    embassy_GB: { address: 'Torre Parque Mar (22Nd Floor) Avenida José Larco 1301 Miraflores Embassy Opening Hours: 08:00 - 13:00 And 14:00 - 16:30 (Monday To Thursday) 08:00 - 13:00 (Friday) Lima Peru', phone: '+51 1 617 3000', web: 'https://embassies.net/united-kingdom-in-peru/lima' },
+    embassy_NI: { address: 'Calle Paúl De Beaudiez 471, San Isidro 15076, Peru', phone: '+51 1 2645577', web: 'https://embassies.net/nicaragua-in-peru/lima' },
+    embassy_SV: { address: 'Av. Javier Prado Oeste No. 2108 San Isidro Lima 27 Peru', phone: '+51 1 440-3500', web: 'https://embassies.net/el-salvador-in-peru/lima' },
+    embassy_PA: { address: 'Calle Roma 397, Lima 27, Peru', phone: '+51 441-2616', web: 'https://embassies.net/panama-in-peru/lima' },
+    embassy_UY: { address: 'Calle Jose Dionisio Anchorena 020, Cercado De Lima 15076, Peru', phone: '+51 1 2640099', web: 'https://embassies.net/uruguay-in-peru/lima' },
+    embassy_PY: { address: '360 Roma Street - San Isidro Lima Peru', phone: '+ 511 221 1399', web: 'https://embassies.net/paraguay-in-peru/lima' },
+    embassy_VE: { address: 'Av. Arequipa 298, Cercado De Lima 15046, Peru', phone: '+51 1 4334511', web: 'https://embassies.net/venezuela-in-peru/lima' },
     emergency_general: '105 (policía) / 116 (bomberos)',
     police: '105',
     ambulance: '117',
@@ -1310,6 +1485,11 @@ const EMERGENCY_DB = {
   },
 
   'Chile': {
+    embassy_NZ: { address: 'Edificio Isidora 3000, Isidora Goyenechea 3000 12Th Floor Santiago, Santiago Province Santiago Metropolitan Region', phone: '+56 2 261 63000', web: 'https://embassies.net/new-zealand-in-chile/santiago' },
+    embassy_HN: { address: 'Show map Calle Zurich No.255 Of.51 Santiago Chile', phone: '+56 2 234 4069', web: 'https://embassies.net/honduras-in-chile/santiago' },
+    embassy_GT: { address: 'Show map Avenida Apoquindo No.4775, Oficina 504 Las Condes Santiago Chile', phone: '+56 2 2326 8133', web: 'https://embassies.net/guatemala-in-chile/santiago' },
+    embassy_UY: { address: 'Av. Pedro De Valdivia 711, Providencia, Región Metropolitana, Chile', phone: '+56 2 2223 8398', web: 'https://embassies.net/uruguay-in-chile/santiago' },
+    embassy_BO: { address: 'Calle Patricio Lynch # 298, Esq. Sotomayor Apartado Postal 741 Arica Chile', web: 'https://embassies.net/bolivia-in-chile/arica' },
     emergency_general: '133 (policía) / 131 (ambulancia)',
     police: '133',
     ambulance: '131',
@@ -1364,6 +1544,16 @@ const EMERGENCY_DB = {
   },
 
   'Brasil': {
+    embassy_NZ: { address: 'Shis Qi 09 Conjunto 16 Casa 01 Brasília - Df 71625-160', phone: '+55 61 324 89900', web: 'https://embassies.net/new-zealand-in-brazil/brasilia' },
+    embassy_NI: { address: 'Shis Ql 24 Conj. 1 Casa 16 - Lago Sul, Brasília - Df, 71655-015, Brazil', phone: '+55 61 33663297', web: 'https://embassies.net/nicaragua-in-brazil/brasilia' },
+    embassy_SV: { address: 'Shis Qi 09 Conjunto 02, Casa 15 - Lago Sul, Brasília - Df, 71625-020, Brazil', phone: '+55 61 33644141', web: 'https://embassies.net/el-salvador-in-brazil/brasilia' },
+    embassy_PA: { address: 'Brasilia Df-Brasil, Ses Avenida Das Nações Qs.803 Lot 9 70200-030 - Brasília - Df Brazil', web: 'https://embassies.net/panama-in-brazil/brasilia' },
+    embassy_CR: { address: 'Srtvn 701 Conjunto C Ala A Salas 308/310 Edificio Centro Empresarial Norte Cep 70 70.719-903 - Brasília - Df Brazil', phone: '+55 61-3328-2219', web: 'https://embassies.net/costa-rica-in-brazil/brasilia' },
+    embassy_CU: { address: 'Show map Casa 01, Shis Qi 5 Conj. 18 - Lago Sul, Brasília - Df, 71615-180, Brazil', phone: '+55 61 3248-4710', web: 'https://embassies.net/cuba-in-brazil/brasilia' },
+    embassy_PY: { address: 'Ses - Av. Das Nações - Qd. 811 - Lt. 42. Brasilia-Df. Cep 70427-900', phone: '+ 55 61 3442 8600', web: 'https://embassies.net/paraguay-in-brazil/brasilia' },
+    embassy_EC: { address: 'Conjunto 8, Shis Ql 10 Casa 1 - Brasília, Df, Brazil', phone: '+55 61 32485560', web: 'https://embassies.net/ecuador-in-brazil/brasilia' },
+    embassy_PE: { address: 'Ses Av. Das Nacoes Batch 43 Quadra 811 Cep: 70428-900 Brasilia Df', phone: '+55 (61) 3242 9933', web: 'https://embassies.net/peru-in-brazil/brasilia' },
+    embassy_CO: { address: 'Ses, Av. Das Nações, Lote 10, Quadra 803, Brasilia, Df - Brazil', phone: '+55 (61) 3214-8900', web: 'https://embassies.net/colombia-in-brazil/brasilia' },
     emergency_general: '190 (policía) / 192 (ambulancia)',
     police: '190',
     ambulance: '192',
@@ -1416,6 +1606,9 @@ const EMERGENCY_DB = {
   // ── AFRICA Y ORIENTE MEDIO ────────────────────────────────────────────────
 
   'Marruecos': {
+    embassy_PA: { address: '7 Rue Eulophia, Secteur 15 Bloc F Villa 7 Hay Riad, Rabat Royaume Du Maroc Morocco', phone: '+212-67314-4237', web: 'https://embassies.net/panama-in-morocco/rabat' },
+    embassy_DO: { address: 'Show map Avenue Mehdi Ben Barka No.3, Secteur 6, Bloc E. Hay Riad Rabat Morocco', phone: '+212 53 771 5905', web: 'https://embassies.net/dominican-republic-in-morocco/rabat' },
+    embassy_PY: { address: '51 Rue Ibrahim Tadili P.O. Box 10170, Souissi Rabat Morocco', phone: '+212 537 632 350', web: 'https://embassies.net/paraguay-in-morocco/rabat' },
     emergency_general: '19 (policía urbana) / 15 (SAMU)',
     police: '19',
     ambulance: '15',
@@ -1465,6 +1658,15 @@ const EMERGENCY_DB = {
   },
 
   'Egipto': {
+    embassy_NZ: { address: 'Level 8, North Tower Nile City Towers, 2005C Corniche El Nil Ramlet Beaulac Cairo', phone: '+20 2 246 16000', web: 'https://embassies.net/new-zealand-in-egypt/cairo' },
+    embassy_NI: { address: 'Show map 71 Syria Street Mohandessin Cairo Egypt', phone: '+20 2 3347 7216', web: 'https://embassies.net/nicaragua-in-egypt/cairo' },
+    embassy_GT: { address: 'Show map 17 Port Said Street, 5Th Floor, Flat 501 Maadi Cairo Egypt', web: 'https://embassies.net/guatemala-in-egypt/cairo' },
+    embassy_PA: { address: '4 Ibn Zanki, Al Gabalayah, Zamalek, Cairo Governorate, Cairo Egypt', phone: '+20 2 27361093', web: 'https://embassies.net/panama-in-egypt/cairo' },
+    embassy_DO: { address: 'Show map 40- A, Mohamed Mazhar Street, 8Th Floor Zamalek 11211 Cairo Egypt', web: 'https://embassies.net/dominican-republic-in-egypt/cairo' },
+    embassy_CU: { address: 'Show map Street 203, Maadi As Sarayat Al Gharbeyah, Maadi, Cairo Governorate, Egypt', web: 'https://embassies.net/cuba-in-egypt/cairo' },
+    embassy_UY: { address: '6, Loutfallah Zamalek, Cairo Egypt', phone: '(02) 2735.3589', web: 'https://embassies.net/uruguay-in-egypt/cairo' },
+    embassy_BO: { address: '21B Amman Street, From Mohi Al Din Abou Al Ezz, Dokki 21 مكرر شارع عمان متفرع من, ش محي الدين أبو العز، Ad Doqi, Giza Governorate 12611, Cairo Egypt', phone: '+20 2 37624361', web: 'https://embassies.net/bolivia-in-egypt/cairo' },
+    embassy_EC: { address: '33 Ismail Mohamed St.، Mohammed Mazhar, Zamalek, Cairo Governorate, Egypt', phone: '+20 2 27361839', web: 'https://embassies.net/ecuador-in-egypt/cairo' },
     emergency_general: '123 (policía) / 123 (ambulancia)',
     police: '122',
     ambulance: '123',
@@ -1515,6 +1717,14 @@ const EMERGENCY_DB = {
   },
 
   'Emiratos Árabes': {
+    embassy_NZ: { address: 'Level 25, Suite 2503, International Tower Capital Centre Abu Dhabi', phone: '+971-2-496-3333', web: 'https://embassies.net/new-zealand-in-united-arab-emirates/abu-dhabi' },
+    embassy_GB: { address: 'British Embassy Abu Dhabi Al Hisn Street, Al Markaziyah West Po Box 248 Abu Dhabi United Arab Emirates', phone: '+971 2 610 1100', web: 'https://embassies.net/united-kingdom-in-united-arab-emirates/abu-dhabi' },
+    embassy_GT: { address: 'Show map Abu Dhabi United Arab Emirates', phone: '+971 26 279 545', web: 'https://embassies.net/guatemala-in-united-arab-emirates/abu-dhabi' },
+    embassy_PA: { address: 'Po Box 4372, Hill Abu Dhabi, Villa E-05 Abu Dhabi, Uae', web: 'https://embassies.net/panama-in-united-arab-emirates/abu-dhabi' },
+    embassy_DO: { address: 'Show map Al Bateen Area, Sector 2, 7Th Street, Villa 4 - Abu Dhabi - United Arab Emirates', phone: '+971 2 658 0788', web: 'https://embassies.net/dominican-republic-in-united-arab-emirates/abu-dhabi' },
+    embassy_CU: { address: 'Show map Between Al Dhafra St. And Quwaysimah St - Abu Dhabi - United Arab Emirates', phone: '+971 2 443 0327', web: 'https://embassies.net/cuba-in-united-arab-emirates/abu-dhabi' },
+    embassy_PE: { address: '25 Th Floor, Al Habtoor Business Tower, Dubai Marina - Dubai United Arab Emirates', phone: '+971 (4) 422755', web: 'https://embassies.net/peru-in-united-arab-emirates/dubai' },
+    embassy_CO: { address: 'Villa 1, Al Bateen Area, West 39, Plot N. 55, Po Box: 60376 - Abu Dhabi, Uae', phone: '+971 (2) 650 5756', web: 'https://embassies.net/colombia-in-united-arab-emirates/abu-dhabi' },
     emergency_general: '999',
     police: '999',
     ambulance: '998',
@@ -1561,6 +1771,9 @@ const EMERGENCY_DB = {
   // ── OCEANIA ───────────────────────────────────────────────────────────────
 
   'Australia': {
+    embassy_NZ: { address: '4/45 William St, Melbourne Vic 3000, Australia', phone: '+61 3 9678 0201', web: 'https://embassies.net/new-zealand-in-australia/melbourne' },
+    embassy_CR: { address: 'Show map 15 London Circuit, Suite 09.03 Canberra, Act 2601 Australia', phone: '+61 2 6113 0271', web: 'https://embassies.net/costa-rica-in-australia/canberra' },
+    embassy_UY: { address: '24 Brisbane Ave, Barton Act 2600, Australia', phone: '+61 2 6273 9100', web: 'https://embassies.net/uruguay-in-australia/canberra' },
     emergency_general: '000',
     police: '000',
     ambulance: '000',
@@ -1618,6 +1831,20 @@ const EMERGENCY_DB = {
 
   // ══ EUROPA ADICIONAL ══════════════════════════════════════════════════════
   'Bélgica': {
+    embassy_NZ: { address: 'Avenue Des Nerviens 9-31 Brussels B-1040 Belgium', phone: '+32 2 512 1040', web: 'https://embassies.net/new-zealand-in-belgium/brussels' },
+    embassy_GB: { address: 'Avenue D’Auderghem 10 1040 Brussels Belgium', phone: '(+32) 2 287 62 11', web: 'https://embassies.net/united-kingdom-in-belgium/brussels' },
+    embassy_DE: { address: 'Lenneke Marelaan 12, 1932 Woluwe-Saint-Stevens (Zaventem), Belgium.', phone: '+32 2 710 10 30', web: 'https://embassies.net/germany-in-belgium/brussels' },
+    embassy_NI: { address: 'Avenue Wolvendael 55, 1180 Uccle, Belgium', phone: '+32 2 375 64 34', web: 'https://embassies.net/nicaragua-in-belgium/brussels' },
+    embassy_HN: { address: 'Show map Avenue De Cortenbergh 89, 1000 Bruxelles, Belgium', phone: '+32 2 734 0000', web: 'https://embassies.net/honduras-in-belgium/brussels' },
+    embassy_GT: { address: 'Show map Avenue Winston Churchill 185 1180 Brussels Belgium', web: 'https://embassies.net/guatemala-in-belgium/brussels' },
+    embassy_PA: { address: 'Avenue Louise 475, 1050 Bruxelles, Belgium', phone: '+32 2 649 07 29', web: 'https://embassies.net/panama-in-belgium/brussels' },
+    embassy_CR: { address: '489 Ave. Louise, Boite 13 1050 Brussels Belgium', phone: '+32 2 640 55 41', web: 'https://embassies.net/costa-rica-in-belgium/brussels' },
+    embassy_CU: { address: 'Show map Ave. Brugmann 80, 1190 Forest Bruxelles Belgium', web: 'https://embassies.net/cuba-in-belgium/brussels' },
+    embassy_UY: { address: 'Avenue Franklin Roosevelt 22, 1000 Bruxelles, Belgium', phone: '+32 2 640 11 69', web: 'https://embassies.net/uruguay-in-belgium/brussels' },
+    embassy_PY: { address: 'Avenue Louise 475, 12Th Floor, 1050 Bruxelles - Belgium', phone: '+ 32 2 649 90 55', web: 'https://embassies.net/paraguay-in-belgium/brussels' },
+    embassy_BO: { address: 'Avenue Louise 176/6, 1000 Bruxelles, Belgium', phone: '+32 2 627 00 10', web: 'https://embassies.net/bolivia-in-belgium/brussels' },
+    embassy_EC: { address: 'Avenue Louise 363, 1050 Brussels Belgium', phone: '+32 2 644 32 58', web: 'https://embassies.net/ecuador-in-belgium/brussels' },
+    embassy_VE: { address: 'Avenue Franklin Roosevelt 10, 1000 Bruxelles, Belgium', phone: '+32 2 639 03 40', web: 'https://embassies.net/venezuela-in-belgium/brussels' },
     emergency_general: '112', police: '101', ambulance: '100', fire: '100',
     embassy_ES: 'Embajada de España en Bruselas: +32 2 230 03 40',
     embassy_AR: { address: 'Avenue Louise 225, 1050 Bruselas', phone: '+32 2 648 9371', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -1652,6 +1879,18 @@ const EMERGENCY_DB = {
     safety_tips: ['Cuidado con los carriles bici en Amsterdam y otras ciudades — tienen prioridad.', 'Los robos de bicicletas son muy frecuentes.'],
   },
   'Suecia': {
+    embassy_NZ: { address: 'Skarpögatan 6 Östermalm 115 27 Stockholm', phone: '+46 8 400 17 270', web: 'https://embassies.net/new-zealand-in-sweden/stockholm' },
+    embassy_CA: { address: '23 Klarabergsgatan, Stockholm, Sweden', phone: '+ 46 (0) 8 453-3000', web: 'https://embassies.net/canada-in-sweden/stockholm' },
+    embassy_PT: { address: 'Drottninggatan 108, 1Tr, 113 60 Stockholm', web: 'https://embassies.net/portugal-in-sweden/stockholm' },
+    embassy_NI: { address: 'Ringvägen 100, 118 60 Stockholm, Sweden', phone: '+46 8 559 347 41', web: 'https://embassies.net/nicaragua-in-sweden/stockholm' },
+    embassy_PA: { address: 'Östermalmsgatan 59 Bv 114 50, Stockholm, Sweden', phone: '+46 8662-6535', web: 'https://embassies.net/panama-in-sweden/stockholm' },
+    embassy_CR: { address: 'Danderydsgatan 11 187 36 Täby Sweden', phone: '+46 8-34 93 24', web: 'https://embassies.net/costa-rica-in-sweden/stockholm' },
+    embassy_DO: { address: 'Show map Kungsholmsgatan 10, 5 Tr. 112 27 Stockholm Sweden', phone: '+46 8-667-4611', web: 'https://embassies.net/dominican-republic-in-sweden/stockholm' },
+    embassy_CU: { address: 'Show map Sturevägen 9 182 73 Stocksund, Stockholm Sweden', phone: '+46 8 545 83 277', web: 'https://embassies.net/cuba-in-sweden/stockholm' },
+    embassy_UY: { address: 'Kommendörsgatan 35, 114 58 Stockholm, Sweden', phone: '+46 8 660 31 96', web: 'https://embassies.net/uruguay-in-sweden/stockholm' },
+    embassy_PY: { address: 'Östermalmstorg 1, 114 42 - 2Nd Floor - Offices 213, 214 And 210, Stockholm - Sweden', phone: '+ 46 850 256 550', web: 'https://embassies.net/paraguay-in-sweden/stockholm' },
+    embassy_EC: { address: 'Engelbrektsgatan 13 111 53 Stockholm Sweden', phone: '+46 (8) 679 60 43', web: 'https://embassies.net/ecuador-in-sweden/stockholm' },
+    embassy_VE: { address: 'Engelbrektsgatan 35B, 114 32 Stockholm, Sweden', phone: '+46 8 411 09 96', web: 'https://embassies.net/venezuela-in-sweden/stockholm' },
     emergency_general: '112', police: '114 14', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Estocolmo: +46 8 667 43 00',
     embassy_AR: { address: 'Valhallavägen 57, 115 22 Estocolmo', phone: '+46 8 663 4210', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -1681,6 +1920,19 @@ const EMERGENCY_DB = {
     safety_tips: ['País muy seguro. Cuidado con el frío extremo en invierno.'],
   },
   'Noruega': {
+    embassy_AU: { address: 'Australian Consulate In Oslo, Norway C/O Wilh. Wilhelmsen Asa Strandveien 20 P.O. Box 33 1324 Lysaker Norway', phone: '+47 6758 4848', web: 'https://embassies.net/australia-in-norway/lysaker' },
+    embassy_DE: { address: 'Oscarsgate 45, 0258 Oslo, Norway', phone: '+47 23 27 54 00', web: 'https://embassies.net/germany-in-norway/oslo' },
+    embassy_PT: { address: 'Josefines Gate, 37 0244 Oslo', web: 'https://embassies.net/portugal-in-norway/oslo' },
+    embassy_BR: { address: 'Sigurd Syrs Gate 4 0244 Oslo Norway', phone: '+47 22 54 07 30', web: 'https://embassies.net/brazil-in-norway/oslo' },
+    embassy_NI: { address: 'Avinds Vei 4 - 0590 Oslo - Norway', phone: '+47 21 754 2938', web: 'https://embassies.net/nicaragua-in-norway/oslo' },
+    embassy_SV: { address: 'N.W. Damm & Søn As 0151 Oslo Norway', phone: '+47 24 05 10 00', web: 'https://embassies.net/el-salvador-in-norway/oslo' },
+    embassy_CR: { address: 'Skippergata 33, 0154 Oslo, Norway', phone: '+47 22 42 58 23', web: 'https://embassies.net/costa-rica-in-norway/oslo' },
+    embassy_CU: { address: 'Show map Oscars Gate 78B, 0256 Oslo, Norway', web: 'https://embassies.net/cuba-in-norway/oslo' },
+    embassy_UY: { address: 'Skoltegrunnskaien 1 5238 Raadal Norway', phone: '+47 55 55 05 00', web: 'https://embassies.net/uruguay-in-norway/bergen' },
+    embassy_EC: { address: 'Fridtjof Nansens Plass 4 0250 Oslo Norway', phone: '+47 22 00 70 10', web: 'https://embassies.net/ecuador-in-norway/oslo' },
+    embassy_VE: { address: 'Drammensveien 82, 0271 Oslo, Norway', phone: '+47 22 43 06 60', web: 'https://embassies.net/venezuela-in-norway/oslo' },
+    embassy_PE: { address: 'Arbins Gate 2 0253 Oslo Norway', phone: '+47 21 99 22 20', web: 'https://embassies.net/peru-in-norway/oslo' },
+    embassy_AR: { address: 'Drammensveien 39 - 0271 Oslo', web: 'https://embassies.net/argentina-in-norway/oslo' },
     emergency_general: '112', police: '02800', ambulance: '113', fire: '110',
     embassy_ES: 'Embajada de España en Oslo: +47 22 92 28 80',
     embassy_BE: { phone: '+47-23-23-92-20', email: 'mailto:Oslo@diplobel.fed.be', web: 'https://norway.diplomatie.belgium.be' },
@@ -1702,12 +1954,39 @@ const EMERGENCY_DB = {
     safety_tips: ['País muy seguro. En senderismo avisa siempre de tu ruta. Clima cambiante.'],
   },
   'Dinamarca': {
+    embassy_AU: { address: 'Dampfaergevej 26, 2Nd Floor Copenhagen Dk-2100 Denmark', phone: '+45 7026 3676', web: 'https://embassies.net/australia-in-denmark/copenhagen' },
+    embassy_CA: { address: 'Kristen Bernikowsgade 1, 1105 Copenhagen K., Denmark', phone: '+45 33 48 32 00', web: 'https://embassies.net/canada-in-denmark/copenhagen' },
+    embassy_US: { address: 'Dag Hammarskjölds Allé 24 2100 København Ø', phone: '+45 33 417 100', web: 'https://embassies.net/united-states-in-denmark/copenhagen' },
+    embassy_GB: { address: 'Kastelsvej 36-40 Dk-2100 Copenhagen Denmark', phone: '+45 35 44 52 00', web: 'https://embassies.net/united-kingdom-in-denmark/copenhagen' },
+    embassy_IT: { address: 'Gammel Vartov Vej, 7 - Dk - 2900 Hellerup', phone: '+004539626877', web: 'https://embassies.net/italy-in-denmark/copenhagen' },
+    embassy_DE: { address: 'Stockholmsgade 57, 2100 Copenhagen Island, Denmark', phone: '+45 35 45 99 00', web: 'https://embassies.net/germany-in-denmark/copenhagen' },
+    embassy_FR: { address: 'Kongens Nytorv 4 1050 Copenhagen K Denmark', phone: '+ 45 33 67 01 00', web: 'https://embassies.net/france-in-denmark/copenhagen' },
+    embassy_PT: { address: 'Toldbodgade 31, 1.Sal 1253 Copenhagen K Denmark', phone: '(+45) 33 13 13 01', web: 'https://embassies.net/portugal-in-denmark/copenhagen' },
+    embassy_BR: { address: 'Jens Kofods Gade 1, St. Th. 1268 - Copenhagen Denmark', phone: '+ 45 3920 6478', web: 'https://embassies.net/brazil-in-denmark/copenhagen' },
+    embassy_NI: { address: 'Kastelsvej 7, Ground Floor 2100 Copenhagen Denmark', phone: '+45 35 55 48 70', web: 'https://embassies.net/nicaragua-in-denmark/copenhagen' },
+    embassy_PA: { address: 'C / O 360 Law Firm, Gl. Kongevej 60, Dk-1850 Frederiksberg (Copenhagen)', phone: '+45 21 451 383', web: 'https://embassies.net/panama-in-denmark/copenhagen' },
+    embassy_CR: { address: 'Dronningens Tværgade 56, 1302, Copenhagen Denmark', phone: '+45 50 34 00 34', web: 'https://embassies.net/costa-rica-in-denmark/copenhagen' },
+    embassy_CU: { address: 'Show map Kastelsvej 19, 3. Tv. 2100 Copenhagen Denmark', phone: '+45-394-01510', web: 'https://embassies.net/cuba-in-denmark/copenhagen' },
+    embassy_UY: { address: 'Gl. Kongevej 11-13 1150 Copenhagen K Denmark', phone: '+45 33265169', web: 'https://embassies.net/uruguay-in-denmark/copenhagen' },
+    embassy_BO: { address: 'Store Kongensgade 81, 2Nd Floor , 1264 Copenhagen K , Denmark', phone: '+45 33 12 49 00', web: 'https://embassies.net/bolivia-in-denmark/copenhagen' },
+    embassy_PE: { address: 'Hojskolevej 15 - 2960 Rungsted Kyst - Denmark', phone: '+45 6070 6428', web: 'https://embassies.net/peru-in-denmark/copenhagen' },
+    embassy_CL: { address: 'Kastelsvej 15, 3Rd Floor 2100 Copenhagen Ø. Denmark', phone: '+45 35 38 58 34', web: 'https://embassies.net/chile-in-denmark/copenhagen' },
+    embassy_CO: { address: 'Show map Toldbodgade 31, 1Th, 1253 København, Denmark', phone: '+45 50 31 99 89', web: 'https://embassies.net/colombia-in-denmark/copenhagen' },
+    embassy_AR: { address: 'Borgergade 16, 4 Piso', phone: '+ 45 3315 8082', web: 'https://embassies.net/argentina-in-denmark/copenhagen' },
+    embassy_MX: { address: 'Bredgade 65, Floor 1, 1260 Copenhagen, Denmark', phone: '+45 3961 0500', web: 'https://embassies.net/mexico-in-denmark/copenhagen' },
     emergency_general: '112', police: '114', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Copenhague: +45 35 42 47 00',
     useful_apps: [{ name: '112 app', icon: '🆘', description: 'App de emergencias danesa.' }],
     safety_tips: ['Muy seguro. Cuidado con los robos en zonas turísticas de Copenhague (Nyhavn).'],
   },
   'Finlandia': {
+    embassy_AU: { address: 'Museokatu 25 B 23 00100 Helsinki Finland', phone: '+358 9 47 77 66 40', web: 'https://embassies.net/australia-in-finland/helsinki' },
+    embassy_DE: { address: 'Krogiuksentie 4B, 00340 Helsinki, Finland', phone: '+358 9 458 580', web: 'https://embassies.net/germany-in-finland/helsinki' },
+    embassy_PT: { address: 'Unioninkatu 22, 2Nd Floor 00130 Helsinki Finland', web: 'https://embassies.net/portugal-in-finland/helsinki' },
+    embassy_NI: { address: 'Show map Vahaniityntie 12 C 00570 Helsinki Finland', phone: '+358 9 698 0600', web: 'https://embassies.net/nicaragua-in-finland/helsinki' },
+    embassy_BO: { address: 'Hoylaamotie Helsinki Finland', web: 'https://embassies.net/bolivia-in-finland/helsinki' },
+    embassy_VE: { address: 'Bulevardi 1 A 62, 00100 Helsinki, Finland', phone: '+358 9 6860440', web: 'https://embassies.net/venezuela-in-finland/helsinki' },
+    embassy_PE: { address: 'Lönnrotinkatu 7 B 11 00120 Helsinki Finland', phone: '+358 (9) 759 9400', web: 'https://embassies.net/peru-in-finland/helsinki' },
     emergency_general: '112', police: '0295 419 800', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Helsinki: +358 9 687 00 80',
     embassy_AR: { address: 'Bulevardi 5 A 11 00120 Helsinki Finland', phone: '+ 358 9 4242 8700', web: 'https://embassies.net/argentina-in-finland/helsinki' },
@@ -1734,6 +2013,8 @@ const EMERGENCY_DB = {
     safety_tips: ['País muy seguro. Peligro de hipotermia en invierno. Nunca camines solo en el hielo sin comprobarlo.'],
   },
   'Irlanda': {
+    embassy_NZ: { address: 'Level 3, 2-4 Merrion Row Dublin D02 Yn56', phone: '+353 1 5677680', web: 'https://embassies.net/new-zealand-in-ireland/dublin' },
+    embassy_AR: { address: '15 Ailesbury Drive, Ballsbridge', web: 'https://embassies.net/argentina-in-ireland/dublin' },
     emergency_general: '112/999', police: '999', ambulance: '999', fire: '999',
     embassy_ES: 'Embajada de España en Dublín: +353 1 269 16 40',
     embassy_AU: { address: 'Third Floor 47-49 St StephenS Green Dublin 2 D02W634 Ireland', phone: '+353  1  664  5300', web: 'https://embassies.net/australia-in-ireland/dublin' },
@@ -1779,6 +2060,8 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro. Cuidado con bares y clubes en Budapest que cobran precios abusivos a turistas.'],
   },
   'Croacia': {
+    embassy_NZ: { address: 'Vlaska Ulica 50A, Zagreb 10000, Croatia', phone: '+385 1 4612060', web: 'https://embassies.net/new-zealand-in-croatia/zagreb' },
+    embassy_PE: { address: 'Jurisiceva 24 - 10 000 Zagreb - Croatia', phone: '+385 1 5802 2222', web: 'https://embassies.net/peru-in-croatia/zagreb' },
     emergency_general: '112', police: '192', ambulance: '194', fire: '193',
     embassy_ES: 'Embajada de España en Zagreb: +385 1 4848 950',
     embassy_AU: { address: 'Kaptol Centar, 3Rd Floor Nova Ves 11 Zagreb 10000 Croatia', phone: '+385 1 489 1200', web: 'https://embassies.net/australia-in-croatia/zagreb' },
@@ -1805,12 +2088,37 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro. Costa dálmata: cuidado con las embarcaciones en zonas de baño. Sol muy intenso en verano.'],
   },
   'Rumania': {
+    embassy_AU: { address: 'Strada Praga 3, București, Romania', web: 'https://embassies.net/australia-in-romania/bucharest' },
+    embassy_CA: { address: '1-3 Tuberozelor Street, 011411 Bucharest, Sector 1, Romania', phone: '+40 (21) 307 50 00', web: 'https://embassies.net/canada-in-romania/bucharest' },
+    embassy_US: { address: '4-6, Dr. Liviu Librescu Blvd. District 1, Bucharest 015118 Romania', phone: '+40 21 200 3300', web: 'https://embassies.net/united-states-in-romania/bucharest' },
+    embassy_GB: { address: '24 Jules Michelet 010463 Bucharest Romania', phone: '+40 (21) 201 7200', web: 'https://embassies.net/united-kingdom-in-romania/bucharest' },
+    embassy_IT: { address: 'Strada Henri Coanda, 9', phone: '+ 0040213052100', web: 'https://embassies.net/italy-in-romania/bucharest' },
+    embassy_DE: { address: 'Strada Cpt. Av. Gheorghe Demetriade 6 - 8, 011849 Bucharest, Romania.', phone: '+40 21 202 98 30', web: 'https://embassies.net/germany-in-romania/bucharest' },
+    embassy_FR: { address: '13-15 Rue Biserica Amzei, 010392 Bucarest - Secteur 1', phone: '+ 40 21 303 10 00', web: 'https://embassies.net/france-in-romania/bucharest' },
+    embassy_PT: { address: 'Str. Paris 55 011815 Bucureşti', web: 'https://embassies.net/portugal-in-romania/bucharest' },
+    embassy_BR: { address: 'Bulevardul Aviatorilor 40, Sector 1 Bucharest, Romania', phone: '+40 021 230 1130', web: 'https://embassies.net/brazil-in-romania/bucharest' },
+    embassy_PA: { address: 'B-Dul Lascar Catargiu 24-26, Sc.A, Ap.4 Sector 1 Bucharest Romania', phone: '+40-21 312 3267', web: 'https://embassies.net/panama-in-romania/bucharest' },
+    embassy_CU: { address: 'Show map Nicolae Caramfil. No 73. Entrada Gheorge Simionescu, Apto.4 Sector 1 Bucurest Romania', web: 'https://embassies.net/cuba-in-romania/bucharest' },
+    embassy_UY: { address: 'Str. Gorki Maxim, 22, Bucuresti-Sector 1, Bucuresti, 11951, București 014192, Romania', phone: '+40 21 313 8129', web: 'https://embassies.net/uruguay-in-romania/bucharest' },
+    embassy_VE: { address: 'Str. Pictor Mirea Nr. 18 Sector 1 Bucharest Romania', web: 'https://embassies.net/venezuela-in-romania/bucharest' },
+    embassy_PE: { address: 'Calle Gheorghe Sontu Nr. 10-12 3Rd Floor, Ap. 10, Sector 1, Bucharest - 014031', web: 'https://embassies.net/peru-in-romania/bucharest' },
+    embassy_CL: { address: 'Maior Gheorghe Şonţu Street, No. 10-12, Floor 4, Ap. 12, Sector 1 - 011448, Bucharest, Romania', phone: '+40 21 312 7239', web: 'https://embassies.net/chile-in-romania/bucharest' },
+    embassy_AR: { address: 'Argentine Embassy Union International Center - Str. Ion Campineanu 11, 3Er. Piso, Of. 301', phone: '+ 40 21 312 2626', web: 'https://embassies.net/argentina-in-romania/bucharest' },
+    embassy_MX: { address: 'Calle Doctor Louis Pasteur N ° 22 Sector 5, Bucharest Romania', phone: '+40 21 210 4577', web: 'https://embassies.net/mexico-in-romania/bucharest' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Bucarest: +40 21 318 10 20',
     useful_apps: [],
     safety_tips: ['Relativamente seguro. Cuidado con perros callejeros en zonas rurales. Carreteras en mal estado.'],
   },
   'Bulgaria': {
+    embassy_AU: { address: '37 Trakia Street Sofia 1504 Bulgaria.', phone: '+359 2 946 1334', web: 'https://embassies.net/australia-in-bulgaria/sofia' },
+    embassy_GT: { address: 'Sofia, 57, Rue Tsar Simeon', phone: '+359 2 983 65 44', web: 'https://embassies.net/guatemala-in-bulgaria/sofia' },
+    embassy_UY: { address: '1202 Sofia, №20 "George Washington" Str.', phone: '+359 877 97 73 51', web: 'https://embassies.net/uruguay-in-bulgaria/sofia' },
+    embassy_EC: { address: '1408 Sofia, 75-83, Rue Dimitar Manov', phone: '+359 2 915 05 00', web: 'https://embassies.net/ecuador-in-bulgaria/sofia' },
+    embassy_VE: { address: 'Boulevard "Simeonovsko Shose Blvd, 53 Studentski Kompleks, Sofia, Bulgaria', phone: '+359 2 962 6170', web: 'https://embassies.net/venezuela-in-bulgaria/sofia' },
+    embassy_CL: { address: '1000 Sofia, 4, Rue Al. Batenberg', phone: '+359 898 345 706', web: 'https://embassies.net/chile-in-bulgaria/sofia' },
+    embassy_CO: { address: 'Jk Yavorov Building 43, Entrance B, 3Rd Floor 1111 Sofia Bulgaria', phone: '+359 888 220 005', web: 'https://embassies.net/colombia-in-bulgaria/sofia' },
+    embassy_MX: { address: '1000 Sofia, 21, Boul. Patriarch Evtimii, Ent. B (Б), Ét.2', phone: '+359 2 989 47 96', web: 'https://embassies.net/mexico-in-bulgaria/sofia' },
     emergency_general: '112', police: '166', ambulance: '150', fire: '160',
     embassy_ES: 'Embajada de España en Sofía: +359 2 943 30 32',
     embassy_AR: { address: '“Interpred”, Block “B”, 8Th Floor, Po Box 635; 36 “Dragan Tsankov” Blvd., 1040 Sofia', web: 'https://embassies.net/argentina-in-bulgaria/sofia' },
@@ -1833,6 +2141,8 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro. Cuidado con taxis sin taxímetro visible. Pregunta el precio antes.'],
   },
   'Serbia': {
+    embassy_EC: { address: 'Graničarska 8/Iii Belgrade Serbia', phone: '+381 11 3440135', web: 'https://embassies.net/ecuador-in-serbia/belgrade' },
+    embassy_PE: { address: 'Vukovarska 3, Senjak , Belgrade 11000', web: 'https://embassies.net/peru-in-serbia/belgrade' },
     emergency_general: '112', police: '192', ambulance: '194', fire: '193',
     embassy_ES: 'Embajada de España en Belgrado: +381 11 2444 476',
     embassy_AR: { address: 'Knez Mihailova 24/I', web: 'https://embassies.net/argentina-in-serbia/belgrade' },
@@ -1861,6 +2171,16 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro. Belgrado tiene vida nocturna activa — los barcos-discoteca (splavovi) en el Danubio son seguros.'],
   },
   'Eslovaquia': {
+    embassy_CA: { address: 'Carlton Savoy Building, Mostova 2, 811 02 Bratislava, Slovakia', phone: '+421 (2) 5920-4031', web: 'https://embassies.net/canada-in-slovakia/bratislava' },
+    embassy_PT: { address: 'Venturska, 16 81101 Bratislava Slovakia', phone: '(+421) 220 768 454', web: 'https://embassies.net/portugal-in-slovakia/bratislava' },
+    embassy_NI: { address: 'Vrbove 22 900 43 Hamuliakovo 85103 Bratislava Slovakia', phone: '+421 2 4598 8329', web: 'https://embassies.net/nicaragua-in-slovakia/bratislava' },
+    embassy_SV: { address: 'Zahradnocka 62 821 05 Bratislava Slovakia', phone: '+421 2 5564 6861', web: 'https://embassies.net/el-salvador-in-slovakia/bratislava' },
+    embassy_CR: { address: 'Prepostska 6 811 06 Bratislava Slovakia', phone: '+421 2-5930-0888', web: 'https://embassies.net/costa-rica-in-slovakia/bratislava' },
+    embassy_CU: { address: 'Show map Somolickeho 1/A 811 05 Bratislava Slovakia', phone: '+421-2-5249-2777', web: 'https://embassies.net/cuba-in-slovakia/bratislava' },
+    embassy_PE: { address: 'Tuhovske 5 831 07 Bratislava Slovakia', phone: '+421 2 4929 4901', web: 'https://embassies.net/peru-in-slovakia/bratislava' },
+    embassy_CL: { address: 'Klzave 31/C 831 01 Bratislava Slovakia', phone: '+421 2 54 79 16 44', web: 'https://embassies.net/chile-in-slovakia/bratislava' },
+    embassy_CO: { address: 'Ac Diplomat Palisády 29/A 811 06 Bratislava 1 Slovakia', phone: '+421 2 5920 1551', web: 'https://embassies.net/colombia-in-slovakia/bratislava' },
+    embassy_MX: { address: 'Rigeleho 1, 811 02 Bratislava', phone: '+421 2 207 59 859', web: 'https://embassies.net/mexico-in-slovakia/bratislava' },
     emergency_general: '112', police: '158', ambulance: '155', fire: '150',
     embassy_ES: 'Embajada de España en Bratislava: +421 2 5441 6597',
     embassy_AT: { web: 'https://www.bmeia.gv.at/oeb-pressburg/' },
@@ -1880,6 +2200,12 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro. Montañas Tatra: riesgo de tormentas repentinas en verano. Sigue siempre los senderos marcados.'],
   },
   'Eslovenia': {
+    embassy_NZ: { address: 'Lek D.D., Verovskova 57, Si 1526 Ljubljana, Slovenia', phone: '+386 1 580 3055', web: 'https://embassies.net/new-zealand-in-slovenia/ljubljana' },
+    embassy_AU: { address: 'Železna Cesta 14 1000 Ljubljana Slovenia', phone: '+386 1 234 8675', web: 'https://embassies.net/australia-in-slovenia/ljubljana' },
+    embassy_CA: { address: 'Linhartova Cesta 49A., 1000 Ljubljana, Slovenia', phone: '+386 (1) 252-4444', web: 'https://embassies.net/canada-in-slovenia/ljubljana' },
+    embassy_DE: { address: 'Prešernova Cesta 27, 1000 Ljubljana, Slovenia.', phone: '+386 01 479 0300', web: 'https://embassies.net/germany-in-slovenia/ljubljana' },
+    embassy_CL: { address: 'Chilean Consulate Brdnikova 34 B 1000 Ljubljana Slovenia', phone: '+386 1 423 96 70', web: 'https://embassies.net/chile-in-slovenia/ljubljana' },
+    embassy_MX: { address: 'Medvedova Ulica 17, 1000 Ljubljana', phone: '+386 5 3750 333', web: 'https://embassies.net/mexico-in-slovenia/ljubljana' },
     emergency_general: '112', police: '113', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Ljubljana: +386 1 425 40 34',
     embassy_AT: { web: 'https://www.bmeia.gv.at/oeb-laibach/' },
@@ -1912,6 +2238,14 @@ const EMERGENCY_DB = {
     safety_tips: ['Naturaleza peligrosa: géiseres queman, olas rogue en la costa negra, erupciones volcánicas. Consulta safetravel.is SIEMPRE.', 'Nunca cruces ríos sin conocer su profundidad. Alquila 4x4 para el interior (Highlands).'],
   },
   'Malta': {
+    embassy_NZ: { address: 'Suite 4 Rainbow Court 94 Triq Ħal-Saflieni Raħal Ġdid (Paola, Pla 1108, Malta', phone: '+356 2034 1717', web: 'https://embassies.net/new-zealand-in-malta/valletta' },
+    embassy_CA: { address: 'Demajo House, 103 Archbishop Street (Triq L-Arcisqof), Valletta Vlt 09, Malta', phone: '+356 2552-3233', web: 'https://embassies.net/canada-in-malta/valletta' },
+    embassy_PA: { address: 'Gm International Services Ltd. 147/1, St. Lucia Street Valleta Vlt 04, Malta', phone: '+356-21220101', web: 'https://embassies.net/panama-in-malta/valletta' },
+    embassy_EC: { address: '7, St. Christopher Street Valletta Malta', phone: '+356 21251196', web: 'https://embassies.net/ecuador-in-malta/valletta' },
+    embassy_PE: { address: '23, Flat 1, Tulip Flats, Giacint Tua Street, Gzira, Malta', phone: '+356 2131 5681', web: 'https://embassies.net/peru-in-malta/valletta' },
+    embassy_CL: { address: 'Sky Apartments, Block B, Flat 2 Marina Street Pieta, Pta 9042 Malta', phone: '+356 21 251 411', web: 'https://embassies.net/chile-in-malta/valletta' },
+    embassy_CO: { address: '64, Triq Il-Kardinal Xiberras Hal Qormi, Qrm 1023 Malta', phone: '(+356) 7945 1180', web: 'https://embassies.net/colombia-in-malta/valletta' },
+    embassy_MX: { address: '150 St. Lucia Street Valletta, Malta', web: 'https://embassies.net/mexico-in-malta/valletta' },
     emergency_general: '112', police: '2122 4001', ambulance: '112', fire: '199',
     embassy_ES: 'Embajada de España en La Valeta: +356 21 232 843',
     embassy_AU: { address: 'Ta Xbiex Terrace Ta Xbiex, Xbx 1034 Malta', phone: '+356  213  38  201', web: 'https://embassies.net/australia-in-malta/valletta' },
@@ -1929,6 +2263,11 @@ const EMERGENCY_DB = {
   // ══ ASIA ADICIONAL ════════════════════════════════════════════════════════
 
   'Malasia': {
+    embassy_NZ: { address: 'Level 21, Menara Imc 8 Jalan Sultan Ismail 50250 Kuala Lumpur', web: 'https://embassies.net/new-zealand-in-malaysia/kuala-lumpur' },
+    embassy_DE: { address: '26Th Floor, Tan & Tan Tower, 207 Jalan Tun Razak, Kuala Lumpur, Malaysia', phone: '+60 3 21 70 96 66', web: 'https://embassies.net/germany-in-malaysia/kuala-lumpur' },
+    embassy_CU: { address: 'Show map 32, Jalan Mesra Off Jalan Damai 55000 Kuala Lumpur Malaysia', web: 'https://embassies.net/cuba-in-malaysia/kuala-lumpur' },
+    embassy_UY: { address: 'Ubn Tower, 10, Jalan P. Ramlee, Kuala Lumpur, 50250 Kuala Lumpur, Federal Territory Of Kuala Lumpur, Malaysia', phone: '+60 32031 3669', web: 'https://embassies.net/uruguay-in-malaysia/kuala-lumpur' },
+    embassy_VE: { address: '207, Jln Tun Razak, Kuala Lumpur, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia', phone: '+60 32163 3444', web: 'https://embassies.net/venezuela-in-malaysia/kuala-lumpur' },
     emergency_general: '999', police: '999', ambulance: '999', fire: '994',
     embassy_ES: 'Embajada de España en Kuala Lumpur: +60 3 2148 4868',
     embassy_AR: { address: 'Suite 16-03, Piso 16, Menara Keck Seng, 203 Jalan Bukit Bintang', web: 'https://embassies.net/argentina-in-malaysia/kuala-lumpur' },
@@ -1959,6 +2298,17 @@ const EMERGENCY_DB = {
     safety_tips: ['Seguro en zonas turísticas. Borneo: zona fronteriza Sabah (Lahad Datu) — evitar o consultar situación actual.', 'Conducción temeraria en algunos estados — usa cinturón siempre.'],
   },
   'Filipinas': {
+    embassy_NZ: { address: '35Th Floor Zuellig Building Makati Avenue Corner Paseo De Roxas, Makati City 1225 Manila', phone: '+63 917 858 9867', web: 'https://embassies.net/new-zealand-in-philippines/manila' },
+    embassy_DE: { address: 'Ford\'S Inn, As Fortuna Street, Corner Banilad Road, 6000 Cebu City, Philippines', phone: '+63 929 667 6386', web: 'https://embassies.net/germany-in-philippines/cebu-city' },
+    embassy_PT: { address: '4/F 410B Mile Long Bldg. Amorsolo Cor. V.A. Rfufino Sts. Makati City 1229 Manila Philippines', phone: '+63 (2) 8815-8380', web: 'https://embassies.net/portugal-in-philippines/makati' },
+    embassy_NI: { address: 'C/O Meridian Assurance Corp. Unit 712 - West Tower Philippine Stock Exchange Centre Exchange Road, Ortigas Complex 1600 Pasig City, Manila Philippines', phone: '+63 (210) 859-1308', web: 'https://embassies.net/nicaragua-in-philippines/manila' },
+    embassy_PA: { address: '11Th Floor, National Life Insurance Building, 6762 Ayala Ave. Makati City 1200 - Philippines P.O. Box 1072 Makati Cpo', phone: '+63 2 8478 6495', web: 'https://embassies.net/panama-in-philippines/manila' },
+    embassy_CR: { address: 'Smith Bell Building, 2294 Pasong Tamo Extension, Makati City, 1231, Metro Manila, Philippines', phone: '+63 2 8816 7851', web: 'https://embassies.net/costa-rica-in-philippines/manila' },
+    embassy_UY: { address: '5Th Floor Pcci Building, 118 Alfaro Street Salcedo Village, Metro Manila, Philippines', phone: '+63 2 8815 0625', web: 'https://embassies.net/uruguay-in-philippines/manila' },
+    embassy_PY: { address: 'Suite 801, Prestige Tower, Emerald Avenue, Ortigas, Pasig City, 1600 Metro Manila, Philippines', phone: '+63 2 8637 0366', web: 'https://embassies.net/paraguay-in-philippines/manila' },
+    embassy_EC: { address: 'Penthouse, Phinma Plaza 39 Plaza Drive, Rockwell Center Makati City Manila Philippines', phone: '+63 (2) 8700 100', web: 'https://embassies.net/ecuador-in-philippines/manila' },
+    embassy_VE: { address: 'Unit 17 A, Multinational Bancorporation Center, 6805 Ayala Avenue, Makati City, 1227, Metro Manila, Philippines', phone: '+63 2 8452841', web: 'https://embassies.net/venezuela-in-philippines/manila' },
+    embassy_PE: { address: 'Suite 405-406, Clmc Building 259 Edsa Greenhills Mandaluyong City Metro Manila Philippines', phone: '+63 2-726-0355', web: 'https://embassies.net/peru-in-philippines/manila' },
     emergency_general: '911', police: '117', ambulance: '911', fire: '160',
     embassy_ES: 'Embajada de España en Manila: +63 2 8523 9586',
     embassy_AR: { address: '8Th Floor, Liberty Center Building, 104 H.V. Dela Costa Street, Salcedo Village', web: 'https://embassies.net/argentina-in-philippines/manila' },
@@ -1988,6 +2338,11 @@ const EMERGENCY_DB = {
     safety_tips: ['Cuidado en zonas de Mindanao (Maguindanao, Marawi) — riesgo de seguridad activo. Consulta aviso de viaje.', 'Tifones de junio a noviembre. Sigue instrucciones de evacuación.', 'Nunca lleves mochila en la espalda en zonas concurridas de Manila — riesgo de arrebato.'],
   },
   'Nepal': {
+    embassy_NZ: { address: 'Tiger Mountain Pvt Ltd, Ramalaya, Panipokhari, P. O. Box 2018', web: 'https://embassies.net/new-zealand-in-nepal/kathmandu' },
+    embassy_CA: { address: 'Kaldhara Marg 20356, Khusibu, Kathmandu, Nepal', phone: '+977 1 438 7910', web: 'https://embassies.net/canada-in-nepal/kathmandu' },
+    embassy_IT: { address: 'Pani Pokhari Kathmandu Nepal', phone: '+977 1-444 3500', web: 'https://embassies.net/italy-in-nepal/kathmandu' },
+    embassy_DE: { address: 'Gyaneshwor, Kathmandu, Nebal', phone: '+977 1 441 27 86', web: 'https://embassies.net/germany-in-nepal/kathmandu' },
+    embassy_CL: { address: 'Chilean Consulate Gpo Box: 3968 Kamaladi Kathmandu Nepal', phone: '+977 1 422 1637', web: 'https://embassies.net/chile-in-nepal/kathmandu' },
     emergency_general: '100/102', police: '100', ambulance: '102', fire: '101',
     embassy_ES: 'Embajada de España en Nueva Delhi cubre Nepal. En Katmandú: Honorary Consul.',
     embassy_AU: { address: 'Bansbari Kathmandu Nepal', phone: '+977 1  4371  678', web: 'https://embassies.net/australia-in-nepal/kathmandu' },
@@ -2006,6 +2361,10 @@ const EMERGENCY_DB = {
     safety_tips: ['Trekking: nunca solo sin guía registrado. Seguro de evacuación en helicóptero obligatorio para rutas de alta montaña.', 'Mal de altura (AMS) a partir de 3.000m — ascende despacio, hidratate, y baja si tienes síntomas.', 'Agua solo embotellada o purificada.'],
   },
   'Sri Lanka': {
+    embassy_PA: { address: 'N ° 623 / 16A Rajagiriya Gardens, Nawala Road Rajagiriya 10107 Colombo, Sri Lanka', web: 'https://embassies.net/panama-in-sri-lanka/colombo' },
+    embassy_CU: { address: 'Anderson Rd, Colombo 00500, Sri Lanka', phone: '+94 (1) 69 8438', web: 'https://embassies.net/cuba-in-sri-lanka/colombo' },
+    embassy_PE: { address: 'House 84, Ward Place Colombo Sri Lanka', web: 'https://embassies.net/peru-in-sri-lanka/colombo' },
+    embassy_CL: { address: 'N°83 George R. De Silva, Mawatha Colombo 13 Sri Lanka', phone: '+94 11 232 4203', web: 'https://embassies.net/chile-in-sri-lanka/colombo' },
     emergency_general: '119/110', police: '119', ambulance: '110', fire: '111',
     embassy_ES: 'Embajada de España en Colombo: +94 11 269 11 11 (Consulado Hon.)',
     embassy_AU: { address: '21 Srimath Rg Senanayake Mawatha Colombo 7 Sri Lanka', phone: '+94  11  246  3200', web: 'https://embassies.net/australia-in-sri-lanka/colombo' },
@@ -2057,6 +2416,18 @@ const EMERGENCY_DB = {
     safety_tips: ['Respeta las leyes locales: alcohol solo en lugares licenciados.', 'Ramadán: no comer, beber o fumar en público durante el ayuno (multa o detención).', 'Muestras de afecto en público entre parejas no casadas pueden ser multadas.', 'Fotografiar edificios gubernamentales, militares o personas sin permiso: ilegal.'],
   },
   'Arabia Saudí': {
+    embassy_NZ: { address: 'Diplomatic Quarter Po Box 94397 Riyadh 11693 Riyadh', phone: '+966 11 488 7988', web: 'https://embassies.net/new-zealand-in-saudi-arabia/riyadh' },
+    embassy_AU: { address: 'Abdullah Bin Hozafa Al-Sahmi Avenue Diplomatic Quarter Riyadh Saudi Arabia', phone: '+966 11 250 0900', web: 'https://embassies.net/australia-in-saudi-arabia/riyadh' },
+    embassy_CA: { address: 'P.O. Box 94321, Riyadh, 11693, Saudi Arabia', phone: '+ 966 (11) 202-3200', web: 'https://embassies.net/canada-in-saudi-arabia/riyadh' },
+    embassy_US: { address: 'P.O. Box 94309 Riyadh 11693 Saudi Arabia', phone: '+966 11 4883 800', web: 'https://embassies.net/united-states-in-saudi-arabia/riyadh' },
+    embassy_GB: { address: 'British Embassy Po Box 94351 11693 Riyadh Saudi Arabia', phone: '+966 (0) 11 481 9100', web: 'https://embassies.net/united-kingdom-in-saudi-arabia/riyadh' },
+    embassy_IT: { address: 'Safarat, Riyadh 11693, Saudi Arabia', phone: '+966 11 488 1212', web: 'https://embassies.net/italy-in-saudi-arabia/riyadh' },
+    embassy_DE: { address: 'Diplomatic Quarter, Riyadh, Saudi Arabia.', phone: '+966 112 77 69 00', web: 'https://embassies.net/germany-in-saudi-arabia/riyadh' },
+    embassy_FR: { address: 'Diplomatic Quarter, Po Box 94367 - Riyad 11693', phone: '+ 966 11 43 44 100', web: 'https://embassies.net/france-in-saudi-arabia/riyadh' },
+    embassy_PT: { address: 'Bdlg 56, Prince Faisal Bin Sa\'Ad Bin Abdulrahman St., Al Worood. Perto/Near Kingdom Tower Riyadh, Kingdom Of Saudi Arabia', web: 'https://embassies.net/portugal-in-saudi-arabia/riyadh' },
+    embassy_CU: { address: 'Show map Riyadh Olaya-Al Soubat Street House No. 34 Corner Prince Manssur Bin Abdulaziz Riyadh Saudi Arabia', web: 'https://embassies.net/cuba-in-saudi-arabia/riyadh' },
+    embassy_UY: { address: 'Alradeef Street, Al Safarat, Riyadh 11564, Saudi Arabia', phone: '+966 11 462 0739', web: 'https://embassies.net/uruguay-in-saudi-arabia/riyadh' },
+    embassy_VE: { address: 'Al-Kindy Area Next To The Culture Palace Parking No. 13, Ground Floor, Office No. 57 Riyadh Saudi Arabia', phone: '+966 53 455 0456', web: 'https://embassies.net/venezuela-in-saudi-arabia/riyadh' },
     emergency_general: '911', police: '999', ambulance: '911', fire: '998',
     embassy_ES: 'Embajada de España en Riad: +966 11 488 08 05',
     embassy_AR: { address: 'Hay Al Malqa, Riad 13524', phone: '+966 11 215 5400', hours: 'Dom-Jue 9:00-13:00', web: null },
@@ -2072,6 +2443,16 @@ const EMERGENCY_DB = {
     safety_tips: ['Respeta siempre las costumbres locales: ropa cubriente en público, especialmente en Meca y Medina (no-musulmanes no pueden entrar).', 'No muestres afecto en público. Alcohol: completamente prohibido.', 'Horario de negocios cambia drásticamente durante Ramadán.'],
   },
   'Israel': {
+    embassy_NZ: { address: '3 Daniel Frish Street64731 Tel Avivisrael', phone: '+972 3 695 6622', web: 'https://embassies.net/new-zealand-in-israel/tel-aviv' },
+    embassy_US: { address: 'Hayarkon St 71, Tel Aviv-Yafo, Israel', phone: '+972 3-519-7575', web: 'https://embassies.net/united-states-in-israel/tel-aviv' },
+    embassy_HN: { address: 'Show map Aharonkaron 3, Second Floor,Rishon Le-Zion 75262 Tel Aviv Israel', phone: '+972 3-964-2092', web: 'https://embassies.net/honduras-in-israel/tel-aviv' },
+    embassy_GT: { address: 'Show map Medinat Hayeudim, Beit Ackerstein, 103 Ôbö St., Floor 2, Herzlia Pituach Tel Aviv', web: 'https://embassies.net/guatemala-in-israel/tel-aviv' },
+    embassy_PA: { address: 'Karlibach 31 Beit Lishkar Hamishchar Building Tel Aviv-Yaffo, 52000, Israel', phone: '+972 36960849', web: 'https://embassies.net/panama-in-israel/tel-aviv' },
+    embassy_CR: { address: 'Show map 5-7 Shoham St. Paz Tower, Ramat Gan 52521 Tel-Aviv Israel', phone: '+972 3-613-5061', web: 'https://embassies.net/costa-rica-in-israel/tel-aviv' },
+    embassy_DO: { address: 'Show map Hahashmonaim St 84, Tel Aviv-Yafo, Israel', phone: '+972 3-605-5592', web: 'https://embassies.net/dominican-republic-in-israel/tel-aviv' },
+    embassy_UY: { address: 'Arieh Shenkar St 4, Herzliya, Israel', phone: '+972 9956 9612', web: 'https://embassies.net/uruguay-in-israel/tel-aviv' },
+    embassy_PY: { address: 'Aryeh Shenkar 4, 3Rd. Grap Buildings Floor, Herzliya Pituach Tel Aviv Israel', phone: '+ 972 9 773 2555', web: 'https://embassies.net/paraguay-in-israel/tel-aviv' },
+    embassy_EC: { address: '4, Rehov Weizman St. Asia House, 4Th. Floor P.O.Box 34002 Tel Aviv 6473925 Israel', phone: '+972 3 695 8764', web: 'https://embassies.net/ecuador-in-israel/tel-aviv' },
     emergency_general: '100/101/102', police: '100', ambulance: '101', fire: '102',
     embassy_ES: 'Embajada de España en Tel Aviv: +972 3 754 62 00',
     embassy_AR: { address: 'Soutine 26, Tel Aviv 64684', phone: '+972 3 546 7400', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -2105,6 +2486,15 @@ const EMERGENCY_DB = {
     safety_tips: ['Consulta el nivel de alerta de seguridad antes y durante el viaje (Ministerio de Exteriores de tu país).', 'En alerta de cohetes: busca el mampara más cercano (mirpeset) — hay menos de 90 segundos. El hotel te indicará el refugio.', 'Controles de seguridad muy estrictos en aeropuertos — llega con 3+ horas de antelación.'],
   },
   'Jordania': {
+    embassy_GB: { address: 'British Embassy (Po Box 87) Abdoun 11118 Amman Jordan', phone: '+962 6 590 9200', web: 'https://embassies.net/united-kingdom-in-jordan/amman' },
+    embassy_PT: { address: 'Show map Xv29+5Qf, Amman, Jordan', phone: '+962 6 585 2470', web: 'https://embassies.net/portugal-in-jordan/amman' },
+    embassy_PA: { address: '19 Hussein Abu Al-Ragheb Street, Abdou, Amman, Jordan', phone: '+ 962-6-592-4616', web: 'https://embassies.net/panama-in-jordan/amman' },
+    embassy_CR: { address: 'Abu Khader Group Chevrolet Gmc, Mecca Al Mukarramah St 137, Amman, Jordan', phone: '+962 6 582 2684', web: 'https://embassies.net/costa-rica-in-jordan/amman' },
+    embassy_UY: { address: 'Sita Wadi Sakra (Saab Car Building) P.O. Box 289 Amman Jordan', phone: '+962 6 632981', web: 'https://embassies.net/uruguay-in-jordan/amman' },
+    embassy_PY: { address: 'Po Box 830 698 Amman 11183 Jordan', phone: '+962 6 461 35 31', web: 'https://embassies.net/paraguay-in-jordan/amman' },
+    embassy_BO: { address: '228 Prince Mohammad Street - Sukljian Center - P.O. Box 289 - Amman 11118 - Jordan', phone: '+962 (6) 461 1886', web: 'https://embassies.net/bolivia-in-jordan/amman' },
+    embassy_EC: { address: '5Th Circle- Saudi Medical Center - Opp Sheraton Hotel - P.O Box 581178 - Amman 11185 - Jordan', phone: '962-6-5938465', web: 'https://embassies.net/ecuador-in-jordan/amman' },
+    embassy_PE: { address: 'Calle De La Reina Rania, Calle De The University Of Jordan, In Front Of The Al Dustour Newspaper, Building (Jordan Book Center) N ° 152', phone: '+962 (6) 515 1715', web: 'https://embassies.net/peru-in-jordan/amman' },
     emergency_general: '911', police: '911', ambulance: '911', fire: '911',
     embassy_ES: 'Embajada de España en Ammán: +962 6 465 52 52',
     embassy_AU: { address: '41 Kayed Al Armouti Street Abdoun, Amman Jordan', phone: '+962  6  580  7000', web: 'https://embassies.net/australia-in-jordan/amman' },
@@ -2130,6 +2520,12 @@ const EMERGENCY_DB = {
     safety_tips: ['País seguro para turistas. Cuidado en zonas fronterizas con Siria e Iraq.', 'Wadi Rum y Petra: lleva agua suficiente (mínimo 3L/persona/día en verano). Calor extremo.', 'Agua del grifo no potable.'],
   },
   'Irán': {
+    embassy_NZ: { address: 'No 1, Second Park Alley 34 Sousan St, North Golestan Complex Aghdassiyeh Avenue Niavaran Tehran', phone: '+98 21 261 22175', web: 'https://embassies.net/new-zealand-in-iran/tehran' },
+    embassy_CA: { address: 'Show map 57 Shahid Javad-E-Sarfaraz Ostad-Motahari Avenue P.O. Box 11365-4647 15868 Tehran Iran', web: 'https://embassies.net/canada-in-iran/tehran' },
+    embassy_NI: { address: 'Show map Sa`Adat Abad St, Qaretapehee St 79 Teheran Iran', phone: '+98 21 8868 5070', web: 'https://embassies.net/nicaragua-in-iran/tehran' },
+    embassy_CU: { address: 'Show map No. 54, 17 West, Khodaverdi St., Niavaran Square Tehran Iran', phone: '+98-21-2228-2749', web: 'https://embassies.net/cuba-in-iran/tehran' },
+    embassy_UY: { address: 'Tehran Province, Tehran, Shabnam Alley, Iran', phone: '+98 21 8878 2321', web: 'https://embassies.net/uruguay-in-iran/tehran' },
+    embassy_VE: { address: 'Av. Africa, Armaghan-E-Sharghi Mazyar Street 2 P.O. Box 19395-7137 Tehran Iran', phone: '+98 21 2205 1955', web: 'https://embassies.net/venezuela-in-iran/tehran' },
     emergency_general: '115/110', police: '110', ambulance: '115', fire: '125',
     embassy_ES: 'Embajada de España en Teherán: +98 21 267 3800',
     embassy_AR: { address: 'Darrus, Yar Mohammadi Av., Ghoo Alley No. 6', web: 'https://embassies.net/argentina-in-iran/tehran' },
@@ -2159,6 +2555,12 @@ const EMERGENCY_DB = {
 
   // ══ AFRICA ════════════════════════════════════════════════════════════════
   'Sudáfrica': {
+    embassy_NZ: { address: 'The Pavilion, Strawberry Lane, Constantia, Cape Town, 7806, South Africa', phone: '+27 21 794 4942', web: 'https://embassies.net/new-zealand-in-south-africa/cape-town' },
+    embassy_GT: { address: 'Show map Floor E-2, Nieuw Muckleneuk Pretoria 0181 South Africa', phone: '+27 12 346 3477', web: 'https://embassies.net/guatemala-in-south-africa/pretoria' },
+    embassy_PA: { address: 'Boshoff Park Office 141 Boshoff Street, Niew Muckleneuk Pretoria, South Africa.', phone: '+27 12 346-0703', web: 'https://embassies.net/panama-in-south-africa/pretoria' },
+    embassy_CR: { address: 'Ozmik House, 165 Lynnwood Road, Brooklyn 0181, Pretoria P.O. Box 11335, 0028 Hatfield, Pretoria South Africa', phone: '+ 27 12 342 1206', web: 'https://embassies.net/costa-rica-in-south-africa/pretoria' },
+    embassy_DO: { address: '252 Berea St, Muckleneuk, Pretoria, 0002, South Africa', phone: '+27 12 431 2380', web: 'https://embassies.net/dominican-republic-in-south-africa/pretoria' },
+    embassy_UY: { address: '1119 Burnett St, Hatfield, Pretoria, 0028, South Africa', phone: '+27 61 218 1228', web: 'https://embassies.net/uruguay-in-south-africa/pretoria' },
     emergency_general: '10111/10177', police: '10111', ambulance: '10177', fire: '10111',
     embassy_ES: 'Embajada de España en Pretoria: +27 12 460 07 99',
     embassy_AR: { address: '200 Standard Plaza, 440 Hilda Street, Hatfield, Pretoria', phone: '+27 12 430 3524', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -2197,6 +2599,11 @@ const EMERGENCY_DB = {
     safety_tips: ['Nunca camines con el móvil visible en la calle en Johannesburgo o Cape Town.', 'Conduce con las puertas bloqueadas y ventanas subidas en ciudades.', 'Smash-and-grab en semáforos: no dejes nada visible en el coche.', 'Townships: solo con guía de confianza. Nunca solo/a.', 'Playas: corrientes fuertes. Algunas playas tienen tiburones (Cape Town — hay alertas).'],
   },
   'Kenia': {
+    embassy_NZ: { address: 'B. D. Basson Incorporated 1 Haddy Street Nairobi Kenya', phone: '+254 22 211 2986', web: 'https://embassies.net/new-zealand-in-kenya/nairobi' },
+    embassy_CR: { address: 'Parklands/Highridge Village Market, Nairobi, Nairobi, Kenya', phone: '+254 20 7120330', web: 'https://embassies.net/costa-rica-in-kenya/nairobi' },
+    embassy_CU: { address: 'Show map Flame Tree Drive 93B, Runda, P.O. Box 198-00606 Sarit Centre Nairobi Kenya', phone: '+254-077-413-7859', web: 'https://embassies.net/cuba-in-kenya/nairobi' },
+    embassy_EC: { address: 'In Nairobi Mpaka House, Mpaka Rd, Westlands Po Box 76626 Nairobi Kenya', phone: '+254-20-2722382', web: 'https://embassies.net/ecuador-in-kenya/nairobi' },
+    embassy_VE: { address: 'International House, Parklands/Highridge, Nairobi, Kenya', phone: '+254 20 7120648', web: 'https://embassies.net/venezuela-in-kenya/nairobi' },
     emergency_general: '999/112', police: '999', ambulance: '999', fire: '999',
     embassy_ES: 'Embajada de España en Nairobi: +254 20 228 64 60',
     embassy_AR: { address: 'Limuru Road, Muthaiga, Nairobi', phone: '+254 20 762 7800', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -2230,6 +2637,8 @@ const EMERGENCY_DB = {
     safety_tips: ['Nairobi: nunca pasees de noche en zonas no turísticas. Westlands y Karen son las más seguras.', 'Safari: nunca salgas del vehículo salvo en zonas designadas.', 'Costa de Kenya: zona fronteriza con Somalia (Lamu) — evitar o consultar avisos actuales.', 'Malaria: profilaxis recomendada. Consulta médico viajes de tu país.'],
   },
   'Tanzania': {
+    embassy_DE: { address: 'Union House, Hamburg Avenue / Mirambo Street., 2Nd Floor, Dar Es Salaam, Tanzania', phone: '+255 22 2212300', web: 'https://embassies.net/germany-in-tanzania/dar-es-salaam' },
+    embassy_CU: { address: 'Show map Plot 313, Lugalo Road Upanga P.O: Box 9282 Dar-Es-Salaam Tanzania', phone: '+255-22-211 5928', web: 'https://embassies.net/cuba-in-tanzania/dar-es-salaam' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '115',
     embassy_ES: 'Embajada de España en Nairobi cubre Tanzania. Consulado Honorario en Dar es Salaam.',
     embassy_BE: { phone: '+255 22 211 40 25', email: 'mailto:DarEsSalaam@diplobel.fed.be', web: 'http://tanzania.diplomatie.belgium.be' },
@@ -2252,6 +2661,17 @@ const EMERGENCY_DB = {
 
   // ══ AMERICAS ══════════════════════════════════════════════════════════════
   'Cuba': {
+    embassy_GB: { address: 'Calle 34 No. 702 Esq 7Ma Miramar Playa Havana La Habana 11300 Cuba', phone: '+53 7214 2200', web: 'https://embassies.net/united-kingdom-in-cuba/havana' },
+    embassy_NI: { address: 'Calle 20, La Habana, Cuba', phone: '+53 72041025', web: 'https://embassies.net/nicaragua-in-cuba/havana' },
+    embassy_HN: { address: 'Show map Casa No. 112, 3Ra. Planta, Calle 30 Entre 1Ra. Y 3Ra., Miramar Ciudad Habana Cuba', phone: '+53 7 204-5496', web: 'https://embassies.net/honduras-in-cuba/havana' },
+    embassy_GT: { address: 'Show map Calle 20 No. 301, Esquina A 3Ra Miramar, Playa Havana Cuba', web: 'https://embassies.net/guatemala-in-cuba/havana' },
+    embassy_PA: { address: 'Calle 5Ta Avenida Nº 2207 Corner 24 Miramar, Municipality, Havana Beach , Cuba', web: 'https://embassies.net/panama-in-cuba/havana' },
+    embassy_DO: { address: 'Show map 5Ta. Ave. Nro. 9202, Entre 92 Y 94, Miramar Playa Havana Cuba', web: 'https://embassies.net/dominican-republic-in-cuba/havana' },
+    embassy_UY: { address: 'Calle 36 N° 716 Entre 7A Y 9A Avenida, Miramar, La Habana, Cuba', phone: '+53 7 2069683', web: 'https://embassies.net/uruguay-in-cuba/havana' },
+    embassy_PY: { address: 'Calle 34 Nº 503 Between 5ª And 7ª Avda. - Miramar, Playa, Havana, Cuba.', phone: '+53 7 204 0884', web: 'https://embassies.net/paraguay-in-cuba/havana' },
+    embassy_BO: { address: 'Calle 44 No 305 Entre 3Ra. Y 3Ra A. Miramar Playa Havana Cuba', web: 'https://embassies.net/bolivia-in-cuba/havana' },
+    embassy_EC: { address: 'Ave 7Ma Esq 40 No 3804, La Habana Cuba', phone: '+53 7 2042 034', web: 'https://embassies.net/ecuador-in-cuba/havana' },
+    embassy_VE: { address: 'Calle 36 A No.704 E/ 7Ma. Y 42 Miramar, La Playa Havana Cuba', phone: '+53 7 204 2662', web: 'https://embassies.net/venezuela-in-cuba/havana' },
     emergency_general: '106/105', police: '106', ambulance: '104', fire: '105',
     embassy_ES: 'Embajada de España en La Habana: +53 7 866 8025',
     embassy_AR: { address: 'Calle 36 Nro. 511, Miramar, Playa, La Habana, República De Cuba', web: 'https://embassies.net/argentina-in-cuba/havana' },
@@ -2279,6 +2699,16 @@ const EMERGENCY_DB = {
     safety_tips: ['Internet muy limitado — VPN recomendada.', 'Dinero en efectivo imprescindible — tarjetas de crédito/débito de bancos europeos raramente funcionan.', 'Jineteros (vendedores ambulantes) muy insistentes en zonas turísticas. Un "no" firme es suficiente.', 'Nunca compres cosas en mercado negro (ron, habanos "de regalo") — puede ser timo.'],
   },
   'Uruguay': {
+    embassy_NZ: { address: 'Miguel Grau 3789 Montevideo 11.000 Uruguay', phone: '+598 2 622 1543', web: 'https://embassies.net/new-zealand-in-uruguay/montevideo' },
+    embassy_AU: { address: '25 De Mayo 455 Piso 2 Montevideo Uruguay', phone: '+598 9845 1451', web: 'https://embassies.net/australia-in-uruguay/montevideo' },
+    embassy_NI: { address: 'Miraflores 1408 Montevideo 11100 Uruguay', phone: '+598 (2) 604 0723', web: 'https://embassies.net/nicaragua-in-uruguay/montevideo' },
+    embassy_GT: { address: 'Show map Carlos Federico Sáez 1538, 11500 Montevideo, Departamento De Montevideo, Uruguay', web: 'https://embassies.net/guatemala-in-uruguay/montevideo' },
+    embassy_CR: { address: 'Roque Graseras 740, 11300 Montevideo, Departamento De Montevideo, Uruguay', phone: '+598 2711 6408', web: 'https://embassies.net/costa-rica-in-uruguay/montevideo' },
+    embassy_DO: { address: 'Show map Plãƒâ¡Cido Ellauri 3478 Montevideo Uruguay', web: 'https://embassies.net/dominican-republic-in-uruguay/montevideo' },
+    embassy_PY: { address: 'Boulevard Artigas 434 Corner Of Luis De La Torre Montevideo Uruguay', phone: '+ 598 2710 6774', web: 'https://embassies.net/paraguay-in-uruguay/montevideo' },
+    embassy_BO: { address: 'Calle Prudencio De Pena N° 2567 Montevideo Uruguay', web: 'https://embassies.net/bolivia-in-uruguay/montevideo' },
+    embassy_EC: { address: 'Pedro Berro 1217 Y Pereira Montevideo Uruguay', phone: '+598 2 707 6463', web: 'https://embassies.net/ecuador-in-uruguay/montevideo' },
+    embassy_MX: { address: '25 De Mayo 512, Department Of Montevideo Uruguay', phone: '+598 2916-8500', web: 'https://embassies.net/mexico-in-uruguay/montevideo' },
     emergency_general: '911', police: '911', ambulance: '105', fire: '104',
     embassy_ES: 'Embajada de España en Montevideo: +598 2 708 6010',
     embassy_AR: { address: 'Cuareim 1470 Montevideo Uruguay', phone: '+ 598 2 902 8166', web: 'https://embassies.net/argentina-in-uruguay/montevideo', email: 'mailto:eurug@mrecic.gov.ar' },
@@ -2306,6 +2736,12 @@ const EMERGENCY_DB = {
 
   // ══ OTROS ═════════════════════════════════════════════════════════════════
   'Nueva Zelanda': {
+    embassy_NI: { address: '50 Clonbern Road Auckland, New Zealand', web: 'https://embassies.net/nicaragua-in-new-zealand/auckland' },
+    embassy_SV: { address: '1644 Manukau Road, Onehunga, Auckland 1061, New Zealand', phone: '+64 9625 4770', web: 'https://embassies.net/el-salvador-in-new-zealand/auckland' },
+    embassy_PA: { address: '2/300 Queen Street, Auckland Cbd, Auckland 1010, New Zealand', phone: '+64 9379 8550', web: 'https://embassies.net/panama-in-new-zealand/auckland' },
+    embassy_UY: { address: '27 Woodbury Street, Avonhead, Christchurch 8042, New Zealand', phone: '+64 3342 5520', web: 'https://embassies.net/uruguay-in-new-zealand/christchurch' },
+    embassy_EC: { address: 'Level 3, 71 Symonds Street P.O. Box 8396, Symonds Street Auckland 1150', phone: '+64 9 303 0590', web: 'https://embassies.net/ecuador-in-new-zealand/auckland' },
+    embassy_CO: { address: '949 Nelson New Zealand', phone: '+64 3 545 1154', web: 'https://embassies.net/colombia-in-new-zealand/nelson' },
     emergency_general: '111', police: '111', ambulance: '111', fire: '111',
     embassy_ES: 'Embajada de España en Wellington: +64 4 802 5665',
     embassy_AR: { address: 'Level 5, 15 Murphy Street', phone: '+ 64 4 472 8330', web: 'https://embassies.net/argentina-in-new-zealand/wellington' },
@@ -2332,6 +2768,8 @@ const EMERGENCY_DB = {
     safety_tips: ['País muy seguro. Mayor riesgo: naturaleza. Clima cambia en minutos, especialmente en Fiordland.', 'Alertas sísmicas: NZ es zona sísmica activa. GeoNet app imprescindible.', 'Ríos: corrientes muy fuertes. No cruces ríos a pie sin evaluarlos con un guía.'],
   },
   'Georgia': {
+    embassy_CA: { address: '34 Rustaveli Avenue, Third Floor, Tbilisi, Georgia, 0108', phone: '+995 (32) 298-2072', web: 'https://embassies.net/canada-in-georgia/tbilisi' },
+    embassy_DE: { address: 'Street C/O Sheraton Metechi Palace Hotel, Telavi Str. 20, 0103 Tbilissi, Georgia.', phone: '+995 32 244 73 00', web: 'https://embassies.net/germany-in-georgia/tbilisi' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Ankara cubre Georgia. Embajada de Polonia representa a España en Tiflis.',
     embassy_AT: { web: 'https://www.bmeia.gv.at/oeb-tiflis/' },
@@ -2351,6 +2789,12 @@ const EMERGENCY_DB = {
     safety_tips: ['País muy seguro. Tiflis: cuidado de noche en Gldani y zonas periféricas.', 'Conducción caótica — usa siempre el cinturón.', 'Zona de Osetia del Sur y Abjasia: evitar completamente. Son territorios ocupados con acceso restringido.'],
   },
   'Canadá': {
+    embassy_NZ: { address: '150 Elgin St Suite 1401, Ottawa, On K2P 1L4, Canada', phone: '+1 613 238 5991', web: 'https://embassies.net/new-zealand-in-canada/ottawa' },
+    embassy_IT: { address: '275, Slater Street, 21St Floor - Ottawa (Ontario)', phone: '+0016132322401', web: 'https://embassies.net/italy-in-canada/ottawa' },
+    embassy_NI: { address: '4870 Avenue Doherty, Montréal, Qc H4V 2B2, Canada', phone: '+1 5144848250', web: 'https://embassies.net/nicaragua-in-canada/montreal' },
+    embassy_DO: { address: 'Show map 130 Albert St #1605, Ottawa, On K1P 5G4, Canada', phone: '+1 613-569-9893', web: 'https://embassies.net/dominican-republic-in-canada/ottawa' },
+    embassy_CU: { address: 'Show map 388 Main St, Ottawa, On K1S 1E3, Canada', web: 'https://embassies.net/cuba-in-canada/ottawa' },
+    embassy_MX: { address: '45 O\'Connor St. Suite 1000 Ottawa, Ontario K1P 1A4', phone: '+1 613 233 8988', web: 'https://embassies.net/mexico-in-canada/ottawa' },
     emergency_general: '911', police: '911', ambulance: '911', fire: '911',
     embassy_ES: 'Embajada de España en Ottawa: +1 613 747 2252',
     embassy_AR: { address: '81 Metcalfe St. 7Th. Floor, Ottawa, On., Canada', phone: '+1 613 236 2351', web: 'https://embassies.net/argentina-in-canada/ottawa' },
@@ -2393,6 +2837,11 @@ const EMERGENCY_DB = {
 
 
   'Estados Unidos': {
+    embassy_NZ: { address: '513 Seminole Avenue N.E. Atlanta, Ga 30307 United States', phone: '+1 404 745 4551', web: 'https://embassies.net/new-zealand-in-united-states/atlanta' },
+    embassy_NI: { address: '1627 New Hampshire Ave Nw, Washington, Dc 20009, United States', phone: '+1 2029396570', web: 'https://embassies.net/nicaragua-in-united-states/washington' },
+    embassy_HN: { address: 'Show map 1990 M St Nw, Washington, Dc 20036, United States', web: 'https://embassies.net/honduras-in-united-states/washington' },
+    embassy_CR: { address: '2112-S Street N.W. Washington, D.C. 20008 United States', phone: '+1 202 234 - 2945', web: 'https://embassies.net/costa-rica-in-united-states/washington' },
+    embassy_DO: { address: 'Show map 1715 22Nd St Nw, Washington, Dc 20008, United States', web: 'https://embassies.net/dominican-republic-in-united-states/washington' },
     emergency_general: '911',
     police: '911',
     ambulance: '911',
@@ -2440,6 +2889,8 @@ const EMERGENCY_DB = {
  * Obtiene datos de emergencia hardcodeados para un país.
  * Compatible con la interfaz que espera Utilities.jsx.
  */
+import { getCountryIso, normalizeCountry } from './countryConfig';
+
 export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España', secondNationality = null) {
   if (!countryLabel) return null;
 
@@ -2503,39 +2954,14 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
   let embassy = null;
   const homeNorm = (homeCountry || 'España').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // Mapeo país origen → clave de embajada en orden de prioridad
-  const embassyKey = (() => {
-    if (homeNorm.includes('mexic'))    return ['embassy_MX'];
-    if (homeNorm.includes('argentin')) return ['embassy_AR'];
-    if (homeNorm.includes('colombi'))  return ['embassy_CO'];
-    if (homeNorm.includes('peru'))     return ['embassy_PE'];
-    if (homeNorm.includes('chile'))    return ['embassy_CL'];
-    if (homeNorm.includes('venezuel')) return ['embassy_VE'];
-    if (homeNorm.includes('ecuad'))    return ['embassy_EC'];
-    if (homeNorm.includes('boliv'))    return ['embassy_BO'];
-    if (homeNorm.includes('paragua')) return ['embassy_PY'];
-    if (homeNorm.includes('urugua'))   return ['embassy_UY'];
-    if (homeNorm.includes('costa ric')) return ['embassy_CR'];
-    if (homeNorm.includes('guatemal')) return ['embassy_GT'];
-    if (homeNorm.includes('hondur'))   return ['embassy_HN'];
-    if (homeNorm.includes('el salv') || homeNorm.includes('salvador')) return ['embassy_SV'];
-    if (homeNorm.includes('nicarag'))  return ['embassy_NI'];
-    if (homeNorm.includes('panam'))    return ['embassy_PA'];
-    if (homeNorm.includes('dominican') || homeNorm.includes('rep dom')) return ['embassy_DO'];
-    if (homeNorm.includes('cuba'))     return ['embassy_CU'];
-    if (homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
-    if (homeNorm.includes('portug'))   return ['embassy_PT'];
-    if (homeNorm.includes('franc'))    return ['embassy_FR'];
-    if (homeNorm.includes('aleman') || homeNorm.includes('german')) return ['embassy_DE'];
-    if (homeNorm.includes('ital'))     return ['embassy_IT'];
-    if (homeNorm.includes('reino unido') || homeNorm.includes('united kingdom')) return ['embassy_GB'];
-    if (homeNorm.includes('estados unidos') || homeNorm.includes('united states')) return ['embassy_US'];
-    if (homeNorm.includes('brasil') || homeNorm.includes('brazil')) return ['embassy_BR'];
-    if (homeNorm.includes('chin'))     return ['embassy_CN'];
-    if (homeNorm.includes('japon') || homeNorm.includes('japan')) return ['embassy_JP'];
-    if (homeNorm.includes('espana') || homeNorm.includes('spain')) return ['embassy_ES'];
-    return null; // Sin datos de embajada para este pasaporte
-  })();
+  // Clave de embajada por ISO del país de origen. Antes era una lista de ifs por
+  // nombre ('mexic', 'german'...) que solo cubría 28 países: las embajadas de
+  // Canadá, Australia, Irlanda, Países Bajos, Austria, Bélgica, Suiza, Finlandia,
+  // India, Corea, Noruega y Suecia estaban en la BD pero eran inalcanzables.
+  // Por ISO funciona con cualquier país y en cualquier idioma, y si mañana se
+  // añade un embassy_XX nuevo no hay que tocar este código.
+  const homeIso = getCountryIso(normalizeCountry(homeCountry));
+  const embassyKey = homeIso ? [`embassy_${homeIso}`] : [];
 
   for (const key of embassyKey) {
     if (data[key]) { embassy = data[key]; break; }
@@ -2545,24 +2971,8 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
   let secondEmbassy = null;
   if (secondNationality && secondNationality !== homeCountry) {
     const sNorm = (secondNationality).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const keys2 = (() => {
-      if (sNorm.includes('espana') || sNorm.includes('spain')) return ['embassy_ES'];
-      if (sNorm.includes('franc') || sNorm.includes('france')) return ['embassy_FR', 'embassy_ES'];
-      if (sNorm.includes('aleman') || sNorm.includes('german') || sNorm.includes('deutsch')) return ['embassy_DE', 'embassy_ES'];
-      if (sNorm.includes('ital'))   return ['embassy_IT', 'embassy_ES'];
-      if (sNorm.includes('portug')) return ['embassy_PT', 'embassy_ES'];
-      if (sNorm.includes('brasil') || sNorm.includes('brazil')) return ['embassy_BR', 'embassy_ES'];
-      if (sNorm.includes('mexic'))   return ['embassy_MX', 'embassy_ES'];
-      if (sNorm.includes('argentin')) return ['embassy_AR', 'embassy_ES'];
-      if (sNorm.includes('colombi')) return ['embassy_CO', 'embassy_ES'];
-      if (sNorm.includes('peru'))    return ['embassy_PE', 'embassy_ES'];
-      if (sNorm.includes('chile'))   return ['embassy_CL', 'embassy_ES'];
-      if (sNorm.includes('venezuel')) return ['embassy_VE', 'embassy_ES'];
-      if (sNorm.includes('ecuad'))  return ['embassy_EC', 'embassy_ES'];
-      if (sNorm.includes('reino unido') || sNorm.includes('united kingdom') || sNorm.includes('britain')) return ['embassy_GB', 'embassy_ES'];
-      if (sNorm.includes('estados unidos') || sNorm.includes('united states')) return ['embassy_US', 'embassy_ES'];
-      return ['embassy_ES'];
-    })();
+    const secondIso = getCountryIso(normalizeCountry(secondNationality));
+    const keys2 = secondIso ? [`embassy_${secondIso}`] : [];
     for (const key of keys2) {
       if (data[key]) { secondEmbassy = data[key]; break; }
     }
@@ -2575,22 +2985,6 @@ export function getHardcodedEmergencyInfo(countryLabel, homeCountry = 'España',
     fire: data.fire,
     embassy,
     secondEmbassy,
-    embassy_AU: { address: '1145 17Th St Nw Suite Gp410 (Mail) Washington, Dc 20036-4707', phone: '+1  202  797  3000', web: 'https://embassies.net/australia-in-united-states/washington' },
-    embassy_AT: { web: 'https://www.austria.org/' },
-    embassy_BE: { phone: '+1-404-659-21-50', email: 'mailto:atlanta@diplobel.fed.be', web: 'https://unitedstates.diplomatie.belgium.be/fr/ambassade-et-consulats/consulat-general-atlanta' },
-    embassy_CA: { address: '501 Pennsylvania Avenue, N.W., Washington, D.C., U.S.A., 20001', phone: '+1-844-880-6519', web: 'https://embassies.net/canada-in-united-states/washington', email: 'mailto:chcgo@international.gc.ca' },
-    embassy_CU: { address: 'Show map 2630 16Th St Nw, Washington, Dc 20009, United States', web: 'https://embassies.net/cuba-in-united-states/washington' },
-    embassy_SV: { address: '1400 16Th Street Nw Suite 100, Washington Dc 20036', phone: '(202) 595-7500', web: 'https://embassies.net/el-salvador-in-united-states/washington' },
-    embassy_FI: { web: 'https://finlandabroad.fi/web/usa' },
-    embassy_GT: { address: 'Show map 2220 R St Nw, Washington, Dc 20008, United States', web: 'https://embassies.net/guatemala-in-united-states/washington' },
-    embassy_IN: { web: 'https://www.cgichicago.gov.in/' },
-    embassy_IE: { web: 'https://www.ireland.ie/en/usa/washington/' },
-    embassy_JP: { web: 'https://www.anchorage.us.emb-japan.go.jp/itprtop_ja/' },
-    embassy_NO: { web: 'https://www.norway.no/en/usa/' },
-    embassy_PA: { address: '2862 Mc Gill Terrace Nw Washington Dc 20008', phone: '+1-202-483-1407', web: 'https://embassies.net/panama-in-united-states/washington' },
-    embassy_KR: { web: 'https://overseas.mofa.go.kr/us-losangeles-ko/index.do' },
-    embassy_SE: { email: 'mailto:generalkonsulat.new-york@gov.se', web: 'https://www.swedenabroad.se/en/embassies/usa-new-york/' },
-    embassy_CH: { email: 'mailto:chicago@eda.admin.ch', web: 'https://www.eda.admin.ch/atlanta' },
     useful_apps: data.useful_apps || [],
     safety_tips: data.safety_tips || [],
   };
@@ -2603,6 +2997,14 @@ Object.assign(EMERGENCY_DB, {
   // ══ EUROPA ════════════════════════════════════════════════════════════════════
 
   'Luxemburgo': {
+    embassy_CA: { address: '51 Rue Raoul Follereau, 1529 Luxembourg', phone: '+352 26 270 570', web: 'https://embassies.net/canada-in-luxembourg/luxembourg' },
+    embassy_GB: { address: '5, Boulevard Joseph Ii L-1840 Luxembourg Luxembourg', phone: '+352 22 98 64', web: 'https://embassies.net/united-kingdom-in-luxembourg/luxembourg' },
+    embassy_BR: { address: '20, Rue General Major Lunsford E. Oliver 2225 Luxembourg Ville Luxembourg', phone: '352 26 45 88 87', web: 'https://embassies.net/brazil-in-luxembourg/luxembourg' },
+    embassy_UY: { address: '7, Val St. Croix 2227 Luxembourg Luxembourg', phone: '+352 22 11 90 - 312', web: 'https://embassies.net/uruguay-in-luxembourg/luxembourg' },
+    embassy_EC: { address: 'Sr. Paul Scheeck Po Box 2679 Luxembourg 1026', phone: '+35-2-45115245', web: 'https://embassies.net/ecuador-in-luxembourg/luxembourg' },
+    embassy_PE: { address: '42, Rue De Hollerich L- 1740, Luxembourg Ville, Luxembourg', phone: '+352 621 786 325', web: 'https://embassies.net/peru-in-luxembourg/luxembourg' },
+    embassy_CL: { address: 'Chilean Consulate In Luxembourg Ville, Luxembourg 39, Rue General Patton 4277 Esch-Sur-Alzette Luxembourg', phone: '+352 621 245 270', web: 'https://embassies.net/chile-in-luxembourg/luxembourg' },
+    embassy_MX: { address: '412F, Route D’Esch L-2086', phone: '+352 2647 8383', web: 'https://embassies.net/mexico-in-luxembourg/luxembourg' },
     emergency_general: '112', police: '113', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Luxemburgo: +352 46 02 55',
     embassy_BE: { phone: '+352 44-27-46-1', email: 'mailto:luxembourg@diplobel.fed.be', web: 'https://luxembourg.diplomatie.belgium.be' },
@@ -2616,6 +3018,13 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['País muy seguro. Pequeño y fácil de recorrer. Ciudad de Luxemburgo: zona de la Cornisa muy segura.'],
   },
   'Estonia': {
+    embassy_AU: { address: 'C/- Standard Ltd Marja 9 Tallinn Ee-10617 Estonia.', phone: '+372 6 509 308', web: 'https://embassies.net/australia-in-estonia/tallinn' },
+    embassy_CA: { address: 'Office Of The Embassy Of Canada Toom Kooli 13, 2Nd Floor, 15186 Tallinn, Estonia', web: 'https://embassies.net/canada-in-estonia/tallinn' },
+    embassy_PT: { address: 'Kohtu 10, 10130 Tallinn, Estonia', phone: '+372 611 7468', web: 'https://embassies.net/portugal-in-estonia/tallinn' },
+    embassy_CR: { address: 'Sõpruse Pst. 2 50050 Tartu Estonia', phone: '+372 7 307 300', web: 'https://embassies.net/costa-rica-in-estonia/tartu' },
+    embassy_UY: { address: 'Toomiku Tee 20, 11911 Tallinn, Estonia', phone: '+372 510 4302', web: 'https://embassies.net/uruguay-in-estonia/tallinn' },
+    embassy_PE: { address: 'Anne, 75-18 50704 Tartu Estonia', phone: '+372 748 4724', web: 'https://embassies.net/peru-in-estonia/tartu' },
+    embassy_MX: { address: 'Kohtu 3 A 2, 10130 Tallinn, Estonia', phone: '+372 5813 7564', web: 'https://embassies.net/mexico-in-estonia/tallinn' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Tallin: +372 627 7960',
     embassy_AT: { web: 'https://www.bmeia.gv.at/oeb-tallinn/' },
@@ -2634,6 +3043,15 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['País muy seguro. Verano nórdico: noches claras desorientan. Tallin vieja ciudad: cuidado con adoquines mojados.'],
   },
   'Letonia': {
+    embassy_AU: { address: 'C/- Airtour , 7 Vilandes, Riga Lv-1010, Latvia', phone: '+371 67 320 509', web: 'https://embassies.net/australia-in-latvia/riga' },
+    embassy_PT: { address: 'Balsata Dambis,60 Oglu Iela Kipsala 1048 Lv Riga Latvia', phone: '+371-678-21924', web: 'https://embassies.net/portugal-in-latvia/riga' },
+    embassy_BR: { address: 'Pulkveea Brieea Iela 7-D628 1010 Riga Latvia', phone: '+371 291 107 91', web: 'https://embassies.net/brazil-in-latvia/riga' },
+    embassy_UY: { address: 'K. Ulmaņa Gatve 2 Riga 1024 Latvia', phone: '+371 762 27 46', web: 'https://embassies.net/uruguay-in-latvia/riga' },
+    embassy_EC: { address: '1, Antonijas Street 1011 Riga Latvia', phone: '+371 780 5576', web: 'https://embassies.net/ecuador-in-latvia/riga' },
+    embassy_PE: { address: 'Balasta Dambis 36 1048 Riga Latvia', phone: '+371 265 108 64', web: 'https://embassies.net/peru-in-latvia/riga' },
+    embassy_CL: { address: '4 Audeju Street Riga, , Lv-1050, Letonia Riga Latvia', phone: '+ 93 71 672 160 24', web: 'https://embassies.net/chile-in-latvia/riga' },
+    embassy_CO: { address: 'Marupes Iela 4 1002 Riga Latvia', phone: '+371 673 256 23', web: 'https://embassies.net/colombia-in-latvia/riga' },
+    embassy_MX: { address: 'Pulkveža Brieža Iela Nr. 8-1 Riga, Lv 1010, Latvia', phone: '+371 6750 5000', web: 'https://embassies.net/mexico-in-latvia/riga' },
     emergency_general: '112', police: '110', ambulance: '113', fire: '112',
     embassy_ES: 'Embajada de España en Riga: +371 6732 0252',
     embassy_CA: { address: '20/22 Baznicas Street, 6Th Floor, Riga Lv-1010, Latvia', phone: '+371 6781-3945', web: 'https://embassies.net/canada-in-latvia/riga' },
@@ -2654,6 +3072,10 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Muy seguro. Riga: vida nocturna activa en el casco antiguo. Cuidado con bebidas no solicitadas en bares.'],
   },
   'Lituania': {
+    embassy_AU: { address: '23 Vilniaus St Lt-2001 Vilnius Lithuania', phone: '+370 5 212 33 69', web: 'https://embassies.net/australia-in-lithuania/vilnius' },
+    embassy_CA: { address: 'Business Centre 2000, Jogailos St. 4, 7Th Floor, Vilnius 01116, Lithuania', phone: '+ 370 (5) 249-0950', web: 'https://embassies.net/canada-in-lithuania/vilnius' },
+    embassy_PT: { address: 'Gedimino Pr. 5, Vilnius 01103, Litunia', phone: '+370 5 262 0511', web: 'https://embassies.net/portugal-in-lithuania/vilnius' },
+    embassy_MX: { address: '14 Lt 03225, Vilnius, Lithuania', phone: '+370 6 875 0658', web: 'https://embassies.net/mexico-in-lithuania/vilnius' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Vilna: +370 5 231 3490',
     embassy_FI: { web: 'https://finlandabroad.fi/web/ltu' },
@@ -2670,6 +3092,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Muy seguro. Vilna tiene uno de los cascos históricos más grandes y mejor conservados de Europa.'],
   },
   'Albania': {
+    embassy_CA: { address: '29 Rruga Ibrahim Rugova, Tirana, Albania', web: 'https://embassies.net/canada-in-albania/tirana' },
+    embassy_UY: { address: 'Banka Amerikane E Shqiperise, Rr. Ismail Qemali, Nr. 27', web: 'https://embassies.net/uruguay-in-albania/tirana' },
     emergency_general: '112', police: '129', ambulance: '127', fire: '128',
     embassy_ES: 'Embajada de España en Tirana: +355 4 227 7150',
     embassy_AT: { phone: '+355-68-205-0267', email: 'mailto:gjergjleqejza@shkodra-honorarkonsulat.com', web: 'https://www.bmeia.gv.at/oeb-tirana/oesterreich-in-albanien/oesterreichische-stellen/' },
@@ -2692,6 +3116,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Seguro. Zonas fuera de caminos marcados en campo abierto: minas antipersona residuales de la guerra (1992-1995). Nunca salgas de los senderos señalizados.'],
   },
   'Kosovo': {
+    embassy_IT: { address: 'Show map Azem Jashanica, 5 - Dragodan Pristina Kosovo', phone: '+381 382 44925', web: 'https://embassies.net/italy-in-kosovo/pristina' },
+    embassy_DE: { address: 'Show map Azem Jashanica 17, Arberia 10000 Pristina Kosovo', phone: '+381 38 25 45 00', web: 'https://embassies.net/germany-in-kosovo/pristina' },
     emergency_general: '112', police: '192', ambulance: '194', fire: '193',
     embassy_ES: 'Embajada de España en Pristina: +383 38 243 500',
     embassy_FR: { web: 'https://kosovo.ambafrance.org/' },
@@ -2711,6 +3137,9 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Seguro. Costa adriática en verano: muy concurrida. Carreteras de montaña (Durmitor): estrechas y sin quitamiedos — conduce despacio.'],
   },
   'Macedonia del Norte': {
+    embassy_AU: { address: 'Motiva Londonska 11 B Skopje 1000 North Macedonia, Republic Of', phone: '+389 2 3061 114', web: 'https://embassies.net/australia-in-north-macedonia/skopje' },
+    embassy_CA: { address: 'Bul. Partizanski Odredi 70B, Third Floor, 1000 Skopje, North Macedonia', phone: '+389 (2) 3225-630', web: 'https://embassies.net/canada-in-north-macedonia/skopje' },
+    embassy_DE: { address: '59, Ul. Lerinska, Skopje, North, Macedonia.', phone: '+389 2 309 39 00', web: 'https://embassies.net/germany-in-north-macedonia/skopje' },
     emergency_general: '112', police: '192', ambulance: '194', fire: '193',
     embassy_ES: 'Embajada de España en Skopje: +389 2 3084 222',
     embassy_AT: { web: 'http://www.bmeia.gv.at/botschaft/skopje/' },
@@ -2724,6 +3153,21 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Seguro para turistas. Skopje: cuidado con taxis sin taxímetro — negocia precio antes.'],
   },
   'Chipre': {
+    embassy_NZ: { address: 'Kondilaki 6, 1090 Lefkosia, Nicosia, Po Box 24676, 1302 Lefkosia, Cyprus', phone: '+357 22 818 884', web: 'https://embassies.net/new-zealand-in-cyprus/nicosia' },
+    embassy_AU: { address: '7Th Floor, Block A Alpha Business Centre 27 Pindarou Street Nicosia 1060 Cyprus', phone: '+357 2269 7555', web: 'https://embassies.net/australia-in-cyprus/nicosia' },
+    embassy_CA: { address: '15 Themistocles Dervis Street, 1066 Nicosia, Cyprus', phone: '+357 22 77 55 08', web: 'https://embassies.net/canada-in-cyprus/nicosia' },
+    embassy_US: { address: 'Metochiou & Ploutarchou Street 2407, Engomi Nicosia, Cyprus', phone: '+357 22 393 939', web: 'https://embassies.net/united-states-in-cyprus/nicosia' },
+    embassy_GB: { address: 'Alexander Pallis Street Po Box 21978 Nicosia 1587 Cyprus', phone: '+357 22 861100', web: 'https://embassies.net/united-kingdom-in-cyprus/nicosia' },
+    embassy_PT: { address: '9 Arch. Makarios Avenue Severis Building, 5Th Floor P.O. Box 27407 1645 Nicosia Cyprus', web: 'https://embassies.net/portugal-in-cyprus/nicosia' },
+    embassy_BR: { address: '14 Achaion Street, Agios Andreas 1101 Nicosia Cyprus', phone: '+357 2259 2300', web: 'https://embassies.net/brazil-in-cyprus/nicosia' },
+    embassy_PA: { address: 'Alexandrou Koumoudorourou 2 2054 Strovolos, Nicosia, Cyprus', phone: '+357-22-456 000', web: 'https://embassies.net/panama-in-cyprus/limassol' },
+    embassy_CR: { address: '143 E. Chr. Haggipavlou, Str. Limassoul, Cyprus', phone: '(00357) 05-362223', web: 'https://embassies.net/costa-rica-in-cyprus/limassol' },
+    embassy_UY: { address: 'Diagoras House 16, Pantelis Catelaris Street P.O.Box 25001 1306 Nicosia Cyprus', phone: '+357 22 660766', web: 'https://embassies.net/uruguay-in-cyprus/nicosia' },
+    embassy_EC: { address: 'Leontiou A’ – Maximos Court A’, 1St Floor 38, Nicou Pattichi Street P.O.Box 50167 3601 Limassol Cyprus', phone: '+357 (25) 334245', web: 'https://embassies.net/ecuador-in-cyprus/limassol' },
+    embassy_PE: { address: '1St Floor 2414 Engomi P.O.Box 16020 2085 Nicosia Cyprus', phone: '+357 22 352540', web: 'https://embassies.net/peru-in-cyprus/nicosia' },
+    embassy_CL: { address: 'Chilean Consulate In Nicosia, Cyprus 5 Medon St. 1060 Nicosia Cyprus', phone: '+357 22 765424', web: 'https://embassies.net/chile-in-cyprus/nicosia' },
+    embassy_CO: { address: '109 Omonias Avenue Flamingo Building, 3Rd Floor 3045 Limassol P. O. Box 50407 3604 Limassol Cyprus', web: 'https://embassies.net/colombia-in-cyprus/limassol' },
+    embassy_MX: { address: 'Evagoras Complex Av. Evagoras 31 Office 61, 6 Floor Cp 1066 Nicosia, Cyprus', phone: '+357 22 103 060', web: 'https://embassies.net/mexico-in-cyprus/nicosia' },
     emergency_general: '112/199', police: '199', ambulance: '199', fire: '199',
     embassy_ES: 'Embajada de España en Nicosia: +357 22 450 750',
     embassy_CU: { address: 'Show map Pentelis 26, Strovolos, Nicosia, Chipre. Cp 2013', phone: '+357-22-769 743', web: 'https://embassies.net/cuba-in-cyprus/nicosia' },
@@ -2763,6 +3207,13 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['País muy seguro. Carreteras en la colina: curvas cerradas — conduce despacio.'],
   },
   'Ucrania': {
+    embassy_NZ: { address: '1St Build, 5 Lopukhinsky Per. Kiev 04107 Ukraine', phone: '+380 (44) 238-26-95', web: 'https://embassies.net/new-zealand-in-ukraine/kiev' },
+    embassy_PA: { address: 'Zolotovoritska St., 2-2A. Kyiv Ukraine', phone: '+380 44 228 2483', web: 'https://embassies.net/panama-in-ukraine/kiev' },
+    embassy_BO: { address: 'Khoryva Street, 45/24 Kiev 04071 Ukraine', web: 'https://embassies.net/bolivia-in-ukraine/kiev' },
+    embassy_EC: { address: 'Saksagansky St., 52A Kyiv 01033 Ukraine', phone: '+380 9 461 8620', web: 'https://embassies.net/ecuador-in-ukraine/kiev' },
+    embassy_PE: { address: 'Naberezhno-Khreschatynska, 25, Office C Kiev 04070 Ukraine', phone: '+380 44 416-2420', web: 'https://embassies.net/peru-in-ukraine/kiev' },
+    embassy_CL: { address: 'Chilean Consulate In Kiev, Ukraine Ul. Olguinskaya 3 Kyiv Ukraine', phone: '+380 44 277 7235', web: 'https://embassies.net/chile-in-ukraine/kiev' },
+    embassy_CO: { address: 'Khreschatyk Street, 50 B Kyiv 01001 Ukraine', phone: '+380 50 311 4100', web: 'https://embassies.net/colombia-in-ukraine/kiev' },
     emergency_general: '112', police: '102', ambulance: '103', fire: '101',
     embassy_ES: 'Embajada de España en Kiev: +380 44 490 7780',
     embassy_AR: { address: 'Ivana Fedorova 12, Piso 6', web: 'https://embassies.net/argentina-in-ukraine/kiev', phone: '+380-44-238-6922', email: 'mailto:eucra@mrecic.gov.ar' },
@@ -2814,6 +3265,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Relativamente seguro. Transnistria: región separatista — consulta situación antes de visitar. Requiere permiso especial.'],
   },
   'Armenia': {
+    embassy_CA: { address: '17 Pavstos Buzand St., №229, 0010, Yerevan, Armenia', phone: '+374 10 567990', web: 'https://embassies.net/canada-in-armenia/yerevan' },
+    embassy_UY: { address: 'Next To The Paris Hotel, 4/6 Amiryan St. 3Th Floor Entrance To The Building By Teryan St, Yerevan 0010, Armenia', web: 'https://embassies.net/uruguay-in-armenia/yerevan' },
     emergency_general: '911', police: '102', ambulance: '103', fire: '101',
     embassy_ES: 'Embajada de España en Yereván: +374 10 54 43 40',
     embassy_AR: { address: '32 Sayat-Nova Avenue, Yerevan, 0025, Armenia', web: 'https://embassies.net/argentina-in-armenia/yerevan' },
@@ -2854,6 +3307,8 @@ Object.assign(EMERGENCY_DB, {
   // ══ ASIA ═════════════════════════════════════════════════════════════════════
 
   'Camboya': {
+    embassy_CA: { address: '27-29 Street 75, Sangkat Srah Chak, Khan Daun Penh, Phnom Penh, Cambodia', phone: '+855 23 430 811', web: 'https://embassies.net/canada-in-cambodia/phnom-penh' },
+    embassy_CU: { address: 'Show map 98 Yougoslavie Blvd (214), Phnom Penh, Cambodia', phone: '+855 23 213 965', web: 'https://embassies.net/cuba-in-cambodia/phnom-penh' },
     emergency_general: '117/119', police: '117', ambulance: '119', fire: '118',
     embassy_ES: 'Embajada de España en Bangkok cubre Camboya.',
     embassy_AU: { address: '16B National Assembly St Sangkat Tonle Bassac Khan Chamkamon Phnom Penh Cambodia', phone: '+855 23 213 470', web: 'https://embassies.net/australia-in-cambodia/phnom-penh' },
@@ -2868,12 +3323,24 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Minas antipersona: nunca abandones senderos marcados fuera de zonas urbanas. Especialmente en noreste.', 'Templos de Angkor: evita sol intenso de mediodía. Cubre hombros y rodillas.', 'Agua del grifo no potable.'],
   },
   'Myanmar': {
+    embassy_NZ: { address: 'No. 43 (C), Inya Myaing Road Bahan Bahan Township Yangon, Yangon Region', web: 'https://embassies.net/new-zealand-in-myanmar/yangon' },
+    embassy_AU: { address: 'Vantage Tower, 623 Pyay Road, Yangon, Myanmar', phone: '+95 1 230 7410', web: 'https://embassies.net/australia-in-myanmar/yangon' },
+    embassy_CA: { address: '9Th Floor, Centrepoint Towers, 65, Cheming Sule Pagoda, Yangon, Myanmar', phone: '+95 1 384 805', web: 'https://embassies.net/canada-in-myanmar/yangon' },
+    embassy_US: { address: '110 University Avenue Road, Yangon, Myanmar (Burma)', phone: '+95-(1) 753-6509', web: 'https://embassies.net/united-states-in-myanmar/rangoon' },
+    embassy_GB: { address: '80 Strand Road (Box No 638) Yangon Myanmar', phone: '+95 (0) 1370863', web: 'https://embassies.net/united-kingdom-in-myanmar/rangoon' },
+    embassy_IT: { address: '3, Inya Myaing Road, Golden Valley, Bahan Township, Yangon', web: 'https://embassies.net/italy-in-myanmar/yangon' },
+    embassy_DE: { address: '9 Bogyoke Aung San Museum Road, Bahan Township, Rangoon (Yangon) 11201', phone: '+95 1 54 89 51', web: 'https://embassies.net/germany-in-myanmar/yangon' },
+    embassy_FR: { address: '102, Pyidaungsu Yeithka Road, Yangon, Myanmar', phone: '+95 9 45041 6298', web: 'https://embassies.net/france-in-myanmar/yangon' },
+    embassy_BR: { address: 'Show map 42, Pyidaungzu Yeiktha Street, Yangon, Myanmar (Burma)', web: 'https://embassies.net/brazil-in-myanmar/yangon' },
     emergency_general: '199', police: '199', ambulance: '192', fire: '191',
     embassy_ES: 'Embajada de España en Bangkok cubre Myanmar.',
     useful_apps: [],
     safety_tips: ['GOLPE DE ESTADO (2021): situación política inestable. Muchas zonas del país en conflicto activo.', 'Consulta aviso de viaje del Ministerio de Exteriores antes de cualquier visita.', 'Evita fotografiar fuerzas militares, policía o edificios gubernamentales.'],
   },
   'Laos': {
+    embassy_CA: { address: 'Office Of The Embassy Of Canada Km4, Thadeua Road, Watnak Village, Sisattanak District, Vientiane, Laos', phone: '+856 (0) 21 35 38 34', web: 'https://embassies.net/canada-in-laos/vientiane' },
+    embassy_DE: { address: 'Rue Sokpalouang 26 (Sisattanek), Vientiane, Laos', phone: '+856 21 31 21 10', web: 'https://embassies.net/germany-in-laos/vientiane' },
+    embassy_CU: { address: 'Show map Ban Saphanethone Neua R-128 M. Sisattanak Vientiane Laos', web: 'https://embassies.net/cuba-in-laos/vientiane' },
     emergency_general: '191/195', police: '191', ambulance: '195', fire: '190',
     embassy_ES: 'Embajada de España en Bangkok cubre Laos.',
     embassy_AU: { address: 'Km4, Thadeua Road Watnak Village Sisattanak District Vientiane Laos Pdr', phone: '+856 21 353  800', web: 'https://embassies.net/australia-in-laos/vientiane' },
@@ -2892,6 +3359,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['País muy seguro. Solo se puede visitar con guía autorizado por el gobierno — obligatorio.', 'Altitud: Paro Dzong (2.200m), algunos treks superan 5.000m — aclimatación indispensable.', 'Fotografiar en dzongs (fortalezas): pide permiso siempre.'],
   },
   'Bangladesh': {
+    embassy_NZ: { address: 'Bashoti Horizon, Flat No B-3, 3Rd Floor, Plot 21, Road - 17, Banani 1213 Dhaka Bangladesh', phone: '+880-2886-1947', web: 'https://embassies.net/new-zealand-in-bangladesh/dhaka' },
+    embassy_CL: { address: '5/F, Chowdhury Centre 23/Ka, New Eskaton Road Dhaka 1000 Bangladesh', phone: '+880 2 933 7042', web: 'https://embassies.net/chile-in-bangladesh/dhaka' },
     emergency_general: '999', police: '999', ambulance: '199', fire: '199',
     embassy_ES: 'Embajada de España en Dacca: +880 2 882 3895',
     embassy_AU: { address: '184 Gulshan Avenue Gulshan 2 Dhaka - 1212 Bangladesh', phone: '+880 2 881 3101', web: 'https://embassies.net/australia-in-bangladesh/dhaka', email: 'mailto:ahc.dhaka@dfat.gov.au' },
@@ -2913,6 +3382,12 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Densa población. Dhaka: tráfico caótico — usa rickshaws o CNG (tuk-tuk a gas) para trayectos cortos.', 'Monzón: inundaciones severas julio-septiembre. Consulta alertas meteorológicas.', 'Agua del grifo no potable.'],
   },
   'Pakistán': {
+    embassy_NZ: { address: '10B/Ii 4Th Zamzama Street, Dha Phase V, Karachi 75500, Pakistan', phone: '+92 21 583 7291', web: 'https://embassies.net/new-zealand-in-pakistan/karachi' },
+    embassy_DE: { address: 'Ramna 5, Diplomatic Enclave, Islamabad, Pakistan', phone: '+ 92 51 2007 200', web: 'https://embassies.net/germany-in-pakistan/islamabad' },
+    embassy_CU: { address: 'Show map F-6/1 F 6/1 F-6, Islamabad, Islamabad Capital Territory, Pakistan', web: 'https://embassies.net/cuba-in-pakistan/islamabad' },
+    embassy_PY: { address: 'House # 15-A, Street # 21, F7 / 2, Islamabad', phone: '+ 92 51 265 5261', web: 'https://embassies.net/paraguay-in-pakistan/islamabad' },
+    embassy_EC: { address: 'Apt. C-1 Afzal Court Block-3, Hehkashan, Clifton Karachi Pakistan', phone: '+92 21 5833 322', web: 'https://embassies.net/ecuador-in-pakistan/karachi' },
+    embassy_CL: { address: 'House 8, Street 21 Shalimar F-8/2 Islamabad Pakistan', phone: '+92 51 228 1461', web: 'https://embassies.net/chile-in-pakistan/islamabad' },
     emergency_general: '15/115/16', police: '15', ambulance: '115', fire: '16',
     embassy_ES: 'Embajada de España en Islamabad: +92 51 282 9430',
     embassy_AR: { address: 'House 24, Street 18, Sector F-6/2', phone: '+ 92 51 843 8120', web: 'https://embassies.net/argentina-in-pakistan/islamabad' },
@@ -3029,6 +3504,10 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['⚠️ NO VIAJAR. Riesgo extremo de secuestro, terrorismo y conflicto armado.', 'Todos los ministerios de exteriores del mundo desaconsejan absolutamente el viaje.', 'Solo personal humanitario acreditado con protocolos de seguridad estrictos.'],
   },
   'Irak': {
+    embassy_NZ: { address: 'New Zealand Embassy Baghdad, Iraq, International Zone Baghdad', phone: '+964 (0) 780 578 9546', web: 'https://embassies.net/new-zealand-in-iraq/baghdad' },
+    embassy_CA: { address: 'British Embassy Compound, International Zone, Baghdad, Iraq', phone: '+964 783 303 5357', web: 'https://embassies.net/canada-in-iraq/baghdad' },
+    embassy_GB: { address: 'British Embassy Baghdad International Zone Baghdad Iraq', phone: '+44(0)1908 516666', web: 'https://embassies.net/united-kingdom-in-iraq/baghdad' },
+    embassy_DE: { address: 'Mahala 609, Street 3 / House Nr. 53, Baghdad-Hay Al-Mansour, Iraq', phone: '+964 790 192 25 26', web: 'https://embassies.net/germany-in-iraq/baghdad' },
     emergency_general: '104/122', police: '104', ambulance: '122', fire: '115',
     embassy_ES: 'Embajada de España en Bagdad: +964 780 191 7070',
     embassy_AU: { address: 'Australian Embassy International Zone Baghdad Iraq', web: 'https://embassies.net/australia-in-iraq/baghdad' },
@@ -3050,6 +3529,15 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['⚠️ NO VIAJAR. Guerra civil activa. Riesgo extremo en prácticamente todo el territorio.', 'Zonas de conflicto activo. Solo personal humanitario acreditado.'],
   },
   'Líbano': {
+    embassy_GB: { address: 'British Embassy Serail Hill, Embassy Complex Beirut Central District Po Box : 11- 471 Beirut Lebanon', phone: '+961 01 960800', web: 'https://embassies.net/united-kingdom-in-lebanon/beirut' },
+    embassy_DE: { address: 'Maghzal Building Close To The Jesus And Mary High School, Rabieh (Approximately 15 Km In The North Of The City Centre), Beirut, Lebalon', phone: '+961 4 93 50 00', web: 'https://embassies.net/germany-in-lebanon/beirut' },
+    embassy_CU: { address: 'Show map Rue Des Officiers O.44, Immeuble Raymound Nouhra (No. 43), 1Er Etage, Mar Takla, Hazmieh Beirut Lebanon', web: 'https://embassies.net/cuba-in-lebanon/beirut' },
+    embassy_UY: { address: 'Jounieh, Banque Du Liban Str. Centre Stella Maris, 7Th Floor P.O.Box 2051 Beirut Lebanon', web: 'https://embassies.net/uruguay-in-lebanon/beirut' },
+    embassy_PY: { address: 'Farid Zeidan Street - "La Rosa" Building - Ground Floor - Hazmieh - Mar Takla - Lebanon', phone: '+ 961 5 458 501', web: 'https://embassies.net/paraguay-in-lebanon/beirut' },
+    embassy_BO: { address: 'Mar Youhanna Street Gemayel Mattar Building, 4Th Floor Beirut Lebanon', phone: '+961 1-874 553', web: 'https://embassies.net/bolivia-in-lebanon/beirut' },
+    embassy_EC: { address: 'Beirut Lebanon', web: 'https://embassies.net/ecuador-in-lebanon/beirut' },
+    embassy_VE: { address: 'Rue Marche Zalka Breezevale House, 5Th Floor P.O. Box 603 Beirut Lebanon', phone: '+961 4 718 612', web: 'https://embassies.net/venezuela-in-lebanon/beirut' },
+    embassy_PE: { address: 'Vica House - 4Th Floor - Sami El Solh Avenue,Beirut', phone: '+961 (1) 329 230', web: 'https://embassies.net/peru-in-lebanon/beirut' },
     emergency_general: '140/125/175', police: '999', ambulance: '140', fire: '175',
     embassy_ES: 'Embajada de España en Beirut: +961 1 952 150',
     embassy_AR: { address: 'Rue Sursock Nº 161, 2Ème. Étage, Imm. Moutran, Residence Des Jardins, , Achrafieh, Beirut, República Libanesa', web: 'https://embassies.net/argentina-in-lebanon/beirut' },
@@ -3074,12 +3562,36 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Situación inestable. Sur del país (frontera con Israel): evitar — riesgo activo de escalada.', 'Beirut: relativamente funcional pero con cortes frecuentes de luz, agua y servicios.', 'Campo de refugiados: no entrar sin autorización. Lleva siempre documentación.'],
   },
   'Qatar': {
+    embassy_AU: { address: 'Australian Embassy Tornado Tower Majlis Al Taawon St Doha, Qatar', phone: '+974 4007 8500', web: 'https://embassies.net/australia-in-qatar/doha' },
+    embassy_CA: { address: 'Tornado Tower, 30Th Floor, Majlis Al Taawon Street, Doha', phone: '+974 4419-9000', web: 'https://embassies.net/canada-in-qatar/doha' },
+    embassy_US: { address: 'U.S. Embassy Doha 22Nd February Street Al Luqta District P.O. Box 2399 Doha, Qatar', phone: '+974 4496 6000', web: 'https://embassies.net/united-states-in-qatar/doha' },
+    embassy_GB: { address: 'British Embassy, West Bay Dafna Area, Onaiza Zone 66, Al Shabab Street. Po Box 3 Doha Qatar', phone: '+974 4496 2000', web: 'https://embassies.net/united-kingdom-in-qatar/doha' },
+    embassy_IT: { address: 'Qatar University Area, Zone Al Torfa N. 68, Street 870 (Al Ghaf), Plot 31', web: 'https://embassies.net/italy-in-qatar/doha' },
+    embassy_DE: { address: 'No. 6, Al-Jazira Al-Arabiya Street, Fereej Kolaib, Doha, Qatar.', phone: '+974 44 08 23 00', web: 'https://embassies.net/germany-in-qatar/doha' },
+    embassy_FR: { address: 'West Bay, Diplomatic Area, P.O. Box : 2669 Doha - Qatar', phone: '+ 974 4832 283', web: 'https://embassies.net/france-in-qatar/doha' },
+    embassy_PT: { address: 'Aljamie Street Street: 803, Zone: 67 Building: 31 P.O. Box 24854 Al Dafna, Doha Qatar', web: 'https://embassies.net/portugal-in-qatar/doha' },
+    embassy_BR: { address: 'Wadi Al-Hadab Street 980 Building 20 - Al-Dafna Doha, Qatar', phone: '+974 4483 8227', web: 'https://embassies.net/brazil-in-qatar/doha' },
+    embassy_SV: { address: 'Show map Villa No. 54 A, Al Riyahd Street West Bay Lagoon East Gate (In Front Of Zig Zag Towers Roundabout, West Bay) Doha Qatar', phone: '+974-4411-0195', web: 'https://embassies.net/el-salvador-in-qatar/doha' },
+    embassy_PA: { address: 'West Bay, Al Dafna, Zone 66 Street # 534, Villa 4, Doha, State Of Qatar', web: 'https://embassies.net/panama-in-qatar/doha' },
+    embassy_CR: { address: 'Villa No. 40, Street No. 835 Zone 64 Doha Qatar', web: 'https://embassies.net/costa-rica-in-qatar/doha' },
+    embassy_DO: { address: 'Show map West Bay Lagoon, Street # 27, Villa 19 P.O. Box: 23545 Doha Qatar', phone: '+974-4411-3868', web: 'https://embassies.net/dominican-republic-in-qatar/doha' },
+    embassy_CU: { address: 'Show map Saha 76, New Dafna, Westbay Lagoon P.O.Box: 12017 Doha Qatar', web: 'https://embassies.net/cuba-in-qatar/doha' },
+    embassy_EC: { address: 'Show map West Bay, Zone 66, Street 502, Villa 14 P.O.Box: 23501 Doha Qatar', web: 'https://embassies.net/ecuador-in-qatar/doha' },
+    embassy_VE: { address: 'Villa No 57-826, Al-Mabahej Street, 66 West Bay Doha Qatar', phone: '+974 4493 2730', web: 'https://embassies.net/venezuela-in-qatar/doha' },
+    embassy_PE: { address: 'Street 835 Building 42, Lejbailat - Zone 64, Po Box 24062, Abdul Aziz Bin Jasim Street, Doha 24062', phone: '+974 4491 5944', web: 'https://embassies.net/peru-in-qatar/doha' },
+    embassy_AR: { address: 'Rawdat Ehraish St., Villa 6, Zone 66, West Bay, Doha, Qatar', phone: '+ 974 4417 3601', web: 'https://embassies.net/argentina-in-qatar/doha' },
+    embassy_MX: { address: 'Saba Street, 512, Saha 12, Bldg. No.14, District 63 West Bay ، Doha', phone: '+974 4450 8000', web: 'https://embassies.net/mexico-in-qatar/doha' },
     emergency_general: '999', police: '999', ambulance: '999', fire: '999',
     embassy_ES: 'Embajada de España en Doha: +974 4496 5555',
     useful_apps: [{ name: 'Karwa Taxi', icon: '🚗', description: 'Taxi oficial de Qatar. Muy fiable.' }],
     safety_tips: ['País muy seguro. Leyes islámicas: alcohol solo en hoteles licenciados.', 'Verano (may-sep): calor extremo (+45°C) — evita actividad exterior entre 11h-16h.', 'Relaciones homosexuales: ilegales. Mucho cuidado con muestras de afecto en público.'],
   },
   'Kuwait': {
+    embassy_GB: { address: 'British Embassy Arabian Gulf Street Dasman Kuwait City Kuwait City Kuwait', phone: '+965 2259 4320', web: 'https://embassies.net/united-kingdom-in-kuwait/kuwait-city' },
+    embassy_NI: { address: 'Show map Bayan, Block 6, Street 5, House # 17 Kuwait City Kuwait', phone: '+965 253 84 765', web: 'https://embassies.net/nicaragua-in-kuwait/kuwait-city' },
+    embassy_HN: { address: 'Show map Surrah Block 5 Street 1 House # 517 Kuwait City Kuwait', web: 'https://embassies.net/honduras-in-kuwait/kuwait-city' },
+    embassy_CU: { address: 'Show map St. Abu Hayan Al-Tawhedy,House 74 Kuwait City Kuwait', phone: '+965-254-9361', web: 'https://embassies.net/cuba-in-kuwait/kuwait-city' },
+    embassy_VE: { address: '30 7 St, Jabriya, Kuwait City, Kuwait', phone: '+965 5324367', web: 'https://embassies.net/venezuela-in-kuwait/kuwait-city' },
     emergency_general: '112', police: '112', ambulance: '112', fire: '112',
     embassy_ES: 'Embajada de España en Kuwait: +965 2256 0601',
     embassy_AR: { address: 'Block 4 - Street 403 - House 21 - Al- Sadiq', web: 'https://embassies.net/argentina-in-kuwait/kuwait-city' },
@@ -3106,6 +3618,14 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Relativamente seguro. Alcohol permitido en hoteles y restaurantes licenciados.', 'Protestas esporádicas en Manama central (zona shií) — evita manifestaciones.'],
   },
   'Omán': {
+    embassy_NZ: { address: '2333 Way, Muscat, Oman', phone: '+968 24 694692', web: 'https://embassies.net/new-zealand-in-oman/muscat' },
+    embassy_CA: { address: '7Th Floor, Getco Tower, Muscat, Oman', phone: '+968 2479 4928', web: 'https://embassies.net/canada-in-oman/muscat' },
+    embassy_US: { address: 'Street Address Jamiat Al Dowal Al Arabiya, Bldg. 32 Shatti Al Qurum Muscat, Sultanate Of Oman', phone: '+968 24 643 400', web: 'https://embassies.net/united-states-in-oman/muscat' },
+    embassy_GB: { address: 'British Embassy Po Box 185 Mina Al Fahal 116 Muscat Muscat Oman', phone: '+968 2460 9000', web: 'https://embassies.net/united-kingdom-in-oman/muscat' },
+    embassy_IT: { address: 'Way 3034 - House N. 2697 - Shatti Al Qurum - P.O. Box 520 Pc 115 Madinat Al Sultan Qaboos (Oman)', web: 'https://embassies.net/italy-in-oman/muscat' },
+    embassy_DE: { address: 'Street Diplomatic Area, Al-Khuwair, Jami\'At Al-Duwal Al-Arabiah Street, Maskat, Muscat, Oman', phone: '+968 2469 1218', web: 'https://embassies.net/germany-in-oman/muscat' },
+    embassy_FR: { address: 'Diplomatic Area, Al Khuwair Jami’At Al-Dowal Al Arabiya Street P.O. Box 208 - Madinat Al Sultan Qabous Muscat Oman', phone: '+ 968 24 681 800', web: 'https://embassies.net/france-in-oman/muscat' },
+    embassy_BR: { address: 'Show map Way 1521, Villa 1424, Madinat Al Llam Al Khuwair P.O. Box 1149 Muscat Oman', web: 'https://embassies.net/brazil-in-oman/muscat' },
     emergency_general: '9999', police: '9999', ambulance: '9999', fire: '9999',
     embassy_ES: 'Embajada de España en Riad cubre Omán. Consulado Honorario en Mascate.',
     useful_apps: [],
@@ -3150,6 +3670,17 @@ Object.assign(EMERGENCY_DB, {
   // ══ LATINOAMÉRICA ════════════════════════════════════════════════════════════
 
   'Venezuela': {
+    embassy_NZ: { address: 'Av. Francisco De Miranda C/C Av. Libertador Torre Kpmg, Piso 7 Chacao Caracas Venezuela', phone: '+58 212 277 7965', web: 'https://embassies.net/new-zealand-in-venezuela/caracas' },
+    embassy_GB: { address: 'British Embassy Caracas Torre La Castellana, Piso 11 Avenida Principal De La Castellana (Av. Eugenio Mendoza), Urbanización La Castellana Caracas Miranda Venezuela', web: 'https://embassies.net/united-kingdom-in-venezuela/caracas' },
+    embassy_DE: { address: 'Avenue Eugenio Mendoza (Principal De La Castellana) With Avenue José Angel Lamas, Tower La Castellana, 10Th Floor- La Castellana, Caracas, Venezuela.', phone: '+58 212 219 25 00', web: 'https://embassies.net/germany-in-venezuela/caracas' },
+    embassy_NI: { address: 'Edi. Tarepaima, 1Era. Tamira Sur, Piso 2, Of. 207 Lado Oeste De La Torre Británica Urbanización Altamira Municipio, Chacao Caracas Venezuela', phone: '+58 (212) 263-0904', web: 'https://embassies.net/nicaragua-in-venezuela/caracas' },
+    embassy_PA: { address: 'Eurobuilding, Professional Center, 8Th Floor, Office 8D Chuao, Caracas. Venezuela', phone: '+58-212-992-4819', web: 'https://embassies.net/panama-in-venezuela/caracas' },
+    embassy_DO: { address: 'Show map Transversal Entre 1Ra. Av. Y Av. Andrés Bello, Los Palos Grandes 1060 Caracas Venezuela', web: 'https://embassies.net/dominican-republic-in-venezuela/caracas' },
+    embassy_CU: { address: 'Show map Calle Roraima E/ Río De Janeiro Y Choroni Chuao Caracas Venezuela', web: 'https://embassies.net/cuba-in-venezuela/caracas' },
+    embassy_UY: { address: 'Caracas 1060, Miranda, Venezuela', phone: '+58 212 261 7603', web: 'https://embassies.net/uruguay-in-venezuela/caracas' },
+    embassy_PY: { address: '4ª Avenida Nº 1811 Between 7ª And 8ª Transversal Of The Altamira Urbanization (Chacao) Caracas Venezuela', phone: '+ 58 212 263 2559', web: 'https://embassies.net/paraguay-in-venezuela/caracas' },
+    embassy_BO: { address: 'Av. Luis Roche Con 6Ta. Transversal, Altamira 5Ta Caracas Venezuela', web: 'https://embassies.net/bolivia-in-venezuela/caracas' },
+    embassy_EC: { address: '4 Av. De Prebo Cc Reda Building, Mezzanina, Locales 6 Caracas Venezuela', web: 'https://embassies.net/ecuador-in-venezuela/caracas' },
     emergency_general: '171/112', police: '171', ambulance: '171', fire: '171',
     embassy_ES: 'Embajada de España en Caracas: +58 212 266 2855',
     embassy_AR: { address: 'Av. Los Chaguaramos - Centro San Ignacio - Torre Kepler - Piso 1 - Municipio Chacao, Caracas - Venezuela', web: 'https://embassies.net/argentina-in-venezuela/caracas' },
@@ -3172,6 +3703,17 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['⚠️ Viaje muy desaconsejado. Caracas es una de las ciudades más peligrosas del mundo.', 'Si viajas: nunca camines de noche. Solo movilidad en vehículos con ventanas cerradas.', 'Zonas fronterizas con Colombia: riesgo de grupos armados ilegales.', 'Efectivo escaso — llevar dólares y euros para cambio informal.'],
   },
   'Bolivia': {
+    embassy_AU: { address: 'Calle Aspiazu 416 Sopocachi (Entre 20 De Octubre Y Sanchez Lima) La Paz Bolivia', phone: '+591 2 211 5655', web: 'https://embassies.net/australia-in-bolivia/la-paz' },
+    embassy_CA: { address: '2678, Calle Victor Sanjinez, Edificio Barcelona, 2Nd Floor, Plaza España (Sopocachi), La Paz, Bolivia', phone: '+591 (2) 241-5141', web: 'https://embassies.net/canada-in-bolivia/la-paz' },
+    embassy_NI: { address: 'Show map Calle 6 De Obrajes Entre 14 De Septiembre Y Hernando Siles No. 481 La Paz Bolivia', phone: '+591 2 211 5563', web: 'https://embassies.net/nicaragua-in-bolivia/la-paz' },
+    embassy_CR: { address: 'Edificio San Miguel Arcángel Número 1420 Primer Piso, Of. 102 Ubicado En La Avenida Montenegro En Calacoto Cp: 2780 La Paz Bolivia', phone: '+591 2-215-3615', web: 'https://embassies.net/costa-rica-in-bolivia/la-paz' },
+    embassy_DO: { address: 'Show map Avenida Fuerza Naval No. 1621 Entre Calles 23 Y 24, Zona De Calacota Apartado Postal N° 1918 La Paz Bolivia', web: 'https://embassies.net/dominican-republic-in-bolivia/la-paz' },
+    embassy_UY: { address: 'Av. Sanchez Bustamante Nº 288, La Paz, Bolivia', phone: '+591 2 2791 482', web: 'https://embassies.net/uruguay-in-bolivia/la-paz' },
+    embassy_PY: { address: 'Pedro Salazar Nº 351 Esq. 6 De Agosto Ed. Illimani Ii Piso 1 Of. 101 Casillo 882 La Paz Bolivia', phone: '+ 591 2 243 2201', web: 'https://embassies.net/paraguay-in-bolivia/la-paz' },
+    embassy_EC: { address: 'Calle 14 8136, La Paz, Bolivia', phone: '+591 2 278 4422', web: 'https://embassies.net/ecuador-in-bolivia/la-paz' },
+    embassy_VE: { address: 'Av. Arce No 2678 Ed. Illimani Piso 4 Y 5 Apartado Postal: 960 La Paz Bolivia', phone: '+591 2 2788501', web: 'https://embassies.net/venezuela-in-bolivia/la-paz' },
+    embassy_CL: { address: 'Calle 14 N° 8024, Calacoto La Paz Bolivia', phone: '+591 2 279 73 31', web: 'https://embassies.net/chile-in-bolivia/la-paz' },
+    embassy_MX: { address: 'Calle Claudio Aliaga 1155, Ríos Tapia Building 3Rd Floor, San Miguel, Southern Area Of ​​La Paz', phone: '+591 2 277 1871', web: 'https://embassies.net/mexico-in-bolivia/la-paz' },
     emergency_general: '110/118/119', police: '110', ambulance: '118', fire: '119',
     embassy_ES: 'Embajada de España en La Paz: +591 2 277 3518',
     embassy_AR: { address: 'Aspiazu 497 / Esq. Sanchez Lima', web: 'https://embassies.net/argentina-in-bolivia/la-paz' },
@@ -3194,6 +3736,14 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Mal de altura: La Paz (3.600m), Potosí (4.090m), Uyuni (3.660m) — aclimatación obligatoria. Sube gradualmente.', 'Carreteras del país: condiciones deficientes. "Carretera de la Muerte" (Coroico): solo con operadora acreditada.', 'Agua del grifo no potable.'],
   },
   'Paraguay': {
+    embassy_AU: { address: 'Australian Consulate, Procer Arguello 208, Entre Mariscal López Y Bollani, (76629) Asunción Paraguay', web: 'https://embassies.net/australia-in-paraguay/asuncion' },
+    embassy_CA: { address: 'Edificio Citicenter, Avenida Mariscal Francisco Solano López 3794 (Cruz Del Chaco Entrance), 5Th Floor, Asunción, Paraguay', web: 'https://embassies.net/canada-in-paraguay/asuncion' },
+    embassy_GT: { address: 'Show map Avenida Santa Teresa Esquina Aviadores Del Chaco Y Herminio Maldonado Complejo Paseo La Galería Torre 2 Piso 15, Oficina 1 Asunción Paraguay', phone: '+595 21 695 535', web: 'https://embassies.net/guatemala-in-paraguay/asuncion' },
+    embassy_CR: { address: 'Carlos Díaz León 3245 Casi Escurra Barrio Herrera Shopping Del Sol, N° 13104 Asunción Paraguay', phone: '+595 21 675-297', web: 'https://embassies.net/costa-rica-in-paraguay/asuncion' },
+    embassy_DO: { address: 'Show map Av.Mcal . Lopez, Esq .Juan Manuel Frutos, Pane Edificio Asturias, Piso 9 Suite C Asuncion Paraguay', phone: '+59-521-213 143', web: 'https://embassies.net/dominican-republic-in-paraguay/asuncion' },
+    embassy_BO: { address: 'Calle Israel 309, Esquina Río De Janeiro Asunción Paraguay', web: 'https://embassies.net/bolivia-in-paraguay/asuncion' },
+    embassy_VE: { address: 'Soldado Desconocido 348, Asunción, Paraguay', phone: '+595 21 664 682', web: 'https://embassies.net/venezuela-in-paraguay/asuncion' },
+    embassy_CO: { address: 'Calle Papa Juan Xxiii, Corner Cecilio Da Silva, 4º. Floor, Pope John Xxiii Building Asuncion Paraguay', web: 'https://embassies.net/colombia-in-paraguay/asuncion' },
     emergency_general: '911', police: '911', ambulance: '911', fire: '132',
     embassy_ES: 'Embajada de España en Asunción: +595 21 222 536',
     embassy_AR: { address: 'Av. Espana, Asunción, Paraguay', web: 'https://embassies.net/argentina-in-paraguay/asuncion' },
@@ -3217,6 +3767,14 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Asunción: cuidado en Ciudad del Este (Triple Frontera) — zona de comercio informal y criminalidad.', 'Calor extremo en verano (nov-mar). Hidratación fundamental.'],
   },
   'Ecuador': {
+    embassy_AU: { address: 'Sbc Office Centre Building Office 1-14, 1St Floor Guayaquil, Ecuador', phone: '+593 4601 7529', web: 'https://embassies.net/australia-in-ecuador/guayaquil' },
+    embassy_NI: { address: 'Km 7.5 Via A Daule, Frabrica Hilantex Guayaquil Ecuador', phone: '+593 4 - 2251 - 617', web: 'https://embassies.net/nicaragua-in-ecuador/guayaquil' },
+    embassy_HN: { address: 'Show map Ave.12 De Octubre 1942 Y Cordero Edificio World Trade Center Torre A, 5To. Piso Oficina 501 Apartado Postal: 17-03-4753 Quito Ecuador', web: 'https://embassies.net/honduras-in-ecuador/quito' },
+    embassy_GT: { address: 'Show map Av. Naciones Unidas E2-30 Y Nuñez De Vela Edificio Metropolitan, Piso 11 Quito Ecuador', phone: '+593 2 2926-094', web: 'https://embassies.net/guatemala-in-ecuador/quito' },
+    embassy_PA: { address: 'Germán Alemán E. 12-92 And Arroyo Del Río Sector Batán Bajo, Quito - Ecuador', phone: '+593 2 243 1792', web: 'https://embassies.net/panama-in-ecuador/quito' },
+    embassy_UY: { address: 'Junín 114 Y Malecon Edif. Torres Del Río, Piso 5To. Of. 9 Apartado: 09.01 Quito Ecuador', web: 'https://embassies.net/uruguay-in-ecuador/quito' },
+    embassy_BO: { address: 'Av. Eloy Alfaro, Quito 170135, Ecuador', phone: '+593 22244831', web: 'https://embassies.net/bolivia-in-ecuador/quito' },
+    embassy_VE: { address: 'Avenida Amazonas N30-240 Y Eloy Alfaro, Edificio Comonsa Piso 8, Quito, Pichincha, Ecuador., Quito 170121, Ecuador', phone: '+593 22557209', web: 'https://embassies.net/venezuela-in-ecuador/quito' },
     emergency_general: '911', police: '101', ambulance: '131', fire: '102',
     embassy_ES: 'Embajada de España en Quito: +593 2 222 6099',
     embassy_AR: { address: 'Av. Amazonas N.21-147 Y Roca, Piso 8', web: 'https://embassies.net/argentina-in-ecuador/quito' },
@@ -3243,6 +3801,21 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Quito: cuidado en La Mariscal (zona de ocio nocturno) y centro histórico de noche.', 'Galápagos: zona muy regulada — sigue siempre al guía del parque. No toques animales.', 'Volcanes activos: consulta nivel de alerta antes de senderismo (Cotopaxi, Tungurahua).', 'Frontera con Colombia: zona sur de Esmeraldas y Sucumbíos — evitar.'],
   },
   'Guatemala': {
+    embassy_NZ: { address: '13 Calle 7/85, Zona 10, Guatemala City 01010, Guatemala', phone: '+502 2431 1705', web: 'https://embassies.net/new-zealand-in-guatemala/guatemala-city' },
+    embassy_AU: { address: 'Avenida Las Américas 7-20, Zona 13 Real América Local 24', phone: '+502 2334 6817', web: 'https://embassies.net/australia-in-guatemala/guatemala-city' },
+    embassy_DE: { address: 'Avenida La Reforma 9-55, Zona 10, Edificio Reforma 10, Nivel 10, Guatemala City, Guatemala', phone: '+502 23 64 67 00', web: 'https://embassies.net/germany-in-guatemala/guatemala-city' },
+    embassy_NI: { address: 'Show map 13 Ave. 14-54, Zona 10, Colonia Oakland Guatemala City Guatemala', web: 'https://embassies.net/nicaragua-in-guatemala/guatemala-city' },
+    embassy_HN: { address: 'Show map 19 Avenida "A", 20-19 Zona 10 Ciudad De Guatemala, 0101 Guatemala', web: 'https://embassies.net/honduras-in-guatemala/guatemala-city' },
+    embassy_PA: { address: '4Th Avenue 18-60A, Zone 14 Guatemala, Guatemala', web: 'https://embassies.net/panama-in-guatemala/guatemala-city' },
+    embassy_CR: { address: '5 Avenida, Cdad. De Guatemala, Guatemala', phone: '+502 2337 4450', web: 'https://embassies.net/costa-rica-in-guatemala/guatemala-city' },
+    embassy_DO: { address: 'Show map 18 Calle 24-69 Zona 10, Centro Empresarial Zona Pradera Torre Ii, Oficina 1606 Guatemala Guatemala', phone: '+502-2261-7016', web: 'https://embassies.net/dominican-republic-in-guatemala/guatemala-city' },
+    embassy_CU: { address: 'Show map Avenida Las Americas 20-72, Cdad. De Guatemala, Guatemala', web: 'https://embassies.net/cuba-in-guatemala/guatemala-city' },
+    embassy_UY: { address: '6A Ave 20-25 Zona 10, 6A Avenida 20-25, Cdad. De Guatemala 01010, Guatemala', phone: '+502 2261 8001', web: 'https://embassies.net/uruguay-in-guatemala/guatemala-city' },
+    embassy_PY: { address: '9°. Avenida 14-51 Zona 10 Guatemala City Guatemala , Guatemala', phone: '+502 2309 9009', web: 'https://embassies.net/paraguay-in-guatemala/guatemala-city' },
+    embassy_BO: { address: '7A Avenida 15-13, Zona 1 Edificio Ejecutivo, Oficina 31 Ciudad De Guatemala Guatemala', phone: '+502 2230-0483', web: 'https://embassies.net/bolivia-in-guatemala/guatemala-city' },
+    embassy_EC: { address: '4A Avenida 12-60, Cdad. De Guatemala 01014, Guatemala', phone: '+502 2368 0397', web: 'https://embassies.net/ecuador-in-guatemala/guatemala-city' },
+    embassy_VE: { address: '13 Calle 3-40 Zona 10 Edificio Atlantis, Oficina 601 Guatemala City Guatemala', phone: '+502 2317 0701', web: 'https://embassies.net/venezuela-in-guatemala/guatemala-city' },
+    embassy_PE: { address: '15 Av. “A” 20-16, Zona 13 Guatemala, Ca 01013', web: 'https://embassies.net/peru-in-guatemala/guatemala-city' },
     emergency_general: '110/120/122', police: '110', ambulance: '120', fire: '122',
     embassy_ES: 'Embajada de España en Guatemala: +502 2379 3530',
     embassy_AR: { address: '5Ta Avenida 6-50, Zona 14', phone: '+ 502 2464 5900', web: 'https://embassies.net/argentina-in-guatemala/guatemala-city' },
@@ -3264,6 +3837,20 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Guatemala Ciudad: zonas 1, 4, 9, 10, 13, 14 y 15 son las más seguras. Evita zonas periféricas.', 'Lago Atitlán y Antigua: relativamente seguros con precauciones básicas.', 'Nunca muestres cámara, joyería o móvil caro en la calle.'],
   },
   'Honduras': {
+    embassy_AU: { address: 'Residencial Las Cumbres, 1Era. Ave., 3Era. Calle, Bloque E, Edif. Grupo Terra Tegucigalpa, Honduras', phone: '+504 2236 6936', web: 'https://embassies.net/australia-in-honduras/tegucigalpa' },
+    embassy_CA: { address: 'Plaza Ficohsa, 3Rd Floor, Boulevard San Juan Bosco, Colonia Payaquí, Tegucigalpa, Honduras', phone: '+504 2232-4551', web: 'https://embassies.net/canada-in-honduras/tegucigalpa' },
+    embassy_IT: { address: 'Los Martínez De Escober, 3, Oficina, 7 Tegucigalpa Honduras', phone: '+504 922 27 59 28', web: 'https://embassies.net/italy-in-honduras/tegucigalpa' },
+    embassy_DE: { address: 'Dominican Republic Avenue # 925, Sendero Santo Domingo, Col. Lomas Del Guijarro, Tegucigalpa, Honduras', phone: '+504 22 75 92 92', web: 'https://embassies.net/germany-in-honduras/tegucigalpa' },
+    embassy_NI: { address: 'San Pedro Sula 21104, Honduras', phone: '+504 5508377', web: 'https://embassies.net/nicaragua-in-honduras/san-pedro-sula' },
+    embassy_GT: { address: 'Show map Colonia Lomas Del Guijarro Sur Calle Londres, Bloque B, Segunda Etapa, Casa No. 0440 Tegucigalpa Honduras', web: 'https://embassies.net/guatemala-in-honduras/tegucigalpa' },
+    embassy_PA: { address: 'Plaza Azul Building, Floor 2 Colonia Lomas Del Guijarro South, Tegucigalpa, Honduras', phone: '+504-2239-5508', web: 'https://embassies.net/panama-in-honduras/tegucigalpa' },
+    embassy_CR: { address: 'Residencial Lomas Del Guijamo Calle # 3451 Tegucigalpa Honduras', phone: '+504 2270 7465', web: 'https://embassies.net/costa-rica-in-honduras/tegucigalpa' },
+    embassy_DO: { address: 'Show map Plaza Miramontes, 2Do. Piso, Local No.6. Colonia De Miramontes Tegucigalpa Honduras', web: 'https://embassies.net/dominican-republic-in-honduras/tegucigalpa' },
+    embassy_CU: { address: 'Show map Colonia Lomas Del Guijarro, Calle Los Eucaliptos No. 3720 Tegucigalpa Honduras', phone: '+504-2239-3778', web: 'https://embassies.net/cuba-in-honduras/tegucigalpa' },
+    embassy_UY: { address: '2Da. Calle, N.O. 1617, Avda. 116 San Pedro Sula Honduras', phone: '+504 553-3094', web: 'https://embassies.net/uruguay-in-honduras/san-pedro-sula' },
+    embassy_PY: { address: '1 And 2 Calle So 20 Ave. “A” Barrio Rio De Piedras. Po Box 1744, San Pedro Sula, Honduras, Ca', phone: '+504 550 7744', web: 'https://embassies.net/paraguay-in-honduras/san-pedro-sula' },
+    embassy_BO: { address: 'Edificio "El Planetario", 4To. Piso Lomas De Guijarro Tegucigalpa Honduras', web: 'https://embassies.net/bolivia-in-honduras/tegucigalpa' },
+    embassy_EC: { address: 'Ave. Juan Lindo, No. 501, Diagonal Al Redondel De Colonia Las Minitas, Tegucigalpa 11101, Honduras', phone: '+504 22391278', web: 'https://embassies.net/ecuador-in-honduras/tegucigalpa' },
     emergency_general: '911', police: '911', ambulance: '195', fire: '198',
     embassy_ES: 'Embajada de España en Tegucigalpa: +504 2236 6589',
     embassy_AR: { address: 'Calle Palermo 302, Col. Rubén Darío', web: 'https://embassies.net/argentina-in-honduras/tegucigalpa' },
@@ -3280,6 +3867,19 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['⚠️ Uno de los países con mayor índice de violencia de la región.', 'Tegucigalpa y San Pedro Sula: evita zonas periféricas y circulación nocturna.', 'Roatán (isla caribeña): bastante más segura — resort turístico bien vigilado.', 'Nunca resistas un robo — da lo que te pidan.'],
   },
   'El Salvador': {
+    embassy_NZ: { address: 'World Trade Center San Salvador, San Salvador, El Salvador', phone: '+503 278 3372', web: 'https://embassies.net/new-zealand-in-el-salvador/san-salvador' },
+    embassy_AU: { address: '12 Calle Poniente 2028 Colonia Flor Blanca San Salvador, El Salvador', phone: '+503 2298 9447', web: 'https://embassies.net/australia-in-el-salvador/san-salvador' },
+    embassy_DE: { address: '77A Av. Norte, Esqu. 7A Calle Poniente 3972, Colonia Escalon, San Salvador.', phone: '+503 22 47 00 00', web: 'https://embassies.net/germany-in-el-salvador/san-salvador' },
+    embassy_NI: { address: 'Calle El Mirador Y 93 Ave. Norte, No. 4814 Colonia Escalón San Salvador El Salvador', phone: '+503 2263-2486', web: 'https://embassies.net/nicaragua-in-el-salvador/san-salvador' },
+    embassy_HN: { address: 'Show map 89 Avenida Norte Entre 7 Y 9 Calle Poniente No. 561 Colonia Escalón, San Salvador El Salvador', web: 'https://embassies.net/honduras-in-el-salvador/san-salvador' },
+    embassy_GT: { address: 'Show map 15 Av. Norte, No. 135 Entre Calle Arce Y Primera Calle Poniente San Salvador El Salvador', web: 'https://embassies.net/guatemala-in-el-salvador/san-salvador' },
+    embassy_PA: { address: 'Calle Los Bambues No 21, San Salvador, El Salvador', phone: '+503 2536 0600', web: 'https://embassies.net/panama-in-el-salvador/san-salvador' },
+    embassy_CR: { address: '85 Avenida Sur Y Calle Cuscatlán N° 4415 Colonia Escalón San Salvador El Salvador', phone: '+503 2264 - 3863', web: 'https://embassies.net/costa-rica-in-el-salvador/san-salvador' },
+    embassy_DO: { address: 'Show map 3Era. Calle Poniente Y 89 Avenida Norte, No.49, Colonia Escalón San Salvador El Salvador', web: 'https://embassies.net/dominican-republic-in-el-salvador/san-salvador' },
+    embassy_CU: { address: 'Show map Calle Arturo Ambrogi 530, San Salvador, El Salvador', phone: '+503 2508 0457', web: 'https://embassies.net/cuba-in-el-salvador/san-salvador' },
+    embassy_UY: { address: 'Ed. Gran Plaza, Local 405, Bulevar Del Hipodromo, San Salvador, El Salvador', phone: '+503 2279 1626', web: 'https://embassies.net/uruguay-in-el-salvador/san-salvador' },
+    embassy_EC: { address: '15 Calle Poniente Y 87 Avenida Norte, Número 830, 15 Calle Poniente, San Salvador, El Salvador', phone: '+503 2263 5258', web: 'https://embassies.net/ecuador-in-el-salvador/san-salvador' },
+    embassy_VE: { address: 'Calle Maquilishuat 28, San Salvador, El Salvador', phone: '+503 22633977', web: 'https://embassies.net/venezuela-in-el-salvador/san-salvador' },
     emergency_general: '911', police: '911', ambulance: '132', fire: '913',
     embassy_ES: 'Embajada de España en San Salvador: +503 2257 5788',
     embassy_AR: { address: 'Colonia Maquilishuat Y Avenida El Almendro # 2-5.', phone: '+ 503 25219400', web: 'https://embassies.net/argentina-in-el-salvador/san-salvador' },
@@ -3298,6 +3898,19 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Situación de seguridad mejorada desde 2022 (estado de excepción anti-pandillas).', 'San Salvador: zonas turísticas (Escalón, Colonia San Benito) son relativamente seguras.', 'Sigue recomendaciones de tu embajada — situación puede cambiar.'],
   },
   'Nicaragua': {
+    embassy_AU: { address: 'Primera Entrada De Las Colinas, 2.5 Cuadras Al Este Managua, Nicaragua', phone: '+505 2298 5300', web: 'https://embassies.net/australia-in-nicaragua/managua' },
+    embassy_CA: { address: 'De Los Pipitos, 2 Streets West, El Nogal Street 25, Bolonia, Managua, Nicaragua', web: 'https://embassies.net/canada-in-nicaragua/managua' },
+    embassy_HN: { address: 'Show map Edificio Opus Ii, Planes De Altamira 3Ra Etapa, Modulo 205, Managua 14042, Nicaragua', web: 'https://embassies.net/honduras-in-nicaragua/managua' },
+    embassy_GT: { address: 'Show map Km. 11 1/2, Carretera A Masaya Managua Nicaragua', web: 'https://embassies.net/guatemala-in-nicaragua/managua' },
+    embassy_PA: { address: 'Villa Fontana Neighborhood, From Club Terraza 1 Block East And Half A Block North N ° D-16 Managua, Nicaragua', phone: '+505 2277-0501', web: 'https://embassies.net/panama-in-nicaragua/managua' },
+    embassy_CR: { address: 'Kilometro 4 1/2 Carretera A Masaya Del Pollo Tip Top Los Robles 25 Vrs Abajo A Mano Derecha Edificio Car, Tercer Piso Managua Nicaragua', phone: '+505 270-3779', web: 'https://embassies.net/costa-rica-in-nicaragua/managua' },
+    embassy_DO: { address: 'Show map Prado Encuestre No. 100 Residencial Las Colinas Apartado Postal: 614 Managua Nicaragua', phone: '+505 2276-2029', web: 'https://embassies.net/dominican-republic-in-nicaragua/managua' },
+    embassy_CU: { address: 'Show map 3Ra Entrada 400 Varas Arriba., Managua, Nicaragua', phone: '+505 2276 0742', web: 'https://embassies.net/cuba-in-nicaragua/managua' },
+    embassy_UY: { address: 'Las Colinas De La Estación De Bomberos Media Cuadra Al Sur,, Managua, Nicaragua', phone: '+505 2276 2363', web: 'https://embassies.net/uruguay-in-nicaragua/managua' },
+    embassy_PY: { address: 'Suburban Track, West Side Of The Sandino Managua Memorial Monument, Nicaragua.', phone: '+505 227 900 95', web: 'https://embassies.net/paraguay-in-nicaragua/managua' },
+    embassy_BO: { address: 'Carrera A Mazaya Km. 3 E, Contiguo A Hyundai Apartado Postal: 154 Managua Managua Nicaragua', web: 'https://embassies.net/bolivia-in-nicaragua/managua' },
+    embassy_VE: { address: '79 Calle Sureste, Managua, Nicaragua', phone: '+505 2276 0266', web: 'https://embassies.net/venezuela-in-nicaragua/managua' },
+    embassy_PE: { address: 'Military Hospital 1 Block To Lake 2 Blocks Abajo, House No. 325, Barrio Bolonia, Managua, Nicaragua', web: 'https://embassies.net/peru-in-nicaragua/managua' },
     emergency_general: '118', police: '118', ambulance: '128', fire: '115',
     embassy_ES: 'Embajada de España en Managua: +505 2276 0966',
     embassy_AR: { address: 'Las Colinas. Calle Prado Ecuestre 235 B (Intersección Con Calle Los Mangos)', web: 'https://embassies.net/argentina-in-nicaragua/managua' },
@@ -3314,6 +3927,16 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Situación política inestable desde 2018. Manifestaciones: evitar completamente.', 'Relativametne seguro en zonas turísticas (Granada, San Juan del Sur).', 'No fotografíes instalaciones policiales o militares.'],
   },
   'Costa Rica': {
+    embassy_AU: { address: 'San José, La Sabana, Oficentro Torre La Sabana, Third Floor. Costa Rica', phone: '+50 647 006 400', web: 'https://embassies.net/australia-in-costa-rica/san-jose' },
+    embassy_NI: { address: 'San José Costa Rica', web: 'https://embassies.net/nicaragua-in-costa-rica/san-jose' },
+    embassy_HN: { address: 'Show map Boulevard Rohrmoser, Del Parque La Amistad 50 Metros Al Sur Y 75 Metros Al Este San Jose Costa Rica', phone: '+506 231-1642', web: 'https://embassies.net/honduras-in-costa-rica/san-jose' },
+    embassy_GT: { address: 'Show map Sabana Sur, Del Gimnasio Fitsimons, 100 Metros Al Sur Y 50 Metros Al Oeste., Calle 64, San José, Costa Rica', web: 'https://embassies.net/guatemala-in-costa-rica/san-jose' },
+    embassy_PA: { address: 'Avenida 4, La Granja, San José Province, San Pedro, Costa Rica', web: 'https://embassies.net/panama-in-costa-rica/san-jose' },
+    embassy_DO: { address: 'Show map A020, El Prado, San José, Curridabat, 11801, Costa Rica', web: 'https://embassies.net/dominican-republic-in-costa-rica/san-jose' },
+    embassy_UY: { address: 'Malinche, Trejos Montealegre, San José Province, San Rafael De Escazú, Costa Rica', phone: '+506 2288 3444', web: 'https://embassies.net/uruguay-in-costa-rica/san-jose' },
+    embassy_PY: { address: 'San José, Curridabat De Mac Donalds Plaza Del Sol 700 To The South And 200 To The East, Corner House With Columns, Beige 600 Mtrs South And 25 Mtrs East House Nº 12', phone: '+ 506 2234 1857', web: 'https://embassies.net/paraguay-in-costa-rica/san-jose' },
+    embassy_EC: { address: 'Urbanizacion Colón, San José Province, San José, Costa Rica', phone: '+506 2232 1503', web: 'https://embassies.net/ecuador-in-costa-rica/san-jose' },
+    embassy_VE: { address: 'Av. 10, Los Yoses, San José, Costa Rica', phone: '+506 2220 3704', web: 'https://embassies.net/venezuela-in-costa-rica/san-jose' },
     emergency_general: '911', police: '911', ambulance: '911', fire: '911',
     embassy_ES: 'Embajada de España en San José: +506 2222 2328',
     embassy_AR: { address: 'Curridabat, De Plaza Del Sol, 700M Sur Y 25M Este, 4Ta, Casa Sobre La Izquierda', phone: '+ 506 234 6520', web: 'https://embassies.net/argentina-in-costa-rica/san-jose' },
@@ -3338,6 +3961,15 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Uno de los países más seguros de Centroamérica.', 'San José: cuidado con carteristas en Mercado Central y zonas de bus.', 'Naturaleza: peligros reales (serpientes, corrientes oceánicas, volcanes). Sigue siempre señalización.', 'Corrientes oceánicas en playas del Pacífico: causa principal de muertes de turistas.'],
   },
   'Panamá': {
+    embassy_AU: { address: 'Oficina No. 7, Edificio El Colegio, Calle José De Obaldia & Calle 8Va, San Felipe, Ciudad De Panamá, Panamá.', phone: '+507 6677 3833', web: 'https://embassies.net/australia-in-panama/panama-city' },
+    embassy_NI: { address: 'Residencial Cerca De, Panama City, Panama', phone: '+507 2644322', web: 'https://embassies.net/nicaragua-in-panama/panama-city' },
+    embassy_SV: { address: '0823 05432 Calle Anastasio Ruiz, Dúplex 6, Frente A Escuela Japonesa Marbella, Panama', phone: '+507 2233020', web: 'https://embassies.net/el-salvador-in-panama/panama-city' },
+    embassy_GT: { address: 'Show map Edificio World Trade Center, Piso 9, Oficina 901 Calle 53 Marbella Ciudad De Panamá Panama', web: 'https://embassies.net/guatemala-in-panama/panama-city' },
+    embassy_DO: { address: 'Show map Calle Elvira Méndez, Torre Delta, Piso 16, Área Bancaria Panama City Panama', web: 'https://embassies.net/dominican-republic-in-panama/panama-city' },
+    embassy_UY: { address: 'Avenida Balboa, Calle 50E Este Panama City 8898, Calle 50, Panamá, Panama', phone: '+507 264 2838', web: 'https://embassies.net/uruguay-in-panama/panama-city' },
+    embassy_PY: { address: 'New Campo Alegre Urbanization. Calle Las Acacias N ° 60, Marbella, Township Of Bella Vista. City Of Panama', phone: '+507 263 4782', web: 'https://embassies.net/paraguay-in-panama/panama-city' },
+    embassy_EC: { address: 'Edificio P.H. Torre 2000, Sexto Piso (Anterior Edificio Bancomer, Diagonal A Danté) Calle 50, Marbella, Bellavista Apartado Postal 8380, Zona 7 Ciudad De Panamá Panama', phone: '+507 264 2654', web: 'https://embassies.net/ecuador-in-panama/panama-city' },
+    embassy_VE: { address: 'Av. Samuel Lewis, Panamá, Panama', phone: '+507 2691014', web: 'https://embassies.net/venezuela-in-panama/panama-city' },
     emergency_general: '911', police: '104', ambulance: '911', fire: '103',
     embassy_ES: 'Embajada de España en Panamá: +507 227 5122',
     embassy_AR: { address: 'Calle 50 Edificio Global Bank Piso 24', web: 'https://embassies.net/argentina-in-panama/panama-city' },
@@ -3365,18 +3997,79 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Ciudad de Panamá: Casco Viejo y áreas turísticas son seguras. Cuidado en Chorillo y barrios periféricos.', 'Darién: zona fronteriza con Colombia — evitar completamente. Grupos armados activos.', 'San Blas (Guna Yala): espectacular. Solo se accede con permiso de las comunidades indígenas Guna.'],
   },
   'Rep. Dominicana': {
+    embassy_CA: { address: 'Office Of The Embassy Of Canada Carretera Veron- Bavaro Km. 2,5, Amstar Business Center, Building 5, Suite 521, Punta Cana, Dominican Republic', phone: '+809 455-1730', web: 'https://embassies.net/canada-in-dominican-republic/punta-cana' },
+    embassy_US: { address: 'Av. Republica De Colombia #57 Santo Domingo Dominican Republic', phone: '+1 809 567 7775', web: 'https://embassies.net/united-states-in-dominican-republic/santo-domingo' },
+    embassy_GB: { address: 'Ave 27 De Febrero No 233, Edificio Corominas Pepin Santo Domingo Dominican Republic', phone: '+1 (809) 472 7111', web: 'https://embassies.net/united-kingdom-in-dominican-republic/santo-domingo' },
+    embassy_IT: { address: 'Avenida Nuñez De Caceres N.11 - Edificio Equinox - Sector Bella Vista, Santo Domingo, D.N', phone: '+0018096820830', web: 'https://embassies.net/italy-in-dominican-republic/santo-domingo' },
+    embassy_DE: { address: 'Ginaka 2.0 Building, Floors 5 And 6, Avenida Núñez De Cáceres No. 11 (Between Sarasota And Rómulo Betancourt), Santo Domingo, Dominikanische Republik', phone: '+18 09 542 89 49', web: 'https://embassies.net/germany-in-dominican-republic/santo-domingo' },
+    embassy_FR: { address: 'Calle Las Damas N°42 - Zone Coloniale - Bp 780 - Saint-Domingue', phone: '+ 1 809 695 43 00', web: 'https://embassies.net/france-in-dominican-republic/santo-domingo' },
+    embassy_BR: { address: 'Av. Winston Churchill Nr. 32, 2. Piso Ed. Franco Acra Y Asociados Santo Domingo Dominican Republic', phone: '+809 532 4200', web: 'https://embassies.net/brazil-in-dominican-republic/santo-domingo' },
+    embassy_NI: { address: 'Show map Avenida Caonabo Los Cacicazgos Santo Domingo Dominican Republic', phone: '+1 809 535 1120', web: 'https://embassies.net/nicaragua-in-dominican-republic/santo-domingo' },
+    embassy_SV: { address: 'Show map C/ Haim Lopez Penha No. 32 Edificio Odonto-Dom, 4Th Floor Ensanche Paraíso Santo Domingo Dominican Republic', web: 'https://embassies.net/el-salvador-in-dominican-republic/santo-domingo' },
+    embassy_HN: { address: 'Show map Calle Caonabo No. 12, Los Cacicazgos Entre Avenida Enriquillo Y Avenida Anacaona, Santo Domingo, República Dominicana', phone: '+1 809 482 7992', web: 'https://embassies.net/honduras-in-dominican-republic/santo-domingo' },
+    embassy_GT: { address: 'Show map Torre Corominas Pepin, Av 27 De Febrero 233, Santo Domingo, Dominican Republic', phone: '+1 809 381-0249', web: 'https://embassies.net/guatemala-in-dominican-republic/santo-domingo' },
+    embassy_PA: { address: 'Hatuey Street, No. 20-B, Cacicazgo Sector, Santo Domingo Dominican Republic.', phone: '+1 809-685-3665', web: 'https://embassies.net/panama-in-dominican-republic/santo-domingo' },
+    embassy_CR: { address: 'Show map Torre Bora Bora, C. Licenciado Malaquias Gil 4, Santo Domingo, Dominican Republic', web: 'https://embassies.net/costa-rica-in-dominican-republic/santo-domingo' },
+    embassy_CU: { address: 'Show map Francisco Prats Ramírez, No. 808 El Millón Santo Domingo Dominican Republic', web: 'https://embassies.net/cuba-in-dominican-republic/santo-domingo' },
+    embassy_UY: { address: 'Orre Ejecutiva Gapo, No, Calle Luis F. Thomen 110, Santo Domingo, Dominican Republic', phone: '+1 809 472 4229', web: 'https://embassies.net/uruguay-in-dominican-republic/santo-domingo' },
+    embassy_PY: { address: 'Pedro Henriquez Ureña Avenue No. 133, 5Th. Apartment, Reyna I Business Building - La Esperilla Sector', phone: '+ 1 809 540 0855', web: 'https://embassies.net/paraguay-in-dominican-republic/santo-domingo' },
+    embassy_BO: { address: 'Winston Churchill Esquina Max Henríquez Ureña #95 Ensánchele Piantinni Santo Domingo Dominican Republic', phone: '+1 809 562 5342', web: 'https://embassies.net/bolivia-in-dominican-republic/santo-domingo' },
+    embassy_EC: { address: 'Show map Avenida Abraham Lincoln 1007 Edificio Optica Félix, Apartamento 601 Ensanche Piantini Santo D, D.N. Casilla Postal 808 Santo Domingo Dominican Republic', web: 'https://embassies.net/ecuador-in-dominican-republic/santo-domingo' },
+    embassy_PE: { address: 'Calle Mayreni Nº 31 Urb. Los Cacicazgos Santo Domingo, National District', phone: '+1 (809) 482 3300', web: 'https://embassies.net/peru-in-dominican-republic/santo-domingo' },
+    embassy_CL: { address: 'Avda. Anacaona Nr. 11 Parque Mirador Sur Santo Domingo Dominican Republic', phone: '+1 809 797 2433', web: 'https://embassies.net/chile-in-dominican-republic/santo-domingo' },
+    embassy_CO: { address: 'Calle Andrés Julio Aybar # 27 Ensanche Piantini Santo Domingo', phone: '+1 (809) 562-1670', web: 'https://embassies.net/colombia-in-dominican-republic/santo-domingo' },
+    embassy_AR: { address: 'Av. Máximo Gómez Nº 10, Gazcue, Santo Domingo', web: 'https://embassies.net/argentina-in-dominican-republic/santo-domingo' },
+    embassy_MX: { address: 'Eduardo Jenner Street # 5, La Esperilla, Santo Domingo', phone: '+1 809 687 6444', web: 'https://embassies.net/mexico-in-dominican-republic/santo-domingo' },
     emergency_general: '911', police: '911', ambulance: '911', fire: '911',
     embassy_ES: 'Embajada de España en Santo Domingo: +1 809 535 6500',
     useful_apps: [],
     safety_tips: ['Zonas turísticas (Punta Cana, Samaná): relativamente seguras dentro de los resorts.', 'Santo Domingo: cuidado en Ciudad Colonial de noche. Zonas de Villa Mella y periféricas — evitar.', 'Nunca lleves objetos de valor visibles. Taxis: negocia precio antes o usa app.'],
   },
   'Jamaica': {
+    embassy_AU: { address: '80-82 Second Street, Port Bustamante Kingston 13 Jamaica', phone: '+1 876 361 1332', web: 'https://embassies.net/australia-in-jamaica/kingston' },
+    embassy_CA: { address: '3 West Kings House Road, 10 Waterloo Rd, Kingston, Jamaica', phone: '+1 876 926 1500', web: 'https://embassies.net/canada-in-jamaica/kingston' },
+    embassy_US: { address: '142 Old Hope Road Kingston 6 Jamaica, West Indies', phone: '+876 702 6000', web: 'https://embassies.net/united-states-in-jamaica/kingston' },
+    embassy_GB: { address: 'British High Commission P O Box 575 28 Trafalgar Road Kingston 10 Kingston Jamaica', phone: '+1 (876) 936 0700', web: 'https://embassies.net/united-kingdom-in-jamaica/kingston' },
+    embassy_IT: { address: ': Drapers San Guest House, Drapers, Port Antonio (Po)', phone: '+0018769488973', web: 'https://embassies.net/italy-in-jamaica/kingston' },
+    embassy_DE: { address: '10 Waterloo Road, Kingston 10, Jamica', phone: '+1 876 819-4351', web: 'https://embassies.net/germany-in-jamaica/kingston' },
+    embassy_FR: { address: '13, Hillcrest Avenue Kingston Jamaica', phone: '+ 1 876 946 40 00', web: 'https://embassies.net/france-in-jamaica/kingston' },
+    embassy_BR: { address: '23 Millsborough, Crescent Kingston 6 Jamaica', phone: '+1 876 946 9812', web: 'https://embassies.net/brazil-in-jamaica/kingston' },
+    embassy_NI: { address: 'Show map 80 Lady Musgrave Road Kingston 6 Jamaica', web: 'https://embassies.net/nicaragua-in-jamaica/kingston' },
+    embassy_PA: { address: 'Victoria Mutual Bulding, 53 Knutsford Booulevard 5Th Floor Kingston 5, Jamaica Wi', phone: '+1-876-618-0755', web: 'https://embassies.net/panama-in-jamaica/kingston' },
+    embassy_CR: { address: '58, 6 Hope Rd, Kingston, Jamaica', phone: '+1 876978 5210', web: 'https://embassies.net/costa-rica-in-jamaica/kingston' },
+    embassy_DO: { address: 'Show map 85 Hope Road Kingston 6, Jamaica, Hope Rd, Kingston, Jamaica', phone: '+1 876-633-7765', web: 'https://embassies.net/dominican-republic-in-jamaica/kingston' },
+    embassy_CU: { address: 'Show map 9 Trafalgar Road Kingston Jamaica', web: 'https://embassies.net/cuba-in-jamaica/kingston' },
+    embassy_UY: { address: '63 A Hagley Park Road, Elspeth Ave, Kingston, Jamaica', phone: '+1 876 926 6511', web: 'https://embassies.net/uruguay-in-jamaica/kingston' },
+    embassy_EC: { address: 'C/O Mayfair Hotel 4 West King\'S House Close Kingston 6 Jamaica', web: 'https://embassies.net/ecuador-in-jamaica/kingston' },
+    embassy_VE: { address: 'Haughton Ave, Kingston, Jamaica', phone: '+1 8769265510', web: 'https://embassies.net/venezuela-in-jamaica/kingston' },
+    embassy_PE: { address: '23 Barbados Avenue, Po Box 1818, Kingston , Jamaica', web: 'https://embassies.net/peru-in-jamaica/kingston' },
+    embassy_CL: { address: '6 St. Lucia Avenue, 5Th Floor. Courtleigh Corporate Centre, Kingston 5, Jamaica', phone: '+ 1 876 968 0260', web: 'https://embassies.net/chile-in-jamaica/kingston' },
+    embassy_CO: { address: '53 Knutsford Blvd. Victoria Mutual Building, 4Th Floor. Kingston, Jamaica', web: 'https://embassies.net/colombia-in-jamaica/kingston' },
+    embassy_AR: { address: '40 Knutsford Blvd.; Kingston 5; Jamaica', web: 'https://embassies.net/argentina-in-jamaica/kingston' },
+    embassy_MX: { address: 'Pcj Building (Ph) 36 Trafalgar Road Kingston 10, Jamaica Wi', phone: '+1 876 926 4242', web: 'https://embassies.net/mexico-in-jamaica/kingston' },
     emergency_general: '119/110', police: '119', ambulance: '110', fire: '110',
     embassy_ES: 'Embajada de España en Kingston: +1 876 929 8180',
     useful_apps: [],
     safety_tips: ['Kingston: West Kingston y zonas de "garrisons" — evitar completamente.', 'Resorts (Montego Bay, Negril, Ocho Ríos): dentro del resort es seguro. Fuera: precauciones.', 'No aceptes marihuana de extraños — aunque sea legal localmente, los turistas son objetivo.'],
   },
   'Trinidad y Tobago': {
+    embassy_AU: { address: '18 Herbert Street St Clair Port Of Spain Trinidad And Tobago', phone: '+1 868 822 5450', web: 'https://embassies.net/australia-in-trinidad-and-tobago/port-of-spain' },
+    embassy_CA: { address: '3-3A Sweet Briar Road, Maple House, St. Clair, Port Of Spain, Trinidad And Tobago', web: 'https://embassies.net/canada-in-trinidad-and-tobago/port-of-spain' },
+    embassy_US: { address: '15 Queen\'S Park W, Port Of Spain, Trinidad & Tobago', phone: '+868 622-6371', web: 'https://embassies.net/united-states-in-trinidad-and-tobago/port-of-spain' },
+    embassy_GB: { address: '19 St Clair Avenue St Clair, Port Of Spain Trinidad And Tobago', phone: '+ 1 868 350 0444', web: 'https://embassies.net/united-kingdom-in-trinidad-and-tobago/port-of-spain' },
+    embassy_IT: { address: '8 Hillcote Scott Street St. Augustine St. Augustine Trinidad And Tobago', phone: '+1 868 662 0861', web: 'https://embassies.net/italy-in-trinidad-and-tobago/port-of-spain' },
+    embassy_DE: { address: 'Street 19 St. Clair Avenue, St. Clair, Port-Of-Spain, Grenada', phone: '+1 868 628 16 30', web: 'https://embassies.net/germany-in-trinidad-and-tobago/port-of-spain' },
+    embassy_FR: { address: 'Show map 7 Mary Street St. Clair P.O. Box 1242 Newtown 190106 Trinidad And Tobago', phone: '+1 868 628-1931', web: 'https://embassies.net/france-in-trinidad-and-tobago/port-of-spain' },
+    embassy_BR: { address: 'Show map 18 Sweet Briar Road, Port Of Spain, Trinidad & Tobago', web: 'https://embassies.net/brazil-in-trinidad-and-tobago/port-of-spain' },
+    embassy_SV: { address: 'Show map 92 Columbus Circle, Port Of Spain, Trinidad & Tobago', web: 'https://embassies.net/el-salvador-in-trinidad-and-tobago/port-of-spain' },
+    embassy_GT: { address: 'Show map Apt. 701, Regents Towers Westmoorings By The Sea Westmoorings Port-Of-Spain Trinidad And Tobago', phone: '+1 868 632 7629', web: 'https://embassies.net/guatemala-in-trinidad-and-tobago/port-of-spain' },
+    embassy_PA: { address: '# 7, Ground Floor, Gray Street, St. Clair, Port Of Spain, Trinidad And Tobago Wi', web: 'https://embassies.net/panama-in-trinidad-and-tobago/port-of-spain' },
+    embassy_DO: { address: 'Show map 10 B, Queen`S Park West, Suite 101 Port Of Spain Trinidad Tobago', web: 'https://embassies.net/dominican-republic-in-trinidad-and-tobago/port-of-spain' },
+    embassy_CU: { address: 'Show map 74 Elm Avenue Bayshore, Westmooring Port Of Spain Trinidad And Tobago', phone: '+1-868-633-3268', web: 'https://embassies.net/cuba-in-trinidad-and-tobago/port-of-spain' },
+    embassy_CL: { address: '#4 Alexandra Street, Saint Clair, Port Of Spain, Trinidad And Tobago', phone: '+1 868 628 0540', web: 'https://embassies.net/chile-in-trinidad-and-tobago/port-of-spain' },
+    embassy_CO: { address: '4Th Floor, Newtown Centre 30-36 Maraval Road Port-Of-Spain Trinidad And Tobago', phone: '+1 (868) 628-5656', web: 'https://embassies.net/colombia-in-trinidad-and-tobago/port-of-spain' },
+    embassy_AR: { address: 'Tatil Building, 4To Piso, 11 Maraval Road, Puerto España', web: 'https://embassies.net/argentina-in-trinidad-and-tobago/port-of-spain' },
+    embassy_MX: { address: '12, Hayes Street. St. Clair Port Of Spain Trinity Wi', phone: '+1 868 622 1422', web: 'https://embassies.net/mexico-in-trinidad-and-tobago/port-of-spain' },
     emergency_general: '999/990', police: '999', ambulance: '990', fire: '990',
     embassy_ES: 'Embajada de España en Caracas cubre Trinidad y Tobago.',
     useful_apps: [],
@@ -3404,6 +4097,8 @@ Object.assign(EMERGENCY_DB, {
   // ══ AFRICA COMPLETO ══════════════════════════════════════════════════════════
 
   'Ghana': {
+    embassy_DE: { address: 'Street No. 6, Kenneth Kaunda Road, North Ridge, Accra, Ghana', phone: '+233 30 221 10 00', web: 'https://embassies.net/germany-in-ghana/accra' },
+    embassy_CU: { address: 'Show map 22 A Akosombo Road. P.O Box 9163. Airport Residential Area, Accra Ghana.', phone: '+233 57 763 5567', web: 'https://embassies.net/cuba-in-ghana/accra' },
     emergency_general: '191/192/193', police: '191', ambulance: '193', fire: '192',
     embassy_ES: 'Embajada de España en Acra: +233 30 274 6954',
     embassy_AU: { address: 'Australian High Commission Accra, 2, Second Rangoon Close (Cnr Josef B. Tito Ave) Cantonments, Accra Ghana', phone: '+233  302  216  400', web: 'https://embassies.net/australia-in-ghana/accra' },
@@ -3426,6 +4121,9 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Uno de los países más estables de África Occidental. Acra: cuidado en Kantamanto y zonas de mercado.', 'Malaria: profilaxis recomendada. Agua embotellada.'],
   },
   'Nigeria': {
+    embassy_PT: { address: 'Orinoco Street, Maitama, Abuja, Nigeria', phone: '+234 903 780 8670', web: 'https://embassies.net/portugal-in-nigeria/abuja' },
+    embassy_CU: { address: 'Show map 339Diplomatic Dr, Central Business Dis, Abuja, Nigeria', phone: '+234 9 461 4821', web: 'https://embassies.net/cuba-in-nigeria/abuja' },
+    embassy_VE: { address: 'Maitama 900271, Abuja, Nigeria', phone: '+234 9 3140900', web: 'https://embassies.net/venezuela-in-nigeria/abuja' },
     emergency_general: '199/112', police: '199', ambulance: '199', fire: '199',
     embassy_ES: 'Embajada de España en Abuja: +234 9 461 4366',
     embassy_AR: { address: '30 Nelson Mandela Street, Off Desmond Tutu, Asokoro, Abuja', web: 'https://embassies.net/argentina-in-nigeria/abuja' },
@@ -3450,6 +4148,9 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Lagos: alto riesgo de robos con violencia. Nunca tomes taxis de calle — solo Uber o servicios de confianza del hotel.', 'Norte de Nigeria (estados de Borno, Yobe, Adamawa): riesgo terrorista extremo (Boko Haram). EVITAR.', 'Delta del Níger: riesgo de secuestros. Solo con escolta.', 'Escamas en Nigeria: timo del príncipe nigeriano es real y prevalente.'],
   },
   'Senegal': {
+    embassy_BR: { address: 'Rue De Fatick, Immeuble Abdoulaye Seck, 1Er Et 2Ème Étages, Point E, Bp 136, Dakar - Senegal', phone: '(+221) 33 825 9400', web: 'https://embassies.net/brazil-in-senegal/dakar' },
+    embassy_NI: { address: 'Show map Lote 148, Street Ng-88 Ngor-Almadies Dakar Senegal', phone: '+221 77 356 0958', web: 'https://embassies.net/nicaragua-in-senegal/dakar' },
+    embassy_CU: { address: 'Show map Sotrac Mermoz, Villa Nro.9, Pb 4510 Dakar Senegal', phone: '+221-33-869-8319', web: 'https://embassies.net/cuba-in-senegal/dakar' },
     emergency_general: '17/15/18', police: '17', ambulance: '15', fire: '18',
     embassy_ES: 'Embajada de España en Dakar: +221 33 821 8048',
     embassy_AR: { email: 'mailto:secon_esene@mrecic.gov.ar', web: 'https://esene.cancilleria.gob.ar/' },
@@ -3469,6 +4170,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Uno de los más estables de África Occidental. Dakar: cuidado con vendedores insistentes en el puerto.', 'Casamance (sur): situación mejorada pero consulta avisos actuales.', 'Malaria: profilaxis recomendada.'],
   },
   'Mozambique': {
+    embassy_GB: { address: 'Avenida Vladmir Lenine, 310 Maputo City Maputo P.O. Box 55 Mozambique', phone: '+258 21 35 60 00', web: 'https://embassies.net/united-kingdom-in-mozambique/maputo' },
+    embassy_CU: { address: 'Show map Avenida Kenneth Kaunda No. 492 Pob 387 Maputo Mozambique', phone: '+258-1-214-92444', web: 'https://embassies.net/cuba-in-mozambique/maputo' },
     emergency_general: '119/198', police: '119', ambulance: '198', fire: '198',
     embassy_ES: 'Embajada de España en Maputo: +258 21 492 025',
     embassy_AR: { address: 'Rua Dos Desportistas 833, 9º Piso, Edificio Jat V-1. Maputo', web: 'https://embassies.net/argentina-in-mozambique/maputo' },
@@ -3529,6 +4232,8 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['País muy seguro y estable. Safaris en Chobe y Okavango: solo con guía certificado.', 'Nunca salgas del vehículo en parques sin autorización — animales peligrosos.', 'Agua potable en ciudades. En campo: solo agua embotellada.'],
   },
   'Etiopía': {
+    embassy_NZ: { address: 'Bole Sub City, Woreda 09 House No 111 Behind Atlas Hotel/Close To Shala Park (Namibia St Addis Ababa', phone: '+251 11 515 1269', web: 'https://embassies.net/new-zealand-in-ethiopia/addis-ababa' },
+    embassy_CU: { address: 'Show map Bole Sub City, Kebele 01, H No. 14831 P.O. Box 90546 Addis Ababa Ethiopia', web: 'https://embassies.net/cuba-in-ethiopia/addis-ababa' },
     emergency_general: '911', police: '991', ambulance: '907', fire: '939',
     embassy_ES: 'Embajada de España en Addis Abeba: +251 11 611 0025',
     embassy_AR: { address: 'Bole Subcity, Addis Abeba', phone: '+251 11 371 0000', hours: 'Lun-Vie 9:00-13:00', web: null },
@@ -3558,6 +4263,10 @@ Object.assign(EMERGENCY_DB, {
     safety_tips: ['Conflicto activo en Tigray (norte): evitar completamente. Consulta avisos actuales para Amhara y Oromía.', 'Addis Abeba: relativamente segura. Cuidado con estafas y "guías" no solicitados.', 'Zona Danakil: temperatura más alta del planeta (+50°C). Solo con tour organizado.', 'Malaria: profilaxis en zonas bajas.'],
   },
   'Angola': {
+    embassy_CA: { address: 'Rua Rei Katyavala 113, Luanda, Angola', web: 'https://embassies.net/canada-in-angola/luanda' },
+    embassy_PA: { address: 'Rua De Banguela 117 Bairro Patrice Lumumba Cp 3835 Luanda Angola', phone: '+244 (222) 449 936', web: 'https://embassies.net/panama-in-angola/luanda' },
+    embassy_UY: { address: 'R. Salvador Allende 71, Luanda, Angola', phone: '+244 222 398 649', web: 'https://embassies.net/uruguay-in-angola/luanda' },
+    embassy_MX: { address: 'Rua Ferraz Bomboco Nº 47 / 49, Alvalade Luanda, Angola', phone: '+244 923 608 082', web: 'https://embassies.net/mexico-in-angola/luanda' },
     emergency_general: '113/112', police: '113', ambulance: '112', fire: '115',
     embassy_ES: 'Embajada de España en Luanda: +244 222 331 666',
     embassy_AR: { address: 'Rua Comandante Stona 190, Bairro Alvalade, Luanda', web: 'https://embassies.net/argentina-in-angola/luanda' },

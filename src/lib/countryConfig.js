@@ -460,19 +460,55 @@ const EN_TO_ES = {
   'Vanuatu':'Vanuatu',
 };
 
+// Nombres alternativos en español que NO son claves de KNOWN_META pero que
+// pudieron guardarse desde listas anteriores de la app. Sin esto, un usuario con
+// "Yemen" guardado no encontraría su país en el selector (que ahora ofrece
+// "Yemén") y podría acabar sobreescribiéndolo por otro.
+const ES_ALIASES = {
+  'Bosnia y Herzegovina':   'Bosnia',
+  'Botswana':               'Botsuana',
+  'Emiratos Árabes Unidos': 'Emiratos Árabes',
+  'Moldavia':               'Moldova',
+  'República del Congo':    'Congo',
+  'Saint-Martin':           'Saint Martin',
+  'Yemen':                  'Yemén',
+  'Suazilandia':            'Esuatini',
+  'Macedonia':              'Macedonia del Norte',
+  'Japan':                  'Japón',
+  'Rwanda':                 'Ruanda',
+  // Incoherencias del propio mapa: EN_TO_ES traduce 'Taiwan'→'Taiwán', pero la
+  // clave real de KNOWN_META es 'Taiwan' sin tilde. Y las listas antiguas usaban
+  // 'Malawi' mientras KNOWN_META tiene 'Malaui'.
+  'Taiwán':                 'Taiwan',
+  'Malawi':                 'Malaui',
+};
+
 export function normalizeCountry(input) {
   if (!input) return '';
   const trimmed = input.trim();
+  // 0. Alias en español de listas antiguas ("Yemen" → "Yemén")
+  if (ES_ALIASES[trimmed]) return ES_ALIASES[trimmed];
+  const lcTrim = trimmed.toLowerCase();
+  const aliasKey = Object.keys(ES_ALIASES).find(k => k.toLowerCase() === lcTrim);
+  if (aliasKey) return ES_ALIASES[aliasKey];
+  let out = trimmed;
   // 1. Direct English match
-  if (EN_TO_ES[trimmed]) return EN_TO_ES[trimmed];
-  // 2. Case-insensitive English match
-  const lc = trimmed.toLowerCase();
-  const engMatch = Object.keys(EN_TO_ES).find(k => k.toLowerCase() === lc);
-  if (engMatch) return EN_TO_ES[engMatch];
-  // 3. Direct Spanish match (already correct)
-  const n = normalizeText(trimmed);
-  const found = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
-  return found || trimmed;
+  if (EN_TO_ES[trimmed]) out = EN_TO_ES[trimmed];
+  else {
+    // 2. Case-insensitive English match
+    const lc = trimmed.toLowerCase();
+    const engMatch = Object.keys(EN_TO_ES).find(k => k.toLowerCase() === lc);
+    if (engMatch) out = EN_TO_ES[engMatch];
+    else {
+      // 3. Direct Spanish match (already correct)
+      const n = normalizeText(trimmed);
+      const found = Object.keys(KNOWN_META).find((k) => normalizeText(k) === n);
+      if (found) out = found;
+    }
+  }
+  // 4. El resultado también pasa por los alias: EN_TO_ES puede devolver un
+  //    nombre que no es clave de KNOWN_META (p. ej. 'Taiwan' → 'Taiwán').
+  return ES_ALIASES[out] || out;
 }
 
 // ─── TOP CITIES ───────────────────────────────────────────────────────────────
@@ -565,4 +601,202 @@ export function computeAvailableCurrencies(cities = [], baseCurrency = 'EUR') {
     }
   }
   return Array.from(set);
+}
+
+// ─── I18N DE PAÍSES ───────────────────────────────────────────────────────────
+// El nombre en español es el ID canónico: es la clave de KNOWN_META y lo que se
+// guarda en la BD (trip.country, city.country, profile.home_country). Estas
+// funciones NO cambian ese canónico: solo traducen lo que se MUESTRA y amplían
+// lo que se puede BUSCAR. Así un usuario en EN ve "Spain" y encuentra el país
+// escribiendo "Spain", "España" o "ES", pero se sigue guardando "España".
+
+// Subdivisiones y territorios que comparten ISO con su país padre. Intl los
+// traduciría al nombre del padre ("Escocia" → "United Kingdom"), que es
+// incorrecto: aquí son destinos por derecho propio y llevan nombre explícito.
+const LABEL_EN_OVERRIDE = {
+  'Escocia': 'Scotland',
+  'Gales': 'Wales',
+  'Irlanda del Norte': 'Northern Ireland',
+  'Alaska': 'Alaska',
+  'Hawái': 'Hawaii',
+  'Tahití': 'Tahiti',
+  'Chipre del Norte': 'Northern Cyprus',
+  'Bonaire': 'Bonaire',
+  'Saba': 'Saba',
+  'Sint Eustatius': 'Sint Eustatius',
+  'Islas del Canal': 'Channel Islands',
+  'Guernsey': 'Guernsey',
+};
+
+// Variantes ortográficas o nombres antiguos que duplican a otro canónico. Se
+// siguen resolviendo (por si ya están guardados en la BD) pero no se ofrecen en
+// los selectores, para no mostrar la misma opción dos veces.
+const REDUNDANT_ALIASES = new Set([
+  'Japan',                    // → Japón
+  'Rwanda',                   // → Ruanda
+  'Suazilandia',              // → Esuatini (nombre oficial desde 2018)
+  'Macedonia',                // → Macedonia del Norte
+  'Saint Kitts',              // → San Cristóbal y Nieves
+  'Saint-Martin',             // → Saint Martin
+  'República del Congo',      // → Congo
+  'Isla Reunión',             // → Reunión
+  'Islas Marianas',           // → Islas Marianas del Norte
+  'Islas Vírgenes de EE.UU',  // → Islas Vírgenes EEUU
+]);
+
+// ES normalizado → ISO. Se deriva de KNOWN_META y se completa con Intl, así no
+// hay que mantener una tabla a mano.
+let _esToIso = null;
+function esToIso() {
+  if (_esToIso) return _esToIso;
+  const map = {};
+  try {
+    const dn = new Intl.DisplayNames(['es'], { type: 'region' });
+    for (const code of Intl.supportedValuesOf('region')) {
+      const label = dn.of(code);
+      if (label && label !== code) map[normalizeText(label)] = code;
+    }
+  } catch { /* navegador sin Intl.DisplayNames: se usa solo KNOWN_META */ }
+  // KNOWN_META manda: sus ISO están curados a mano.
+  for (const [label, meta] of Object.entries(KNOWN_META)) {
+    if (meta.iso) map[normalizeText(label)] = meta.iso;
+  }
+  _esToIso = map;
+  return map;
+}
+
+/** ISO-3166 alpha-2 de un país canónico en español. null si no se conoce. */
+export function getCountryIso(canonicalEs) {
+  if (!canonicalEs) return null;
+  return KNOWN_META[canonicalEs]?.iso || esToIso()[normalizeText(canonicalEs)] || null;
+}
+
+const _labelCache = {};
+/** Nombre del país en el idioma pedido. Cae al canónico español si no se puede. */
+export function getCountryLabel(canonicalEs, lang = 'es') {
+  if (!canonicalEs) return '';
+  const base = (lang || 'es').split('-')[0];
+  if (base === 'es') return canonicalEs;
+  const ck = base + '|' + canonicalEs;
+  if (_labelCache[ck]) return _labelCache[ck];
+  // Subdivisión con nombre propio: no derivar del ISO del país padre.
+  if (base === 'en' && LABEL_EN_OVERRIDE[canonicalEs]) {
+    _labelCache[ck] = LABEL_EN_OVERRIDE[canonicalEs];
+    return _labelCache[ck];
+  }
+  if (LABEL_EN_OVERRIDE[canonicalEs]) return canonicalEs;
+  const iso = getCountryIso(canonicalEs);
+  if (!iso) return canonicalEs;
+  try {
+    const label = new Intl.DisplayNames([base], { type: 'region' }).of(iso);
+    const out = (label && label !== iso) ? label : canonicalEs;
+    _labelCache[ck] = out;
+    return out;
+  } catch {
+    return canonicalEs;
+  }
+}
+
+// ES canónico → lista de alias buscables (español, inglés, idioma activo, ISO).
+let _aliasIndex = null;
+function aliasIndex() {
+  if (_aliasIndex) return _aliasIndex;
+  const idx = {};
+  const push = (es, alias) => {
+    if (!alias) return;
+    const n = normalizeText(alias);
+    if (!n) return;
+    (idx[es] = idx[es] || new Set()).add(n);
+  };
+  for (const es of Object.keys(KNOWN_META)) push(es, es);
+  // Inglés: EN_TO_ES ya cubre variantes ("Great Britain", "Holland"...)
+  for (const [en, es] of Object.entries(EN_TO_ES)) push(es, en);
+  // Nombres antiguos en español ("Yemen" → Yemén) para que sigan encontrándose
+  for (const [alias, es] of Object.entries(ES_ALIASES)) push(es, alias);
+  // ISO
+  for (const es of Object.keys(idx)) {
+    const iso = getCountryIso(es);
+    if (iso) push(es, iso);
+  }
+  _aliasIndex = idx;
+  return idx;
+}
+
+/**
+ * Busca países. Devuelve [{ value, label }] donde value es SIEMPRE el canónico
+ * español (lo que se guarda) y label el nombre en el idioma activo (lo que se ve).
+ * Encuentra escribiendo en español, en inglés, en el idioma activo o por ISO.
+ */
+export function searchCountries(query, lang = 'es', limit = 8) {
+  const list = getCountryOptions(lang);
+  const q = normalizeText(query || '');
+  if (!q) return list.slice(0, limit);
+  const idx = aliasIndex();
+  const exact = [];
+  const exactSub = [];   // subdivisiones: comparten ISO con su país padre
+  const starts = [];
+  const contains = [];
+  for (const opt of list) {
+    const aliases = new Set(idx[opt.value] || []);
+    aliases.add(normalizeText(opt.label));
+    let hit = 0;
+    for (const a of aliases) {
+      if (a === q) { hit = 3; break; }        // exacto (incluye ISO: "ES" → España)
+      if (a.startsWith(q)) { hit = Math.max(hit, 2); }
+      else if (a.includes(q)) { hit = Math.max(hit, 1); }
+    }
+    if (hit === 3) (LABEL_EN_OVERRIDE[opt.value] ? exactSub : exact).push(opt);
+    else if (hit === 2) starts.push(opt);
+    else if (hit === 1) contains.push(opt);
+  }
+  return [...exact, ...exactSub, ...starts, ...contains].slice(0, limit);
+}
+
+let _optionsCache = {};
+/**
+ * Lista completa de países como [{ value, label }], ordenada alfabéticamente en
+ * el idioma pedido. value = canónico español; label = nombre traducido.
+ * Excluye variantes redundantes (siguen resolviendo, pero no se ofrecen).
+ * Úsala para DESTINOS: incluye subdivisiones como Escocia o Tahití, que son
+ * destinos de viaje legítimos.
+ */
+export function getCountryOptions(lang = 'es') {
+  const base = (lang || 'es').split('-')[0];
+  if (_optionsCache[base]) return _optionsCache[base];
+  const out = Object.keys(KNOWN_META)
+    .filter(es => !REDUNDANT_ALIASES.has(es))
+    .map(es => ({ value: es, label: getCountryLabel(es, base) }))
+    .sort((a, b) => a.label.localeCompare(b.label, base));
+  _optionsCache[base] = out;
+  return out;
+}
+
+let _originCache = {};
+/**
+ * Lista de países para PAÍS DE ORIGEN / NACIONALIDAD. Igual que
+ * getCountryOptions() pero sin subdivisiones (Escocia, Alaska, Hawái...).
+ *
+ * Motivo: home_country alimenta los textos y la búsqueda de embajada
+ * ("Embajada de {origen} en {destino}"), y la BD de embajadas resuelve por
+ * nombre de país soberano. Con "Alaska" saldría "Embajada de Alaska en Japón",
+ * que no existe. Como destino sí tienen sentido, por eso solo se filtran aquí.
+ */
+export function getOriginCountryOptions(lang = 'es') {
+  const base = (lang || 'es').split('-')[0];
+  if (_originCache[base]) return _originCache[base];
+  const out = getCountryOptions(base).filter(o => !LABEL_EN_OVERRIDE[o.value]);
+  _originCache[base] = out;
+  return out;
+}
+
+/** Nombre de idioma (languageLabel de KNOWN_META) traducido al idioma activo. */
+export function getLanguageLabel(languageCode, lang = 'es') {
+  if (!languageCode) return '';
+  const base = (lang || 'es').split('-')[0];
+  const code = languageCode.split('-')[0];
+  try {
+    const label = new Intl.DisplayNames([base], { type: 'language' }).of(code);
+    if (label && label !== code) return label.charAt(0).toUpperCase() + label.slice(1);
+  } catch { /* sin Intl: se devuelve el código */ }
+  return languageCode;
 }
