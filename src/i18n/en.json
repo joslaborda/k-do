@@ -1139,7 +1139,13 @@
       "noEmbassyHint": "We don't have the data for the embassy of {{home}} in {{country}} yet.",
       "searchOfficial": "Search your country's official site →",
       "usefulApps": "Useful apps in {{country}}",
-      "safetyTips": "Safety tips"
+      "safetyTips": "Safety tips",
+      "consulates_one": "{{count}} consulate",
+      "consulates_other": "{{count}} consulates",
+      "here": "Here",
+      "showLess": "Show less",
+      "showMore_one": "Show {{count}} more",
+      "showMore_other": "Show {{count}} more"
     }
   },
   "weather": {
