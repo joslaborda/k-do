@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Heart, MapPin, Calendar, ArrowRight, ThumbsUp } from 'lucide-react';
+import { Heart, MapPin, Calendar, ArrowRight, Map, Plane } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 import { toast } from '@/components/ui/use-toast';
 import { createPageUrl } from '@/utils';
@@ -92,8 +91,10 @@ export default function TemplateCard({ template, currentUser }) {
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-6xl">
-              {template.countries?.[0] ? '🗺️' : '✈️'}
+            <div className="w-full h-full flex items-center justify-center">
+              {template.countries?.[0]
+                ? <Map className="w-12 h-12 text-border" strokeWidth={1.5} />
+                : <Plane className="w-12 h-12 text-border" strokeWidth={1.5} />}
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
