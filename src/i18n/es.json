@@ -137,6 +137,49 @@
       "searchPlaceholder": "Restaurantes, museos, cafeterías...",
       "mySpots": "Mis spots",
       "saved": "Guardado"
+    },
+    "s3": {
+      "title1": "Vuestro viaje,",
+      "title2": "un solo sitio",
+      "body": "Invita a tus compañeros al viaje. Todos tendréis acceso a la misma información: ruta, documentos, spots y gastos.",
+      "travelers": "3 viajeros",
+      "invite": "+ Invitar"
+    },
+    "s4": {
+      "title1": "Todo listo antes",
+      "title2": "de despegar",
+      "body": "Kōdo te da información personalizada: visados, vacunas, adaptadores. Sube tus documentos y asígnalos a un día concreto para que aparezcan cuando los necesites.",
+      "daysToTrip": "días para el viaje",
+      "firstStop": "Primera parada: Tokio · 12 mar",
+      "todo": "Por hacer antes del viaje",
+      "passport": "pasaporte de España",
+      "allSet": "Todo listo ✓",
+      "noVisa": "Sin visado — Japón",
+      "noVisaSub": "Pasaporte español · No requiere trámite",
+      "insurance": "Seguro de viaje"
+    },
+    "s5": {
+      "title1": "Las cuentas aquí",
+      "title2": "siempre encajan",
+      "yourBalance": "Tu balance",
+      "owedToYou": "Te deben",
+      "youOwe": "Tú debes a",
+      "example": "Carlos debe a José",
+      "owedToYouLabel": "Te deben a ti",
+      "dinner": "Cena en Tsukiji",
+      "paidBy": "Pagó {{name}} · ÷ 4"
+    },
+    "s6": {
+      "title1": "Tu día a día",
+      "title2": "en la tab Hoy",
+      "today": "HOY",
+      "searchExample": "Restaurantes, museos, cafeterías...",
+      "flightSub": "Vuelo · asignado hoy",
+      "spotSub": "Spot · asignado 14:00",
+      "restaurantSub": "Restaurante · sin hora · toca para añadir",
+      "ramenSub": "Restaurante · Tokio",
+      "teamlabSub": "Actividad · asignado 15 mar",
+      "saved": "Guardado"
     }
   },
   "tabs": {
@@ -145,7 +188,9 @@
     "today": "Hoy",
     "tomorrow": "Mañana",
     "summary": "Resumen",
-    "chat": "Chat"
+    "chat": "Chat",
+    "route": "Ruta",
+    "expenses": "Gastos"
   },
   "tripslist": {
     "myTrips": "Mis viajes",
@@ -217,7 +262,63 @@
     "noDates": "Sin fechas",
     "open": "Abrir",
     "deleteConfirmPrompt": "Escribe el nombre del viaje exactamente para confirmar:",
-    "deleteConfirmPlaceholder": "Escribe el nombre del viaje..."
+    "deleteConfirmPlaceholder": "Escribe el nombre del viaje...",
+    "dialog": {
+      "tripDates": "Fechas del viaje",
+      "stops_one": "Paradas · {{count}} ciudad",
+      "stops_other": "Paradas · {{count}} ciudades",
+      "cityAria": "Ciudad de origen",
+      "startDate": "Fecha inicio",
+      "endDate": "Fecha fin",
+      "deleting": "Eliminando...",
+      "deleteStop": "Eliminar parada",
+      "minOneStop": "Mínimo una parada",
+      "saving": "Guardando...",
+      "done": "Listo",
+      "newStop": "Nueva parada",
+      "adding": "Añadiendo...",
+      "addStop": "Añadir parada",
+      "deleteTrip": "Eliminar viaje"
+    },
+    "loadingTrip": "Cargando viaje...",
+    "nav": {
+      "routeSub": "Ciudades e itinerario",
+      "docs": "Docs",
+      "docsSub": "Documentos y checklist",
+      "spotsSub": "Lugares que visitar",
+      "expensesSub": "Gestión de gastos",
+      "useful": "Útil",
+      "usefulSub": "Info útil y clima"
+    },
+    "new": {
+      "countryRequired": "País *",
+      "typeCityName": "Escribe el nombre de la ciudad",
+      "namePlaceholder": "ej. Mamma mía 2026",
+      "tripName": "Nombre del viaje",
+      "nameRequired": "El nombre es obligatorio",
+      "tripType": "Tipo de viaje",
+      "singleDest": "1 destino",
+      "multiCity": "Multi-ciudad",
+      "startRequired": "La fecha de inicio es obligatoria",
+      "orByNights": "(o se calcula por noches)",
+      "nights": "Noches",
+      "manual": "Manual",
+      "autoDistribute": "Auto-repartir",
+      "nightsAria": "Número de noches",
+      "nightsPh": "noches",
+      "firstStopCountry": "El país de la primera parada es obligatorio",
+      "creating": "Creando...",
+      "nightsExtra_one": "Sobra {{count}} noche respecto al rango",
+      "nightsExtra_other": "Sobran {{count}} noches respecto al rango",
+      "nightsMissing_one": "Falta {{count}} noche para completar el viaje",
+      "nightsMissing_other": "Faltan {{count}} noches para completar el viaje"
+    },
+    "activeCity": {
+      "nowIn": "Ahora estoy en:",
+      "auto": "Automático (por fecha)"
+    },
+    "sectionsAria": "Secciones del viaje",
+    "settingsAria": "Configuración del viaje"
   },
   "expenses": {
     "title": "Gastos",
@@ -261,7 +362,8 @@
       "theyWillSettle": "Ellos verán el botón \"Saldar\" en su vista",
       "groupBalance": "Saldo del grupo",
       "owesYou": "Te debe",
-      "you": "Tú"
+      "you": "Tú",
+      "theyWillSee": "Ellos verán el botón «{{button}}» en su vista"
     },
     "stats": {
       "yourPart": "Tu parte",
@@ -271,7 +373,9 @@
       "noExpenses": "Sin gastos registrados",
       "myTotal": "Total mío",
       "noStats": "Sin estadísticas",
-      "byCity": "Por ciudad"
+      "byCity": "Por ciudad",
+      "empty": "Sin estadísticas",
+      "groupSum": "Total grupo"
     },
     "errors": {
       "amountRequired": "Introduce un importe para guardar el gasto.",
@@ -306,7 +410,18 @@
     "saveChanges": "Guardar cambios",
     "saveExpense": "Guardar gasto",
     "paidByShort": "Pagó {{name}} · ÷ {{count}}",
-    "localCurrencyPrompt": "La moneda local es {{currencyName}} ({{currencyCode}}). ¿Registrar gastos en {{currencyCode}}?"
+    "localCurrencyPrompt": "La moneda local es {{currencyName}} ({{currencyCode}}). ¿Registrar gastos en {{currencyCode}}?",
+    "receipts": "Recibos",
+    "convertFrom": "Convertir desde",
+    "currentCity": "Ciudad actual",
+    "saveError": "Error al guardar",
+    "noDataYet": "Sin datos aún",
+    "form": {
+      "descPlaceholder": "Descripción del gasto *",
+      "paidBy": "Pagó",
+      "splitBetween": "Dividir entre",
+      "totalMatches": "Total cuadra"
+    }
   },
   "pretrip": {
     "title": "Pre-viaje",
@@ -329,7 +444,8 @@
     "checked": "Hecho",
     "days": "{{count}} días para el viaje",
     "daysAgo": "Hace {{count}} días",
-    "departed": "Salida hace {{count}} días"
+    "departed": "Salida hace {{count}} días",
+    "verify": "Verificar"
   },
   "home": {
     "tripSettings": "Ajustes",
@@ -355,7 +471,15 @@
       "perDay": "{{amount}} {{currency}}/día"
     },
     "travelers": "Viajeros",
-    "traveler": "Viajero"
+    "traveler": "Viajero",
+    "dayCard": {
+      "noTime": "Sin hora · toca para añadir",
+      "addPlaces": "Añade lugares a tu día"
+    },
+    "tomorrow": {
+      "emptyTitle": "Nada planificado para mañana",
+      "emptyHint": "Añade spots o documentos para el día de mañana"
+    }
   },
   "spots": {
     "title": "Spots",
@@ -370,13 +494,14 @@
       "down": "No me gusta"
     },
     "types": {
-      "restaurant": "Restaurante",
-      "hotel": "Hotel",
-      "attraction": "Atracción",
+      "food": "Comer",
+      "sight": "Cultura",
       "activity": "Actividad",
-      "transport": "Transporte",
       "shopping": "Compras",
-      "other": "Otro"
+      "transport": "Transporte",
+      "hotel": "Hotel",
+      "nightlife": "Bares/Noche",
+      "custom": "Otro"
     },
     "create": {
       "title": "Crear spot",
@@ -404,7 +529,8 @@
       "whenVisit": "¿Cuándo quieres visitar este spot?",
       "unassigned": "Sin asignar",
       "confirm": "Confirmar",
-      "notNow": "Ahora no"
+      "notNow": "Ahora no",
+      "when": "¿Cuándo quieres visitar este spot?"
     },
     "toast": {
       "savedIn": "Guardado en {{city}}",
@@ -464,7 +590,82 @@
     "noLocalTitle": "No tienes ese spot todavía",
     "searchResultsFor": "Resultados de búsqueda para",
     "searchOnMap": "Buscar \"{{query}}\" en el mapa",
-    "noFilterMatch": "Sin spots con ese filtro"
+    "noFilterMatch": "Sin spots con ese filtro",
+    "rating": {
+      "title": "¿Qué te pareció?",
+      "liked": "Me gustó",
+      "notSoMuch": "No tanto",
+      "placeholder": "Cuéntanos qué tal... (opcional)",
+      "photoSelected": "Foto seleccionada ✓",
+      "uploadPhoto": "Subir foto",
+      "addPhoto": "Añadir una foto",
+      "saving": "Guardando...",
+      "save": "Guardar valoración"
+    },
+    "comments": {
+      "title": "Comentarios",
+      "empty": "Sin comentarios todavía. ¡Sé el primero!",
+      "placeholder": "Añade un comentario...",
+      "ok": "OK",
+      "gallery": "Galería",
+      "camera": "Cámara",
+      "photo": "Foto",
+      "post": "Publicar",
+      "emptyShort": "Sin comentarios. ¡Sé el primero!",
+      "writePlaceholder": "Escribe un comentario..."
+    },
+    "delete": {
+      "title": "¿Eliminar este spot?",
+      "body1": "Se eliminará",
+      "body2": "de tu lista. Esta acción no se puede deshacer."
+    },
+    "card": {
+      "visited": "Visitado",
+      "done": "Hecho",
+      "markDone": "Marcar hecho"
+    },
+    "alreadyInList": "Ya en tu lista",
+    "assigned": "Asignado",
+    "noDay": "Sin día",
+    "addedBy": "Añadido por",
+    "viewOnMaps": "Ver en Google Maps",
+    "section": {
+      "saving": "Guardando...",
+      "placeNameAria": "Nombre del lugar",
+      "placeNamePlaceholder": "Nombre del lugar *",
+      "tagsPlaceholder": "Tags: sunset, mirador... (Enter)",
+      "addressAria": "Dirección",
+      "addressPlaceholder": "Dirección (opcional)",
+      "notesAria": "Notas",
+      "notesPlaceholder": "Notas...",
+      "searchIn": "Busca en {{city}}...",
+      "searchPlace": "Busca un lugar...",
+      "near": "Cerca",
+      "searching": "Buscando...",
+      "results_one": "{{count}} resultado",
+      "results_other": "{{count}} resultados",
+      "gettingLocation": "Obteniendo ubicación...",
+      "placesNear_one": "{{count}} lugar cerca",
+      "placesNear_other": "{{count}} lugares cerca",
+      "emptyHint": "Busca lugares o crea un spot manualmente"
+    },
+    "sheet": {
+      "myNote": "Mi nota",
+      "notePlaceholder": "Cabinas individuales. Reservar para las 20h...",
+      "day": "Día",
+      "unassigned": "Sin asignar",
+      "time": "Hora",
+      "noTime": "-- Sin hora --",
+      "deleteSpot": "Eliminar spot",
+      "like": "Like",
+      "comment": "Comentar",
+      "saveChanges": "Guardar cambios"
+    },
+    "modal": {
+      "noTime": "Sin hora",
+      "addTime": "Añadir hora",
+      "addNote": "Añadir nota..."
+    }
   },
   "documents": {
     "title": "Documentos",
@@ -559,7 +760,13 @@
         "choose": "Elegir",
         "chooseDesc": "Selecciona quién lo ve"
       }
-    }
+    },
+    "card": {
+      "view": "Ver",
+      "noFile": "Sin archivo"
+    },
+    "dayDocs": "Documentos del día",
+    "otherDocs": "Otros documentos"
   },
   "profile": {
     "title": "Perfil",
@@ -587,7 +794,16 @@
     "trips": "Viajes",
     "mySpots": "Mis spots",
     "created": "Creados",
-    "showMore": "Ver {{count}} más →"
+    "showMore": "Ver {{count}} más →",
+    "public": "Público",
+    "private": "Privado",
+    "emptyTitle": "Nada aquí todavía",
+    "emptyHint": "Usa el buscador para descubrir spots y guardarlos",
+    "user": "Usuario",
+    "countries": "Países",
+    "noTrips": "Sin viajes aún",
+    "spotCount_one": "{{count}} spot",
+    "spotCount_other": "{{count}} spots"
   },
   "settings": {
     "title": "Ajustes",
@@ -741,6 +957,15 @@
       "deleteConfirm": "¿Eliminar este día?",
       "deletePermanent": "{{title}} se eliminará permanentemente.",
       "delete": "Eliminar"
+    },
+    "modal": {
+      "cityStop": "Ciudad / Parada",
+      "cityPlaceholder": "Ej: Tokyo",
+      "accommodation": "Alojamiento",
+      "accommodationPlaceholder": "Ej: APA Hotel Pride Kokkaigijidomae, Tokyo",
+      "coverImage": "Imagen de portada (URL)",
+      "arrival": "Fecha llegada",
+      "departure": "Fecha salida"
     }
   },
   "restaurants": {
@@ -767,7 +992,9 @@
     "tripInvite": "te invitó a un viaje",
     "spotAdded": "añadió un spot",
     "new": "nueva notificación",
-    "joinTrip": "Unirme al viaje"
+    "joinTrip": "Unirme al viaje",
+    "inviteFrom": "Invitación de",
+    "someone": "Alguien"
   },
   "invites": {
     "title": "Invitaciones",
@@ -776,7 +1003,54 @@
     "accept": "Aceptar",
     "reject": "Rechazar",
     "accepted": "Aceptada",
-    "rejected": "Rechazada"
+    "rejected": "Rechazada",
+    "modal": {
+      "title": "Invitar al viaje",
+      "theTrip": "el viaje",
+      "sendError": "Error al enviar. Inténtalo de nuevo.",
+      "invalidEmail": "Introduce un email válido",
+      "sent": "¡Invitación enviada!",
+      "sentHint": "{{name}} recibirá un enlace para unirse al viaje",
+      "backToSearch": "← Volver a búsqueda por usuario",
+      "sending": "Enviando…",
+      "sendInvite": "Enviar invitación",
+      "searchPlaceholder": "Buscar por @usuario…",
+      "noUser": "Ningún usuario con ese @",
+      "notYetInKodo": "¿Aún no está en Kōdo?",
+      "traveledWith": "Con quién ya has viajado",
+      "onTrip": "En el viaje",
+      "invitedPending": "Invitado · pendiente",
+      "byEmail": "Invitar por email",
+      "byEmailHint": "Para quien no tiene cuenta en Kōdo",
+      "invite": "Invitar →",
+      "tripCount_one": "{{count}} viaje",
+      "tripCount_other": "{{count}} viajes"
+    },
+    "page": {
+      "acceptError": "No se pudo aceptar la invitación",
+      "rejectError": "No se pudo rechazar",
+      "acceptError2": "Error al aceptar",
+      "invalidTitle": "Invitación inválida",
+      "invalidBody": "Esta invitación ha expirado o ya fue usada.",
+      "goToTrips": "Ir a mis viajes",
+      "goToTrip": "Ir al viaje →",
+      "alreadyMemberTitle": "Ya eres miembro",
+      "alreadyMemberBody1": "Ya formas parte de",
+      "mismatchTitle": "Esta invitación es para otra cuenta",
+      "mismatch1": "La invitación se envió a",
+      "mismatch2": ", pero has iniciado sesión como",
+      "mismatch3": "Entra con la cuenta invitada para unirte al viaje.",
+      "youHaveInvite": "Tienes una invitación",
+      "joinQuestion": "¿Te unes al viaje?",
+      "invitedBy": "Invitado por",
+      "aCompanion": "un compañero",
+      "role": "Rol:",
+      "createAccountHint": "Crea una cuenta con el email al que te enviaron la invitación para unirte al viaje.",
+      "joinTrip": "Unirme al viaje",
+      "step1": "Un compañero te invita desde su viaje",
+      "step2": "Recibes una notificación en el bell",
+      "step3": "Aceptas y tienes acceso completo al viaje"
+    }
   },
   "utilities": {
     "title": "Utilidades",
@@ -785,13 +1059,116 @@
     "adapter": "Enchufes",
     "emergency": "Emergencias",
     "currency": "Divisas",
-    "translator": "Traductor"
+    "translator": "Traductor",
+    "weather": "Clima",
+    "loading": "Cargando...",
+    "noDestination": "Sin destino asignado al viaje",
+    "noDataFor": "Sin datos para {{country}}",
+    "packing": {
+      "cat": {
+        "personal": "Personal",
+        "ropa": "Ropa",
+        "neceser": "Néceres",
+        "tecnologia": "Tecnología",
+        "medicinas": "Medicinas",
+        "otros": "Otros"
+      },
+      "newItem": "Nuevo artículo",
+      "itemNameAria": "Nombre del artículo",
+      "itemNamePlaceholder": "Nombre del artículo...",
+      "category": "Categoría",
+      "markEssential": "Marcar como esencial",
+      "adding": "Añadiendo...",
+      "add": "Añadir",
+      "tabMaleta": "Maleta",
+      "tabSouvenirs": "Souvenirs",
+      "emptyTitle": "Maleta vacía",
+      "emptyHint": "Añade los artículos que vas a necesitar",
+      "emptyHintCountry": "Añade los artículos que vas a necesitar en {{country}}",
+      "addItem": "Añadir artículo",
+      "itemShort": "Artículo",
+      "totalProgress": "Progreso total",
+      "itemsReady": "{{packed}} de {{total}} artículos listos",
+      "essentialCount_one": "{{count}} esencial",
+      "essentialCount_other": "{{count}} esenciales",
+      "noItems": "Sin artículos",
+      "essential": "esencial",
+      "souvEmptyTitle": "Lista vacía",
+      "souvEmptyHint": "Anota lo que quieres comprar en el viaje",
+      "souvPlaceholder": "¿Qué quieres comprar?"
+    },
+    "reqs": {
+      "checkConsulate": "Consulta el consulado o embajada de tu país",
+      "verifyConsulate": "Verificar con consulado",
+      "intro1": "Requisitos para viajar a",
+      "intro2": "con pasaporte de",
+      "visa": {
+        "evisa": "Tramitar online antes de viajar",
+        "voa": "Se obtiene a la llegada en el aeropuerto",
+        "eta": "Autorización electrónica — tramitar online",
+        "esta": "Tramitar ESTA en esta.cbp.dhs.gov",
+        "nzeta": "Tramitar NZeTA en nzeta.immigration.govt.nz"
+      },
+      "plugTitle": "Enchufe y voltaje",
+      "variousTypes": "Varios tipos",
+      "adapterNeeded": "Adaptador necesario",
+      "compatible": "Compatible",
+      "noAdapter": "Sin adaptador necesario",
+      "vaxRequired": "Obligatorias para entrada",
+      "vaxRecommended": "Recomendadas",
+      "seeLess": "Ver menos",
+      "seeMore": "Ver {{count}} más",
+      "noVaxTitle": "Sin vacunas requeridas",
+      "noVaxHint": "No hay requisitos de vacunación específicos para {{country}}",
+      "currency": "Moneda",
+      "tips": "Consejos útiles"
+    },
+    "emerg": {
+      "police": "Policía",
+      "ambulance": "Ambulancia",
+      "fire": "Bomberos",
+      "general": "General",
+      "noInfo": "Aún no tenemos información de emergencias para este país",
+      "header": "Emergencias · {{flag}} {{country}}",
+      "embassyOf": "Embajada de {{home}} en {{country}}",
+      "emergency24h": "Emergencias 24h",
+      "officialSite": "Sitio web oficial",
+      "noEmbassyTitle": "Sin datos de embajada",
+      "noEmbassyHint": "No tenemos todavía los datos de la embajada de {{home}} en {{country}}.",
+      "searchOfficial": "Buscar en web oficial de tu país →",
+      "usefulApps": "Apps útiles en {{country}}",
+      "safetyTips": "Consejos de seguridad"
+    }
   },
   "weather": {
     "feelsLike": "Sensación",
     "humidity": "Humedad",
     "wind": "Viento",
-    "loading": "Cargando clima..."
+    "loading": "Cargando clima...",
+    "unavailable": "Clima no disponible",
+    "max": "Máxima",
+    "min": "Mínima",
+    "rain": "Lluvia",
+    "wmo": {
+      "variable": "Variable",
+      "clear": "Despejado",
+      "mostlyClear": "Casi despejado",
+      "partlyCloudy": "Parcialmente nublado",
+      "cloudy": "Nublado",
+      "fog": "Niebla",
+      "freezingFog": "Niebla helada",
+      "drizzle": "Llovizna",
+      "heavyDrizzle": "Llovizna intensa",
+      "rain": "Lluvia",
+      "heavyRain": "Lluvia intensa",
+      "snow": "Nieve",
+      "heavySnow": "Nevada intensa",
+      "showers": "Chubascos",
+      "heavyShowers": "Chubascos fuertes",
+      "storm": "Tormenta",
+      "hail": "Granizo",
+      "stormHail": "Tormenta con granizo"
+    }
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",
@@ -856,5 +1233,92 @@
       "title": "¡Habláis el mismo idioma!",
       "body": "En {{flag}} {{country}} hablan {{language}}."
     }
+  },
+  "chat": {
+    "fileTooLarge": "Archivo demasiado grande",
+    "max20mb": "Máximo 20MB",
+    "uploadError": "Error al subir",
+    "micUnavailable": "Micrófono no disponible",
+    "micHint": "Activa el micrófono en la configuración del navegador",
+    "camera": "Cámara",
+    "file": "Archivo",
+    "poll": "Encuesta",
+    "emptyTitle": "Todavía no hay mensajes",
+    "emptyHint": "Sé el primero en escribir algo al grupo",
+    "newPoll": "Nueva encuesta",
+    "pollQuestion": "¿Cuál es la pregunta?",
+    "pollOption": "Opción {{n}}",
+    "addOption": "+ Añadir opción",
+    "sendPoll": "Enviar encuesta"
+  },
+  "explore": {
+    "search": {
+      "placeholder": "Busca destinos, itinerarios, @usuarios, spots...",
+      "min2": "Escribe al menos 2 caracteres",
+      "title": "Busca en la comunidad",
+      "subtitle": "Destinos, itinerarios, @usuarios o spots",
+      "noResults": "Sin resultados para \"{{query}}\"",
+      "tryAnother": "Prueba con otro término",
+      "users": "Usuarios",
+      "destinations": "Destinos",
+      "itineraries": "Itinerarios",
+      "recommendedSpots": "Spots recomendados"
+    },
+    "traveler": "Viajero",
+    "saving": "Guardando...",
+    "following": "Siguiendo",
+    "follow": "Seguir",
+    "filterByCity": "Filtra por ciudad o país...",
+    "title": "Explorar",
+    "subtitle": "Descubre spots, viajes y viajeros",
+    "searchCta": "Busca destinos, @usuarios, spots...",
+    "filterSpots": "Filtrar spots",
+    "clear": "Limpiar",
+    "cityCountry": "Ciudad/País",
+    "tag": "Tag",
+    "tabs": {
+      "explore": "Explorar",
+      "following": "Siguiendo",
+      "people": "Personas",
+      "top": "Top"
+    },
+    "ph": {
+      "search": "mirador, ramen...",
+      "city": "Tokyo, Italia...",
+      "tag": "sunset, temple...",
+      "people": "Busca por nombre, @usuario o país..."
+    },
+    "empty": {
+      "topSpotsTitle": "Sin spots todavía",
+      "topSpotsSub": "Sé el primero en publicar un spot con valoraciones",
+      "noSpots": "Sin spots",
+      "changeFilters": "Prueba cambiando los filtros",
+      "firstSpot": "Sé el primero en publicar un spot",
+      "noItinerariesTitle": "Sin itinerarios todavía",
+      "noItinerariesSub": "Publica tu primer viaje",
+      "noFollowsTitle": "Aún no sigues a nadie",
+      "noFollowsSub": "Ve a Personas y sigue a viajeros",
+      "noContentTitle": "Sin contenido todavía",
+      "noContentSub": "Las personas que sigues no han publicado nada aún",
+      "noTravelersTitle": "Sin viajeros todavía",
+      "tryOtherName": "Prueba con otro nombre",
+      "beFirst": "Sé de los primeros en unirte"
+    }
+  },
+  "offline": {
+    "restored": "Conexión restaurada",
+    "offline": "Sin conexión · Viendo datos guardados"
+  },
+  "publish": {
+    "published": "Publicado",
+    "private": "Privado:",
+    "unlisted": "No listado:",
+    "public": "Público:",
+    "permissions": "Permisos:",
+    "privateDesc": "Solo tú puedes ver y editar este itinerario. Nadie más podrá acceder a él ni aparecerá en Explorar.",
+    "unlistedDesc": "Accesible por enlace directo, pero no aparecerá en Explorar. Perfecto para compartir con gente específica.",
+    "publicDesc": "Aparecerá en Explorar y otros viajeros podrán descubrirlo y guardarlo.",
+    "permissionsDesc": "Solo los admins del viaje pueden publicar itinerarios.",
+    "publishedToast": "Itinerario publicado"
   }
 }

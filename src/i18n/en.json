@@ -137,6 +137,49 @@
       "searchPlaceholder": "Restaurants, museums, cafés...",
       "mySpots": "My spots",
       "saved": "Saved"
+    },
+    "s3": {
+      "title1": "Your trip,",
+      "title2": "in one place",
+      "body": "Invite your companions to the trip. Everyone gets access to the same information: route, documents, spots and expenses.",
+      "travelers": "3 travellers",
+      "invite": "+ Invite"
+    },
+    "s4": {
+      "title1": "Everything ready",
+      "title2": "before take-off",
+      "body": "Kōdo gives you personalised information: visas, vaccines, adapters. Upload your documents and assign them to a specific day so they show up when you need them.",
+      "daysToTrip": "days to the trip",
+      "firstStop": "First stop: Tokyo · 12 Mar",
+      "todo": "To do before the trip",
+      "passport": "Spanish passport",
+      "allSet": "All set ✓",
+      "noVisa": "No visa — Japan",
+      "noVisaSub": "Spanish passport · No paperwork required",
+      "insurance": "Travel insurance"
+    },
+    "s5": {
+      "title1": "The numbers here",
+      "title2": "always add up",
+      "yourBalance": "Your balance",
+      "owedToYou": "You're owed",
+      "youOwe": "You owe",
+      "example": "Carlos owes José",
+      "owedToYouLabel": "You're owed",
+      "dinner": "Dinner in Tsukiji",
+      "paidBy": "Paid by {{name}} · ÷ 4"
+    },
+    "s6": {
+      "title1": "Your day to day",
+      "title2": "in the Today tab",
+      "today": "TODAY",
+      "searchExample": "Restaurants, museums, cafés...",
+      "flightSub": "Flight · assigned today",
+      "spotSub": "Spot · assigned 14:00",
+      "restaurantSub": "Restaurant · no time · tap to add",
+      "ramenSub": "Restaurant · Tokyo",
+      "teamlabSub": "Activity · assigned 15 Mar",
+      "saved": "Saved"
     }
   },
   "tabs": {
@@ -145,7 +188,9 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "summary": "Summary",
-    "chat": "Chat"
+    "chat": "Chat",
+    "route": "Route",
+    "expenses": "Expenses"
   },
   "tripslist": {
     "myTrips": "My trips",
@@ -217,7 +262,63 @@
     "noDates": "No dates",
     "open": "Open",
     "deleteConfirmPrompt": "Type the trip name exactly to confirm:",
-    "deleteConfirmPlaceholder": "Type the trip name..."
+    "deleteConfirmPlaceholder": "Type the trip name...",
+    "dialog": {
+      "tripDates": "Trip dates",
+      "stops_one": "Stops · {{count}} city",
+      "stops_other": "Stops · {{count}} cities",
+      "cityAria": "Origin city",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "deleting": "Deleting...",
+      "deleteStop": "Delete stop",
+      "minOneStop": "At least one stop",
+      "saving": "Saving...",
+      "done": "Done",
+      "newStop": "New stop",
+      "adding": "Adding...",
+      "addStop": "Add stop",
+      "deleteTrip": "Delete trip"
+    },
+    "loadingTrip": "Loading trip...",
+    "nav": {
+      "routeSub": "Cities and itinerary",
+      "docs": "Docs",
+      "docsSub": "Documents and checklist",
+      "spotsSub": "Places to visit",
+      "expensesSub": "Expense management",
+      "useful": "Useful",
+      "usefulSub": "Useful info and weather"
+    },
+    "new": {
+      "countryRequired": "Country *",
+      "typeCityName": "Type the city name",
+      "namePlaceholder": "e.g. Mamma mia 2026",
+      "tripName": "Trip name",
+      "nameRequired": "The name is required",
+      "tripType": "Trip type",
+      "singleDest": "1 destination",
+      "multiCity": "Multi-city",
+      "startRequired": "The start date is required",
+      "orByNights": "(or calculated by nights)",
+      "nights": "Nights",
+      "manual": "Manual",
+      "autoDistribute": "Auto-distribute",
+      "nightsAria": "Number of nights",
+      "nightsPh": "nights",
+      "firstStopCountry": "The first stop's country is required",
+      "creating": "Creating...",
+      "nightsExtra_one": "{{count}} night too many for the range",
+      "nightsExtra_other": "{{count}} nights too many for the range",
+      "nightsMissing_one": "{{count}} night missing to complete the trip",
+      "nightsMissing_other": "{{count}} nights missing to complete the trip"
+    },
+    "activeCity": {
+      "nowIn": "I'm now in:",
+      "auto": "Automatic (by date)"
+    },
+    "sectionsAria": "Trip sections",
+    "settingsAria": "Trip settings"
   },
   "expenses": {
     "title": "Expenses",
@@ -261,7 +362,8 @@
       "theyWillSettle": "They'll see a \"Settle\" button on their end",
       "groupBalance": "Group balance",
       "owesYou": "Owes you",
-      "you": "You"
+      "you": "You",
+      "theyWillSee": "They will see the \"{{button}}\" button in their view"
     },
     "stats": {
       "yourPart": "Your share",
@@ -271,7 +373,9 @@
       "noExpenses": "No expenses recorded",
       "myTotal": "My total",
       "noStats": "No stats yet",
-      "byCity": "By city"
+      "byCity": "By city",
+      "empty": "No statistics",
+      "groupSum": "Group total"
     },
     "errors": {
       "amountRequired": "Enter an amount to save the expense.",
@@ -306,7 +410,18 @@
     "saveChanges": "Save changes",
     "saveExpense": "Save expense",
     "paidByShort": "Paid by {{name}} · ÷ {{count}}",
-    "localCurrencyPrompt": "Local currency is {{currencyName}} ({{currencyCode}}). Record expenses in {{currencyCode}}?"
+    "localCurrencyPrompt": "Local currency is {{currencyName}} ({{currencyCode}}). Record expenses in {{currencyCode}}?",
+    "receipts": "Receipts",
+    "convertFrom": "Convert from",
+    "currentCity": "Current city",
+    "saveError": "Error saving",
+    "noDataYet": "No data yet",
+    "form": {
+      "descPlaceholder": "Expense description *",
+      "paidBy": "Paid by",
+      "splitBetween": "Split between",
+      "totalMatches": "Total matches"
+    }
   },
   "pretrip": {
     "title": "Pre-trip",
@@ -329,7 +444,8 @@
     "checked": "Done",
     "days": "{{count}} days to trip",
     "daysAgo": "{{count}} days ago",
-    "departed": "Departed {{count}} days ago"
+    "departed": "Departed {{count}} days ago",
+    "verify": "Verify"
   },
   "home": {
     "tripSettings": "Settings",
@@ -355,7 +471,15 @@
       "perDay": "{{amount}} {{currency}}/day"
     },
     "travelers": "Travelers",
-    "traveler": "Traveler"
+    "traveler": "Traveler",
+    "dayCard": {
+      "noTime": "No time · tap to add",
+      "addPlaces": "Add places to your day"
+    },
+    "tomorrow": {
+      "emptyTitle": "Nothing planned for tomorrow",
+      "emptyHint": "Add spots or documents for tomorrow"
+    }
   },
   "spots": {
     "title": "Spots",
@@ -370,13 +494,14 @@
       "down": "Dislike"
     },
     "types": {
-      "restaurant": "Restaurant",
-      "hotel": "Hotel",
-      "attraction": "Attraction",
+      "food": "Eat",
+      "sight": "Culture",
       "activity": "Activity",
-      "transport": "Transport",
       "shopping": "Shopping",
-      "other": "Other"
+      "transport": "Transport",
+      "hotel": "Hotel",
+      "nightlife": "Bars & Nightlife",
+      "custom": "Other"
     },
     "create": {
       "title": "Create spot",
@@ -404,7 +529,8 @@
       "whenVisit": "When do you want to visit this spot?",
       "unassigned": "Unassigned",
       "confirm": "Confirm",
-      "notNow": "Not now"
+      "notNow": "Not now",
+      "when": "When do you want to visit this spot?"
     },
     "toast": {
       "savedIn": "Saved in {{city}}",
@@ -464,7 +590,82 @@
     "noLocalTitle": "You don't have that spot yet",
     "searchResultsFor": "Search results for",
     "searchOnMap": "Search \"{{query}}\" on the map",
-    "noFilterMatch": "No spots with that filter"
+    "noFilterMatch": "No spots with that filter",
+    "rating": {
+      "title": "What did you think?",
+      "liked": "Liked it",
+      "notSoMuch": "Not so much",
+      "placeholder": "Tell us how it was... (optional)",
+      "photoSelected": "Photo selected ✓",
+      "uploadPhoto": "Upload photo",
+      "addPhoto": "Add a photo",
+      "saving": "Saving...",
+      "save": "Save rating"
+    },
+    "comments": {
+      "title": "Comments",
+      "empty": "No comments yet. Be the first!",
+      "placeholder": "Add a comment...",
+      "ok": "OK",
+      "gallery": "Gallery",
+      "camera": "Camera",
+      "photo": "Photo",
+      "post": "Post",
+      "emptyShort": "No comments. Be the first!",
+      "writePlaceholder": "Write a comment..."
+    },
+    "delete": {
+      "title": "Delete this spot?",
+      "body1": "This will remove",
+      "body2": "from your list. This action cannot be undone."
+    },
+    "card": {
+      "visited": "Visited",
+      "done": "Done",
+      "markDone": "Mark done"
+    },
+    "alreadyInList": "Already in your list",
+    "assigned": "Assigned",
+    "noDay": "No day",
+    "addedBy": "Added by",
+    "viewOnMaps": "View on Google Maps",
+    "section": {
+      "saving": "Saving...",
+      "placeNameAria": "Place name",
+      "placeNamePlaceholder": "Place name *",
+      "tagsPlaceholder": "Tags: sunset, viewpoint... (Enter)",
+      "addressAria": "Address",
+      "addressPlaceholder": "Address (optional)",
+      "notesAria": "Notes",
+      "notesPlaceholder": "Notes...",
+      "searchIn": "Search in {{city}}...",
+      "searchPlace": "Search for a place...",
+      "near": "Nearby",
+      "searching": "Searching...",
+      "results_one": "{{count}} result",
+      "results_other": "{{count}} results",
+      "gettingLocation": "Getting location...",
+      "placesNear_one": "{{count}} place nearby",
+      "placesNear_other": "{{count}} places nearby",
+      "emptyHint": "Search for places or create a spot manually"
+    },
+    "sheet": {
+      "myNote": "My note",
+      "notePlaceholder": "Private booths. Book for 8pm...",
+      "day": "Day",
+      "unassigned": "Unassigned",
+      "time": "Time",
+      "noTime": "-- No time --",
+      "deleteSpot": "Delete spot",
+      "like": "Like",
+      "comment": "Comment",
+      "saveChanges": "Save changes"
+    },
+    "modal": {
+      "noTime": "No time",
+      "addTime": "Add time",
+      "addNote": "Add note..."
+    }
   },
   "documents": {
     "title": "Documents",
@@ -559,7 +760,13 @@
         "choose": "Choose",
         "chooseDesc": "Select who sees it"
       }
-    }
+    },
+    "card": {
+      "view": "View",
+      "noFile": "No file"
+    },
+    "dayDocs": "Documents for the day",
+    "otherDocs": "Other documents"
   },
   "profile": {
     "title": "Profile",
@@ -587,7 +794,16 @@
     "trips": "Trips",
     "mySpots": "My spots",
     "created": "Created",
-    "showMore": "Show {{count}} more →"
+    "showMore": "Show {{count}} more →",
+    "public": "Public",
+    "private": "Private",
+    "emptyTitle": "Nothing here yet",
+    "emptyHint": "Use the search to discover spots and save them",
+    "user": "User",
+    "countries": "Countries",
+    "noTrips": "No trips yet",
+    "spotCount_one": "{{count}} spot",
+    "spotCount_other": "{{count}} spots"
   },
   "settings": {
     "title": "Settings",
@@ -741,6 +957,15 @@
       "deleteConfirm": "Delete this day?",
       "deletePermanent": "{{title}} will be permanently deleted.",
       "delete": "Delete"
+    },
+    "modal": {
+      "cityStop": "City / Stop",
+      "cityPlaceholder": "e.g. Tokyo",
+      "accommodation": "Accommodation",
+      "accommodationPlaceholder": "e.g. APA Hotel Pride Kokkaigijidomae, Tokyo",
+      "coverImage": "Cover image (URL)",
+      "arrival": "Arrival date",
+      "departure": "Departure date"
     }
   },
   "restaurants": {
@@ -767,7 +992,9 @@
     "tripInvite": "invited you to a trip",
     "spotAdded": "added a spot",
     "new": "new notification",
-    "joinTrip": "Join trip"
+    "joinTrip": "Join trip",
+    "inviteFrom": "Invitation from",
+    "someone": "Someone"
   },
   "invites": {
     "title": "Invitations",
@@ -776,7 +1003,54 @@
     "accept": "Accept",
     "reject": "Decline",
     "accepted": "Accepted",
-    "rejected": "Declined"
+    "rejected": "Declined",
+    "modal": {
+      "title": "Invite to trip",
+      "theTrip": "the trip",
+      "sendError": "Couldn't send. Try again.",
+      "invalidEmail": "Enter a valid email",
+      "sent": "Invitation sent!",
+      "sentHint": "{{name}} will receive a link to join the trip",
+      "backToSearch": "← Back to user search",
+      "sending": "Sending…",
+      "sendInvite": "Send invitation",
+      "searchPlaceholder": "Search by @username…",
+      "noUser": "No user with that @",
+      "notYetInKodo": "Not on Kōdo yet?",
+      "traveledWith": "Who you've travelled with",
+      "onTrip": "On the trip",
+      "invitedPending": "Invited · pending",
+      "byEmail": "Invite by email",
+      "byEmailHint": "For those without a Kōdo account",
+      "invite": "Invite →",
+      "tripCount_one": "{{count}} trip",
+      "tripCount_other": "{{count}} trips"
+    },
+    "page": {
+      "acceptError": "Couldn't accept the invitation",
+      "rejectError": "Couldn't reject",
+      "acceptError2": "Error accepting",
+      "invalidTitle": "Invalid invitation",
+      "invalidBody": "This invitation has expired or was already used.",
+      "goToTrips": "Go to my trips",
+      "goToTrip": "Go to trip →",
+      "alreadyMemberTitle": "You're already a member",
+      "alreadyMemberBody1": "You're already part of",
+      "mismatchTitle": "This invitation is for another account",
+      "mismatch1": "The invitation was sent to",
+      "mismatch2": ", but you signed in as",
+      "mismatch3": "Sign in with the invited account to join the trip.",
+      "youHaveInvite": "You have an invitation",
+      "joinQuestion": "Join the trip?",
+      "invitedBy": "Invited by",
+      "aCompanion": "a companion",
+      "role": "Role:",
+      "createAccountHint": "Create an account with the email the invitation was sent to in order to join the trip.",
+      "joinTrip": "Join the trip",
+      "step1": "A companion invites you from their trip",
+      "step2": "You get a notification in the bell",
+      "step3": "You accept and get full access to the trip"
+    }
   },
   "utilities": {
     "title": "Utilities",
@@ -785,13 +1059,116 @@
     "adapter": "Power adapters",
     "emergency": "Emergencies",
     "currency": "Currency",
-    "translator": "Translator"
+    "translator": "Translator",
+    "weather": "Weather",
+    "loading": "Loading...",
+    "noDestination": "No destination assigned to the trip",
+    "noDataFor": "No data for {{country}}",
+    "packing": {
+      "cat": {
+        "personal": "Personal",
+        "ropa": "Clothing",
+        "neceser": "Toiletries",
+        "tecnologia": "Tech",
+        "medicinas": "Medicine",
+        "otros": "Other"
+      },
+      "newItem": "New item",
+      "itemNameAria": "Item name",
+      "itemNamePlaceholder": "Item name...",
+      "category": "Category",
+      "markEssential": "Mark as essential",
+      "adding": "Adding...",
+      "add": "Add",
+      "tabMaleta": "Luggage",
+      "tabSouvenirs": "Souvenirs",
+      "emptyTitle": "Luggage empty",
+      "emptyHint": "Add the items you're going to need",
+      "emptyHintCountry": "Add the items you're going to need in {{country}}",
+      "addItem": "Add item",
+      "itemShort": "Item",
+      "totalProgress": "Total progress",
+      "itemsReady": "{{packed}} of {{total}} items ready",
+      "essentialCount_one": "{{count}} essential",
+      "essentialCount_other": "{{count}} essentials",
+      "noItems": "No items",
+      "essential": "essential",
+      "souvEmptyTitle": "List empty",
+      "souvEmptyHint": "Note down what you want to buy on the trip",
+      "souvPlaceholder": "What do you want to buy?"
+    },
+    "reqs": {
+      "checkConsulate": "Check with your country's consulate or embassy",
+      "verifyConsulate": "Verify with consulate",
+      "intro1": "Requirements to travel to",
+      "intro2": "with a passport from",
+      "visa": {
+        "evisa": "Apply online before travelling",
+        "voa": "Obtained on arrival at the airport",
+        "eta": "Electronic authorisation — apply online",
+        "esta": "Apply for ESTA at esta.cbp.dhs.gov",
+        "nzeta": "Apply for NZeTA at nzeta.immigration.govt.nz"
+      },
+      "plugTitle": "Plug and voltage",
+      "variousTypes": "Various types",
+      "adapterNeeded": "Adapter needed",
+      "compatible": "Compatible",
+      "noAdapter": "No adapter needed",
+      "vaxRequired": "Required for entry",
+      "vaxRecommended": "Recommended",
+      "seeLess": "See less",
+      "seeMore": "See {{count}} more",
+      "noVaxTitle": "No vaccines required",
+      "noVaxHint": "There are no specific vaccination requirements for {{country}}",
+      "currency": "Currency",
+      "tips": "Useful tips"
+    },
+    "emerg": {
+      "police": "Police",
+      "ambulance": "Ambulance",
+      "fire": "Fire brigade",
+      "general": "General",
+      "noInfo": "We don't have emergency information for this country yet",
+      "header": "Emergencies · {{flag}} {{country}}",
+      "embassyOf": "Embassy of {{home}} in {{country}}",
+      "emergency24h": "24h emergencies",
+      "officialSite": "Official website",
+      "noEmbassyTitle": "No embassy data",
+      "noEmbassyHint": "We don't have the data for the embassy of {{home}} in {{country}} yet.",
+      "searchOfficial": "Search your country's official site →",
+      "usefulApps": "Useful apps in {{country}}",
+      "safetyTips": "Safety tips"
+    }
   },
   "weather": {
     "feelsLike": "Feels like",
     "humidity": "Humidity",
     "wind": "Wind",
-    "loading": "Loading weather..."
+    "loading": "Loading weather...",
+    "unavailable": "Weather unavailable",
+    "max": "High",
+    "min": "Low",
+    "rain": "Rain",
+    "wmo": {
+      "variable": "Variable",
+      "clear": "Clear",
+      "mostlyClear": "Mostly clear",
+      "partlyCloudy": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "fog": "Fog",
+      "freezingFog": "Freezing fog",
+      "drizzle": "Drizzle",
+      "heavyDrizzle": "Heavy drizzle",
+      "rain": "Rain",
+      "heavyRain": "Heavy rain",
+      "snow": "Snow",
+      "heavySnow": "Heavy snow",
+      "showers": "Showers",
+      "heavyShowers": "Heavy showers",
+      "storm": "Storm",
+      "hail": "Hail",
+      "stormHail": "Thunderstorm with hail"
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -856,5 +1233,92 @@
       "title": "You speak the same language!",
       "body": "In {{flag}} {{country}} they speak {{language}}."
     }
+  },
+  "chat": {
+    "fileTooLarge": "File too large",
+    "max20mb": "Maximum 20MB",
+    "uploadError": "Upload error",
+    "micUnavailable": "Microphone unavailable",
+    "micHint": "Enable the microphone in your browser settings",
+    "camera": "Camera",
+    "file": "File",
+    "poll": "Poll",
+    "emptyTitle": "No messages yet",
+    "emptyHint": "Be the first to write something to the group",
+    "newPoll": "New poll",
+    "pollQuestion": "What's the question?",
+    "pollOption": "Option {{n}}",
+    "addOption": "+ Add option",
+    "sendPoll": "Send poll"
+  },
+  "explore": {
+    "search": {
+      "placeholder": "Search destinations, itineraries, @users, spots...",
+      "min2": "Type at least 2 characters",
+      "title": "Search the community",
+      "subtitle": "Destinations, itineraries, @users or spots",
+      "noResults": "No results for \"{{query}}\"",
+      "tryAnother": "Try another term",
+      "users": "Users",
+      "destinations": "Destinations",
+      "itineraries": "Itineraries",
+      "recommendedSpots": "Recommended spots"
+    },
+    "traveler": "Traveller",
+    "saving": "Saving...",
+    "following": "Following",
+    "follow": "Follow",
+    "filterByCity": "Filter by city or country...",
+    "title": "Explore",
+    "subtitle": "Discover spots, trips and travellers",
+    "searchCta": "Search destinations, @users, spots...",
+    "filterSpots": "Filter spots",
+    "clear": "Clear",
+    "cityCountry": "City/Country",
+    "tag": "Tag",
+    "tabs": {
+      "explore": "Explore",
+      "following": "Following",
+      "people": "People",
+      "top": "Top"
+    },
+    "ph": {
+      "search": "viewpoint, ramen...",
+      "city": "Tokyo, Italy...",
+      "tag": "sunset, temple...",
+      "people": "Search by name, @user or country..."
+    },
+    "empty": {
+      "topSpotsTitle": "No spots yet",
+      "topSpotsSub": "Be the first to publish a spot with ratings",
+      "noSpots": "No spots",
+      "changeFilters": "Try changing the filters",
+      "firstSpot": "Be the first to publish a spot",
+      "noItinerariesTitle": "No itineraries yet",
+      "noItinerariesSub": "Publish your first trip",
+      "noFollowsTitle": "You're not following anyone yet",
+      "noFollowsSub": "Go to People and follow travellers",
+      "noContentTitle": "No content yet",
+      "noContentSub": "The people you follow haven't published anything yet",
+      "noTravelersTitle": "No travellers yet",
+      "tryOtherName": "Try another name",
+      "beFirst": "Be one of the first to join"
+    }
+  },
+  "offline": {
+    "restored": "Connection restored",
+    "offline": "Offline · Viewing saved data"
+  },
+  "publish": {
+    "published": "Published",
+    "private": "Private:",
+    "unlisted": "Unlisted:",
+    "public": "Public:",
+    "permissions": "Permissions:",
+    "privateDesc": "Only you can view and edit this itinerary. Nobody else can access it and it won't appear in Explore.",
+    "unlistedDesc": "Accessible via direct link, but it won't appear in Explore. Perfect for sharing with specific people.",
+    "publicDesc": "It will appear in Explore and other travellers can discover and save it.",
+    "permissionsDesc": "Only trip admins can publish itineraries.",
+    "publishedToast": "Itinerary published"
   }
 }
