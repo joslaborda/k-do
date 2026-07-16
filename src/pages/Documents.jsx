@@ -240,7 +240,7 @@ export default function Documents() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId }),
-    onSuccess: (_, data) => {
+    onSuccess: (newDoc, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);
       // Notify members about new doc
@@ -254,7 +254,7 @@ export default function Documents() {
             resolved.forEach(({ userId }) => notify({
               userId,
               type: 'doc_added',
-              actor: myProfile_,
+              actor: profilesByEmail[currentUserEmail],
               tripId,
               tripName: trip?.name,
               refId: newDoc?.id,

@@ -202,7 +202,7 @@ function buildHashtags(spots, tripCities) {
   const countries = [...new Set(tripCities.map(c => c.country).filter(Boolean))];
   countries.forEach(c => {
     const tags = COUNTRY_SPECIAL_TAGS[c] || [];
-    tags.forEach(_trip=> countryTags.push(t));
+    tags.forEach(tag => countryTags.push(tag));
   });
   // Combine: type tags + country-specific + generic, deduplicated
   const all = [...typeSet, ...countryTags, ...genericTags];
