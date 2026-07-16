@@ -201,7 +201,7 @@ export default function ExpenseForm({
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
           <input
-            placeholder="Descripción del gasto *"
+            placeholder={t('expenses.form.descPlaceholder')}
             value={form.description}
             onChange={e => set('description', e.target.value)}
             className="flex-1 text-sm text-foreground placeholder-muted-foreground bg-transparent outline-none"
@@ -263,7 +263,7 @@ export default function ExpenseForm({
 
       {/* Quién paga */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pagó</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.form.paidBy')}</p>
         <div className="flex gap-2 flex-wrap">
           {members.map(email => (
             <button key={email} type="button" onClick={() => set('paid_by', email)}
@@ -288,7 +288,7 @@ export default function ExpenseForm({
 
       {/* División */}
       <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Dividir entre</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.form.splitBetween')}</p>
         {/* Mode selector */}
         <div className="flex rounded-xl border border-border overflow-hidden mb-3 text-sm">
           {[
@@ -372,7 +372,7 @@ export default function ExpenseForm({
               return Math.abs(diff) > 0.01 ? (
                 <p className="text-xs text-amber-600 mt-1">Faltan {Math.abs(diff).toFixed(2)} {currency} por asignar</p>
               ) : total > 0 ? (
-                <p className="text-xs text-green-600 mt-1">Total cuadra</p>
+                <p className="text-xs text-green-600 mt-1">{t('expenses.form.totalMatches')}</p>
               ) : null;
             })()}
           </div>
