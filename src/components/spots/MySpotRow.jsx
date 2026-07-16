@@ -5,9 +5,11 @@ import { Pencil } from 'lucide-react';
 import { TYPE_CONFIG } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
+import { useTranslation } from 'react-i18next';
 
 export default
 function MySpotRow({ spot, onTap, userId }) {
+  const { t } = useTranslation();
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
   const [showComments, setShowComments] = useState(false);
@@ -30,7 +32,7 @@ function MySpotRow({ spot, onTap, userId }) {
             {spot.title}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {tc.label}
+            {t(tc.tk)}
             {spot.city_name ? ' · ' + spot.city_name : ''}
           </p>
           {hasDate && (
@@ -42,11 +44,11 @@ function MySpotRow({ spot, onTap, userId }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {spot.visited ? (
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Visitado</span>
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">{t('spots.card.visited')}</span>
           ) : hasDate ? (
-            <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full font-medium">Asignado</span>
+            <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full font-medium">{t('spots.assigned')}</span>
           ) : (
-            <span className="text-xs text-muted-foreground/60">Sin día</span>
+            <span className="text-xs text-muted-foreground/60">{t('spots.noDay')}</span>
           )}
           <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
         </div>

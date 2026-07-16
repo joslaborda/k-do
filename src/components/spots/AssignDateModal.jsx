@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default
 function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
 
   const tripDates = useMemo(() => {
@@ -46,20 +46,20 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div>
-              <p className="font-semibold text-foreground text-sm">¡Guardado!</p>
+              <p className="font-semibold text-foreground text-sm">{t('spots.assign.saved')}</p>
               <p className="text-xs text-muted-foreground truncate max-w-[220px]">{spot.title}</p>
             </div>
           </div>
 
           {/* Date picker — trip days only */}
-          <p className="text-sm font-semibold text-foreground mb-2">¿Cuándo quieres visitar este spot?</p>
+          <p className="text-sm font-semibold text-foreground mb-2">{t('spots.assign.when')}</p>
           {tripDates.size > 0 ? (
             <select
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
               className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
             >
-              <option value="">Sin asignar</option>
+              <option value="">{t('spots.sheet.unassigned')}</option>
               {(() => {
                 const days = [];
                 const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));

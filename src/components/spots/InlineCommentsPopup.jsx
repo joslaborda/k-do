@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Send, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default
 function InlineCommentsPopup({ spot, userId, onClose }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
 
@@ -54,7 +56,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
         {/* Comments list */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {comments.length === 0 && (
-            <p className="text-center text-sm text-muted-foreground py-6">Sin comentarios. ¡Sé el primero!</p>
+            <p className="text-center text-sm text-muted-foreground py-6">{t('spots.comments.emptyShort')}</p>
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-2">
@@ -77,7 +79,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
               value={text}
               onChange={e => setText(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
-              placeholder="Escribe un comentario..."
+              placeholder={t('spots.comments.writePlaceholder')}
               className="flex-1 text-sm border border-border rounded-2xl px-3 py-2.5 resize-none outline-none focus:border-primary bg-secondary min-h-[40px] max-h-24"
               rows={1}
             />

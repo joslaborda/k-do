@@ -2,19 +2,20 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, X, Navigation, PenLine, MapPin, Camera } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, LayoutGrid, Utensils, Landmark, Zap, ShoppingBag, Train, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SpotCard from './SpotCard';
+import { useTranslation } from 'react-i18next';
 
 const ALL_TYPES = [
-  { value: 'all',       label: 'Todos',      emoji: '📍' },
-  { value: 'food',      label: 'Comida',     emoji: '🍜' },
-  { value: 'sight',     label: 'Atracción',  emoji: '🏛️' },
-  { value: 'activity',  label: 'Actividad',  emoji: '⚡' },
-  { value: 'shopping',  label: 'Compras',    emoji: '🛍️' },
-  { value: 'transport', label: 'Transporte', emoji: '🚆' },
-  { value: 'custom',    label: 'Otro',       emoji: '⭐' },
+  { value: 'all',       tk: 'common.all',            Icon: LayoutGrid  },
+  { value: 'food',      tk: 'spots.types.food',      Icon: Utensils    },
+  { value: 'sight',     tk: 'spots.types.sight',     Icon: Landmark    },
+  { value: 'activity',  tk: 'spots.types.activity',  Icon: Zap         },
+  { value: 'shopping',  tk: 'spots.types.shopping',  Icon: ShoppingBag },
+  { value: 'transport', tk: 'spots.types.transport', Icon: Train       },
+  { value: 'custom',    tk: 'spots.types.custom',    Icon: Star        },
 ];
 
 const OSM_MAP = {
@@ -62,19 +63,20 @@ async function nearbyPlaces(lat, lng) {
 }
 
 function PlaceResultCard({ place, onSave, saving }) {
-  const tc = ALL_TYPES.find(t => t.value === place.type) || ALL_TYPES[6];
+  const { t } = useTranslation();
+  const tc = ALL_TYPES.find(item => item.value === place.type) || ALL_TYPES[6];
   return (
     <div className="bg-card rounded-xl border border-border flex overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="w-12 h-12 bg-orange-50 flex-shrink-0 flex items-center justify-center self-stretch">
-        <span className="text-xl">{tc.emoji}</span>
+        <tc.Icon className="w-5 h-5 text-muted-foreground flex-shrink-0" />
       </div>
       <div className="flex-1 min-w-0 p-2.5">
         <p className="font-semibold text-sm leading-tight text-foreground">{place.name}</p>
-        <span className="text-xs text-muted-foreground">{tc.label}</span>
+        <span className="text-xs text-muted-foreground">{t(tc.tk)}</span>
         {place.address && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5"><MapPin className="w-3 h-3 inline mr-0.5"/>{place.address}</p>}
         <Button size="sm" onClick={() => onSave(place)} disabled={saving}
           className="mt-1.5 h-6 text-xs bg-primary hover:bg-orange-800 text-white px-2.5">
-          <Plus className="w-3 h-3 mr-1"/>{saving ? 'Guardando...' : 'Añadir'}
+          <Plus className="w-3 h-3 mr-1"/>{saving ? t('spots.section.saving') : t('common.add')}
         </Button>
       </div>
     </div>
@@ -82,6 +84,7 @@ function PlaceResultCard({ place, onSave, saving }) {
 }
 
 function ManualForm({ onSave, saving, onClose }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [type, setType] = useState('custom');
   const [notes, setNotes] = useState('');
@@ -92,15 +95,15 @@ function ManualForm({ onSave, saving, onClose }) {
   return (
     <div className="bg-card rounded-xl border border-border p-3 space-y-2.5">
       <div className="flex items-center justify-between">
-        <p className="font-semibold text-sm">Crear spot</p>
+        <p className="font-semibold text-sm">{t('spots.create.title')}</p>
         <button onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
       </div>
-      <Input value={title} onChange={e => setTitle(e.target.value)} aria-label="Nombre del lugar" placeholder="Nombre del lugar *" className="h-9 text-sm"/>
+      <Input value={title} onChange={e => setTitle(e.target.value)} aria-label={t('spots.section.placeNameAria')} placeholder={t('spots.section.placeNamePlaceholder')} className="h-9 text-sm"/>
       <div className="flex flex-wrap gap-1.5">
-        {ALL_TYPES.filter(t => t.value!=='all').map(t => (
-          <button key={t.value} onClick={() => setType(t.value)}
-            className={"text-xs px-2 py-1 rounded-full border transition-colors " + (type===t.value?'bg-primary text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-primary/30')}>
-            {t.emoji} {t.label}
+        {ALL_TYPES.filter(item => item.value!=='all').map(item => (
+          <button key={item.value} onClick={() => setType(item.value)}
+            className={"inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-colors " + (type===item.value?'bg-primary text-white border-orange-700':'bg-card text-muted-foreground border-border hover:border-primary/30')}>
+            <item.Icon className="w-3 h-3" />{t(item.tk)}
           </button>
         ))}
       </div>
@@ -114,19 +117,20 @@ function ManualForm({ onSave, saving, onClose }) {
       <Input value={tagInput} onChange={e => setTagInput(e.target.value)}
         onKeyDown={e => { if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(tagInput);} }}
         onBlur={() => tagInput && addTag(tagInput)}
-        placeholder="Tags: sunset, mirador... (Enter)" className="h-8 text-xs"/>
-      <Input value={address} onChange={e => setAddress(e.target.value)} aria-label="Dirección" placeholder="Dirección (opcional)" className="h-8 text-xs"/>
-      <textarea value={notes} onChange={e => setNotes(e.target.value)} aria-label="Notas" placeholder="Notas..."
+        placeholder={t('spots.section.tagsPlaceholder')} className="h-8 text-xs"/>
+      <Input value={address} onChange={e => setAddress(e.target.value)} aria-label={t('spots.section.addressAria')} placeholder={t('spots.section.addressPlaceholder')} className="h-8 text-xs"/>
+      <textarea value={notes} onChange={e => setNotes(e.target.value)} aria-label={t('spots.section.notesAria')} placeholder={t('spots.section.notesPlaceholder')}
         className="w-full text-xs border border-border rounded-lg px-3 py-2 h-16 resize-none outline-none focus:border-primary/40"/>
       <Button onClick={() => onSave({ title, type, notes, address, tags })} disabled={!title.trim()||saving}
         className="w-full bg-primary hover:bg-orange-800 text-white h-9">
-        {saving ? 'Guardando...' : 'Guardar spot'}
+        {saving ? t('spots.section.saving') : t('spots.create.save')}
       </Button>
     </div>
   );
 }
 
 export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, days = [], city = '', country = '' }) {
+  const { t } = useTranslation();
   const [activeType, setActiveType] = useState('all');
   const [panelMode, setPanelMode] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -223,7 +227,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
   return (
     <div className="mt-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-foreground">📍 Spots</h2>
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2"><MapPin className="w-5 h-5 text-primary" />{t('spots.title')}</h2>
       </div>
 
       {/* Buscador + botones */}
@@ -231,13 +235,13 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
           <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-            placeholder={city ? `Busca en ${city}...` : 'Busca un lugar...'}
+            placeholder={city ? t('spots.section.searchIn', { city }) : t('spots.section.searchPlace')}
             className="pl-9 pr-20 h-10 text-sm bg-card"/>
           {searchQuery ? (
             <button onClick={() => { setSearchQuery(''); setSearchResults([]); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"><X className="w-4 h-4"/></button>
           ) : (
             <button onClick={handleNearby} className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs bg-orange-100 text-primary px-2 py-1 rounded-md font-medium">
-              <Navigation className="w-3 h-3"/>Cerca
+              <Navigation className="w-3 h-3"/>{t('spots.section.near')}
             </button>
           )}
         </div>
@@ -248,7 +252,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
         </button>
       </div>
 
-      {searching && <p className="text-xs text-muted-foreground text-center mb-2">Buscando...</p>}
+      {searching && <p className="text-xs text-muted-foreground text-center mb-2">{t('spots.section.searching')}</p>}
 
       {/* Formulario manual */}
       {panelMode === 'manual' && (
@@ -260,7 +264,7 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
       {/* Resultados búsqueda */}
       {searchResults.length > 0 && (
         <div className="space-y-2 mb-3">
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{searchResults.length} resultados</p>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{t('spots.section.results', { count: searchResults.length })}</p>
           {searchResults.map(p => <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id}/>)}
         </div>
       )}
@@ -268,10 +272,10 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
       {/* Cerca de mí */}
       {panelMode === 'nearby' && (
         <div className="space-y-2 mb-3">
-          {loadingNearby && <p className="text-xs text-muted-foreground text-center">Obteniendo ubicación...</p>}
+          {loadingNearby && <p className="text-xs text-muted-foreground text-center">{t('spots.section.gettingLocation')}</p>}
           {!loadingNearby && nearbyResults.length > 0 && (
             <>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{nearbyResults.length} lugares cerca</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">{t('spots.section.placesNear', { count: nearbyResults.length })}</p>
               {nearbyResults.map(p => <PlaceResultCard key={p.id} place={p} onSave={saveOsmPlace} saving={savingId===p.id}/>)}
             </>
           )}
@@ -281,12 +285,12 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
       {/* Filtros tipo */}
       {spots.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {ALL_TYPES.filter(t => t.value==='all' || spots.some(s => s.type===t.value)).map(t => (
-            <button key={t.value} onClick={() => setActiveType(t.value)}
-              className={"text-xs px-2.5 py-1 rounded-full border font-medium transition-colors " +
-                (activeType===t.value ? 'bg-primary text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-primary/30')}>
-              {t.emoji} {t.label}
-              {t.value!=='all' && <span className="ml-1 opacity-60">{spots.filter(s=>s.type===t.value).length}</span>}
+          {ALL_TYPES.filter(item => item.value==='all' || spots.some(s => s.type===item.value)).map(item => (
+            <button key={item.value} onClick={() => setActiveType(item.value)}
+              className={"inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors " +
+                (activeType===item.value ? 'bg-primary text-white border-orange-700' : 'bg-card text-muted-foreground border-border hover:border-primary/30')}>
+              <item.Icon className="w-3 h-3" />{t(item.tk)}
+              {item.value!=='all' && <span className="ml-1 opacity-60">{spots.filter(s=>s.type===item.value).length}</span>}
             </button>
           ))}
         </div>
@@ -297,8 +301,8 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
         <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-20 bg-secondary rounded-xl animate-pulse"/>)}</div>
       ) : filteredSpots.length === 0 && !searchResults.length && !nearbyResults.length ? (
         <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-card">
-          <p className="text-2xl mb-2">📍</p>
-          <p className="text-sm text-muted-foreground">Busca lugares o crea un spot manualmente</p>
+          <MapPin className="w-8 h-8 mx-auto mb-2 text-border" strokeWidth={1.5} />
+          <p className="text-sm text-muted-foreground">{t('spots.section.emptyHint')}</p>
         </div>
       ) : (
         <div className="space-y-3">

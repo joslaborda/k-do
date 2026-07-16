@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { MapPin, Navigation, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { TYPE_CONFIG } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
+import { useTranslation } from 'react-i18next';
 
 export default
 function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved, userId }) {
+  const { t } = useTranslation();
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot.id, userId);
   const [showComments, setShowComments] = useState(false);
@@ -38,10 +39,10 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
                 </div>
                 <div>
                   <p className="font-semibold text-foreground text-sm">{spot.title}</p>
-                  <p className="text-xs text-muted-foreground">{tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
+                  <p className="text-xs text-muted-foreground">{t(tc.tk)}{spot.city_name ? ' · ' + spot.city_name : ''}</p>
                 </div>
               </div>
-              <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+              <button onClick={onClose} aria-label={t('common.close')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
@@ -56,7 +57,7 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
             )}
             {spot.notes && (
               <div className="bg-secondary/50 rounded-xl p-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Descripción</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{t('common.description')}</p>
                 <p className="text-sm text-foreground leading-relaxed">{spot.notes}</p>
               </div>
             )}
@@ -68,11 +69,11 @@ function CommunitySpotDetailSheet({ spot, onClose, onSave, saving, alreadySaved,
               </div>
             )}
             {spot.creator_username && (
-              <p className="text-xs text-muted-foreground">Añadido por <span className="font-medium text-foreground">@{spot.creator_username}</span></p>
+              <p className="text-xs text-muted-foreground">{t('spots.addedBy')} <span className="font-medium text-foreground">@{spot.creator_username}</span></p>
             )}
             <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-primary font-medium hover:text-primary/80 transition-colors">
-              <Navigation className="w-4 h-4" />Ver en Google Maps
+              <Navigation className="w-4 h-4" />{t('spots.viewOnMaps')}
             </a>
           </div>
 

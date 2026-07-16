@@ -117,12 +117,12 @@ export async function loadLeaflet() {
 // ── Type config ───────────────────────────────────────────────────────────────
 
 export const TYPE_CONFIG = {
-  food:      { label:'Comer',      Icon: Utensils,    color:'bg-orange-100 text-primary' },
-  sight:     { label:'Cultura',    Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
-  activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
-  shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
-  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
-  custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
+  food:      { label:'Comer',      tk:'spots.types.food',      Icon: Utensils,    color:'bg-orange-100 text-primary' },
+  sight:     { label:'Cultura',    tk:'spots.types.sight',     Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
+  activity:  { label:'Actividad',  tk:'spots.types.activity',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
+  shopping:  { label:'Compras',    tk:'spots.types.shopping',  Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
+  transport: { label:'Transporte', tk:'spots.types.transport', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
+  custom:    { label:'Otro',       tk:'spots.types.custom',    Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
 // ── Recent searches (localStorage) ───────────────────────────────────────────

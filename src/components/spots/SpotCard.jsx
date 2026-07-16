@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { notify, resolveUserIds } from '@/lib/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Image, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon, ThumbsUp, ThumbsDown, Check, Trash2 } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 import { getMapsUrl } from './spotsHelpers';
+import { useTranslation } from 'react-i18next';
 
 const TYPE_CONFIG = {
-  food:      { label: 'Restaurante', Icon: Utensils,   color: 'bg-orange-100 text-primary' },
-  sight:     { label: 'Atracción',   Icon: Landmark,   color: 'bg-blue-100 text-blue-700' },
-  activity:  { label: 'Actividad',   Icon: Zap,        color: 'bg-green-100 text-green-700' },
-  shopping:  { label: 'Compras',     Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
-  transport: { label: 'Transporte',  Icon: Train,      color: 'bg-secondary text-foreground' },
-  hotel:     { label: 'Hotel',       Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
-  nightlife: { label: 'Bares/Noche',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
-  custom:    { label: 'Otro',        Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
+  food:      { tk: 'spots.types.food',      Icon: Utensils,   color: 'bg-orange-100 text-primary' },
+  sight:     { tk: 'spots.types.sight',     Icon: Landmark,   color: 'bg-blue-100 text-blue-700' },
+  activity:  { tk: 'spots.types.activity',   Icon: Zap,        color: 'bg-green-100 text-green-700' },
+  shopping:  { tk: 'spots.types.shopping',   Icon: ShoppingBag,color: 'bg-purple-100 text-purple-700' },
+  transport: { tk: 'spots.types.transport',  Icon: Train,      color: 'bg-secondary text-foreground' },
+  hotel:     { tk: 'spots.types.hotel',      Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
+  nightlife: { tk: 'spots.types.nightlife',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
+  custom:    { tk: 'spots.types.custom',    Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
 
 // ── Popup de valoración ───────────────────────────────────────────────────────
@@ -31,6 +31,7 @@ async function uploadPhoto(file) {
 
 
 function RatingPopup({ spot, userId, userProfile, onClose }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [thumb, setThumb] = useState(null);
   const [text, setText] = useState('');
@@ -60,31 +61,31 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
         <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="font-semibold text-foreground text-sm">¿Qué te pareció?</p>
+            <p className="font-semibold text-foreground text-sm">{t('spots.rating.title')}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{spot.title}</p>
           </div>
-          <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+          <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <button aria-label="Me gusta" onClick={() => setThumb('up')}
+          <button aria-label={t('spots.vote.up')} onClick={() => setThumb('up')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'up' ? 'bg-green-50 border-green-300' : 'bg-secondary border-border hover:border-green-200')}>
             <ThumbsUp className={"w-5 h-5 " + (thumb === 'up' ? 'text-green-600' : 'text-muted-foreground')} />
-            <span className={"text-sm font-medium " + (thumb === 'up' ? 'text-green-700' : 'text-muted-foreground')}>Me gustó</span>
+            <span className={"text-sm font-medium " + (thumb === 'up' ? 'text-green-700' : 'text-muted-foreground')}>{t('spots.rating.liked')}</span>
           </button>
-          <button aria-label="No me gusta" onClick={() => setThumb('down')}
+          <button aria-label={t('spots.vote.down')} onClick={() => setThumb('down')}
             className={"flex items-center justify-center gap-2 py-3 rounded-xl border transition-all " +
               (thumb === 'down' ? 'bg-red-50 border-red-300' : 'bg-secondary border-border hover:border-red-200')}>
             <ThumbsDown className={"w-5 h-5 " + (thumb === 'down' ? 'text-red-600' : 'text-muted-foreground')} />
-            <span className={"text-sm font-medium " + (thumb === 'down' ? 'text-red-700' : 'text-muted-foreground')}>No tanto</span>
+            <span className={"text-sm font-medium " + (thumb === 'down' ? 'text-red-700' : 'text-muted-foreground')}>{t('spots.rating.notSoMuch')}</span>
           </button>
         </div>
 
         <textarea value={text} onChange={e => setText(e.target.value)}
-          placeholder="Cuéntanos qué tal... (opcional)"
+          placeholder={t('spots.rating.placeholder')}
           className="w-full text-sm border border-border rounded-xl px-3 py-2.5 h-20 resize-none outline-none focus:border-primary bg-secondary mb-3" />
 
         {showImageField ? (
@@ -98,19 +99,19 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
               }} />
             <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
               <Camera className="w-4 h-4" />
-              {imageUrl ? 'Foto seleccionada ✓' : 'Subir foto'}
+              {imageUrl ? t('spots.rating.photoSelected') : t('spots.rating.uploadPhoto')}
             </div>
           </label>
         ) : (
           <button onClick={() => setShowImageField(true)}
             className="w-full flex items-center gap-2 px-3 py-2.5 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors mb-3">
-            <Camera className="w-4 h-4" />Añadir una foto
+            <Camera className="w-4 h-4" />{t('spots.rating.addPhoto')}
           </button>
         )}
 
         <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
           className="w-full py-3 rounded-full bg-green-600 text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition-colors">
-          {mutation.isPending ? 'Guardando...' : 'Guardar valoración'}
+          {mutation.isPending ? t('spots.rating.saving') : t('spots.rating.save')}
         </button>
       </div>
     </div>
@@ -119,6 +120,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
 
 // ── Popup de comentarios ──────────────────────────────────────────────────────
 function CommentsPopup({ spot, userId, userProfile, onClose }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [thumb, setThumb] = useState(null);
@@ -156,13 +158,13 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-start justify-between">
             <div>
-              <p className="font-semibold text-foreground text-sm">Comentarios</p>
+              <p className="font-semibold text-foreground text-sm">{t('spots.comments.title')}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> {ups}</span>
                 <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full flex items-center gap-1"><ThumbsDown className="w-3 h-3" /> {downs}</span>
               </div>
             </div>
-            <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
+            <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -170,7 +172,7 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {comments.length === 0 && (
-            <p className="text-center text-sm text-muted-foreground py-8">Sin comentarios todavía. ¡Sé el primero!</p>
+            <p className="text-center text-sm text-muted-foreground py-8">{t('spots.comments.empty')}</p>
           )}
           {comments.map(c => (
             <div key={c.id} className="flex gap-3">
@@ -194,16 +196,16 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 
         <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
           <div className="flex gap-2">
-            <button aria-label="Me gusta" onClick={() => setThumb(thumb === 'up' ? null : 'up')}
+            <button aria-label={t('spots.vote.up')} onClick={() => setThumb(thumb === 'up' ? null : 'up')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'up' ? 'bg-green-50 border-green-300 text-green-700' : 'bg-secondary border-border text-muted-foreground')}>
               <ThumbsUp className="w-4 h-4" />
             </button>
-            <button aria-label="No me gusta" onClick={() => setThumb(thumb === 'down' ? null : 'down')}
+            <button aria-label={t('spots.vote.down')} onClick={() => setThumb(thumb === 'down' ? null : 'down')}
               className={"px-3 py-1.5 rounded-lg text-sm border transition-colors " + (thumb === 'down' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-secondary border-border text-muted-foreground')}>
               <ThumbsDown className="w-4 h-4" />
             </button>
             <textarea value={text} onChange={e => setText(e.target.value)}
-              placeholder="Añade un comentario..."
+              placeholder={t('spots.comments.placeholder')}
               className="flex-1 text-sm border border-border rounded-xl px-3 py-1.5 resize-none outline-none focus:border-primary bg-secondary h-9" />
           </div>
           <div className="flex gap-2">
@@ -213,25 +215,25 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
                   <input type="file" accept="image/*" className="hidden"
                     onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
                   <div className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
-                    <Camera className="w-3.5 h-3.5" />{imageUrl ? 'OK' : 'Galeria'}
+                    <Camera className="w-3.5 h-3.5" />{imageUrl ? t('spots.comments.ok') : t('spots.comments.gallery')}
                   </div>
                 </label>
                 <label className="cursor-pointer flex-1">
                   <input type="file" accept="image/*" capture="environment" className="hidden"
                     onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
                   <div className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:border-primary/40 transition-colors">
-                    <Camera className="w-3.5 h-3.5" />Camara
+                    <Camera className="w-3.5 h-3.5" />{t('spots.comments.camera')}
                   </div>
                 </label>
               </div>
             ) : (
               <button onClick={() => setShowImageField(true)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary px-2 py-1.5 border border-dashed border-border rounded-xl flex-1 justify-center transition-colors">
-                <Camera className="w-3.5 h-3.5" />Foto
+                <Camera className="w-3.5 h-3.5" />{t('spots.comments.photo')}
               </button>
             )}
             <button onClick={() => mutation.mutate()} disabled={!thumb || mutation.isPending}
               className="px-4 py-1.5 rounded-xl bg-primary text-white text-sm font-medium disabled:opacity-50 hover:bg-primary/90 transition-colors">
-              {mutation.isPending ? '...' : 'Publicar'}
+              {mutation.isPending ? '...' : t('spots.comments.post')}
             </button>
           </div>
         </div>
@@ -242,15 +244,16 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
 
 // ── Popup de confirmación de eliminar ─────────────────────────────────────────
 function DeleteConfirmPopup({ spot, onConfirm, onCancel }) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onCancel}>
       <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
         <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
-        <p className="font-semibold text-foreground text-sm mb-1">¿Eliminar este spot?</p>
-        <p className="text-xs text-muted-foreground mb-5">Se eliminará <strong>{spot.title}</strong> de tu lista. Esta acción no se puede deshacer.</p>
+        <p className="font-semibold text-foreground text-sm mb-1">{t('spots.delete.title')}</p>
+        <p className="text-xs text-muted-foreground mb-5">{t('spots.delete.body1')} <strong>{spot.title}</strong> {t('spots.delete.body2')}</p>
         <div className="flex gap-3">
-          <button onClick={onCancel} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">Cancelar</button>
-          <button onClick={onConfirm} className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium">Eliminar</button>
+          <button onClick={onCancel} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">{t('common.cancel')}</button>
+          <button onClick={onConfirm} className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium">{t('common.delete')}</button>
         </div>
       </div>
     </div>
@@ -264,6 +267,7 @@ function VisitedRatingPopup({ spot, userId, userProfile, onClose }) {
 
 // ── SpotCard principal ────────────────────────────────────────────────────────
 export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tripId }) {
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const queryClient = useQueryClient();
@@ -322,11 +326,11 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-foreground text-sm leading-tight">{spot.title}</p>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {spot.visited && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">✅ Visitado</span>}
+                  {spot.visited && <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium"><Check className="w-3 h-3" />{t('spots.card.visited')}</span>}
                   <Pencil className="w-3.5 h-3.5 text-muted-foreground/40" />
                 </div>
               </div>
-              <span className={"inline-block text-xs px-2 py-0.5 rounded-full mt-1 " + tc.color}>{tc.label}</span>
+              <span className={"inline-block text-xs px-2 py-0.5 rounded-full mt-1 " + tc.color}>{t(tc.tk)}</span>
               {spot.address && (
                 <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1.5">
                   <MapPin className="w-3 h-3 flex-shrink-0" />{spot.address}
@@ -371,15 +375,16 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
 
           {/* Visited toggle */}
           <button onClick={handleMarkVisited}
-            className={`text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
+            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border transition-all ${
               spot.visited ? 'bg-green-100 text-green-700 border-green-200' : 'bg-secondary border-border text-muted-foreground hover:border-green-300'
             }`}>
-            {spot.visited ? '✅ Hecho' : 'Marcar hecho'}
+            {spot.visited && <Check className="w-3 h-3" />}{spot.visited ? t('spots.card.done') : t('spots.card.markDone')}
           </button>
 
           {canDelete && (
-            <button onClick={() => setShowDeleteConfirm(true)} className="text-xs text-red-500 hover:text-red-700 transition-colors">
-              🗑️
+            <button onClick={() => setShowDeleteConfirm(true)} aria-label={t('common.delete')}
+              className="text-red-500 hover:text-red-700 transition-colors">
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

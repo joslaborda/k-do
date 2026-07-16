@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { MapPin, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MapPin } from 'lucide-react';
 import { TYPE_CONFIG } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import CommunitySpotDetailSheet from './CommunitySpotDetailSheet';
+import { useTranslation } from 'react-i18next';
 
 export default
 function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
+  const { t } = useTranslation();
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
   const [showDetail, setShowDetail] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -45,7 +46,7 @@ function CommunitySpotCard({ spot, onSave, saving, alreadySaved, userId }) {
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-foreground leading-tight">{spot.title}</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {tc.label}{spot.city_name ? ' · ' + spot.city_name : ''}
+                {t(tc.tk)}{spot.city_name ? ' · ' + spot.city_name : ''}
               </p>
               {spot.notes
                 ? <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">{spot.notes}</p>
