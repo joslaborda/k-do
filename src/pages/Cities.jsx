@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { format, differenceInDays, parseISO, isToday, isTomorrow, eachDayOfInterval } from 'date-fns';
+import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Compass } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,87 +52,6 @@ function getTransportIcon(docs, cityStartDate) {
 }
 
 // ── Draggable spot list ───────────────────────────────────────────────────────
-function DraggableSpots({ spots, onReorder, onEdit }) {
-  const [items, setItems] = useState(spots);
-  const [dragging, setDragging] = useState(null);
-  const [dragOver, setDragOver] = useState(null);
-  const touchRef = useRef(null);
-
-  useEffect(() => { setItems(spots); }, [spots]);
-
-  const onDragStart = (e, i) => { setDragging(i); e.dataTransfer.effectAllowed = 'move'; };
-  const onDragOver = (e, i) => { e.preventDefault(); setDragOver(i); };
-  const onDrop = (e, i) => {
-    e.preventDefault();
-    if (dragging === null || dragging === i) return;
-    const next = [...items];
-    const [m] = next.splice(dragging, 1);
-    next.splice(i, 0, m);
-    setItems(next); setDragging(null); setDragOver(null);
-    onReorder(next);
-  };
-  const onDragEnd = () => { setDragging(null); setDragOver(null); };
-
-  const onTouchStart = (e, i) => { touchRef.current = i; setDragging(i); };
-  const onTouchMove = (e) => {
-    if (touchRef.current === null) return;
-    e.preventDefault();
-    const y = e.touches[0].clientY;
-    document.querySelectorAll('[data-spot-row]').forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (y >= r.top && y <= r.bottom) setDragOver(parseInt(el.dataset.spotRow));
-    });
-  };
-  const onTouchEnd = () => {
-    if (touchRef.current !== null && dragOver !== null && touchRef.current !== dragOver) {
-      const next = [...items];
-      const [m] = next.splice(touchRef.current, 1);
-      next.splice(dragOver, 0, m);
-      setItems(next);
-      onReorder(next);
-    }
-    touchRef.current = null; setDragging(null); setDragOver(null);
-  };
-
-  return (
-    <div onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      {items.map((spot, i) => (
-        <div key={spot.id} data-spot-row={i}
-          draggable
-          onDragStart={e => onDragStart(e, i)}
-          onDragOver={e => onDragOver(e, i)}
-          onDrop={e => onDrop(e, i)}
-          onDragEnd={onDragEnd}
-          onTouchStart={e => onTouchStart(e, i)}
-          className={`flex items-center gap-2 px-4 py-3 border-t border-border transition-all select-none
-            ${dragging === i ? 'opacity-40' : ''}
-            ${dragOver === i && dragging !== i ? 'bg-accent/40' : ''}
-          `}>
-          <GripVertical className="w-4 h-4 text-muted-foreground/30 shrink-0 cursor-grab touch-none" />
-          <span className="text-sm shrink-0">{(() => { const I = SPOT_ICONS[spot.type]; return I ? <I size={14} className='text-muted-foreground' /> : <MapPin size={14} className='text-muted-foreground' />; })()}</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
-            {spot.assigned_time && <p className="text-xs text-primary font-medium mt-0.5">{spot.assigned_time}</p>}
-            {spot.notes
-              ? <p className="text-xs text-muted-foreground mt-0.5 truncate">{spot.notes}</p>
-              : <button onClick={() => onEdit(spot)} className="text-xs text-primary mt-0.5 flex items-center gap-1">
-                  <Plus className="w-3 h-3" />Añadir nota
-                </button>
-            }
-          </div>
-          <button onClick={() => onEdit(spot)}
-            className="w-7 h-7 rounded-lg border border-border bg-card flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ── Spot edit modal ───────────────────────────────────────────────────────────
 function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
   const { t } = useTranslation();

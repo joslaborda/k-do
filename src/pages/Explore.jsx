@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck, X, Tag, Star } from 'lucide-react';
+import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck, X, Star, Utensils, Landmark, Zap, ShoppingBag, Train, Sparkles, Map } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import TemplateCard from '@/components/explore/TemplateCard';
 import CommunitySearch from '@/components/social/CommunitySearch';
 import { createPageUrl } from '@/utils';
+import { useTranslation } from 'react-i18next';
 import { useLike } from '@/hooks/useLike';
 
-const SPOT_TYPE_EMOJI = { food:'🍜', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
+const SPOT_TYPE_ICON = { food: Utensils, sight: Landmark, activity: Zap, shopping: ShoppingBag, transport: Train, custom: MapPin };
 const TYPE_COLORS = {
   food:'bg-orange-50 text-primary', sight:'bg-blue-100 text-blue-700',
   activity:'bg-green-100 text-green-700', shopping:'bg-purple-100 text-purple-700',
@@ -39,7 +40,8 @@ function LikeButton({ targetId, targetType, userId, targetOwnerId }) {
 }
 
 function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
-  const emoji = SPOT_TYPE_EMOJI[spot.type] || '📍';
+  const { t } = useTranslation();
+  const TypeIcon = SPOT_TYPE_ICON[spot.type] || MapPin;
   const color = TYPE_COLORS[spot.type] || TYPE_COLORS.custom;
   const isOwn = currentUser?.id === spot.created_by_user_id;
   const attribution = spot.source_username || spot.source_display_name;
@@ -52,7 +54,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
           <div className="flex-1 min-w-0">
             <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id}
               className="text-xs font-semibold text-foreground hover:text-primary truncate block">
-              {profile?.display_name || 'Viajero'}{profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
+              {profile?.display_name || t('explore.traveler')}{profile?.username && <span className="text-muted-foreground font-normal ml-1">@{profile.username}</span>}
             </Link>
             {(spot.city_name || spot.country) && (
               <p className="text-xs text-muted-foreground flex items-center gap-0.5">
@@ -60,7 +62,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
               </p>
             )}
           </div>
-          <span className={"text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 " + color}>{emoji}</span>
+          <span className={"inline-flex items-center px-2 py-1 rounded-full flex-shrink-0 " + color}><TypeIcon className="w-3 h-3" /></span>
         </div>
         {attribution && (
           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
@@ -86,7 +88,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
           <LikeButton targetId={spot.id} targetType="spot" userId={currentUser?.id} targetOwnerId={spot.created_by_user_id}/>
           {!isOwn && currentUser && (
             <button onClick={() => onSave(spot)} disabled={saving} className="flex items-center gap-1.5 text-xs text-primary font-medium hover:text-accent-foreground">
-              <Bookmark className="w-3.5 h-3.5"/>{saving ? 'Guardando...' : 'Guardar'}
+              <Bookmark className="w-3.5 h-3.5"/>{saving ? t('explore.saving') : t('common.save')}
             </button>
           )}
         </div>
@@ -96,6 +98,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
 }
 
 function UserCard({ profile, currentUser, myFollows, onFollow }) {
+  const { t } = useTranslation();
   const isOwn = currentUser?.id === profile.user_id;
   const followRecord = myFollows.find(f => f.followed_user_id === profile.user_id);
   const isFollowing = !!followRecord;
@@ -104,7 +107,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
       <Avatar profile={profile}/>
       <div className="flex-1 min-w-0">
         <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-primary block truncate">
-          {profile.display_name || 'Viajero'}
+          {profile.display_name || t('explore.traveler')}
         </Link>
         {profile.username && <p className="text-xs text-muted-foreground font-mono">@{profile.username}</p>}
         {profile.home_country && <p className="text-xs text-muted-foreground">{profile.home_country}</p>}
@@ -112,7 +115,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
       {!isOwn && currentUser && (
         <Button size="sm" onClick={() => onFollow(profile, followRecord)}
           className={isFollowing ? 'border border-primary/30 text-primary bg-card hover:bg-secondary' : 'bg-primary hover:bg-primary/90 text-white'}>
-          {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1"/>Siguiendo</> : <><UserPlus className="w-3.5 h-3.5 mr-1"/>Seguir</>}
+          {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1"/>{t('explore.following')}</> : <><UserPlus className="w-3.5 h-3.5 mr-1"/>{t('explore.follow')}</>}
         </Button>
       )}
     </div>
@@ -121,6 +124,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
 
 
 function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotId }) {
+  const { t } = useTranslation();
   const [cityFilter, setCityFilter] = useState('');
   const queryClient = useQueryClient();
 
@@ -155,17 +159,16 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
     }).slice(0, 20);
   }, [publicSpots, allComments, cityFilter]);
 
-  const TYPE_EMOJI = { food:'🍽️', sight:'🏛️', activity:'⚡', shopping:'🛍️', transport:'🚆', custom:'📍' };
 
   return (
     <div>
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
         <Input value={cityFilter} onChange={e => setCityFilter(e.target.value)}
-          placeholder="Filtra por ciudad o país..." className="pl-9 bg-card"/>
+          placeholder={t('explore.filterByCity')} className="pl-9 bg-card"/>
       </div>
       {filteredSpots.length === 0 ? (
-        <EmptyFeed emoji="⭐" title="Sin spots todavía" subtitle="Sé el primero en publicar un spot con valoraciones"/>
+        <EmptyFeed Icon={Star} title={t('explore.empty.topSpotsTitle')} subtitle={t('explore.empty.topSpotsSub')}/>
       ) : (
         <div className="space-y-3">
           {filteredSpots.map((spot, idx) => {
@@ -182,7 +185,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-semibold text-sm text-foreground">{spot.title}</p>
-                    <span className="text-lg flex-shrink-0">{TYPE_EMOJI[spot.type] || '📍'}</span>
+                    {(() => { const I = SPOT_TYPE_ICON[spot.type] || MapPin; return <I className="w-4 h-4 text-muted-foreground flex-shrink-0" />; })()}
                   </div>
                   {(spot.city_name || spot.country) && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -197,7 +200,7 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
                   {!isOwn && currentUser && (
                     <button onClick={() => onSave(spot)} disabled={savingSpotId === spot.id}
                       className="mt-2 text-xs text-primary font-medium hover:underline flex items-center gap-1">
-                      <Bookmark className="w-3 h-3"/>{savingSpotId === spot.id ? 'Guardando...' : 'Guardar'}
+                      <Bookmark className="w-3 h-3"/>{savingSpotId === spot.id ? t('explore.saving') : t('common.save')}
                     </button>
                   )}
                 </div>
@@ -210,10 +213,10 @@ function TopSpotsTab({ publicSpots, profileMap, currentUser, onSave, savingSpotI
   );
 }
 
-function EmptyFeed({ emoji, title, subtitle }) {
+function EmptyFeed({ Icon = MapPin, title, subtitle }) {
   return (
     <div className="text-center py-16 text-muted-foreground">
-      <div className="text-5xl mb-3">{emoji}</div>
+      <Icon className="w-12 h-12 mx-auto mb-3 text-border" strokeWidth={1.5} />
       <p className="font-semibold text-foreground">{title}</p>
       <p className="text-sm mt-1 max-w-xs mx-auto">{subtitle}</p>
     </div>
@@ -221,6 +224,7 @@ function EmptyFeed({ emoji, title, subtitle }) {
 }
 
 export default function Explore() {
+  const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -352,12 +356,12 @@ export default function Explore() {
     <div className="min-h-screen bg-background pb-24">
       <div className="bg-background pt-12 pb-6 px-6">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-white text-4xl font-bold mb-1">Explorar</h1>
-          <p className="text-white/80 text-sm mb-4">Descubre spots, viajes y viajeros</p>
+          <h1 className="text-white text-4xl font-bold mb-1">{t('explore.title')}</h1>
+          <p className="text-white/80 text-sm mb-4">{t('explore.subtitle')}</p>
           <button onClick={() => setSearchOpen(true)}
             className="w-full flex items-center gap-3 bg-white/15 hover:bg-white/25 transition-colors rounded-xl px-4 py-3 text-white/80 text-sm border border-white/20">
             <Search className="w-4 h-4 flex-shrink-0"/>
-            <span>Busca destinos, @usuarios, spots...</span>
+            <span>{t('explore.searchCta')}</span>
           </button>
         </div>
       </div>
@@ -366,19 +370,19 @@ export default function Explore() {
         <Tabs defaultValue="explorar">
           <TabsList className="w-full mb-5 bg-card border border-border">
             <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Globe className="w-4 h-4 mr-1"/>Explorar
+              <Globe className="w-4 h-4 mr-1"/>{t('explore.tabs.explore')}
             </TabsTrigger>
             <TabsTrigger value="siguiendo" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Heart className="w-4 h-4 mr-1"/>Siguiendo
+              <Heart className="w-4 h-4 mr-1"/>{t('explore.tabs.following')}
               {(siguiendoSpots.length + siguiendoTemplates.length) > 0 && (
                 <Badge variant="secondary" className="ml-1">{siguiendoSpots.length + siguiendoTemplates.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Users className="w-4 h-4 mr-1"/>Personas
+              <Users className="w-4 h-4 mr-1"/>{t('explore.tabs.people')}
             </TabsTrigger>
             <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              ⭐ Top
+              <Star className="w-4 h-4 mr-1"/>{t('explore.tabs.top')}
             </TabsTrigger>
           </TabsList>
 
@@ -387,29 +391,29 @@ export default function Explore() {
             {/* Filtros de spots */}
             <div className="bg-card rounded-2xl border border-border p-4 mb-5 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtrar spots</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('explore.filterSpots')}</p>
                 {activeFilters > 0 && (
                   <button onClick={() => { setSpotSearch(''); setSpotCity(''); setSpotTag(''); }}
                     className="text-xs text-primary hover:underline flex items-center gap-1">
-                    <X className="w-3 h-3"/>Limpiar
+                    <X className="w-3 h-3"/>{t('explore.clear')}
                   </button>
                 )}
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Buscar</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">{t('common.search')}</label>
                   <Input value={spotSearch} onChange={e => setSpotSearch(e.target.value)}
-                    placeholder="mirador, ramen..." className="h-8 text-xs"/>
+                    placeholder={t('explore.ph.search')} className="h-8 text-xs"/>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Ciudad/País</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">{t('explore.cityCountry')}</label>
                   <Input value={spotCity} onChange={e => setSpotCity(e.target.value)}
-                    placeholder="Tokyo, Italia..." className="h-8 text-xs"/>
+                    placeholder={t('explore.ph.city')} className="h-8 text-xs"/>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Tag</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">{t('explore.tag')}</label>
                   <Input value={spotTag} onChange={e => setSpotTag(e.target.value)}
-                    placeholder="sunset, temple..." className="h-8 text-xs"/>
+                    placeholder={t('explore.ph.tag')} className="h-8 text-xs"/>
                 </div>
               </div>
             </div>
@@ -418,13 +422,13 @@ export default function Explore() {
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
                 <Compass className="w-4 h-4 text-primary"/>
-                <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">Spots</h2>
+                <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">{t('spots.title')}</h2>
                 <Badge variant="secondary" className="ml-auto">{filteredSpots.length}</Badge>
               </div>
               {loadingSpots ? (
                 <div className="grid grid-cols-2 gap-3">{[1,2,3,4].map(i => <div key={i} className="h-40 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
               ) : filteredSpots.length === 0 ? (
-                <EmptyFeed emoji="📍" title="Sin spots" subtitle={activeFilters > 0 ? 'Prueba cambiando los filtros' : 'Sé el primero en publicar un spot'}/>
+                <EmptyFeed Icon={MapPin} title={t('explore.empty.noSpots')} subtitle={activeFilters > 0 ? t('explore.empty.changeFilters') : t('explore.empty.firstSpot')}/>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {filteredSpots.slice(0,12).map(spot => (
@@ -439,13 +443,13 @@ export default function Explore() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Globe className="w-4 h-4 text-primary"/>
-                <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">Itinerarios</h2>
+                <h2 className="font-semibold text-foreground text-sm uppercase tracking-wide">{t('explore.search.itineraries')}</h2>
                 <Badge variant="secondary" className="ml-auto">{publicTemplates.length}</Badge>
               </div>
               {loadingTemplates ? (
                 <div className="grid grid-cols-2 gap-3">{[1,2].map(i => <div key={i} className="h-48 bg-card rounded-2xl border border-border animate-pulse"/>)}</div>
               ) : publicTemplates.length === 0 ? (
-                <EmptyFeed emoji="🗺️" title="Sin itinerarios todavía" subtitle="Publica tu primer viaje"/>
+                <EmptyFeed Icon={Map} title={t('explore.empty.noItinerariesTitle')} subtitle={t('explore.empty.noItinerariesSub')}/>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {publicTemplates.slice(0,6).map(t => <TemplateCard key={t.id} template={t} currentUser={currentUser}/>)}
@@ -457,16 +461,16 @@ export default function Explore() {
           {/* ── SIGUIENDO ─────────────────────────────────────────────────── */}
           <TabsContent value="siguiendo">
             {followedUserIds.length === 0 ? (
-              <EmptyFeed emoji="👥" title="Aún no sigues a nadie" subtitle="Ve a Personas y sigue a viajeros"/>
+              <EmptyFeed Icon={Users} title={t('explore.empty.noFollowsTitle')} subtitle={t('explore.empty.noFollowsSub')}/>
             ) : (siguiendoSpots.length + siguiendoTemplates.length) === 0 ? (
-              <EmptyFeed emoji="✨" title="Sin contenido todavía" subtitle="Las personas que sigues no han publicado nada aún"/>
+              <EmptyFeed Icon={Sparkles} title={t('explore.empty.noContentTitle')} subtitle={t('explore.empty.noContentSub')}/>
             ) : (
               <div className="space-y-8">
                 {siguiendoSpots.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <Compass className="w-4 h-4 text-primary"/>
-                      <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">Spots</h2>
+                      <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">{t('spots.title')}</h2>
                       <Badge variant="secondary" className="ml-auto">{siguiendoSpots.length}</Badge>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -481,7 +485,7 @@ export default function Explore() {
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <Globe className="w-4 h-4 text-primary"/>
-                      <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">Itinerarios</h2>
+                      <h2 className="font-semibold text-sm uppercase tracking-wide text-foreground">{t('explore.search.itineraries')}</h2>
                       <Badge variant="secondary" className="ml-auto">{siguiendoTemplates.length}</Badge>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -497,12 +501,12 @@ export default function Explore() {
           <TabsContent value="personas">
             <div className="relative mb-5">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
-              <Input placeholder="Busca por nombre, @usuario o país..." value={peopleQuery}
+              <Input placeholder={t('explore.ph.people')} value={peopleQuery}
                 onChange={e => setPeopleQuery(e.target.value)} className="pl-9 bg-card"/>
             </div>
             {filteredProfiles.length === 0 ? (
-              <EmptyFeed emoji="🔍" title={peopleQuery ? 'Sin resultados' : 'Sin viajeros todavía'}
-                subtitle={peopleQuery ? 'Prueba con otro nombre' : 'Sé de los primeros en unirte'}/>
+              <EmptyFeed Icon={Search} title={peopleQuery ? t('common.noResults') : t('explore.empty.noTravelersTitle')}
+                subtitle={peopleQuery ? t('explore.empty.tryOtherName') : t('explore.empty.beFirst')}/>
             ) : (
               <div className="space-y-3">
                 {filteredProfiles.map(profile => (

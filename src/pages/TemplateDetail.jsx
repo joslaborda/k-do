@@ -3,17 +3,18 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Settings, MapPin, Calendar, DollarSign, CheckSquare } from 'lucide-react';
+import { Users, MapPin, Calendar, Map, FileText, Wallet, Compass } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { format, differenceInDays } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getTripCoverImage } from '@/lib/tripImage';
-import ActiveCitySelector from '@/components/trip/ActiveCitySelector';
 import { useTripContext } from '@/hooks/useTripContext';
+import { getCountryLabel } from '@/lib/countryConfig';
 
 export default function TripDetail() {
+  const { t, i18n } = useTranslation();
   const [tripId, setTripId] = useState(null);
   const { user } = useAuth();
 
@@ -74,7 +75,7 @@ export default function TripDetail() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="mb-4 flex justify-center"><PlaneIcon size={48} color="#c2410c" /></div>
-          <p className="text-muted-foreground">Cargando viaje...</p>
+          <p className="text-muted-foreground">{t('trip.loadingTrip')}</p>
         </div>
       </div>
     );
@@ -97,7 +98,7 @@ export default function TripDetail() {
           <div>
             <h1 className="text-3xl font-bold text-white mb-1">{trip.name}</h1>
             <div className="flex flex-wrap gap-3 text-white/80 text-sm">
-              <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}, {trip.country}</span>
+              <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{trip.destination}, {getCountryLabel(trip.country, i18n.language)}</span>
               {trip.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
@@ -117,41 +118,41 @@ export default function TripDetail() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 overflow-hidden">
           <Link to={createPageUrl(`Cities?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🗺️</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Ruta</h3>
-              <p className="text-xs text-muted-foreground">Ciudades e itinerario</p>
+              <Map className="w-9 h-9 mb-3 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <h3 className="text-base font-bold text-foreground mb-1">{t('tabs.route')}</h3>
+              <p className="text-xs text-muted-foreground">{t('trip.nav.routeSub')}</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Documents?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform"><Calendar size={20} className="text-muted-foreground" /></div>
-              <h3 className="text-base font-bold text-foreground mb-1">Docs</h3>
-              <p className="text-xs text-muted-foreground">Documentos y checklist</p>
+              <FileText className="w-9 h-9 mb-3 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <h3 className="text-base font-bold text-foreground mb-1">{t('trip.nav.docs')}</h3>
+              <p className="text-xs text-muted-foreground">{t('trip.nav.docsSub')}</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Restaurants?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">📍</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Spots</h3>
-              <p className="text-xs text-muted-foreground">Lugares que visitar</p>
+              <MapPin className="w-9 h-9 mb-3 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <h3 className="text-base font-bold text-foreground mb-1">{t('spots.title')}</h3>
+              <p className="text-xs text-muted-foreground">{t('trip.nav.spotsSub')}</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Expenses?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">💰</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Gastos</h3>
-              <p className="text-xs text-muted-foreground">Gestión de gastos</p>
+              <Wallet className="w-9 h-9 mb-3 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <h3 className="text-base font-bold text-foreground mb-1">{t('tabs.expenses')}</h3>
+              <p className="text-xs text-muted-foreground">{t('trip.nav.expensesSub')}</p>
             </div>
           </Link>
 
           <Link to={createPageUrl(`Utilities?trip_id=${tripId}`)}>
             <div className="glass border-2 border-border rounded-2xl p-5 hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🔧</div>
-              <h3 className="text-base font-bold text-foreground mb-1">Útil</h3>
-              <p className="text-xs text-muted-foreground">Info útil y clima</p>
+              <Compass className="w-9 h-9 mb-3 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
+              <h3 className="text-base font-bold text-foreground mb-1">{t('trip.nav.useful')}</h3>
+              <p className="text-xs text-muted-foreground">{t('trip.nav.usefulSub')}</p>
             </div>
           </Link>
 

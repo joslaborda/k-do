@@ -1,19 +1,14 @@
-import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef} from 'react';
-import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, ExternalLink, Loader2, X, Minus, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryLabel } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getCountryRequirements, SKIP_VACCINES } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
-import { useTripContext } from '@/hooks/useTripContext';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 
@@ -21,18 +16,19 @@ import { useTranslation } from 'react-i18next';
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 const PACKING_CATEGORIES = [
-  { value:'personal',   label:'Personal',   Icon: User },
-  { value:'ropa',       label:'Ropa',       Icon: Shirt },
-  { value:'neceser',    label:'Néceres',    Icon: Droplets },
-  { value:'tecnologia', label:'Tecnología', Icon: Smartphone },
-  { value:'medicinas',  label:'Medicinas',  Icon: Pill },
-  { value:'otros',      label:'Otros',      Icon: MoreHorizontal },
+  { value:'personal',   tk:'utilities.packing.cat.personal',   Icon: User },
+  { value:'ropa',       tk:'utilities.packing.cat.ropa',       Icon: Shirt },
+  { value:'neceser',    tk:'utilities.packing.cat.neceser',    Icon: Droplets },
+  { value:'tecnologia', tk:'utilities.packing.cat.tecnologia', Icon: Smartphone },
+  { value:'medicinas',  tk:'utilities.packing.cat.medicinas',  Icon: Pill },
+  { value:'otros',      tk:'utilities.packing.cat.otros',      Icon: MoreHorizontal },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Add packing item sheet
 // ─────────────────────────────────────────────────────────────────────────────
 function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, saving }) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [category, setCategory] = useState(defaultCategory);
   const [essential, setEssential] = useState(false);
@@ -51,19 +47,19 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
     <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={onClose}>
       <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-4" onClick={e => e.stopPropagation()}>
         <div className="w-9 h-1 bg-border rounded-full mx-auto" />
-        <p className="text-sm font-medium text-foreground">Nuevo artículo</p>
-        <input autoFocus aria-label="Nombre del artículo" placeholder="Nombre del artículo..." value={name}
+        <p className="text-sm font-medium text-foreground">{t('utilities.packing.newItem')}</p>
+        <input autoFocus aria-label={t('utilities.packing.itemNameAria')} placeholder={t('utilities.packing.itemNamePlaceholder')} value={name}
           onChange={e => setName(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSave()}
           className="w-full px-4 py-3 rounded-2xl border border-border bg-secondary text-sm text-foreground placeholder:text-muted-foreground outline-none" />
         <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">Categoría</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">{t('utilities.packing.category')}</p>
           <div className="grid grid-cols-2 gap-2">
             {PACKING_CATEGORIES.map(cat => (
               <button key={cat.value} onClick={() => setCategory(cat.value)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${category === cat.value ? 'border-primary bg-orange-50' : 'border-border'}`}>
                 <cat.Icon size={14} color={category === cat.value ? 'hsl(var(--primary))' : '#888'} />
-                <span className={`text-xs font-medium ${category === cat.value ? 'text-primary' : 'text-muted-foreground'}`}>{cat.label}</span>
+                <span className={`text-xs font-medium ${category === cat.value ? 'text-primary' : 'text-muted-foreground'}`}>{t(cat.tk)}</span>
               </button>
             ))}
           </div>
@@ -73,13 +69,13 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
           <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${essential ? 'border-primary bg-primary' : 'border-border'}`}>
             {essential && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
           </div>
-          <span className={`text-sm ${essential ? 'text-primary font-medium' : 'text-muted-foreground'}`}>Marcar como esencial</span>
+          <span className={`text-sm ${essential ? 'text-primary font-medium' : 'text-muted-foreground'}`}>{t('utilities.packing.markEssential')}</span>
         </button>
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">Cancelar</button>
+          <button onClick={onClose} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">{t('common.cancel')}</button>
           <button onClick={handleSave} disabled={!name.trim() || saving}
             className="flex-[2] py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
-            {saving ? 'Añadiendo...' : 'Añadir'}
+            {saving ? t('utilities.packing.adding') : t('utilities.packing.add')}
           </button>
         </div>
       </div>
@@ -120,21 +116,21 @@ function PlugIcon({ type }) {
 }
 
 function RequirementsTab({ reqs, country, homeCountry, meta }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showAllVaccines, setShowAllVaccines] = useState(false);
 
   if (!country) return (
     <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
       <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
-      <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
+      <p className="text-sm text-muted-foreground">{t('utilities.noDestination')}</p>
     </div>
   );
 
   if (!reqs) return (
     <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
       <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
-      <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
-      <p className="text-xs text-muted-foreground">Consulta el consulado o embajada de tu país</p>
+      <p className="text-sm font-medium text-foreground mb-1">{t('utilities.noDataFor', { country: getCountryLabel(country, i18n.language) })}</p>
+      <p className="text-xs text-muted-foreground">{t('utilities.reqs.checkConsulate')}</p>
     </div>
   );
 
@@ -147,7 +143,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
   // Determinar estado del visado usando nuevo campo type/label
   const visaNeeded = visa.needed;
   const visaType = visa.type;
-  const visaLabel = visa.label || (visaNeeded === false ? t('pretrip.visaFree') : visaNeeded === true ? t('pretrip.visaRequired') : 'Verificar con consulado');
+  const visaLabel = visa.label || (visaNeeded === false ? t('pretrip.visaFree') : visaNeeded === true ? t('pretrip.visaRequired') : t('utilities.reqs.verifyConsulate'));
 
   let visaColor, visaIcon;
   if (visaNeeded === false) {
@@ -179,7 +175,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-muted-foreground">Requisitos para viajar a <span className="font-medium text-foreground">{country}</span> con pasaporte de <span className="font-medium text-foreground">{homeCountry}</span></p>
+      <p className="text-xs text-muted-foreground">{t('utilities.reqs.intro1')} <span className="font-medium text-foreground">{getCountryLabel(country, i18n.language)}</span> {t('utilities.reqs.intro2')} <span className="font-medium text-foreground">{getCountryLabel(homeCountry, i18n.language)}</span></p>
 
       {/* Visado */}
       <div className={`bg-card rounded-2xl border p-4 ${visaColor}`}>
@@ -190,13 +186,13 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
             {visa.info && <p className="text-xs text-muted-foreground mt-0.5">{visa.info}</p>}
             {visaType && visaType !== 'esta' && visaType !== 'nzeta' && (
               <p className="text-xs font-medium text-amber-700 mt-1">
-                {visaType === 'evisa' && 'Tramitar online antes de viajar'}
-                {visaType === 'voa' && 'Se obtiene a la llegada en el aeropuerto'}
-                {visaType === 'eta' && 'Autorización electrónica — tramitar online'}
+                {visaType === 'evisa' && t('utilities.reqs.visa.evisa')}
+                {visaType === 'voa' && t('utilities.reqs.visa.voa')}
+                {visaType === 'eta' && t('utilities.reqs.visa.eta')}
               </p>
             )}
-            {visaType === 'esta' && <p className="text-xs font-medium text-amber-700 mt-1">Tramitar ESTA en esta.cbp.dhs.gov</p>}
-            {visaType === 'nzeta' && <p className="text-xs font-medium text-amber-700 mt-1">Tramitar NZeTA en nzeta.immigration.govt.nz</p>}
+            {visaType === 'esta' && <p className="text-xs font-medium text-amber-700 mt-1">{t('utilities.reqs.visa.esta')}</p>}
+            {visaType === 'nzeta' && <p className="text-xs font-medium text-amber-700 mt-1">{t('utilities.reqs.visa.nzeta')}</p>}
           </div>
         </div>
       </div>
@@ -205,20 +201,20 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
       <div className="bg-card rounded-2xl border border-border p-4">
         <div className="flex items-center gap-2 mb-3">
           <Zap className="w-4 h-4 text-muted-foreground" />
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Enchufe y voltaje</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('utilities.reqs.plugTitle')}</p>
         </div>
         {needsAdapter ? (
           <>
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              {destPlugs.length > 0 ? destPlugs.map(p => <PlugIcon key={p} type={p} />) : <span className="text-sm text-foreground">{adapter.type || 'Varios tipos'}</span>}
-              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium border border-red-100">Adaptador necesario</span>
+              {destPlugs.length > 0 ? destPlugs.map(p => <PlugIcon key={p} type={p} />) : <span className="text-sm text-foreground">{adapter.type || t('utilities.reqs.variousTypes')}</span>}
+              <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium border border-red-100">{t('utilities.reqs.adapterNeeded')}</span>
             </div>
             <p className="text-xs text-muted-foreground">{adapter.info}</p>
           </>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium border border-green-100">Compatible</span>
-            <p className="text-xs text-muted-foreground">{adapter.info || 'Sin adaptador necesario'}</p>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium border border-green-100">{t('utilities.reqs.compatible')}</span>
+            <p className="text-xs text-muted-foreground">{adapter.info || t('utilities.reqs.noAdapter')}</p>
           </div>
         )}
       </div>
@@ -232,7 +228,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
           </div>
           {requiredVax.length > 0 && (
             <div className="px-4 py-3 border-b border-border">
-              <p className="text-xs font-medium text-red-600 mb-2">Obligatorias para entrada</p>
+              <p className="text-xs font-medium text-red-600 mb-2">{t('utilities.reqs.vaxRequired')}</p>
               {requiredVax.map((v, i) => (
                 <div key={i} className="flex items-center gap-2 mb-1.5">
                   <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
@@ -243,7 +239,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
           )}
           {recommendedVax.length > 0 && (
             <div className="px-4 py-3">
-              <p className="text-xs font-medium text-amber-600 mb-2">Recomendadas</p>
+              <p className="text-xs font-medium text-amber-600 mb-2">{t('utilities.reqs.vaxRecommended')}</p>
               {(showAllVaccines ? recommendedVax : recommendedVax.slice(0, 3)).map((v, i) => (
                 <div key={i} className="flex items-start gap-2 mb-1.5">
                   <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
@@ -255,7 +251,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
               ))}
               {recommendedVax.length > 3 && (
                 <button onClick={() => setShowAllVaccines(v => !v)} className="text-xs text-primary font-medium flex items-center gap-1 mt-1">
-                  {showAllVaccines ? <><ChevronUp size={12} /> Ver menos</> : <><ChevronDown size={12} /> Ver {recommendedVax.length - 3} más</>}
+                  {showAllVaccines ? <><ChevronUp size={12} /> {t('utilities.reqs.seeLess')}</> : <><ChevronDown size={12} /> {t('utilities.reqs.seeMore', { count: recommendedVax.length - 3 })}</>}
                 </button>
               )}
             </div>
@@ -267,8 +263,8 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
         <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3">
           <Syringe className="w-4 h-4 text-green-600" />
           <div>
-            <p className="text-sm font-medium text-foreground">Sin vacunas requeridas</p>
-            <p className="text-xs text-muted-foreground">No hay requisitos de vacunación específicos para {country}</p>
+            <p className="text-sm font-medium text-foreground">{t('utilities.reqs.noVaxTitle')}</p>
+            <p className="text-xs text-muted-foreground">{t('utilities.reqs.noVaxHint', { country: getCountryLabel(country, i18n.language) })}</p>
           </div>
         </div>
       )}
@@ -278,7 +274,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
         <div className="bg-card rounded-2xl border border-border p-4">
           <div className="flex items-center gap-2 mb-2">
             <Coins className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Moneda</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('utilities.reqs.currency')}</p>
           </div>
           <p className="text-sm text-foreground">{currency.info}</p>
         </div>
@@ -289,7 +285,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
             <Info className="w-4 h-4 text-muted-foreground" />
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Consejos útiles</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('utilities.reqs.tips')}</p>
           </div>
           <div className="px-4 py-3 space-y-2">
             {tips.map((tip, i) => (
@@ -339,6 +335,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
 // Packing tab
 // ─────────────────────────────────────────────────────────────────────────────
 function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onExternalClose }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState({});
   const [adding, setAdding] = useState(null);
@@ -407,8 +404,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
 
   // Inner tab bar (Maleta / Souvenirs) — Ō style
   const innerTabs = [
-    { key: 'maleta', label: 'Maleta' },
-    ...(tripInProgress ? [{ key: 'souvenirs', label: 'Souvenirs' }] : []),
+    { key: 'maleta', label: t('utilities.packing.tabMaleta') },
+    ...(tripInProgress ? [{ key: 'souvenirs', label: t('utilities.packing.tabSouvenirs') }] : []),
   ];
 
   return (
@@ -427,8 +424,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                 }} />
                 <span style={{
                   fontSize: 13, fontWeight: 500,
-                  color: activeInnerTab === t.key ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
-                }}>{t.label}</span>
+                  color: activeInnerTab === tab.key ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)',
+                }}>{tab.label}</span>
               </button>
             ))}
           </div>
@@ -440,13 +437,13 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
         <>
           {totalItems === 0 ? (
             <div className="bg-card rounded-2xl border border-border text-center py-14 px-6">
-                            <p className="text-sm font-medium text-foreground mb-1">Maleta vacía</p>
+                            <p className="text-sm font-medium text-foreground mb-1">{t('utilities.packing.emptyTitle')}</p>
               <p className="text-xs text-muted-foreground mb-5">
-                Añade los artículos que vas a necesitar{country ? ` en ${country}` : ''}
+                {country ? t('utilities.packing.emptyHintCountry', { country }) : t('utilities.packing.emptyHint')}
               </p>
               <button onClick={() => setSheetOpen(true)}
                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
-                <Plus className="w-4 h-4" />Añadir artículo
+                <Plus className="w-4 h-4" />{t('utilities.packing.addItem')}
               </button>
             </div>
           ) : (
@@ -454,14 +451,14 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
               {/* Progress */}
               <div className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-foreground">Progreso total</p>
+                  <p className="text-sm font-medium text-foreground">{t('utilities.packing.totalProgress')}</p>
                   <p className={`text-sm font-medium ${progress === 100 ? 'text-green-700' : 'text-primary'}`}>{progress}%</p>
                 </div>
                 <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-1.5">
                   <div className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? 'bg-green-600' : 'bg-primary'}`}
                     style={{ width: `${progress}%` }} />
                 </div>
-                <p className="text-xs text-muted-foreground">{packedCount} de {totalItems} artículos listos</p>
+                <p className="text-xs text-muted-foreground">{t('utilities.packing.itemsReady', { packed: packedCount, total: totalItems })}</p>
               </div>
 
               {/* Categories */}
@@ -480,10 +477,10 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/20 transition-colors">
                       <div className="flex items-center gap-2">
                         <cat.Icon size={15} color="#888" />
-                        <span className="text-sm font-medium text-foreground">{cat.label}</span>
+                        <span className="text-sm font-medium text-foreground">{t(cat.tk)}</span>
                         {essentialCount > 0 && (
                           <span className="text-xs font-medium text-primary bg-orange-50 px-1.5 py-0.5 rounded-full">
-                            {essentialCount} esencial{essentialCount > 1 ? 'es' : ''}
+                            {t('utilities.packing.essentialCount', { count: essentialCount })}
                           </span>
                         )}
                         {allDone && catItems.length > 0 && (
@@ -502,7 +499,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                     {!isCollapsed && (
                       <>
                         {catItems.length === 0 && !isAddingHere && (
-                          <p className="text-xs text-muted-foreground text-center py-4 border-t border-border">Sin artículos</p>
+                          <p className="text-xs text-muted-foreground text-center py-4 border-t border-border">{t('utilities.packing.noItems')}</p>
                         )}
                         {catItems.map(item => (
                           <div key={item.id}
@@ -532,12 +529,12 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                               value={newName}
                               onChange={e => setNewName(e.target.value)}
                               onKeyDown={e => { if (e.key === 'Enter') commitAdd(); if (e.key === 'Escape') setAdding(null); }}
-                              placeholder="Nombre del artículo..."
+                              placeholder={t('utilities.packing.itemNamePlaceholder')}
                               className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
                             />
                             <button onClick={() => setNewEssential(v => !v)}
                               className={`text-xs px-2 py-1 rounded-lg border transition-colors ${newEssential ? 'bg-orange-50 border-primary text-primary' : 'border-border text-muted-foreground'}`}>
-                              esencial
+                              {t('utilities.packing.essential')}
                             </button>
                             <button onClick={commitAdd}
                               className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
@@ -561,11 +558,11 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {souvenirItems.length === 0 && adding !== 'souvenir' && (
               <div className="text-center py-12 px-6">
-                                <p className="text-sm font-medium text-foreground mb-1">Lista vacía</p>
-                <p className="text-xs text-muted-foreground mb-5">Anota lo que quieres comprar en el viaje</p>
+                                <p className="text-sm font-medium text-foreground mb-1">{t('utilities.packing.souvEmptyTitle')}</p>
+                <p className="text-xs text-muted-foreground mb-5">{t('utilities.packing.souvEmptyHint')}</p>
                 <button onClick={() => openAdding('souvenir')}
                   className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-white text-sm rounded-full font-medium hover:bg-primary/90 transition-colors">
-                  <Plus className="w-4 h-4" />Añadir
+                  <Plus className="w-4 h-4" />{t('utilities.packing.add')}
                 </button>
               </div>
             )}
@@ -594,7 +591,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') commitAdd(); if (e.key === 'Escape') setAdding(null); }}
-                  placeholder="¿Qué quieres comprar?"
+                  placeholder={t('utilities.packing.souvPlaceholder')}
                   className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
                 />
                 <button onClick={commitAdd}
@@ -605,7 +602,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
             ) : souvenirItems.length > 0 ? (
               <button onClick={() => openAdding('souvenir')}
                 className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-border text-xs text-primary font-medium hover:bg-orange-50/50 transition-colors">
-                <Plus className="w-3.5 h-3.5" />Añadir
+                <Plus className="w-3.5 h-3.5" />{t('utilities.packing.add')}
               </button>
             ) : null}
           </div>
@@ -630,6 +627,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
 function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
 
@@ -646,10 +644,10 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
   // loading/data handled inline below
 
   const numbers = data ? [
-    data.police && { label:'Policía', number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50' },
-    data.ambulance && data.ambulance !== data.police && { label:'Ambulancia', number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50' },
-    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:'Bomberos', number:data.fire, Icon: Flame, color: 'text-primary', bg: 'bg-orange-50' },
-    data.emergency_general && !data.police && { label:'General', number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50' },
+    data.police && { label:t('utilities.emerg.police'), number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50' },
+    data.ambulance && data.ambulance !== data.police && { label:t('utilities.emerg.ambulance'), number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50' },
+    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:t('utilities.emerg.fire'), number:data.fire, Icon: Flame, color: 'text-primary', bg: 'bg-orange-50' },
+    data.emergency_general && !data.police && { label:t('utilities.emerg.general'), number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50' },
   ].filter(Boolean) : [];
 
   return (
@@ -658,14 +656,14 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
       {loading && country && (
         <div className="text-center py-12">
           <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Cargando...</p>
+          <p className="text-sm text-muted-foreground">{t('utilities.loading')}</p>
         </div>
       )}
       {!loading && country && !data && (
         <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
           <AlertTriangle className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
-          <p className="text-sm font-medium text-foreground mb-1">Sin datos para {country}</p>
-          <p className="text-xs text-muted-foreground">Aún no tenemos información de emergencias para este país</p>
+          <p className="text-sm font-medium text-foreground mb-1">{t('utilities.noDataFor', { country: getCountryLabel(country, i18n.language) })}</p>
+          <p className="text-xs text-muted-foreground">{t('utilities.emerg.noInfo')}</p>
         </div>
       )}
       {/* Emergency numbers */}
@@ -673,7 +671,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Emergencias · {meta.flag} {country}
+              {t('utilities.emerg.header', { flag: meta.flag, country: getCountryLabel(country, i18n.language) })}
             </p>
           </div>
           {numbers.map((n, i) => (
@@ -700,7 +698,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           : data.embassy;
         return (
           <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Embajada de {homeCountry} en {country}</p></div>
+            <div className="flex items-center gap-2 mb-1"><Landmark className="w-4 h-4 text-muted-foreground" /><p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('utilities.emerg.embassyOf', { home: getCountryLabel(homeCountry, i18n.language), country: getCountryLabel(country, i18n.language) })}</p></div>
             {emb.name && <p className="text-sm font-semibold text-foreground">{emb.name}</p>}
             {emb.address && (
               <div className="flex items-start gap-2">
@@ -718,7 +716,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
               <a href={`tel:${emb.emergency_phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
                 <div>
-                  <p className="text-label text-muted-foreground">Emergencias 24h</p>
+                  <p className="text-label text-muted-foreground">{t('utilities.emerg.emergency24h')}</p>
                   <p className="text-sm font-bold text-primary">{emb.emergency_phone}</p>
                 </div>
               </a>
@@ -738,7 +736,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
             {emb.web && (
               <a href={emb.web} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <ExternalLink className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm text-primary font-medium">Sitio web oficial</span>
+                <span className="text-sm text-primary font-medium">{t('utilities.emerg.officialSite')}</span>
               </a>
             )}
           </div>
@@ -776,11 +774,11 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
         return (
           <div className="bg-card rounded-2xl border border-border p-4 text-center">
             <Landmark className="w-7 h-7 mx-auto mb-2 text-muted-foreground/40" />
-            <p className="text-sm font-medium text-foreground mb-1">Sin datos de embajada</p>
-            <p className="text-xs text-muted-foreground mb-3">No tenemos todavía los datos de la embajada de {homeCountry} en {country}.</p>
+            <p className="text-sm font-medium text-foreground mb-1">{t('utilities.emerg.noEmbassyTitle')}</p>
+            <p className="text-xs text-muted-foreground mb-3">{t('utilities.emerg.noEmbassyHint', { home: getCountryLabel(homeCountry, i18n.language), country: getCountryLabel(country, i18n.language) })}</p>
             <a href={link} target="_blank" rel="noopener noreferrer"
               className="text-xs text-primary font-medium">
-              Buscar en web oficial de tu país →
+              {t('utilities.emerg.searchOfficial')}
             </a>
           </div>
         );
@@ -790,7 +788,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
       {!loading && data?.useful_apps?.length > 0 && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Apps útiles en {country}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('utilities.emerg.usefulApps', { country: getCountryLabel(country, i18n.language) })}</p>
           </div>
           {data.useful_apps.map((app, i) => (
             <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0">
@@ -858,7 +856,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
       {!loading && data?.safety_tips?.length > 0 && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Consejos de seguridad</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('utilities.emerg.safetyTips')}</p>
           </div>
           <div className="px-4 py-3 space-y-2.5">
             {data.safety_tips.map((tip, i) => (
@@ -919,9 +917,9 @@ export default function Utilities() {
     : false;
 
   const tabs = [
-    { key: 'tiempo',      label: 'Clima' },
+    { key: 'tiempo',      label: t('utilities.weather') },
     { key: 'emergencias', label: t('utilities.emergency') },
-    { key: 'maleta',      label: 'Maleta' },
+    { key: 'maleta',      label: t('utilities.packing.tabMaleta') },
   ];
   
   // Requisitos del país activo
@@ -932,11 +930,11 @@ export default function Utilities() {
       <div className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="px-4 pt-12 pb-0">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-semibold text-foreground">Utilidades</h1>
+            <h1 className="text-xl font-semibold text-foreground">{t('utilities.title')}</h1>
             {activeTab === 'maleta' && (
               <button onClick={() => setPackingSheetOpen(true)}
                 className="flex items-center gap-1.5 text-primary text-sm font-medium">
-                <Plus className="w-4 h-4" /> Artículo
+                <Plus className="w-4 h-4" /> {t('utilities.packing.itemShort')}
               </button>
             )}
           </div>
@@ -969,7 +967,7 @@ export default function Utilities() {
               <WeatherCard city={trip?.name || country} tripCountry={country} />
             ) : (
               <div className="bg-card rounded-2xl border border-border text-center py-10 px-6">
-                <p className="text-sm text-muted-foreground">Sin destino asignado al viaje</p>
+                <p className="text-sm text-muted-foreground">{t('utilities.noDestination')}</p>
               </div>
             )}
           </div>

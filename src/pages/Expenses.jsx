@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowRight, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
+import { Plus, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -139,7 +139,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
 
 // ── Tab: Gastos ───────────────────────────────────────────────────────────────
 function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, currentUserEmail }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [catFilter, setCatFilter] = useState('all');
 
   const filtered = catFilter === 'all' ? expenses : expenses.filter(e => e.category === catFilter);
@@ -252,7 +252,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16">
         <Scale className="w-8 h-8 mx-auto mb-3 opacity-25" />
-        <p className="text-sm font-medium text-foreground mb-1">Sin datos aún</p>
+        <p className="text-sm font-medium text-foreground mb-1">{t('expenses.noDataYet')}</p>
         <p className="text-xs text-muted-foreground">{t('expenses.addToSeeBalances')}</p>
       </div>
     );
@@ -372,7 +372,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
               );
             })}
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">Ellos verán el botón t('expenses.balance.settle') en su vista</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">{t('expenses.balance.theyWillSee', { button: t('expenses.balance.settle') })}</p>
         </div>
       )}
 
@@ -516,7 +516,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16">
         <BarChart2 className="w-8 h-8 mx-auto mb-3 opacity-25" />
-        <p className="text-sm font-medium text-foreground mb-1">Sin estadísticas</p>
+        <p className="text-sm font-medium text-foreground mb-1">{t('expenses.stats.empty')}</p>
         <p className="text-xs text-muted-foreground">{t('expenses.addToSeeStats')}</p>
       </div>
     );
@@ -528,11 +528,11 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('expenses.myExpense')}</p>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs text-muted-foreground mb-1">Total mío</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('expenses.stats.myTotal')}</p>
           <p className="text-xl font-medium text-foreground">{fmtAmt(mySpend, baseCurrency)} {s}</p>
         </div>
         <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs text-muted-foreground mb-1">Media/día</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('expenses.stats.perDay')}</p>
           <p className="text-xl font-medium text-foreground">{fmtAmt(myPerDay, baseCurrency)} {s}</p>
         </div>
       </div>
@@ -564,10 +564,10 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       )}
 
       {/* Grupo — curiosidad */}
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Grupo (total)</p>
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('expenses.stats.groupTotal')}</p>
       <div className="bg-card rounded-2xl border border-border p-4">
         <div className="flex justify-between items-center mb-3">
-          <span className="text-xs text-muted-foreground">Total grupo</span>
+          <span className="text-xs text-muted-foreground">{t('expenses.stats.groupSum')}</span>
           <span className="text-sm font-medium text-foreground">{fmtAmt(totalGroup, baseCurrency)} {s}</span>
         </div>
         <div className="space-y-2.5">
@@ -594,7 +594,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
 
       {byCity.length > 1 && (
         <div className="bg-card rounded-2xl border border-border p-4">
-          <p className="text-xs text-muted-foreground mb-3">Por ciudad</p>
+          <p className="text-xs text-muted-foreground mb-3">{t('expenses.stats.byCity')}</p>
           <div className="space-y-2">
             {byCity.map(([city, amt]) => (
               <div key={city} className="flex items-center justify-between py-1">
@@ -633,7 +633,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
                 <p className="text-xs text-muted-foreground">{tc.label}{expense.date ? ' · ' + expense.date : ''}</p>
               </div>
             </div>
-            <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+            <button onClick={onClose} aria-label={t('common.close')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
@@ -671,7 +671,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
             {/* Fotos */}
             {expense.receipt_photos?.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Recibos</p>
+                <p className="text-xs text-muted-foreground mb-2">{t('expenses.receipts')}</p>
                 <div className="flex gap-2">
                   {expense.receipt_photos.map((url, i) => (
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer">
@@ -690,7 +690,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
             </button>
           </div>
           <div className="flex gap-3 px-5 pb-5 pt-2">
-            <button onClick={onClose} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">Cerrar</button>
+            <button onClick={onClose} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">{t('common.close')}</button>
             <button onClick={() => { onClose(); onEdit(expense); }}
               className="flex-1 py-2.5 bg-primary text-white rounded-full text-sm font-medium">
               Editar
@@ -711,7 +711,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
             <p className="text-xs text-muted-foreground mb-5 ml-11">{expense.description} — Se eliminará permanentemente.</p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
-              <button onClick={() => { setConfirmDelete(false); onDelete(expense); }} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">Eliminar</button>
+              <button onClick={() => { setConfirmDelete(false); onDelete(expense); }} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
             </div>
           </div>
         </div>
@@ -731,7 +731,7 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
           <div className="flex items-center justify-between">
             <p className="text-base font-medium text-foreground">{editingExpense ? t('expenses.editExpense') : t('expenses.addExpense')}</p>
-            <button onClick={onClose} aria-label="Cerrar" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+            <button onClick={onClose} aria-label={t('common.close')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
@@ -822,7 +822,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
     <div className="space-y-3">
       {/* Amount + from currency */}
       <div className="bg-card rounded-2xl border border-border p-4">
-        <p className="text-xs text-muted-foreground mb-2">Convertir desde</p>
+        <p className="text-xs text-muted-foreground mb-2">{t('expenses.convertFrom')}</p>
         <div className="flex items-center gap-2">
           <select
             value={fromCurrency}
@@ -867,7 +867,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
                   <span className="text-sm font-medium text-muted-foreground">{getCountryMeta(currency)?.flag || currency}</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{currency}</p>
-                    {isActive && <p className="text-xs text-primary font-medium">Ciudad actual</p>}
+                    {isActive && <p className="text-xs text-primary font-medium">{t('expenses.currentCity')}</p>}
                     {rate && <p className="text-xs text-muted-foreground">1 {fromCurrency} = {rate.toFixed(4)} {currency}</p>}
                   </div>
                 </div>
@@ -1018,7 +1018,7 @@ export default function Expenses() {
 
   const createMutation = useMutation({
     mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount) }),
-    onError: () => toast({ title: 'Error al guardar', description: 'Inténtalo de nuevo.', variant: 'destructive' }),
+    onError: () => toast({ title: t('expenses.saveError'), description: t('common.tryAgain'), variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setSheetOpen(false); setEditingExpense(null);

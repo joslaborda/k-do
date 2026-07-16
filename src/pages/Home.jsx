@@ -11,7 +11,6 @@ import { ArrowRight, Calendar, MapPin, Settings } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
-import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -230,7 +229,7 @@ export default function Home() {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4"><PlaneIcon className="w-7 h-7 text-muted-foreground/50" /></div>
-        <p className="text-muted-foreground">Cargando viaje...</p>
+        <p className="text-muted-foreground">{t('trip.loadingTrip')}</p>
       </div>
     </div>
   );
@@ -251,7 +250,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <NotificationBell userId={currentUserId} userEmail={currentUserEmail} currentTripId={tripId} />
               <button onClick={() => setSettingsOpen(true)}
-                aria-label="Configuración del viaje"
+                aria-label={t('trip.settingsAria')}
                 className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-secondary/60 transition-colors">
                 <Settings className="w-5 h-5 text-foreground" />
               </button>

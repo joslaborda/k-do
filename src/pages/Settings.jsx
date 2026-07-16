@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import DarkModeToggle from '@/components/DarkModeToggle';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Loader2, Camera, Check } from 'lucide-react';
+import { Loader2, Camera } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 
@@ -17,9 +17,10 @@ function LanguageSwitcher() {
   const current = getLanguage();
 
   const handleChange = (lang) => {
+    // i18n.changeLanguage() ya es reactivo: react-i18next re-renderiza los
+    // componentes que usan t(). No hace falta recargar (en Capacitor un reload
+    // deja la pantalla en blanco y pierde el estado de navegación).
     setLanguage(lang);
-    // Force re-render
-    window.location.reload();
   };
 
   return (
@@ -54,52 +55,9 @@ function LanguageSwitcher() {
 // Data
 // ─────────────────────────────────────────────────────────────────────────────
 // Build full country list from countryConfig KNOWN_META
-function buildCountryList() {
-  const { KNOWN_META_KEYS } = (() => {
-    try {
-      // Get all country names from countryConfig via getCountryMeta
-      // We inline the key list here for reliability
-      return { KNOWN_META_KEYS: true };
-    } catch { return { KNOWN_META_KEYS: false }; }
-  })();
-  return null; // replaced below
-}
-
-const COUNTRIES = [
-  'España','México','Colombia','Argentina','Perú','Chile','Venezuela','Ecuador','Bolivia',
-  'Paraguay','Uruguay','Costa Rica','Guatemala','Honduras','El Salvador','Nicaragua','Panamá',
-  'Cuba','República Dominicana','Haití','Puerto Rico','Belice','Guyana','Surinam','Guyana Francesa',
-  'Francia','Italia','Alemania','Portugal','Reino Unido','Países Bajos','Bélgica','Suiza',
-  'Austria','Grecia','Turquía','Polonia','República Checa','Hungría','Rumanía','Bulgaria',
-  'Croacia','Serbia','Eslovenia','Eslovaquia','Noruega','Suecia','Dinamarca','Finlandia',
-  'Irlanda','Islandia','Estonia','Letonia','Lituania','Ucrania','Bielorrusia','Moldavia',
-  'Albania','Bosnia','Kosovo','Montenegro','Macedonia','Liechtenstein','Andorra','Mónaco',
-  'San Marino','Ciudad del Vaticano','Malta','Chipre','Luxemburgo','Gibraltar',
-  'Japón','China','Corea del Sur','India','Tailandia','Vietnam','Indonesia','Filipinas',
-  'Singapur','Malasia','Camboya','Myanmar','Laos','Nepal','Sri Lanka','Bangladesh',
-  'Pakistán','Afganistán','Uzbekistán','Kazajistán','Kirguistán','Tayikistán','Turkmenistán',
-  'Mongolia','Hong Kong','Macao','Taiwan',
-  'Emiratos Árabes Unidos','Arabia Saudí','Qatar','Kuwait','Omán','Bahréin','Jordania',
-  'Israel','Palestina','Líbano','Siria','Irak','Irán','Yemén',
-  'Turquía','Azerbaiyán','Armenia','Georgia',
-  'Marruecos','Egipto','Túnez','Argelia','Libia','Sudán','Etiopía','Kenia','Tanzania',
-  'Uganda','Ruanda','Nigeria','Ghana','Senegal','Costa de Marfil','Camerún','Angola',
-  'Mozambique','Zambia','Zimbabue','Botswana','Namibia','Sudáfrica','Madagascar','Mauricio',
-  'Seychelles','Cabo Verde','Eritrea','Somalia','Yibuti','Malawi','Esuatini','Lesoto',
-  'Gabón','Congo','República Democrática del Congo','República Centroafricana','Chad',
-  'Malí','Burkina Faso','Níger','Guinea','Sierra Leona','Liberia','Guinea Ecuatorial',
-  'Australia','Nueva Zelanda','Papúa Nueva Guinea','Fiyi','Samoa','Tonga','Vanuatu',
-  'Islas Salomón','Micronesia','Palaos','Kiribati','Tuvalu','Nauru','Islas Marshall',
-  'Polinesia Francesa','Nueva Caledonia','Guam','Islas Cook',
-  'Canadá','Estados Unidos',
-  'Saint-Martin','Sint Maarten','Martinica','Guadalupe','Aruba','Curazao','Bermudas',
-  'Islas Caimán','Jamaica','Barbados','Trinidad y Tobago','Bahamas','Santa Lucía',
-  'Antigua y Barbuda','Granada','Dominica','San Cristóbal y Nieves',
-].map(function(n) {
-  var name = String(n);
-  var m = getCountryMeta(name) || {};
-  return { name: name, flag: m.flag || '🌍', currency: m.currency || 'USD' };
-}).sort(function(a, b) { return String(a.name).localeCompare(String(b.name), 'es'); });
+// La lista de países se construye desde countryConfig en el idioma activo:
+// `name` es el canónico español (lo que se guarda en BD) y `label` el nombre
+// traducido (lo que ve el usuario). Ver buildCountries() dentro de Settings.
 
 const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','GBP','JPY','BRL','PEN','CHF','AUD','CAD'].map(name => {
   const meta = getCountryMeta(name);
@@ -228,7 +186,12 @@ function DeleteAccountRow() {
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Settings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // value = canónico español (se guarda), label = traducido (se muestra)
+  const COUNTRIES = useMemo(() => getOriginCountryOptions(i18n.language).map(o => {
+    const m = getCountryMeta(o.value) || {};
+    return { name: o.value, label: o.label, flag: m.flag || '🌍', currency: m.currency || 'USD' };
+  }), [i18n.language]);
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -423,11 +386,11 @@ export default function Settings() {
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
             <p className="text-xs text-muted-foreground mb-1.5">{t('settings.homeCountry')} <span className="text-muted-foreground/60">{t('settings.homeCountrySub')}</span></p>
-            <select value={homeCountry} onChange={e => {
+            <select value={normalizeCountry(homeCountry)} onChange={e => {
               const c = COUNTRIES.find(x => x.name === e.target.value) || COUNTRIES[0];
               setHomeCountry(c.name); setHomeCurrency(c.currency);
             }} className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary appearance-none">
-              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+              {COUNTRIES.map(c => <option key={c.name} value={c.name}>{c.label}</option>)}
             </select>
           </div>
           <div className="px-4 py-3 border-b border-border">
@@ -456,23 +419,22 @@ export default function Settings() {
                     {t('settings.noSecondNat')}
                   </button>
                   {COUNTRIES.filter(c => {
-                    const name = typeof c === 'string' ? c : c.name;
-                    return !secondNatQuery || name.toLowerCase().includes(secondNatQuery.toLowerCase());
-                  }).map(c => {
-                    const name = typeof c === 'string' ? c : c.name;
-                    return (
-                      <button key={name}
-                        className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary"
-                        onMouseDown={() => { setSecondNationality(name); setSecondNatQuery(''); setShowSecondNatList(false); }}>
-                        {name}
-                      </button>
-                    );
-                  })}
+                    if (!secondNatQuery) return true;
+                    const q = secondNatQuery.toLowerCase();
+                    // se busca por nombre traducido y por canónico español
+                    return c.label.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);
+                  }).map(c => (
+                    <button key={c.name}
+                      className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-secondary"
+                      onMouseDown={() => { setSecondNationality(c.name); setSecondNatQuery(''); setShowSecondNatList(false); }}>
+                      {c.label}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
             {secondNationality && (
-              <p className="text-xs text-muted-foreground mt-1.5">{t('settings.secondNatHint', { country: secondNationality })}</p>
+              <p className="text-xs text-muted-foreground mt-1.5">{t('settings.secondNatHint', { country: getCountryLabel(normalizeCountry(secondNationality), i18n.language) })}</p>
             )}
           </div>
           <div className="px-4 py-3">

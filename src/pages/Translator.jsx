@@ -1,7 +1,7 @@
 import { createPageUrl } from '@/utils';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowRightLeft, Copy, Check, Volume2, Loader2, AlertCircle, Camera } from 'lucide-react';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { ArrowRightLeft, Copy, Check, Volume2, Loader2, AlertCircle } from 'lucide-react';
+import { getCountryMeta, getLanguageLabel, getCountryLabel } from '@/lib/countryConfig';
 import { useTripContext } from '@/hooks/useTripContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -64,6 +64,7 @@ function speakText(text, bcpLang) {
 
 // ── Lang selector row ─────────────────────────────────────────────────────────
 function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
+  const { i18n } = useTranslation();
   return (
     <div className="flex items-center gap-2 py-1">
       <select
@@ -71,7 +72,7 @@ function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
         onChange={e => onFromChange(e.target.value)}
         className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-card outline-none focus:border-primary appearance-none"
       >
-        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
+        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {getLanguageLabel(l.code, i18n.language)}</option>)}
       </select>
       <button
         onClick={onSwap}
@@ -84,7 +85,7 @@ function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
         onChange={e => onToChange(e.target.value)}
         className="flex-1 h-10 border border-border rounded-xl px-3 text-sm bg-card outline-none focus:border-primary appearance-none"
       >
-        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.label}</option>)}
+        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {getLanguageLabel(l.code, i18n.language)}</option>)}
       </select>
     </div>
   );
@@ -332,7 +333,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
 
 // ── Texto tab ─────────────────────────────────────────────────────────────────
 function TextoTab({ fromLang, toLang, onSaveToHistory }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [input, setInput]       = useState('');
   const [result, setResult]     = useState({ original: '', translated: '' });
   const [loading, setLoading]   = useState(false);
@@ -357,9 +358,9 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
     <div className="space-y-4">
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="px-4 pt-3 pb-1">
-          <p className="text-xs text-muted-foreground mb-1.5">{fromL.flag} {fromL.label}</p>
+          <p className="text-xs text-muted-foreground mb-1.5">{fromL.flag} {getLanguageLabel(fromL.code, i18n.language)}</p>
           <textarea
-            placeholder={t('translator.texto.placeholder', { lang: fromL.label })}
+            placeholder={t('translator.texto.placeholder', { lang: getLanguageLabel(fromL.code, i18n.language) })}
             value={input}
             onChange={e => { setInput(e.target.value); setResult({ original: '', translated: '' }); setError(''); }}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); translate(); } }}
@@ -576,7 +577,7 @@ function TranslatorContent({ tripId, inPage = false }) {
             <div className="flex-1">
               <p className="text-sm font-medium text-green-900">{t('translator.sameLang.title')}</p>
               <p className="text-sm text-green-700 mt-1 leading-relaxed">
-                {t('translator.sameLang.body', { flag: meta.flag, country: countryRaw, language: meta.languageLabel })}
+                {t('translator.sameLang.body', { flag: meta.flag, country: getCountryLabel(countryRaw, i18n.language), language: getLanguageLabel(meta.languageCode, i18n.language) })}
               </p>
             </div>
             <button

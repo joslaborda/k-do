@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -11,9 +11,10 @@ import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { getCountryLabel } from '@/lib/countryConfig';
 
 export default function Invites() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ export default function Invites() {
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${invite.trip_id}`));
     } catch (e) {
-      toast({ title: 'Error', description: e.message || 'No se pudo aceptar la invitación', variant: 'destructive' });
+      toast({ title: t('common.error'), description: e.message || t('invites.page.acceptError'), variant: 'destructive' });
       setProcessing(false);
     }
   };
@@ -99,7 +100,7 @@ export default function Invites() {
       await declineTripInvite(invite.id, token);
       navigate(createPageUrl('TripsList'));
     } catch (e) {
-      toast({ title: 'Error', description: e.message || 'No se pudo rechazar', variant: 'destructive' });
+      toast({ title: t('common.error'), description: e.message || t('invites.page.rejectError'), variant: 'destructive' });
       setProcessing(false);
     }
   };
@@ -114,7 +115,7 @@ export default function Invites() {
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${inv.trip_id}`));
     } catch (e) {
-      toast({ title: 'Error', description: e.message || 'Error al aceptar', variant: 'destructive' });
+      toast({ title: t('common.error'), description: e.message || t('invites.page.acceptError2'), variant: 'destructive' });
       setProcessing(false);
     }
   };
@@ -144,13 +145,13 @@ export default function Invites() {
           <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
             <X className="w-7 h-7 text-red-500" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">Invitación inválida</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('invites.page.invalidTitle')}</h2>
           <p className="text-sm text-muted-foreground text-center">
-            Esta invitación ha expirado o ya fue usada.
+            {t('invites.page.invalidBody')}
           </p>
           <button onClick={() => navigate(createPageUrl('TripsList'))}
             className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
-            Ir a mis viajes
+            {t('invites.page.goToTrips')}
           </button>
         </div>
       );
@@ -166,13 +167,13 @@ export default function Invites() {
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
             <Check className="w-7 h-7 text-green-600" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">Ya eres miembro</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('invites.page.alreadyMemberTitle')}</h2>
           <p className="text-sm text-muted-foreground text-center">
-            Ya formas parte de <span className="font-medium text-foreground">{trip.name}</span>.
+            {t('invites.page.alreadyMemberBody1')} <span className="font-medium text-foreground">{trip.name}</span>.
           </p>
           <button onClick={() => navigate(createPageUrl('Home') + `?trip_id=${trip.id}`)}
             className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
-            Ir al viaje →
+            {t('invites.page.goToTrip')}
           </button>
         </div>
       );
@@ -188,13 +189,13 @@ export default function Invites() {
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
             <Mail className="w-7 h-7 text-amber-600" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">Esta invitación es para otra cuenta</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('invites.page.mismatchTitle')}</h2>
           <p className="text-sm text-muted-foreground text-center max-w-xs">
-            La invitación se envió a <span className="font-medium text-foreground">{invite.email}</span>, pero has iniciado sesión como <span className="font-medium text-foreground">{currentUser.email}</span>. Entra con la cuenta invitada para unirte al viaje.
+            {t('invites.page.mismatch1')} <span className="font-medium text-foreground">{invite.email}</span>{t('invites.page.mismatch2')} <span className="font-medium text-foreground">{currentUser.email}</span>. {t('invites.page.mismatch3')}
           </p>
           <button onClick={() => navigate(createPageUrl('TripsList'))}
             className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
-            Ir a mis viajes
+            {t('invites.page.goToTrips')}
           </button>
         </div>
       );
@@ -208,9 +209,9 @@ export default function Invites() {
             <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
               <Mail className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-xs text-muted-foreground">Tienes una invitación</p>
+            <p className="text-xs text-muted-foreground">{t('invites.page.youHaveInvite')}</p>
           </div>
-          <h1 className="text-xl font-semibold text-foreground">¿Te unes al viaje?</h1>
+          <h1 className="text-xl font-semibold text-foreground">{t('invites.page.joinQuestion')}</h1>
         </div>
 
         <div className="flex-1 px-5 py-6 space-y-4">
@@ -221,7 +222,7 @@ export default function Invites() {
             {trip.destination && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                {trip.destination}{trip.country ? `, ${trip.country}` : ''}
+                {trip.destination}{trip.country ? `, ${getCountryLabel(trip.country, i18n.language)}` : ''}
               </div>
             )}
 
@@ -235,15 +236,15 @@ export default function Invites() {
 
             <div className="pt-3 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                Invitado por <span className="font-medium text-foreground">{invite.invited_by || 'un compañero'}</span>
-                {' · '}Rol: <span className="font-medium text-foreground capitalize">{invite.role || 'editor'}</span>
+                {t('invites.page.invitedBy')} <span className="font-medium text-foreground">{invite.invited_by || t('invites.page.aCompanion')}</span>
+                {' · '}{t('invites.page.role')} <span className="font-medium text-foreground capitalize">{invite.role || 'editor'}</span>
               </p>
             </div>
           </div>
 
           {!currentUser && (
             <div className="bg-orange-50 border border-primary/20 rounded-2xl px-4 py-3">
-              <p className="text-xs text-primary font-medium">Crea una cuenta con el email al que te enviaron la invitación para unirte al viaje.</p>
+              <p className="text-xs text-primary font-medium">{t('invites.page.createAccountHint')}</p>
             </div>
           )}
         </div>
@@ -252,11 +253,11 @@ export default function Invites() {
         <div className="px-5 pb-10 flex gap-3">
           <button onClick={handleDecline} disabled={processing}
             className="flex-1 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
-            Rechazar
+            {t('common.reject')}
           </button>
           <button onClick={handleAccept} disabled={processing || !currentUser}
             className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold disabled:opacity-50">
-            {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Unirme al viaje'}
+            {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('invites.page.joinTrip')}
           </button>
         </div>
       </div>
@@ -303,19 +304,19 @@ export default function Invites() {
                 <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">1</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Un compañero te invita desde su viaje</p>
+                <p className="text-xs text-muted-foreground">{t('invites.page.step1')}</p>
               </div>
               <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
                 <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">2</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Recibes una notificación en el bell</p>
+                <p className="text-xs text-muted-foreground">{t('invites.page.step2')}</p>
               </div>
               <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
                 <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">3</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Aceptas y tienes acceso completo al viaje</p>
+                <p className="text-xs text-muted-foreground">{t('invites.page.step3')}</p>
               </div>
             </div>
           </div>

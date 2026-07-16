@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useRef, useCallback} from 'react';
+import { useState, useEffect, useMemo, useRef} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Check, CirclePlus, Compass, Landmark, Loader2, MapPin, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { getCountryMeta, normalizeCountry } from '@/lib/countryConfig';
+import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { getTripCoverImage } from '@/lib/tripImage';
 import TripCard from '@/components/trip/TripCard';
 import OTabBar from '@/components/trip/OTabBar';
@@ -19,13 +19,13 @@ const SPOT_ICONS_MAP = {
   shopping: ShoppingBag, custom: CirclePlus, other: Compass,
   restaurant: Utensils, museum: Landmark,
 };
-const TYPE_LABEL  = { food:'Comida', sight:'Sights', activity:'Actividades', shopping:'Compras', custom:'Otro' };
+const TYPE_LABEL  = { food:'spots.types.food', sight:'spots.types.sight', activity:'spots.types.activity', shopping:'spots.types.shopping', custom:'spots.types.custom' };
 const TYPE_FILTERS = [
-  { key:'all',      label:'Todos' },
-  { key:'food',     label:'Comida' },
-  { key:'sight',    label:'Sights' },
-  { key:'activity', label:'Actividades' },
-  { key:'shopping', label:'Compras' },
+  { key:'all',      tk:'common.all' },
+  { key:'food',     tk:'spots.types.food' },
+  { key:'sight',    tk:'spots.types.sight' },
+  { key:'activity', tk:'spots.types.activity' },
+  { key:'shopping', tk:'spots.types.shopping' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,6 +49,7 @@ function countryFlag(country) {
 // Spot row — used in both tabs and search results
 // ─────────────────────────────────────────────────────────────────────────────
 function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
+  const { t } = useTranslation();
   const SpotTypeIcon = SPOT_ICONS_MAP[spot.type] || MapPin;
   const coverImg = spot.image_url || (spot.city_name || spot.country
     ? getTripCoverImage(spot.city_name, spot.country)
@@ -76,7 +77,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
             ? 'bg-orange-50 text-primary border border-orange-200'
             : 'bg-secondary text-muted-foreground border border-border'
         }`}>
-          {spot.visibility === 'public' ? 'Público' : 'Privado'}
+          {spot.visibility === 'public' ? t('profile.public') : t('profile.private')}
         </span>
       )}
       {onSave && !isSaved && (
@@ -98,15 +99,15 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
 // Spot collection grouped by country
 // ─────────────────────────────────────────────────────────────────────────────
 function SpotCollection({spots, showLikes = false, showVisibility = false }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [expanded, setExpanded] = useState({});
   const [showAll, setShowAll] = useState({});
 
   if (!spots.length) return (
     <div className="text-center py-10 px-4">
       
-      <p className="text-sm font-medium text-foreground mb-1">Nada aquí todavía</p>
-      <p className="text-xs text-muted-foreground">Usa el buscador para descubrir spots y guardarlos</p>
+      <p className="text-sm font-medium text-foreground mb-1">{t('profile.emptyTitle')}</p>
+      <p className="text-xs text-muted-foreground">{t('profile.emptyHint')}</p>
     </div>
   );
 
@@ -126,8 +127,8 @@ function SpotCollection({spots, showLikes = false, showVisibility = false }) {
               className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-secondary/30 transition-colors">
               <div className="flex items-center gap-2">
                 <span className="text-sm">{flag}</span>
-                <span className="text-sm font-medium text-foreground">{country}</span>
-                <span className="text-xs text-muted-foreground">· {cSpots.length} spot{cSpots.length !== 1 ? 's' : ''}</span>
+                <span className="text-sm font-medium text-foreground">{getCountryLabel(country, i18n.language)}</span>
+                <span className="text-xs text-muted-foreground">· {t('profile.spotCount', { count: cSpots.length })}</span>
               </div>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                 className={`text-muted-foreground transition-transform ${isExp ? 'rotate-90' : ''}`}>
@@ -235,7 +236,7 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
                     ? 'bg-primary text-white border-primary'
                     : 'bg-card border-border text-muted-foreground'
                 }`}>
-                {f.label}
+                {t(f.tk)}
               </button>
             ))}
           </div>
@@ -279,7 +280,7 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState('guardados');
@@ -393,7 +394,7 @@ export default function Profile() {
     </div>
   );
 
-  const displayName = profile?.display_name || user?.full_name || 'Usuario';
+  const displayName = profile?.display_name || user?.full_name || t('profile.user');
   const initials = displayName[0]?.toUpperCase() || '?';
   const countryMeta = getCountryMeta(profile?.home_country || '');
 
@@ -420,7 +421,7 @@ export default function Profile() {
               Configuración
             </Link>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Perfil</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('profile.title')}</h1>
         </div>
       </div>
 
@@ -440,10 +441,10 @@ export default function Profile() {
               <p className="text-sm text-muted-foreground">
                 {profile?.username ? `@${profile.username}` : ''}
                 {profile?.username && profile?.home_country ? ' · ' : ''}
-                {profile?.home_country ? `${countryMeta.flag} ${profile.home_country}` : ''}
+                {profile?.home_country ? `${countryMeta.flag} ${getCountryLabel(profile.home_country, i18n.language)}` : ''}
                 {profile?.second_nationality ? (() => {
                   const m2 = getCountryMeta(profile.second_nationality);
-                  return ` · ${m2.flag} ${profile.second_nationality}`;
+                  return ` · ${m2.flag} ${getCountryLabel(profile.second_nationality, i18n.language)}`;
                 })() : ''}
               </p>
             </div>
@@ -454,7 +455,7 @@ export default function Profile() {
             {[
               { value: tripsCount, label: t('profile.trips') },
               { value: mySpots.length, label: t('profile.mySpots') },
-              { value: countriesCount, label: 'Países' },
+              { value: countriesCount, label: t('profile.countries') },
             ].map((stat, i) => (
               <div key={stat.label} className={`flex-1 text-center ${i > 0 ? 'border-l border-border' : ''}`}>
                 <p className="text-lg font-medium text-foreground">{stat.value}</p>
@@ -490,7 +491,7 @@ export default function Profile() {
             <div className="p-3 space-y-2">
               {myTrips.length === 0 ? (
                 <div className="text-center py-10 text-muted-foreground">
-                  <p className="text-sm">Sin viajes aún</p>
+                  <p className="text-sm">{t('profile.noTrips')}</p>
                 </div>
               ) : (
                 myTrips.map(trip => {
