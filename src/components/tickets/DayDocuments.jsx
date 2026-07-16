@@ -2,12 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import DocumentCard from './DocumentCard';
 import { FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Shows documents associated to a specific itinerary day.
  * Shown inside CityDetail, within each day's collapsible.
  */
 export default function DayDocuments({ dayId, tripId, currentUserEmail, dayTitle = '' }) {
+  const { t } = useTranslation();
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
@@ -30,7 +32,7 @@ export default function DayDocuments({ dayId, tripId, currentUserEmail, dayTitle
     <div className="mt-3 pt-3 border-t border-border/50">
       <div className="flex items-center gap-2 mb-2">
         <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-xs font-semibold text-muted-foreground">Documentos del día</span>
+        <span className="text-xs font-semibold text-muted-foreground">{t('documents.dayDocs')}</span>
       </div>
       <div className="space-y-1.5">
         {dayDocs.map(ticket => (

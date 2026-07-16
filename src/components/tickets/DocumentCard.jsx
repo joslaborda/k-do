@@ -4,6 +4,7 @@ import { format, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import PDFViewer from '@/components/PDFViewer';
 import { CATEGORY_CONFIG } from './DocumentForm';
+import { useTranslation } from 'react-i18next';
 
 // Categories not in CATEGORY_CONFIG (legacy data) → fallback mapping
 const CATEGORY_FALLBACK = {
@@ -12,9 +13,9 @@ const CATEGORY_FALLBACK = {
 };
 
 const VISIBILITY_BADGE = {
-  personal:       { label: 'Solo yo',    icon: EyeOff, cls: 'bg-secondary text-muted-foreground' },
-  shared:         { label: 'Grupo',      icon: Eye,    cls: 'bg-green-50 text-green-600' },
-  selected_users: { label: 'Compartido', icon: Users,  cls: 'bg-blue-50 text-blue-500'  },
+  personal:       { tk: 'documents.visibility.personal', icon: EyeOff, cls: 'bg-secondary text-muted-foreground' },
+  shared:         { tk: 'documents.visibility.group',    icon: Eye,    cls: 'bg-green-50 text-green-600' },
+  selected_users: { tk: 'documents.visibility.selected', icon: Users,  cls: 'bg-blue-50 text-blue-500'  },
 };
 
 const ICON_BG = {
@@ -27,6 +28,7 @@ const ICON_BG = {
 };
 
 export default function DocumentCard({ ticket, onEdit, onDelete, compact = false, cityName = '', dayTitle = '' }) {
+  const { t, i18n } = useTranslation();
   const [viewingPDF, setViewingPDF] = useState(null);
 
   // Resolve category — legacy values fall back gracefully
@@ -44,8 +46,9 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
     ? `${ticket.origin} → ${ticket.destination}`
     : ticket.name;
 
-  const dateStr    = ticket.date     ? format(new Date(ticket.date),     'd MMM yyyy', { locale: es }) : null;
-  const endDateStr = ticket.end_date ? format(new Date(ticket.end_date), 'd MMM yyyy', { locale: es }) : null;
+  const dateLocale = i18n.language === 'en' ? undefined : es;
+  const dateStr    = ticket.date     ? format(new Date(ticket.date),     'd MMM yyyy', { locale: dateLocale }) : null;
+  const endDateStr = ticket.end_date ? format(new Date(ticket.end_date), 'd MMM yyyy', { locale: dateLocale }) : null;
   const todayBadge = ticket.date && isToday(new Date(ticket.date));
   const contextCity = ticket.city || cityName || null;
 
@@ -60,7 +63,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground text-sm truncate">{smartTitle}</p>
             <p className="text-xs text-muted-foreground mt-0.5 truncate">
-              {config.label}{dateStr ? ` · ${dateStr}` : ''}{contextCity ? ` · ${contextCity}` : ''}
+              {t(config.labelKey)}{dateStr ? ` · ${dateStr}` : ''}{contextCity ? ` · ${contextCity}` : ''}
             </p>
           </div>
           {ticket.file_url && (
@@ -68,7 +71,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
               onClick={() => setViewingPDF(ticket.file_url)}
               className="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary text-white text-xs font-semibold transition-all flex-shrink-0"
             >
-              Ver
+              {t('documents.card.view')}
             </button>
           )}
         </div>
@@ -94,7 +97,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           <h3 className="font-bold text-foreground text-base leading-tight truncate pr-2">{smartTitle}</h3>
 
           {/* Row 2: subtitle = category label */}
-          <p className="text-sm text-muted-foreground">{config.label}</p>
+          <p className="text-sm text-muted-foreground">{t(config.labelKey)}</p>
 
           {/* Row 3: date + city on same line */}
           {(dateStr || contextCity) && (
@@ -106,7 +109,7 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
                     {dateStr}{endDateStr ? ` → ${endDateStr}` : ''}
                   </span>
                   {todayBadge && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-label uppercase tracking-wide">Hoy</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-label uppercase tracking-wide">{t('cities.day.today')}</span>
                   )}
                 </span>
               )}
@@ -127,19 +130,19 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           <div className="flex items-center gap-2 mt-1.5">
             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label font-semibold ${vis.cls}`}>
               <VisIcon className="w-3 h-3" />
-              {vis.label}
+              {t(vis.tk)}
             </span>
             {/* Edit/Delete — visible on hover */}
             <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {onEdit && (
                 <button onClick={() => onEdit(ticket)}
-                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-muted-foreground transition-colors" title="Editar">
+                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-muted-foreground transition-colors" title={t('common.edit')}>
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
               )}
               {onDelete && (
                 <button onClick={() => onDelete(ticket)}
-                  className="p-1 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors" title="Eliminar">
+                  className="p-1 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors" title={t('common.delete')}>
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -155,10 +158,10 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
             >
               <FileText className="w-4 h-4" />
-              Ver
+              {t('documents.card.view')}
             </button>
           ) : (
-            <span className="text-xs text-muted-foreground italic">Sin archivo</span>
+            <span className="text-xs text-muted-foreground italic">{t('documents.card.noFile')}</span>
           )}
         </div>
 

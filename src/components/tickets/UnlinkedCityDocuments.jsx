@@ -2,12 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import DocumentCard from './DocumentCard';
 import { Paperclip } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Shows documents associated to a city but WITHOUT an itinerary_day_id.
  * These are documents with city_id set but no specific day assigned.
  */
 export default function UnlinkedCityDocuments({ cityId, tripId, currentUserEmail }) {
+  const { t } = useTranslation();
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
     queryFn: () => base44.entities.Ticket.filter({ trip_id: tripId }, '-date'),
@@ -29,7 +31,7 @@ export default function UnlinkedCityDocuments({ cityId, tripId, currentUserEmail
     <div className="mt-8 pt-6 border-t border-border/50">
       <div className="flex items-center gap-2 mb-3">
         <Paperclip className="w-4 h-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold text-muted-foreground">Otros documentos</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground">{t('documents.otherDocs')}</h3>
         <span className="text-xs bg-secondary text-muted-foreground font-semibold px-2 py-0.5 rounded-full">{unlinkedDocs.length}</span>
       </div>
       <div className="space-y-2">
