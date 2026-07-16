@@ -3,7 +3,8 @@ import { createPageUrl } from '@/utils';
 import { ChevronRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { normalizeCountry } from '@/lib/countryConfig';
+import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
+import { useTranslation } from 'react-i18next';
 
 const cityImages = {
   // ── JAPÓN ──────────────────────────────────────────────────────────────────
@@ -423,6 +424,7 @@ const countryImages = {
 
 
 export default function CityCard({ city, daysCount, tripId }) {
+  const { i18n } = useTranslation();
   const formatDateRange = () => {
     if (!city.start_date) return null;
     const start = new Date(city.start_date);
@@ -453,7 +455,7 @@ export default function CityCard({ city, daysCount, tripId }) {
           <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
             <div>
               <div className="text-white text-xl font-bold leading-tight">{city.name}</div>
-              {city.country && <div className="text-white/80 text-sm mt-0.5">{city.country}</div>}
+              {city.country && <div className="text-white/80 text-sm mt-0.5">{getCountryLabel(city.country, i18n.language)}</div>}
               <div className="flex items-center gap-3 mt-1">
                 {city.start_date && (
                   <span className="flex items-center gap-1 text-white/85 text-xs">

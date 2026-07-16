@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, X, Save, ImageIcon } from 'lucide-react';
+import { Settings, Save } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -67,25 +67,25 @@ export default function CitySettingsModal({
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Ciudad / Parada</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.modal.cityStop')}</label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ej: Tokyo"
+                placeholder={t('cities.modal.cityPlaceholder')}
                 className="bg-input border-border text-foreground"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Alojamiento</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.modal.accommodation')}</label>
               <Input
                 value={form.accommodation}
                 onChange={(e) => setForm({ ...form, accommodation: e.target.value })}
-                placeholder="Ej: APA Hotel Pride Kokkaigijidomae, Tokyo"
+                placeholder={t('cities.modal.accommodationPlaceholder')}
                 className="bg-input border-border text-foreground"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Imagen de portada (URL)</label>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.modal.coverImage')}</label>
               {form.image_url && (
                 <div className="mb-2 rounded-lg overflow-hidden h-24 bg-muted">
                   <img src={form.image_url} alt="preview" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display='none'} />
@@ -100,7 +100,7 @@ export default function CitySettingsModal({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha llegada</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.modal.arrival')}</label>
                 <Input
                   type="date"
                   value={form.start_date}
@@ -109,7 +109,7 @@ export default function CitySettingsModal({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Fecha salida</label>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">{t('cities.modal.departure')}</label>
                 <Input
                   type="date"
                   value={form.end_date}
@@ -129,7 +129,7 @@ export default function CitySettingsModal({
                 className="bg-primary hover:bg-primary text-white"
               >
                 <Save className="w-3.5 h-3.5 mr-1.5" />
-                {saving ? 'Guardando...' : 'Guardar'}
+                {saving ? t('trip.dialog.saving') : t('common.save')}
               </Button>
             </div>
           </div>
