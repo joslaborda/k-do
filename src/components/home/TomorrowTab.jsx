@@ -4,8 +4,10 @@ import { format } from 'date-fns';
 import { Calendar } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DayCard from './DayCard';
+import { useTranslation } from 'react-i18next';
 
 export default function TomorrowTab({ trip, cities, tripId }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
 
