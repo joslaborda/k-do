@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, CheckCircle2, XCircle, Check } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Check, Languages, Plane, Hotel, Shield, Utensils, Ticket, MapPin, Palette, CloudSun } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryOptions, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 
@@ -11,10 +11,22 @@ import { setLanguage, getLanguage } from '@/i18n/index.js';
 const HISPANO_FIRST = ['España','México','Colombia','Argentina','Perú','Venezuela','Chile','Ecuador','Guatemala','Cuba','Bolivia','República Dominicana','Honduras','Paraguay','El Salvador','Nicaragua','Costa Rica','Panamá','Uruguay','Puerto Rico','Guinea Ecuatorial'];
 const ALL_COUNTRIES_RAW = ['Afganistán','Albania','Alemania','Andorra','Angola','Antigua y Barbuda','Arabia Saudí','Argelia','Argentina','Armenia','Aruba','Australia','Austria','Azerbaiyán','Bahamas','Bahréin','Bangladés','Barbados','Bélgica','Belice','Benín','Bielorrusia','Bolivia','Bosnia y Herzegovina','Botswana','Brasil','Brunéi','Bulgaria','Burkina Faso','Burundi','Bután','Cabo Verde','Camboya','Camerún','Canadá','Chad','Chile','China','Chipre','Colombia','Comoras','Congo','Corea del Norte','Corea del Sur','Costa Rica','Costa de Marfil','Croacia','Cuba','Curazao','Dinamarca','Dominica','Ecuador','Egipto','El Salvador','Emiratos Árabes Unidos','Eritrea','Eslovaquia','Eslovenia','España','Estados Unidos','Estonia','Etiopía','Filipinas','Finlandia','Fiyi','Francia','Gabón','Gambia','Georgia','Ghana','Gibraltar','Granada','Grecia','Guatemala','Guinea','Guinea Ecuatorial','Guinea-Bisáu','Guyana','Guyana Francesa','Haití','Honduras','Hungría','India','Indonesia','Irak','Irán','Irlanda','Islandia','Israel','Italia','Jamaica','Japón','Jordania','Kazajistán','Kenia','Kirguistán','Kiribati','Kosovo','Kuwait','Laos','Lesoto','Letonia','Líbano','Liberia','Libia','Liechtenstein','Lituania','Luxemburgo','Madagascar','Malaui','Malasia','Maldivas','Malí','Malta','Marruecos','Martinica','Mauritania','Mauricio','México','Micronesia','Moldavia','Mónaco','Mongolia','Montenegro','Mozambique','Myanmar','Namibia','Nepal','Nicaragua','Níger','Nigeria','Noruega','Nueva Zelanda','Omán','Pakistán','Palaos','Panamá','Papúa Nueva Guinea','Paraguay','Países Bajos','Perú','Polonia','Portugal','Puerto Rico','Qatar','Reino Unido','República Centroafricana','República Checa','República del Congo','República Dominicana','Ruanda','Rumanía','Rusia','Saint-Martin','Samoa','San Cristóbal y Nieves','San Marino','San Vicente','Santa Lucía','Santo Tomé y Príncipe','Senegal','Serbia','Seychelles','Sierra Leona','Singapur','Sint Maarten','Somalia','Sri Lanka','Sudáfrica','Sudán','Sudán del Sur','Suecia','Suiza','Surinam','Tailandia','Taiwan','Tayikistán','Tanzania','Timor Oriental','Togo','Tonga','Trinidad y Tobago','Túnez','Turkmenistán','Turquía','Tuvalu','Ucrania','Uganda','Uruguay','Uzbekistán','Vanuatu','Venezuela','Vietnam','Yemen','Yibuti','Zambia','Zimbabue','Esuatini'];
 const SORTED_COUNTRIES = [...HISPANO_FIRST, ...ALL_COUNTRIES_RAW.filter(n => !HISPANO_FIRST.includes(n)).sort((a, b) => a.localeCompare(b, 'es'))];
-const COUNTRIES = SORTED_COUNTRIES.map(name => {
-  const meta = getCountryMeta(name);
-  return { name, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
-});
+// Lista de países en el idioma activo. `name` es el canónico español (lo que se
+// guarda en BD); `label` es el nombre traducido que ve el usuario. Los países
+// hispanohablantes van primero por relevancia para la base de usuarios actual.
+function buildCountries(lang) {
+  // nacionalidad/residencia: sin subdivisiones (ver getOriginCountryOptions)
+  const opts = getOriginCountryOptions(lang);
+  const byName = new Map(opts.map(o => [o.value, o]));
+  const first = HISPANO_FIRST.filter(n => byName.has(n));
+  const rest = opts.filter(o => !HISPANO_FIRST.includes(o.value))
+                   .sort((a, b) => a.label.localeCompare(b.label, (lang || 'es').split('-')[0]));
+  const ordered = [...first.map(n => byName.get(n)), ...rest];
+  return ordered.map(o => {
+    const meta = getCountryMeta(o.value);
+    return { name: o.value, label: o.label, flag: meta.flag || '🌍', currency: meta.currency || 'USD' };
+  });
+}
 
 // ── Slides de features (3-6) ──────────────────────────────────────────────────
 const FEATURE_SLIDES = [
@@ -25,13 +37,20 @@ const FEATURE_SLIDES = [
 ];
 
 // ── Selector de país ──────────────────────────────────────────────────────────
-function CountryPicker({ value, onChange, placeholder = 'Selecciona un país' }) {
+function CountryPicker({ value, onChange, placeholder }) {
+  const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
+  const COUNTRIES = useMemo(() => buildCountries(i18n.language), [i18n.language]);
   const filtered = search
-    ? COUNTRIES.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
+    ? COUNTRIES.filter(c => {
+        const q = search.toLowerCase();
+        // se busca por nombre traducido y por canónico español
+        return c.label.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);
+      })
     : COUNTRIES;
-  const selected = COUNTRIES.find(c => c.name === value);
+  // se normaliza por si en BD hay un nombre de una lista antigua ('Yemen' → 'Yemén')
+  const selected = COUNTRIES.find(c => c.name === normalizeCountry(value));
 
   return (
     <div className="relative">
@@ -43,7 +62,7 @@ function CountryPicker({ value, onChange, placeholder = 'Selecciona un país' })
         {selected ? (
           <span className="flex items-center gap-2 font-medium text-foreground">
             <span className="text-lg">{selected.flag}</span>
-            <span>{selected.name}</span>
+            <span>{selected.label}</span>
             {selected.currency && (
               <span className="text-xs text-primary font-semibold ml-1">{selected.currency} ✓</span>
             )}
@@ -63,7 +82,7 @@ function CountryPicker({ value, onChange, placeholder = 'Selecciona un país' })
               autoFocus
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar país..."
+              placeholder={t('settings.searchCountry')}
               className="w-full px-3 py-2 text-sm bg-secondary rounded-xl outline-none border border-border focus:border-primary/50"
             />
           </div>
@@ -76,13 +95,13 @@ function CountryPicker({ value, onChange, placeholder = 'Selecciona un país' })
                 className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-secondary/60 ${value === country.name ? 'bg-orange-50 text-primary font-semibold' : 'text-foreground'}`}
               >
                 <span className="text-base flex-shrink-0">{country.flag}</span>
-                <span className="flex-1">{country.name}</span>
+                <span className="flex-1">{country.label}</span>
                 <span className="text-xs text-muted-foreground">{country.currency}</span>
                 {value === country.name && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
               </button>
             ))}
             {filtered.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-4">Sin resultados</p>
+              <p className="text-center text-sm text-muted-foreground py-4">{t('common.noResults')}</p>
             )}
           </div>
         </div>
@@ -103,7 +122,7 @@ function SlideIdioma({ onSelect }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4">
       <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mb-6">
-        <span className="text-3xl">🌍</span>
+        <Languages className="w-8 h-8 text-primary" strokeWidth={1.5} />
       </div>
       <h2 className="text-2xl font-black text-foreground text-center leading-tight mb-2">
         {selected === 'es' ? 'Elige tu idioma' : 'Choose your language'}
@@ -175,9 +194,9 @@ function SlideGrupo() {
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">3 / 6</p>
-      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Vuestro viaje,<br />un solo sitio</h2>
+      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s3.title1')}<br />{t('onboarding.s3.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        Invita a tus compañeros al viaje. Todos tendréis acceso a la misma información: ruta, documentos, spots y gastos.
+        {t('onboarding.s3.body')}
       </p>
 
       {/* Demo: documentos compartidos */}
@@ -191,20 +210,20 @@ function SlideGrupo() {
                 {l}
               </div>
             ))}
-            <span className="text-xs text-muted-foreground ml-2">3 viajeros</span>
+            <span className="text-xs text-muted-foreground ml-2">{t('onboarding.s3.travelers')}</span>
           </div>
-          <span className="text-xs bg-orange-50 text-primary border border-orange-200 px-2.5 py-1 rounded-full font-semibold">+ Invitar</span>
+          <span className="text-xs bg-orange-50 text-primary border border-orange-200 px-2.5 py-1 rounded-full font-semibold">{t('onboarding.s3.invite')}</span>
         </div>
 
         {/* Docs compartidos */}
         <div className="divide-y divide-border">
           {[
-            { icon: '✈️', bg: 'bg-blue-50', name: 'MAD → NRT · Iberia', sub: '09:45 · 12 mar', vis: 'Grupo', visCls: 'bg-green-100 text-green-700' },
-            { icon: '🏨', bg: 'bg-purple-50', name: 'Park Hyatt Tokyo', sub: 'Check-in 12 mar', vis: 'Solo yo', visCls: 'bg-secondary text-muted-foreground' },
-            { icon: '🛡️', bg: 'bg-secondary', name: 'Seguro de viaje', sub: 'Válido 12–24 mar', vis: 'Compartido', visCls: 'bg-blue-100 text-blue-700' },
+            { Icon: Plane, bg: 'bg-blue-50', name: 'MAD → NRT · Iberia', sub: '09:45 · 12 mar', vis: t('documents.visibility.group'), visCls: 'bg-green-100 text-green-700' },
+            { Icon: Hotel, bg: 'bg-purple-50', name: 'Park Hyatt Tokyo', sub: 'Check-in 12 mar', vis: t('documents.visibility.personal'), visCls: 'bg-secondary text-muted-foreground' },
+            { Icon: Shield, bg: 'bg-secondary', name: t('onboarding.s4.insurance'), sub: 'Válido 12–24 mar', vis: t('documents.visibility.selected'), visCls: 'bg-blue-100 text-blue-700' },
           ].map((doc, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-sm ${doc.bg}`}>{doc.icon}</div>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${doc.bg}`}><doc.Icon className="w-4 h-4 text-muted-foreground" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground leading-snug truncate">{doc.name}</p>
                 <p className="text-xs text-muted-foreground">{doc.sub}</p>
@@ -223,16 +242,16 @@ function SlidePreparativos() {
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">4 / 6</p>
-      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Todo listo antes<br />de despegar</h2>
+      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s4.title1')}<br />{t('onboarding.s4.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        Kōdo te da información personalizada: visados, vacunas, adaptadores. Sube tus documentos y asígnalos a un día concreto para que aparezcan cuando los necesites.
+        {t('onboarding.s4.body')}
       </p>
 
       {/* Countdown */}
       <div className="bg-card border border-border rounded-2xl p-4 text-center mb-3">
         <p className="text-5xl font-semibold text-primary leading-none">47</p>
-        <p className="text-xs text-muted-foreground mt-1">días para el viaje</p>
-        <p className="text-xs text-primary mt-1.5">Primera parada: Tokio · 12 mar</p>
+        <p className="text-xs text-muted-foreground mt-1">{t('onboarding.s4.daysToTrip')}</p>
+        <p className="text-xs text-primary mt-1.5">{t('onboarding.s4.firstStop')}</p>
       </div>
 
       {/* Grid maleta + docs */}
@@ -256,10 +275,10 @@ function SlidePreparativos() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
           <div>
-            <p className="text-sm font-semibold text-foreground">Por hacer antes del viaje</p>
-            <p className="text-xs text-muted-foreground">pasaporte de España</p>
+            <p className="text-sm font-semibold text-foreground">{t('onboarding.s4.todo')}</p>
+            <p className="text-xs text-muted-foreground">{t('onboarding.s4.passport')}</p>
           </div>
-          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Todo listo ✓</span>
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">{t('onboarding.s4.allSet')}</span>
         </div>
         {/* Visados: level ok → solo informativo, badge verde */}
         <div className="flex items-center gap-2 px-4 py-2 bg-secondary/30 border-b border-border">
@@ -270,8 +289,8 @@ function SlidePreparativos() {
         <div className="flex items-start gap-3 px-4 py-2.5 border-b border-border">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" className="mt-0.5 flex-shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground leading-tight">Sin visado — Japón</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Pasaporte español · No requiere trámite</p>
+            <p className="text-sm font-medium text-foreground leading-tight">{t('onboarding.s4.noVisa')}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('onboarding.s4.noVisaSub')}</p>
           </div>
           <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 border border-green-200">ok</span>
         </div>
@@ -298,7 +317,7 @@ function SlideGastos() {
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">5 / 6</p>
-      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Las cuentas aquí<br />siempre encajan</h2>
+      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s5.title1')}<br />{t('onboarding.s5.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
         Apunta quién paga y con quién comparte cada gasto. Kōdo lleva los balances y al final todos saben exactamente lo que se deben.
       </p>
@@ -306,20 +325,20 @@ function SlideGastos() {
       {/* Balance */}
       <div className="bg-card border border-border rounded-2xl px-4 py-3 mb-3 flex items-baseline justify-between">
         <div>
-          <p className="text-xs text-muted-foreground mb-0.5">Tu balance</p>
+          <p className="text-xs text-muted-foreground mb-0.5">{t('onboarding.s5.yourBalance')}</p>
           <p className="text-3xl font-semibold text-green-600">+€25.00</p>
         </div>
-        <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full font-semibold">Te deben</span>
+        <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full font-semibold">{t('onboarding.s5.owedToYou')}</span>
       </div>
 
       {/* Gastos */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden mb-3">
         {[
-          { icon: '🍽️', bg: 'bg-orange-50', name: 'Cena en Tsukiji', sub: 'Pagó Carlos · ÷ 4', amount: '€60.00' },
-          { icon: '🎫', bg: 'bg-orange-50', name: 'TeamLab Planets', sub: 'Pagó José · ÷ 4', amount: '€80.00' },
+          { Icon: Utensils, bg: 'bg-orange-50', name: t('onboarding.s5.dinner'), sub: t('onboarding.s5.paidBy', { name: 'Carlos' }), amount: '€60.00' },
+          { Icon: Ticket, bg: 'bg-orange-50', name: 'TeamLab Planets', sub: t('onboarding.s5.paidBy', { name: 'José' }), amount: '€80.00' },
         ].map((g, i, arr) => (
           <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-sm ${g.bg}`}>{g.icon}</div>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${g.bg}`}><g.Icon className="w-4 h-4 text-muted-foreground" /></div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground leading-snug">{g.name}</p>
               <p className="text-xs text-muted-foreground">{g.sub}</p>
@@ -332,7 +351,7 @@ function SlideGastos() {
       {/* Balances — quién debe a quién */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="px-4 py-2 bg-secondary/30 border-b border-border">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Te deben a ti</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('onboarding.s5.owedToYouLabel')}</p>
         </div>
         {[
           { initial: 'M', color: 'bg-violet-500', text: 'María debe a Carlos', amount: '€15.00' },
@@ -345,11 +364,11 @@ function SlideGastos() {
           </div>
         ))}
         <div className="px-4 py-2 bg-secondary/30 border-b border-border">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tú debes a</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('onboarding.s5.youOwe')}</p>
         </div>
         <div className="flex items-center gap-3 px-4 py-2.5">
           <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-white flex-shrink-0">J</div>
-          <p className="text-sm font-medium text-foreground flex-1">Carlos debe a José</p>
+          <p className="text-sm font-medium text-foreground flex-1">{t('onboarding.s5.example')}</p>
           <p className="text-sm font-bold text-red-500 flex-shrink-0">€5.00</p>
         </div>
       </div>
@@ -362,7 +381,7 @@ function SlideHoy() {
   return (
     <div className="flex-1 flex flex-col">
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">6 / 6</p>
-      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">Tu día a día<br />en la tab Hoy</h2>
+      <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s6.title1')}<br />{t('onboarding.s6.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
         Todo lo que subes y preparas genera tu itinerario diario. La tab Hoy te muestra el clima, los documentos del día y tus spots. Busca restaurantes, museos o cualquier plan, asígnales día y hora para que aparezcan exactamente cuando los necesitas.
       </p>
@@ -371,17 +390,17 @@ function SlideHoy() {
       <div className="bg-card border-2 border-orange-200 rounded-2xl overflow-hidden mb-3">
         <div className="flex items-center justify-between px-4 py-2.5 bg-orange-50 border-b border-orange-200">
           <div className="flex items-center gap-2.5">
-            <span className="text-xs font-bold text-primary uppercase tracking-widest">HOY</span>
+            <span className="text-xs font-bold text-primary uppercase tracking-widest">{t('onboarding.s6.today')}</span>
             <span className="text-sm font-semibold text-foreground">Tokio</span>
             <span className="text-xs text-muted-foreground">14 mar · 3</span>
           </div>
-          <span className="text-sm">⛅ <span className="text-xs font-semibold text-foreground">18°</span></span>
+          <span className="inline-flex items-center gap-1"><CloudSun className="w-4 h-4 text-muted-foreground" /><span className="text-xs font-semibold text-foreground">18°</span></span>
         </div>
         {/* Timeline items */}
         {[
-          { time: '09:45', icon: '✈️', iconBg: 'bg-blue-50', name: 'MAD → NRT · Iberia', sub: 'Vuelo · asignado hoy', hasLine: true },
-          { time: '14:00', icon: '📍', iconBg: 'bg-orange-50', name: 'Tsukiji Fish Market', sub: 'Spot · asignado 14:00', hasLine: true },
-          { time: null, icon: '🍽️', iconBg: 'bg-orange-50', name: 'Sukiyabashi Jiro', sub: 'Restaurante · sin hora · toca para añadir', hasLine: false },
+          { time: '09:45', Icon: Plane, iconBg: 'bg-blue-50', name: 'MAD → NRT · Iberia', sub: t('onboarding.s6.flightSub'), hasLine: true },
+          { time: '14:00', Icon: MapPin, iconBg: 'bg-orange-50', name: 'Tsukiji Fish Market', sub: t('onboarding.s6.spotSub'), hasLine: true },
+          { time: null, Icon: Utensils, iconBg: 'bg-orange-50', name: 'Sukiyabashi Jiro', sub: t('onboarding.s6.restaurantSub'), hasLine: false },
         ].map((item, i) => (
           <div key={i} className={`flex items-start gap-0 px-4 py-2 ${i < 2 ? 'border-b border-border' : ''}`}>
             <div className="w-10 flex-shrink-0 flex flex-col items-end pt-0.5 gap-1">
@@ -390,7 +409,7 @@ function SlideHoy() {
                 : <div className="w-2 h-2 rounded-full bg-border mt-1" />}
               {item.hasLine && <div className="w-px h-5 bg-border mr-1.5" />}
             </div>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mx-2 text-sm ${item.iconBg}`}>{item.icon}</div>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mx-2 ${item.iconBg}`}><item.Icon className="w-4 h-4 text-muted-foreground" /></div>
             <div className="flex-1 min-w-0 pt-0.5">
               <p className="text-sm font-medium text-foreground leading-snug truncate">{item.name}</p>
               <p className="text-xs text-muted-foreground">{item.sub}</p>
@@ -403,23 +422,23 @@ function SlideHoy() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="flex border-b border-border">
           <div className="flex-1 py-2 text-center border-b-2 border-primary -mb-px">
-            <span className="text-xs font-bold text-primary">Buscar</span>
+            <span className="text-xs font-bold text-primary">{t('common.search')}</span>
           </div>
           <div className="flex-1 py-2 text-center">
-            <span className="text-xs text-muted-foreground">Mis spots</span>
+            <span className="text-xs text-muted-foreground">{t('spots.mySpots')}</span>
           </div>
         </div>
         <div className="px-3 py-2.5">
           <div className="bg-secondary border border-border rounded-xl px-3 py-2 flex items-center gap-2 mb-2">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground flex-shrink-0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span className="text-xs text-muted-foreground">Restaurantes, museos, cafeterías...</span>
+            <span className="text-xs text-muted-foreground">{t('onboarding.s6.searchExample')}</span>
           </div>
           {[
-            { icon: '🍜', bg: 'bg-orange-50', name: 'Ramen Ichiran Shibuya', sub: 'Restaurante · Tokio', badge: null },
-            { icon: '🎨', bg: 'bg-blue-50', name: 'TeamLab Planets', sub: 'Actividad · asignado 15 mar', badge: 'Guardado' },
+            { Icon: Utensils, bg: 'bg-orange-50', name: 'Ramen Ichiran Shibuya', sub: t('onboarding.s6.ramenSub'), badge: null },
+            { Icon: Palette, bg: 'bg-blue-50', name: 'TeamLab Planets', sub: t('onboarding.s6.teamlabSub'), badge: t('onboarding.s6.saved') },
           ].map((spot, i, arr) => (
             <div key={i} className={`flex items-center gap-2 py-2 ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs ${spot.bg}`}>{spot.icon}</div>
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${spot.bg}`}><spot.Icon className="w-3.5 h-3.5 text-muted-foreground" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-foreground leading-snug truncate">{spot.name}</p>
                 <p className="text-[10px] text-muted-foreground">{spot.sub}</p>

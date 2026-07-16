@@ -5,14 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, User, BookOpen, Loader2, ArrowRight } from 'lucide-react';
+import { Search, MapPin, User, BookOpen, Loader2, ArrowRight, Utensils, Landmark, Zap, ShoppingBag, Train, Map } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-const SPOT_TYPE_EMOJI = {
-  food: '🍽️', sight: '🏛️', activity: '🎯',
-  shopping: '🛍️', transport: '🚇', custom: '📍',
+const SPOT_TYPE_ICON = {
+  food: Utensils, sight: Landmark, activity: Zap,
+  shopping: ShoppingBag, transport: Train, custom: MapPin,
 };
 
 function Avatar({ profile, size = 8 }) {
@@ -41,6 +42,7 @@ function SectionHeader({ icon: Icon, label, count }) {
 
 // ── Main component ──────────────────────────────────────────────────────────
 export default function CommunitySearch({ open, onOpenChange }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const { user: currentUser } = useAuth();
   const navigate = useNavigate();
@@ -139,7 +141,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Busca destinos, itinerarios, @usuarios, spots..."
+              placeholder={t('explore.search.placeholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10 text-base border-0 shadow-none focus-visible:ring-0 bg-transparent"
@@ -147,7 +149,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
             />
           </div>
           {query.length > 0 && query.length < 2 && (
-            <p className="text-xs text-muted-foreground mt-1 pl-10">Escribe al menos 2 caracteres</p>
+            <p className="text-xs text-muted-foreground mt-1 pl-10">{t('explore.search.min2')}</p>
           )}
         </div>
 
@@ -157,8 +159,8 @@ export default function CommunitySearch({ open, onOpenChange }) {
           {!query && (
             <div className="text-center py-12 text-muted-foreground px-6">
               <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">Busca en la comunidad</p>
-              <p className="text-sm mt-1 opacity-70">Destinos, itinerarios, @usuarios o spots</p>
+              <p className="font-medium">{t('explore.search.title')}</p>
+              <p className="text-sm mt-1 opacity-70">{t('explore.search.subtitle')}</p>
               <div className="flex flex-wrap gap-2 justify-center mt-4">
                 {['Japón', 'Lisboa', '@viajero', 'ramen'].map(s => (
                   <button
@@ -183,8 +185,8 @@ export default function CommunitySearch({ open, onOpenChange }) {
           {/* Sin resultados */}
           {query.length >= 2 && !isLoading && results && !hasResults && (
             <div className="text-center py-12 text-muted-foreground">
-              <p className="font-medium">Sin resultados para "{query}"</p>
-              <p className="text-sm mt-1">Prueba con otro término</p>
+              <p className="font-medium">{t('explore.search.noResults', { query })}</p>
+              <p className="text-sm mt-1">{t('explore.search.tryAnother')}</p>
             </div>
           )}
 
@@ -194,7 +196,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
               {/* Usuarios */}
               {results.users.length > 0 && (
                 <div>
-                  <SectionHeader icon={User} label="Usuarios" count={results.users.length} />
+                  <SectionHeader icon={User} label={t('explore.search.users')} count={results.users.length} />
                   {results.users.map(profile => (
                     <button
                       key={profile.id}
@@ -215,7 +217,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
               {/* Destinos */}
               {results.destinations.length > 0 && (
                 <div>
-                  <SectionHeader icon={MapPin} label="Destinos" count={results.destinations.length} />
+                  <SectionHeader icon={MapPin} label={t('explore.search.destinations')} count={results.destinations.length} />
                   {results.destinations.map((dest, i) => (
                     <button
                       key={i}
@@ -227,7 +229,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-sm text-foreground">{dest.name}</p>
-                        <p className="text-xs text-muted-foreground">{dest.type === 'country' ? 'País' : 'Ciudad'}</p>
+                        <p className="text-xs text-muted-foreground">{dest.type === 'country' ? t('common.country') : t('common.city')}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-muted-foreground" />
                     </button>
@@ -238,7 +240,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
               {/* Itinerarios */}
               {results.templates.length > 0 && (
                 <div>
-                  <SectionHeader icon={BookOpen} label="Itinerarios" count={results.templates.length} />
+                  <SectionHeader icon={BookOpen} label={t('explore.search.itineraries')} count={results.templates.length} />
                   {results.templates.map(t => (
                     <button
                       key={t.id}
@@ -248,7 +250,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         {t.cover_image
                           ? <img src={t.cover_image} className="w-full h-full object-cover" alt={t.title} />
-                          : <div className="w-full h-full flex items-center justify-center text-xl">🗺️</div>
+                          : <div className="w-full h-full flex items-center justify-center"><Map className="w-4 h-4 text-muted-foreground" /></div>
                         }
                       </div>
                       <div className="flex-1 min-w-0">
@@ -268,15 +270,15 @@ export default function CommunitySearch({ open, onOpenChange }) {
               {/* Spots */}
               {results.spots.length > 0 && (
                 <div>
-                  <SectionHeader icon={MapPin} label="Spots recomendados" count={results.spots.length} />
+                  <SectionHeader icon={MapPin} label={t('explore.search.recommendedSpots')} count={results.spots.length} />
                   {results.spots.map(s => (
                     <button
                       key={s.id}
                       onClick={() => s.creator_username && goTo(`${createPageUrl('Profile')}?user_id=${s.created_by_user_id}`)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
                     >
-                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-xl flex-shrink-0">
-                        {SPOT_TYPE_EMOJI[s.type] || '📍'}
+                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                        {(() => { const I = SPOT_TYPE_ICON[s.type] || MapPin; return <I className="w-4 h-4 text-primary" />; })()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-foreground line-clamp-1">{s.title}</p>
