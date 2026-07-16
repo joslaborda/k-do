@@ -35,6 +35,11 @@ export default [
       "unused-imports": pluginUnusedImports,
     },
     rules: {
+      // El objeto `rules` sobrescribe el de pluginJs.configs.recommended, así que
+      // no-undef (que viene en recommended) quedaba desactivado. Sin él, cosas como
+      // usar t() sin declararlo con useTranslation compilan y solo revientan en
+      // runtime. Se activa explícitamente.
+      "no-undef": "error",
       "no-unused-vars": "off",
       "react/jsx-uses-vars": "error",
       "react/jsx-uses-react": "error",
