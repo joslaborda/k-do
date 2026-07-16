@@ -2,9 +2,9 @@ import { useState, useEffect, useRef} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2 } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
-import { getCountryMeta, getCountryLabel } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryLabel, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getCountryRequirements, SKIP_VACCINES } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
@@ -626,9 +626,13 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
 // ─────────────────────────────────────────────────────────────────────────────
 // Emergency tab
 // ─────────────────────────────────────────────────────────────────────────────
-function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
+function EmergencyContent({ country, homeCountry, secondNationality, meta, activeCityName }) {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
+  // Consulados: viven en un fichero aparte de ~340 KB, así que se carga bajo
+  // demanda (solo al abrir esta pestaña) y no lastra el arranque de la app.
+  const [consulates, setConsulates] = useState([]);
+  const [showAllConsulates, setShowAllConsulates] = useState(false);
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -638,6 +642,33 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
     setData(d);
     setLoading(false);
   }, [country, homeCountry, secondNationality]);
+
+  // Carga diferida de los consulados (fichero grande: solo si hace falta).
+  useEffect(() => {
+    let cancelled = false;
+    setShowAllConsulates(false);
+    if (!country || !homeCountry) { setConsulates([]); return; }
+    const iso = getCountryIso(normalizeCountry(homeCountry));
+    if (!iso) { setConsulates([]); return; }
+    import('@/lib/consulatesDB')
+      .then(({ getConsulates }) => {
+        if (cancelled) return;
+        const list = getConsulates(country, iso);
+        // El que esté en la ciudad donde está el viajero, primero: si te pasa algo
+        // en Mar del Plata te sirve el de Mar del Plata, no el de Buenos Aires.
+        const here = (activeCityName || '').trim().toLowerCase();
+        const sorted = here
+          ? [...list].sort((a, b) => {
+              const aq = (a.c || '').toLowerCase() === here ? 0 : 1;
+              const bq = (b.c || '').toLowerCase() === here ? 0 : 1;
+              return aq - bq;
+            })
+          : list;
+        setConsulates(sorted);
+      })
+      .catch(() => { if (!cancelled) setConsulates([]); });
+    return () => { cancelled = true; };
+  }, [country, homeCountry, activeCityName]);
 
   // No early return — show all tabs even without active trip
 
@@ -742,6 +773,56 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta }) {
           </div>
         );
       })()}
+
+      {/* Consulados: los 3 primeros (el de la ciudad actual va arriba) y el resto plegado */}
+      {!loading && consulates.length > 0 && (
+        <div className="bg-card rounded-2xl border border-border p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 className="w-4 h-4 text-muted-foreground" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {t('utilities.emerg.consulates', { count: consulates.length })}
+            </p>
+          </div>
+          <div className="space-y-3">
+            {(showAllConsulates ? consulates : consulates.slice(0, 3)).map((c, i) => {
+              const isHere = activeCityName && (c.c || '').toLowerCase() === activeCityName.trim().toLowerCase();
+              return (
+                <div key={`${c.c}-${i}`} className={`rounded-xl p-3 ${isHere ? 'bg-orange-50 border border-orange-100' : 'bg-secondary/40'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold text-foreground">{c.c}</p>
+                    {isHere && (
+                      <span className="text-label bg-primary text-white px-2 py-0.5 rounded-full font-semibold">
+                        {t('utilities.emerg.here')}
+                      </span>
+                    )}
+                  </div>
+                  {c.a && (
+                    <div className="flex items-start gap-2 mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-muted-foreground">{c.a}</p>
+                    </div>
+                  )}
+                  {c.p && (
+                    <a href={`tel:${c.p.replace(/\s/g,'')}`} className="flex items-center gap-2 mt-1.5">
+                      <Phone className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      <span className="text-xs font-semibold text-primary">{c.p}</span>
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {consulates.length > 3 && (
+            <button
+              onClick={() => setShowAllConsulates(v => !v)}
+              className="w-full mt-3 py-2 flex items-center justify-center gap-1 text-xs font-medium text-primary">
+              {showAllConsulates
+                ? <><ChevronUp className="w-3.5 h-3.5" />{t('utilities.emerg.showLess')}</>
+                : <><ChevronDown className="w-3.5 h-3.5" />{t('utilities.emerg.showMore', { count: consulates.length - 3 })}</>}
+            </button>
+          )}
+        </div>
+      )}
       {!loading && data && !data.embassy && (() => {
         const normalizeC = (c) => (c || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         if (normalizeC(country) === normalizeC(homeCountry)) return null;
@@ -949,6 +1030,7 @@ export default function Utilities() {
             homeCountry={homeCountry}
             secondNationality={secondNationality}
             meta={meta}
+            activeCityName={activeCity?.name || ''}
           />
         )}
         {activeTab === 'maleta' && (
