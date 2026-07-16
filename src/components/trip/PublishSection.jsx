@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Share2, Copy, CheckCircle, Globe, Lock, LinkIcon, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { publishTripAsTemplate, getTemplateShareUrl } from '@/lib/publishTripAsTemplate';
+import { useTranslation } from 'react-i18next';
 
 const VISIBILITY_OPTIONS = [
   { value: 'private', label: 'Privado (solo yo)', icon: Lock, description: 'Nadie más puede verlo' },
@@ -20,6 +20,7 @@ export default function PublishSection({
   isAdmin,
   onPublish
 }) {
+  const { t } = useTranslation();
   const [visibility, setVisibility] = useState(trip?.template_visibility || 'private');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -40,7 +41,7 @@ export default function PublishSection({
     try {
       const result = await publishTripAsTemplate(trip, cities, user, profile, visibility);
       toast({
-        title: '✨ Itinerario publicado',
+        title: t('publish.publishedToast'),
         description: `Tu viaje ahora es ${visibility === 'public' ? 'público' : visibility === 'unlisted' ? 'no listado' : 'privado'}`
       });
       if (onPublish) onPublish(result);
@@ -85,7 +86,7 @@ export default function PublishSection({
         <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
           <CheckCircle className="w-5 h-5 text-green-600" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-green-900">Publicado</p>
+            <p className="text-sm font-medium text-green-900">{t('publish.published')}</p>
             <p className="text-xs text-green-800">
               {visibility === 'private' && 'Solo tú puedes verlo'}
               {visibility === 'unlisted' && 'Accesible por enlace'}
@@ -97,7 +98,7 @@ export default function PublishSection({
 
       {/* Visibility Selection */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-foreground block">Visibilidad</label>
+        <label className="text-sm font-medium text-foreground block">{t('documents.form.visibility')}</label>
         <Select value={visibility} onValueChange={setVisibility}>
           <SelectTrigger className="bg-input border-border text-foreground">
             <SelectValue />
@@ -126,21 +127,21 @@ export default function PublishSection({
         {visibility === 'private' && (
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-xs text-blue-800">
-              <strong>Privado:</strong> Solo tú puedes ver y editar este itinerario. Nadie más podrá acceder a él ni aparecerá en Explorar.
+              <strong>{t('publish.private')}</strong> {t('publish.privateDesc')}
             </p>
           </div>
         )}
         {visibility === 'unlisted' && (
           <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
             <p className="text-xs text-purple-800">
-              <strong>No listado:</strong> Accesible por enlace directo, pero no aparecerá en Explorar. Perfecto para compartir con gente específica.
+              <strong>{t('publish.unlisted')}</strong> {t('publish.unlistedDesc')}
             </p>
           </div>
         )}
         {visibility === 'public' && (
           <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <p className="text-xs text-accent-foreground">
-              <strong>Público:</strong> Aparecerá en Explorar y otros viajeros podrán descubrirlo y guardarlo.
+              <strong>{t('publish.public')}</strong> {t('publish.publicDesc')}
             </p>
           </div>
         )}
@@ -150,7 +151,7 @@ export default function PublishSection({
       {!isAdmin && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-xs text-red-800">
-            <strong>Permisos:</strong> Solo los admins del viaje pueden publicar itinerarios.
+            <strong>{t('publish.permissions')}</strong> {t('publish.permissionsDesc')}
           </p>
         </div>
       )}

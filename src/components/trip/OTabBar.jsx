@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const [lineStyle, setLineStyle] = useState({ left: 0, width: 0 });
   const [mounted, setMounted] = useState(false);
@@ -32,7 +34,7 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
   }, [updateLine]);
 
   return (
-    <div ref={containerRef} role="tablist" aria-label="Secciones del viaje" className="relative flex" style={{ position: 'relative' }}>
+    <div ref={containerRef} role="tablist" aria-label={t('trip.sectionsAria')} className="relative flex" style={{ position: 'relative' }}>
       {/* Single sliding line — top */}
       <div style={{
         position: 'absolute',

@@ -3,9 +3,9 @@ import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
+import { useTranslation } from 'react-i18next';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -26,6 +26,7 @@ const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', s
 
 
 export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
+  const { t } = useTranslation();
   const [notes, setNotes]         = useState(spot?.notes || '');
   const [time, setTime]           = useState(spot?.assigned_time || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
@@ -138,13 +139,13 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
           {/* Día */}
           {tripDayOptions.length > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Día</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('spots.sheet.day')}</p>
               <select
                 value={assignedDate}
                 onChange={e => setAssignedDate(e.target.value)}
                 className="w-full h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
               >
-                <option value="">Sin asignar</option>
+                <option value="">{t('spots.sheet.unassigned')}</option>
                 {tripDayOptions.map(d => (
                   <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
                 ))}
@@ -154,17 +155,17 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
 
           {/* Hora */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Hora</p>
+            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('spots.sheet.time')}</p>
             {editingTime ? (
               <div className="flex items-center gap-2">
                 <input type="time" value={time} onChange={e => setTime(e.target.value)}
                   className="h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary w-[120px]" />
-                <button onClick={() => setTime('')} className="text-xs text-muted-foreground">Quitar</button>
+                <button onClick={() => setTime('')} className="text-xs text-muted-foreground">{t('cities.day.remove')}</button>
                 <div className="ml-auto flex gap-2">
-                  <button onClick={() => setEditingTime(false)} className="text-xs text-muted-foreground">Cancelar</button>
+                  <button onClick={() => setEditingTime(false)} className="text-xs text-muted-foreground">{t('common.cancel')}</button>
                   <button onClick={handleSave} disabled={saving}
                     className="text-xs text-white bg-primary px-3 py-1.5 rounded-full disabled:opacity-40">
-                    {saving ? '...' : 'Guardar'}
+                    {saving ? '...' : t('common.save')}
                   </button>
                 </div>
               </div>
@@ -173,9 +174,9 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                 {time
                   ? <span className="text-sm text-primary font-medium">{time}</span>
-                  : <span className="text-sm text-muted-foreground">Sin hora</span>}
+                  : <span className="text-sm text-muted-foreground">{t('spots.modal.noTime')}</span>}
                 <button onClick={() => setEditingTime(true)} className="text-xs text-primary font-medium underline underline-offset-2 ml-1">
-                  {time ? 'Editar' : 'Añadir hora'}
+                  {time ? t('common.edit') : t('spots.modal.addTime')}
                 </button>
               </div>
             )}
@@ -183,17 +184,17 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
 
           {/* Notas */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Nota personal</p>
+            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('cities.day.personalNote')}</p>
             {editingNotes ? (
               <div className="space-y-2">
                 <Textarea value={notes} onChange={e => setNotes(e.target.value)}
                   className="text-sm bg-secondary border-border resize-none" rows={3} autoFocus />
                 <div className="flex justify-end gap-2">
                   <button onClick={() => { setEditingNotes(false); setNotes(spot.notes || ''); }}
-                    className="text-xs text-muted-foreground px-3 py-1.5 rounded-full border border-border">Cancelar</button>
+                    className="text-xs text-muted-foreground px-3 py-1.5 rounded-full border border-border">{t('common.cancel')}</button>
                   <button onClick={handleSave} disabled={saving}
                     className="text-xs text-white bg-primary px-3 py-1.5 rounded-full disabled:opacity-40">
-                    {saving ? '...' : 'Guardar'}
+                    {saving ? '...' : t('common.save')}
                   </button>
                 </div>
               </div>
@@ -201,7 +202,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
               <button onClick={() => setEditingNotes(true)} className="w-full text-left">
                 {notes
                   ? <div className="bg-secondary rounded-xl p-3 text-sm text-foreground leading-relaxed">{notes}</div>
-                  : <div className="bg-secondary/50 rounded-xl p-3 text-sm text-muted-foreground border border-dashed border-border">Añadir nota...</div>}
+                  : <div className="bg-secondary/50 rounded-xl p-3 text-sm text-muted-foreground border border-dashed border-border">{t('spots.modal.addNote')}</div>}
               </button>
             )}
           </div>

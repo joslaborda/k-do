@@ -4,10 +4,12 @@
  */
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const AUTO_VALUE = '__auto__';
 
 export default function ActiveCitySelector({ cities = [], overrideCityId, setOverrideCityId, clearOverride, activeCity, onSelect }) {
+  const { t } = useTranslation();
   if (!cities.length) return null;
 
   // Soporte firma antigua (setOverrideCityId+clearOverride) y nueva (onSelect)
@@ -25,13 +27,13 @@ export default function ActiveCitySelector({ cities = [], overrideCityId, setOve
   return (
     <div className="flex items-center gap-2 bg-white/90 border border-border rounded-xl px-3 py-2 shadow-sm">
       <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-      <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Ahora estoy en:</span>
+      <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">{t('trip.activeCity.nowIn')}</span>
       <Select value={value} onValueChange={handleChange}>
         <SelectTrigger className="h-7 border-0 bg-transparent shadow-none text-sm font-semibold text-foreground p-0 focus:ring-0 min-w-[120px]">
           <SelectValue placeholder={activeCity?.name || 'Auto'} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={AUTO_VALUE}><span className="flex items-center gap-1.5"><Calendar size={13} />Automático (por fecha)</span></SelectItem>
+          <SelectItem value={AUTO_VALUE}><span className="flex items-center gap-1.5"><Calendar size={13} />{t('trip.activeCity.auto')}</span></SelectItem>
           {cities.map((c) => (
             <SelectItem key={c.id} value={c.id}>
               {c.name}

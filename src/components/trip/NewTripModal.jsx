@@ -1,10 +1,8 @@
 import { useState, useRef, forwardRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, X, Shuffle, ChevronDown, Loader2, AlertTriangle } from 'lucide-react';
-import { getCountryMeta, getTopCities, normalizeCountry } from '@/lib/countryConfig';
+import { getCountryMeta, getTopCities, normalizeCountry, getCountryOptions, searchCountries, getCountryLabel } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -94,47 +92,18 @@ function defaultStops(mode) {
 
 // ─── Inline country autocomplete (free-text + suggestions from catalog) ───────
 const CountryField = forwardRef(function CountryField({ value, onChange, hasError }, externalRef) {
-  const countries = useMemo(() => {
-    // All countries from our curated list — guaranteed to work everywhere
-    const list = [
-      'Afganistán','Albania','Alemania','Andorra','Angola','Antigua y Barbuda','Arabia Saudí',
-      'Argelia','Argentina','Armenia','Aruba','Australia','Austria','Azerbaiyán',
-      'Bahamas','Bahréin','Bangladés','Barbados','Bélgica','Belice','Benín','Bielorrusia',
-      'Bolivia','Bosnia','Botsuana','Brasil','Brunéi','Bulgaria','Burkina Faso','Burundi',
-      'Bután','Cabo Verde','Camboya','Camerún','Canadá','Chad','Chile','China',
-      'Chipre','Colombia','Comoras','Congo','Corea del Norte','Corea del Sur',
-      'Costa de Marfil','Costa Rica','Croacia','Cuba','Curazao',
-      'Dinamarca','Dominica','Ecuador','Egipto','El Salvador','Emiratos Árabes',
-      'Eritrea','Eslovaquia','Eslovenia','España','Estados Unidos','Estonia','Etiopía',
-      'Filipinas','Finlandia','Fiyi','Francia','Gabón','Gambia','Georgia','Ghana',
-      'Gibraltar','Granada','Grecia','Guatemala','Guinea','Guinea Ecuatorial','Guinea-Bisáu',
-      'Guyana','Haití','Honduras','Hungría','India','Indonesia','Irak','Irán','Irlanda',
-      'Islandia','Israel','Italia','Jamaica','Japón','Jordania','Kazajistán','Kenia',
-      'Kirguistán','Kiribati','Kosovo','Kuwait','Laos','Lesoto','Letonia','Líbano',
-      'Liberia','Libia','Liechtenstein','Lituania','Luxemburgo','Madagascar','Malaui',
-      'Malasia','Maldivas','Malí','Malta','Marruecos','Martinica','Mauritania','Mauricio',
-      'México','Micronesia','Moldova','Mónaco','Mongolia','Montenegro','Mozambique',
-      'Myanmar','Namibia','Nepal','Nicaragua','Níger','Nigeria','Noruega',
-      'Nueva Zelanda','Omán','Pakistán','Palaos','Panamá','Papúa Nueva Guinea',
-      'Paraguay','Países Bajos','Perú','Polonia','Portugal','Puerto Rico',
-      'Qatar','Reino Unido','República Centroafricana','República Checa',
-      'República del Congo','República Democrática del Congo','República Dominicana',
-      'Ruanda','Rumanía','Rusia','Sahara Occidental','Saint-Martin','San Cristóbal y Nieves',
-      'San Marino','San Vicente','Santa Lucía','Santo Tomé y Príncipe','Senegal','Serbia',
-      'Seychelles','Sierra Leona','Singapur','Sint Maarten','Siria','Somalia',
-      'Sri Lanka','Sudáfrica','Sudán','Sudán del Sur','Suecia','Suiza','Surinam',
-      'Svalbard','Tailandia','Taiwan','Tayikistán','Tanzania','Timor Oriental','Togo',
-      'Tonga','Trinidad y Tobago','Túnez','Turkmenistán','Turquía','Tuvalu',
-      'Ucrania','Uganda','Uruguay','Uzbekistán','Vanuatu','Venezuela','Vietnam',
-      'Yemen','Yibuti','Zambia','Zimbabue',
-    ];
-    return list.map(l => ({ code: l, label: l }));
-  }, []);
+  const { i18n } = useTranslation();
+  // Lista de países en el idioma activo. `value` es siempre el canónico en
+  // español (lo que se guarda en BD); `label` es lo que ve el usuario.
+  const countries = useMemo(() => getCountryOptions(i18n.language), [i18n.language]);
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState(value || '');
+  // El valor llega como canónico español; se muestra en el idioma activo.
+  const [q, setQ] = useState(() => (value ? getCountryLabel(value, i18n.language) : ''));
   const containerRef = useRef(null);
 
-  useEffect(() => { setQ(value || ''); }, [value]);
+  useEffect(() => {
+    setQ(value ? getCountryLabel(value, i18n.language) : '');
+  }, [value, i18n.language]);
 
   useEffect(() => {
     const handler = e => { if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false); };
@@ -144,31 +113,35 @@ const CountryField = forwardRef(function CountryField({ value, onChange, hasErro
 
   const suggestions = useMemo(() => {
     if (!q || q.length < 1) return [];
-    const lower = q.toLowerCase();
-    return countries.filter(c => c.label.toLowerCase().startsWith(lower)).slice(0, 8);
-  }, [q, countries]);
+    return searchCountries(q, i18n.language, 8);
+  }, [q, i18n.language]);
 
   const handleInput = e => {
     const v = e.target.value;
     setQ(v);
-    onChange(v);
+    // Texto libre: se normaliza a canónico (acepta "Spain", "España", "ES"...).
+    onChange(normalizeCountry(v) || v);
     setOpen(true);
   };
 
   const handleSelect = c => {
-    setQ(c.label);
-    onChange(c.label);
+    setQ(c.label);       // se muestra en el idioma activo
+    onChange(c.value);   // se guarda SIEMPRE el canónico en español
     setOpen(false);
   };
 
   const handleBlur = () => {
     setTimeout(() => {
       if (!containerRef.current?.contains(document.activeElement)) {
-        // try to canonicalize on blur
+        // Al salir, fijar el canónico y mostrar su nombre en el idioma activo.
         if (q.trim()) {
           try {
-            const exact = countries.find(c => c.label.toLowerCase() === q.toLowerCase());
-            if (exact) { setQ(exact.label); onChange(exact.label); }
+            const hit = searchCountries(q, i18n.language, 1)[0];
+            if (hit && (hit.label.toLowerCase() === q.toLowerCase()
+                     || hit.value.toLowerCase() === q.toLowerCase())) {
+              setQ(hit.label);
+              onChange(hit.value);
+            }
           } catch {}
         }
         setOpen(false);
@@ -184,7 +157,7 @@ const CountryField = forwardRef(function CountryField({ value, onChange, hasErro
         onChange={handleInput}
         onFocus={() => setOpen(true)}
         onBlur={handleBlur}
-        placeholder="País *"
+        placeholder={t('trip.new.countryRequired')}
         autoComplete="off"
         className={`w-full h-9 border rounded-xl px-3 text-sm outline-none transition-colors ${
           hasError ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
@@ -259,7 +232,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
       )}
       {open && !loading && filtered.length === 0 && q.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg px-3 py-2.5">
-          <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
+          <p className="text-sm text-muted-foreground">{t('trip.new.typeCityName')}</p>
           <button onMouseDown={() => { onChange(q); setOpen(false); }}
             className="mt-1.5 text-sm text-primary font-medium">
             Usar &ldquo;{q}&rdquo; →
@@ -268,7 +241,7 @@ function CityField({ country, value, onChange, placeholder = 'Ciudad...' }) {
       )}
       {open && !loading && cities.length === 0 && q.length === 0 && country && (
         <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg px-3 py-2.5">
-          <p className="text-sm text-muted-foreground">Escribe el nombre de la ciudad</p>
+          <p className="text-sm text-muted-foreground">{t('trip.new.typeCityName')}</p>
         </div>
       )}
     </div>
@@ -302,8 +275,8 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
   let nightsError = null;
   if (formData.start_date && formData.end_date && stops.some(s => s.nights)) {
     const diff = totalNightsEntered - tripTotalDays;
-    if (diff > 0) nightsError = `Sobran ${diff} noche${diff !== 1 ? 's' : ''} respecto al rango`;
-    else if (diff < 0) nightsError = `Faltan ${Math.abs(diff)} noche${Math.abs(diff) !== 1 ? 's' : ''} para completar el viaje`;
+    if (diff > 0) nightsError = t('trip.new.nightsExtra', { count: diff });
+    else if (diff < 0) nightsError = t('trip.new.nightsMissing', { count: Math.abs(diff) });
   }
 
   const canCreate =
@@ -429,25 +402,25 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
           {/* 1. Nombre */}
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Nombre del viaje <span className="text-primary">*</span>
+              {t('trip.new.tripName')} <span className="text-primary">*</span>
             </label>
             <input
               ref={nameRef}
-              placeholder="ej. Mamma mía 2026"
+              placeholder={t('trip.new.namePlaceholder')}
               value={formData.name}
               onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
               className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${
                 missingName ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
               }`}
             />
-            {missingName && <p className="text-xs text-red-500 mt-1">El nombre es obligatorio</p>}
+            {missingName && <p className="text-xs text-red-500">{t('trip.new.nameRequired')}</p>}
           </div>
 
           {/* 2. Modo */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">Tipo de viaje</label>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">{t('trip.new.tripType')}</label>
             <div className="flex rounded-xl border border-border overflow-hidden max-w-xs">
-              {[['single','1 destino'],['multi','Multi-ciudad']].map(([v,l]) => (
+              {[['single',t('trip.new.singleDest')],['multi',t('trip.new.multiCity')]].map(([v,l]) => (
                 <button key={v} type="button" onClick={() => setMode_(v)}
                   className={`flex-1 py-2 text-sm font-medium transition-colors ${mode === v ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
                   {l}
@@ -460,7 +433,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Fecha inicio <span className="text-primary">*</span>
+                {t('trip.dialog.startDate')} <span className="text-primary">*</span>
               </label>
               <input
                 ref={startDateRef}
@@ -471,11 +444,11 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                   missingStart ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'
                 }`}
               />
-              {missingStart && <p className="text-xs text-red-500 mt-1">La fecha de inicio es obligatoria</p>}
+              {missingStart && <p className="text-xs text-red-500">{t('trip.new.startRequired')}</p>}
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Fecha fin <span className="text-muted-foreground font-normal text-xs">(o se calcula por noches)</span>
+                {t('trip.dialog.endDate')} <span className="text-muted-foreground font-normal text-xs">{t('trip.new.orByNights')}</span>
               </label>
               <input
                 type="date"
@@ -496,7 +469,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               <div className="flex items-center gap-2">
                 {mode === 'multi' && formData.start_date && (
                   <div className="flex gap-1">
-                    {[{v:'nights',l:'Noches'},{v:'manual',l:'Manual'}].map(({v,l}) => (
+                    {[{v:'nights',l:t('trip.new.nights')},{v:'manual',l:t('trip.new.manual')}].map(({v,l}) => (
                       <button key={v} type="button" onClick={() => setDateMode(v)}
                         className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
                           dateMode === v ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
@@ -511,7 +484,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             {mode === 'multi' && formData.start_date && stops.length > 1 && (
               <button type="button" onClick={dateMode === 'nights' ? autoDistributeNights : autoDistributeManual}
                 className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors -mt-1">
-                <Shuffle className="w-3.5 h-3.5" />Auto-repartir
+                <Shuffle className="w-3.5 h-3.5" />{t('trip.new.autoDistribute')}
               </button>
             )}
 
@@ -551,12 +524,12 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                         ) : null
                       ) : dateMode === 'nights' ? (
                         <div className="flex items-center gap-2 pl-1">
-                          <input type="number" min="1" aria-label="Número de noches" placeholder="noches"
+                          <input type="number" min="1" aria-label={t('trip.new.nightsAria')} placeholder={t('trip.new.nightsPh')}
                             value={stop.nights}
                             onChange={e => updateStop(idx, { nights: e.target.value })}
                             className="w-20 h-8 border border-border rounded-lg px-2 text-sm outline-none focus:border-primary bg-secondary"
                           />
-                          <span className="text-xs text-muted-foreground">noches</span>
+                          <span className="text-xs text-muted-foreground">{t('trip.new.nightsPh')}</span>
                           {stop.nights && nightsAllocations[idx] && (
                             <span className="text-xs text-primary font-medium">
                               {nightsAllocations[idx].start_date} → {nightsAllocations[idx].end_date}
@@ -587,11 +560,11 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             {mode === 'multi' && (
               <button type="button" onClick={addStop}
                 className="w-full flex items-center justify-center gap-1.5 text-sm text-primary font-medium border border-dashed border-primary/40 rounded-xl py-2.5 hover:bg-orange-50 transition-colors">
-                <Plus className="w-4 h-4" />Añadir parada
+                <Plus className="w-4 h-4" />{t('trip.dialog.addStop')}
               </button>
             )}
 
-            {missingCountry && <p className="text-xs text-red-500">El país de la primera parada es obligatorio</p>}
+            {missingCountry && <p className="text-xs text-red-500">{t('trip.new.firstStopCountry')}</p>}
 
             {mode === 'multi' && dateMode === 'nights' && formData.start_date && (
               <div className="pl-1 space-y-1">
@@ -616,7 +589,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               className="bg-primary hover:bg-primary/90 text-white"
               disabled={isPending}
             >
-              {isPending ? 'Creando...' : t('trip.create')}
+              {isPending ? t('trip.new.creating') : t('trip.create')}
             </Button>
           </div>
         </div>
