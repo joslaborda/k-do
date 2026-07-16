@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Users, Calendar } from 'lucide-react';
+import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -104,7 +104,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Invitación de <span className="font-medium text-foreground">{notif.actor_display_name || notif.actor_username || 'Alguien'}</span></p>
+                <p className="text-xs text-muted-foreground">{t('notifications.inviteFrom')} <span className="font-medium text-foreground">{notif.actor_display_name || notif.actor_username || t('notifications.someone')}</span></p>
                 <p className="text-base font-semibold text-foreground">{tripData.name || tripData.destination}</p>
               </div>
             </div>
