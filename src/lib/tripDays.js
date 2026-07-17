@@ -21,6 +21,8 @@ import { parseISO, addDays, format } from 'date-fns';
  * @returns {Array<{ date: string, city: string }>}  date en formato 'yyyy-MM-dd'
  */
 export function getTripDays(cities = []) {
+  // `= []` solo cubre undefined: si llega null explícito hay que atajarlo aquí.
+  if (!Array.isArray(cities)) return [];
   const sorted = [...cities].sort((a, b) => {
     if (a.start_date && b.start_date) return a.start_date.localeCompare(b.start_date);
     return (a.order ?? 0) - (b.order ?? 0);

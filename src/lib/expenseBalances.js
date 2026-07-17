@@ -10,6 +10,7 @@
  * @param {Array} members - emails de los miembros
  */
 export function calculateBalances(expenses, members) {
+  if (!Array.isArray(expenses) || !Array.isArray(members)) return {};
   const balances = {};
   members.forEach(email => { balances[email] = 0; });
 
@@ -52,6 +53,7 @@ export function calculateBalances(expenses, members) {
  * Minimiza el número de pagos necesarios para saldar todas las deudas
  */
 export function getDebts(balances) {
+  if (!balances || typeof balances !== 'object') return [];
   // Filtrar balances significativos
   const credits = []; // positivo: te deben
   const debts_list = []; // negativo: debes
@@ -96,5 +98,6 @@ export function getDebts(balances) {
  * Calcula el total gastado normalizado a moneda base
  */
 export function getTotalInBase(expenses) {
+  if (!Array.isArray(expenses)) return 0;
   return expenses.reduce((sum, e) => sum + parseFloat(e.amount_base || e.amount || 0), 0);
 }
