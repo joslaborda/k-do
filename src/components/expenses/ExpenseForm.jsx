@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
+import { checkUpload } from '@/lib/uploadLimits';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
@@ -102,10 +103,23 @@ export default function ExpenseForm({
 
   const handleReceiptUpload = async file => {
     if (!file) return;
+    const chk = checkUpload(file);
+    if (!chk.ok) {
+      toast({
+        title: chk.reason === 'size' ? t('upload.tooLarge') : t('upload.notImage'),
+        description: chk.reason === 'size' ? t('upload.maxMb', { mb: chk.maxMb }) : undefined,
+        variant: 'destructive',
+      });
+      return;
+    }
     setUploadingReceipt(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setReceipts(p => [...p, file_url]);
+    } catch (e) {
+      // Antes era try/finally sin catch: si fallaba, el error se perdía y el
+      // usuario no sabía que su recibo no se había subido.
+      toast({ title: t('upload.failed'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
     } finally { setUploadingReceipt(false); }
   };
 
