@@ -1052,7 +1052,7 @@ export default function Expenses() {
   const updateMutation = useMutation({
     mutationFn: ({ id, d }) => base44.entities.Expense.update(id, { ...d, amount: parseFloat(d.amount) }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['expenses', tripId] }); setSheetOpen(false); setEditingExpense(null); window.scrollTo({ top: 0, behavior: 'smooth' }); },
-    onError: () => toast({ title: 'Error al actualizar el gasto', variant: 'destructive' }),
+    onError: () => toast({ title: t('expenses.updateError'), variant: 'destructive' }),
   });
 
   const [pendingDeleteClose, setPendingDeleteClose] = useState(null);
@@ -1063,7 +1063,7 @@ export default function Expenses() {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setDetailExpense(null); // close sheet after confirmed delete
     },
-    onError: () => toast({ title: 'Error al eliminar el gasto', variant: 'destructive' }),
+    onError: () => toast({ title: t('expenses.deleteError'), variant: 'destructive' }),
   });
 
   const handleSave = d => {
