@@ -6,6 +6,7 @@ import { MapPin, X, Camera, Navigation, Pencil, Utensils, Landmark, Zap, Shoppin
 import { useLike } from '@/hooks/useLike';
 import { getMapsUrl } from './spotsHelpers';
 import { useTranslation } from 'react-i18next';
+import { checkUpload } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
 
 const TYPE_CONFIG = {
@@ -22,11 +23,14 @@ const TYPE_CONFIG = {
 // ── Popup de valoración ───────────────────────────────────────────────────────
 // ── Upload helper ─────────────────────────────────────────────────────────────
 async function uploadPhoto(file) {
+  // Devuelve { url } o { error: 'size'|'type'|'failed', maxMb }
+  const chk = checkUpload(file);
+  if (!chk.ok) return { error: chk.reason, maxMb: chk.maxMb };
   try {
     const { file_url } = await base44.storage.uploadFile(file);
-    return file_url;
+    return { url: file_url };
   } catch {
-    return null;
+    return { error: 'failed' };
   }
 }
 
@@ -98,8 +102,10 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
               onChange={async e => {
                 const file = e.target.files?.[0];
                 if (!file) return;
-                const url = await uploadPhoto(file);
-                if (url) setImageUrl(url);
+                const r = await uploadPhoto(file);
+                if (r.url) setImageUrl(r.url);
+                else toast({ title: r.error === 'size' ? t('upload.tooLarge') : r.error === 'type' ? t('upload.notImage') : t('upload.failed'),
+                  description: r.error === 'size' ? t('upload.maxMb', { mb: r.maxMb }) : undefined, variant: 'destructive' });
               }} />
             <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
               <Camera className="w-4 h-4" />
@@ -220,14 +226,14 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
               <div className="flex gap-1.5 flex-1">
                 <label className="cursor-pointer flex-1">
                   <input type="file" accept="image/*" className="hidden"
-                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
+                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const r=await uploadPhoto(file); if(r.url) setImageUrl(r.url); else toast({ title: r.error==='size'?t('upload.tooLarge'):r.error==='type'?t('upload.notImage'):t('upload.failed'), description: r.error==='size'?t('upload.maxMb',{mb:r.maxMb}):undefined, variant:'destructive' }); }} />
                   <div className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border text-xs transition-colors ${imageUrl ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>
                     <Camera className="w-3.5 h-3.5" />{imageUrl ? t('spots.comments.ok') : t('spots.comments.gallery')}
                   </div>
                 </label>
                 <label className="cursor-pointer flex-1">
                   <input type="file" accept="image/*" capture="environment" className="hidden"
-                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const url=await uploadPhoto(file); if(url) setImageUrl(url); }} />
+                    onChange={async e => { const file=e.target.files?.[0]; if(!file) return; const r=await uploadPhoto(file); if(r.url) setImageUrl(r.url); else toast({ title: r.error==='size'?t('upload.tooLarge'):r.error==='type'?t('upload.notImage'):t('upload.failed'), description: r.error==='size'?t('upload.maxMb',{mb:r.maxMb}):undefined, variant:'destructive' }); }} />
                   <div className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-xl border border-border text-xs text-muted-foreground hover:border-primary/40 transition-colors">
                     <Camera className="w-3.5 h-3.5" />{t('spots.comments.camera')}
                   </div>
