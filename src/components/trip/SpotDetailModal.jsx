@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { getTripDays } from '@/lib/tripDays';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -43,19 +44,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
   });
 
   const tripDayOptions = useMemo(() => {
-    const days = [];
-    const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
-    sorted.forEach(c => {
-      if (c.start_date && c.end_date) {
-        let d = new Date(c.start_date + 'T00:00:00');
-        const end = new Date(c.end_date + 'T00:00:00');
-        while (d <= end) {
-          days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
-          d.setDate(d.getDate() + 1);
-        }
-      }
-    });
-    return days;
+    return getTripDays(tripCities);
   }, [tripCities]);
 
   useEffect(() => {
