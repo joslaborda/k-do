@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 export default
 function InlineCommentsPopup({ spot, userId, onClose }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
 
@@ -32,6 +34,8 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
       text: text.trim() || null,
     }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] }); setText(''); },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleSubmit = () => {

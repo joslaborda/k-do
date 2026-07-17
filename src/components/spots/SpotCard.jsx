@@ -6,6 +6,7 @@ import { MapPin, X, Camera, Navigation, Pencil, Utensils, Landmark, Zap, Shoppin
 import { useLike } from '@/hooks/useLike';
 import { getMapsUrl } from './spotsHelpers';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 const TYPE_CONFIG = {
   food:      { tk: 'spots.types.food',      Icon: Utensils,   color: 'bg-orange-100 text-primary' },
@@ -32,6 +33,7 @@ async function uploadPhoto(file) {
 
 function RatingPopup({ spot, userId, userProfile, onClose }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [thumb, setThumb] = useState(null);
   const [text, setText] = useState('');
@@ -53,6 +55,8 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] });
       onClose();
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   return (
@@ -121,6 +125,7 @@ function RatingPopup({ spot, userId, userProfile, onClose }) {
 // ── Popup de comentarios ──────────────────────────────────────────────────────
 function CommentsPopup({ spot, userId, userProfile, onClose }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
   const [thumb, setThumb] = useState(null);
@@ -146,6 +151,8 @@ function CommentsPopup({ spot, userId, userProfile, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['spotComments', spot.id] });
       setText(''); setThumb(null); setImageUrl(''); setShowImageField(false);
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const ups = comments.filter(c => c.thumb === 'up').length;
@@ -262,12 +269,14 @@ function DeleteConfirmPopup({ spot, onConfirm, onCancel }) {
 
 // ── Popup de valoración tras visitar ────────────────────────────────────────
 function VisitedRatingPopup({ spot, userId, userProfile, onClose }) {
+  const { toast } = useToast();
   return <RatingPopup spot={spot} userId={userId} userProfile={userProfile} onClose={onClose} />;
 }
 
 // ── SpotCard principal ────────────────────────────────────────────────────────
 export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tripId }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [showComments, setShowComments] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const queryClient = useQueryClient();
@@ -301,6 +310,8 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
       queryClient.invalidateQueries({ queryKey: ['spots', cityId] });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const deleteMutation = useMutation({
@@ -309,6 +320,8 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
       queryClient.invalidateQueries({ queryKey: ['spots', cityId] });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleMarkVisited = () => {

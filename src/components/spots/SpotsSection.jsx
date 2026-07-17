@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import SpotCard from './SpotCard';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 const ALL_TYPES = [
   { value: 'all',       tk: 'common.all',            Icon: LayoutGrid  },
@@ -64,6 +65,7 @@ async function nearbyPlaces(lat, lng) {
 
 function PlaceResultCard({ place, onSave, saving }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const tc = ALL_TYPES.find(item => item.value === place.type) || ALL_TYPES[6];
   return (
     <div className="bg-card rounded-xl border border-border flex overflow-hidden shadow-sm hover:shadow-md transition-shadow">
@@ -131,6 +133,7 @@ function ManualForm({ onSave, saving, onClose }) {
 
 export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, days = [], city = '', country = '' }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [activeType, setActiveType] = useState('all');
   const [panelMode, setPanelMode] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -158,6 +161,8 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
   const createMutation = useMutation({
     mutationFn: data => base44.entities.Spot.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', cityId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   useEffect(() => {
