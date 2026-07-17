@@ -79,6 +79,7 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
 
 export default function InviteModal({ open, onClose, trip, tripId, queryClient, profiles = [], currentUserEmail = '', currentUserName = '' }) {
   const { t } = useTranslation();
+  const [cancelling, setCancelling] = useState(null);
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState('search'); // 'search' | 'email'
   const [emailInput, setEmailInput] = useState('');
@@ -198,6 +199,19 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       setError(e?.message || t('invites.modal.sendError'));
     }
     setSending(false);
+  };
+
+  // Retirar una invitación pendiente: antes, si te equivocabas de email, esa
+  // invitación quedaba viva para siempre y no había forma de anularla.
+  const handleCancelInvite = async (inv) => {
+    setCancelling(inv.id);
+    try {
+      await base44.entities.TripInvite.update(inv.id, { status: 'cancelled' });
+      queryClient.invalidateQueries({ queryKey: ['pendingInvites', tripId] });
+    } catch (e) {
+      setError(e?.message || t('invites.modal.cancelError'));
+    }
+    setCancelling(null);
   };
 
   const handleEmailInvite = async () => {
@@ -396,7 +410,12 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                           <p className="text-sm text-foreground truncate">{inv.email}</p>
                           <p className="text-xs text-muted-foreground">{t('invites.modal.invitedPending')}</p>
                         </div>
-                        <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-2 py-0.5 flex-shrink-0">{t('common.pending')}</span>
+                        <button
+                          onClick={() => handleCancelInvite(inv)}
+                          disabled={cancelling === inv.id}
+                          className="text-xs text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0 disabled:opacity-50">
+                          {cancelling === inv.id ? '…' : t('invites.modal.cancelInvite')}
+                        </button>
                       </div>
                     ))}
                   </div>

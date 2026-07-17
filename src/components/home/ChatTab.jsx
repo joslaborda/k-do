@@ -87,6 +87,8 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       setMessage('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleUpload = async (file) => {

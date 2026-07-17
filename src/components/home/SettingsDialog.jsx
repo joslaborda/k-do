@@ -10,17 +10,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import CountryInput from '@/components/trip/CountryInput';
 import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
+import { AlertTriangle } from 'lucide-react';
 
 export default
 function SettingsDialog({
   open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = []
 }) {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [editingCity, setEditingCity] = useState(null); // city id or 'new'
+  const [cityToDelete, setCityToDelete] = useState(null);
   const [cityDraft, setCityDraft] = useState({});
   const [saving, setSaving] = useState(false);
   const [cityLoading, setCityLoading] = useState(null);
@@ -50,7 +54,9 @@ function SettingsDialog({
       });
       onSaved();
       onClose();
-    } catch {}
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
     setSaving(false);
   };
 
@@ -81,7 +87,9 @@ function SettingsDialog({
       });
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
-    } catch {}
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
     setCityLoading(null);
   };
 
@@ -89,10 +97,22 @@ function SettingsDialog({
     if (cities.length <= 1) return;
     setCityLoading(cityId);
     try {
+      // Los días de la parada se borran también: si no, quedan huérfanos en la BD
+      // apuntando a un city_id que ya no existe.
+      const days = await base44.entities.ItineraryDay.filter({ city_id: cityId });
+      await Promise.all(days.map(d => base44.entities.ItineraryDay.delete(d.id)));
       await base44.entities.City.delete(cityId);
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
       closeCityEdit();
-    } catch {}
+      setCityToDelete(null);
+    } catch (e) {
+      toast({
+        title: t('trip.dialog.deleteStopError'),
+        description: e?.message || t('common.tryAgain'),
+        variant: 'destructive',
+      });
+    }
     setCityLoading(null);
   };
 
@@ -114,7 +134,9 @@ function SettingsDialog({
       });
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
-    } catch {}
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
     setCityLoading(null);
   };
 
@@ -219,7 +241,7 @@ function SettingsDialog({
                 <div className="flex items-center justify-between">
                   {cities.length > 1 ? (
                     <button
-                      onClick={() => deleteCity(city.id)}
+                      onClick={() => setCityToDelete(city)}
                       disabled={cityLoading === city.id}
                       className="text-xs text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors disabled:opacity-50">
                       <Trash2 className="w-3.5 h-3.5" />
@@ -331,6 +353,34 @@ function SettingsDialog({
           </div>
         </div>
       </DialogContent>
+
+      {/* Confirmación de borrado de parada: antes desaparecía de un toque, y con
+          ella los días de esa ciudad, sin avisar. */}
+      <Dialog open={!!cityToDelete} onOpenChange={o => !o && setCityToDelete(null)}>
+        <DialogContent className="max-w-xs rounded-2xl p-5">
+          <DialogHeader className="sr-only"><DialogTitle>{t('trip.dialog.deleteStopConfirm')}</DialogTitle></DialogHeader>
+          <div className="flex items-start gap-3 mb-1">
+            <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+            </div>
+            <p className="text-sm font-medium text-foreground pt-1.5">{t('trip.dialog.deleteStopConfirm')}</p>
+          </div>
+          <p className="text-xs text-muted-foreground mb-5 ml-11">
+            {t('trip.dialog.deleteStopWarning', { city: cityToDelete?.name || '' })}
+          </p>
+          <div className="flex gap-2">
+            <button onClick={() => setCityToDelete(null)}
+              className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">
+              {t('common.cancel')}
+            </button>
+            <button onClick={() => deleteCity(cityToDelete.id)}
+              disabled={cityLoading === cityToDelete?.id}
+              className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-50">
+              {cityLoading === cityToDelete?.id ? t('trip.dialog.deleting') : t('common.delete')}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
