@@ -1377,5 +1377,11 @@
     "docsSub": "Documentos del viaje",
     "translateSub": "Voz, texto e imagen",
     "utilitiesSub": "Clima, emergencias, maleta"
+  },
+  "upload": {
+    "tooLarge": "Archivo demasiado grande",
+    "maxMb": "El máximo son {{mb}} MB",
+    "notImage": "Solo se admiten imágenes",
+    "failed": "No se pudo subir el archivo"
   }
 }

@@ -1377,5 +1377,11 @@
     "docsSub": "Trip documents",
     "translateSub": "Voice, text and image",
     "utilitiesSub": "Weather, emergencies, packing"
+  },
+  "upload": {
+    "tooLarge": "File too large",
+    "maxMb": "The maximum is {{mb}} MB",
+    "notImage": "Only images are allowed",
+    "failed": "Couldn't upload the file"
   }
 }
