@@ -9,11 +9,22 @@ import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import ItemDetailSheet from './ItemDetailSheet';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_ICON } from './constants';
-import { getHolidaysForDate } from '@/lib/holidaysDB';
 import { useTranslation } from 'react-i18next';
 
 export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime }) {
   const { t } = useTranslation();
+  // holidaysDB son ~120 KB: se cargan solo si hay ciudad y fecha.
+  const [holidays, setHolidays] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!city?.country || !dateStr) { setHolidays([]); return; }
+    import('@/lib/holidaysDB')
+      .then(({ getHolidaysForDate }) => {
+        if (!cancelled) setHolidays(getHolidaysForDate(city.country, dateStr, city.name) || []);
+      })
+      .catch(() => { if (!cancelled) setHolidays([]); });
+    return () => { cancelled = true; };
+  }, [city?.country, dateStr, city?.name]);
   const [open, setOpen]         = useState(defaultOpen);
   const [viewFile, setViewFile] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -93,8 +104,6 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
       </button>
 
       {(() => {
-        if (!city?.country || !dateStr) return null;
-        const holidays = getHolidaysForDate(city.country, dateStr, city.name);
         if (!holidays.length) return null;
         return (
           <div className="border-t border-amber-200/60 dark:border-amber-900/30 bg-amber-50/60 dark:bg-amber-950/20 px-4 py-2 flex flex-col gap-1">

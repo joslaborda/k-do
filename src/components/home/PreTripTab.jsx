@@ -1,18 +1,18 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, Check, Users } from 'lucide-react';
-import { COUNTRY_REQUIREMENTS, SKIP_VACCINES } from '@/lib/packingDB';
-import { getHolidaysInRange } from '@/lib/holidaysDB';
-import { getVisaInfo } from '@/lib/visaMatrix';
+
 import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { REQ_ICON_MAP } from './constants';
 import MemberAvatarRow from './MemberAvatarRow';
 
-function buildRequirements(countries, originCountry, secondNationality = null, lang = 'es') {
+function buildRequirements(countries, originCountry, secondNationality = null, lang = 'es', db = null) {
+  if (!db) return [];
+  const { COUNTRY_REQUIREMENTS, SKIP_VACCINES, getHolidaysInRange, getVisaInfo } = db;
   const requirements = [];
   const originISO = getCountryMeta(originCountry)?.iso || originCountry;
   const secondISO = secondNationality ? getCountryMeta(secondNationality)?.iso : null;
@@ -129,9 +129,30 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
     return Object.values(seen);
   }, [trip, cities]);
 
+  // Las bases de visados, vacunas y festivos suman ~880 KB y solo se usan en esta
+  // pestaña (y solo antes de que empiece el viaje): se cargan al abrirla.
+  const [db, setDb] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      import('@/lib/packingDB'),
+      import('@/lib/holidaysDB'),
+      import('@/lib/visaMatrix'),
+    ]).then(([packing, holidays, visa]) => {
+      if (cancelled) return;
+      setDb({
+        COUNTRY_REQUIREMENTS: packing.COUNTRY_REQUIREMENTS,
+        SKIP_VACCINES: packing.SKIP_VACCINES,
+        getHolidaysInRange: holidays.getHolidaysInRange,
+        getVisaInfo: visa.getVisaInfo,
+      });
+    }).catch(() => { if (!cancelled) setDb(null); });
+    return () => { cancelled = true; };
+  }, []);
+
   const requirements = useMemo(() =>
-    buildRequirements([...allCountries], originCountry, myProfile?.second_nationality || null, i18n.language),
-    [allCountries, originCountry, myProfile?.second_nationality, i18n.language]
+    buildRequirements([...allCountries], originCountry, myProfile?.second_nationality || null, i18n.language, db),
+    [allCountries, originCountry, myProfile?.second_nationality, i18n.language, db]
   );
 
   const toggleCheck = (id) => {
@@ -285,9 +306,9 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
       )}
 
       {(() => {
-        if (!trip?.start_date || !trip?.end_date) return null;
+        if (!trip?.start_date || !trip?.end_date || !db) return null;
         const countryList = [...new Set(sortedCities.map(c => c.country).filter(Boolean))];
-        const tripHolidays = getHolidaysInRange(countryList, trip.start_date, trip.end_date, sortedCities);
+        const tripHolidays = db.getHolidaysInRange(countryList, trip.start_date, trip.end_date, sortedCities);
         if (!tripHolidays.length) return null;
         return (
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
