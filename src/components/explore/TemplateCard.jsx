@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Heart, MapPin, Calendar, ArrowRight, Map, Plane } from 'lucide-react';
 import { useLike } from '@/hooks/useLike';
 import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 import { createPageUrl } from '@/utils';
 
 export default function TemplateCard({ template, currentUser }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { isLiked, count: likeCount, toggle: toggleLike } = useLike({
@@ -64,7 +66,8 @@ export default function TemplateCard({ template, currentUser }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myCollection', currentUser?.id] });
-    }
+    },
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleSaveToggle = (e) => {
