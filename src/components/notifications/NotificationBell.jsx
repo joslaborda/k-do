@@ -271,7 +271,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
           <div style={{position:"fixed", top: bellRef.current ? bellRef.current.getBoundingClientRect().bottom + 8 : 64, right: 12}} className="w-80 max-w-[calc(100vw-1.5rem)] bg-card border border-border rounded-2xl shadow-xl z-[200] overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <span className="font-semibold text-sm text-foreground">{t('notifications.title')}</span>
-              <button onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
+              <button aria-label={t('common.close')} onClick={doClose} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
             </div>
             <div className="max-h-[70vh] overflow-y-auto">
               {notifications.length === 0
