@@ -165,7 +165,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
       {/* Grid stats */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: 'Días de viaje', value: totalDays || '—', Icon: Calendar },
+          { label: t('home.finished.tripDays'), value: totalDays || '—', Icon: Calendar },
           { label: 'Ciudades',      value: cities.length,    Icon: MapPin },
           { label: 'Spots visitados', value: visitedSpots,  Icon: Compass },
         ].map(s => (

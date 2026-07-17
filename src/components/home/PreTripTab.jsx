@@ -218,7 +218,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                     className="w-full flex items-center justify-between px-4 py-2 bg-secondary/30 border-b border-border hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-2">
                       <p className="text-label font-semibold text-foreground/70 uppercase tracking-wider">{group.label}</p>
-                      {allDone && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
+                      {allDone && <Check className="w-3 h-3 text-green-600" strokeWidth={2.5} />}
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                       className={"text-muted-foreground transition-transform " + (isCollapsed ? '' : 'rotate-180')}>

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { BarChart2, Camera, Download, FileText, Image, MessageCircle, Send, X } from 'lucide-react';
+import { BarChart2, Camera, Download, FileText, Image, MessageCircle, Send, X, WifiOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
@@ -339,9 +339,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
         {/* Offline banner — reading works, sending doesn't */}
         {!navigator.onLine && (
           <div className="flex items-center gap-2 mx-3 mb-2 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" className="flex-shrink-0">
-              <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-            </svg>
+            <WifiOff className="w-3.5 h-3.5 text-amber-800 flex-shrink-0" />
             <p className="text-xs text-amber-800 font-medium">{t('translator.offline')}</p>
           </div>
         )}
