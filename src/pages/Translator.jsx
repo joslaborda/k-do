@@ -64,7 +64,7 @@ function speakText(text, bcpLang) {
 
 // ── Lang selector row ─────────────────────────────────────────────────────────
 function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <div className="flex items-center gap-2 py-1">
       <select
@@ -74,7 +74,7 @@ function LangRow({ fromLang, toLang, onFromChange, onToChange, onSwap }) {
       >
         {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {getLanguageLabel(l.code, i18n.language)}</option>)}
       </select>
-      <button
+      <button aria-label={t('translator.swapAria')}
         onClick={onSwap}
         className="p-2 rounded-xl border border-border bg-card hover:bg-secondary hover:border-primary/30 transition-colors flex-shrink-0"
       >

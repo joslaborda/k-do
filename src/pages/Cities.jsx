@@ -133,7 +133,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
             <p className="text-sm font-semibold text-foreground truncate">{doc?.name || doc?.title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">{type} {doc?.date ? `· ${doc.date}` : ''}</p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-full border border-border flex items-center justify-center shrink-0">
+          <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full border border-border flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
@@ -425,7 +425,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
               placeholder={t('cities.day.titlePlaceholder')} className="flex-1 h-9 text-sm bg-secondary border-border"
               autoFocus onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }} />
             <button onClick={() => setTitleEditing(false)} className="text-muted-foreground p-1"><X className="w-4 h-4" /></button>
-            <button onClick={saveTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
+            <button aria-label={t('common.save')} onClick={saveTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
         ) : (
           <button onClick={() => setTitleEditing(true)} className="w-full flex items-center gap-2 text-left group">
