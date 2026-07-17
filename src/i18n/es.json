@@ -63,7 +63,9 @@
     "group": "Grupo",
     "personal": "Personal",
     "all": "Todos",
-    "country": "País"
+    "country": "País",
+    "saveError": "No se pudo guardar",
+    "deleteError": "No se pudo eliminar"
   },
   "language": {
     "select": "Elige tu idioma",
@@ -278,7 +280,10 @@
       "newStop": "Nueva parada",
       "adding": "Añadiendo...",
       "addStop": "Añadir parada",
-      "deleteTrip": "Eliminar viaje"
+      "deleteTrip": "Eliminar viaje",
+      "deleteStopConfirm": "¿Eliminar esta parada?",
+      "deleteStopWarning": "Se eliminará {{city}} y los días de su itinerario. Esta acción no se puede deshacer.",
+      "deleteStopError": "No se pudo eliminar la parada"
     },
     "loadingTrip": "Cargando viaje...",
     "nav": {
@@ -1026,7 +1031,9 @@
       "byEmailHint": "Para quien no tiene cuenta en Kōdo",
       "invite": "Invitar →",
       "tripCount_one": "{{count}} viaje",
-      "tripCount_other": "{{count}} viajes"
+      "tripCount_other": "{{count}} viajes",
+      "cancelInvite": "Retirar",
+      "cancelError": "No se pudo retirar la invitación"
     },
     "page": {
       "acceptError": "No se pudo aceptar la invitación",
@@ -1193,7 +1200,12 @@
     "title": "Fotos",
     "progress": "{{current}} de {{total}}",
     "emptyTitle": "Sin fotos aún",
-    "emptySubtitle": "Sube fotos del viaje o envíalas por el chat del grupo"
+    "emptySubtitle": "Sube fotos del viaje o envíalas por el chat del grupo",
+    "uploadFailedTitle_one": "{{count}} foto no se pudo subir",
+    "uploadFailedTitle_other": "{{count}} fotos no se pudieron subir",
+    "uploadPartial": "Se subieron {{ok}} y fallaron {{failed}}. Inténtalo de nuevo con las que faltan.",
+    "uploadRetry": "Comprueba tu conexión e inténtalo de nuevo.",
+    "uploadErrorTitle": "No se pudieron subir las fotos"
   },
   "translator": {
     "translate": "Traducir",

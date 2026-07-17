@@ -63,7 +63,9 @@
     "group": "Group",
     "personal": "Personal",
     "all": "All",
-    "country": "Country"
+    "country": "Country",
+    "saveError": "Couldn't save",
+    "deleteError": "Couldn't delete"
   },
   "language": {
     "select": "Choose your language",
@@ -278,7 +280,10 @@
       "newStop": "New stop",
       "adding": "Adding...",
       "addStop": "Add stop",
-      "deleteTrip": "Delete trip"
+      "deleteTrip": "Delete trip",
+      "deleteStopConfirm": "Delete this stop?",
+      "deleteStopWarning": "{{city}} and its itinerary days will be deleted. This action cannot be undone.",
+      "deleteStopError": "Couldn't delete the stop"
     },
     "loadingTrip": "Loading trip...",
     "nav": {
@@ -1026,7 +1031,9 @@
       "byEmailHint": "For those without a Kōdo account",
       "invite": "Invite →",
       "tripCount_one": "{{count}} trip",
-      "tripCount_other": "{{count}} trips"
+      "tripCount_other": "{{count}} trips",
+      "cancelInvite": "Withdraw",
+      "cancelError": "Couldn't withdraw the invitation"
     },
     "page": {
       "acceptError": "Couldn't accept the invitation",
@@ -1193,7 +1200,12 @@
     "title": "Photos",
     "progress": "{{current}} of {{total}}",
     "emptyTitle": "No photos yet",
-    "emptySubtitle": "Upload trip photos or send them via the group chat"
+    "emptySubtitle": "Upload trip photos or send them via the group chat",
+    "uploadFailedTitle_one": "{{count}} photo couldn't be uploaded",
+    "uploadFailedTitle_other": "{{count}} photos couldn't be uploaded",
+    "uploadPartial": "{{ok}} uploaded, {{failed}} failed. Try again with the remaining ones.",
+    "uploadRetry": "Check your connection and try again.",
+    "uploadErrorTitle": "Couldn't upload the photos"
   },
   "translator": {
     "translate": "Translate",
