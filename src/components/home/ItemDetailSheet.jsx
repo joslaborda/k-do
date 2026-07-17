@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { X, Clock, ArrowRight , CirclePlus } from 'lucide-react';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS } from './constants';
+import { useTranslation } from 'react-i18next';
 
 export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }) {
+  const { t } = useTranslation();
   const [editingTime, setEditingTime] = useState(false);
   const [time, setTime] = useState(item?.time || '');
   const [saving, setSaving] = useState(false);
@@ -39,7 +41,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
               {item.time && <span className="text-primary font-medium"> · {item.time}</span>}
             </p>
           </div>
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+          <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
