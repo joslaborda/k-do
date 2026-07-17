@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Loader2 } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -800,7 +800,7 @@ export default function Cities() {
     enabled: !!tripId, staleTime: 30000,
   });
 
-  const { data: cities = [] } = useQuery({
+  const { data: cities = [], isLoading: loadingCities } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 30000,
@@ -900,7 +900,11 @@ export default function Cities() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-5 py-5 pb-24">
-        {sortedCities.length === 0 ? (
+        {loadingCities && sortedCities.length === 0 ? (
+          <div className="text-center py-16">
+            <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
+          </div>
+        ) : sortedCities.length === 0 ? (
           <div className="text-center py-16">
             <div className='w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4'><Map className='w-7 h-7 text-muted-foreground/50' /></div>
             <p className="text-muted-foreground mb-4">{t('cities.noCitiesYet')}</p>

@@ -9,12 +9,13 @@ import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2 } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
 import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 
 
@@ -271,6 +272,7 @@ function LeafletMap({ lat, lng, onMove }) {
 // ── Create spot bottom sheet ──────────────────────────────────────────────────
 function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [title, setTitle] = useState('');
   const [type, setType] = useState('food');
   const [notes, setNotes] = useState('');
@@ -675,7 +677,7 @@ export default function Restaurants() {
   }, [activeCity?.name]);
 
   // Queries
-  const { data: spots = [] } = useQuery({
+  const { data: spots = [], isLoading: loadingSpots } = useQuery({
     queryKey: ['spots', tripId],
     queryFn: () => base44.entities.Spot.filter({ trip_id: tripId }),
     enabled: !!tripId, staleTime: 30000,
@@ -727,14 +729,20 @@ export default function Restaurants() {
   const createMutation = useMutation({
     mutationFn: d => base44.entities.Spot.create(d),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Spot.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const deleteMutation = useMutation({
     mutationFn: id => base44.entities.Spot.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   // OSM search
@@ -1276,7 +1284,11 @@ export default function Restaurants() {
               ))}
             </div>
 
-            {spots.length === 0 ? (
+            {loadingSpots && spots.length === 0 ? (
+              <div className="text-center py-12">
+                <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
+              </div>
+            ) : spots.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
                   <MapPin className="w-7 h-7 text-muted-foreground/50" />

@@ -148,6 +148,8 @@ export default function TripsList() {
         // silencioso — el popup es una mejora, no crítico
       }
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   // Classify trips

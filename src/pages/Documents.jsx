@@ -16,6 +16,7 @@ import PDFViewer from '@/components/PDFViewer';
 import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/autoLinkTickets';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 const DOC_ICONS = {
   flight:    PlaneIcon,
@@ -56,6 +57,7 @@ const VIS = {
 // ── Doc row ───────────────────────────────────────────────────────────────────
 function DocRow({ticket, onEdit, onDelete, onView }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const cat  = ticket.category || 'other';
   const IconComp = DOC_ICONS[cat] || DOC_ICONS.other;
@@ -171,6 +173,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Documents() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const tripId = new URLSearchParams(window.location.search).get('trip_id');
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
@@ -264,14 +267,20 @@ export default function Documents() {
         }
       }
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditDoc(null); },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDeleteDoc(null); },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   // Filter

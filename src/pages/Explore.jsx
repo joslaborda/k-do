@@ -13,6 +13,7 @@ import CommunitySearch from '@/components/social/CommunitySearch';
 import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { useLike } from '@/hooks/useLike';
+import { useToast } from '@/components/ui/use-toast';
 
 const SPOT_TYPE_ICON = { food: Utensils, sight: Landmark, activity: Zap, shopping: ShoppingBag, transport: Train, custom: MapPin };
 const TYPE_COLORS = {
@@ -41,6 +42,7 @@ function LikeButton({ targetId, targetType, userId, targetOwnerId }) {
 
 function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const TypeIcon = SPOT_TYPE_ICON[spot.type] || MapPin;
   const color = TYPE_COLORS[spot.type] || TYPE_COLORS.custom;
   const isOwn = currentUser?.id === spot.created_by_user_id;
@@ -225,6 +227,7 @@ function EmptyFeed({ Icon = MapPin, title, subtitle }) {
 
 export default function Explore() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -331,6 +334,8 @@ export default function Explore() {
       else await base44.entities.Follow.create({ follower_user_id: currentUser.id, followed_user_id: profile.user_id });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myFollows', currentUser?.id] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const saveSpotMutation = useMutation({
@@ -345,6 +350,8 @@ export default function Explore() {
       tags: spot.tags || [],
     }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['savedSpots', currentUser?.id] }); setSavingSpotId(null); },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleSaveSpot = async spot => { setSavingSpotId(spot.id); await saveSpotMutation.mutateAsync(spot); };

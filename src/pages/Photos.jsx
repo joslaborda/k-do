@@ -5,12 +5,13 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus } from 'lucide-react';
+import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 function groupByDate(photos) {
   const groups = {};
@@ -26,6 +27,7 @@ function groupByDate(photos) {
 
 export default function Photos() {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const { user } = useAuth();
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -37,7 +39,7 @@ export default function Photos() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
-  const { data: messages = [] } = useQuery({
+  const { data: messages = [], isLoading: loadingPhotos } = useQuery({
     queryKey: ['tripMessages', tripId],
     queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, 'created_date', 500),
     enabled: !!tripId,
@@ -75,32 +77,53 @@ export default function Photos() {
 
   const uploadMutation = useMutation({
     mutationFn: async (files) => {
-      const results = [];
+      // Cada foto se sube por separado: si una falla, las demás siguen. Antes el
+      // bucle abortaba en la primera excepción y las ya subidas ni se mostraban.
+      const uploaded = [];
+      const failed = [];
       setUploadProgress({ current: 0, total: files.length });
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const takenAt = await getExifDate(file);
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        await base44.entities.TripMessage.create({
-          trip_id: tripId,
-          user_id: user.id,
-          user_email: user.email,
-          display_name: myProfile?.display_name || user.email,
-          avatar_url: myProfile?.avatar_url || null,
-          content: '',
-          file_url,
-          file_type: 'image',
-          file_name: file.name,
-          taken_at: takenAt || new Date().toISOString(),
-        });
-        results.push(file_url);
+        try {
+          const takenAt = await getExifDate(file);
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+          await base44.entities.TripMessage.create({
+            trip_id: tripId,
+            user_id: user.id,
+            user_email: user.email,
+            display_name: myProfile?.display_name || user.email,
+            avatar_url: myProfile?.avatar_url || null,
+            content: '',
+            file_url,
+            file_type: 'image',
+            file_name: file.name,
+            taken_at: takenAt || new Date().toISOString(),
+          });
+          uploaded.push(file_url);
+        } catch {
+          failed.push(file.name);
+        }
         setUploadProgress({ current: i + 1, total: files.length });
       }
-      return results;
+      return { uploaded, failed };
     },
-    onSuccess: async (_, files) => {
+    onSuccess: async ({ uploaded, failed }) => {
+      // Se refresca siempre: aunque algunas fallen, las que sí subieron deben verse.
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
-      await notifyMembers(files.length);
+      if (uploaded.length) await notifyMembers(uploaded.length);
+      if (failed.length) {
+        toast({
+          title: t('photos.uploadFailedTitle', { count: failed.length }),
+          description: uploaded.length
+            ? t('photos.uploadPartial', { ok: uploaded.length, failed: failed.length })
+            : t('photos.uploadRetry'),
+          variant: 'destructive',
+        });
+      }
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+      toast({ title: t('photos.uploadErrorTitle'), description: t('photos.uploadRetry'), variant: 'destructive' });
     },
     onSettled: () => {
       setUploading(false);
@@ -198,7 +221,14 @@ export default function Photos() {
         </div>
       )}
 
-      {photos.length === 0 && !uploading && (
+      {loadingPhotos && photos.length === 0 && (
+        <div className="mx-4 mt-8 border border-border rounded-2xl p-12 flex flex-col items-center gap-3">
+          <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+          <p className="text-sm text-muted-foreground">{t('utilities.loading')}</p>
+        </div>
+      )}
+
+      {!loadingPhotos && photos.length === 0 && !uploading && (
           <div
             className="mx-4 mt-8 border border-border rounded-2xl p-12 flex flex-col items-center gap-3 cursor-pointer hover:bg-secondary/40 transition-colors"
             onClick={() => fileInputRef.current?.click()}

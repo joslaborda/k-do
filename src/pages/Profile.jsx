@@ -10,6 +10,7 @@ import { getTripCoverImage } from '@/lib/tripImage';
 import TripCard from '@/components/trip/TripCard';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -50,6 +51,7 @@ function countryFlag(country) {
 // ─────────────────────────────────────────────────────────────────────────────
 function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const SpotTypeIcon = SPOT_ICONS_MAP[spot.type] || MapPin;
   const coverImg = spot.image_url || (spot.city_name || spot.country
     ? getTripCoverImage(spot.city_name, spot.country)
@@ -281,6 +283,7 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState('guardados');
@@ -386,6 +389,8 @@ export default function Profile() {
       });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['savedSpots', user?.id] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   if (profileLoading) return (

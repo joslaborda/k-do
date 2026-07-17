@@ -11,6 +11,7 @@ import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDo
 import { useSearchParams } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -29,6 +30,7 @@ const PACKING_CATEGORIES = [
 // ─────────────────────────────────────────────────────────────────────────────
 function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, saving }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [category, setCategory] = useState(defaultCategory);
   const [essential, setEssential] = useState(false);
@@ -336,6 +338,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onExternalClose }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState({});
   const [adding, setAdding] = useState(null);
@@ -357,16 +360,22 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
   const createMutation = useMutation({
     mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, packed }) => base44.entities.PackingItem.update(id, { packed }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const deleteMutation = useMutation({
     mutationFn: id => base44.entities.PackingItem.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const packingItems  = items.filter(i => i.category !== 'souvenir');

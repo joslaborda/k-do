@@ -374,6 +374,8 @@ export default function CityDetail() {
       setDialogOpen(false);
       setFormData({ title: '', date: '', content: '' });
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const updateMutation = useMutation({
@@ -384,6 +386,8 @@ export default function CityDetail() {
       setEditingDay(null);
       setFormData({ title: '', date: '', content: '' });
     },
+  
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const deleteMutation = useMutation({
@@ -392,7 +396,8 @@ export default function CityDetail() {
       queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
       setDeleteDialogOpen(false);
       setDayToDelete(null);
-    }
+    },
+    onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const handleDeleteClick = (day) => {
