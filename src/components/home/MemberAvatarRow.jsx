@@ -61,7 +61,7 @@ export default function MemberAvatarRow({
               ? <img src={profile.avatar_url} alt={name} className="w-9 h-9 rounded-full object-cover" />
               : <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>
             }
-            <span className="text-xs text-muted-foreground max-w-[48px] truncate text-center">{isMe ? 'Tú' : name}</span>
+            <span className="text-xs text-muted-foreground max-w-[48px] truncate text-center">{isMe ? t('common.you') : name}</span>
           </div>
         );
       })}

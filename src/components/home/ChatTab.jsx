@@ -226,7 +226,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                       : (msg.display_name||'?')[0].toUpperCase()}
                   </div>
                   <div className={`max-w-[70%] flex flex-col gap-0.5 ${me ? 'items-end' : 'items-start'}`}>
-                    <span className="text-micro text-muted-foreground px-1">{me ? 'Tú' : (msg.display_name||msg.user_email)}</span>
+                    <span className="text-micro text-muted-foreground px-1">{me ? t('common.you') : (msg.display_name||msg.user_email)}</span>
                     {isImage(msg) && (
                       <div className="rounded-2xl overflow-hidden cursor-pointer" style={{maxWidth:180}}
                         onClick={() => setLightbox(msg.file_url)}>
