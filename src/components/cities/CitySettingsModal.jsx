@@ -55,7 +55,7 @@ export default function CitySettingsModal({
         type="button"
         onClick={handleOpen}
         className="flex-shrink-0 w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-white/30 hover:text-white transition-all"
-        title="Ajustes de la ciudad"
+        title={t('cities.modal.settingsTitle')}
       >
         <Settings className="w-4 h-4" />
       </button>
