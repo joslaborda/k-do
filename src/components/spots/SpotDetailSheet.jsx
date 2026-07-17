@@ -9,6 +9,7 @@ import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
+import { getTripDays } from '@/lib/tripDays';
 
 export default
 function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId, onNotify }) {
@@ -30,19 +31,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
   // Build trip day options from cities — must be before early return
   const tripDayOptions = useMemo(() => {
-    const days = [];
-    const sorted = [...(tripCities || [])].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
-    sorted.forEach(c => {
-      if (c.start_date && c.end_date) {
-        let d = parseISO(c.start_date);
-        const end = parseISO(c.end_date);
-        while (d <= end) {
-          days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
-          d = addDays(d, 1);
-        }
-      }
-    });
-    return days;
+    return getTripDays(tripCities || []);
   }, [tripCities]);
 
   const hasTripDays = tripDayOptions.length > 0;
