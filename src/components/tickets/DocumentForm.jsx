@@ -8,6 +8,7 @@ import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-re
 import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
+import { getTripDays } from '@/lib/tripDays';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -85,19 +86,7 @@ export default function DocumentForm({
 
   // Build trip day options from tripCities prop
   const tripDayOptions = useMemo(() => {
-    const days = [];
-    const sorted = [...(tripCities || [])].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
-    sorted.forEach(c => {
-      if (c.start_date && c.end_date) {
-        let d = parseISO(c.start_date);
-        const end = parseISO(c.end_date);
-        while (d <= end) {
-          days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
-          d = addDays(d, 1);
-        }
-      }
-    });
-    return days;
+    return getTripDays(tripCities || []);
   }, [tripCities]);
 
   const isPersonalCategory = PERSONAL_CATEGORIES.includes(category);
