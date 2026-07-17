@@ -65,7 +65,8 @@
     "all": "Todos",
     "country": "País",
     "saveError": "No se pudo guardar",
-    "deleteError": "No se pudo eliminar"
+    "deleteError": "No se pudo eliminar",
+    "you": "Tú"
   },
   "language": {
     "select": "Elige tu idioma",
@@ -325,7 +326,8 @@
       "auto": "Automático (por fecha)"
     },
     "sectionsAria": "Secciones del viaje",
-    "settingsAria": "Configuración del viaje"
+    "settingsAria": "Configuración del viaje",
+    "startsToday": "¡Hoy empieza!"
   },
   "expenses": {
     "title": "Gastos",
@@ -436,6 +438,12 @@
       "descRequiredDesc": "Añade una descripción al gasto.",
       "payerRequired": "Pagador requerido",
       "payerRequiredDesc": "Indica quién pagó el gasto."
+    },
+    "fx": {
+      "unavailableTitle": "Sin tipo de cambio",
+      "unavailableDesc": "No se pudo convertir {{from}} → {{to}}. El importe se guarda en {{from}} sin convertir y no cuadrará en los balances.",
+      "unavailableRetry": "No se pudo convertir {{from}} → {{to}}. Revisa tu conexión.",
+      "notConverted": "Sin convertir"
     }
   },
   "pretrip": {
@@ -1358,7 +1366,8 @@
       "unlistedDesc": "Accesible solo con el enlace",
       "public": "Público (Explorar)",
       "publicDesc": "Aparece en la sección Explorar"
-    }
+    },
+    "update": "Actualizar publicación"
   },
   "nav": {
     "home": "Inicio",

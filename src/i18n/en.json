@@ -65,7 +65,8 @@
     "all": "All",
     "country": "Country",
     "saveError": "Couldn't save",
-    "deleteError": "Couldn't delete"
+    "deleteError": "Couldn't delete",
+    "you": "You"
   },
   "language": {
     "select": "Choose your language",
@@ -325,7 +326,8 @@
       "auto": "Automatic (by date)"
     },
     "sectionsAria": "Trip sections",
-    "settingsAria": "Trip settings"
+    "settingsAria": "Trip settings",
+    "startsToday": "Starts today!"
   },
   "expenses": {
     "title": "Expenses",
@@ -436,6 +438,12 @@
       "descRequiredDesc": "Add a description to the expense.",
       "payerRequired": "Payer required",
       "payerRequiredDesc": "Indicate who paid the expense."
+    },
+    "fx": {
+      "unavailableTitle": "No exchange rate",
+      "unavailableDesc": "Couldn't convert {{from}} → {{to}}. The amount is saved in {{from}} unconverted and won't add up in the balances.",
+      "unavailableRetry": "Couldn't convert {{from}} → {{to}}. Check your connection.",
+      "notConverted": "Not converted"
     }
   },
   "pretrip": {
@@ -1358,7 +1366,8 @@
       "unlistedDesc": "Accessible only with the link",
       "public": "Public (Explore)",
       "publicDesc": "Appears in the Explore section"
-    }
+    },
+    "update": "Update publication"
   },
   "nav": {
     "home": "Home",
