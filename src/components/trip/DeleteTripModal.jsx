@@ -15,7 +15,7 @@ export default function DeleteTripModal({
     <AlertDialog open={open} onOpenChange={(v) => { onOpenChange(v); setInputValue(''); }}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-destructive">Eliminar viaje</AlertDialogTitle>
+          <AlertDialogTitle className="text-destructive">{t('trip.dialog.deleteTrip')}</AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>{t('trip.deleteWarning')}</p>
             <p>{t('trip.deleteConfirmPrompt')}</p>

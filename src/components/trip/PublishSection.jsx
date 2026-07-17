@@ -47,7 +47,7 @@ export default function PublishSection({
       if (onPublish) onPublish(result);
     } catch (error) {
       toast({
-        title: 'Error al publicar',
+        title: t('publish.publishError'),
         description: error.message,
         variant: 'destructive'
       });
