@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 export default
 function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
@@ -14,7 +15,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
         let d = new Date(c.start_date);
         const end = new Date(c.end_date);
         while (d <= end) {
-          dates.add(d.toISOString().slice(0, 10));
+          dates.add(format(d, 'yyyy-MM-dd'));
           d.setDate(d.getDate() + 1);
         }
       }
@@ -43,7 +44,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
           {/* Saved confirmation */}
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <Check className="w-5 h-5 text-green-600" strokeWidth={2.5} />
             </div>
             <div>
               <p className="font-semibold text-foreground text-sm">{t('spots.assign.saved')}</p>
