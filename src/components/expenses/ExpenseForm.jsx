@@ -411,7 +411,7 @@ export default function ExpenseForm({
         )}
 
         {form.split_type === 'equal' && form.split_with.length === 0 && (
-          <p className="text-xs text-red-500 mt-2">Selecciona al menos una persona</p>
+          <p className="text-xs text-red-500 mt-2">{t('expenses.form.pickSomeone')}</p>
         )}
       </div>
 
