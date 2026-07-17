@@ -6,6 +6,7 @@ import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, Shopp
 import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -49,7 +50,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
         let d = new Date(c.start_date + 'T00:00:00');
         const end = new Date(c.end_date + 'T00:00:00');
         while (d <= end) {
-          days.push({ date: d.toISOString().slice(0, 10), city: c.name });
+          days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
           d.setDate(d.getDate() + 1);
         }
       }

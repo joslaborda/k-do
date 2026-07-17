@@ -5,6 +5,7 @@ import { Plus, X, Shuffle, ChevronDown, Loader2, AlertTriangle } from 'lucide-re
 import { getCountryMeta, getTopCities, normalizeCountry, getCountryOptions, searchCountries, getCountryLabel } from '@/lib/countryConfig';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 // ─── Currency options ─────────────────────────────────────────────────────────
 const CURRENCY_OPTIONS = [
@@ -37,9 +38,11 @@ function currencySymbol(code) {
 }
 
 function addDays(dateStr, n) {
-  const d = new Date(dateStr);
+  // 'T00:00:00' fuerza medianoche local; format() evita la conversión a UTC que
+  // desplazaba un día en husos positivos.
+  const d = new Date(dateStr + 'T00:00:00');
   d.setDate(d.getDate() + n);
-  return d.toISOString().slice(0, 10);
+  return format(d, 'yyyy-MM-dd');
 }
 function daysBetween(a, b) {
   return Math.round((new Date(b) - new Date(a)) / 86400000);

@@ -7,9 +7,9 @@ import { publishTripAsTemplate, getTemplateShareUrl } from '@/lib/publishTripAsT
 import { useTranslation } from 'react-i18next';
 
 const VISIBILITY_OPTIONS = [
-  { value: 'private', label: 'Privado (solo yo)', icon: Lock, description: 'Nadie más puede verlo' },
-  { value: 'unlisted', label: 'No listado (link)', icon: LinkIcon, description: 'Accesible solo con el enlace' },
-  { value: 'public', label: 'Público (Explorar)', icon: Globe, description: 'Aparece en la sección Explorar' }
+  { value: 'private',  tk: 'publish.opt.private',  dk: 'publish.opt.privateDesc',  icon: Lock },
+  { value: 'unlisted', tk: 'publish.opt.unlisted', dk: 'publish.opt.unlistedDesc', icon: LinkIcon },
+  { value: 'public',   tk: 'publish.opt.public',   dk: 'publish.opt.publicDesc',   icon: Globe }
 ];
 
 export default function PublishSection({
@@ -111,8 +111,8 @@ export default function PublishSection({
                   <div className="flex items-center gap-2">
                     <Icon className="w-4 h-4" />
                     <div>
-                      <p className="font-medium">{opt.label}</p>
-                      <p className="text-xs text-muted-foreground">{opt.description}</p>
+                      <p className="font-medium">{t(opt.tk)}</p>
+                      <p className="text-xs text-muted-foreground">{t(opt.dk)}</p>
                     </div>
                   </div>
                 </SelectItem>
