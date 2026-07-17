@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 
 const CATEGORIES = [
   { value: 'food',          label: 'Comida',      Icon: Utensils    },
@@ -46,7 +47,7 @@ export default function ExpenseForm({
     amount: '',
     currency: defaultCurrency,
     category: 'food',
-    date: new Date().toISOString().slice(0, 10),
+    date: format(new Date(), 'yyyy-MM-dd'),
     paid_by: members[0] || '',
     split_type: 'equal',
     split_with: [...members],
@@ -108,23 +109,28 @@ export default function ExpenseForm({
     } finally { setUploadingReceipt(false); }
   };
 
+  const customTotal = Object.values(form.amounts_by_user || {}).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+  const customCuadra = Math.abs(parseFloat(form.amount || 0) - customTotal) < 0.01;
+
   const canSave = form.description.trim() && form.amount && parseFloat(form.amount) > 0 && !saving && (
     form.split_type === 'solo' ||
     (form.split_type === 'equal' && form.split_with.length > 0) ||
-    (form.split_type === 'custom' && Object.values(form.amounts_by_user||{}).some(v => parseFloat(v) > 0))
+    // En custom hay que asignar el importe completo: si no cuadra, el reparto se
+    // haría por ratios y las cantidades escritas se escalarían sin avisar.
+    (form.split_type === 'custom' && customTotal > 0 && customCuadra)
   );
 
   const handleSave = async () => {
     if (!form.amount || parseFloat(form.amount) <= 0) {
-      toast({ title: 'Importe requerido', description: 'Introduce un importe para guardar el gasto.', variant: 'destructive' });
+      toast({ title: t('expenses.form.amountRequired'), description: t('expenses.form.amountRequiredDesc'), variant: 'destructive' });
       return;
     }
     if (!form.description.trim()) {
-      toast({ title: 'Descripción requerida', description: 'Añade una descripción al gasto.', variant: 'destructive' });
+      toast({ title: t('expenses.form.descRequired'), description: t('expenses.form.descRequiredDesc'), variant: 'destructive' });
       return;
     }
     if (!form.paid_by) {
-      toast({ title: 'Pagador requerido', description: 'Indica quién pagó el gasto.', variant: 'destructive' });
+      toast({ title: t('expenses.form.payerRequired'), description: t('expenses.form.payerRequiredDesc'), variant: 'destructive' });
       return;
     }
     let amountBase = parseFloat(form.amount);
@@ -367,13 +373,19 @@ export default function ExpenseForm({
               );
             })}
             {(() => {
-              const total = Object.values(form.amounts_by_user || {}).reduce((s,v) => s + parseFloat(v||0), 0);
-              const diff = parseFloat(form.amount||0) - total;
-              return Math.abs(diff) > 0.01 ? (
-                <p className="text-xs text-amber-600 mt-1">Faltan {Math.abs(diff).toFixed(2)} {currency} por asignar</p>
-              ) : total > 0 ? (
-                <p className="text-xs text-green-600 mt-1">{t('expenses.form.totalMatches')}</p>
-              ) : null;
+              const diff = parseFloat(form.amount || 0) - customTotal;
+              if (Math.abs(diff) <= 0.01) {
+                return customTotal > 0
+                  ? <p className="text-xs text-green-600 mt-1">{t('expenses.form.totalMatches')}</p>
+                  : null;
+              }
+              return (
+                <p className="text-xs text-amber-600 mt-1">
+                  {diff > 0
+                    ? t('expenses.form.missingToAssign', { amount: Math.abs(diff).toFixed(2), currency })
+                    : t('expenses.form.overAssigned', { amount: Math.abs(diff).toFixed(2), currency })}
+                </p>
+              );
             })()}
           </div>
         )}
