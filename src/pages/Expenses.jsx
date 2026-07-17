@@ -15,6 +15,7 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import OTabBar from '@/components/trip/OTabBar';
+import { format } from 'date-fns';
 
 
 // ── Category config ───────────────────────────────────────────────────────────
@@ -1079,7 +1080,7 @@ export default function Expenses() {
         description: `Liquidación: ${userMap[debt.from] || debt.from} → ${userMap[debt.to] || debt.to}`,
         amount: settleAmount, currency: settleCurrency, amount_base: debt.amount,
         category: 'other', paid_by: debt.from, split_with: [debt.to],
-        split_type: 'equal', date: new Date().toISOString().slice(0, 10),
+        split_type: 'equal', date: format(new Date(), 'yyyy-MM-dd'),
         is_settlement: true,
       });
       // Notificar a quien le deben que le han liquidado

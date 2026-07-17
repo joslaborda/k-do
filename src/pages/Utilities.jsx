@@ -2,7 +2,7 @@ import { useState, useEffect, useRef} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2 } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2, Check } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta, getCountryLabel, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
 import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
@@ -12,6 +12,7 @@ import { useSearchParams } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
+import { format } from 'date-fns';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -493,7 +494,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
                           </span>
                         )}
                         {allDone && catItems.length > 0 && (
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          <Check className="w-3.5 h-3.5 text-green-600" strokeWidth={2.5} />
                         )}
                       </div>
                       <div className="flex items-center gap-2">
@@ -994,7 +995,7 @@ export default function Utilities() {
   });
 
   // Para viajes multipaís, usar la ciudad activa según la fecha de hoy
-  const today = new Date().toISOString().slice(0, 10);
+  const today = format(new Date(), 'yyyy-MM-dd');
   const activeCity = tripCities.find(c => c.start_date <= today && (!c.end_date || c.end_date >= today))
     || tripCities[0];
   const country = activeCity?.country || trip?.country || '';

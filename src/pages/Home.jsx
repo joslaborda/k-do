@@ -94,7 +94,7 @@ export default function Home() {
   const deleteMutation = useMutation({
     mutationFn: () => base44.entities.Trip.delete(tripId),
     onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
-    onError: () => toast({ title: 'Error al eliminar el viaje', description: 'Inténtalo de nuevo.', variant: 'destructive' }),
+    onError: () => toast({ title: 'Error al eliminar el viaje', description: t('common.tryAgain'), variant: 'destructive' }),
   });
 
   const currentUserEmail = currentUser?.email;

@@ -4,7 +4,7 @@ import DarkModeToggle from '@/components/DarkModeToggle';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Loader2, Camera } from 'lucide-react';
+import { Loader2, Camera, ChevronRight } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
@@ -124,7 +124,7 @@ function PasswordSection({ user }) {
 
   if (!open) return (
     <SettingRow label={t('settings.pwd.change')} isLast
-      right={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c4bfb9" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>}
+      right={<ChevronRight className="w-3 h-3 text-muted-foreground" />}
       onClick={() => setOpen(true)} />
   );
 
