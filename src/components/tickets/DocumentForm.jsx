@@ -7,6 +7,7 @@ import { Check } from 'lucide-react';
 import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
+import { format, parseISO, addDays } from 'date-fns';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -88,11 +89,11 @@ export default function DocumentForm({
     const sorted = [...(tripCities || [])].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
     sorted.forEach(c => {
       if (c.start_date && c.end_date) {
-        let d = new Date(c.start_date);
-        const end = new Date(c.end_date);
+        let d = parseISO(c.start_date);
+        const end = parseISO(c.end_date);
         while (d <= end) {
-          days.push({ date: d.toISOString().slice(0, 10), city: c.name });
-          d.setDate(d.getDate() + 1);
+          days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
+          d = addDays(d, 1);
         }
       }
     });
