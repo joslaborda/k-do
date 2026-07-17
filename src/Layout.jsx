@@ -2,29 +2,30 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, FileText, Compass, Receipt, MoreHorizontal, MapPin, Languages, Info, User, X, Camera } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SyncIndicator from '@/components/SyncIndicator';
 
 // ── Nav principal del viaje — los 4 que más se usan ──────────────────────────
 const mainNavItems = [
-  { name: 'Inicio',  page: 'Home',      icon: Home     },
-  { name: 'Ruta',    page: 'Cities',    icon: MapPin   },
-  { name: 'Spots',   page: 'Restaurants', icon: Compass },
-  { name: 'Gastos',  page: 'Expenses',  icon: Receipt   },
+  { tk: 'nav.home',      page: 'Home',        icon: Home    },
+  { tk: 'tabs.route',    page: 'Cities',      icon: MapPin  },
+  { tk: 'spots.title',   page: 'Restaurants', icon: Compass },
+  { tk: 'tabs.expenses', page: 'Expenses',    icon: Receipt },
 ];
 
 // ── Drawer: el resto de páginas del viaje ─────────────────────────────────────
 const drawerItems = [
-  { name: 'Fotos',     page: 'Photos',     icon: Camera,   sub: 'Fotos del viaje' },
-  { name: 'Docs',      page: 'Documents',  icon: FileText, sub: 'Documentos del viaje' },
-  { name: 'Traducir',  page: 'Translator', icon: Languages, sub: 'Voz, texto e imagen'  },
-  { name: 'Utilidades',page: 'Utilities',  icon: Info,     sub: 'Clima, emergencias, maleta'},
+  { tk: 'photos.title',    page: 'Photos',     icon: Camera,    sk: 'nav.photosSub'    },
+  { tk: 'trip.nav.docs',   page: 'Documents',  icon: FileText,  sk: 'nav.docsSub'      },
+  { tk: 'nav.translate',   page: 'Translator', icon: Languages, sk: 'nav.translateSub' },
+  { tk: 'utilities.title', page: 'Utilities',  icon: Info,      sk: 'nav.utilitiesSub' },
 ];
 
 // ── Nav global (fuera del viaje) ──────────────────────────────────────────────
 const globalNavItems = [
-  { name: 'Viajes', page: 'TripsList', icon: Home },
-  { name: 'Perfil', page: 'Profile',   icon: User },
+  { tk: 'trip.trips',    page: 'TripsList', icon: Home },
+  { tk: 'profile.title', page: 'Profile',   icon: User },
 ];
 
 const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile', 'Settings', 'VerifyEmail', 'Invites'];
@@ -33,6 +34,7 @@ const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restauran
                          'Expenses', 'Utilities', 'Translator'];
 
 export default function Layout({ children, currentPageName }) {
+  const { t } = useTranslation();
   const getTripId = () => { const p = new URLSearchParams(window.location.search); return p.get('trip_id') || p.get('id') || null; };
   const [tripId, setTripId]       = useState(() => getTripId());
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -100,7 +102,7 @@ export default function Layout({ children, currentPageName }) {
         >
           <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-lg">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Más herramientas</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('nav.moreTools')}</span>
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center"
@@ -131,9 +133,9 @@ export default function Layout({ children, currentPageName }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                      {item.name}
+                      {t(item.tk)}
                     </p>
-                    <p className="text-xs text-muted-foreground">{item.sub}</p>
+                    <p className="text-xs text-muted-foreground">{t(item.sk)}</p>
                   </div>
                   {isActive && (
                     <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -186,7 +188,7 @@ export default function Layout({ children, currentPageName }) {
                             strokeWidth={isActive ? 2.5 : 1.75}
                           />
                           <span className="text-micro font-medium" style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}>
-                            {item.name}
+                            {t(item.tk)}
                           </span>
                         </Link>
                       );
@@ -227,7 +229,7 @@ export default function Layout({ children, currentPageName }) {
                       strokeWidth={isActive ? 2.5 : 1.75}
                     />
                     <span className="text-micro font-medium" style={{color: isActive ? 'hsl(var(--primary))' : 'var(--kodo-nav-inactive)'}}>
-                      {item.name}
+                      {t(item.tk)}
                     </span>
                     <div style={{height:2.5,borderRadius:2,background:isActive?'hsl(var(--primary))':'transparent',width:isActive?18:0,transition:'all 0.25s cubic-bezier(.4,0,.2,1)'}} />
                   </Link>
@@ -267,7 +269,7 @@ export default function Layout({ children, currentPageName }) {
                     strokeWidth={isActive ? 2.5 : 2}
                   />
                   <span className={`text-micro font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {item.name}
+                    {t(item.tk)}
                   </span>
                 </Link>
               );
@@ -292,7 +294,7 @@ export default function Layout({ children, currentPageName }) {
                         strokeWidth={isActive ? 2.5 : 2}
                       />
                       <span className={`text-micro font-medium ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
-                        {item.name}
+                        {t(item.tk)}
                       </span>
                     </Link>
                   );
