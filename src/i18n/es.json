@@ -427,7 +427,15 @@
       "descPlaceholder": "Descripción del gasto *",
       "paidBy": "Pagó",
       "splitBetween": "Dividir entre",
-      "totalMatches": "Total cuadra"
+      "totalMatches": "Total cuadra",
+      "missingToAssign": "Faltan {{amount}} {{currency}} por asignar",
+      "overAssigned": "Sobran {{amount}} {{currency}}: el reparto supera el importe",
+      "amountRequired": "Importe requerido",
+      "amountRequiredDesc": "Introduce un importe para guardar el gasto.",
+      "descRequired": "Descripción requerida",
+      "descRequiredDesc": "Añade una descripción al gasto.",
+      "payerRequired": "Pagador requerido",
+      "payerRequiredDesc": "Indica quién pagó el gasto."
     }
   },
   "pretrip": {
@@ -475,7 +483,8 @@
       "tripRoute": "Ruta del viaje",
       "yourPart": "Tu parte",
       "groupTotal": "Total grupo",
-      "perDay": "{{amount}} {{currency}}/día"
+      "perDay": "{{amount}} {{currency}}/día",
+      "tripDays": "Días de viaje"
     },
     "travelers": "Viajeros",
     "traveler": "Viajero",
@@ -1323,7 +1332,9 @@
       "noTravelersTitle": "Sin viajeros todavía",
       "tryOtherName": "Prueba con otro nombre",
       "beFirst": "Sé de los primeros en unirte"
-    }
+    },
+    "mustSignIn": "Debes iniciar sesión",
+    "mustSignInDesc": "Inicia sesión para guardar itinerarios"
   },
   "offline": {
     "restored": "Conexión restaurada",
@@ -1339,6 +1350,23 @@
     "unlistedDesc": "Accesible por enlace directo, pero no aparecerá en Explorar. Perfecto para compartir con gente específica.",
     "publicDesc": "Aparecerá en Explorar y otros viajeros podrán descubrirlo y guardarlo.",
     "permissionsDesc": "Solo los admins del viaje pueden publicar itinerarios.",
-    "publishedToast": "Itinerario publicado"
+    "publishedToast": "Itinerario publicado",
+    "opt": {
+      "private": "Privado (solo yo)",
+      "privateDesc": "Nadie más puede verlo",
+      "unlisted": "No listado (link)",
+      "unlistedDesc": "Accesible solo con el enlace",
+      "public": "Público (Explorar)",
+      "publicDesc": "Aparece en la sección Explorar"
+    }
+  },
+  "nav": {
+    "home": "Inicio",
+    "translate": "Traducir",
+    "moreTools": "Más herramientas",
+    "photosSub": "Fotos del viaje",
+    "docsSub": "Documentos del viaje",
+    "translateSub": "Voz, texto e imagen",
+    "utilitiesSub": "Clima, emergencias, maleta"
   }
 }

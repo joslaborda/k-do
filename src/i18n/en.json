@@ -427,7 +427,15 @@
       "descPlaceholder": "Expense description *",
       "paidBy": "Paid by",
       "splitBetween": "Split between",
-      "totalMatches": "Total matches"
+      "totalMatches": "Total matches",
+      "missingToAssign": "{{amount}} {{currency}} left to assign",
+      "overAssigned": "{{amount}} {{currency}} over: the split exceeds the amount",
+      "amountRequired": "Amount required",
+      "amountRequiredDesc": "Enter an amount to save the expense.",
+      "descRequired": "Description required",
+      "descRequiredDesc": "Add a description to the expense.",
+      "payerRequired": "Payer required",
+      "payerRequiredDesc": "Indicate who paid the expense."
     }
   },
   "pretrip": {
@@ -475,7 +483,8 @@
       "tripRoute": "Trip route",
       "yourPart": "Your share",
       "groupTotal": "Group total",
-      "perDay": "{{amount}} {{currency}}/day"
+      "perDay": "{{amount}} {{currency}}/day",
+      "tripDays": "Trip days"
     },
     "travelers": "Travelers",
     "traveler": "Traveler",
@@ -1323,7 +1332,9 @@
       "noTravelersTitle": "No travellers yet",
       "tryOtherName": "Try another name",
       "beFirst": "Be one of the first to join"
-    }
+    },
+    "mustSignIn": "You must sign in",
+    "mustSignInDesc": "Sign in to save itineraries"
   },
   "offline": {
     "restored": "Connection restored",
@@ -1339,6 +1350,23 @@
     "unlistedDesc": "Accessible via direct link, but it won't appear in Explore. Perfect for sharing with specific people.",
     "publicDesc": "It will appear in Explore and other travellers can discover and save it.",
     "permissionsDesc": "Only trip admins can publish itineraries.",
-    "publishedToast": "Itinerary published"
+    "publishedToast": "Itinerary published",
+    "opt": {
+      "private": "Private (only me)",
+      "privateDesc": "Nobody else can see it",
+      "unlisted": "Unlisted (link)",
+      "unlistedDesc": "Accessible only with the link",
+      "public": "Public (Explore)",
+      "publicDesc": "Appears in the Explore section"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "translate": "Translate",
+    "moreTools": "More tools",
+    "photosSub": "Trip photos",
+    "docsSub": "Trip documents",
+    "translateSub": "Voice, text and image",
+    "utilitiesSub": "Weather, emergencies, packing"
   }
 }
