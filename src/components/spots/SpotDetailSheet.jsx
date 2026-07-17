@@ -61,7 +61,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
       if (timeChanged && assignedTime) onNotify?.('spot_time', `${spot.title}: hora cambiada a ${assignedTime}`, spot.title);
       onClose();
     } catch (e) {
-      toast({ title: 'Error al guardar', description: e.message, variant: 'destructive' });
+      toast({ title: t('common.saveError'), description: e.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
