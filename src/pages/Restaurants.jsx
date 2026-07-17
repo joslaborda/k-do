@@ -16,6 +16,7 @@ import MySpotRow from '@/components/spots/MySpotRow';
 import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
+import { format, parseISO, addDays } from 'date-fns';
 
 
 
@@ -481,11 +482,11 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
     const dates = new Set();
     tripCities.forEach(c => {
       if (c.start_date && c.end_date) {
-        let d = new Date(c.start_date);
-        const end = new Date(c.end_date);
+        let d = parseISO(c.start_date);
+        const end = parseISO(c.end_date);
         while (d <= end) {
-          dates.add(d.toISOString().slice(0, 10));
-          d.setDate(d.getDate() + 1);
+          dates.add(format(d, 'yyyy-MM-dd'));
+          d = addDays(d, 1);
         }
       }
     });
@@ -535,11 +536,11 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
                 const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
                 sorted.forEach(c => {
                   if (c.start_date && c.end_date) {
-                    let d = new Date(c.start_date);
-                    const end = new Date(c.end_date);
+                    let d = parseISO(c.start_date);
+                    const end = parseISO(c.end_date);
                     while (d <= end) {
-                      days.push({ date: d.toISOString().slice(0, 10), city: c.name });
-                      d.setDate(d.getDate() + 1);
+                      days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
+                      d = addDays(d, 1);
                     }
                   }
                 });

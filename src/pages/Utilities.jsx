@@ -5,7 +5,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2, Check } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta, getCountryLabel, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
-import { getHardcodedEmergencyInfo } from '@/lib/emergencyDB';
 import { getCountryRequirements, SKIP_VACCINES } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -646,11 +645,18 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta, activ
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    let cancelled = false;
     if (!country) { setData(null); setLoading(false); return; }
     setLoading(true);
-    const d = getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null);
-    setData(d);
-    setLoading(false);
+    // Carga diferida: emergencyDB son ~495 KB de datos que solo hacen falta aquí.
+    import('@/lib/emergencyDB')
+      .then(({ getHardcodedEmergencyInfo }) => {
+        if (cancelled) return;
+        setData(getHardcodedEmergencyInfo(country, homeCountry, secondNationality || null));
+        setLoading(false);
+      })
+      .catch(() => { if (!cancelled) { setData(null); setLoading(false); } });
+    return () => { cancelled = true; };
   }, [country, homeCountry, secondNationality]);
 
   // Carga diferida de los consulados (fichero grande: solo si hace falta).

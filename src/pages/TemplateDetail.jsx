@@ -34,14 +34,14 @@ export default function TripDetail() {
         window.location.href = createPageUrl('TripsList');
         return null;
       }
-      const trips = await base44.entities.Trip.list();
-      const foundTrip = trips.find(t => t.id === tripId);
-      if (!foundTrip) {
-        // Si no se encuentra el trip, redirigir a TripsList
-        window.location.href = createPageUrl('TripsList');
-        return null;
-      }
-      return foundTrip;
+      // Antes: Trip.list() traía TODOS los viajes al cliente para quedarse con uno.
+      // Trip.get() pide solo el que hace falta.
+      try {
+        const found = await base44.entities.Trip.get(tripId);
+        if (found) return found;
+      } catch { /* no existe o sin permiso: se cae al redirect */ }
+      window.location.href = createPageUrl('TripsList');
+      return null;
     },
     enabled: !!tripId,
   });

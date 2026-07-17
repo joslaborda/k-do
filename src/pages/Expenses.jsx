@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine } from 'lucide-react';
+import { Plus, X, Trash2, Utensils, Hotel, Ticket, ShoppingBag, MoreHorizontal, DollarSign, Scale, BarChart2, Compass, Wine, AlertTriangle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTripContext } from '@/hooks/useTripContext';
 import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig';
@@ -129,9 +129,16 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
         </p>
         {/* Equivalente en base — solo si moneda diferente */}
         {!isSame && (
-          <p className="text-xs text-muted-foreground mt-0.5">
-            ≈ {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)} {baseCurrency}
-          </p>
+          expense.fx_source === 'unavailable' ? (
+            <p className="text-xs text-amber-600 mt-0.5 flex items-center gap-1 justify-end">
+              <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+              {t('expenses.fx.notConverted')}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              ≈ {sym(baseCurrency)}{fmtAmt(parseFloat(expense.amount_base || expense.amount || 0), baseCurrency)} {baseCurrency}
+            </p>
+          )
         )}
       </div>
     </button>
