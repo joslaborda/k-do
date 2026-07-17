@@ -5,7 +5,6 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { getSeedSpotsForCity } from '@/lib/spotsDB';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
+import { getTripDays, getTripDates } from '@/lib/tripDays';
 
 
 
@@ -478,20 +478,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
 
-  const tripDates = useMemo(() => {
-    const dates = new Set();
-    tripCities.forEach(c => {
-      if (c.start_date && c.end_date) {
-        let d = parseISO(c.start_date);
-        const end = parseISO(c.end_date);
-        while (d <= end) {
-          dates.add(format(d, 'yyyy-MM-dd'));
-          d = addDays(d, 1);
-        }
-      }
-    });
-    return dates;
-  }, [tripCities]);
+  const tripDates = useMemo(() => new Set(getTripDates(tripCities)), [tripCities]);
 
   const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
   const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
@@ -532,19 +519,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             >
               <option value="">{t('spots.assign.unassigned')}</option>
               {(() => {
-                const days = [];
-                const sorted = [...tripCities].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
-                sorted.forEach(c => {
-                  if (c.start_date && c.end_date) {
-                    let d = parseISO(c.start_date);
-                    const end = parseISO(c.end_date);
-                    while (d <= end) {
-                      days.push({ date: format(d, 'yyyy-MM-dd'), city: c.name });
-                      d = addDays(d, 1);
-                    }
-                  }
-                });
-                return days.map(d => (
+                return getTripDays(tripCities).map(d => (
                   <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
                 ));
               })()}
@@ -902,10 +877,19 @@ export default function Restaurants() {
     setToast({ visible: false, spot: null });
   };
 
-  // Seed spots
-  const seedSpots = useMemo(() => {
-    if (!country || !city) return [];
-    return getSeedSpotsForCity(country, selectedCity || city);
+  // Seed spots. spotsDB son ~112 KB de datos que solo hacen falta en esta pantalla;
+  // se cargan bajo demanda para no lastrar el arranque (pages.config.js importa
+  // todas las páginas de forma estática, así que un import normal iría al bundle inicial).
+  const [seedSpots, setSeedSpots] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!country || !city) { setSeedSpots([]); return; }
+    import('@/lib/spotsDB')
+      .then(({ getSeedSpotsForCity }) => {
+        if (!cancelled) setSeedSpots(getSeedSpotsForCity(country, selectedCity || city) || []);
+      })
+      .catch(() => { if (!cancelled) setSeedSpots([]); });
+    return () => { cancelled = true; };
   }, [country, selectedCity, city]);
 
   // Seed spots that match the search query (shown alongside OSM results)

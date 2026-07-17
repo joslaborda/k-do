@@ -5,7 +5,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2, Check } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta, getCountryLabel, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
-import { getCountryRequirements, SKIP_VACCINES } from '@/lib/packingDB';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import OTabBar from '@/components/trip/OTabBar';
@@ -117,7 +116,7 @@ function PlugIcon({ type }) {
   );
 }
 
-function RequirementsTab({ reqs, country, homeCountry, meta }) {
+function RequirementsTab({ reqs, country, homeCountry, meta, skipVaccines = [] }) {
   const { t, i18n } = useTranslation();
   const [showAllVaccines, setShowAllVaccines] = useState(false);
 
@@ -158,7 +157,7 @@ function RequirementsTab({ reqs, country, homeCountry, meta }) {
 
   // Filtrar COVID-19 (no es requisito de viaje) y vacunas de rutina pediátrica
   // Filtrar vacunas rutinarias (todos las tenemos de niños) — solo mostrar las específicas de viaje
-  const filteredVaccines = vaccines.filter(v => !SKIP_VACCINES.includes(v.name));
+  const filteredVaccines = vaccines.filter(v => !skipVaccines.includes(v.name));
   const requiredVax = filteredVaccines.filter(v => v.priority?.includes('obligatori'));
   // Limpiar labels: quitar "(check age and history)" y "(seasonal and risk based)" del texto visible
   const cleanPriority = (p) => p
@@ -1019,8 +1018,22 @@ export default function Utilities() {
     { key: 'maleta',      label: t('utilities.packing.tabMaleta') },
   ];
   
-  // Requisitos del país activo
-  const countryReqs = country ? getCountryRequirements(country, homeCountry) : null;
+  // Requisitos del país activo. packingDB (+visaMatrix +visaDB) son ~760 KB que
+  // solo se usan aquí: se cargan al abrir la pantalla, no al arrancar la app.
+  const [countryReqs, setCountryReqs] = useState(null);
+  const [skipVaccines, setSkipVaccines] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!country) { setCountryReqs(null); return; }
+    import('@/lib/packingDB')
+      .then(({ getCountryRequirements, SKIP_VACCINES }) => {
+        if (cancelled) return;
+        setCountryReqs(getCountryRequirements(country, homeCountry));
+        setSkipVaccines(SKIP_VACCINES || []);
+      })
+      .catch(() => { if (!cancelled) setCountryReqs(null); });
+    return () => { cancelled = true; };
+  }, [country, homeCountry]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -1053,7 +1066,7 @@ export default function Utilities() {
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
         {activeTab === 'requisitos' && (
-          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} />
+          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} skipVaccines={skipVaccines} />
         )}
         {activeTab === 'tiempo' && (
           <div className="space-y-4">
