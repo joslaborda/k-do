@@ -1269,7 +1269,8 @@
     "sameLang": {
       "title": "You speak the same language!",
       "body": "In {{flag}} {{country}} they speak {{language}}."
-    }
+    },
+    "swapAria": "Swap languages"
   },
   "chat": {
     "fileTooLarge": "File too large",
