@@ -289,7 +289,7 @@ function SlidePreparativos() {
           <Check className="w-3 h-3 text-green-500 ml-auto" />
         </div>
         <div className="flex items-start gap-3 px-4 py-2.5 border-b border-border">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" className="mt-0.5 flex-shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <Shield className="w-3.5 h-3.5 text-green-600 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground leading-tight">{t('onboarding.s4.noVisa')}</p>
             <p className="text-xs text-muted-foreground mt-0.5">{t('onboarding.s4.noVisaSub')}</p>
