@@ -98,7 +98,7 @@ function ManualForm({ onSave, saving, onClose }) {
     <div className="bg-card rounded-xl border border-border p-3 space-y-2.5">
       <div className="flex items-center justify-between">
         <p className="font-semibold text-sm">{t('spots.create.title')}</p>
-        <button onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
+        <button aria-label={t('common.close')} onClick={onClose} className="text-muted-foreground"><X className="w-4 h-4"/></button>
       </div>
       <Input value={title} onChange={e => setTitle(e.target.value)} aria-label={t('spots.section.placeNameAria')} placeholder={t('spots.section.placeNamePlaceholder')} className="h-9 text-sm"/>
       <div className="flex flex-wrap gap-1.5">

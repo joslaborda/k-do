@@ -51,7 +51,7 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-3" />
           <div className="flex items-center justify-between">
             <p className="font-semibold text-foreground text-sm">{spot.title}</p>
-            <button onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+            <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>

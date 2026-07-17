@@ -22,7 +22,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
           <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
 
           {/* Close button */}
-          <button
+          <button aria-label={t('common.close')}
             onClick={onSkip}
             className="absolute top-4 right-4 w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
           >
