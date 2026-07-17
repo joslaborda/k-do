@@ -74,8 +74,8 @@ export default function TemplateCard({ template, currentUser }) {
     e.preventDefault();
     if (!currentUser) {
       toast({
-        title: 'Debes iniciar sesión',
-        description: 'Inicia sesión para guardar itinerarios'
+        title: t('explore.mustSignIn'),
+        description: t('explore.mustSignInDesc')
       });
       return;
     }
