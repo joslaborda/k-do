@@ -109,25 +109,43 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
     responded_date: new Date().toISOString()
   });
 
-  const trip = await base44.entities.Trip.get(tripId);
-  const members = trip.members || [];
-  const roles = trip.roles || {};
-
-  // Si ya es miembro, no duplicar ni degradar rol
-  const alreadyMember = members.includes(normalizedUserEmail);
-  const newMembers = alreadyMember ? members : [...members, normalizedUserEmail];
+  // Añadirse a `members` es leer→modificar→escribir sobre un array completo. Si dos
+  // invitados aceptan a la vez, el segundo escribe su copia (que no incluye al
+  // primero) y lo borra del viaje: el primero aceptó, su invitación quedó marcada
+  // como usada, y se queda fuera sin enterarse y sin poder reintentar.
+  // Se relee tras escribir y se reintenta hasta confirmar que está dentro.
   const roleHierarchy = { admin: 3, editor: 2, viewer: 1 };
-  const existingRole = roles[normalizedUserEmail];
-  const inviteRole = invite.role || 'editor';
-  // Solo asignar rol si no tiene uno más alto ya
-  const finalRole = existingRole && (roleHierarchy[existingRole] || 0) >= (roleHierarchy[inviteRole] || 0)
-    ? existingRole
-    : inviteRole;
-  const newRoles = { ...roles, [normalizedUserEmail]: finalRole };
 
-  await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+  for (let intento = 0; intento < 4; intento++) {
+    const trip = await base44.entities.Trip.get(tripId);
+    const members = trip.members || [];
+    const roles = trip.roles || {};
 
-  return trip;
+    const inviteRole = invite.role || 'editor';
+    const existingRole = roles[normalizedUserEmail];
+    // Solo asignar rol si no tiene uno más alto ya
+    const finalRole = existingRole && (roleHierarchy[existingRole] || 0) >= (roleHierarchy[inviteRole] || 0)
+      ? existingRole
+      : inviteRole;
+
+    // Ya está dentro con el rol correcto: nada que hacer.
+    if (members.includes(normalizedUserEmail) && roles[normalizedUserEmail] === finalRole) return trip;
+
+    const newMembers = members.includes(normalizedUserEmail) ? members : [...members, normalizedUserEmail];
+    const newRoles = { ...roles, [normalizedUserEmail]: finalRole };
+
+    await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+
+    // Releer: si otro aceptó a la vez, su escritura pudo pisar la nuestra.
+    const check = await base44.entities.Trip.get(tripId);
+    if ((check.members || []).includes(normalizedUserEmail)) return check;
+
+    // Espera creciente para no volver a chocar con el mismo.
+    await new Promise(r => setTimeout(r, 120 * (intento + 1)));
+  }
+
+  // Cuatro intentos y sigue sin aparecer: mejor fallar que dejarle creer que entró.
+  throw new Error('No se pudo unir al viaje. Vuelve a intentarlo en unos segundos.');
 }
 
 export async function declineTripInvite(inviteId, inviteToken) {
