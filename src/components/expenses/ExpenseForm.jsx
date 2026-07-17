@@ -143,10 +143,10 @@ export default function ExpenseForm({
           const r = await convertAmount(parseFloat(form.amount), currency, baseCurrency, form.date || null);
           amountBase = r.amountConverted; fxRate = r.rate; fxSource = r.source; fxTimestamp = r.fetchedAt;
           if (r.source === 'unavailable') {
-            toast({ title: 'Sin tipo de cambio', description: `No se pudo convertir ${currency} → ${baseCurrency}. El importe se guarda en ${currency} sin convertir.`, variant: 'destructive' });
+            toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableDesc', { from: currency, to: baseCurrency }), variant: 'destructive' });
           }
         } catch {
-          toast({ title: 'Sin tipo de cambio', description: `No se pudo convertir ${currency} → ${baseCurrency}. Revisa tu conexión.`, variant: 'destructive' });
+          toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableRetry', { from: currency, to: baseCurrency }), variant: 'destructive' });
         }
       }
     }
@@ -285,7 +285,7 @@ export default function ExpenseForm({
                     </div>;
               })()}
               <span className={`text-xs truncate font-medium ${form.paid_by === email ? 'text-primary' : 'text-muted-foreground'}`}>
-                {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
+                {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
               </span>
             </button>
           ))}
@@ -340,7 +340,7 @@ export default function ExpenseForm({
                     : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'var(--kodo-bg-orange-mid)':'var(--kodo-progress-track)',color:selected?'hsl(var(--primary))':'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
+                    {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
                   </span>
                   {shareStr && <span className="text-xs text-primary font-medium">{shareStr} {currency}</span>}
                 </button>
@@ -360,7 +360,7 @@ export default function ExpenseForm({
                     : <div style={{width:28,height:28,borderRadius:'50%',background:'var(--kodo-progress-track)',color:'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500,flexShrink:0}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className="text-xs font-medium text-foreground flex-1 truncate">
-                    {email === (currentUserEmail || members[0]) ? 'Tú' : getName(email)}
+                    {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
                   </span>
                   <input
                     type="number" min="0" step="any" placeholder="0"
