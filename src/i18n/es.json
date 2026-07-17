@@ -327,7 +327,8 @@
     },
     "sectionsAria": "Secciones del viaje",
     "settingsAria": "Configuración del viaje",
-    "startsToday": "¡Hoy empieza!"
+    "startsToday": "¡Hoy empieza!",
+    "deleteError": "Error al eliminar el viaje"
   },
   "expenses": {
     "title": "Gastos",
@@ -437,14 +438,17 @@
       "descRequired": "Descripción requerida",
       "descRequiredDesc": "Añade una descripción al gasto.",
       "payerRequired": "Pagador requerido",
-      "payerRequiredDesc": "Indica quién pagó el gasto."
+      "payerRequiredDesc": "Indica quién pagó el gasto.",
+      "pickSomeone": "Selecciona al menos una persona"
     },
     "fx": {
       "unavailableTitle": "Sin tipo de cambio",
       "unavailableDesc": "No se pudo convertir {{from}} → {{to}}. El importe se guarda en {{from}} sin convertir y no cuadrará en los balances.",
       "unavailableRetry": "No se pudo convertir {{from}} → {{to}}. Revisa tu conexión.",
       "notConverted": "Sin convertir"
-    }
+    },
+    "updateError": "Error al actualizar el gasto",
+    "deleteError": "Error al eliminar el gasto"
   },
   "pretrip": {
     "title": "Pre-viaje",
@@ -989,7 +993,8 @@
       "accommodationPlaceholder": "Ej: APA Hotel Pride Kokkaigijidomae, Tokyo",
       "coverImage": "Imagen de portada (URL)",
       "arrival": "Fecha llegada",
-      "departure": "Fecha salida"
+      "departure": "Fecha salida",
+      "settingsTitle": "Ajustes de la ciudad"
     }
   },
   "restaurants": {
@@ -1368,7 +1373,8 @@
       "public": "Público (Explorar)",
       "publicDesc": "Aparece en la sección Explorar"
     },
-    "update": "Actualizar publicación"
+    "update": "Actualizar publicación",
+    "publishError": "Error al publicar"
   },
   "nav": {
     "home": "Inicio",
