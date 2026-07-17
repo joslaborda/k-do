@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 // Códigos WMO → clave i18n + icono Lucide. El campo `icon` ya existía en el
 // código pero no se usaba: ahora es la fuente del icono (antes se pintaba emoji).
 import { Sun, Cloud, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, CloudFog } from 'lucide-react';
+import { format } from 'date-fns';
 
 // nombre corto → componente Lucide
 const WMO_ICON = {
@@ -46,7 +47,7 @@ function fmtDay(dateStr, lang = 'es') {
   return s.charAt(0).toUpperCase() + s.slice(1).replace('.', '');
 }
 function isToday(dateStr) {
-  return dateStr === new Date().toISOString().slice(0, 10);
+  return dateStr === format(new Date(), 'yyyy-MM-dd');
 }
 
 async function geocode(cityName, country) {
@@ -95,7 +96,7 @@ function processWeather(data) {
   });
 
   // Hourly for today (6h, 9h, 12h, 15h, 18h, 21h)
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
   const hourlyTimes = data.hourly.time || [];
   const wantedHours = [6, 9, 12, 15, 18, 21];
   const hourly = wantedHours.map(h => {
