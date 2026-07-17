@@ -169,7 +169,7 @@ export default function PublishSection({
         ) : (
           <>
             <Share2 className="w-4 h-4 mr-2" />
-            {isPublished && visibility === trip?.template_visibility ? 'Actualizar Publicación' : 'Publicar Ahora'}
+            {isPublished && visibility === trip?.template_visibility ? t('publish.update') : 'Publicar Ahora'}
           </>
         )}
       </Button>

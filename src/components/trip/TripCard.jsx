@@ -7,6 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { getTripCoverImage } from '@/lib/tripImage';
 import { getCountryMeta } from '@/lib/countryConfig';
 
+// Devuelve solo datos: el texto lo pone quien renderiza, con su t(). Antes
+// construía labels en español ('En 3 días', 'Finalizado') que nadie llegaba a
+// usar — los consumidores solo miran type/days/dayNum/total.
 export function getTripStatus(trip) {
   if (!trip.start_date) return null;
   const today = new Date(); today.setHours(0,0,0,0);
@@ -14,16 +17,15 @@ export function getTripStatus(trip) {
   const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
   if (today < start) {
     const days = differenceInDays(start, today);
-    if (days === 0) return { label:'¡Hoy empieza!', days: 0, type:'upcoming' };
-    return { label:`En ${days} día${days!==1?'s':''}`, days, type:'upcoming' };
+    return { days, type: 'upcoming' };
   }
-  if (end && today > end) return { label:'Finalizado', type:'past' };
+  if (end && today > end) return { type: 'past' };
   if (end) {
     const dayNum = differenceInDays(today, start) + 1;
     const total  = differenceInDays(end, start) + 1;
-    return { label: 'active', dayNum, total, type:'active' };
+    return { dayNum, total, type: 'active' };
   }
-  return { label: 'active', type:'active' };
+  return { type: 'active' };
 }
 
 function getTripDuration(trip) {
