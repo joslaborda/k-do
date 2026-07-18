@@ -415,25 +415,32 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
 }
 
 // ── Historial tab ─────────────────────────────────────────────────────────────
-const HIST_KEY = 'kodo_translator_history';
+// Antes esta clave era fija para todo el navegador: si dos personas usaban
+// Kōdo en el mismo dispositivo (móvil compartido, tablet familiar), el
+// historial de traducción de una se mezclaba con el de la otra. Se sufija con
+// el user.id para que cada persona tenga su propio historial local.
+const HIST_KEY_BASE = 'kodo_translator_history';
+function histKey(userId) { return userId ? `${HIST_KEY_BASE}_${userId}` : HIST_KEY_BASE; }
 
-function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+function loadHistory(userId) {
+  try { return JSON.parse(localStorage.getItem(histKey(userId)) || '[]'); } catch { return []; }
 }
-function saveHistory(h) {
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, 50))); } catch {}
+function saveHistory(userId, h) {
+  try { localStorage.setItem(histKey(userId), JSON.stringify(h.slice(0, 50))); } catch {}
 }
 
-function HistorialTab() {
+function HistorialTab({ userId }) {
   const { t } = useTranslation();
-  const [history, setHistory] = useState(() => loadHistory());
+  const [history, setHistory] = useState(() => loadHistory(userId));
+
+  useEffect(() => { setHistory(loadHistory(userId)); }, [userId]);
 
   const toggle = (id) => {
     const next = history.map(h => h.id === id ? { ...h, saved: !h.saved } : h);
-    setHistory(next); saveHistory(next);
+    setHistory(next); saveHistory(userId, next);
   };
 
-  const clearAll = () => { setHistory([]); saveHistory([]); };
+  const clearAll = () => { setHistory([]); saveHistory(userId, []); };
 
   const saved   = history.filter(h => h.saved);
   const recent  = history.filter(h => !h.saved);
@@ -556,7 +563,7 @@ function TranslatorContent({ tripId, inPage = false }) {
   const handleSaveToHistory = useCallback(({ original, translated, fromLang: fl, toLang: tl }) => {
     const fromL = LANGUAGES.find(l => l.code === fl) || LANGUAGES[0];
     const toL   = LANGUAGES.find(l => l.code === tl) || LANGUAGES[1];
-    const history = loadHistory();
+    const history = loadHistory(user?.id);
     const entry = {
       id: Date.now().toString(),
       original, translated,
@@ -565,8 +572,8 @@ function TranslatorContent({ tripId, inPage = false }) {
       timeLabel: t('translator.now'),
     };
     const next = [entry, ...history];
-    saveHistory(next);
-  }, []);
+    saveHistory(user?.id, next);
+  }, [user?.id]);
 
   return (
     <>
@@ -624,7 +631,7 @@ function TranslatorContent({ tripId, inPage = false }) {
           />
         )}
 
-        {tab === 'historial' && <HistorialTab />}
+        {tab === 'historial' && <HistorialTab userId={user?.id} />}
       </div>
     </>
   );

@@ -11,6 +11,7 @@ import { ArrowRight, Calendar, MapPin, Settings } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
+import { daysUntil } from '@/lib/tripDays';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -100,7 +101,10 @@ export default function Home() {
   const currentUserEmail = currentUser?.email;
   const currentUserId = currentUser?.id;
   const roles = trip?.roles || {};
-  const isAdmin = !trip || roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail;
+  // Antes `!trip` hacía fail-open a admin mientras el viaje no había cargado
+  // (o si el backend devolvía vacío en vez de lanzar error). Con trip aún sin
+  // cargar, nadie debe verse como admin.
+  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail);
 
   const { activeCity, activeMeta, countryRoute } = useTripContext(tripId);
 
@@ -175,7 +179,7 @@ export default function Home() {
   );
 
   // Smart tab logic
-  const daysToStart = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
+  const daysToStart = tripStart ? daysUntil(tripStart) : null;
   const isDeparture = daysToStart === 0;       // today IS the start date
   const isDMinus1   = daysToStart === 1;       // tomorrow is start
 
@@ -244,7 +248,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <Link to={createPageUrl('TripsList')}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-                <ArrowRight className="w-4 h-4 rotate-180" />Mis viajes
+                <ArrowRight className="w-4 h-4 rotate-180" />{t('tripslist.myTrips')}
               </button>
             </Link>
             <div className="flex items-center gap-2">
@@ -347,12 +351,12 @@ export default function Home() {
         tripId={tripId}
         isAdmin={isAdmin}
         profiles={profiles}
+        currentUserEmail={currentUserEmail}
         onDelete={() => { setSettingsOpen(false); setDeleteOpen(true); }}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
           queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
         }}
-        onInvite={() => setInviteOpen(true)}
       />
 
             <DeleteTripModal

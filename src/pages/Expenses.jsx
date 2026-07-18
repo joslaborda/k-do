@@ -729,7 +729,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
 }
 
 // ── Expense add/edit sheet ────────────────────────────────────────────────────
-function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail }) {
+function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail, cities, defaultCityId }) {
   const { t } = useTranslation();
   if (!open) return null;
   return (
@@ -757,6 +757,8 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             userMap={userMap}
             currentUserEmail={currentUserEmail}
             profilesByEmail={profilesByEmail}
+            cities={cities}
+            defaultCityId={defaultCityId}
           />
         </div>
         {/* Buttons — outside scroll, always visible */}
@@ -1225,6 +1227,8 @@ export default function Expenses() {
         saving={createMutation.isPending || updateMutation.isPending}
         currentUserEmail={currentUserEmail}
         profilesByEmail={profilesByEmail}
+        cities={cities}
+        defaultCityId={activeCity?.id}
       />
     </div>
   );

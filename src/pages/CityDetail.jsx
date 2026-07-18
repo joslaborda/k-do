@@ -602,7 +602,7 @@ export default function CityDetail() {
                         <div className="prose prose-sm max-w-none pt-4 text-foreground [&>*]:text-foreground">
                           <ReactMarkdown>{day.content || t('cities.detail.noDetails')}</ReactMarkdown>
                         </div>
-                        <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} dayTitle={day.title} />
+                        <DayDocuments dayId={day.id} tripId={tripId} currentUserEmail={currentUser?.email} currentUserId={currentUser?.id} dayTitle={day.title} />
                       </div>
                     </CollapsibleContent>
                 </div>

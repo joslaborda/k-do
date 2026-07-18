@@ -790,6 +790,37 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta, activ
         );
       })()}
 
+      {/* Embajada de la segunda nacionalidad (doble pasaporte) — se calculaba en
+          emergencyDB.js pero nunca se llegaba a mostrar aquí */}
+      {data && data.secondEmbassy && (() => {
+        const emb2 = typeof data.secondEmbassy === 'string'
+          ? { name: data.secondEmbassy.split(':')[0], phone: data.secondEmbassy.match(/[+\d][\d\s()-]{6,}/)?.[0] }
+          : data.secondEmbassy;
+        return (
+          <div className="bg-card rounded-2xl border border-border p-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Landmark className="w-4 h-4 text-muted-foreground" />
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                {t('utilities.emerg.secondEmbassyOf', { home: getCountryLabel(secondNationality, i18n.language) })}
+              </p>
+            </div>
+            {emb2.name && <p className="text-sm font-semibold text-foreground">{emb2.name}</p>}
+            {emb2.address && (
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground">{emb2.address}</p>
+              </div>
+            )}
+            {emb2.phone && (
+              <a href={`tel:${emb2.phone.replace(/\s/g,'')}`} className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-sm font-semibold text-primary">{emb2.phone}</span>
+              </a>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Consulados: los 3 primeros (el de la ciudad actual va arriba) y el resto plegado */}
       {!loading && consulates.length > 0 && (
         <div className="bg-card rounded-2xl border border-border p-4">
@@ -1029,12 +1060,12 @@ export default function Utilities() {
     import('@/lib/packingDB')
       .then(({ getCountryRequirements, SKIP_VACCINES }) => {
         if (cancelled) return;
-        setCountryReqs(getCountryRequirements(country, homeCountry));
+        setCountryReqs(getCountryRequirements(country, homeCountry, secondNationality));
         setSkipVaccines(SKIP_VACCINES || []);
       })
       .catch(() => { if (!cancelled) setCountryReqs(null); });
     return () => { cancelled = true; };
-  }, [country, homeCountry]);
+  }, [country, homeCountry, secondNationality]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -16,6 +16,7 @@ import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
+import { daysUntil } from '@/lib/tripDays';
 import { useTranslation } from 'react-i18next';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -846,7 +847,7 @@ export default function Cities() {
   const progress = totalDays && dayNumber ? Math.min(100, Math.round((dayNumber / totalDays) * 100)) : 0;
   const tripNotStarted = tripStart && todayStr < tripStart;
   const tripFinished = tripEnd && todayStr > tripEnd;
-  const daysLeft = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
+  const daysLeft = tripStart ? daysUntil(tripStart) : null;
 
   const activeCityName = useMemo(() => {
     const c = sortedCities.find(c => c.start_date && c.end_date && todayStr >= c.start_date && todayStr <= c.end_date);

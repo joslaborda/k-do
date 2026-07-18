@@ -16,7 +16,7 @@ import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays, getTripDates } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue } from '@/lib/tripDays';
 
 
 
@@ -478,7 +478,20 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
 
-  const tripDates = useMemo(() => new Set(getTripDates(tripCities)), [tripCities]);
+  // El spot ya tiene city_id fijo desde que se creó (la ciudad activa en ese
+  // momento). Cities.jsx solo lo muestra en un día si `assigned_date` Y
+  // `city_id` coinciden con ese día — si aquí se deja elegir una fecha de OTRA
+  // ciudad del viaje, el spot queda con una fecha que no cuadra con su city_id
+  // y desaparece de todas las vistas de itinerario sin aviso. Por eso los
+  // días que se ofrecen aquí se filtran a la ciudad del propio spot.
+  const dayOptions = useMemo(() => {
+    const allDays = getTripDays(tripCities);
+    if (!spot?.city_id) return allDays;
+    const own = allDays.filter(d => d.cityId === spot.city_id);
+    return own.length > 0 ? own : allDays;
+  }, [tripCities, spot?.city_id]);
+
+  const tripDates = useMemo(() => new Set(dayOptions.map(d => d.date)), [dayOptions]);
 
   const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
   const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
@@ -518,11 +531,9 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
               className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
             >
               <option value="">{t('spots.assign.unassigned')}</option>
-              {(() => {
-                return getTripDays(tripCities).map(d => (
-                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
-                ));
-              })()}
+              {dayOptions.map(d => (
+                <option key={tripDayOptionValue(d)} value={d.date}>{d.date} · {d.city}</option>
+              ))}
             </select>
           ) : (
             <input
@@ -1347,6 +1358,7 @@ export default function Restaurants() {
           tripId={tripId}
           tripCities={tripCities}
           userId={user?.id}
+          currentUserEmail={currentUser?.email}
         />
       )}
 

@@ -50,7 +50,9 @@ export default function Invites() {
     queryKey: ['myPendingInvites', currentUser?.email],
     queryFn: async () => {
       if (!currentUser?.email) return [];
-      return base44.entities.TripInvite.filter({ email: currentUser.email, status: 'pending' });
+      // invites.js guarda el email siempre en minúsculas — sin normalizar
+      // aquí, un email con mayúsculas no encontraba sus propias invitaciones.
+      return base44.entities.TripInvite.filter({ email: currentUser.email.toLowerCase(), status: 'pending' });
     },
     enabled: !!currentUser?.email && !token,
   });

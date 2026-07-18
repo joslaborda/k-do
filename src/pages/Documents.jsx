@@ -290,11 +290,11 @@ export default function Documents() {
     // personal: only owner sees it
     if (vis === 'personal' && !isOwner) return false;
     // selected_users: owner or explicitly shared
-    if (vis === 'selected_users' && !isOwner && !(t.shared_with || []).includes(currentUserEmail)) return false;
+    if (vis === 'selected_users' && !isOwner && !(ticket.shared_with || []).includes(currentUserEmail)) return false;
     // shared: all trip members — no extra check needed
     if (catFilter !== 'all') {
-      if (catFilter === 'other') return !['flight','hotel','train'].includes(t.category);
-      return t.category === catFilter;
+      if (catFilter === 'other') return !['flight','hotel','train'].includes(ticket.category);
+      return ticket.category === catFilter;
     }
     return true;
   }), [tickets, catFilter, currentUserEmail, userId]);

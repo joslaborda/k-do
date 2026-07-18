@@ -42,7 +42,12 @@ export default function Photos() {
 
   const { data: messages = [], isLoading: loadingPhotos } = useQuery({
     queryKey: ['tripMessages', tripId],
-    queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, 'created_date', 500),
+    // Con orden ascendente y un límite de 500, un viaje con mucho chat+fotos
+    // se quedaba con los 500 mensajes MÁS ANTIGUOS — las fotos recientes ni
+    // siquiera llegaban a bajarse. Orden descendente para que el límite se
+    // coma lo viejo, no lo nuevo (el reordenado cronológico para mostrar es
+    // aparte, más abajo).
+    queryFn: () => base44.entities.TripMessage.filter({ trip_id: tripId }, '-created_date', 500),
     enabled: !!tripId,
     staleTime: 0,
   });

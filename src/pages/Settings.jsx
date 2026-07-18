@@ -162,21 +162,76 @@ function PasswordSection({ user }) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Delete account confirmation
+//
+// Antes este botón decía "esta acción es permanente e irreversible" y luego
+// solo hacía logout — no borraba nada, así que la promesa era falsa y la
+// cuenta seguía intacta.
+//
+// Alcance del borrado real (decidido explícitamente, no todo lo que "borrar
+// cuenta" podría implicar):
+//   - Se saca al usuario de `members`/`roles` en todos los viajes donde
+//     participa (deja de tener acceso).
+//   - Se borra su UserProfile.
+//   - Se borran sus SavedSpot (favoritos guardados, son 100% privados suyos).
+//   - Se cierra sesión.
+// A propósito NO se borran Spot / Expense / Ticket / TripMessage que haya
+// creado dentro de viajes compartidos: son datos que el resto del grupo sigue
+// usando (itinerario, balances de gastos, documentos, chat) y borrarlos de
+// golpe rompería esos viajes para las demás personas. Esos registros quedan
+// con su `created_by`/`user_id` original, huérfanos de perfil pero intactos.
 // ─────────────────────────────────────────────────────────────────────────────
-function DeleteAccountRow() {
+function DeleteAccountRow({ user, profile }) {
   const { t } = useTranslation();
   const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState('');
+
   if (!confirm) return (
     <SettingRow label={<span className="text-muted-foreground text-sm">{t('settings.deleteAccount')}</span>} isLast onClick={() => setConfirm(true)} />
   );
+
+  const handleDelete = async () => {
+    if (!user?.email || !user?.id) return;
+    setDeleting(true);
+    setError('');
+    try {
+      // 1. Salir de todos los viajes donde el usuario es miembro.
+      const trips = await base44.entities.Trip.filter({ members: { $elemMatch: { $eq: user.email } } });
+      await Promise.all(trips.map(trip => {
+        const newMembers = (trip.members || []).filter(e => e !== user.email);
+        const newRoles = { ...(trip.roles || {}) };
+        delete newRoles[user.email];
+        return base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
+      }));
+
+      // 2. Borrar favoritos guardados (privados, sin relación con viajes compartidos).
+      const saved = await base44.entities.SavedSpot.filter({ user_id: user.id });
+      await Promise.all(saved.map(s => base44.entities.SavedSpot.delete(s.id)));
+
+      // 3. Borrar el perfil.
+      if (profile?.id) {
+        await base44.entities.UserProfile.delete(profile.id);
+      }
+
+      // 4. Cerrar sesión. base44 no expone borrado de la cuenta de auth desde
+      // el cliente — lo que sí queda garantizado es que ya no aparece en
+      // ningún viaje ni tiene perfil en Kōdo.
+      base44.auth.logout();
+    } catch (e) {
+      setDeleting(false);
+      setError(e?.message || t('common.tryAgain'));
+    }
+  };
+
   return (
     <div className="px-4 py-3 space-y-2">
       <p className="text-xs text-red-500">{t('settings.delete.confirm')}</p>
+      {error && <p className="text-xs text-red-500">{error}</p>}
       <div className="flex gap-2">
-        <button onClick={() => setConfirm(false)} className="flex-1 py-2 border border-border rounded-xl text-xs text-muted-foreground">{t('common.cancel')}</button>
-        <button onClick={() => base44.auth.logout()} className="flex-1 py-2 bg-red-500 text-white rounded-xl text-xs font-medium">{t('settings.delete.yes')}</button>
-
-
+        <button onClick={() => setConfirm(false)} disabled={deleting} className="flex-1 py-2 border border-border rounded-xl text-xs text-muted-foreground disabled:opacity-50">{t('common.cancel')}</button>
+        <button onClick={handleDelete} disabled={deleting} className="flex-1 py-2 bg-red-500 text-white rounded-xl text-xs font-medium disabled:opacity-50">
+          {deleting ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : t('settings.delete.yes')}
+        </button>
       </div>
     </div>
   );
@@ -261,12 +316,34 @@ export default function Settings() {
 
   const handleSave = async () => {
     if (!displayName.trim()) { setSaveMsg({ type:'error', text:t('settings.errors.nameEmpty') }); return; }
-    if (username && validateUsername(username)) { setSaveMsg({ type:'error', text: validateUsername(username) }); return; }
-    if (usernameAvailable === false) { setSaveMsg({ type:'error', text:t('settings.errors.usernameTaken') }); return; }
+    // Antes `username && validateUsername(...)` se saltaba la validación entera
+    // cuando el campo estaba vacío (username='' es falsy), así que se podía
+    // guardar un perfil sin username pese a que validateUsername('') dice
+    // explícitamente que no puede estar vacío — y el username es obligatorio
+    // desde el alta (CreateProfileModal no deja avanzar sin uno).
+    const usernameErr = validateUsername(username);
+    if (usernameErr) { setSaveMsg({ type:'error', text: usernameErr }); return; }
+    // El check de disponibilidad en pantalla es un debounce de 600ms: si el
+    // usuario escribe y pulsa "Guardar" antes de que resuelva (o mientras
+    // sigue en null tras un cambio reciente), `usernameAvailable` puede no
+    // reflejar el username actual todavía y el chequeo de abajo no lo pilla.
+    // Se revalida en el momento del guardado si el username cambió.
+    if (username !== profile?.username) {
+      const stillAvailable = await checkUsernameAvailability(username, user?.id);
+      if (!stillAvailable) {
+        setUsernameAvailable(false);
+        setSaveMsg({ type:'error', text:t('settings.errors.usernameTaken') });
+        return;
+      }
+    }
     setSaving(true);
     try {
       await base44.entities.UserProfile.update(profile.id, {
-        email: user.email,
+        // Otros flujos (invites.js, NotificationBell, Invites.jsx) comparan y
+        // filtran por email en minúsculas; guardarlo tal cual venga de
+        // base44.auth podía dejar un email con mayúsculas que no cuadrara con
+        // esas comparaciones.
+        email: (user.email || '').toLowerCase(),
         display_name: displayName.trim(),
         username,
         username_normalized: username.toLowerCase(),
@@ -489,7 +566,7 @@ export default function Settings() {
               className="w-full text-left px-4 py-3.5 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors border-b border-border">
               {t('settings.logout')}
             </button>
-            <DeleteAccountRow />
+            <DeleteAccountRow user={user} profile={profile} />
           </div>
         </div>
 
