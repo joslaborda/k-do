@@ -2,18 +2,29 @@
  * Automáticamente vincula documentos a días de itinerario basándose en fecha
  */
 
-export function findMatchingItineraryDay(ticketDate, itineraryDays) {
+export function findMatchingItineraryDay(ticketDate, itineraryDays, preferredCityId) {
   if (!ticketDate || !itineraryDays.length) return null;
 
   const ticketDateObj = new Date(ticketDate);
 
-  // Buscar el primer día cuyo rango incluya la fecha del ticket
-  const matchedDay = itineraryDays.find(day => {
+  // En un día de tránsito, dos ItineraryDay de ciudades distintas pueden caer
+  // en la misma fecha. Antes se tomaba el primero que encajara por fecha, sin
+  // más — si el ticket ya tenía una ciudad conocida (elegida a mano o porque
+  // el documento ya estaba vinculado a un city_id), el auto-link podía
+  // "robarle" el día a la ciudad equivocada. Ahora, si se conoce la ciudad,
+  // se prioriza el día de esa ciudad; solo si no hay match para ella se cae al
+  // primer día que coincida en fecha (comportamiento anterior).
+  const matchesDate = (day) => {
     if (!day.date) return false;
-    const dayDateObj = new Date(day.date);
-    // Comparar por día (ignorar horas)
-    return dayDateObj.toDateString() === ticketDateObj.toDateString();
-  });
+    return new Date(day.date).toDateString() === ticketDateObj.toDateString();
+  };
+
+  if (preferredCityId) {
+    const cityMatch = itineraryDays.find(day => matchesDate(day) && day.city_id === preferredCityId);
+    if (cityMatch) return cityMatch;
+  }
+
+  const matchedDay = itineraryDays.find(matchesDate);
 
   return matchedDay || null;
 }
@@ -39,7 +50,10 @@ export function enrichTicketDataWithAutoLinks(formData, itineraryDays, userSelec
 
   // Si tiene fecha y no tiene day asignado, buscar automáticamente
   if (formData.date && !formData.itinerary_day_id) {
-    const matchedDay = findMatchingItineraryDay(formData.date, itineraryDays);
+    // Si el usuario ya eligió ciudad a mano, se prioriza el día de ESA ciudad
+    // para esa fecha (relevante en días de tránsito, donde la fecha sola es
+    // ambigua entre dos ciudades).
+    const matchedDay = findMatchingItineraryDay(formData.date, itineraryDays, userSelectedCityId);
     if (matchedDay) {
       enriched.itinerary_day_id = matchedDay.id;
       // Solo asignar city_id si el usuario no lo ha elegido manualmente

@@ -1,5 +1,5 @@
 import { getVisaInfo } from '@/lib/visaMatrix';
-import { getCountryMeta } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
 
 /**
  * packingDB.js — Base de datos global de requisitos de viaje
@@ -2927,53 +2927,46 @@ export const COUNTRY_REQUIREMENTS = {
 };
 
 
-export function getCountryRequirements(destination, homeCountry = 'España') {
-  const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const hn = norm(homeCountry);
-  const has = keys => keys.some(k => hn.includes(k));
+// Resuelve el valor de visado de un objeto `visa` de COUNTRY_REQUIREMENTS para
+// un código de pasaporte concreto (exacto, o vía el bloque LATAM, o fallback a ES).
+function resolveVisaVal(v, code) {
+  let visaVal = v[code];
+  if (visaVal === undefined) {
+    const latam = v.LATAM || {};
+    const inList = list => list === 'all' || (Array.isArray(list) && list.includes(code));
+    if (inList(latam.free)) visaVal = false;
+    else if (inList(latam.evisa)) visaVal = 'evisa';
+    else if (inList(latam.voa)) visaVal = 'voa';
+    else if (inList(latam.eta)) visaVal = 'eta';
+    else if (inList(latam.required)) visaVal = true;
+    else visaVal = v.ES;
+  }
+  return visaVal;
+}
 
-  const code = (() => {
-    if (has(['espana','spain','español'])) return 'ES';
-    if (has(['estados unidos','united states','eeuu','usa'])) return 'US';
-    if (has(['reino unido','united kingdom','britain'])) return 'UK';
-    if (has(['australia'])) return 'AU';
-    if (has(['canad'])) return 'CA';
-    if (has(['japon','japan'])) return 'JP';
-    if (has(['corea del sur','south korea'])) return 'KR';
-    if (has(['india'])) return 'IN';
-    if (has(['chin'])) return 'CN';
-    if (has(['rusia','russia'])) return 'RU';
-    if (has(['argentin'])) return 'AR';
-    if (has(['brasil','brazil'])) return 'BR';
-    if (has(['chile'])) return 'CL';
-    if (has(['colombi'])) return 'CO';
-    if (has(['ecuad'])) return 'EC';
-    if (has(['mexic'])) return 'MX';
-    if (has(['panam'])) return 'PA';
-    if (has(['peru','perú'])) return 'PE';
-    if (has(['paragua'])) return 'PY';
-    if (has(['urugua'])) return 'UY';
-    if (has(['venezuel'])) return 'VE';
-    if (has(['boliv'])) return 'BO';
-    if (has(['hondur'])) return 'HN';
-    if (has(['nicarag'])) return 'NI';
-    if (has(['salv'])) return 'SV';
-    if (has(['guatemal'])) return 'GT';
-    if (has(['cuba'])) return 'CU';
-    if (has(['dominicana','dominican'])) return 'DO';
-    if (has(['haiti','haití'])) return 'HT';
-    const euPassports = ['portug','franc','aleman','german','ital','neder','belg','austr','grec','suec','norweg','danm','finl','polon','czech','hungr','roman','bulgar','croac','eslov','eston','letón','lituán','luxemb','malt','chipre'];
-    if (euPassports.some(k => hn.includes(k))) return 'ES';
-    return 'ES';
-  })();
+// Qué tan bueno es un visaVal: sin visado > evisa/voa/eta > requerido > desconocido.
+function rankVisaVal(visaVal) {
+  if (visaVal === false) return 0;
+  if (typeof visaVal === 'string') return 1;
+  if (visaVal === true) return 2;
+  return 3;
+}
+
+export function getCountryRequirements(destination, homeCountry = 'España', secondNationality = null) {
+  // Antes esto era una lista de ~29 `if` por nombre de país que caía a 'ES' por
+  // defecto para cualquier nacionalidad no cubierta (la mayoría de África, Asia
+  // y Oriente Medio, pese a que el selector de nacionalidad ofrece ~190 países).
+  // getCountryIso() cubre el catálogo completo — mismo helper que usa emergencyDB.js.
+  const code = getCountryIso(normalizeCountry(homeCountry)) || null;
+  const secondCode = secondNationality ? (getCountryIso(normalizeCountry(secondNationality)) || null) : null;
 
   const req = COUNTRY_REQUIREMENTS[destination] || null;
   if (!req) {
-    // Fallback: intentar visaDB con ISOs
+    // Fallback: intentar visaDB con ISOs (ya tiene en cuenta la segunda nacionalidad)
     const destISO = DEST_NAME_TO_ISO[destination] || getCountryMeta(destination)?.iso || null;
     if (destISO && code) {
       try {
-        const visaInfo = getVisaInfo(destISO, code);
+        const visaInfo = getVisaInfo(destISO, code, secondCode);
         if (visaInfo && visaInfo.needed !== null) {
           const type = visaInfo.eVisa ? 'evisa' : visaInfo.needed === false ? null : 'required';
           const labelMap = { evisa: 'e-Visa requerida', voa: 'Visa en llegada', eta: 'ETA requerida' };
@@ -2994,29 +2987,37 @@ export function getCountryRequirements(destination, homeCountry = 'España') {
         }
       } catch(e) {}
     }
+    if (!code) {
+      return {
+        visa: { needed: null, type: null, label: 'Sin datos — verifica con el consulado', info: '', passportCode: null },
+        adapter: { needed: null, type: null, info: null },
+        vaccines: [], currency: { info: null }, tips: [], emergency: null,
+      };
+    }
     return null;
   }
 
   const v = req.visa || {};
-  let visaVal = v[code];
+  let visaVal = resolveVisaVal(v, code);
+  let usedCode = code;
 
-  if (visaVal === undefined) {
-    const latam = v.LATAM || {};
-    const inList = list => list === 'all' || (Array.isArray(list) && list.includes(code));
-    if (inList(latam.free)) visaVal = false;
-    else if (inList(latam.evisa)) visaVal = 'evisa';
-    else if (inList(latam.voa)) visaVal = 'voa';
-    else if (inList(latam.eta)) visaVal = 'eta';
-    else if (inList(latam.required)) visaVal = true;
-    else visaVal = v.ES;
+  // Si hay segunda nacionalidad, quedarnos con la que dé mejor resultado.
+  if (secondCode) {
+    const secondVal = resolveVisaVal(v, secondCode);
+    if (rankVisaVal(secondVal) < rankVisaVal(visaVal)) {
+      visaVal = secondVal;
+      usedCode = secondCode;
+    }
   }
 
   const needed = visaVal === false ? false : visaVal === true ? true : null;
   const type = typeof visaVal === 'string' ? visaVal : null;
   const labelMap = { evisa: 'e-Visa requerida', voa: 'Visa en llegada', eta: 'ETA / Autorización electrónica', esta: 'ESTA requerida', nzeta: 'NZeTA requerida' };
-  const label = needed === false ? 'Sin visado' : needed === true ? 'Visado requerido' : (labelMap[type] || 'Verificar con consulado');
+  const label = code === null
+    ? 'Sin datos — verifica con el consulado'
+    : needed === false ? 'Sin visado' : needed === true ? 'Visado requerido' : (labelMap[type] || 'Verificar con consulado');
 
-  return { ...req, visa: { ...req.visa, needed, type, label, passportCode: code } };
+  return { ...req, visa: { ...req.visa, needed, type, label, passportCode: usedCode } };
 }
 
 

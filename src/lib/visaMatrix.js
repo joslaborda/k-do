@@ -1511,9 +1511,15 @@ export function getVisaInfo(destinationISO, originISO, secondOriginISO = null) {
   const destData = VISA_MATRIX[destinationISO];
   
   if (!destData) {
-    // Fallback: consultar visaDB con datos de visarequirements.info
-    const dbType = getVisaFromDB(destinationISO, originISO) ||
-                   (secondOriginISO ? getVisaFromDB(destinationISO, secondOriginISO) : null);
+    // Fallback: consultar visaDB con datos de visarequirements.info.
+    // Si hay segunda nacionalidad, nos quedamos con la que dé mejor resultado
+    // (antes esto era `a || b`, que nunca miraba `b` porque 'required' es truthy).
+    const rankDbType = t => t === 'free' ? 0 : (t === 'evisa' || t === 'voa' || t === 'eta') ? 1 : t === 'required' ? 2 : 3;
+    const primaryDbType = getVisaFromDB(destinationISO, originISO);
+    const secondaryDbType = secondOriginISO ? getVisaFromDB(destinationISO, secondOriginISO) : null;
+    const dbType = (secondaryDbType && rankDbType(secondaryDbType) < rankDbType(primaryDbType))
+      ? secondaryDbType
+      : (primaryDbType || secondaryDbType);
     if (dbType) {
       const info = visaTypeToInfo(dbType, destinationISO);
       return { ...info, passport: originISO, source: 'visaDB' };
@@ -1549,9 +1555,16 @@ export function getVisaInfo(destinationISO, originISO, secondOriginISO = null) {
 
   // If two passports, return the most favorable
   if (primary && secondary) {
-    // Most favorable = needed:false > needed:true with eVisa > needed:true embassy
+    // Most favorable = needed:false > needed:true with eVisa > needed:true embassy.
+    // Si ambos empatan en ese nivel (p. ej. los dos sin visado), desempatar por
+    // días de estancia permitidos — antes se quedaba siempre con `primary` aunque
+    // `secondary` diera más días.
     const score = (v) => v.needed === false ? 0 : v.eVisa ? 1 : 2;
-    if (score(secondary) < score(primary)) {
+    const scoreSecondary = score(secondary);
+    const scorePrimary = score(primary);
+    const secondaryIsBetter = scoreSecondary < scorePrimary ||
+      (scoreSecondary === scorePrimary && (secondary.days || 0) > (primary.days || 0));
+    if (secondaryIsBetter) {
       return {
         ...secondary,
         info: `Con tu pasaporte de ${secondOriginISO}: ${secondary.info}`,

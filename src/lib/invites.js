@@ -25,9 +25,14 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
 
   let invite;
   if (existing.length > 0) {
+    // Reinvitar con un rol distinto (p. ej. de viewer a editor) debe actualizar
+    // el rol de la invitación pendiente, no solo el token — si no, quien acepte
+    // se queda con el rol de la primera invitación aunque se le haya reinvitado
+    // explícitamente con otro.
     invite = await base44.entities.TripInvite.update(existing[0].id, {
       invite_token: inviteToken,
-      invited_by: inviterEmail
+      invited_by: inviterEmail,
+      role: role || 'editor'
     });
   } else {
     invite = await base44.entities.TripInvite.create({
