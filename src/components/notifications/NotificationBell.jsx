@@ -40,7 +40,10 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         const fetchedTrip = await base44.entities.Trip.get(notif.trip_id);
         setTripData(fetchedTrip);
         if (currentUser?.email) {
-          const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email, status: 'pending' });
+          // invites.js siempre guarda el email en minúsculas (normalizedEmail);
+          // si aquí se filtraba con currentUser.email tal cual, un email con
+          // mayúsculas nunca encontraba su propia invitación pendiente.
+          const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email.toLowerCase(), status: 'pending' });
           setInvite(invs[0] || null);
         }
         const memberEmails = fetchedTrip.members || [];
