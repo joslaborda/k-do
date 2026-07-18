@@ -82,6 +82,14 @@
     "nationality": {
       "type": "string",
       "description": "Nacionalidad del usuario — determina requisitos de visado"
+    },
+    "second_nationality": {
+      "type": "string",
+      "description": "Segunda nacionalidad (doble pasaporte) — se usa para ofrecer los requisitos de visado más favorables"
+    },
+    "language": {
+      "type": "string",
+      "description": "Idioma preferido de la interfaz"
     }
   },
   "required": [

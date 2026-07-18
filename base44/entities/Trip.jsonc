@@ -37,6 +37,10 @@
       "default": "EUR",
       "description": "Moneda del viaje"
     },
+    "base_currency": {
+      "type": "string",
+      "description": "Moneda base para conversión de gastos compartidos — hoy siempre igual a 'currency' al crear el viaje"
+    },
     "members": {
       "type": "array",
       "items": {

@@ -21,7 +21,9 @@
         "neceser",
         "tecnologia",
         "ropa",
-        "medicinas"
+        "medicinas",
+        "otros",
+        "souvenir"
       ],
       "description": "Categor\u00eda del art\u00edculo"
     },
@@ -32,6 +34,11 @@
     "quantity": {
       "type": "number",
       "default": 1
+    },
+    "essential": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marca el art\u00edculo como esencial (se resalta y se cuenta aparte)"
     }
   },
   "required": [

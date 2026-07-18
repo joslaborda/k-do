@@ -113,6 +113,26 @@
     "day_order": {
       "type": "number",
       "description": "Orden del spot dentro del d\u00eda para el itinerario"
+    },
+    "saved_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails de usuarios que guardaron este spot (sin ser su creador) \u2014 usado por el filtro 'Guardados'"
+    },
+    "osm_id": {
+      "type": "string",
+      "description": "ID de OpenStreetMap si el spot vino de b\u00fasqueda OSM"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "osm",
+        "saved_import"
+      ],
+      "description": "C\u00f3mo se a\u00f1adi\u00f3 el spot: manual, importado de b\u00fasqueda OSM, o importado de la wishlist personal"
     }
   },
   "required": [

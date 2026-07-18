@@ -37,6 +37,11 @@
     "file_name": {
       "type": "string",
       "description": "Nombre original del archivo"
+    },
+    "taken_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha/hora real en que se tomó la foto (EXIF), usada para agrupar/ordenar la galería por día"
     }
   },
   "required": [

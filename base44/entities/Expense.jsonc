@@ -239,6 +239,19 @@
     "fx_timestamp": {
       "type": "string",
       "description": "Timestamp de la obtención del tipo de cambio"
+    },
+    "is_settlement": {
+      "type": "boolean",
+      "default": false,
+      "description": "true si es un registro de liquidación de deuda entre miembros (no un gasto real) — se excluye de estadísticas y desgloses"
+    },
+    "city_id": {
+      "type": "string",
+      "description": "ID de la ciudad donde ocurrió el gasto (opcional)"
+    },
+    "city_name": {
+      "type": "string",
+      "description": "Nombre de la ciudad donde ocurrió el gasto, usado en el desglose 'Por ciudad'"
     }
   },
   "required": [
