@@ -9,16 +9,16 @@ import { toast } from '@/components/ui/use-toast';
 import { sendTripInvite } from '@/lib/invites';
 import { useTranslation } from 'react-i18next';
 
-const roleConfig = {
-  admin: { label: 'Admin', icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  editor: { label: 'Editor', icon: Pencil, color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  viewer: { label: 'Lector', icon: Eye, color: 'bg-secondary text-foreground border-border' },
-};
-
 export default function MembersPanel({
   trip, currentUserEmail, isAdmin, profiles = []
 }) {
   const { t } = useTranslation();
+
+  const roleConfig = {
+    admin: { label: t('membersPanel.roleAdmin'), icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
+    editor: { label: t('membersPanel.roleEditor'), icon: Pencil, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    viewer: { label: t('membersPanel.roleViewer'), icon: Eye, color: 'bg-secondary text-foreground border-border' },
+  };
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
@@ -62,7 +62,7 @@ export default function MembersPanel({
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
       setMemberToRemove(null);
     },
-    onError: (e) => toast({ title: 'Error', description: e?.message || 'No se pudo expulsar al miembro' }),
+    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.removeError') }),
   });
 
   const handleInvite = async () => {
@@ -80,7 +80,7 @@ export default function MembersPanel({
           found = await base44.entities.UserProfile.filter({ username: query });
         }
         if (!found.length) {
-          toast({ title: 'Usuario no encontrado', description: `No existe el usuario @${query}` });
+          toast({ title: t('membersPanel.userNotFound'), description: t('membersPanel.userNotFoundDesc', { query }) });
           setInviting(false);
           return;
         }
@@ -92,7 +92,7 @@ export default function MembersPanel({
           const users = await base44.entities.User.filter({ id: profile.user_id });
           const user = users[0];
           if (!user?.email) {
-            toast({ title: 'Error', description: 'No se pudo resolver el email del usuario' });
+            toast({ title: t('common.error'), description: t('membersPanel.resolveEmailError') });
             setInviting(false);
             return;
           }
@@ -100,7 +100,7 @@ export default function MembersPanel({
         }
       }
       if (members.includes(resolvedEmail)) {
-        toast({ title: 'Ya es miembro', description: 'Este usuario ya está en el viaje' });
+        toast({ title: t('membersPanel.alreadyMember'), description: t('membersPanel.alreadyMemberDesc') });
         setInviting(false);
         return;
       }
@@ -119,13 +119,13 @@ export default function MembersPanel({
         setShareLink(result.inviteUrl);
         setInviteEmail('');
       } else {
-        toast({ title: 'Invitación enviada', description: `Email enviado a ${resolvedEmail}` });
+        toast({ title: t('membersPanel.inviteSent'), description: t('membersPanel.inviteSentDesc', { email: resolvedEmail }) });
         setInviteEmail('');
         setInviteRole('editor');
       }
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
     } catch (e) {
-      toast({ title: 'Error', description: e.message || 'No se pudo enviar la invitación' });
+      toast({ title: t('common.error'), description: e.message || t('membersPanel.inviteError') });
     } finally {
       setInviting(false);
     }
@@ -134,7 +134,7 @@ export default function MembersPanel({
   const handleRoleChange = (email, newRole) => {
     const adminCount = Object.values(roles).filter(r => r === 'admin').length;
     if (roles[email] === 'admin' && adminCount <= 1 && newRole !== 'admin') {
-      toast({ title: 'No permitido', description: 'Debe haber al menos un admin en el viaje.', variant: 'destructive' });
+      toast({ title: t('membersPanel.notAllowed'), description: t('membersPanel.needOneAdmin'), variant: 'destructive' });
       return;
     }
     updateTripMutation.mutate({ roles: { ...roles, [email]: newRole } });
@@ -146,14 +146,14 @@ export default function MembersPanel({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />
-          <h3 className="font-medium text-foreground text-sm">Viajeros ({members.length})</h3>
+          <h3 className="font-medium text-foreground text-sm">{t('membersPanel.travelersCount', { count: members.length })}</h3>
         </div>
         {isAdmin && (
           <button
             onClick={() => document.getElementById('invite-input')?.focus()}
             className="flex items-center gap-1.5 text-xs text-primary font-medium hover:text-primary/80 transition-colors"
           >
-            <UserPlus className="w-3.5 h-3.5" />Invitar
+            <UserPlus className="w-3.5 h-3.5" />{t('membersPanel.invite')}
           </button>
         )}
       </div>
@@ -180,7 +180,7 @@ export default function MembersPanel({
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     {displayName}
-                    {isCurrentUser && <span className="text-xs text-muted-foreground ml-1">(tú)</span>}
+                    {isCurrentUser && <span className="text-xs text-muted-foreground ml-1">{t('membersPanel.you')}</span>}
                   </p>
                   <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs mt-0.5 ${config.color}`}>
                     <RoleIcon className="w-3 h-3" />
@@ -193,15 +193,15 @@ export default function MembersPanel({
                   <Select value={role} onValueChange={v => handleRoleChange(email, v)}>
                     <SelectTrigger className="w-28 h-7 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="editor">Editor</SelectItem>
-                      <SelectItem value="viewer">Lector</SelectItem>
+                      <SelectItem value="admin">{t('membersPanel.roleAdmin')}</SelectItem>
+                      <SelectItem value="editor">{t('membersPanel.roleEditor')}</SelectItem>
+                      <SelectItem value="viewer">{t('membersPanel.roleViewer')}</SelectItem>
                     </SelectContent>
                   </Select>
                   {!isCreator && (
                     <button
                       onClick={() => setMemberToRemove(email)}
-                      aria-label="Expulsar del viaje"
+                      aria-label={t('membersPanel.removeFromTrip')}
                       className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -219,12 +219,12 @@ export default function MembersPanel({
         <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/40" onClick={() => setMemberToRemove(null)}>
           <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
-            <p className="font-semibold text-foreground text-sm mb-1">Expulsar del viaje</p>
+            <p className="font-semibold text-foreground text-sm mb-1">{t('membersPanel.removeFromTrip')}</p>
             <p className="text-xs text-muted-foreground mb-5">
               {(() => {
                 const prof = getProfile(memberToRemove);
                 const name = prof?.display_name || prof?.username || memberToRemove;
-                return <>¿Seguro que quieres expulsar a <strong>{name}</strong> del viaje? Podrá volver a unirse solo si le invitas de nuevo.</>;
+                return t('membersPanel.removeConfirmBody', { name });
               })()}
             </p>
             <div className="flex gap-3">
@@ -236,7 +236,7 @@ export default function MembersPanel({
                 disabled={removeMemberMutation.isPending}
                 className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50"
               >
-                {removeMemberMutation.isPending ? '...' : 'Expulsar'}
+                {removeMemberMutation.isPending ? '...' : t('membersPanel.remove')}
               </button>
             </div>
           </div>
@@ -249,10 +249,10 @@ export default function MembersPanel({
           {shareLink ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Mail className="w-3 h-3" />Comparte el enlace de invitación
+                <Mail className="w-3 h-3" />{t('membersPanel.shareLinkHint')}
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                No podemos enviar email a usuarios externos. Comparte este enlace directamente.
+                {t('membersPanel.shareLinkNote')}
               </p>
               <div className="bg-secondary rounded-xl px-3 py-2.5">
                 <p className="text-xs font-mono break-all text-foreground leading-relaxed">{shareLink}</p>
@@ -263,21 +263,21 @@ export default function MembersPanel({
                   className="flex-1 bg-primary hover:bg-primary/90 text-white"
                   size="sm"
                 >
-                  {copied ? <><Check className="w-3.5 h-3.5 mr-1" />¡Copiado!</> : <><Copy className="w-3.5 h-3.5 mr-1" />Copiar enlace</>}
+                  {copied ? <><Check className="w-3.5 h-3.5 mr-1" />{t('membersPanel.copied')}</> : <><Copy className="w-3.5 h-3.5 mr-1" />{t('membersPanel.copyLink')}</>}
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setShareLink('')}>Volver</Button>
+                <Button variant="outline" size="sm" onClick={() => setShareLink('')}>{t('membersPanel.back')}</Button>
               </div>
             </div>
           ) : (
             <>
               <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
-                <Mail className="w-3 h-3" />Invitar por email
+                <Mail className="w-3 h-3" />{t('invites.modal.byEmail')}
               </p>
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <Input
                     id="invite-input"
-                    placeholder="email@ejemplo.com"
+                    placeholder={t('membersPanel.emailPlaceholder')}
                     value={inviteEmail}
                     onChange={e => setInviteEmail(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleInvite()}
@@ -286,9 +286,9 @@ export default function MembersPanel({
                   <Select value={inviteRole} onValueChange={setInviteRole}>
                     <SelectTrigger className="w-24 h-9 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="editor">Editor</SelectItem>
-                      <SelectItem value="viewer">Lector</SelectItem>
+                      <SelectItem value="admin">{t('membersPanel.roleAdmin')}</SelectItem>
+                      <SelectItem value="editor">{t('membersPanel.roleEditor')}</SelectItem>
+                      <SelectItem value="viewer">{t('membersPanel.roleViewer')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -298,7 +298,7 @@ export default function MembersPanel({
                   className="w-full bg-primary hover:bg-primary/90 text-white"
                   size="sm"
                 >
-                  {inviting ? '...' : 'Enviar invitación'}
+                  {inviting ? '...' : t('invites.modal.sendInvite')}
                 </Button>
               </div>
             </>
