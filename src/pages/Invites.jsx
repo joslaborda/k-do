@@ -8,7 +8,7 @@ import { Loader2, MapPin, Calendar, Mail, Check, X, ChevronLeft } from 'lucide-r
 import { createPageUrl } from '@/utils';
 import { toast } from '@/components/ui/use-toast';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import { getCountryLabel } from '@/lib/countryConfig';
@@ -231,8 +231,8 @@ export default function Invites() {
             {trip.start_date && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-                {format(new Date(trip.start_date), "d 'de' MMMM yyyy", { locale: es })}
-                {trip.end_date && ` — ${format(new Date(trip.end_date), "d 'de' MMMM yyyy", { locale: es })}`}
+                {format(parseISO(trip.start_date), "d 'de' MMMM yyyy", { locale: es })}
+                {trip.end_date && ` — ${format(parseISO(trip.end_date), "d 'de' MMMM yyyy", { locale: es })}`}
               </div>
             )}
 
@@ -352,8 +352,8 @@ export default function Invites() {
                     {tripData.start_date && (
                       <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 text-primary" />
-                        {format(new Date(tripData.start_date), "d MMM yyyy", { locale: es })}
-                        {tripData.end_date && ` — ${format(new Date(tripData.end_date), "d MMM yyyy", { locale: es })}`}
+                        {format(parseISO(tripData.start_date), "d MMM yyyy", { locale: es })}
+                        {tripData.end_date && ` — ${format(parseISO(tripData.end_date), "d MMM yyyy", { locale: es })}`}
                       </p>
                     )}
                   </div>

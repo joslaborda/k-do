@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import ReactMarkdown from 'react-markdown';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { 
   ArrowLeft, Plus, Calendar, ChevronDown, ChevronUp, 
   Edit2, Trash2, Save, MapPin, RefreshCw, Hotel,
@@ -486,8 +486,8 @@ export default function CityDetail() {
                   <Calendar className="w-4 h-4" />
                   <span>
                     {city.start_date && city.end_date
-                      ? `${format(new Date(city.start_date), 'd MMM')} – ${format(new Date(city.end_date), 'd MMM yyyy')}`
-                      : format(new Date(city.start_date), 'd MMM yyyy')}
+                      ? `${format(parseISO(city.start_date), 'd MMM')} – ${format(parseISO(city.end_date), 'd MMM yyyy')}`
+                      : format(parseISO(city.start_date), 'd MMM yyyy')}
                   </span>
                 </>
               )}

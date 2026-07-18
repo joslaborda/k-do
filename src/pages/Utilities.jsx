@@ -1040,8 +1040,13 @@ export default function Utilities() {
   const homeCountry = myProfile?.nationality || myProfile?.home_country || myProfile?.country || 'España';
   const secondNationality = myProfile?.second_nationality || null;
 
+  // `new Date('2026-07-20')` se parsea como medianoche UTC, no local, y sin hora
+  // de fin cualquier momento después de medianoche del último día ya contaba
+  // como "viaje terminado" — la pestaña Souvenirs desaparecía antes de tiempo,
+  // incluso durante el propio día de vuelta. Igual que en Expenses.jsx, se ancla
+  // a medianoche/fin de día locales explícitamente.
   const tripInProgress = trip?.start_date && trip?.end_date
-    ? new Date() >= new Date(trip.start_date) && new Date() <= new Date(trip.end_date)
+    ? new Date() >= new Date(trip.start_date + 'T00:00:00') && new Date() <= new Date(trip.end_date + 'T23:59:59')
     : false;
 
   const tabs = [

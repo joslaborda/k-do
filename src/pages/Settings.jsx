@@ -322,7 +322,7 @@ export default function Settings() {
     // explícitamente que no puede estar vacío — y el username es obligatorio
     // desde el alta (CreateProfileModal no deja avanzar sin uno).
     const usernameErr = validateUsername(username);
-    if (usernameErr) { setSaveMsg({ type:'error', text: usernameErr }); return; }
+    if (usernameErr) { setSaveMsg({ type:'error', text: t(`common.usernameErrors.${usernameErr}`) }); return; }
     // El check de disponibilidad en pantalla es un debounce de 600ms: si el
     // usuario escribe y pulsa "Guardar" antes de que resuelva (o mientras
     // sigue en null tras un cambio reciente), `usernameAvailable` puede no
