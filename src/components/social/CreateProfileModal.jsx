@@ -259,7 +259,7 @@ function SlidePreparativos() {
       {/* Grid maleta + docs */}
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="bg-card border border-border rounded-2xl p-3">
-          <p className="text-xs text-muted-foreground mb-0.5">Maleta</p>
+          <p className="text-xs text-muted-foreground mb-0.5">{t('onboarding.s5.packing')}</p>
           <p className="text-2xl font-semibold text-foreground">34%</p>
           <div className="mt-1.5 h-1 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-primary rounded-full" style={{ width: '34%' }} />
@@ -267,7 +267,7 @@ function SlidePreparativos() {
           <p className="text-xs text-muted-foreground mt-1">6/18 items</p>
         </div>
         <div className="bg-card border border-border rounded-2xl p-3">
-          <p className="text-xs text-muted-foreground mb-0.5">Documentos</p>
+          <p className="text-xs text-muted-foreground mb-0.5">{t('onboarding.s5.documents')}</p>
           <p className="text-2xl font-semibold text-foreground">3</p>
           <p className="text-xs text-muted-foreground mt-3">3 subidos</p>
         </div>
@@ -285,7 +285,7 @@ function SlidePreparativos() {
         {/* Visados: level ok → solo informativo, badge verde */}
         <div className="flex items-center gap-2 px-4 py-2 bg-secondary/30 border-b border-border">
           <div style={{ height: 2.5, width: 20, background: 'hsl(var(--primary))', borderRadius: 2 }} />
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Visados</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('onboarding.s4extra.visaCategory')}</p>
           <Check className="w-3 h-3 text-green-500 ml-auto" />
         </div>
         <div className="flex items-start gap-3 px-4 py-2.5 border-b border-border">
@@ -299,13 +299,13 @@ function SlidePreparativos() {
         {/* Equipamiento: level info → sin checkbox, badge recomendado */}
         <div className="flex items-center gap-2 px-4 py-2 bg-secondary/30 border-b border-border">
           <div style={{ height: 2.5, width: 20, background: 'hsl(var(--primary))', borderRadius: 2 }} />
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Equipamiento</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('onboarding.s4extra.equipmentCategory')}</p>
         </div>
         <div className="flex items-start gap-3 px-4 py-2.5">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="2" className="mt-0.5 flex-shrink-0"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground leading-tight">Adaptador tipo A</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Diferente al europeo</p>
+            <p className="text-sm font-medium text-foreground leading-tight">{t('onboarding.s4extra.adapterItem')}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('onboarding.s4extra.adapterItemSub')}</p>
           </div>
           <span className="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-medium flex-shrink-0 border border-amber-100">recom.</span>
         </div>
@@ -322,7 +322,7 @@ function SlideGastos() {
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">5 / 6</p>
       <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s5.title1')}<br />{t('onboarding.s5.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        Apunta quién paga y con quién comparte cada gasto. Kōdo lleva los balances y al final todos saben exactamente lo que se deben.
+        {t('onboarding.s5.body')}
       </p>
 
       {/* Balance */}
@@ -387,7 +387,7 @@ function SlideHoy() {
       <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">6 / 6</p>
       <h2 className="text-2xl font-black text-foreground leading-tight mb-2">{t('onboarding.s6.title1')}<br />{t('onboarding.s6.title2')}</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        Todo lo que subes y preparas genera tu itinerario diario. La tab Hoy te muestra el clima, los documentos del día y tus spots. Busca restaurantes, museos o cualquier plan, asígnales día y hora para que aparezcan exactamente cuando los necesitas.
+        {t('onboarding.s6.body')}
       </p>
 
       {/* DayCard HOY fiel al código */}
