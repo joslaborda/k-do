@@ -428,6 +428,8 @@
     "noDataYet": "No data yet",
     "form": {
       "descPlaceholder": "Expense description *",
+      "city": "City",
+      "noCityOption": "No city",
       "paidBy": "Paid by",
       "splitBetween": "Split between",
       "totalMatches": "Total matches",
@@ -1152,6 +1154,7 @@
       "noInfo": "We don't have emergency information for this country yet",
       "header": "Emergencies · {{flag}} {{country}}",
       "embassyOf": "Embassy of {{home}} in {{country}}",
+      "secondEmbassyOf": "With your second nationality ({{home}})",
       "emergency24h": "24h emergencies",
       "officialSite": "Official website",
       "noEmbassyTitle": "No embassy data",

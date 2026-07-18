@@ -428,6 +428,8 @@
     "noDataYet": "Sin datos aún",
     "form": {
       "descPlaceholder": "Descripción del gasto *",
+      "city": "Ciudad",
+      "noCityOption": "Sin ciudad",
       "paidBy": "Pagó",
       "splitBetween": "Dividir entre",
       "totalMatches": "Total cuadra",
@@ -1152,6 +1154,7 @@
       "noInfo": "Aún no tenemos información de emergencias para este país",
       "header": "Emergencias · {{flag}} {{country}}",
       "embassyOf": "Embajada de {{home}} en {{country}}",
+      "secondEmbassyOf": "Con tu segunda nacionalidad ({{home}})",
       "emergency24h": "Emergencias 24h",
       "officialSite": "Sitio web oficial",
       "noEmbassyTitle": "Sin datos de embajada",
