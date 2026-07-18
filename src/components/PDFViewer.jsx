@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { FileText, X, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function PDFViewer({ fileUrl, onClose }) {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const canvasRefs   = useRef({});
   const [pdfDoc, setPdfDoc]     = useState(null);
@@ -14,7 +16,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
 
   const isPDF = fileUrl?.toLowerCase().includes('.pdf') || fileUrl?.toLowerCase().includes('application/pdf');
   const isImg = fileUrl && /\.(jpe?g|png|webp|gif|heic)(\?|$)/i.test(fileUrl);
-  const fileName = fileUrl?.split('/').pop()?.split('?')[0] || 'documento';
+  const fileName = fileUrl?.split('/').pop()?.split('?')[0] || t('pdfViewer.defaultName');
 
   // ESC to close
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
         setPdfDoc(pdf);
         setPageCount(pdf.numPages);
         setLoading(false);
-      } catch { setError('No se pudo cargar el PDF'); setLoading(false); }
+      } catch { setError(t('pdfViewer.loadError')); setLoading(false); }
     };
     load();
   }, [fileUrl, isPDF]);
@@ -102,7 +104,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
       <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>
         <div className="w-8" />
         <p className="text-sm font-medium truncate max-w-xs" style={{ color: 'rgba(255,255,255,.75)' }}>{fileName}</p>
-        <button aria-label="Cerrar" onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center"
+        <button aria-label={t('common.close')} onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center"
           style={{ background: 'rgba(255,255,255,.1)' }}>
           <X className="w-5 h-5" style={{ color: 'rgba(255,255,255,.8)' }} />
         </button>
@@ -119,13 +121,13 @@ export default function PDFViewer({ fileUrl, onClose }) {
         style={{ overscrollBehavior: 'contain' }}
       >
         {loading && (
-          <p className="text-sm text-center mt-12" style={{ color: 'rgba(255,255,255,.4)' }}>Cargando...</p>
+          <p className="text-sm text-center mt-12" style={{ color: 'rgba(255,255,255,.4)' }}>{t('utilities.loading')}</p>
         )}
         {error && (
           <div className="text-center mt-12">
             <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,.4)' }}>{error}</p>
             <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary underline">
-              Abrir en nueva pestaña
+              {t('pdfViewer.openNewTab')}
             </a>
           </div>
         )}
@@ -138,7 +140,7 @@ export default function PDFViewer({ fileUrl, onClose }) {
                 {!rendered[num] && (
                   <div className="absolute inset-0 flex items-center justify-center rounded-lg"
                     style={{ background: 'rgba(255,255,255,.05)', minHeight: 200 }}>
-                    <span className="text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>Página {num}...</span>
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>{t('pdfViewer.pageLoading', { num })}</span>
                   </div>
                 )}
                 <canvas
@@ -163,11 +165,11 @@ export default function PDFViewer({ fileUrl, onClose }) {
         {!loading && !error && !isPDF && !isImg && (
           <div className="text-center mt-12">
             <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
-            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.4)' }}>Vista previa no disponible</p>
+            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.4)' }}>{t('pdfViewer.noPreview')}</p>
             <a href={fileUrl} target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white"
               style={{ background: 'rgba(255,255,255,.12)' }}>
-              <Download className="w-4 h-4" />Abrir archivo
+              <Download className="w-4 h-4" />{t('pdfViewer.openFile')}
             </a>
           </div>
         )}
@@ -185,12 +187,12 @@ export default function PDFViewer({ fileUrl, onClose }) {
             style={{ background: 'rgba(255,255,255,.1)' }}>+</button>
         </div>
         {isPDF && pageCount > 0 && (
-          <span className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{pageCount} página{pageCount > 1 ? 's' : ''}</span>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{t('pdfViewer.pageCount', { count: pageCount })}</span>
         )}
         <a href={fileUrl} download target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white"
           style={{ background: 'rgba(255,255,255,.12)' }}>
-          <Download className="w-4 h-4" />Descargar
+          <Download className="w-4 h-4" />{t('pdfViewer.download')}
         </a>
       </div>
     </div>

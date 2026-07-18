@@ -300,7 +300,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
           {/* Hourly — only for today */}
           {selIsToday && weather.hourly.length > 0 && (
             <>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">Por hora</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-2">{t('weather.hourly')}</p>
               <div className="flex gap-1.5">
                 {weather.hourly.map(h => (
                   <div key={h.hour} className="flex-1 text-center bg-card border border-border rounded-lg py-1.5">
