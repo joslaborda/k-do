@@ -63,7 +63,9 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground text-sm truncate">{smartTitle}</p>
             <p className="text-xs text-muted-foreground mt-0.5 truncate">
-              {t(config.labelKey)}{dateStr ? ` · ${dateStr}` : ''}{contextCity ? ` · ${contextCity}` : ''}
+              {t(config.labelKey)}{dateStr ? ` · ${dateStr}` : ''}
+              {ticket.time ? <span className="text-primary font-medium"> · {ticket.time}</span> : ''}
+              {contextCity ? ` · ${contextCity}` : ''}
             </p>
           </div>
           {ticket.file_url && (
@@ -108,6 +110,9 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
                   <span className="font-medium text-muted-foreground">
                     {dateStr}{endDateStr ? ` → ${endDateStr}` : ''}
                   </span>
+                  {ticket.time && (
+                    <span className="font-medium text-primary">· {ticket.time}</span>
+                  )}
                   {todayBadge && (
                     <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-primary font-bold text-label uppercase tracking-wide">{t('cities.day.today')}</span>
                   )}

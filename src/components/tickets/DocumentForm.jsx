@@ -8,7 +8,7 @@ import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-re
 import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -91,6 +91,18 @@ export default function DocumentForm({
 
   const isPersonalCategory = PERSONAL_CATEGORIES.includes(category);
   const useTripDays = !isPersonalCategory && tripDayOptions.length > 0;
+
+  // Documentos guardados antes de este fix no tienen city_id para su día — en
+  // ese caso, para que el <select> siga mostrando algo seleccionado, cae al
+  // primer option cuya fecha coincida (comportamiento anterior).
+  const selectedDayOption = useMemo(() => {
+    if (!fields.date) return null;
+    if (fields.city_id) {
+      const exact = tripDayOptions.find(d => d.date === fields.date && d.cityId === fields.city_id);
+      if (exact) return exact;
+    }
+    return tripDayOptions.find(d => d.date === fields.date) || null;
+  }, [tripDayOptions, fields.date, fields.city_id]);
 
   const showFields = SHOW_FIELDS[category] || SHOW_FIELDS.other;
   const hasField   = (f) => showFields.includes(f);
@@ -193,13 +205,16 @@ export default function DocumentForm({
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.date')}</p>
               {useTripDays ? (
                 <select
-                  value={fields.date}
-                  onChange={e => setField('date', e.target.value)}
+                  value={selectedDayOption ? tripDayOptionValue(selectedDayOption) : ''}
+                  onChange={e => {
+                    const { date, cityId } = parseTripDayOptionValue(e.target.value);
+                    setFields(prev => ({ ...prev, date, city_id: cityId || '' }));
+                  }}
                   className="w-full h-10 border border-border rounded-md px-3 text-sm outline-none focus:border-primary bg-input"
                 >
                   <option value="">{t('documents.form.selectDay')}</option>
                   {tripDayOptions.map(d => (
-                    <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                    <option key={tripDayOptionValue(d)} value={tripDayOptionValue(d)}>{d.date} · {d.city}</option>
                   ))}
                 </select>
               ) : (

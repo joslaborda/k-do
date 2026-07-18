@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
  * Shows documents associated to a specific itinerary day.
  * Shown inside CityDetail, within each day's collapsible.
  */
-export default function DayDocuments({ dayId, tripId, currentUserEmail, dayTitle = '' }) {
+export default function DayDocuments({ dayId, tripId, currentUserEmail, currentUserId, dayTitle = '' }) {
   const { t } = useTranslation();
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
@@ -18,8 +18,12 @@ export default function DayDocuments({ dayId, tripId, currentUserEmail, dayTitle
 
   const dayDocs = allTickets.filter(t => {
     if (t.itinerary_day_id !== dayId) return false;
-    // Visibility filter
-    if (t.visibility === 'personal') return t.user_id === currentUserEmail || t.created_by === currentUserEmail;
+    // Visibility filter. `t.user_id` es el id del usuario, no un email — se
+    // comparaba contra currentUserEmail y nunca coincidía, así que un
+    // documento "solo yo" creado sin created_by (o con created_by distinto al
+    // email actual, p.ej. tras un cambio de email) desaparecía para su propio
+    // dueño. Se compara contra currentUserId, que sí es un id.
+    if (t.visibility === 'personal') return t.user_id === currentUserId || t.created_by === currentUserEmail;
     if (t.visibility === 'selected_users') {
       return t.created_by === currentUserEmail || (t.shared_with || []).includes(currentUserEmail);
     }
