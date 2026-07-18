@@ -59,7 +59,7 @@ export default function TomorrowTab({ trip, cities, tripId }) {
   return (
     <div className="space-y-3">
       <DayCard
-        label="Mañana"
+        label={t('common.tomorrow')}
         city={tomorrowCity}
         docs={tomorrowDocs}
         spots={tomorrowSpots}

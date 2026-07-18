@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -214,7 +214,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                   <div className="flex items-center gap-2 my-3">
                     <div className="flex-1 h-px bg-border" />
                     <span className="text-label text-muted-foreground font-medium px-2">
-                      {msgDate.getDate()} {msgDate.toLocaleString('es',{month:'short'})}
+                      {msgDate.getDate()} {msgDate.toLocaleString(i18n.language, {month:'short'})}
                     </span>
                     <div className="flex-1 h-px bg-border" />
                   </div>
@@ -315,13 +315,13 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
                                 );
                               })}
                             </div>
-                            <p className="text-label text-muted-foreground text-center pb-2">{total} voto{total !== 1 ? 's' : ''}</p>
+                            <p className="text-label text-muted-foreground text-center pb-2">{t('chat.votes', { count: total })}</p>
                           </div>
                         );
                       })()}
                     {!isImage(msg) && !isAudio(msg) && !isFile(msg) && msg.file_type !== 'poll' && (
                       <div className={`px-3 py-2 rounded-2xl text-sm leading-snug ${me ? 'bg-primary text-white rounded-br-sm' : 'bg-secondary text-foreground rounded-bl-sm'}`}>
-                        {msg.content || (msg.file_url ? 'Archivo adjunto' : '')}
+                        {msg.content || (msg.file_url ? t('chat.attachedFile') : '')}
                       </div>
                     )}
                     <span className="text-micro text-muted-foreground px-1">

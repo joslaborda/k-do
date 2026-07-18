@@ -154,7 +154,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                       : SpotIcon ? <SpotIcon size={16} /> : null}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{item.title || item.name || 'Sin título'}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{item.title || item.name || t('home.dayCard.noTitle')}</p>
                     {!isDoc && !isNote && item.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.notes}</p>}
                     {isNote && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.content}</p>}
                     {isDoc && !hasTime && <p className="text-xs text-muted-foreground mt-0.5">{t('home.dayCard.noTime')}</p>}
@@ -166,7 +166,9 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                       if (diffMin <= 0 || diffMin > 240) return null;
                       const hrs = Math.floor(diffMin / 60);
                       const mins = diffMin % 60;
-                      const lbl = hrs > 0 ? `Sale en ${hrs}h${mins > 0 ? ` ${mins}min` : ''}` : `Sale en ${diffMin} min`;
+                      const lbl = hrs > 0
+                        ? (mins > 0 ? t('home.dayCard.departsInHoursMinutes', { hours: hrs, minutes: mins }) : t('home.dayCard.departsInHours', { hours: hrs }))
+                        : t('home.dayCard.departsInMinutes', { count: diffMin });
                       return <p className="text-xs font-semibold mt-0.5" style={{color: diffMin <= 60 ? '#dc2626' : 'hsl(var(--primary))'}}>{lbl}</p>;
                     })()}
                   </div>
@@ -179,7 +181,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
               className="flex items-center gap-3 px-4 py-4 border-t border-border hover:bg-secondary/30 transition-colors">
               <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0"><MapPin size={16} className="text-muted-foreground" /></div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Explorar spots en {city?.name}</p>
+                <p className="text-sm font-medium text-foreground">{t('home.dayCard.exploreSpotsIn', { city: city?.name })}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{t('home.dayCard.addPlaces')}</p>
               </div>
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -187,7 +189,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
           )}
           <Link to={createPageUrl('CityDetail') + '?id=' + city?.id + '&trip_id=' + tripId}
             className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
-            <span className="text-xs font-medium text-primary">{hasItinerary ? `Ver itinerario de ${city?.name}` : `Abrir ${city?.name}`}</span>
+            <span className="text-xs font-medium text-primary">{hasItinerary ? t('home.dayCard.viewItineraryOf', { city: city?.name }) : t('home.dayCard.openCity', { city: city?.name })}</span>
             <ArrowRight className="w-3.5 h-3.5 text-primary" />
           </Link>
         </div>

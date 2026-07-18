@@ -10,6 +10,7 @@ import MemberAvatarRow from './MemberAvatarRow';
 import { useTranslation } from 'react-i18next';
 
 export default function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const today = new Date();
   const todayStr    = format(today, 'yyyy-MM-dd');
@@ -80,16 +81,16 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
     <div className="space-y-3">
       {dayNumber && totalDays && (
         <div className="flex items-center justify-between px-1">
-          <span className="text-xs text-muted-foreground font-medium">Día {dayNumber} de {totalDays}</span>
+          <span className="text-xs text-muted-foreground font-medium">{t('trip.dayOf', { day: dayNumber, total: totalDays })}</span>
           <Link to={createPageUrl('Cities') + '?trip_id=' + tripId} className="text-xs text-primary font-medium">
-            Ver ruta completa →
+            {t('home.viewFullRoute')}
           </Link>
         </div>
       )}
 
       {todayCity && (
         <DayCard
-          label="Hoy"
+          label={t('common.today')}
           city={todayCity}
           docs={docsForDate(todayStr)}
           spots={spotsForDate(todayCity.id, todayStr)}
@@ -104,7 +105,7 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
 
       {tomorrowCity && tomorrowCity.id !== todayCity?.id && (
         <DayCard
-          label="Mañana"
+          label={t('common.tomorrow')}
           city={tomorrowCity}
           docs={docsForDate(tomorrowStr)}
           spots={spotsForDate(tomorrowCity.id, tomorrowStr)}
