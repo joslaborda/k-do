@@ -489,7 +489,7 @@ export default function CreateProfileModal({ user, open }) {
   useEffect(() => {
     if (!username) { setAvailable(null); setUsernameError(''); return; }
     const err = validateUsername(username);
-    if (err) { setUsernameError(err); setAvailable(null); return; }
+    if (err) { setUsernameError(t(`common.usernameErrors.${err}`)); setAvailable(null); return; }
     setUsernameError('');
     setChecking(true);
     const timer = setTimeout(async () => {
