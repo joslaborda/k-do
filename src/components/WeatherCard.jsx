@@ -67,8 +67,11 @@ async function fetchWeather(lat, lon, timezone) {
   const params = new URLSearchParams({
     latitude: lat, longitude: lon,
     current: 'temperature_2m,apparent_temperature,weathercode,relative_humidity_2m,windspeed_10m,uv_index',
-    daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max',
-    hourly: 'temperature_2m,weathercode',
+    // windspeed_10m_max y uv_index_max sí vienen agregados por día en la API.
+    // La humedad relativa no tiene agregado diario propio en Open-Meteo, así
+    // que se pide también en `hourly` para promediarla por día en processWeather.
+    daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,windspeed_10m_max,uv_index_max',
+    hourly: 'temperature_2m,weathercode,relative_humidity_2m',
     timezone,
     forecast_days: 6,
   });
@@ -81,7 +84,23 @@ function processWeather(data) {
   const code = data.current.weathercode;
   const cond = WMO_CONDITIONS[code] || { tk:'weather.wmo.variable', icon:'cloud' };
 
-  // Daily forecast (5 days)
+  const hourlyTimesAll = data.hourly?.time || [];
+  const hourlyHumidity = data.hourly?.relative_humidity_2m || [];
+  // Humedad media del día: no hay agregado diario en Open-Meteo, se calcula a
+  // mano promediando las horas de ese mismo día en el bloque `hourly`.
+  const avgHumidityForDate = (date) => {
+    const vals = hourlyTimesAll
+      .map((t, idx) => (t.startsWith(date) ? hourlyHumidity[idx] : null))
+      .filter(v => v != null);
+    if (!vals.length) return null;
+    return Math.round(vals.reduce((s, v) => s + v, 0) / vals.length);
+  };
+
+  // Daily forecast (5 days). Antes esta tarjeta mostraba humedad/viento/UV de
+  // `current` (el momento presente) sin importar qué día del strip se tuviera
+  // seleccionado — al tocar "dentro de 3 días" seguía enseñando la humedad de
+  // HOY bajo el detalle de ese otro día. Ahora cada día trae sus propios
+  // valores.
   const daily = (data.daily.time || []).slice(0, 5).map((date, i) => {
     const dc = data.daily.weathercode[i];
     const dcond = WMO_CONDITIONS[dc] || { tk:'weather.wmo.variable', icon:'cloud' };
@@ -92,6 +111,9 @@ function processWeather(data) {
       max: Math.round(data.daily.temperature_2m_max[i]),
       min: Math.round(data.daily.temperature_2m_min[i]),
       rain: data.daily.precipitation_probability_max?.[i] ?? 0,
+      wind: data.daily.windspeed_10m_max?.[i] != null ? Math.round(data.daily.windspeed_10m_max[i]) : null,
+      uv: data.daily.uv_index_max?.[i] != null ? Math.round(data.daily.uv_index_max[i]) : null,
+      humidity: avgHumidityForDate(date),
     };
   });
 
@@ -131,7 +153,9 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
   const [selectedDay, setSelectedDay] = useState(0); // index into daily
 
   const country = city.country || tripCountry || '';
-  const cacheKey = `weather_v5:${city.name}:${country}`;
+  // v6: el shape de `daily` cambió (añade wind/uv/humidity por día) — se sube
+  // la versión para no deserializar una caché vieja con forma distinta.
+  const cacheKey = `weather_v6:${city.name}:${country}`;
 
   useEffect(() => {
     const cached = sessionStorage.getItem(cacheKey);
@@ -174,9 +198,9 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
   const sel = weather.daily[selectedDay];
   const selIsToday = sel && isToday(sel.date);
 
-  // UV label
-  const uvLabel = weather.uv != null
-    ? weather.uv <= 2 ? 'Bajo' : weather.uv <= 5 ? 'Moderado' : weather.uv <= 7 ? 'Alto' : 'Muy alto'
+  // UV label — del día seleccionado, no del momento actual
+  const uvLabel = sel?.uv != null
+    ? sel.uv <= 2 ? 'Bajo' : sel.uv <= 5 ? 'Moderado' : sel.uv <= 7 ? 'Alto' : 'Muy alto'
     : null;
 
   return (
@@ -253,20 +277,22 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
             </div>
           </div>
 
-          {/* Humidity / Wind / UV */}
+          {/* Humidity / Wind / UV — del día seleccionado (antes eran siempre
+              los valores "current" de ahora mismo, aunque se hubiera tocado
+              otro día del strip) */}
           <div className="grid grid-cols-3 gap-2 mb-2.5">
             <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-0.5">{t('weather.humidity')}</p>
-              <p className="text-sm font-medium text-foreground">{weather.humidity}%</p>
+              <p className="text-sm font-medium text-foreground">{sel.humidity != null ? `${sel.humidity}%` : '—'}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-2 text-center">
               <p className="text-xs text-muted-foreground mb-0.5">{t('weather.wind')}</p>
-              <p className="text-sm font-medium text-foreground">{weather.wind} km/h</p>
+              <p className="text-sm font-medium text-foreground">{sel.wind != null ? `${sel.wind} km/h` : '—'}</p>
             </div>
             {uvLabel && (
               <div className="bg-card border border-border rounded-xl p-2 text-center">
                 <p className="text-xs text-muted-foreground mb-0.5">UV</p>
-                <p className="text-sm font-medium text-foreground">{weather.uv} <span className="text-xs font-normal text-muted-foreground">{uvLabel}</span></p>
+                <p className="text-sm font-medium text-foreground">{sel.uv} <span className="text-xs font-normal text-muted-foreground">{uvLabel}</span></p>
               </div>
             )}
           </div>
