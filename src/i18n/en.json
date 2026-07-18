@@ -612,6 +612,7 @@
     "filterAll": "All",
     "filterCreated": "Created",
     "filterAssigned": "Assigned",
+    "filterSaved": "Saved",
     "emptyTitle": "You don't have any spots in this trip yet",
     "emptySubtitle": "Search restaurants, museums or any plan and save them here",
     "createFirst": "Create first spot",
@@ -997,18 +998,6 @@
       "settingsTitle": "City settings"
     }
   },
-  "restaurants": {
-    "title": "Restaurants",
-    "search": "Search restaurants...",
-    "noResults": "No results",
-    "saved": "Saved",
-    "nearby": "Nearby",
-    "filters": {
-      "all": "All",
-      "saved": "Saved",
-      "visited": "Visited"
-    }
-  },
   "notifications": {
     "noNotifications": "No notifications",
     "markAllRead": "Mark all as read",
@@ -1085,6 +1074,7 @@
   },
   "utilities": {
     "title": "Utilities",
+    "backHome": "Home",
     "visa": "Visas",
     "vaccines": "Vaccines",
     "adapter": "Power adapters",

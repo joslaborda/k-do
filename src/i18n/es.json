@@ -612,6 +612,7 @@
     "filterAll": "Todos",
     "filterCreated": "Creados",
     "filterAssigned": "Asignados",
+    "filterSaved": "Guardados",
     "emptyTitle": "Aún no tienes spots en este viaje",
     "emptySubtitle": "Busca restaurantes, museos o cualquier plan y guárdalos aquí",
     "createFirst": "Crear primer spot",
@@ -997,18 +998,6 @@
       "settingsTitle": "Ajustes de la ciudad"
     }
   },
-  "restaurants": {
-    "title": "Restaurantes",
-    "search": "Buscar restaurantes...",
-    "noResults": "Sin resultados",
-    "saved": "Guardados",
-    "nearby": "Cercanos",
-    "filters": {
-      "all": "Todos",
-      "saved": "Guardados",
-      "visited": "Visitados"
-    }
-  },
   "notifications": {
     "noNotifications": "Sin notificaciones",
     "markAllRead": "Marcar todo como leído",
@@ -1085,6 +1074,7 @@
   },
   "utilities": {
     "title": "Utilidades",
+    "backHome": "Inicio",
     "visa": "Visados",
     "vaccines": "Vacunas",
     "adapter": "Enchufes",
