@@ -1,0 +1,13 @@
+{
+  "name": "ExchangeRateCache",
+  "type": "object",
+  "properties": {
+    "base": { "type": "string", "description": "Moneda origen (ISO 4217)" },
+    "quote": { "type": "string", "description": "Moneda destino (ISO 4217)" },
+    "rate": { "type": "number", "description": "Tasa de cambio (1 base = rate quote)" },
+    "fetched_at": { "type": "string", "format": "date-time", "description": "Timestamp de obtención" },
+    "valid_until": { "type": "string", "format": "date-time", "description": "Válido hasta" },
+    "source": { "type": "string", "description": "Fuente: frankfurter/ECB, llm/internet, etc." }
+  },
+  "required": ["base", "quote", "rate"]
+}
