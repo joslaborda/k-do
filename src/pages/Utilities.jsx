@@ -2,11 +2,12 @@ import { useState, useEffect, useRef} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2, Check } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Loader2, AlertTriangle, Landmark, MapPin, Phone, Mail, Clock, User, Shirt, Droplets, Smartphone, Pill, MoreHorizontal, Building2, Check, ArrowRight } from 'lucide-react';
 import WeatherCard from '@/components/WeatherCard';
 import { getCountryMeta, getCountryLabel, getCountryIso, normalizeCountry } from '@/lib/countryConfig';
 import { ShieldCheck, ShieldX, ShieldAlert, Zap, Syringe, Coins, Info, ChevronDown, ChevronUp, Shield, Cross, Flame } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
@@ -1040,7 +1041,14 @@ export default function Utilities() {
       <div className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="px-4 pt-12 pb-0">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-semibold text-foreground">{t('utilities.title')}</h1>
+            <div>
+              <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
+                <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors mb-1">
+                  <ArrowRight className="w-4 h-4 rotate-180" />{t('utilities.backHome')}
+                </button>
+              </Link>
+              <h1 className="text-xl font-semibold text-foreground">{t('utilities.title')}</h1>
+            </div>
             {activeTab === 'maleta' && (
               <button onClick={() => setPackingSheetOpen(true)}
                 className="flex items-center gap-1.5 text-primary text-sm font-medium">

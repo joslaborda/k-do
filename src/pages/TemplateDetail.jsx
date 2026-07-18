@@ -74,7 +74,7 @@ export default function TripDetail() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 flex justify-center"><PlaneIcon size={48} color="#c2410c" /></div>
+          <div className="mb-4 flex justify-center"><PlaneIcon size={48} className="text-primary" /></div>
           <p className="text-muted-foreground">{t('trip.loadingTrip')}</p>
         </div>
       </div>

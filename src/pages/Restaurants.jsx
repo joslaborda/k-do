@@ -8,7 +8,7 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2 } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
@@ -1259,7 +1259,7 @@ export default function Restaurants() {
 
             {/* Filters */}
             <div className="flex gap-2 mb-4">
-              {[['all',t('spots.filterAll')],['created',t('spots.filterCreated')],['saved',t('restaurants.filters.saved')],['assigned',t('spots.filterAssigned')]].map(([v,l]) => (
+              {[['all',t('spots.filterAll')],['created',t('spots.filterCreated')],['saved',t('spots.filterSaved')],['assigned',t('spots.filterAssigned')]].map(([v,l]) => (
                 <button key={v} onClick={() => setStateFilter(v)}
                   className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                     stateFilter===v ? 'bg-primary text-white border-primary' : 'bg-card border-border text-muted-foreground hover:border-primary/40'
