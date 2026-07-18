@@ -46,9 +46,7 @@ export function enrichTicketDataWithAutoLinks(formData, itineraryDays, userSelec
       if (!userSelectedCityId) {
         enriched.city_id = matchedDay.city_id;
       }
-    } else {
     }
-  } else {
   }
 
   return enriched;
@@ -72,7 +70,6 @@ export function createBackfillMutation(allTickets, itineraryDays, cities) {
     if (matchedDay) {
       updates.itinerary_day_id = matchedDay.id;
       updates.city_id = matchedDay.city_id;
-    } else {
     }
 
     return { ticketId: ticket.id, updates };
