@@ -40,7 +40,9 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
     const [h, m] = firstDoc.time.split(':').map(Number);
     const diff = (h * 60 + m) - nowMinutes;
     if (diff > 0 && diff <= 480) {
-      countdown = diff <= 60 ? `en ${diff} min` : `en ${Math.round(diff / 60)}h ${diff % 60 > 0 ? (diff % 60) + 'min' : ''}`.trim();
+      countdown = diff <= 60
+        ? t('home.inicio.inMinutes', { count: diff })
+        : t('home.inicio.inHours', { hours: Math.round(diff / 60), minutes: diff % 60 > 0 ? (diff % 60) + 'min' : '' }).trim();
     }
   }
 
@@ -69,10 +71,10 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
         )}
         <div style={{ position: 'relative', zIndex: 1, padding: '16px 16px 18px' }}>
           <p style={{ fontSize: 10, fontWeight: 500, color: 'var(--kodo-hero-eyebrow)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-            {isDeparture ? '¡Hoy empieza!' : '¡Mañana empieza!'}
+            {isDeparture ? t('home.departure.today') : t('home.departure.tomorrow')}
           </p>
           <p style={{ fontSize: 22, fontWeight: 500, color: 'white', lineHeight: 1.2, marginBottom: 6 }}>
-            {firstCity?.country || trip?.destination || trip?.name}<br/>te espera
+            {firstCity?.country || trip?.destination || trip?.name}<br/>{t('home.inicio.awaits')}
           </p>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,.55)' }}>{destName}</p>
         </div>
@@ -82,9 +84,11 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {TRANSPORT_TYPES.includes(firstDoc.type) ? 'Tu primer ' + (firstDoc.type === 'flight' ? 'vuelo' : firstDoc.type === 'train' ? 'tren' : 'transporte') : 'Primer documento'}
+              {TRANSPORT_TYPES.includes(firstDoc.type)
+                ? (firstDoc.type === 'flight' ? t('home.inicio.firstFlight') : firstDoc.type === 'train' ? t('home.inicio.firstTrain') : t('home.inicio.firstTransport'))
+                : t('home.inicio.firstDocument')}
             </p>
-            {countdown && <span className="text-xs font-medium text-primary">Sale {countdown}</span>}
+            {countdown && <span className="text-xs font-medium text-primary">{t('home.inicio.departsIn', { countdown })}</span>}
           </div>
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-xl flex-shrink-0">
@@ -92,7 +96,7 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{firstDoc.title || firstDoc.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{firstDoc.time ? `Salida ${firstDoc.time}` : 'Sin hora'}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{firstDoc.time ? t('home.inicio.departureTime', { time: firstDoc.time }) : t('home.inicio.noTime')}</p>
             </div>
             {firstDoc.time && <p className="text-base font-semibold text-foreground flex-shrink-0">{firstDoc.time}</p>}
           </div>
@@ -100,7 +104,7 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
             <div className="px-4 pb-3">
               <Link to={createPageUrl('Documents') + '?trip_id=' + tripId}
                 className="block w-full py-2.5 bg-primary text-white text-sm font-medium text-center rounded-full">
-                Ver billete
+                {t('home.inicio.viewTicket')}
               </Link>
             </div>
           )}
@@ -110,20 +114,20 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
       {packingItems.length > 0 && (
         <div className="bg-card rounded-2xl border border-border p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-foreground">Maleta</p>
+            <p className="text-sm font-medium text-foreground">{t('utilities.packing.tabMaleta')}</p>
             <p className="text-sm font-medium text-primary">{packedPct}%</p>
           </div>
           <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-1">
             <div className="h-full bg-primary rounded-full transition-all" style={{ width: packedPct + '%' }} />
           </div>
-          <p className="text-xs text-muted-foreground">{packedCount} de {packingItems.length} listos</p>
+          <p className="text-xs text-muted-foreground">{t('home.inicio.packedReady', { packed: packedCount, total: packingItems.length })}</p>
         </div>
       )}
 
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Users className="w-4 h-4" />Viajeros
+            <Users className="w-4 h-4" />{t('home.travelers')}
           </p>
         </div>
         <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} currentUserEmail={currentUserEmail} />

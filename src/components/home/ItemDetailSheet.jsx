@@ -15,7 +15,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
   const EmojiIcon = isDoc ? (DOC_ICONS[item.type] || DOC_ICONS.other) : null;
   const SpotIcon  = !isDoc ? (SPOT_ICONS[item.type] || CirclePlus) : null;
   const spotColor = !isDoc ? (SPOT_COLORS[item.type] || SPOT_COLORS.custom) : '';
-  const title = item.title || item.name || 'Sin título';
+  const title = item.title || item.name || t('itemDetail.untitled');
 
   const handleSave = async () => {
     setSaving(true);
@@ -37,7 +37,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-foreground leading-snug">{title}</p>
             <p className="text-xs text-muted-foreground mt-0.5 capitalize">
-              {isDoc ? (item.type || 'documento') : (item.type || 'spot')}
+              {isDoc ? (item.type || t('itemDetail.document')) : (item.type || t('itemDetail.spot'))}
               {item.time && <span className="text-primary font-medium"> · {item.time}</span>}
             </p>
           </div>
@@ -48,17 +48,17 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
 
         <div className="px-5 py-4 space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Hora</p>
+            <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('itemDetail.time')}</p>
             {editingTime ? (
               <div className="flex items-center gap-2">
                 <input type="time" value={time} onChange={e => setTime(e.target.value)}
                   className="h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary" />
                 <button onClick={handleSave} disabled={saving}
                   className="px-4 py-1.5 bg-primary text-white text-sm rounded-full font-medium disabled:opacity-50">
-                  {saving ? '...' : 'Guardar'}
+                  {saving ? '...' : t('common.save')}
                 </button>
                 <button onClick={() => { setEditingTime(false); setTime(item?.time || ''); }}
-                  className="text-sm text-muted-foreground">Cancelar</button>
+                  className="text-sm text-muted-foreground">{t('common.cancel')}</button>
               </div>
             ) : (
               <div className="flex items-center gap-3">
@@ -66,10 +66,10 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
                   <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                   {item.time
                     ? <span className="text-primary font-medium">{item.time}</span>
-                    : <span className="text-muted-foreground">Sin hora asignada</span>}
+                    : <span className="text-muted-foreground">{t('itemDetail.noTimeAssigned')}</span>}
                 </div>
                 <button onClick={() => setEditingTime(true)} className="text-xs text-primary font-medium underline underline-offset-2">
-                  {item.time ? 'Editar' : 'Añadir hora'}
+                  {item.time ? t('itemDetail.edit') : t('itemDetail.addTime')}
                 </button>
               </div>
             )}
@@ -77,7 +77,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
 
           {!isDoc && item.notes && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Nota</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('itemDetail.note')}</p>
               <div className="bg-secondary rounded-xl p-3">
                 <p className="text-sm text-foreground leading-relaxed">{item.notes}</p>
               </div>
@@ -87,13 +87,13 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
           {isDoc && item.type && (
             <div className="flex gap-2">
               <div className="bg-secondary rounded-xl p-3 flex-1">
-                <p className="text-xs text-muted-foreground mb-1">Tipo</p>
+                <p className="text-xs text-muted-foreground mb-1">{t('itemDetail.type')}</p>
                 <p className="text-sm font-medium text-foreground capitalize">{item.type}</p>
               </div>
               {!item.file_url && (
                 <div className="bg-secondary rounded-xl p-3 flex-1">
-                  <p className="text-xs text-muted-foreground mb-1">Archivo</p>
-                  <p className="text-sm text-muted-foreground">Sin archivo</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('itemDetail.file')}</p>
+                  <p className="text-sm text-muted-foreground">{t('itemDetail.noFile')}</p>
                 </div>
               )}
             </div>
@@ -104,18 +104,18 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf }
           {isDoc && item.file_url && (
             <button onClick={() => { onClose(); setTimeout(() => onOpenPdf(item.file_url), 50); }}
               className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">
-              Ver documento
+              {t('itemDetail.viewDocument')}
             </button>
           )}
           {!isDoc && item.lat && item.lng && (
             <a href={`https://maps.google.com/?q=${item.lat},${item.lng}`} target="_blank" rel="noopener noreferrer"
               className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium text-center">
-              Ver en mapa
+              {t('itemDetail.viewOnMap')}
             </a>
           )}
           <button onClick={onClose}
             className="flex-1 py-3 bg-secondary border border-border rounded-full text-sm text-muted-foreground">
-            Cerrar
+            {t('common.close')}
           </button>
         </div>
       </div>
