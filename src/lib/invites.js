@@ -9,6 +9,10 @@ export function generateInviteToken() {
 export async function sendTripInvite({ tripId, email, role, tripName, inviterEmail, inviterName }) {
   const inviteToken = generateInviteToken();
   const normalizedEmail = email.trim().toLowerCase();
+  // invited_by se compara contra currentUser.email en las reglas de seguridad
+  // (rls) de TripInvite — si queda con mayúsculas mezcladas, esa comparación
+  // deja de coincidir y el invitador pierde acceso a su propia invitación.
+  const normalizedInviter = (inviterEmail || '').trim().toLowerCase();
 
   // Verificar que el usuario no sea ya miembro del viaje
   const trip = await base44.entities.Trip.get(tripId);
@@ -31,7 +35,7 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
     // explícitamente con otro.
     invite = await base44.entities.TripInvite.update(existing[0].id, {
       invite_token: inviteToken,
-      invited_by: inviterEmail,
+      invited_by: normalizedInviter,
       role: role || 'editor'
     });
   } else {
@@ -41,7 +45,7 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
       role: role || 'editor',
       status: 'pending',
       invite_token: inviteToken,
-      invited_by: inviterEmail
+      invited_by: normalizedInviter
     });
   }
 
