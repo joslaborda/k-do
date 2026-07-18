@@ -164,17 +164,21 @@
     "s5": {
       "title1": "Las cuentas aquí",
       "title2": "siempre encajan",
+      "body": "Apunta quién paga y con quién comparte cada gasto. Kōdo lleva los balances y al final todos saben exactamente lo que se deben.",
       "yourBalance": "Tu balance",
       "owedToYou": "Te deben",
       "youOwe": "Tú debes a",
       "example": "Carlos debe a José",
       "owedToYouLabel": "Te deben a ti",
       "dinner": "Cena en Tsukiji",
-      "paidBy": "Pagó {{name}} · ÷ 4"
+      "paidBy": "Pagó {{name}} · ÷ 4",
+      "packing": "Maleta",
+      "documents": "Documentos"
     },
     "s6": {
       "title1": "Tu día a día",
       "title2": "en la tab Hoy",
+      "body": "Todo lo que subes y preparas genera tu itinerario diario. La tab Hoy te muestra el clima, los documentos del día y tus spots. Busca restaurantes, museos o cualquier plan, asígnales día y hora para que aparezcan exactamente cuando los necesitas.",
       "today": "HOY",
       "searchExample": "Restaurantes, museos, cafeterías...",
       "flightSub": "Vuelo · asignado hoy",
@@ -183,6 +187,12 @@
       "ramenSub": "Restaurante · Tokio",
       "teamlabSub": "Actividad · asignado 15 mar",
       "saved": "Guardado"
+    },
+    "s4extra": {
+      "visaCategory": "Visados",
+      "equipmentCategory": "Equipamiento",
+      "adapterItem": "Adaptador tipo A",
+      "adapterItemSub": "Diferente al europeo"
     }
   },
   "tabs": {
@@ -339,6 +349,7 @@
       "conversion": "Conversión"
     },
     "addExpense": "Nuevo gasto",
+    "addShort": "Gasto",
     "editExpense": "Editar gasto",
     "description": "Descripción",
     "amount": "Importe",
@@ -512,6 +523,20 @@
     "tomorrow": {
       "emptyTitle": "Nada planificado para mañana",
       "emptyHint": "Añade spots o documentos para el día de mañana"
+    },
+    "inicio": {
+      "awaits": "te espera",
+      "firstFlight": "Tu primer vuelo",
+      "firstTrain": "Tu primer tren",
+      "firstTransport": "Tu primer transporte",
+      "firstDocument": "Primer documento",
+      "departsIn": "Sale {{countdown}}",
+      "inMinutes": "en {{count}} min",
+      "inHours": "en {{hours}}h {{minutes}}",
+      "departureTime": "Salida {{time}}",
+      "noTime": "Sin hora",
+      "viewTicket": "Ver billete",
+      "packedReady": "{{packed}} de {{total}} listos"
     }
   },
   "spots": {
@@ -1085,6 +1110,49 @@
       "step3": "Aceptas y tienes acceso completo al viaje"
     }
   },
+  "itemDetail": {
+    "untitled": "Sin título",
+    "document": "documento",
+    "spot": "spot",
+    "time": "Hora",
+    "noTimeAssigned": "Sin hora asignada",
+    "edit": "Editar",
+    "addTime": "Añadir hora",
+    "note": "Nota",
+    "type": "Tipo",
+    "file": "Archivo",
+    "noFile": "Sin archivo",
+    "viewDocument": "Ver documento",
+    "viewOnMap": "Ver en mapa"
+  },
+  "membersPanel": {
+    "travelersCount": "Viajeros ({{count}})",
+    "invite": "Invitar",
+    "you": "(tú)",
+    "roleAdmin": "Admin",
+    "roleEditor": "Editor",
+    "roleViewer": "Lector",
+    "removeFromTrip": "Expulsar del viaje",
+    "removeConfirmBody": "¿Seguro que quieres expulsar a {{name}} del viaje? Podrá volver a unirse solo si le invitas de nuevo.",
+    "remove": "Expulsar",
+    "shareLinkHint": "Comparte el enlace de invitación",
+    "shareLinkNote": "No podemos enviar email a usuarios externos. Comparte este enlace directamente.",
+    "copied": "¡Copiado!",
+    "copyLink": "Copiar enlace",
+    "back": "Volver",
+    "emailPlaceholder": "email@ejemplo.com",
+    "userNotFound": "Usuario no encontrado",
+    "userNotFoundDesc": "No existe el usuario @{{query}}",
+    "resolveEmailError": "No se pudo resolver el email del usuario",
+    "alreadyMember": "Ya es miembro",
+    "alreadyMemberDesc": "Este usuario ya está en el viaje",
+    "inviteSent": "Invitación enviada",
+    "inviteSentDesc": "Email enviado a {{email}}",
+    "inviteError": "No se pudo enviar la invitación",
+    "notAllowed": "No permitido",
+    "needOneAdmin": "Debe haber al menos un admin en el viaje.",
+    "removeError": "No se pudo expulsar al miembro"
+  },
   "utilities": {
     "title": "Utilidades",
     "backHome": "Inicio",
@@ -1191,6 +1259,7 @@
     "max": "Máxima",
     "min": "Mínima",
     "rain": "Lluvia",
+    "hourly": "Por hora",
     "wmo": {
       "variable": "Variable",
       "clear": "Despejado",
@@ -1217,6 +1286,26 @@
     "network": "Sin conexión. Comprueba tu internet.",
     "notFound": "No encontrado",
     "unauthorized": "No autorizado"
+  },
+  "pdfViewer": {
+    "defaultName": "documento",
+    "loadError": "No se pudo cargar el PDF",
+    "openNewTab": "Abrir en nueva pestaña",
+    "pageLoading": "Página {{num}}...",
+    "noPreview": "Vista previa no disponible",
+    "openFile": "Abrir archivo",
+    "pageCount_one": "{{count}} página",
+    "pageCount_other": "{{count}} páginas",
+    "download": "Descargar"
+  },
+  "verifyEmail": {
+    "title": "Verifica tu email",
+    "body": "Te hemos enviado un correo de verificación. Ábrelo y confirma tu cuenta para continuar usando Kōdo.",
+    "notVerifiedYet": "Tu email aún no está verificado. Revisa tu bandeja de entrada.",
+    "checkError": "Error al verificar. Inténtalo de nuevo.",
+    "checking": "Comprobando...",
+    "alreadyVerified": "Ya verifiqué",
+    "logout": "Cerrar sesión"
   },
   "photos": {
     "uploading": "Subiendo fotos...",
