@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Loader2, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function VerifyEmail() {
+  const { t } = useTranslation();
   const [checking, setChecking] = useState(false);
   const [msg, setMsg] = useState('');
 
@@ -15,10 +17,10 @@ export default function VerifyEmail() {
       if (u?.is_verified) {
         window.location.reload();
       } else {
-        setMsg('Tu email aún no está verificado. Revisa tu bandeja de entrada.');
+        setMsg(t('verifyEmail.notVerifiedYet'));
       }
     } catch {
-      setMsg('Error al verificar. Inténtalo de nuevo.');
+      setMsg(t('verifyEmail.checkError'));
     } finally {
       setChecking(false);
     }
@@ -30,9 +32,9 @@ export default function VerifyEmail() {
         <div className="w-16 h-16 bg-orange-50/60 rounded-full flex items-center justify-center mx-auto mb-4">
           <Mail className="w-8 h-8 text-primary" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Verifica tu email</h2>
+        <h2 className="text-xl font-bold mb-2">{t('verifyEmail.title')}</h2>
         <p className="text-sm text-muted-foreground mb-6">
-          Te hemos enviado un correo de verificación. Ábrelo y confirma tu cuenta para continuar usando Kōdo.
+          {t('verifyEmail.body')}
         </p>
         {msg && (
           <p className="text-sm mb-4 text-primary bg-secondary border border-border rounded-lg px-3 py-2">{msg}</p>
@@ -42,13 +44,13 @@ export default function VerifyEmail() {
           onClick={handleCheck}
           disabled={checking}
         >
-          {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Comprobando...</> : 'Ya verifiqué'}
+          {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('verifyEmail.checking')}</> : t('verifyEmail.alreadyVerified')}
         </Button>
         <button
           onClick={() => base44.auth.logout()}
           className="mt-4 text-xs text-muted-foreground hover:underline block mx-auto"
         >
-          Cerrar sesión
+          {t('verifyEmail.logout')}
         </button>
       </div>
     </div>

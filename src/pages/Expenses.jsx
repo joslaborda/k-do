@@ -1118,14 +1118,14 @@ export default function Expenses() {
             <Link to={createPageUrl('Home') + '?trip_id=' + tripId}>
               <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Inicio
+                {t('utilities.backHome')}
               </button>
             </Link>
             <button onClick={openAdd} className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
-              <Plus className="w-4 h-4" />Gasto
+              <Plus className="w-4 h-4" />{t('expenses.addShort')}
             </button>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Gastos</h1>
+          <h1 className="text-2xl font-semibold text-foreground mb-4">{t('expenses.title')}</h1>
           <OTabBar
             tabs={[{key:'gastos',label:t('expenses.tabs.expenses')},{key:'balances',label:t('expenses.tabs.balances')},...(availableCurrencies.length > 1 ? [{key:'conversión',label:t('expenses.tabs.conversion')}] : []),{key:'stats',label:t('expenses.tabs.stats')}]}
             activeKey={tab}
