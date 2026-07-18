@@ -6,7 +6,7 @@ import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Ca
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
@@ -123,8 +123,8 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar size={12} className="text-muted-foreground flex-shrink-0" />
                   <span>
-                    {new Date(tripData.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    {tripData.end_date && ` — ${new Date(tripData.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                    {parseISO(tripData.start_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {tripData.end_date && ` — ${parseISO(tripData.end_date).toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
                   </span>
                 </div>
               )}
