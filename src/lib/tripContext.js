@@ -41,7 +41,13 @@ export function getActiveCity({ cities = [], overrideCityId = null, nowDate = ne
     if (found) return found;
   }
 
-  const now = nowDate instanceof Date ? nowDate : new Date(nowDate);
+  const nowRaw = nowDate instanceof Date ? nowDate : new Date(nowDate);
+  // Normalizado a medianoche: start_date/end_date son fechas sin hora, así que
+  // comparar contra un `now` con hora real hacía que el último día de cada
+  // ciudad (cualquier momento después de las 00:00) se leyera como "ya
+  // terminado" — el viajero perdía la ciudad activa correcta durante todo el
+  // día de transición y la función caía al fallback (siempre la 1ª ciudad).
+  const now = new Date(nowRaw.getFullYear(), nowRaw.getMonth(), nowRaw.getDate());
   const sorted = sortedCities(cities);
 
   // 2. Ciudad en curso (fechas envuelven hoy)

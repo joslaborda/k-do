@@ -7,13 +7,18 @@ export function normalizeUsername(input) {
   return input.toLowerCase().replace(/[^a-z0-9_]/g, '');
 }
 
-/** Valida contra las reglas: minúsculas, empieza por letra, 3-30 chars */
+/**
+ * Valida contra las reglas: minúsculas, empieza por letra, 3-30 chars.
+ * Devuelve un CÓDIGO de error (no texto) para que cada pantalla lo traduzca
+ * con t('profile.usernameErrors.<code>') — antes devolvía el mensaje en
+ * español fijo y se mostraba tal cual también con la app en inglés.
+ */
 export function validateUsername(username) {
-  if (!username) return 'El username no puede estar vacío';
-  if (username.length < 3) return 'Mínimo 3 caracteres';
-  if (username.length > 30) return 'Máximo 30 caracteres';
-  if (!/^[a-z]/.test(username)) return 'Debe empezar por una letra';
-  if (!USERNAME_REGEX.test(username)) return 'Solo letras minúsculas, números y _';
+  if (!username) return 'empty';
+  if (username.length < 3) return 'tooShort';
+  if (username.length > 30) return 'tooLong';
+  if (!/^[a-z]/.test(username)) return 'mustStartWithLetter';
+  if (!USERNAME_REGEX.test(username)) return 'invalidChars';
   return null; // válido
 }
 
