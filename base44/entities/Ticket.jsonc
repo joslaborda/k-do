@@ -103,6 +103,10 @@
     "arrival_city_id": {
       "type": "string",
       "description": "Ciudad destino (trenes/vuelos)"
+    },
+    "day_order": {
+      "type": "number",
+      "description": "Orden manual dentro de los items sin hora fija de un día (arrastrar para reordenar). Igual que Spot.day_order."
     }
   },
   "required": [

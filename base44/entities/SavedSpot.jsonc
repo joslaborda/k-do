@@ -78,18 +78,10 @@
     "title",
     "type"
   ],
-  "access_control": {
-    "read": {
-      "formula": "entity.user_id == currentUser.id"
-    },
-    "create": {
-      "formula": "data.user_id == currentUser.id"
-    },
-    "update": {
-      "formula": "entity.user_id == currentUser.id"
-    },
-    "delete": {
-      "formula": "entity.user_id == currentUser.id"
-    }
+  "rls": {
+    "read": { "data.user_id": "{{user.id}}" },
+    "create": { "data.user_id": "{{user.id}}" },
+    "update": { "data.user_id": "{{user.id}}" },
+    "delete": { "data.user_id": "{{user.id}}" }
   }
 }

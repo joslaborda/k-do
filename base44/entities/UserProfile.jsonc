@@ -97,5 +97,11 @@
     "username",
     "username_normalized",
     "display_name"
-  ]
+  ],
+  "rls": {
+    "create": { "data.user_id": "{{user.id}}" },
+    "read": true,
+    "update": { "data.user_id": "{{user.id}}" },
+    "delete": { "data.user_id": "{{user.id}}" }
+  }
 }

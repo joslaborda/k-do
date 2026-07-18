@@ -31,5 +31,21 @@
     "status",
     "invite_token",
     "invited_by"
-  ]
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "$or": [
+        { "data.email": "{{user.email}}" },
+        { "data.invited_by": "{{user.email}}" }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "data.email": "{{user.email}}" },
+        { "data.invited_by": "{{user.email}}" }
+      ]
+    },
+    "delete": false
+  }
 }
