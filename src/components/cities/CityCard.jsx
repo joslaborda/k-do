@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ChevronRight, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
@@ -427,8 +427,11 @@ export default function CityCard({ city, daysCount, tripId }) {
   const { i18n } = useTranslation();
   const formatDateRange = () => {
     if (!city.start_date) return null;
-    const start = new Date(city.start_date);
-    const end = city.end_date ? new Date(city.end_date) : null;
+    // new Date('YYYY-MM-DD') se interpreta como medianoche UTC: en zonas con
+    // offset negativo (América) el día mostrado se desplazaba un día hacia
+    // atrás. parseISO respeta la fecha local tal cual está guardada.
+    const start = parseISO(city.start_date);
+    const end = city.end_date ? parseISO(city.end_date) : null;
     if (end && start.getTime() === end.getTime()) return format(start, 'd MMM', { locale: es });
     if (end) return `${format(start, 'd', { locale: es })}-${format(end, 'd MMM', { locale: es })}`;
     return format(start, 'd MMM', { locale: es });
