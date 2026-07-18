@@ -524,7 +524,10 @@ export default function CreateProfileModal({ user, open }) {
       if (!ok) { setError(t('onboarding.slide0.usernameTaken')); setSaving(false); setAvailable(false); return; }
       await base44.entities.UserProfile.create({
         user_id: user.id,
-        email: user.email,
+        // invites.js/NotificationBell/Invites.jsx comparan y filtran email en
+        // minúsculas; si aquí se guarda tal cual venga de base44.auth, un
+        // email con mayúsculas rompe esas comparaciones desde el primer día.
+        email: (user.email || '').toLowerCase(),
         username,
         username_normalized: username,
         display_name: displayName.trim(),
