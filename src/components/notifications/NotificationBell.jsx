@@ -162,7 +162,7 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
   const { t } = useTranslation();
   const cfg = TYPE[n.type] ?? FALLBACK;
   const { Icon } = cfg;
-  const name = n.actor_display_name || n.actor_username || 'Alguien';
+  const name = n.actor_display_name || n.actor_username || t('notifications.someone');
   const showTrip = !currentTripId && n.trip_name;
   return (
     <div onClick={() => { onRead(n.id); onNavigate(n); }}
