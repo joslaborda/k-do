@@ -63,7 +63,7 @@ export default function CountryInput({ value, onChange, placeholder = 'País…'
       {open && filtered.length > 0 && (
         <ul style={{
           position:'absolute',top:'100%',left:0,right:0,zIndex:200,
-          background:'white',border:'1px solid #e8e3dc',borderRadius:12,
+          background:'hsl(var(--card))',border:'1px solid hsl(var(--border))',borderRadius:12,
           marginTop:4,maxHeight:200,overflowY:'auto',
           boxShadow:'0 4px 16px rgba(0,0,0,0.1)',listStyle:'none',padding:4,
         }}>
@@ -72,7 +72,7 @@ export default function CountryInput({ value, onChange, placeholder = 'País…'
               onMouseDown={() => select(c)}
               onTouchEnd={e => { e.preventDefault(); select(c); }}
               style={{padding:'8px 12px',fontSize:14,cursor:'pointer',borderRadius:8,color:'var(--kodo-text-active)'}}
-              onMouseEnter={e => e.currentTarget.style.background='#fff3ee'}
+              onMouseEnter={e => e.currentTarget.style.background='var(--kodo-bg-orange)'}
               onMouseLeave={e => e.currentTarget.style.background='transparent'}
             >{c}</li>
           ))}
