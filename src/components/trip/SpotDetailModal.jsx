@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { getTripDays } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue } from '@/lib/tripDays';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -43,9 +43,16 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
     staleTime: 60000,
   });
 
+  // El spot ya tiene city_id fijo desde que se creó. Si aquí se ofrecen fechas
+  // de otra ciudad del viaje, el spot queda con una fecha que no cuadra con su
+  // city_id y desaparece de las vistas de itinerario (que filtran por ambos a
+  // la vez). Se filtra a los días de la propia ciudad del spot.
   const tripDayOptions = useMemo(() => {
-    return getTripDays(tripCities);
-  }, [tripCities]);
+    const allDays = getTripDays(tripCities);
+    if (!spot?.city_id) return allDays;
+    const own = allDays.filter(d => d.cityId === spot.city_id);
+    return own.length > 0 ? own : allDays;
+  }, [tripCities, spot?.city_id]);
 
   useEffect(() => {
     if (spot) {
@@ -62,13 +69,17 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
   const IconComp = SPOT_ICONS[spot.type] || null;
   const typeLabel = TYPE_LABELS[spot.type] || spot.type || 'Spot';
 
-  const handleSave = async () => {
+  // `overrides` permite guardar un valor recién elegido sin esperar al
+  // siguiente render (setAssignedDate es async, así que llamar a handleSave()
+  // justo después del onChange guardaría el valor VIEJO si no se pasa aquí).
+  const handleSave = async (overrides = {}) => {
+    const nextDate = 'assignedDate' in overrides ? overrides.assignedDate : assignedDate;
     setSaving(true);
     try {
       await base44.entities.Spot.update(spot.id, {
         notes: notes.trim() || null,
         assigned_time: time || null,
-        assigned_date: assignedDate || null,
+        assigned_date: nextDate || null,
       });
       if (queryClient && tripId) {
         queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
@@ -132,12 +143,21 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
               <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">{t('spots.sheet.day')}</p>
               <select
                 value={assignedDate}
-                onChange={e => setAssignedDate(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value;
+                  setAssignedDate(val);
+                  // A diferencia de Hora/Notas (que piden confirmar con un botón
+                  // Guardar), el selector de día se guarda al instante: antes
+                  // cambiar el día aquí no hacía nada hasta que el usuario tocara
+                  // Hora o Notas, así que la reasignación se perdía en silencio.
+                  handleSave({ assignedDate: val });
+                }}
+                disabled={saving}
                 className="w-full h-9 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
               >
                 <option value="">{t('spots.sheet.unassigned')}</option>
                 {tripDayOptions.map(d => (
-                  <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                  <option key={tripDayOptionValue(d)} value={d.date}>{d.date} · {d.city}</option>
                 ))}
               </select>
             </div>

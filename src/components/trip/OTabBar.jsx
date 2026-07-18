@@ -35,13 +35,14 @@ export default function OTabBar({ tabs, activeKey, onChange, urgentCount = 0 }) 
 
   return (
     <div ref={containerRef} role="tablist" aria-label={t('trip.sectionsAria')} className="relative flex" style={{ position: 'relative' }}>
-      {/* Single sliding line — top */}
+      {/* Single sliding line — bottom border, 2px naranja según el sistema de diseño
+          (antes estaba en top:0 con 3px, pegada al borde equivocado) */}
       <div style={{
         position: 'absolute',
-        top: 0,
+        bottom: 0,
         left: lineStyle.left,
         width: lineStyle.width,
-        height: 3,
+        height: 2,
         background: 'hsl(var(--primary))',
         borderRadius: 2,
         transition: mounted ? 'left 0.25s cubic-bezier(.4,0,.2,1), width 0.25s cubic-bezier(.4,0,.2,1)' : 'none',

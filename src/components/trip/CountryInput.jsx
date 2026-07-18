@@ -1,38 +1,23 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { searchCountries, getCountryLabel } from '@/lib/countryConfig';
 
-// Hardcoded list — Intl.supportedValuesOf fails on iOS Safari
-const COUNTRY_LIST = [
-  'España','México','Colombia','Argentina','Perú','Chile','Venezuela','Ecuador',
-  'Bolivia','Paraguay','Uruguay','Costa Rica','Guatemala','Honduras','El Salvador',
-  'Nicaragua','Panamá','Cuba','República Dominicana','Puerto Rico',
-  'Estados Unidos','Canadá','Brasil','Reino Unido','Francia','Alemania','Italia',
-  'Portugal','Países Bajos','Bélgica','Suiza','Austria','Suecia','Noruega',
-  'Dinamarca','Finlandia','Polonia','Chequia','Hungría','Rumanía','Grecia',
-  'Turquía','Rusia','Ucrania','Israel','Emiratos Árabes Unidos','Arabia Saudí',
-  'Japón','China','Corea del Sur','India','Tailandia','Vietnam','Indonesia',
-  'Malasia','Singapur','Filipinas','Australia','Nueva Zelanda','Sudáfrica',
-  'Kenia','Egipto','Marruecos','Nigeria','Ghana','Etiopía','Tanzania',
-  'Mozambique','Angola','Camerún','Costa de Marfil','Senegal','Madagascar',
-  'Zambia','Zimbabue','Botswana','Namibia','Túnez','Argelia','Libia','Sudán',
-  'Etiopía','Somalia','Mozambique','Zimbabue','Irlanda','Escocia','Eslovaquia',
-  'Eslovenia','Croacia','Serbia','Bulgaria','Albania','Kosovo','Montenegro',
-  'Macedonia del Norte','Bosnia y Herzegovina','Moldavia','Bielorrusia','Georgia',
-  'Armenia','Azerbaiyán','Kazajistán','Uzbekistán','Turkmenistán','Kirguistán',
-  'Tayikistán','Afganistán','Pakistán','Bangladés','Nepal','Sri Lanka','Myanmar',
-  'Camboya','Laos','Mongolia','Bután','Maldivas','Qatar','Kuwait','Bahréin',
-  'Omán','Jordania','Líbano','Siria','Irak','Irán','Yemen',
-  'Jamaica','Trinidad y Tobago','Barbados','Bahamas','Haití','Guatemala',
-  'Belice','Guyana','Surinam','Panamá','Costa Rica','Nicaragua',
-];
-
-const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+// Antes esta lista vivía duplicada aquí, a mano, desincronizada del catálogo
+// canónico de countryConfig.js (con entradas repetidas — "Guatemala",
+// "Costa Rica", "Panamá", "Nicaragua", "Etiopía", "Mozambique" y "Zimbabue"
+// aparecían dos veces — y sin traducción al idioma activo). Se usa
+// searchCountries(), que ya resuelve por alias/inglés/ISO y no depende de
+// Intl.supportedValuesOf (que sí falla en iOS Safari, motivo original de que
+// esto se hardcodeara).
 
 export default function CountryInput({ value, onChange, placeholder = 'País…' }) {
-  const [query, setQuery] = useState(value || '');
+  const { i18n } = useTranslation();
+  const lang = (i18n.language || 'es').split('-')[0];
+  const [query, setQuery] = useState(() => value ? getCountryLabel(value, lang) : '');
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  useEffect(() => { setQuery(value || ''); }, [value]);
+  useEffect(() => { setQuery(value ? getCountryLabel(value, lang) : ''); }, [value, lang]);
 
   useEffect(() => {
     const handle = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -41,13 +26,12 @@ export default function CountryInput({ value, onChange, placeholder = 'País…'
     return () => { document.removeEventListener('mousedown', handle); document.removeEventListener('touchstart', handle); };
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = norm(query);
-    if (!q) return COUNTRY_LIST.slice(0, 8);
-    return COUNTRY_LIST.filter(c => norm(c).startsWith(q) || norm(c).includes(q)).slice(0, 10);
-  }, [query]);
+  // searchCountries devuelve {value, label}: value es SIEMPRE el canónico en
+  // español (lo que se guarda en la BD), label el nombre traducido (lo que se
+  // ve). Con la lista vieja el input guardaba directamente el texto tecleado.
+  const filtered = useMemo(() => searchCountries(query, lang, 10), [query, lang]);
 
-  const select = label => { setQuery(label); onChange(label); setOpen(false); };
+  const select = opt => { setQuery(opt.label); onChange(opt.value); setOpen(false); };
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -67,14 +51,14 @@ export default function CountryInput({ value, onChange, placeholder = 'País…'
           marginTop:4,maxHeight:200,overflowY:'auto',
           boxShadow:'0 4px 16px rgba(0,0,0,0.1)',listStyle:'none',padding:4,
         }}>
-          {filtered.map(c => (
-            <li key={c}
-              onMouseDown={() => select(c)}
-              onTouchEnd={e => { e.preventDefault(); select(c); }}
+          {filtered.map(opt => (
+            <li key={opt.value}
+              onMouseDown={() => select(opt)}
+              onTouchEnd={e => { e.preventDefault(); select(opt); }}
               style={{padding:'8px 12px',fontSize:14,cursor:'pointer',borderRadius:8,color:'var(--kodo-text-active)'}}
               onMouseEnter={e => e.currentTarget.style.background='var(--kodo-bg-orange)'}
               onMouseLeave={e => e.currentTarget.style.background='transparent'}
-            >{c}</li>
+            >{opt.label}</li>
           ))}
         </ul>
       )}

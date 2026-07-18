@@ -266,6 +266,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
   const nameRef = useRef(null);
   const startDateRef = useRef(null);
   const firstCountryRef = useRef(null);
+  const nightsErrorRef = useRef(null);
 
   const validStops = stops.filter(s => s.city.trim());
   const totalNightsEntered = stops.reduce((sum, s) => sum + (parseInt(s.nights) || 0), 0);
@@ -289,6 +290,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     formData.start_date &&
     (!formData.end_date || formData.end_date >= formData.start_date) &&
     validStops.length > 0 &&
+    !nightsError &&
     !isPending;
 
   // ── helpers ──────────────────────────────────────────────────────────────
@@ -345,6 +347,10 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
     if (!formData.start_date) { startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); startDateRef.current?.focus(); return; }
     if (!stops[0]?.country?.trim()) { firstCountryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstCountryRef.current?.focus(); return; }
     if (validStops.length === 0) return;
+    // El error de noches (suma de noches por parada no cuadra con los días del
+    // viaje) solo se mostraba visualmente — no bloqueaba el envío, así que se
+    // podía crear un viaje con fechas/paradas inconsistentes.
+    if (nightsError) { nightsErrorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
     const tripCities = validStops;
     let allocations = [];
@@ -571,7 +577,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
             {missingCountry && <p className="text-xs text-red-500">{t('trip.new.firstStopCountry')}</p>}
 
             {mode === 'multi' && dateMode === 'nights' && formData.start_date && (
-              <div className="pl-1 space-y-1">
+              <div className="pl-1 space-y-1" ref={nightsErrorRef}>
                 {nightsError ? (
                   <p className="text-xs text-destructive font-medium flex items-center gap-1"><AlertTriangle size={12} />{nightsError}</p>
                 ) : totalNightsEntered > 0 && (
@@ -591,7 +597,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
               type="button"
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90 text-white"
-              disabled={isPending}
+              disabled={(attempted && !canCreate) || isPending}
             >
               {isPending ? t('trip.new.creating') : t('trip.create')}
             </Button>

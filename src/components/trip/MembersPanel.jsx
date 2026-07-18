@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, UserPlus, Crown, Pencil, Eye, Mail, Copy, Check } from 'lucide-react';
+import { Users, UserPlus, Crown, Pencil, Eye, Mail, Copy, Check, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,14 +24,45 @@ export default function MembersPanel({
   const [inviting, setInviting] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState(null);
   const queryClient = useQueryClient();
 
   const members = trip?.members || [];
   const roles = trip?.roles || {};
 
+  // `profiles` llega como array (así lo devuelve el useQuery de perfiles en
+  // Home.jsx: `data: profiles = []`), pero este componente asumía que podía
+  // llegar como objeto {email: profile} — con un array, `profiles?.[email]`
+  // siempre daba undefined y la lista de miembros se quedaba sin avatar/nombre.
+  // Se admite cualquiera de las dos formas.
+  const getProfile = (email) => {
+    if (!profiles) return null;
+    if (Array.isArray(profiles)) return profiles.find(p => p.email === email || p.user_email === email) || null;
+    return profiles[email] || null;
+  };
+
   const updateTripMutation = useMutation({
     mutationFn: data => base44.entities.Trip.update(trip.id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['trip', trip.id] }),
+  });
+
+  // Expulsar miembro: MembersPanel existía en el proyecto pero no estaba
+  // conectado a ninguna pantalla, y aunque se conectara solo permitía cambiar
+  // el rol — no había forma de sacar a alguien del viaje sin tocar la BD a
+  // mano. Igual que con el rol, no se puede expulsar al creador del viaje ni
+  // a uno mismo.
+  const removeMemberMutation = useMutation({
+    mutationFn: async (email) => {
+      const newMembers = members.filter(e => e !== email);
+      const newRoles = { ...roles };
+      delete newRoles[email];
+      await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
+      setMemberToRemove(null);
+    },
+    onError: (e) => toast({ title: 'Error', description: e?.message || 'No se pudo expulsar al miembro' }),
   });
 
   const handleInvite = async () => {
@@ -134,7 +165,8 @@ export default function MembersPanel({
           const config = roleConfig[role];
           const RoleIcon = config.icon;
           const isCurrentUser = email === currentUserEmail;
-          const prof = (Array.isArray(profiles) ? null : profiles?.[email]) || null;
+          const isCreator = trip?.created_by === email;
+          const prof = getProfile(email);
           const displayName = prof?.display_name || prof?.username || email || email;
           const initials = displayName.slice(0,2).toUpperCase();
 
@@ -157,19 +189,59 @@ export default function MembersPanel({
                 </div>
               </div>
               {isAdmin && !isCurrentUser && (
-                <Select value={role} onValueChange={v => handleRoleChange(email, v)}>
-                  <SelectTrigger className="w-28 h-7 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="viewer">Lector</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-1.5">
+                  <Select value={role} onValueChange={v => handleRoleChange(email, v)}>
+                    <SelectTrigger className="w-28 h-7 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                      <SelectItem value="viewer">Lector</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {!isCreator && (
+                    <button
+                      onClick={() => setMemberToRemove(email)}
+                      aria-label="Expulsar del viaje"
+                      className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Confirmación de expulsión */}
+      {memberToRemove && (
+        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/40" onClick={() => setMemberToRemove(null)}>
+          <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+            <p className="font-semibold text-foreground text-sm mb-1">Expulsar del viaje</p>
+            <p className="text-xs text-muted-foreground mb-5">
+              {(() => {
+                const prof = getProfile(memberToRemove);
+                const name = prof?.display_name || prof?.username || memberToRemove;
+                return <>¿Seguro que quieres expulsar a <strong>{name}</strong> del viaje? Podrá volver a unirse solo si le invitas de nuevo.</>;
+              })()}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setMemberToRemove(null)} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={() => removeMemberMutation.mutate(memberToRemove)}
+                disabled={removeMemberMutation.isPending}
+                className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-50"
+              >
+                {removeMemberMutation.isPending ? '...' : 'Expulsar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Invite form */}
       {isAdmin && (
