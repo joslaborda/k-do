@@ -35,7 +35,7 @@ export default function DeleteTripModal({
             disabled={!matches || isPending}
             className="bg-destructive hover:bg-destructive/90 text-white"
           >
-            {isPending ? 'Eliminando...' : 'Eliminar viaje'}
+            {isPending ? t('trip.dialog.deleting') : t('trip.dialog.deleteTrip')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
