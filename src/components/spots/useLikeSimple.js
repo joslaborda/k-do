@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
 export default
-function useLikeSimple(spotId, userId) {
+function useLikeSimple(spotId, userId, targetOwnerId) {
   const queryClient = useQueryClient();
   const isReal = spotId && !String(spotId).startsWith('seed_');
 
@@ -22,7 +22,10 @@ function useLikeSimple(spotId, userId) {
       if (isLiked && likeRecord) {
         await base44.entities.Like.delete(likeRecord.id);
       } else {
-        await base44.entities.Like.create({ user_id: userId, target_id: spotId, target_type: 'spot' });
+        // Sin target_owner_id, el dueño del spot nunca se enteraba de que le
+        // habían dado like (useLike.js sí lo guarda; este hook "simple" se
+        // había quedado atrás).
+        await base44.entities.Like.create({ user_id: userId, target_id: spotId, target_type: 'spot', target_owner_id: targetOwnerId || null });
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['likes', 'spot', spotId] }),

@@ -9,10 +9,10 @@ import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue } from '@/lib/tripDays';
 
 export default
-function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId, onNotify }) {
+function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId, onNotify, currentUserEmail }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [notes, setNotes] = useState(spot?.notes || '');
@@ -20,7 +20,11 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const [assignedTime, setAssignedTime] = useState(spot?.assigned_time || '');
   const [saving, setSaving] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // Mismo criterio que SpotCard.jsx: solo quien creó el spot puede borrarlo.
+  // Antes cualquier miembro del grupo veía el botón de borrar sin confirmación.
+  const canDelete = spot?.created_by === currentUserEmail;
+  const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId, spot?.created_by_user_id);
   const isReal = spot?.id && !String(spot?.id || '').startsWith('seed_');
   const { data: comments = [] } = useQuery({
     queryKey: ['spotComments', spot?.id],
@@ -29,10 +33,17 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
     staleTime: 30000,
   });
 
-  // Build trip day options from cities — must be before early return
+  // Build trip day options from cities — must be before early return.
+  // El spot ya tiene city_id fijo desde que se creó. Si aquí se ofrecen fechas
+  // de otra ciudad del viaje, el spot queda con una fecha que no cuadra con su
+  // city_id y desaparece de las vistas de itinerario (que filtran por ambos a
+  // la vez). Se filtra a los días de la propia ciudad del spot.
   const tripDayOptions = useMemo(() => {
-    return getTripDays(tripCities || []);
-  }, [tripCities]);
+    const allDays = getTripDays(tripCities || []);
+    if (!spot?.city_id) return allDays;
+    const own = allDays.filter(d => d.cityId === spot.city_id);
+    return own.length > 0 ? own : allDays;
+  }, [tripCities, spot?.city_id]);
 
   const hasTripDays = tripDayOptions.length > 0;
 
@@ -115,7 +126,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
                 >
                   <option value="">{t('spots.sheet.unassigned')}</option>
                   {tripDayOptions.map(d => (
-                    <option key={d.date} value={d.date}>{d.date} · {d.city}</option>
+                    <option key={tripDayOptionValue(d)} value={d.date}>{d.date} · {d.city}</option>
                   ))}
                 </select>
               ) : (
@@ -145,11 +156,13 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
             </div>
           </div>
 
-          {/* Delete */}
-          <button onClick={() => { onDelete(spot.id); onClose(); }}
-            className="w-full text-xs text-red-500 hover:text-red-700 transition-colors py-2 text-center">
-            {t('spots.sheet.deleteSpot')}
-          </button>
+          {/* Delete — solo quien lo creó, y con confirmación (antes borraba al instante) */}
+          {canDelete && (
+            <button onClick={() => setShowDeleteConfirm(true)}
+              className="w-full text-xs text-red-500 hover:text-red-700 transition-colors py-2 text-center">
+              {t('spots.sheet.deleteSpot')}
+            </button>
+          )}
         </div>
 
         {/* Like / Comentar row */}
@@ -186,6 +199,20 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
       </div>
     </div>
     {showComments && isReal && <InlineCommentsPopup spot={spot} userId={userId} onClose={() => setShowComments(false)} />}
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
+        <div className="bg-card w-full max-w-md rounded-t-2xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+          <div className="w-9 h-1 bg-border rounded-full mx-auto mb-4" />
+          <p className="font-semibold text-foreground text-sm mb-1">{t('spots.delete.title')}</p>
+          <p className="text-xs text-muted-foreground mb-5">{t('spots.delete.body1')} <strong>{spot.title}</strong> {t('spots.delete.body2')}</p>
+          <div className="flex gap-3">
+            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 py-3 rounded-full border border-border text-sm text-muted-foreground">{t('common.cancel')}</button>
+            <button onClick={() => { onDelete(spot.id); setShowDeleteConfirm(false); onClose(); }}
+              className="flex-1 py-3 rounded-full bg-primary text-white text-sm font-medium">{t('common.delete')}</button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }

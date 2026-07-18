@@ -160,8 +160,14 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
 
   const createMutation = useMutation({
     mutationFn: data => base44.entities.Spot.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', cityId] }),
-  
+    // Restaurants.jsx (la vista de spots de todo el viaje) cachea bajo
+    // ['spots', tripId], no ['spots', cityId] — un spot creado aquí, en la
+    // vista de ciudad, no aparecía ahí hasta recargar la página entera.
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['spots', cityId] });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+    },
+
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
