@@ -300,19 +300,47 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
   const dayDocs = [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
 
-  // Build timeline
+  // Build timeline. Los items sin hora (`noTime`) se pueden arrastrar para
+  // reordenar — antes ese arrastre solo cambiaba el estado local (`dragItems`
+  // más abajo) y nunca se guardaba: al recargar la página, o simplemente al
+  // añadir/borrar cualquier otro item del día, el orden manual desaparecía
+  // sin avisar. Ahora cada item lleva un `_order` persistido (day_order en
+  // Spot/Ticket, `order` dentro del objeto de nota en el JSON de `content`) y
+  // el drag lo escribe de verdad — ver persistNoTimeOrder más abajo.
   const { withTime, noTime } = useMemo(() => {
-    const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
-    const spotItems = spots.map(s   => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
+    const docItems  = dayDocs.map((d, i) => ({ ...d,  _kind: 'doc',  _time: d.time || null, _order: d.day_order ?? (1000 + i), _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
+    const spotItems = spots.map((s, i) => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _order: s.day_order ?? (2000 + i), _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
     const noteItems = notesList.filter(n => n.text?.trim()).map((n, i) => ({
-      id: 'note-' + i, _kind: 'note', _time: n.time || null, _title: n.text, _sub: null, _noteIdx: i,
+      id: 'note-' + i, _kind: 'note', _time: n.time || null, _order: n.order ?? (3000 + i), _title: n.text, _sub: null, _noteIdx: i,
     }));
     const all = [...docItems, ...spotItems, ...noteItems];
     return {
       withTime: all.filter(i => i._time).sort((a, b) => a._time.localeCompare(b._time)),
-      noTime:   all.filter(i => !i._time),
+      noTime:   all.filter(i => !i._time).sort((a, b) => a._order - b._order),
     };
   }, [dayDocs, spots, notesList]);
+
+  // Persiste el nuevo orden tras un drag. `orderedItems` es la lista completa
+  // `noTime` ya reordenada.
+  const persistNoTimeOrder = async (orderedItems) => {
+    const spotUpdates = [];
+    const docUpdates = [];
+    const newNotes = [...notesList];
+    orderedItems.forEach((item, idx) => {
+      if (item._kind === 'spot') spotUpdates.push(base44.entities.Spot.update(item.id, { day_order: idx }));
+      else if (item._kind === 'doc') docUpdates.push(base44.entities.Ticket.update(item.id, { day_order: idx }));
+      else if (item._kind === 'note' && newNotes[item._noteIdx]) newNotes[item._noteIdx] = { ...newNotes[item._noteIdx], order: idx };
+    });
+    try {
+      await Promise.all([...spotUpdates, ...docUpdates]);
+      if (docUpdates.length) queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      if (spotUpdates.length) queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      if (newNotes.some((n, i) => n.order !== notesList[i]?.order)) await saveNotes(newNotes);
+    } catch {
+      // Best-effort: si falla, el próximo refetch vuelve a traer el orden anterior.
+      // No se bloquea la UI por esto — reordenar no es una acción destructiva.
+    }
+  };
 
   // Draggable no-time items
   const [dragItems, setDragItems]   = useState(noTime);
@@ -328,6 +356,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
     if (dragging === null || dragging === i) return;
     const next = [...dragItems]; const [m] = next.splice(dragging, 1); next.splice(i, 0, m);
     setDragItems(next); setDragging(null); setDragOver(null);
+    persistNoTimeOrder(next);
   };
   const onDragEnd = () => { setDragging(null); setDragOver(null); };
   const onTouchStart = (e, i) => { touchRef.current = i; setDragging(i); };
@@ -343,6 +372,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
     if (touchRef.current !== null && dragOver !== null && touchRef.current !== dragOver) {
       const next = [...dragItems]; const [m] = next.splice(touchRef.current, 1); next.splice(dragOver, 0, m);
       setDragItems(next);
+      persistNoTimeOrder(next);
     }
     touchRef.current = null; setDragging(null); setDragOver(null);
   };

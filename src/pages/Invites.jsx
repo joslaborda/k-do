@@ -276,10 +276,10 @@ export default function Invites() {
             <ChevronLeft className="w-4 h-4 text-foreground" />
           </button>
           <div>
-            <h1 className="text-base font-semibold text-foreground">Invitaciones</h1>
+            <h1 className="text-base font-semibold text-foreground">{t('invites.title')}</h1>
             <p className="text-xs text-muted-foreground">
-              {pendingInvites.length === 0 ? 'Sin invitaciones pendientes'
-                : `${pendingInvites.length} pendiente${pendingInvites.length !== 1 ? 's' : ''}`}
+              {pendingInvites.length === 0 ? t('invites.noPending')
+                : t('invites.pendingCount', { count: pendingInvites.length })}
             </p>
           </div>
         </div>
@@ -295,9 +295,9 @@ export default function Invites() {
               </div>
             </div>
 
-            <p className="text-base font-semibold text-foreground mb-2">Sin invitaciones pendientes</p>
+            <p className="text-base font-semibold text-foreground mb-2">{t('invites.noPending')}</p>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-7">
-              Cuando alguien te invite a un viaje aparecerá aquí.
+              {t('invites.noPendingHint')}
             </p>
 
             {/* Pasos — qué esperar */}
@@ -333,10 +333,10 @@ export default function Invites() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground text-sm">
-                      {tripData?.name || 'Cargando...'}
+                      {tripData?.name || t('utilities.loading')}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Invitado por {inv.invited_by || 'alguien'}
+                      {t('invites.page.invitedBy')} {inv.invited_by || t('invites.page.aCompanion')}
                     </p>
                   </div>
                 </div>
@@ -362,11 +362,11 @@ export default function Invites() {
                 <div className="flex gap-2 pt-1">
                   <button onClick={() => handleDeclineFromList(inv)} disabled={processing}
                     className="flex-1 h-9 rounded-full border border-border text-xs font-medium text-muted-foreground">
-                    Rechazar
+                    {t('invites.reject')}
                   </button>
                   <button onClick={() => handleAcceptFromList(inv)} disabled={processing}
                     className="flex-1 h-9 rounded-full bg-primary text-white text-xs font-semibold disabled:opacity-50">
-                    {processing ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : 'Aceptar'}
+                    {processing ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : t('invites.accept')}
                   </button>
                 </div>
               </div>

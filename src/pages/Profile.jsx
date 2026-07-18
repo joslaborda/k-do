@@ -90,7 +90,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
       )}
       {onSave && isSaved && (
         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
-          Guardado
+          {t('profile.savedBadge')}
         </span>
       )}
     </div>
@@ -192,7 +192,7 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
 
   const handleSave = async (spot) => {
     await onSave(spot);
-    setToastMsg(`${spot.title} guardado · Añadido a tu carpeta ${spot.country || ''}`);
+    setToastMsg(t('profile.savedToast', { title: spot.title, country: spot.country || '' }));
     setTimeout(() => setToastMsg(null), 3000);
   };
 
@@ -250,12 +250,12 @@ function SpotSearchPanel({savedSpotIds, onSave }) {
           ) : results.length === 0 ? (
             <div className="bg-card border border-border rounded-2xl text-center py-8">
               <Search className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">Sin resultados para "{query}"</p>
+              <p className="text-sm text-muted-foreground">{t('profile.noResultsFor', { query })}</p>
             </div>
           ) : (
             <div className="bg-card border border-border rounded-2xl overflow-hidden">
               <p className="text-xs text-muted-foreground px-3 pt-3 pb-1">
-                {results.length} resultado{results.length !== 1 ? 's' : ''} para "{query}"
+                {t('profile.resultsCount', { count: results.length, query })}
               </p>
               {results.map((spot, i) => {
                 const isSaved = savedSpotIds.has(spot.id);
@@ -415,7 +415,7 @@ export default function Profile() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 12H5M12 5l-7 7 7 7"/>
               </svg>
-              Mis viajes
+              {t('profile.myTrips')}
             </Link>
             <Link to={createPageUrl('Settings')}
               className="flex items-center gap-1.5 text-primary text-sm font-medium hover:text-primary/80 transition-colors">
@@ -423,7 +423,7 @@ export default function Profile() {
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
               </svg>
-              Configuración
+              {t('settings.title')}
             </Link>
           </div>
           <h1 className="text-2xl font-semibold text-foreground mb-4">{t('profile.title')}</h1>

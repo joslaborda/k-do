@@ -1046,6 +1046,10 @@ export default function Utilities() {
 
   const tabs = [
     { key: 'tiempo',      label: t('utilities.weather') },
+    // 'requisitos' (visado/vacunas/enchufe/moneda) existía como pantalla completa
+    // (RequirementsTab) pero no estaba en esta lista de pestañas — nadie podía
+    // llegar a verla desde la UI, aunque toda la lógica y los datos sí funcionaban.
+    { key: 'requisitos',  label: t('utilities.requirements') },
     { key: 'emergencias', label: t('utilities.emergency') },
     { key: 'maleta',      label: t('utilities.packing.tabMaleta') },
   ];

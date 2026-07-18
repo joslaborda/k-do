@@ -82,7 +82,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
         <span style={{ fontSize: 20, flexShrink: 0 }}>{flag}</span>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 3 }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: 'hsl(var(--primary))' }}>Has llegado a {countryName}</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'hsl(var(--primary))' }}>{t('expenses.arrivedAt', { countryName })}</p>
             <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'var(--kodo-border)', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
           <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
@@ -91,11 +91,11 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onAccept}
               style={{ flex: 1, background: 'hsl(var(--primary))', color: 'white', border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
-              Sí, usar {currencyCode}
+              {t('expenses.useThisCurrency', { currencyCode })}
             </button>
             <button onClick={onDismiss}
               style={{ flex: 1, background: 'white', color: 'hsl(var(--primary))', border: '0.5px solid hsl(var(--primary) / 0.3)', borderRadius: 8, padding: '7px 0', fontSize: 12, cursor: 'pointer' }}>
-              Mantener base
+              {t('expenses.keepBaseCurrency')}
             </button>
           </div>
         </div>
