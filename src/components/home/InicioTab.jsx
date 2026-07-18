@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { format, differenceInDays, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { Users, Car, FileText, Hotel, TrainFront } from 'lucide-react';
 import { BusFront, PlaneIcon } from '@/lib/icons';
 import { getCountryMeta } from '@/lib/countryConfig';
+import { daysUntil } from '@/lib/tripDays';
 import MemberAvatarRow from './MemberAvatarRow';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +13,7 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
   const { t } = useTranslation();
   const todayStr  = format(new Date(), 'yyyy-MM-dd');
   const tripStart = trip?.start_date || '';
-  const daysLeft  = tripStart ? differenceInDays(parseISO(tripStart), new Date()) : null;
+  const daysLeft  = tripStart ? daysUntil(tripStart) : null;
   const isDeparture = daysLeft === 0;
 
   const sortedCities = useMemo(() =>

@@ -207,7 +207,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     setCancelling(inv.id);
     try {
       await base44.entities.TripInvite.update(inv.id, { status: 'cancelled' });
-      queryClient.invalidateQueries({ queryKey: ['pendingInvites', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
     } catch (e) {
       setError(e?.message || t('invites.modal.cancelError'));
     }

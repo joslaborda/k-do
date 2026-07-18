@@ -3,11 +3,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
+import { ChevronDown, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CountryInput from '@/components/trip/CountryInput';
+import MembersPanel from '@/components/trip/MembersPanel';
 import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
@@ -15,7 +16,7 @@ import { AlertTriangle } from 'lucide-react';
 
 export default
 function SettingsDialog({
-  open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, onInvite, profiles = []
+  open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, profiles = [], currentUserEmail = ''
 }) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
@@ -311,28 +312,12 @@ function SettingsDialog({
           </button>
         )}
 
-        {/* Viajeros */}
-        <div className="bg-secondary/50 px-5 py-2 border-b border-border">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Viajeros · {trip?.members?.length || 1}
-          </p>
-        </div>
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <div className="flex gap-2">
-            {(trip?.members || [trip?.created_by]).filter(Boolean).map((email, i) => {
-              const prof = profiles?.find(p => p.email === email || p.user_email === email);
-              const name = prof?.display_name || prof?.username || email || '?';
-              const initials = name.slice(0,2).toUpperCase();
-              const colors = ['bg-accent text-primary', 'bg-violet-100 text-violet-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
-              return prof?.avatar_url
-                ? <img key={email} src={prof.avatar_url} alt={name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                : <div key={email} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${colors[i % colors.length]}`}>{initials}</div>;
-            })}
-          </div>
-          <button onClick={() => { onClose(); setTimeout(() => onInvite?.(), 100); }}
-            className="text-xs text-primary flex items-center gap-1 font-medium">
-            <UserPlus className="w-3.5 h-3.5" />Invitar
-          </button>
+        {/* Viajeros — antes solo mostraba avatares con un botón "Invitar";
+            MembersPanel existía en el proyecto pero no estaba conectado a
+            ninguna pantalla, así que no había forma de ver el rol de cada
+            miembro, cambiarlo o expulsar a alguien desde la app. */}
+        <div className="px-5 py-4 border-b border-border">
+          <MembersPanel trip={trip} currentUserEmail={currentUserEmail} isAdmin={isAdmin} profiles={profiles} />
         </div>
 
         {/* Footer */}

@@ -185,7 +185,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
           )}
-          <Link to={createPageUrl('CityDetail') + '?city_id=' + city?.id + '&trip_id=' + tripId}
+          <Link to={createPageUrl('CityDetail') + '?id=' + city?.id + '&trip_id=' + tripId}
             className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
             <span className="text-xs font-medium text-primary">{hasItinerary ? `Ver itinerario de ${city?.name}` : `Abrir ${city?.name}`}</span>
             <ArrowRight className="w-3.5 h-3.5 text-primary" />

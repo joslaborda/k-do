@@ -2,11 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { format, differenceInDays, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Calendar, Check, Users } from 'lucide-react';
 
 import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
+import { daysUntil } from '@/lib/tripDays';
 import { REQ_ICON_MAP } from './constants';
 import MemberAvatarRow from './MemberAvatarRow';
 
@@ -174,8 +175,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
     [cities]
   );
 
-  const tripStart = trip?.start_date ? parseISO(trip.start_date) : null;
-  const daysLeft  = tripStart ? differenceInDays(tripStart, new Date()) : null;
+  const daysLeft = trip?.start_date ? daysUntil(trip.start_date) : null;
 
   return (
     <div className="space-y-3">
