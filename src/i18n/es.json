@@ -43,6 +43,13 @@
     "member": "Miembro",
     "members": "Miembros",
     "admin": "Admin",
+    "usernameErrors": {
+      "empty": "El usuario no puede estar vacío",
+      "tooShort": "Mínimo 3 caracteres",
+      "tooLong": "Máximo 30 caracteres",
+      "mustStartWithLetter": "Debe empezar por una letra",
+      "invalidChars": "Solo letras minúsculas, números y _"
+    },
     "pending": "Pendiente",
     "available": "Disponible",
     "obligatory": "Obligatorio",
@@ -516,9 +523,17 @@
     },
     "travelers": "Viajeros",
     "traveler": "Viajero",
+    "viewFullRoute": "Ver ruta completa →",
     "dayCard": {
       "noTime": "Sin hora · toca para añadir",
-      "addPlaces": "Añade lugares a tu día"
+      "addPlaces": "Añade lugares a tu día",
+      "noTitle": "Sin título",
+      "exploreSpotsIn": "Explorar spots en {{city}}",
+      "viewItineraryOf": "Ver itinerario de {{city}}",
+      "openCity": "Abrir {{city}}",
+      "departsInHoursMinutes": "Sale en {{hours}}h {{minutes}}min",
+      "departsInHours": "Sale en {{hours}}h",
+      "departsInMinutes": "Sale en {{count}} min"
     },
     "tomorrow": {
       "emptyTitle": "Nada planificado para mañana",
@@ -1386,7 +1401,10 @@
     "pollQuestion": "¿Cuál es la pregunta?",
     "pollOption": "Opción {{n}}",
     "addOption": "+ Añadir opción",
-    "sendPoll": "Enviar encuesta"
+    "sendPoll": "Enviar encuesta",
+    "attachedFile": "Archivo adjunto",
+    "votes_one": "{{count}} voto",
+    "votes_other": "{{count}} votos"
   },
   "explore": {
     "search": {

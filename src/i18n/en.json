@@ -43,6 +43,13 @@
     "member": "Member",
     "members": "Members",
     "admin": "Admin",
+    "usernameErrors": {
+      "empty": "Username can't be empty",
+      "tooShort": "Minimum 3 characters",
+      "tooLong": "Maximum 30 characters",
+      "mustStartWithLetter": "Must start with a letter",
+      "invalidChars": "Only lowercase letters, numbers and _"
+    },
     "pending": "Pending",
     "available": "Available",
     "obligatory": "Required",
@@ -516,9 +523,17 @@
     },
     "travelers": "Travelers",
     "traveler": "Traveler",
+    "viewFullRoute": "View full route →",
     "dayCard": {
       "noTime": "No time · tap to add",
-      "addPlaces": "Add places to your day"
+      "addPlaces": "Add places to your day",
+      "noTitle": "Untitled",
+      "exploreSpotsIn": "Explore spots in {{city}}",
+      "viewItineraryOf": "View itinerary for {{city}}",
+      "openCity": "Open {{city}}",
+      "departsInHoursMinutes": "Departs in {{hours}}h {{minutes}}min",
+      "departsInHours": "Departs in {{hours}}h",
+      "departsInMinutes": "Departs in {{count}} min"
     },
     "tomorrow": {
       "emptyTitle": "Nothing planned for tomorrow",
@@ -1386,7 +1401,10 @@
     "pollQuestion": "What's the question?",
     "pollOption": "Option {{n}}",
     "addOption": "+ Add option",
-    "sendPoll": "Send poll"
+    "sendPoll": "Send poll",
+    "attachedFile": "Attached file",
+    "votes_one": "{{count}} vote",
+    "votes_other": "{{count}} votes"
   },
   "explore": {
     "search": {
