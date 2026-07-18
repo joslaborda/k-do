@@ -86,7 +86,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             onClick={onUndo}
             className="flex-1 py-3 rounded-full text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
           >
-            Deshacer
+            {t('spots.undo')}
           </button>
           <button
             onClick={() => {
@@ -98,7 +98,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             }}
             className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold transition-colors"
           >
-            {selectedDate && isAllowed(selectedDate) ? 'Confirmar' : 'Ahora no'}
+            {selectedDate && isAllowed(selectedDate) ? t('spots.assign.confirm') : t('spots.assign.notNow')}
           </button>
         </div>
       </div>
