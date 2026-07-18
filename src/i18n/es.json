@@ -421,6 +421,9 @@
     "saveExpense": "Guardar gasto",
     "paidByShort": "Pagó {{name}} · ÷ {{count}}",
     "localCurrencyPrompt": "La moneda local es {{currencyName}} ({{currencyCode}}). ¿Registrar gastos en {{currencyCode}}?",
+    "arrivedAt": "Has llegado a {{countryName}}",
+    "useThisCurrency": "Sí, usar {{currencyCode}}",
+    "keepBaseCurrency": "Mantener base",
     "receipts": "Recibos",
     "convertFrom": "Convertir desde",
     "currentCity": "Ciudad actual",
@@ -834,7 +837,12 @@
     "countries": "Países",
     "noTrips": "Sin viajes aún",
     "spotCount_one": "{{count}} spot",
-    "spotCount_other": "{{count}} spots"
+    "spotCount_other": "{{count}} spots",
+    "savedBadge": "Guardado",
+    "savedToast": "{{title}} guardado · Añadido a tu carpeta {{country}}",
+    "noResultsFor": "Sin resultados para \"{{query}}\"",
+    "resultsCount_one": "{{count}} resultado para \"{{query}}\"",
+    "resultsCount_other": "{{count}} resultados para \"{{query}}\""
   },
   "settings": {
     "title": "Ajustes",
@@ -1019,7 +1027,10 @@
   "invites": {
     "title": "Invitaciones",
     "pending": "Pendientes",
+    "pendingCount_one": "{{count}} pendiente",
+    "pendingCount_other": "{{count}} pendientes",
     "noPending": "Sin invitaciones pendientes",
+    "noPendingHint": "Cuando alguien te invite a un viaje aparecerá aquí.",
     "accept": "Aceptar",
     "reject": "Rechazar",
     "accepted": "Aceptada",
@@ -1077,6 +1088,7 @@
   "utilities": {
     "title": "Utilidades",
     "backHome": "Inicio",
+    "requirements": "Requisitos",
     "visa": "Visados",
     "vaccines": "Vacunas",
     "adapter": "Enchufes",

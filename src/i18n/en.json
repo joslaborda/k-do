@@ -421,6 +421,9 @@
     "saveExpense": "Save expense",
     "paidByShort": "Paid by {{name}} · ÷ {{count}}",
     "localCurrencyPrompt": "Local currency is {{currencyName}} ({{currencyCode}}). Record expenses in {{currencyCode}}?",
+    "arrivedAt": "You've arrived in {{countryName}}",
+    "useThisCurrency": "Yes, use {{currencyCode}}",
+    "keepBaseCurrency": "Keep base currency",
     "receipts": "Receipts",
     "convertFrom": "Convert from",
     "currentCity": "Current city",
@@ -834,7 +837,12 @@
     "countries": "Countries",
     "noTrips": "No trips yet",
     "spotCount_one": "{{count}} spot",
-    "spotCount_other": "{{count}} spots"
+    "spotCount_other": "{{count}} spots",
+    "savedBadge": "Saved",
+    "savedToast": "{{title}} saved · Added to your {{country}} folder",
+    "noResultsFor": "No results for \"{{query}}\"",
+    "resultsCount_one": "{{count}} result for \"{{query}}\"",
+    "resultsCount_other": "{{count}} results for \"{{query}}\""
   },
   "settings": {
     "title": "Settings",
@@ -1019,7 +1027,10 @@
   "invites": {
     "title": "Invitations",
     "pending": "Pending",
+    "pendingCount_one": "{{count}} pending",
+    "pendingCount_other": "{{count}} pending",
     "noPending": "No pending invitations",
+    "noPendingHint": "When someone invites you to a trip, it'll show up here.",
     "accept": "Accept",
     "reject": "Decline",
     "accepted": "Accepted",
@@ -1077,6 +1088,7 @@
   "utilities": {
     "title": "Utilities",
     "backHome": "Home",
+    "requirements": "Requirements",
     "visa": "Visas",
     "vaccines": "Vaccines",
     "adapter": "Power adapters",
