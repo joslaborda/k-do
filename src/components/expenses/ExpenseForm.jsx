@@ -36,6 +36,8 @@ export default function ExpenseForm({
   currentUserEmail = '',
   profiles = {},
   profilesByEmail,
+  cities = [],
+  defaultCityId = '',
 }) {
   const { t } = useTranslation();
   const getName = email => userMap[email] || email || email || '?';
@@ -53,6 +55,11 @@ export default function ExpenseForm({
     split_type: 'equal',
     split_with: [...members],
     amounts_by_user: {},
+    // Sin esto, "Por ciudad" en Estadísticas se quedaba vacío para siempre —
+    // el gasto nunca guardaba de qué ciudad era. Se preselecciona la ciudad
+    // activa del viaje, pero el usuario puede cambiarla o dejarla sin ciudad.
+    city_id: defaultCityId || '',
+    city_name: (cities.find(c => c.id === defaultCityId)?.name) || '',
   });
 
   const [receipts, setReceipts] = useState(initialData?.receipt_photos || []);
@@ -259,11 +266,30 @@ export default function ExpenseForm({
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleReceiptUpload(e.target.files[0])} />
       <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={e => e.target.files?.[0] && handleReceiptUpload(e.target.files[0])} />
 
-      {/* Fecha */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('common.date')}</p>
-        <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
-          className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground" />
+      {/* Fecha + Ciudad */}
+      <div className={cities.length > 0 ? 'grid grid-cols-2 gap-3' : ''}>
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('common.date')}</p>
+          <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
+            className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground" />
+        </div>
+        {cities.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('expenses.form.city')}</p>
+            <select
+              value={form.city_id || ''}
+              onChange={e => {
+                const cityId = e.target.value;
+                const cityName = cities.find(c => c.id === cityId)?.name || '';
+                setForm(p => ({ ...p, city_id: cityId, city_name: cityName }));
+              }}
+              className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground"
+            >
+              <option value="">{t('expenses.form.noCityOption')}</option>
+              {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Categoría */}
