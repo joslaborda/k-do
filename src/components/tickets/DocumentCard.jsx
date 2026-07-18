@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Users, Pencil, Trash2, MapPin, CalendarDays, FileText } from 'lucide-react';
-import { format, isToday } from 'date-fns';
+import { format, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import PDFViewer from '@/components/PDFViewer';
 import { CATEGORY_CONFIG } from './DocumentForm';
@@ -47,9 +47,13 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
     : ticket.name;
 
   const dateLocale = i18n.language === 'en' ? undefined : es;
-  const dateStr    = ticket.date     ? format(new Date(ticket.date),     'd MMM yyyy', { locale: dateLocale }) : null;
-  const endDateStr = ticket.end_date ? format(new Date(ticket.end_date), 'd MMM yyyy', { locale: dateLocale }) : null;
-  const todayBadge = ticket.date && isToday(new Date(ticket.date));
+  // new Date('YYYY-MM-DD') parsea como medianoche UTC — en zonas con offset
+  // negativo esto desplazaba la fecha mostrada un día atrás y podía hacer que
+  // isToday() diera falso (o verdadero un día de más/menos) cerca de medianoche.
+  // parseISO respeta la fecha local tal cual está guardada.
+  const dateStr    = ticket.date     ? format(parseISO(ticket.date),     'd MMM yyyy', { locale: dateLocale }) : null;
+  const endDateStr = ticket.end_date ? format(parseISO(ticket.end_date), 'd MMM yyyy', { locale: dateLocale }) : null;
+  const todayBadge = ticket.date && isToday(parseISO(ticket.date));
   const contextCity = ticket.city || cityName || null;
 
   // ── Compact ───────────────────────────────────────────────────────────────
