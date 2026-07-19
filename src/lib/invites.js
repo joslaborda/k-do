@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { notify } from '@/lib/notifications';
+import { syncTripMembers } from '@/lib/syncTripMembers';
 
 export function generateInviteToken() {
   return Math.random().toString(36).substring(2, 15) +
@@ -147,7 +148,15 @@ export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail)
 
     // Releer: si otro aceptó a la vez, su escritura pudo pisar la nuestra.
     const check = await base44.entities.Trip.get(tripId);
-    if ((check.members || []).includes(normalizedUserEmail)) return check;
+    if ((check.members || []).includes(normalizedUserEmail)) {
+      // El nuevo miembro necesita ver el historial del viaje (gastos, chat,
+      // documentos...) desde ya, no solo lo que se cree a partir de ahora —
+      // por eso se sincroniza trip_members en todos los registros existentes.
+      // Si falla, no se revierte la entrada al viaje: mejor dentro con acceso
+      // parcial (se puede reintentar) que fuera del todo.
+      syncTripMembers(tripId, check.members).catch(() => {});
+      return check;
+    }
 
     // Espera creciente para no volver a chocar con el mismo.
     await new Promise(r => setTimeout(r, 120 * (intento + 1)));
