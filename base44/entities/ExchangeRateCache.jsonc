@@ -9,5 +9,11 @@
     "valid_until": { "type": "string", "format": "date-time", "description": "Válido hasta" },
     "source": { "type": "string", "description": "Fuente: frankfurter/ECB, llm/internet, etc." }
   },
-  "required": ["base", "quote", "rate"]
+  "required": ["base", "quote", "rate"],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": true,
+    "delete": false
+  }
 }

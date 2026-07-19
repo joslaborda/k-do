@@ -134,6 +134,15 @@
       ],
       "description": "C\u00f3mo se a\u00f1adi\u00f3 el spot: manual, importado de b\u00fasqueda OSM, o importado de la wishlist personal"
     },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Etiquetas libres del spot \u2014 el campo faltaba en el schema y se perd\u00eda en cada creaci\u00f3n pese a tener UI completa (SpotsSection, SpotCard, etc.)"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Foto del spot \u2014 usada al importar desde SavedSpot (wishlist personal)"
+    },
     "trip_members": {
       "type": "array",
       "items": { "type": "string" },

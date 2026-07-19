@@ -90,6 +90,26 @@
     "language": {
       "type": "string",
       "description": "Idioma preferido de la interfaz"
+    },
+    "notif_invites": {
+      "type": "boolean",
+      "default": true,
+      "description": "Recibir notificaciones de invitaciones a viajes — el campo faltaba en el schema y los 4 toggles de notificaciones de Settings.jsx nunca persistían"
+    },
+    "notif_expenses": {
+      "type": "boolean",
+      "default": true,
+      "description": "Recibir notificaciones de gastos añadidos/liquidados"
+    },
+    "notif_comments": {
+      "type": "boolean",
+      "default": false,
+      "description": "Recibir notificaciones de comentarios"
+    },
+    "spots_public_default": {
+      "type": "boolean",
+      "default": false,
+      "description": "Visibilidad pública por defecto de spots nuevos"
     }
   },
   "required": [
