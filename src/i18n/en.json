@@ -983,6 +983,7 @@
     "cityName": "City name",
     "backHome": "Home",
     "cityShort": "City",
+    "configureRoute": "Configure route",
     "intro": "The base of your trip in Kōdo. Build the full day-by-day itinerary with your group using Documents, Spots and Notes. Your Today tab on Home will show your trip day by day.",
     "noDates": "No dates",
     "tripCompleted": "Trip completed",
