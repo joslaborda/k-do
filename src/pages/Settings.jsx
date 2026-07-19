@@ -11,6 +11,7 @@ import { syncTripMembers } from '@/lib/syncTripMembers';
 import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
+import FeedbackModal from '@/components/settings/FeedbackModal';
 
 // ── Language Switcher ──────────────────────────────────────────────────────────
 function LanguageSwitcher() {
@@ -273,6 +274,7 @@ export default function Settings() {
   const [spotsPublic,   setSpotsPublic]   = useState(false);
 
   const avatarInputRef = useRef(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile', user?.id],
@@ -575,7 +577,17 @@ export default function Settings() {
           </div>
         </div>
 
-
+        {/* ── AYUDA ── */}
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.help')}</p>
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <SettingRow
+            label={t('settings.feedback')}
+            sublabel={t('settings.feedbackSub')}
+            isLast
+            onClick={() => setFeedbackOpen(true)}
+            right={<ChevronRight className="w-3 h-3 text-muted-foreground" />}
+          />
+        </div>
 
       </div>
       {/* Guardar */}
@@ -588,6 +600,13 @@ export default function Settings() {
           {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('settings.saveChanges')}
         </button>
       </div>
+
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        userEmail={user?.email || ''}
+        userName={displayName || profile?.display_name || ''}
+      />
     </div>
   );
 }
