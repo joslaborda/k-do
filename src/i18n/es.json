@@ -1169,7 +1169,8 @@
     "inviteError": "No se pudo enviar la invitación",
     "notAllowed": "No permitido",
     "needOneAdmin": "Debe haber al menos un admin en el viaje.",
-    "removeError": "No se pudo expulsar al miembro"
+    "removeError": "No se pudo expulsar al miembro",
+    "roleChangeError": "No se pudo cambiar el rol"
   },
   "utilities": {
     "title": "Utilidades",

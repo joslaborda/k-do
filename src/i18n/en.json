@@ -1169,7 +1169,8 @@
     "inviteError": "Couldn't send the invitation",
     "notAllowed": "Not allowed",
     "needOneAdmin": "There must be at least one admin on the trip.",
-    "removeError": "Couldn't remove the member"
+    "removeError": "Couldn't remove the member",
+    "roleChangeError": "Couldn't change the role"
   },
   "utilities": {
     "title": "Utilities",
