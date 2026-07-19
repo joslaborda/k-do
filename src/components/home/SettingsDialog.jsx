@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CountryInput from '@/components/trip/CountryInput';
+import CityInput from '@/components/trip/CityInput';
 import MembersPanel from '@/components/trip/MembersPanel';
 import { normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,16 @@ function SettingsDialog({
   const [cityDraft, setCityDraft] = useState({});
   const [saving, setSaving] = useState(false);
   const [cityLoading, setCityLoading] = useState(null);
+  // Sugerencias extra para CityInput (además de las "top cities" del país
+  // elegido): los nombres de ciudad que este viaje YA usa. A diferencia de
+  // País (CountryInput, que obliga a elegir de una lista), Ciudad era texto
+  // libre — si un viaje repite ciudad (p. ej. Lima ida y vuelta) y la segunda
+  // vez se teclea con una mayúscula o espacio distinto, el resto de la app
+  // que agrupa por nombre de ciudad (asignar día a un spot, etc.) dejaba de
+  // reconocerlas como la misma. No obliga a elegir de la lista — se puede
+  // seguir escribiendo libre para una ciudad o pueblo nuevo — pero ahora hay
+  // opciones para elegir en vez de tener que teclearlo bien a pelo.
+  const existingCityNames = [...new Set((cities || []).map(c => c.name).filter(Boolean))];
 
   // Init form from trip data
   useEffect(() => {
@@ -196,6 +207,7 @@ function SettingsDialog({
               <Input
                 type="date"
                 value={startDate}
+                max={endDate || undefined}
                 onChange={e => setStartDate(e.target.value)}
                 className="h-8 text-sm flex-1"
               />
@@ -203,6 +215,7 @@ function SettingsDialog({
               <Input
                 type="date"
                 value={endDate}
+                min={startDate || undefined}
                 onChange={e => setEndDate(e.target.value)}
                 className="h-8 text-sm flex-1"
               />
@@ -247,7 +260,7 @@ function SettingsDialog({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">{t('common.city')}</p>
-                    <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} className="h-8 text-sm" aria-label={t('trip.dialog.cityAria')} placeholder={t('common.city')} />
+                    <CityInput country={cityDraft.country} value={cityDraft.name || ''} onChange={v => setCityDraft(p => ({ ...p, name: v }))} extraSuggestions={existingCityNames} placeholder={t('common.city')} />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">{t('common.country')}</p>
@@ -257,11 +270,11 @@ function SettingsDialog({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.startDate')}</p>
-                    <Input type="date" value={cityDraft.start_date || ''} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
+                    <Input type="date" value={cityDraft.start_date || ''} max={cityDraft.end_date || undefined} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.endDate')}</p>
-                    <Input type="date" value={cityDraft.end_date || ''} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
+                    <Input type="date" value={cityDraft.end_date || ''} min={cityDraft.start_date || undefined} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -299,7 +312,7 @@ function SettingsDialog({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-muted-foreground mb-1">{t('common.city')}</p>
-                <Input value={cityDraft.name || ''} onChange={e => setCityDraft(p => ({ ...p, name: e.target.value }))} aria-label={t('common.city')} className="h-8 text-sm" placeholder={t('common.city')} autoFocus />
+                <CityInput country={cityDraft.country} value={cityDraft.name || ''} onChange={v => setCityDraft(p => ({ ...p, name: v }))} extraSuggestions={existingCityNames} placeholder={t('common.city')} />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">{t('common.country')}</p>
@@ -309,11 +322,11 @@ function SettingsDialog({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.startDate')}</p>
-                <Input type="date" value={cityDraft.start_date || ''} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
+                <Input type="date" value={cityDraft.start_date || ''} max={cityDraft.end_date || undefined} onChange={e => setCityDraft(p => ({ ...p, start_date: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">{t('trip.dialog.endDate')}</p>
-                <Input type="date" value={cityDraft.end_date || ''} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
+                <Input type="date" value={cityDraft.end_date || ''} min={cityDraft.start_date || undefined} onChange={e => setCityDraft(p => ({ ...p, end_date: e.target.value }))} className="h-8 text-sm" />
               </div>
             </div>
             <div className="flex justify-end gap-2">
