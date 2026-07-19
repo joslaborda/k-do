@@ -106,6 +106,7 @@ export default function Photos() {
             file_type: 'image',
             file_name: file.name,
             taken_at: takenAt || new Date().toISOString(),
+            trip_members: trip?.members || [],
           });
           uploaded.push(file_url);
         } catch {

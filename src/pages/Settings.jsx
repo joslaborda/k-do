@@ -7,6 +7,7 @@ import { createPageUrl } from '@/utils';
 import { Loader2, Camera, ChevronRight } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
+import { syncTripMembers } from '@/lib/syncTripMembers';
 import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
@@ -197,11 +198,15 @@ function DeleteAccountRow({ user, profile }) {
     try {
       // 1. Salir de todos los viajes donde el usuario es miembro.
       const trips = await base44.entities.Trip.filter({ members: { $elemMatch: { $eq: user.email } } });
-      await Promise.all(trips.map(trip => {
+      await Promise.all(trips.map(async trip => {
         const newMembers = (trip.members || []).filter(e => e !== user.email);
         const newRoles = { ...(trip.roles || {}) };
         delete newRoles[user.email];
-        return base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
+        await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
+        // Revoca el acceso a los datos de cada viaje que abandona — si no, su
+        // email queda congelado en el trip_members de gastos/chat/documentos
+        // antiguos y conservaría acceso a ellos después de borrar la cuenta.
+        await syncTripMembers(trip.id, newMembers);
       }));
 
       // 2. Borrar favoritos guardados (privados, sin relación con viajes compartidos).

@@ -124,6 +124,7 @@ export default function TripsList() {
           country: normalizeCountry(stopCountries[i] || formData.country || ''),
           order: i,
           start_date: dates.start_date, end_date: dates.end_date,
+          trip_members: trip.members || [],
         });
       }
       return trip;

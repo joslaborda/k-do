@@ -233,7 +233,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
     const payload = { content: JSON.stringify(clean) };
     try {
       if (day?.id) await base44.entities.ItineraryDay.update(day.id, payload);
-      else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: '', ...payload, order: 0 });
+      else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: '', ...payload, order: 0, trip_members: trip?.members || [] });
       queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
     } finally { setSavingNotes(false); }
@@ -241,7 +241,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
   const saveTitle = async () => {
     if (day?.id) await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
-    else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: titleVal, content: '', order: 0 });
+    else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: titleVal, content: '', order: 0, trip_members: trip?.members || [] });
     queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
     setTitleEditing(false);
   };
@@ -273,7 +273,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
     setSavingNewDoc(true);
     try {
       const enriched = enrichTicketDataWithAutoLinks(data, itineraryDays || [], data.city_id);
-      await base44.entities.Ticket.create({ ...enriched, trip_id: tripId, user_id: userId, date: enriched.date || dayDate });
+      await base44.entities.Ticket.create({ ...enriched, trip_id: tripId, user_id: userId, date: enriched.date || dayDate, trip_members: trip?.members || [] });
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddingDoc(false);

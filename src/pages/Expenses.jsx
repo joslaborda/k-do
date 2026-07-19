@@ -1027,7 +1027,7 @@ export default function Expenses() {
   });
 
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount) }),
+    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || [] }),
     onError: () => toast({ title: t('expenses.saveError'), description: t('common.tryAgain'), variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });

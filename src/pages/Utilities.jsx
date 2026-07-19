@@ -336,7 +336,7 @@ function KodoCheck({ checked, onChange, essential = false }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Packing tab
 // ─────────────────────────────────────────────────────────────────────────────
-function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onExternalClose }) {
+function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, externalOpen, onExternalClose }) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -358,7 +358,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, externalOpen, onE
   });
 
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId }),
+    mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId, trip_members: tripMembers || [] }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
   
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
@@ -1111,7 +1111,7 @@ export default function Utilities() {
           />
         )}
         {activeTab === 'maleta' && (
-          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
+          <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} tripMembers={trip?.members} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
         {activeTab === 'requisitos' && (
           <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} skipVaccines={skipVaccines} />

@@ -242,7 +242,11 @@ export default function Documents() {
   }, [tripId, tickets.length, itineraryDays.length]);
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId }),
+    // trip_members: copia de trip.members en el momento de crear — el rls de
+    // Ticket compara contra esto (no puede comprobar la pertenencia al viaje
+    // directamente, base44 no soporta condiciones cross-entity). Se mantiene
+    // sincronizado por syncTripMembers() cada vez que cambia la membresía.
+    mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId, trip_members: trip?.members || [] }),
     onSuccess: (newDoc, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);

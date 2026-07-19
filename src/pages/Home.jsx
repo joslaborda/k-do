@@ -337,6 +337,7 @@ export default function Home() {
             currentUserEmail={currentUserEmail}
             currentUserId={currentUserId}
             myProfile={myProfile}
+            tripMembers={trip?.members}
           />
         )}
       </div>

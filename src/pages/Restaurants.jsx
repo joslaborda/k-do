@@ -714,9 +714,9 @@ export default function Restaurants() {
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Spot.create(d),
+    mutationFn: d => base44.entities.Spot.create({ ...d, trip_members: trip?.members || [] }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
-  
+
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const updateMutation = useMutation({

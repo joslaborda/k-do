@@ -367,7 +367,8 @@ export default function CityDetail() {
       ...data,
       city_id: cityId,
       trip_id: tripId,
-      order: days.length
+      order: days.length,
+      trip_members: trip?.members || [],
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
