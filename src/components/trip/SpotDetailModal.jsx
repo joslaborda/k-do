@@ -38,7 +38,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
 
   const { data: tripCities = [] } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'), // misma queryKey ['cities', tripId] que otras pantallas — unificado para no compartir caché con fetches distintos
     enabled: !!tripId,
     staleTime: 60000,
   });
