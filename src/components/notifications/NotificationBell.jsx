@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
@@ -95,7 +96,15 @@ function TripInviteModal({ notif, onClose, onAccept }) {
     setProcessing(false);
   };
 
-  return (
+  // Se renderiza con createPortal directo a document.body — antes se
+  // devolvía el JSX tal cual, así que el `position:fixed` quedaba atrapado
+  // dentro del contexto de apilamiento de algún ancestro (probable que la
+  // página use transform/overflow en algún wrapper), y aunque z-[250] es
+  // mayor que el z-50 de la barra de navegación inferior (Layout.jsx), el
+  // modal se pintaba por debajo de esa barra en vez de por encima — los
+  // botones de aceptar/rechazar quedaban tapados. InviteModal.jsx ya usaba
+  // este mismo patrón de portal y no tenía el problema.
+  return createPortal(
     <div className="fixed inset-0 z-[250] flex flex-col justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -155,7 +164,8 @@ function TripInviteModal({ notif, onClose, onAccept }) {
           </>
         ) : <div className="py-8 text-center text-sm text-muted-foreground">{translate('errors.generic')}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -240,12 +250,32 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
     else { setOpen(true); markAll(); }
   };
 
-  const handleNavigate = (n) => {
+  const handleNavigate = async (n) => {
     // Abrir el modal de invitación debe cerrar el panel de notificaciones —
     // antes se dejaba `open` en true, y como el panel (z-[200]) queda por
     // encima del modal (z-[100]) el panel tapaba el propio modal en vez de
     // desaparecer.
-    if (n.type === 'trip_invite') { doClose(); setInviteNotif(n); return; }
+    if (n.type === 'trip_invite') {
+      doClose();
+      // Si la invitación ya se aceptó por otra vía (p. ej. el enlace del
+      // email) la notificación en la app se queda igual, apuntando a la
+      // misma invitación — antes eso siempre reabría el modal de "¿te unes
+      // al viaje?" aunque ya fueras miembro, mostrando de nuevo botones de
+      // aceptar/rechazar que ya no pintaban nada. Se comprueba la
+      // membresía antes de decidir: si ya eres miembro, se abre el viaje
+      // directamente.
+      if (n.trip_id && userEmail) {
+        try {
+          const t = await base44.entities.Trip.get(n.trip_id);
+          if (t?.members?.includes(userEmail.toLowerCase())) {
+            navigate(createPageUrl('Home') + `?trip_id=${n.trip_id}`);
+            return;
+          }
+        } catch { /* si falla la comprobación, se cae al modal de siempre */ }
+      }
+      setInviteNotif(n);
+      return;
+    }
     doClose();
     if (!n.trip_id) return;
     const extra = (() => { try { return n.ref_extra ? JSON.parse(n.ref_extra) : {}; } catch { return {}; } })();
