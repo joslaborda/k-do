@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { sendTripInvite } from '@/lib/invites';
-import { syncTripMembers } from '@/lib/syncTripMembers';
+import { removeTripMember, setTripMemberRole } from '@/lib/tripMembers';
 import { useTranslation } from 'react-i18next';
 
 export default function MembersPanel({
@@ -42,33 +42,32 @@ export default function MembersPanel({
     return profiles[email] || null;
   };
 
+  // Cambiar rol y expulsar corren en el backend (base44/functions/
+  // manageTripMember), no aquí. Motivo: el rls de Trip.update no puede
+  // exigir "solo si eres admin" para tocar members/roles sin también
+  // bloquear a cualquier miembro normal que solo quiere renombrar el viaje o
+  // salir de él — con Trip.update() directo desde el cliente, cualquier
+  // miembro (viewer incluido) podía llamarlo a mano y auto-promocionarse a
+  // admin o expulsar a otros. La función valida server-side que quien llama
+  // sea admin antes de tocar la membresía de otra persona.
   const updateTripMutation = useMutation({
-    mutationFn: data => base44.entities.Trip.update(trip.id, data),
+    mutationFn: ({ email, role }) => setTripMemberRole(trip.id, email, role),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['trip', trip.id] }),
+    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.roleChangeError'), variant: 'destructive' }),
   });
 
   // Expulsar miembro: MembersPanel existía en el proyecto pero no estaba
   // conectado a ninguna pantalla, y aunque se conectara solo permitía cambiar
   // el rol — no había forma de sacar a alguien del viaje sin tocar la BD a
   // mano. Igual que con el rol, no se puede expulsar al creador del viaje ni
-  // a uno mismo.
+  // a uno mismo (la función backend lo revalida igualmente).
   const removeMemberMutation = useMutation({
-    mutationFn: async (email) => {
-      const newMembers = members.filter(e => e !== email);
-      const newRoles = { ...roles };
-      delete newRoles[email];
-      await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
-      // Revoca el acceso del expulsado a los datos ya existentes del viaje
-      // (gastos, chat, documentos...) — sin esto seguiría viéndolos para
-      // siempre, porque su email quedaría congelado en el trip_members de
-      // cada registro desde antes de la expulsión.
-      await syncTripMembers(trip.id, newMembers);
-    },
+    mutationFn: (email) => removeTripMember(trip.id, email),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
       setMemberToRemove(null);
     },
-    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.removeError') }),
+    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.removeError'), variant: 'destructive' }),
   });
 
   const handleInvite = async () => {
@@ -143,7 +142,7 @@ export default function MembersPanel({
       toast({ title: t('membersPanel.notAllowed'), description: t('membersPanel.needOneAdmin'), variant: 'destructive' });
       return;
     }
-    updateTripMutation.mutate({ roles: { ...roles, [email]: newRole } });
+    updateTripMutation.mutate({ email, role: newRole });
   };
 
   return (
