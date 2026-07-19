@@ -33,18 +33,20 @@ const AuthenticatedApp = () => {
     }
   }, [isLoadingAuth, authError]);
 
-  // Migración silenciosa: añadir email a UserProfile si no lo tiene
+  // Migración silenciosa: mantener UserProfile.email en minúsculas y al día.
   useEffect(() => {
     if (!authUser?.id || !authUser?.email) return;
+    const correctEmail = authUser.email.toLowerCase();
     base44.entities.UserProfile.filter({ user_id: authUser.id }).then(results => {
       const prof = results?.[0];
-      if (prof && !prof.email) {
-        // invites.js/NotificationBell/Invites.jsx siempre comparan y filtran
-        // email en minúsculas — sin normalizar aquí, un perfil backfileado
-        // con el email tal cual lo da el proveedor de auth (con mayúsculas)
-        // no coincidía con esas búsquedas, y quien invitaba a este usuario
-        // nunca le generaba notificación in-app aunque sí tuviera perfil.
-        base44.entities.UserProfile.update(prof.id, { email: authUser.email.toLowerCase() }).catch(() => {});
+      // invites.js/NotificationBell/Invites.jsx siempre comparan y filtran
+      // email en minúsculas — antes esto solo corregía perfiles SIN email
+      // (`!prof.email`), pero un perfil que ya tuviera el email guardado con
+      // mayúsculas (p. ej. backfileado antes de este fix, o si el proveedor
+      // de auth lo cambia) se quedaba mal para siempre: la condición nunca
+      // volvía a cumplirse. Se corrige cualquier desajuste, no solo el vacío.
+      if (prof && prof.email !== correctEmail) {
+        base44.entities.UserProfile.update(prof.id, { email: correctEmail }).catch(() => {});
       }
     }).catch(() => {});
   }, [authUser?.id, authUser?.email]);
