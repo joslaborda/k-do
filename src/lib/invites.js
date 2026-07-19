@@ -58,14 +58,23 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
     await base44.integrations.Core.SendEmail({
       to: normalizedEmail,
       subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
+      // SendEmail de base44 solo admite body de texto plano (confirmado en su
+      // documentación) — no hay forma de mandar un <a href> real. Entre <> es
+      // la forma estándar (RFC 3986) de delimitar una URL suelta en texto
+      // plano; Gmail/Outlook/Apple Mail la reconocen igual de bien que sin
+      // ellos, pero evita que un cliente de correo más torpe la confunda con
+      // el texto de alrededor y no la subraye como enlace.
       body: `Hola,
 
 ${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
 
-Haz clic aquí para aceptar la invitación:
-${inviteUrl}
+Para aceptar la invitación, abre este enlace:
 
-Si aún no tienes cuenta en Kōdo, regístrate con este email (${normalizedEmail}) y la invitación aparecerá automáticamente.
+<${inviteUrl}>
+
+Si el enlace no se abre solo al tocarlo, cópialo y pégalo en el navegador.
+
+Si aún no tienes cuenta en Kōdo, el mismo enlace te lleva a crearla con este email (${normalizedEmail}) — la invitación aparecerá automáticamente en cuanto entres.
 
 ¡Buen viaje! 🧳`
     });
