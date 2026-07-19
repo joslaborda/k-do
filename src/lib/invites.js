@@ -1,6 +1,5 @@
 import { base44 } from '@/api/base44Client';
 import { notify } from '@/lib/notifications';
-import { syncTripMembers } from '@/lib/syncTripMembers';
 
 export function generateInviteToken() {
   return Math.random().toString(36).substring(2, 15) +
@@ -98,72 +97,35 @@ Si aún no tienes cuenta en Kōdo, regístrate con este email (${normalizedEmail
   return { invite, emailSent, inviteUrl };
 }
 
-export async function acceptTripInvite(inviteId, inviteToken, tripId, userEmail) {
-  const invite = await base44.entities.TripInvite.get(inviteId);
-
-  if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
-    throw new Error('Invitación inválida o expirada');
-  }
-
-  // Seguridad: el enlace de invitación está atado al email invitado.
-  // Evita que un enlace reenviado deje entrar a una cuenta distinta.
-  const normalizedUserEmail = (userEmail || '').toLowerCase();
-  if (invite.email && invite.email.toLowerCase() !== normalizedUserEmail) {
-    const err = new Error(`Esta invitación es para ${invite.email}. Inicia sesión con esa cuenta para unirte al viaje.`);
-    err.code = 'email_mismatch';
+// La aceptación en sí corre en el backend (base44/functions/acceptTripInvite),
+// no aquí. Motivo: para poder cerrar Trip.update a "solo miembros actuales",
+// esta era la única operación que necesitaba saltarse esa regla (el invitado
+// se añade a sí mismo justo antes de ser miembro) — y de paso, la sincronización
+// de trip_members en los datos ya existentes del viaje necesita permisos de
+// servicio para no depender de que el nuevo miembro ya figure en cada registro
+// (que es justo lo que está intentando arreglar). El email tampoco lo manda
+// el cliente: lo toma la función de la sesión autenticada, así no se puede
+// aceptar una invitación ajena falseando el email.
+export async function acceptTripInvite(inviteId, inviteToken) {
+  let result;
+  try {
+    result = await base44.functions.invoke('acceptTripInvite', { inviteId, inviteToken });
+  } catch (e) {
+    // Algunas versiones del SDK lanzan en vez de resolver con el error en el body.
+    const serverError = e?.response?.data?.error || e?.data?.error;
+    const err = new Error(serverError || e?.message || 'No se pudo unir al viaje.');
+    const code = e?.response?.data?.code || e?.data?.code;
+    if (code) err.code = code;
     throw err;
   }
 
-  await base44.entities.TripInvite.update(inviteId, {
-    status: 'accepted',
-    responded_date: new Date().toISOString()
-  });
-
-  // Añadirse a `members` es leer→modificar→escribir sobre un array completo. Si dos
-  // invitados aceptan a la vez, el segundo escribe su copia (que no incluye al
-  // primero) y lo borra del viaje: el primero aceptó, su invitación quedó marcada
-  // como usada, y se queda fuera sin enterarse y sin poder reintentar.
-  // Se relee tras escribir y se reintenta hasta confirmar que está dentro.
-  const roleHierarchy = { admin: 3, editor: 2, viewer: 1 };
-
-  for (let intento = 0; intento < 4; intento++) {
-    const trip = await base44.entities.Trip.get(tripId);
-    const members = trip.members || [];
-    const roles = trip.roles || {};
-
-    const inviteRole = invite.role || 'editor';
-    const existingRole = roles[normalizedUserEmail];
-    // Solo asignar rol si no tiene uno más alto ya
-    const finalRole = existingRole && (roleHierarchy[existingRole] || 0) >= (roleHierarchy[inviteRole] || 0)
-      ? existingRole
-      : inviteRole;
-
-    // Ya está dentro con el rol correcto: nada que hacer.
-    if (members.includes(normalizedUserEmail) && roles[normalizedUserEmail] === finalRole) return trip;
-
-    const newMembers = members.includes(normalizedUserEmail) ? members : [...members, normalizedUserEmail];
-    const newRoles = { ...roles, [normalizedUserEmail]: finalRole };
-
-    await base44.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
-
-    // Releer: si otro aceptó a la vez, su escritura pudo pisar la nuestra.
-    const check = await base44.entities.Trip.get(tripId);
-    if ((check.members || []).includes(normalizedUserEmail)) {
-      // El nuevo miembro necesita ver el historial del viaje (gastos, chat,
-      // documentos...) desde ya, no solo lo que se cree a partir de ahora —
-      // por eso se sincroniza trip_members en todos los registros existentes.
-      // Si falla, no se revierte la entrada al viaje: mejor dentro con acceso
-      // parcial (se puede reintentar) que fuera del todo.
-      syncTripMembers(tripId, check.members).catch(() => {});
-      return check;
-    }
-
-    // Espera creciente para no volver a chocar con el mismo.
-    await new Promise(r => setTimeout(r, 120 * (intento + 1)));
+  const data = result?.data ?? result;
+  if (data?.error) {
+    const err = new Error(data.error);
+    if (data.code) err.code = data.code;
+    throw err;
   }
-
-  // Cuatro intentos y sigue sin aparecer: mejor fallar que dejarle creer que entró.
-  throw new Error('No se pudo unir al viaje. Vuelve a intentarlo en unos segundos.');
+  return data.trip;
 }
 
 export async function declineTripInvite(inviteId, inviteToken) {
