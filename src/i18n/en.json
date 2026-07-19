@@ -1097,7 +1097,8 @@
       "tripCount_one": "{{count}} trip",
       "tripCount_other": "{{count}} trips",
       "cancelInvite": "Withdraw",
-      "cancelError": "Couldn't withdraw the invitation"
+      "cancelError": "Couldn't withdraw the invitation",
+      "resolveEmailError": "Couldn't resolve this user's email. Please try again."
     },
     "page": {
       "acceptError": "Couldn't accept the invitation",

@@ -1097,7 +1097,8 @@
       "tripCount_one": "{{count}} viaje",
       "tripCount_other": "{{count}} viajes",
       "cancelInvite": "Retirar",
-      "cancelError": "No se pudo retirar la invitación"
+      "cancelError": "No se pudo retirar la invitación",
+      "resolveEmailError": "No se pudo resolver el email de este usuario. Inténtalo de nuevo."
     },
     "page": {
       "acceptError": "No se pudo aceptar la invitación",
