@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { notify } from '@/lib/notifications';
+import { getLanguage } from '@/i18n/index.js';
 
 export function generateInviteToken() {
   return Math.random().toString(36).substring(2, 15) +
@@ -52,21 +53,41 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
   // URL de aceptación
   const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
 
-  // Enviar email — capturar error si base44 no permite externos
+  // Enviar email — Resend primero (HTML de verdad, con un <a href> real y
+  // clicable), vía la función de backend sendInviteEmail. El SendEmail
+  // nativo de base44 solo admite texto plano: probamos ya que aunque la URL
+  // llegue íntegra como texto suelto, ningún cliente la convierte sola en
+  // enlace clicable (Outlook la muestra en texto normal). Si Resend aún no
+  // está configurado (falta RESEND_API_KEY en Secretos, o el dominio no está
+  // verificado), se cae al SendEmail de texto plano como red de seguridad
+  // para no dejar la invitación sin ningún correo mientras se termina de
+  // montar Resend.
   let emailSent = false;
   try {
-    await base44.integrations.Core.SendEmail({
+    const result = await base44.functions.invoke('sendInviteEmail', {
       to: normalizedEmail,
-      subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
-      // SendEmail de base44 solo admite body de texto plano (confirmado en su
-      // documentación) — no hay forma de mandar un <a href> real. Un intento
-      // previo envolvía la URL entre <> (delimitador RFC 3986 para texto
-      // plano), pero el pipeline de envío/renderizado (Outlook lo confirma)
-      // trata algo con pinta de "<https://...>" como una etiqueta HTML
-      // desconocida y la descarta entera — el enlace desaparecía del todo.
-      // Por eso va como texto plano suelto, sin ningún carácter que pueda
-      // confundirse con marcado.
-      body: `Hola,
+      tripName,
+      inviterName,
+      inviterEmail,
+      inviteUrl,
+      destination: trip?.destination,
+      country: trip?.country,
+      startDate: trip?.start_date,
+      endDate: trip?.end_date,
+      // Idioma activo de quien invita — el destinatario a menudo no tiene
+      // cuenta todavía, así que no hay otro idioma que consultar.
+      lang: getLanguage()
+    });
+    const data = result?.data ?? result;
+    if (data?.error) throw new Error(data.error);
+    emailSent = true;
+  } catch (e) {
+    console.warn('[sendTripInvite] Resend falló, usando SendEmail de reserva:', e?.message);
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: normalizedEmail,
+        subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
+        body: `Hola,
 
 ${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
 
@@ -79,10 +100,11 @@ Si el enlace no se abre solo al tocarlo, cópialo y pégalo en el navegador.
 Si aún no tienes cuenta en Kōdo, el mismo enlace te lleva a crearla con este email (${normalizedEmail}) — la invitación aparecerá automáticamente en cuanto entres.
 
 ¡Buen viaje! 🧳`
-    });
-    emailSent = true;
-  } catch (e) {
-    console.warn('[sendTripInvite] Email no enviado:', e?.message);
+      });
+      emailSent = true;
+    } catch (e2) {
+      console.warn('[sendTripInvite] Email no enviado (ni Resend ni SendEmail):', e2?.message);
+    }
   }
 
   // Si el usuario ya existe en Kōdo, crear notificación in-app
