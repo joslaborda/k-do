@@ -2,53 +2,49 @@ import { base44 } from '@/api/base44Client';
 import { notify } from '@/lib/notifications';
 import { getLanguage } from '@/i18n/index.js';
 
+// Ya no se usa para crear invitaciones (eso ahora genera su propio token
+// dentro de createTripInvite, en el backend). Se deja exportada por si algo
+// más la importa, pero no participa en la seguridad del flujo de invitación.
 export function generateInviteToken() {
   return Math.random().toString(36).substring(2, 15) +
          Math.random().toString(36).substring(2, 15);
 }
 
 export async function sendTripInvite({ tripId, email, role, tripName, inviterEmail, inviterName }) {
-  const inviteToken = generateInviteToken();
   const normalizedEmail = email.trim().toLowerCase();
-  // invited_by se compara contra currentUser.email en las reglas de seguridad
-  // (rls) de TripInvite — si queda con mayúsculas mezcladas, esa comparación
-  // deja de coincidir y el invitador pierde acceso a su propia invitación.
-  const normalizedInviter = (inviterEmail || '').trim().toLowerCase();
 
-  // Verificar que el usuario no sea ya miembro del viaje
-  const trip = await base44.entities.Trip.get(tripId);
-  if (trip?.members?.includes(normalizedEmail)) {
-    throw new Error('Este usuario ya es miembro del viaje');
-  }
+  // Solo para rellenar el email bonito (destino/fechas) — ya no decide nada
+  // de seguridad, eso lo hace createTripInvite server-side. Si fallara (p.
+  // ej. el propio Trip.read ahora exige ser miembro), el email se manda
+  // igual con estos campos vacíos gracias al optional chaining de abajo.
+  const trip = await base44.entities.Trip.get(tripId).catch(() => null);
 
-  // Crear o reusar invitación pending
-  const existing = await base44.entities.TripInvite.filter({
-    trip_id: tripId,
-    email: normalizedEmail,
-    status: 'pending'
-  });
-
-  let invite;
-  if (existing.length > 0) {
-    // Reinvitar con un rol distinto (p. ej. de viewer a editor) debe actualizar
-    // el rol de la invitación pendiente, no solo el token — si no, quien acepte
-    // se queda con el rol de la primera invitación aunque se le haya reinvitado
-    // explícitamente con otro.
-    invite = await base44.entities.TripInvite.update(existing[0].id, {
-      invite_token: inviteToken,
-      invited_by: normalizedInviter,
-      role: role || 'editor'
-    });
-  } else {
-    invite = await base44.entities.TripInvite.create({
-      trip_id: tripId,
+  // Crear (o renovar si ya había una pendiente) la invitación en el backend,
+  // no aquí. TripInvite.create está cerrado a "false" en el rls (ver
+  // base44/entities/TripInvite.jsonc) precisamente porque crearla desde el
+  // cliente permitía a cualquier usuario autenticado invitarse a sí mismo a
+  // CUALQUIER viaje ajeno con un trip_id cualquiera, sin ser miembro. La
+  // función createTripInvite valida server-side que quien invita ya es
+  // miembro del viaje, y decide el email/invited_by/rol final — el rol que
+  // se manda aquí es solo una preferencia, no una concesión.
+  let createResult;
+  try {
+    createResult = await base44.functions.invoke('createTripInvite', {
+      tripId,
       email: normalizedEmail,
       role: role || 'editor',
-      status: 'pending',
-      invite_token: inviteToken,
-      invited_by: normalizedInviter
     });
+  } catch (e) {
+    // Igual que en acceptTripInvite: algunas versiones del SDK lanzan en vez
+    // de resolver con el error en el body (p. ej. el 403 de "no eres
+    // miembro de este viaje").
+    const serverError = e?.response?.data?.error || e?.data?.error;
+    throw new Error(serverError || e?.message || 'No se pudo crear la invitación.');
   }
+  const data = createResult?.data ?? createResult;
+  if (data?.error) throw new Error(data.error);
+  const invite = data.invite;
+  const inviteToken = invite.invite_token;
 
   // URL de aceptación
   const inviteUrl = `${window.location.origin}/Invites?token=${inviteToken}`;
