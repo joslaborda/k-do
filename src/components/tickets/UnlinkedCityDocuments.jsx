@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
  * Shows documents associated to a city but WITHOUT an itinerary_day_id.
  * These are documents with city_id set but no specific day assigned.
  */
-export default function UnlinkedCityDocuments({ cityId, tripId, currentUserEmail }) {
+export default function UnlinkedCityDocuments({ cityId, tripId, currentUserEmail, currentUserId }) {
   const { t } = useTranslation();
   const { data: allTickets = [] } = useQuery({
     queryKey: ['tickets', tripId],
@@ -20,7 +20,11 @@ export default function UnlinkedCityDocuments({ cityId, tripId, currentUserEmail
   const unlinkedDocs = allTickets.filter(t => {
     if (t.city_id !== cityId || t.itinerary_day_id) return false;
     const vis = t.visibility || 'personal';
-    if (vis === 'personal') return t.created_by === currentUserEmail;
+    // t.user_id es el id del usuario, no un email — comparar solo por
+    // created_by hacía que un documento "solo yo" creado sin created_by (o
+    // con un created_by que ya no coincide, p.ej. tras cambiar de email)
+    // desapareciera para su propio dueño. Mismo fix que ya tiene DayDocuments.
+    if (vis === 'personal') return t.user_id === currentUserId || t.created_by === currentUserEmail;
     if (vis === 'selected_users') return t.created_by === currentUserEmail || (t.shared_with || []).includes(currentUserEmail);
     return true;
   });
