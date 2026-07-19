@@ -43,16 +43,30 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
     staleTime: 60000,
   });
 
-  // El spot ya tiene city_id fijo desde que se creó. Si aquí se ofrecen fechas
-  // de otra ciudad del viaje, el spot queda con una fecha que no cuadra con su
-  // city_id y desaparece de las vistas de itinerario (que filtran por ambos a
-  // la vez). Se filtra a los días de la propia ciudad del spot.
+  // Si el viaje visita la misma ciudad más de una vez (varios registros City
+  // con el mismo nombre), agrupar por NOMBRE en vez del city_id exacto de la
+  // estancia en la que se creó el spot — si no, solo se podían elegir los
+  // días de la primera visita. Al guardar (ver handleSave) se re-ancla el
+  // spot a la estancia que de verdad contiene la fecha elegida, para que no
+  // desaparezca de las vistas de itinerario (que exigen que assigned_date Y
+  // city_id coincidan).
   const tripDayOptions = useMemo(() => {
     const allDays = getTripDays(tripCities);
-    if (!spot?.city_id) return allDays;
-    const own = allDays.filter(d => d.cityId === spot.city_id);
-    return own.length > 0 ? own : allDays;
-  }, [tripCities, spot?.city_id]);
+    const spotCityName = spot?.city_name || tripCities.find(c => c.id === spot?.city_id)?.name;
+    if (!spotCityName) {
+      if (!spot?.city_id) return allDays;
+      const own = allDays.filter(d => d.cityId === spot.city_id);
+      return own.length > 0 ? own : allDays;
+    }
+    const sameCity = allDays.filter(d => d.city === spotCityName);
+    return sameCity.length > 0 ? sameCity : allDays;
+  }, [tripCities, spot?.city_id, spot?.city_name]);
+
+  const resolveCityIdForDate = (dateStr) => {
+    if (!dateStr) return null;
+    const c = tripCities.find(c => c.start_date && c.end_date && dateStr >= c.start_date && dateStr <= c.end_date);
+    return c?.id || null;
+  };
 
   useEffect(() => {
     if (spot) {
@@ -76,10 +90,13 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
     const nextDate = 'assignedDate' in overrides ? overrides.assignedDate : assignedDate;
     setSaving(true);
     try {
+      const resolvedCityId = nextDate ? resolveCityIdForDate(nextDate) : null;
+      const cityIdUpdate = resolvedCityId && resolvedCityId !== spot?.city_id ? { city_id: resolvedCityId } : {};
       await base44.entities.Spot.update(spot.id, {
         notes: notes.trim() || null,
         assigned_time: time || null,
         assigned_date: nextDate || null,
+        ...cityIdUpdate,
       });
       if (queryClient && tripId) {
         queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
