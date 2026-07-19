@@ -662,6 +662,19 @@ export default function Restaurants() {
   const [stateFilter, setStateFilter] = useState('all');
   const [assignDateSpot, setAssignDateSpot] = useState(null); // spot to assign date after saving
   const [selectedCity, setSelectedCity] = useState('');
+  // Los chips de "Lima", "Oxapampa"... antes solo guardaban el NOMBRE elegido
+  // (selectedCity). Si el viaje repite ciudad (varias paradas con el mismo
+  // nombre), eso rompía dos cosas: (a) el chip "seleccionado" se comparaba por
+  // nombre, así que las DOS paradas "Lima" se pintaban resaltadas a la vez al
+  // tocar cualquiera de ellas; y (b) los spots que se guardaban (buscados o
+  // creados a mano) nunca usaban el id de la parada que el chip representaba
+  // — se etiquetaban con `cityId` (la ciudad "activa hoy" según la fecha,
+  // fija) sin importar qué chip de Lima se hubiera tocado. selectedCityId
+  // guarda el id exacto de la parada elegida para que ambas cosas apunten a
+  // la parada correcta.
+  const [selectedCityId, setSelectedCityId] = useState(null);
+  const effectiveCityId = selectedCityId || cityId;
+  const effectiveCityName = selectedCity || city;
   // Renombrado de `toast` a `savedToast`: el nombre `toast` tapaba la función
   // useToast() de más abajo — los onError de las mutaciones de Spot llamaban
   // a este estado como si fuera función y crasheaban con "toast is not a
@@ -678,8 +691,8 @@ export default function Restaurants() {
   const toastTimer = useRef(null);
 
   useEffect(() => {
-    if (activeCity?.name && !selectedCity) setSelectedCity(activeCity.name);
-  }, [activeCity?.name]);
+    if (activeCity?.name && !selectedCity) { setSelectedCity(activeCity.name); setSelectedCityId(activeCity.id || null); }
+  }, [activeCity?.name, activeCity?.id]);
 
   // Queries
   const { data: spots = [], isLoading: loadingSpots } = useQuery({
@@ -801,7 +814,7 @@ export default function Restaurants() {
   };
 
   const baseData = extra => ({
-    trip_id: tripId || undefined, city_id: cityId||undefined, city_name: city, country: normalizeCountry(country),
+    trip_id: tripId || undefined, city_id: effectiveCityId||undefined, city_name: effectiveCityName, country: normalizeCountry(country),
     visibility: 'trip_members', visited: false,
     created_by: user?.email, created_by_user_id: user?.id,
     creator_username: myProfile?.username||'',
@@ -821,8 +834,8 @@ export default function Restaurants() {
     setSavingId(place.id);
     try {
       const created = await createMutation.mutateAsync({
-        trip_id: tripId || undefined, city_id: cityId||undefined,
-        city_name: selectedCity || city, country: normalizeCountry(country),
+        trip_id: tripId || undefined, city_id: effectiveCityId||undefined,
+        city_name: effectiveCityName, country: normalizeCountry(country),
         title: place.name, type: place.type || 'sight',
         address: place.address || '', lat: place.lat, lng: place.lng,
         osm_id: place.id || null, source: 'osm',
@@ -864,8 +877,8 @@ export default function Restaurants() {
     setSavingId('import_' + savedSpot.id);
     try {
       const created = await createMutation.mutateAsync({
-        trip_id: tripId, city_id: cityId || undefined,
-        city_name: selectedCity || city, country: normalizeCountry(country),
+        trip_id: tripId, city_id: effectiveCityId || undefined,
+        city_name: effectiveCityName, country: normalizeCountry(country),
         title: savedSpot.title, type: savedSpot.type || 'custom',
         address: savedSpot.address || '', lat: savedSpot.lat, lng: savedSpot.lng,
         notes: savedSpot.notes || '', image_url: savedSpot.image_url || null,
@@ -889,8 +902,8 @@ export default function Restaurants() {
     try {
       // Save community spot WITHOUT overriding created_by — preserve original author
       const created = await createMutation.mutateAsync({
-        trip_id: tripId || undefined, city_id: cityId || undefined,
-        city_name: selectedCity || city, country: normalizeCountry(country),
+        trip_id: tripId || undefined, city_id: effectiveCityId || undefined,
+        city_name: effectiveCityName, country: normalizeCountry(country),
         title: spot.title, type: spot.type, address: spot.address || '',
         lat: spot.lat, lng: spot.lng, notes: spot.notes || '',
         visibility: 'trip_members', visited: false,
@@ -1054,9 +1067,13 @@ export default function Restaurants() {
             {!searchQuery && tripCities.length > 1 && (
               <div className="flex flex-wrap gap-2">
                 {tripCities.map(c => (
-                  <button key={c.id} onClick={() => setSelectedCity(selectedCity === c.name ? '' : c.name)}
+                  <button key={c.id} onClick={() => {
+                      const isSame = selectedCityId === c.id;
+                      setSelectedCity(isSame ? '' : c.name);
+                      setSelectedCityId(isSame ? null : c.id);
+                    }}
                     className={`text-sm px-4 py-1.5 rounded-full border font-medium transition-colors flex-shrink-0 ${
-                      selectedCity === c.name
+                      selectedCityId === c.id
                         ? 'bg-primary text-white border-primary'
                         : 'bg-card border-border text-foreground hover:border-primary/40'
                     }`}>
@@ -1075,7 +1092,7 @@ export default function Restaurants() {
                       value={customCity}
                       onChange={e => setCustomCity(e.target.value)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter' && customCity.trim()) { setSelectedCity(customCity.trim()); setShowCityInput(false); setCustomCity(''); }
+                        if (e.key === 'Enter' && customCity.trim()) { setSelectedCity(customCity.trim()); setSelectedCityId(null); setShowCityInput(false); setCustomCity(''); }
                         if (e.key === 'Escape') { setShowCityInput(false); setCustomCity(''); }
                       }}
                       placeholder={t('spots.cityPlaceholder')}
