@@ -131,23 +131,48 @@ Deno.serve(async (req) => {
 
     const infoBox = infoRows
       ? `<tr><td style="padding:0 32px 22px;">
-           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fdfbf9;border:1px solid #e2ddd7;border-radius:10px;">
-             <tr><td style="padding:14px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#78716c;">${infoRows}</td></tr>
+           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#fdfbf9" style="background-color:#fdfbf9;border:1px solid #e2ddd7;border-radius:10px;">
+             <tr><td class="kodo-muted" style="padding:14px 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#78716c;">${infoRows}</td></tr>
            </table>
          </td></tr>`
       : "";
 
-    const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f6f3;padding:32px 16px;">
+    // Nota sobre modo oscuro: sin estas etiquetas, clientes como Outlook.com
+    // invierten automáticamente los colores del email (fondo claro → negro,
+    // texto oscuro → blanco), rompiendo el diseño por completo — es lo que
+    // se vio en la primera prueba real. El meta "color-scheme" le dice a los
+    // clientes que lo respetan que este email es solo para modo claro, y las
+    // reglas [data-ogsc]/[data-ogsb] son el hook específico que usa
+    // Outlook.com cuando ignora ese meta y fuerza su propio modo oscuro. El
+    // atributo bgcolor (además del style) es redundancia a propósito: cada
+    // motor de email respeta uno u otro de forma inconsistente.
+    const html = `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
+<style>
+  :root { color-scheme: light only; supported-color-schemes: light only; }
+  [data-ogsc] .kodo-bg, [data-ogsb] .kodo-bg { background-color:#f8f6f3 !important; }
+  [data-ogsc] .kodo-card, [data-ogsb] .kodo-card { background-color:#ffffff !important; }
+  [data-ogsc] .kodo-text, [data-ogsb] .kodo-text { color:#1b1917 !important; }
+  [data-ogsc] .kodo-muted, [data-ogsb] .kodo-muted { color:#78716c !important; }
+</style>
+</head>
+<body class="kodo-bg" style="margin:0;padding:0;background-color:#f8f6f3;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8f6f3" class="kodo-bg" style="background-color:#f8f6f3;padding:32px 16px;">
 <tr><td align="center">
-<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#ffffff;border:1px solid #e8e3dc;border-radius:12px;">
+<table role="presentation" width="480" cellpadding="0" cellspacing="0" bgcolor="#ffffff" class="kodo-card" style="max-width:480px;width:100%;background-color:#ffffff;border:1px solid #e8e3dc;border-radius:12px;">
 
 <tr><td style="padding:26px 32px;text-align:center;border-bottom:1px solid #f0ede8;">
-<span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:bold;color:#1b1917;">K<span style="color:#c2410c;">&#333;</span>do</span>
+<span class="kodo-text" style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:bold;color:#1b1917;">K<span style="color:#c2410c;">&#333;</span>do</span>
 </td></tr>
 
 <tr><td style="padding:28px 32px 8px;text-align:center;">
-<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#78716c;">${safeInviter} ${s.invitedBy}</p>
-<h1 style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#1b1917;">${safeTrip}</h1>
+<p class="kodo-muted" style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#78716c;">${safeInviter} ${s.invitedBy}</p>
+<h1 class="kodo-text" style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#1b1917;">${safeTrip}</h1>
 </td></tr>
 
 ${infoBox}
@@ -157,17 +182,19 @@ ${infoBox}
 </td></tr>
 
 <tr><td style="padding:16px 32px 0;text-align:center;">
-<p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#9a9490;">${s.linkHint}</p>
+<p class="kodo-muted" style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#9a9490;">${s.linkHint}</p>
 <p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#c2410c;word-break:break-all;">${inviteUrl}</p>
 </td></tr>
 
 <tr><td style="padding:16px 32px 26px;border-top:1px solid #f0ede8;">
-<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#9a9490;line-height:1.6;">${s.noAccount}</p>
+<p class="kodo-muted" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#9a9490;line-height:1.6;">${s.noAccount}</p>
 </td></tr>
 
 </table>
 </td></tr>
-</table>`;
+</table>
+</body>
+</html>`;
 
     const subject = lang === "en"
       ? `${inviterName || inviterEmail || "Someone"} ${s.subjectVerb} "${tripName || ""}" ${s.inKodo} ✈️`
