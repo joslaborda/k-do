@@ -39,7 +39,12 @@ const AuthenticatedApp = () => {
     base44.entities.UserProfile.filter({ user_id: authUser.id }).then(results => {
       const prof = results?.[0];
       if (prof && !prof.email) {
-        base44.entities.UserProfile.update(prof.id, { email: authUser.email }).catch(() => {});
+        // invites.js/NotificationBell/Invites.jsx siempre comparan y filtran
+        // email en minúsculas — sin normalizar aquí, un perfil backfileado
+        // con el email tal cual lo da el proveedor de auth (con mayúsculas)
+        // no coincidía con esas búsquedas, y quien invitaba a este usuario
+        // nunca le generaba notificación in-app aunque sí tuviera perfil.
+        base44.entities.UserProfile.update(prof.id, { email: authUser.email.toLowerCase() }).catch(() => {});
       }
     }).catch(() => {});
   }, [authUser?.id, authUser?.email]);
