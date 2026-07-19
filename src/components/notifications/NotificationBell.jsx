@@ -66,7 +66,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
     if (!invite || !currentUser?.email) return;
     setProcessing(true);
     try {
-      await acceptTripInvite(invite.id, invite.invite_token, invite.trip_id, currentUser.email);
+      await acceptTripInvite(invite.id, invite.invite_token);
       try {
         const myProfArr = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
         const myProf = myProfArr[0] || null;
