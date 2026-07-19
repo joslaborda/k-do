@@ -7,6 +7,8 @@
     "close": "Cerrar",
     "edit": "Editar",
     "delete": "Eliminar",
+    "expand": "Ver más",
+    "collapse": "Ver menos",
     "add": "Añadir",
     "search": "Buscar",
     "loading": "Cargando...",

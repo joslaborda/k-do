@@ -7,6 +7,8 @@
     "close": "Close",
     "edit": "Edit",
     "delete": "Delete",
+    "expand": "Show more",
+    "collapse": "Show less",
     "add": "Add",
     "search": "Search",
     "loading": "Loading...",
