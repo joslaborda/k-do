@@ -159,6 +159,14 @@ export default function ExpenseForm({
     if (!isSameCurrency) {
       if (fxInfo) {
         amountBase = fxInfo.amountConverted; fxRate = fxInfo.rate; fxSource = fxInfo.source; fxTimestamp = fxInfo.fetchedAt;
+        // fxInfo lo precalcula el useEffect de arriba — si las 3 fuentes de
+        // cambio fallaron, viene con rate:1/source:'unavailable' con la misma
+        // forma que una conversión real. Sin este aviso, un gasto de 500 USD
+        // se guardaba como 500 en la moneda base (p. ej. JPY, ~75.000) sin que
+        // nadie se enterara; la rama manual de abajo sí lo avisaba.
+        if (fxInfo.source === 'unavailable') {
+          toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableDesc', { from: currency, to: baseCurrency }), variant: 'destructive' });
+        }
       } else {
         try {
           const r = await convertAmount(parseFloat(form.amount), currency, baseCurrency, form.date || null);
