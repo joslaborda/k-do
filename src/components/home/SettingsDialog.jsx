@@ -46,6 +46,13 @@ function SettingsDialog({
 
   const handleSaveTrip = async () => {
     if (!name.trim()) return;
+    // Antes se guardaba igual aunque la fecha de fin quedara antes que la de
+    // inicio — no rompía nada de golpe, pero dejaba el viaje sin ningún día
+    // generado (getTripDays descarta el rango entero) sin avisar de por qué.
+    if (startDate && endDate && endDate < startDate) {
+      toast({ title: t('trip.dialog.endBeforeStart'), variant: 'destructive' });
+      return;
+    }
     setSaving(true);
     try {
       await base44.entities.Trip.update(tripId, {
@@ -78,6 +85,15 @@ function SettingsDialog({
 
   const saveCityEdit = async (cityId) => {
     if (!cityDraft.name?.trim()) return;
+    // Mismo motivo que en handleSaveTrip: una parada con fin antes que
+    // inicio no genera ningún día (getTripDays la descarta entera), y sin
+    // esta validación se guardaba así en silencio — la parada se veía en la
+    // lista pero "Toca para planificar" nunca aparecía y ningún spot de esa
+    // ciudad podía asignarse a un día.
+    if (cityDraft.start_date && cityDraft.end_date && cityDraft.end_date < cityDraft.start_date) {
+      toast({ title: t('trip.dialog.endBeforeStart'), variant: 'destructive' });
+      return;
+    }
     setCityLoading(cityId);
     try {
       await base44.entities.City.update(cityId, {
@@ -124,6 +140,10 @@ function SettingsDialog({
 
   const saveNewCity = async () => {
     if (!cityDraft.name?.trim()) return;
+    if (cityDraft.start_date && cityDraft.end_date && cityDraft.end_date < cityDraft.start_date) {
+      toast({ title: t('trip.dialog.endBeforeStart'), variant: 'destructive' });
+      return;
+    }
     setCityLoading('new');
     try {
       // Si `trip` no había cargado (conexión lenta/intermitente), antes se
