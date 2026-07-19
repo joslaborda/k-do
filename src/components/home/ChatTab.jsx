@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
+import { parseServerDate } from '@/lib/parseServerDate';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembers }) {
@@ -205,8 +206,8 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
             </div>
           )}
           {messages.map((msg, idx) => {
-            const msgDate = msg.created_date ? new Date(msg.created_date) : null;
-            const prevDate = idx > 0 && messages[idx-1].created_date ? new Date(messages[idx-1].created_date) : null;
+            const msgDate = msg.created_date ? parseServerDate(msg.created_date) : null;
+            const prevDate = idx > 0 && messages[idx-1].created_date ? parseServerDate(messages[idx-1].created_date) : null;
             const showDate = msgDate && (!prevDate || msgDate.toDateString() !== prevDate.toDateString());
             const me = isMe(msg);
             return (

@@ -181,18 +181,29 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
   };
 
   const handleInvite = async (profile, resolvedEmail) => {
-    if (!resolvedEmail) return;
+    let email = resolvedEmail;
+    // Perfiles antiguos (o creados sin backfill) pueden no tener `email`
+    // guardado — antes esto cortaba aquí en silencio: el botón parecía
+    // activo pero pulsarlo no hacía nada, ni error ni invitación. Se intenta
+    // resolver vía User.filter, igual que ya hace MembersPanel.jsx.
+    if (!email && profile?.user_id) {
+      try {
+        const users = await base44.entities.User.filter({ id: profile.user_id });
+        email = users[0]?.email || '';
+      } catch { /* se cae al error de abajo */ }
+    }
+    if (!email) { setError(t('invites.modal.resolveEmailError')); return; }
     setSending(true); setError('');
     try {
       const result = await sendTripInvite({
-        tripId, email: resolvedEmail, role: 'editor',
+        tripId, email, role: 'editor',
         tripName: trip?.name || t('invites.modal.theTrip'),
         inviterEmail: currentUserEmail || trip?.created_by || '',
         inviterName: currentUserName || currentUserEmail || trip?.created_by || '',
       });
       queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
-      setSentTo(profile?.display_name || profile?.username || resolvedEmail);
+      setSentTo(profile?.display_name || profile?.username || email);
       setDone(true);
       setTimeout(() => { setDone(false); onClose(); }, 2000);
     } catch (e) {
@@ -250,7 +261,11 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       <div className="absolute inset-0 bg-black/40" />
       <div
         className="relative bg-background rounded-t-3xl shadow-2xl flex flex-col"
-        style={{ maxHeight: '88vh' }}
+        // 88vh se calcula sobre el viewport completo de la pantalla, no sobre
+        // el visible cuando el teclado está abierto — el input y sobre todo
+        // los resultados de búsqueda (debajo) quedaban tapados por el
+        // teclado hasta cerrarlo. dvh sí se ajusta al viewport visual real.
+        style={{ maxHeight: '88dvh' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Handle */}
@@ -305,6 +320,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                   ref={inputRef}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
+                  onFocus={e => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' })}
                   placeholder={t('invites.modal.searchPlaceholder')}
                   className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                 />
