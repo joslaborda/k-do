@@ -49,6 +49,18 @@ export function getTripDays(cities = []) {
   return days;
 }
 
+/** Compara nombres de ciudad ignorando mayúsculas/minúsculas y espacios al
+ *  borde — dos estancias son "la misma ciudad" a efectos de agrupar días
+ *  aunque se haya tecleado con distinta capitalización o un espacio de más
+ *  (p. ej. "Lima" vs "lima " al crear una parada nueva). Sin esto, una
+ *  comparación exacta (===) excluye en silencio visitas repetidas a la
+ *  misma ciudad cuyo nombre no coincide carácter a carácter. */
+export function sameCityName(a, b) {
+  const norm = s => (s || '').trim().toLowerCase();
+  const na = norm(a);
+  return !!na && na === norm(b);
+}
+
 /** Value único para un <option> de selector fecha+ciudad: combina fecha y ciudad
  *  para que días de tránsito (misma fecha, dos ciudades) no colisionen. */
 export function tripDayOptionValue(day) {
