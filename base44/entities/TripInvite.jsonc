@@ -33,7 +33,7 @@
     "invited_by"
   ],
   "rls": {
-    "create": true,
+    "create": false,
     "read": {
       "$or": [
         { "data.email": "{{user.email}}" },
