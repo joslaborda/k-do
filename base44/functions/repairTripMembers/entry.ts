@@ -22,12 +22,38 @@ import { createClientFromRequest } from "npm:@base44/sdk";
  * Con permisos de servicio (asServiceRole), así no depende de que quien lo
  * ejecute ya tuviera acceso a los registros rotos (por definición, no lo
  * tenía — ese es justo el problema que arregla).
+ *
+ * Rate limiting: al recorrer muchos viajes con muchos registros seguidos,
+ * base44 puede devolver "Rate limit exceeded" a mitad de la pasada (visto en
+ * pruebas reales, siempre cerca del final de una ejecución larga). Por eso
+ * cada llamada pasa por withRetry (reintenta con espera creciente) y además
+ * se deja una pequeña pausa entre entidades para no ir a ráfaga.
  */
 
 const SYNCED_ENTITIES = [
   "City", "Expense", "Ticket", "TripMessage", "DiaryEntry",
   "PackingItem", "Spot", "ItineraryDay", "TodoItem", "UsefulInfo", "Restaurant",
 ];
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function withRetry<T>(fn: () => Promise<T>, retries = 4): Promise<T> {
+  let lastError: any;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastError = e;
+      const msg = String(e?.message || e || "");
+      const isRateLimit = /rate limit/i.test(msg);
+      if (!isRateLimit || attempt === retries) throw e;
+      await sleep(1000 * Math.pow(2, attempt)); // 1s, 2s, 4s, 8s
+    }
+  }
+  throw lastError;
+}
 
 Deno.serve(async (req) => {
   try {
@@ -59,13 +85,13 @@ Deno.serve(async (req) => {
 
       for (const entityName of SYNCED_ENTITIES) {
         try {
-          const records = await service.entities[entityName].filter({ trip_id: trip.id });
+          const records = await withRetry(() => service.entities[entityName].filter({ trip_id: trip.id }));
           let fixed = 0;
           for (const record of records) {
             const current = JSON.stringify((record.trip_members || []).slice().sort());
             const target = JSON.stringify(members.slice().sort());
             if (current !== target) {
-              await service.entities[entityName].update(record.id, { trip_members: members });
+              await withRetry(() => service.entities[entityName].update(record.id, { trip_members: members }));
               fixed++;
             }
           }
@@ -73,6 +99,7 @@ Deno.serve(async (req) => {
         } catch (e) {
           tripReport.entities[entityName] = { error: e.message };
         }
+        await sleep(150); // pequeña pausa entre entidades para no ir a ráfaga
       }
 
       report.push(tripReport);
