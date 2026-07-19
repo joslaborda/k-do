@@ -96,7 +96,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-end" onClick={onClose}>
+    <div className="fixed inset-0 z-[250] flex flex-col justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative bg-background rounded-t-3xl px-5 pt-4 pb-8 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
@@ -241,7 +241,11 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
   };
 
   const handleNavigate = (n) => {
-    if (n.type === 'trip_invite') { setInviteNotif(n); return; }
+    // Abrir el modal de invitación debe cerrar el panel de notificaciones —
+    // antes se dejaba `open` en true, y como el panel (z-[200]) queda por
+    // encima del modal (z-[100]) el panel tapaba el propio modal en vez de
+    // desaparecer.
+    if (n.type === 'trip_invite') { doClose(); setInviteNotif(n); return; }
     doClose();
     if (!n.trip_id) return;
     const extra = (() => { try { return n.ref_extra ? JSON.parse(n.ref_extra) : {}; } catch { return {}; } })();
