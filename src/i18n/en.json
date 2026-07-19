@@ -303,7 +303,8 @@
       "deleteTrip": "Delete trip",
       "deleteStopConfirm": "Delete this stop?",
       "deleteStopWarning": "{{city}} and its itinerary days will be deleted. This action cannot be undone.",
-      "deleteStopError": "Couldn't delete the stop"
+      "deleteStopError": "Couldn't delete the stop",
+      "endBeforeStart": "The end date can't be before the start date"
     },
     "loadingTrip": "Loading trip...",
     "nav": {
