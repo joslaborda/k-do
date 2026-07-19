@@ -628,12 +628,21 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
   const { t } = useTranslation();
   const [open, setOpen] = useState(defaultOpen);
 
+  // Un día de tránsito (una ciudad termina el mismo día que la siguiente
+  // empieza) tiene DOS filas con la misma fecha — una por ciudad. Antes este
+  // filtro solo miraba la fecha, así que CUALQUIER documento de ese día
+  // (de cualquier ciudad del viaje) aparecía duplicado en ambas filas. Ahora
+  // exige también que el documento sea de esta ciudad — como origen
+  // (city_id) o como destino de un vuelo/tren (arrival_city_id), mismo
+  // criterio que ya usa CityTickets.jsx.
   const docs = useMemo(() =>
     allDocs.filter(d => {
       const dd = d.date || d.valid_from || d.start_date;
-      return dd === dateStr;
+      if (dd !== dateStr) return false;
+      if (!d.city_id && !d.arrival_city_id) return true; // sin ciudad asignada, no se pierde
+      return d.city_id === cityId || d.arrival_city_id === cityId;
     }),
-    [allDocs, dateStr]
+    [allDocs, dateStr, cityId]
   );
 
   const spots = useMemo(() =>
