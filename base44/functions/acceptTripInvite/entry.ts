@@ -53,8 +53,11 @@ Deno.serve(async (req) => {
     }
 
     // El enlace de invitación está atado al email invitado — evita que un
-    // enlace reenviado deje entrar a una cuenta distinta.
-    if (invite.email && invite.email.toLowerCase() !== normalizedUserEmail) {
+    // enlace reenviado deje entrar a una cuenta distinta. Se exige SIEMPRE
+    // (antes, si invite.email venía vacío, la comprobación se saltaba entera
+    // — con TripInvite.create ahora cerrado a solo createTripInvite esto ya
+    // no debería poder pasar, pero se deja como segunda barrera).
+    if (!invite.email || invite.email.toLowerCase() !== normalizedUserEmail) {
       return Response.json(
         {
           error: `Esta invitación es para ${invite.email}. Inicia sesión con esa cuenta para unirte al viaje.`,
