@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { sendTripInvite } from '@/lib/invites';
+import { syncTripMembers } from '@/lib/syncTripMembers';
 import { useTranslation } from 'react-i18next';
 
 export default function MembersPanel({
@@ -57,6 +58,11 @@ export default function MembersPanel({
       const newRoles = { ...roles };
       delete newRoles[email];
       await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
+      // Revoca el acceso del expulsado a los datos ya existentes del viaje
+      // (gastos, chat, documentos...) — sin esto seguiría viéndolos para
+      // siempre, porque su email quedaría congelado en el trip_members de
+      // cada registro desde antes de la expulsión.
+      await syncTripMembers(trip.id, newMembers);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
