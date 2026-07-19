@@ -39,10 +39,23 @@ export default function Invites() {
     enabled: !!token,
   });
 
+  // Trip.read ahora solo deja leer a quien ya es miembro (antes estaba
+  // abierto a cualquier usuario logueado de Kōdo, lo cual dejaba ver nombre,
+  // destino, fechas y el email de todos los miembros de CUALQUIER viaje —
+  // no solo los tuyos). Quien abre este enlace normalmente todavía NO es
+  // miembro, así que Trip.get directo ya no le sirve: se pide la vista
+  // previa vía la función getTripPreview, que sí puede leer el viaje (con
+  // permisos de servicio) pero solo si el token coincide con una invitación
+  // real dirigida a su email.
   const { data: trip, isLoading: tripLoading } = useQuery({
-    queryKey: ['trip', invite?.trip_id],
-    queryFn: () => base44.entities.Trip.get(invite.trip_id),
-    enabled: !!invite?.trip_id,
+    queryKey: ['tripPreview', invite?.trip_id, token],
+    queryFn: async () => {
+      const result = await base44.functions.invoke('getTripPreview', { tripId: invite.trip_id, token });
+      const data = result?.data ?? result;
+      if (data?.error) throw new Error(data.error);
+      return data.trip;
+    },
+    enabled: !!invite?.trip_id && !!token,
   });
 
   // ── Sin token: listar invitaciones del usuario ──────────────────────────────
@@ -57,11 +70,24 @@ export default function Invites() {
     enabled: !!currentUser?.email && !token,
   });
 
+  // Mismo motivo que la vista previa de arriba: todavía no eres miembro de
+  // estos viajes, así que Trip.get directo ya no vale con Trip.read cerrado
+  // a solo miembros — se pide cada uno vía getTripPreview con el token de
+  // su propia invitación. Si una falla (token corrupto, etc.) no revienta
+  // la lista entera: esa tarjeta simplemente sale sin datos del viaje.
   const { data: pendingTrips = [] } = useQuery({
     queryKey: ['pendingTrips', pendingInvites.map(i => i.id).join(',')],
     queryFn: async () => {
       if (!pendingInvites.length) return [];
-      return Promise.all(pendingInvites.map(inv => base44.entities.Trip.get(inv.trip_id)));
+      return Promise.all(pendingInvites.map(async inv => {
+        try {
+          const result = await base44.functions.invoke('getTripPreview', { tripId: inv.trip_id, token: inv.invite_token });
+          const data = result?.data ?? result;
+          return data?.trip || null;
+        } catch {
+          return null;
+        }
+      }));
     },
     enabled: pendingInvites.length > 0,
   });
