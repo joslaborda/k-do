@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Loader2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Loader2, Settings } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,8 @@ import { toast } from '@/components/ui/use-toast';
 import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
+import SettingsDialog from '@/components/home/SettingsDialog';
+import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 import { daysUntil } from '@/lib/tripDays';
 import { useTranslation } from 'react-i18next';
@@ -854,6 +856,23 @@ export default function Cities() {
     enabled: !!tripId, staleTime: 30000,
   });
 
+  // Configurar ruta (fechas del viaje + paradas): antes esto solo se podía
+  // tocar desde Inicio, aunque el sitio natural para arreglar "puse mal las
+  // ciudades o las fechas" es justo esta pantalla (Ruta). El diálogo ya
+  // existía (SettingsDialog, usado en Home.jsx) — aquí se reutiliza tal
+  // cual, solo que se abre directamente sin saltar a Inicio primero.
+  const currentUserEmail = currentUser?.email;
+  const roles = trip?.roles || {};
+  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const deleteTripMutation = useMutation({
+    mutationFn: () => base44.entities.Trip.delete(tripId),
+    onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
+    onError: () => toast({ title: t('trip.deleteError'), description: t('common.tryAgain'), variant: 'destructive' }),
+  });
+
   const { data: cities = [], isLoading: loadingCities } = useQuery({
     queryKey: ['cities', tripId],
     queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
@@ -920,11 +939,9 @@ export default function Cities() {
                 <ArrowRight className="w-4 h-4 rotate-180" />{t('cities.backHome')}
               </button>
             </Link>
-            <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
-              <button className="text-sm text-primary flex items-center gap-1 font-semibold">
-                <Plus className="w-4 h-4" />{t('cities.cityShort')}
-              </button>
-            </Link>
+            <button onClick={() => setSettingsOpen(true)} className="text-sm text-primary flex items-center gap-1 font-semibold">
+              <Settings className="w-4 h-4" />{t('cities.configureRoute')}
+            </button>
           </div>
 
           <h1 className="text-2xl font-semibold text-foreground mb-1">{t('cities.title')}</h1>
@@ -962,11 +979,9 @@ export default function Cities() {
           <div className="text-center py-16">
             <div className='w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4'><Map className='w-7 h-7 text-muted-foreground/50' /></div>
             <p className="text-muted-foreground mb-4">{t('cities.noCitiesYet')}</p>
-            <Link to={createPageUrl('Home') + '?trip_id=' + tripId + '&open_settings=true'}>
-              <Button className="bg-primary hover:bg-primary/90 text-white">
-                <Plus className="w-4 h-4 mr-2" />{t('cities.addCity')}
-              </Button>
-            </Link>
+            <Button onClick={() => setSettingsOpen(true)} className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="w-4 h-4 mr-2" />{t('cities.addCity')}
+            </Button>
           </div>
         ) : sortedCities.length === 1 ? (
           // Una sola ciudad — mostrar días directamente sin cabecera de ciudad
@@ -1041,6 +1056,28 @@ export default function Cities() {
           </div>
         )}
       </div>
+
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        trip={trip}
+        cities={sortedCities}
+        tripId={tripId}
+        isAdmin={isAdmin}
+        profiles={profiles}
+        currentUserEmail={currentUserEmail}
+        onDelete={() => { setSettingsOpen(false); setDeleteOpen(true); }}
+        onSaved={() => {
+          queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
+          queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
+        }}
+      />
+      <DeleteTripModal
+        open={deleteOpen} onOpenChange={setDeleteOpen}
+        tripName={trip?.name || ''}
+        onConfirm={() => deleteTripMutation.mutate()}
+        isPending={deleteTripMutation.isPending}
+      />
     </div>
   );
 }
