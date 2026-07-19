@@ -59,18 +59,20 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
       to: normalizedEmail,
       subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
       // SendEmail de base44 solo admite body de texto plano (confirmado en su
-      // documentación) — no hay forma de mandar un <a href> real. Entre <> es
-      // la forma estándar (RFC 3986) de delimitar una URL suelta en texto
-      // plano; Gmail/Outlook/Apple Mail la reconocen igual de bien que sin
-      // ellos, pero evita que un cliente de correo más torpe la confunda con
-      // el texto de alrededor y no la subraye como enlace.
+      // documentación) — no hay forma de mandar un <a href> real. Un intento
+      // previo envolvía la URL entre <> (delimitador RFC 3986 para texto
+      // plano), pero el pipeline de envío/renderizado (Outlook lo confirma)
+      // trata algo con pinta de "<https://...>" como una etiqueta HTML
+      // desconocida y la descarta entera — el enlace desaparecía del todo.
+      // Por eso va como texto plano suelto, sin ningún carácter que pueda
+      // confundirse con marcado.
       body: `Hola,
 
 ${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
 
 Para aceptar la invitación, abre este enlace:
 
-<${inviteUrl}>
+${inviteUrl}
 
 Si el enlace no se abre solo al tocarlo, cópialo y pégalo en el navegador.
 
