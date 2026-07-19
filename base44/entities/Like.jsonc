@@ -28,5 +28,11 @@
     "user_id",
     "target_id",
     "target_type"
-  ]
+  ],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": { "data.user_id": "{{user.id}}" },
+    "delete": { "data.user_id": "{{user.id}}" }
+  }
 }

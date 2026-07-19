@@ -88,7 +88,7 @@
   ],
   "rls": {
     "create": true,
-    "read": true,
+    "read": { "data.members": { "$in": ["{{user.email}}"] } },
     "update": { "data.members": { "$in": ["{{user.email}}"] } },
     "delete": { "created_by": "{{user.email}}" }
   }
