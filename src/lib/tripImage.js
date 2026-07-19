@@ -82,8 +82,13 @@ const COUNTRY_IMAGES = {
   // ── Micro-estados y países sin foto propia → usar país cercano ──────────────
   'andorra':'photo-1558618047-f4cac43b1ee4',          // Pirineos como España
   'monaco':'photo-1558618666-fcd25c85cd64',            // Costa Azul
-  'san marino':'photo-1539650116574-75c0c6d73f6e',     // Similar Italia
-  'liechtenstein':'photo-1506905925346-21bda4d32df4',  // Alpino como Suiza
+  // Estas dos claves ya existían arriba (línea 72) con el mismo comentario de
+  // intención ("similar a Italia"/"alpino como Suiza") pero con IDs de foto
+  // copiados por error de Egipto y Australia respectivamente — como es un
+  // objeto literal, esta segunda definición pisaba silenciosamente a la
+  // primera y ganaba la incorrecta. Ahora sí usan la foto real de Italia/Suiza.
+  'san marino':'photo-1523906834658-6e24ef2386f9',     // = 'italia' (línea 16)
+  'liechtenstein':'photo-1515488764276-beab7607c1e6',  // = 'suiza' (línea 16)
   'kosovo':'photo-1558618047-f4cac43b1ee4',            // Balcanes
   'timor oriental':'photo-1518509562904-e7ef99cdcc86', // Similar Indonesia
   'brunei':'photo-1508702973812-62b6a9e50aeb',         // Similar Malasia

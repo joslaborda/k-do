@@ -1553,6 +1553,17 @@ export function getVisaInfo(destinationISO, originISO, secondOriginISO = null) {
   const primary = lookupForPassport(originISO);
   const secondary = secondOriginISO ? lookupForPassport(secondOriginISO) : null;
 
+  // Si el pasaporte principal no resuelve a nada (destino sin `_default` ni
+  // coincidencia de grupo) pero el segundo sí, antes `if (primary && secondary)`
+  // se saltaba entero y se perdía el resultado válido de `secondary` — se
+  // devolvía "Información no disponible" aunque sí había datos usables.
+  if (!primary && secondary) {
+    return {
+      ...secondary,
+      info: `Con tu pasaporte de ${secondOriginISO}: ${secondary.info}`,
+    };
+  }
+
   // If two passports, return the most favorable
   if (primary && secondary) {
     // Most favorable = needed:false > needed:true with eVisa > needed:true embassy.

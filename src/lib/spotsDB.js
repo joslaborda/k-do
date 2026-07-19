@@ -575,7 +575,13 @@ export function getAvailableCountries() {
 }
 
 export function getAvailableCities(country) {
-  return Object.keys(SEED_SPOTS[country] || {});
+  // getSeedSpotsForCity/getSeedSpotsForCountry normalizan acentos/mayúsculas
+  // (Japon/Japón, osaka/Osaka) al buscar la clave — esta función comparaba
+  // por igualdad exacta y devolvía [] aunque sí hubiera spots para ese país,
+  // solo porque venía con distinta capitalización o sin acentos.
+  const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const countryKey = Object.keys(SEED_SPOTS).find(k => norm(k) === norm(country));
+  return Object.keys(countryKey ? SEED_SPOTS[countryKey] : {});
 }
 
 export function getTopSpotsGlobal(limit = 20) {

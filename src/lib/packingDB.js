@@ -2928,7 +2928,7 @@ export const COUNTRY_REQUIREMENTS = {
 
 
 // Resuelve el valor de visado de un objeto `visa` de COUNTRY_REQUIREMENTS para
-// un código de pasaporte concreto (exacto, o vía el bloque LATAM, o fallback a ES).
+// un código de pasaporte concreto (exacto, o vía el bloque LATAM).
 function resolveVisaVal(v, code) {
   let visaVal = v[code];
   if (visaVal === undefined) {
@@ -2939,7 +2939,13 @@ function resolveVisaVal(v, code) {
     else if (inList(latam.voa)) visaVal = 'voa';
     else if (inList(latam.eta)) visaVal = 'eta';
     else if (inList(latam.required)) visaVal = true;
-    else visaVal = v.ES;
+    // Antes caía a `v.ES` (estatus de pasaporte español) para cualquier
+    // nacionalidad sin dato explícito — la mayoría de las ~190 del selector,
+    // solo hay códigos explícitos para ES/US/UK/AU/CA/JP/KR/IN/CN/RU + LATAM
+    // opcional. Mostraba con total confianza "Sin visado" (el valor de
+    // España) a alguien que sí lo necesitaba. Se deja sin resolver para que
+    // el caller lo trate como needed:null → "Verificar con consulado", en
+    // vez de una respuesta concreta pero potencialmente falsa.
   }
   return visaVal;
 }

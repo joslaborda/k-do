@@ -34,10 +34,24 @@ export function calculateBalances(expenses, members) {
     } else if (split_type === 'custom' && amounts_by_user) {
       // amounts_by_user en moneda original — usar ratios para calcular en base
       const totalCustom = Object.values(amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-      Object.entries(amounts_by_user).forEach(([email, val]) => {
-        const ratio = totalCustom > 0 ? parseFloat(val) / totalCustom : 0;
-        balances[email] = (balances[email] || 0) - (amount * ratio);
-      });
+      const participants = Object.keys(amounts_by_user);
+      if (totalCustom > 0) {
+        Object.entries(amounts_by_user).forEach(([email, val]) => {
+          const ratio = parseFloat(val) / totalCustom;
+          balances[email] = (balances[email] || 0) - (amount * ratio);
+        });
+      } else if (participants.length > 0) {
+        // Todos los importes a 0/vacíos (dato legado, importado o editado a
+        // mano): con ratio=0 para todos, antes nadie se debitaba nada pero el
+        // pagador sí se acreditaba el importe completo — rompía la invariante
+        // "suma de balances = 0" y getDebts() generaba una deuda fantasma de
+        // todo el grupo hacia el pagador. Se reparte a partes iguales entre
+        // quienes estaban en el split en vez de perder el débito por completo.
+        const share = amount / participants.length;
+        participants.forEach(email => {
+          balances[email] = (balances[email] || 0) - share;
+        });
+      }
     } else if (split_type === 'solo') {
       // Gasto personal: solo afecta al pagador, neto 0 para el grupo
       // El pagador adelanta y se lo descuenta a sí mismo → no crea deuda entre miembros
