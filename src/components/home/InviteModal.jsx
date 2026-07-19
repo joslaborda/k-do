@@ -247,9 +247,16 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     setSending(false);
   };
 
-  // Co-traveler profiles resolved
+  // Co-traveler profiles resolved — antes solo se buscaba en `profiles`, que
+  // Home.jsx solo rellena con los miembros ACTUALES del viaje. Un co-viajero
+  // de otro viaje anterior nunca es miembro de este, así que `profiles.find`
+  // no lo encontraba nunca: se veía el email en vez del nombre, y sin avatar
+  // aunque el usuario tuviera foto de perfil. `allProfiles` (cargado más
+  // arriba para la búsqueda) sí tiene a todos los usuarios de Kōdo, así que
+  // se busca ahí primero.
   const coTravelerProfiles = coTravelerEmails.map(({ email, count }) => ({
-    profile: profiles.find(p => p.email === email || p.user_email === email),
+    profile: allProfiles.find(p => p.email === email || p.user_email === email)
+      || profiles.find(p => p.email === email || p.user_email === email),
     email,
     count,
   })).filter(({ email }) => getStatus(email) !== 'member').slice(0, 5);
