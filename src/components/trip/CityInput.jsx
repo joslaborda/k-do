@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { getTopCities } from '@/lib/countryConfig';
 import { Loader2, ChevronDown } from 'lucide-react';
 
-export default function CityInput({ country, value, onChange, placeholder = 'Elige o escribe una ciudad...' }) {
+export default function CityInput({ country, value, onChange, placeholder = 'Elige o escribe una ciudad...', extraSuggestions = [] }) {
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -35,9 +35,15 @@ export default function CityInput({ country, value, onChange, placeholder = 'Eli
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // extraSuggestions: nombres de ciudad que el propio usuario ya escribió en
+  // este viaje (p. ej. una parada repetida) — no dependen de country ni de la
+  // lista "top cities", así que se combinan con esa lista en vez de sustituirla.
+  // Así se sugieren tanto ciudades conocidas como paradas que el usuario ya usó,
+  // incluyendo pueblos pequeños que no salen en ningún listado global.
+  const allSuggestions = [...new Set([...(extraSuggestions || []), ...cities])];
   const filtered = filter
-    ? cities.filter((c) => c.toLowerCase().includes(filter.toLowerCase()))
-    : cities;
+    ? allSuggestions.filter((c) => c.toLowerCase().includes(filter.toLowerCase()))
+    : allSuggestions;
 
   const handleInput = (e) => {
     const v = e.target.value;
