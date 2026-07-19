@@ -882,9 +882,18 @@ export default function Cities() {
     onError: () => toast({ title: t('trip.deleteError'), description: t('common.tryAgain'), variant: 'destructive' }),
   });
 
+  // OJO: esta query comparte queryKey ['cities', tripId] con Home.jsx y
+  // useTripContext.js — ambos piden `.filter({trip_id}, 'order')`. Antes esta
+  // pedía sin el 'order', así que React Query podía devolver aquí un fetch
+  // en caché hecho por la otra pantalla (o viceversa) sin darse cuenta de que
+  // la llamada real al backend era distinta — mismo dato final una vez
+  // ordenado por fecha, pero abría la puerta a que una pantalla mostrara un
+  // resultado "congelado" de una consulta anterior mientras la otra ya tenía
+  // el dato fresco. Unificado para que las tres consultas sean IDÉNTICAS y
+  // compartan una sola caché real.
   const { data: cities = [], isLoading: loadingCities } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'),
     enabled: !!tripId, staleTime: 30000,
   });
 

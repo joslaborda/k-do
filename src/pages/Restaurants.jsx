@@ -702,7 +702,7 @@ export default function Restaurants() {
 
   const { data: tripCities = [] } = useQuery({
     queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
+    queryFn: () => base44.entities.City.filter({ trip_id: tripId }, 'order'), // misma queryKey ['cities', tripId] que otras pantallas — unificado para no compartir caché con fetches distintos
     enabled: !!tripId, staleTime: 60000,
   });
 
@@ -908,7 +908,14 @@ export default function Restaurants() {
   };
 
   const undoSave = async () => {
-    if (lastSavedId) { await deleteMutation.mutateAsync(lastSavedId); setLastSavedId(null); }
+    if (lastSavedId) {
+      await deleteMutation.mutateAsync(lastSavedId);
+      // El modal de "¿cuándo?" puede seguir abierto para este mismo spot recién
+      // creado — si no lo cerramos aquí, al confirmar una fecha ahí se intenta
+      // actualizar un spot que este Deshacer ya borró ("Entity Spot ... not found").
+      setAssignDateSpot(prev => (prev?.id === lastSavedId ? null : prev));
+      setLastSavedId(null);
+    }
     setSavedToast({ visible: false, spot: null });
   };
 
@@ -1400,12 +1407,24 @@ export default function Restaurants() {
             if (resolvedCityId && resolvedCityId !== assignDateSpot.city_id) {
               data.city_id = resolvedCityId;
             }
-            await updateMutation.mutateAsync({ id: assignDateSpot.id, data });
+            try {
+              await updateMutation.mutateAsync({ id: assignDateSpot.id, data });
+            } catch (e) {
+              // El spot pudo haber sido borrado con el "Deshacer" del toast
+              // mientras este modal seguía abierto — no es un error real que
+              // mostrar, simplemente ya no hay nada que actualizar.
+              const notFound = /not found/i.test(String(e?.message || ''));
+              if (!notFound) throw e;
+            }
             setAssignDateSpot(null);
           }}
           onSkip={() => setAssignDateSpot(null)}
           onUndo={async () => {
-            if (assignDateSpot?.id) await deleteMutation.mutateAsync(assignDateSpot.id);
+            if (assignDateSpot?.id) {
+              await deleteMutation.mutateAsync(assignDateSpot.id).catch(() => {});
+              if (lastSavedId === assignDateSpot.id) setLastSavedId(null);
+              setSavedToast(prev => (prev.spot && lastSavedId === assignDateSpot.id ? { visible: false, spot: null } : prev));
+            }
             setAssignDateSpot(null);
           }}
         />
