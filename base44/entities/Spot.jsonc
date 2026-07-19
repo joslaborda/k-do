@@ -171,6 +171,11 @@
         { "$and": [ { "data.visibility": "selected_users" }, { "data.shared_with": { "$in": ["{{user.email}}"] } } ] }
       ]
     },
-    "delete": { "created_by": "{{user.email}}" }
+    "delete": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "$and": [ { "created_by": null }, { "data.saved_by": { "$in": ["{{user.email}}"] } } ] }
+      ]
+    }
   }
 }
