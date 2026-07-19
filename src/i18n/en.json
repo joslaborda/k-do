@@ -894,6 +894,9 @@
     "account": "Account",
     "logout": "Log out",
     "deleteAccount": "Delete account",
+    "help": "Help",
+    "feedback": "Help & feedback",
+    "feedbackSub": "Report a problem or share an idea",
     "version": "Version",
     "heading": "Settings",
     "backProfile": "Profile",
@@ -950,6 +953,23 @@
       "confirm": "Sure? This action is permanent and irreversible.",
       "yes": "Yes, delete"
     }
+  },
+  "feedback": {
+    "title": "Help & feedback",
+    "subtitle": "What would you like to tell us?",
+    "type": {
+      "bug": "Bug",
+      "suggestion": "Suggestion",
+      "other": "Other"
+    },
+    "placeholder": "Tell us what happened or what you'd like Kōdo to do...",
+    "contactHint": "We may reply at {{email}} if needed",
+    "send": "Send",
+    "sending": "Sending...",
+    "sent": "Thank you!",
+    "sentHint": "We've received your message",
+    "emptyError": "Write something before sending",
+    "sendError": "Couldn't send, please try again"
   },
   "cities": {
     "title": "Route",

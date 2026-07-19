@@ -894,6 +894,9 @@
     "account": "Cuenta",
     "logout": "Cerrar sesión",
     "deleteAccount": "Eliminar cuenta",
+    "help": "Ayuda",
+    "feedback": "Ayuda y sugerencias",
+    "feedbackSub": "Reporta un problema o cuéntanos una idea",
     "version": "Versión",
     "heading": "Configuración",
     "backProfile": "Perfil",
@@ -950,6 +953,23 @@
       "confirm": "¿Seguro? Esta acción es permanente e irreversible.",
       "yes": "Sí, eliminar"
     }
+  },
+  "feedback": {
+    "title": "Ayuda y sugerencias",
+    "subtitle": "¿Qué quieres contarnos?",
+    "type": {
+      "bug": "Bug",
+      "suggestion": "Sugerencia",
+      "other": "Otro"
+    },
+    "placeholder": "Cuéntanos qué ha pasado o qué te gustaría que hiciera Kōdo...",
+    "contactHint": "Podremos contestarte en {{email}} si hace falta",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "sent": "¡Gracias!",
+    "sentHint": "Hemos recibido tu mensaje",
+    "emptyError": "Escribe algo antes de enviar",
+    "sendError": "No se pudo enviar, inténtalo de nuevo"
   },
   "cities": {
     "title": "Ruta",
