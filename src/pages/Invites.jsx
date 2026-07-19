@@ -257,7 +257,7 @@ export default function Invites() {
           <h1 className="text-xl font-semibold text-foreground">{t('invites.page.joinQuestion')}</h1>
         </div>
 
-        <div className="flex-1 px-5 py-6 space-y-4">
+        <div className="px-5 py-6 space-y-4">
           {/* Trip card */}
           <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
             <p className="text-lg font-semibold text-foreground">{trip.name}</p>
@@ -290,28 +290,31 @@ export default function Invites() {
               <p className="text-xs text-primary font-medium">{t('invites.page.createAccountHint')}</p>
             </div>
           )}
-        </div>
 
-        {/* Botones — sin sesión, el botón principal era "Unirme al viaje"
-            deshabilitado sin ninguna explicación visible de por qué ni forma
-            de arreglarlo: parecía que la invitación no existía. Ahora ese
-            mismo botón lleva directo al login/registro de Kōdo. */}
-        <div className="px-5 pb-10 flex gap-3">
-          <button onClick={handleDecline} disabled={processing}
-            className="flex-1 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
-            {t('common.reject')}
-          </button>
-          {currentUser ? (
-            <button onClick={handleAccept} disabled={processing}
-              className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold disabled:opacity-50">
-              {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('invites.page.joinTrip')}
+          {/* Botones — antes iban en un contenedor aparte empujado al fondo
+              del viewport con flex-1 (mt-auto en la práctica). En el navegador
+              in-app que abre el enlace del email (Outlook, Gmail, etc.) la
+              barra de herramientas inferior se come parte de ese "100vh", así
+              que los botones quedaban tapados o exigían hacer scroll sin que
+              se notara que hacía falta. Ahora van justo debajo de la tarjeta
+              del viaje, en el flujo normal — siempre visibles sin adivinar. */}
+          <div className="flex gap-3 pt-1">
+            <button onClick={handleDecline} disabled={processing}
+              className="flex-1 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
+              {t('common.reject')}
             </button>
-          ) : (
-            <button onClick={() => navigateToLogin()}
-              className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold">
-              {t('invites.page.loginToAccept')}
-            </button>
-          )}
+            {currentUser ? (
+              <button onClick={handleAccept} disabled={processing}
+                className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold disabled:opacity-50">
+                {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('invites.page.joinTrip')}
+              </button>
+            ) : (
+              <button onClick={() => navigateToLogin()}
+                className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold">
+                {t('invites.page.loginToAccept')}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
