@@ -85,7 +85,7 @@ export default function Invites() {
     if (!invite || !currentUser?.email || invite._status !== 'pending') return;
     setProcessing(true);
     try {
-      await acceptTripInvite(invite.id, token, invite.trip_id, currentUser.email);
+      await acceptTripInvite(invite.id, token);
       await notifyMembers(invite.trip_id, trip?.name, currentUser.email, currentUser.id);
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${invite.trip_id}`));
@@ -112,7 +112,7 @@ export default function Invites() {
     if (!currentUser?.email) return;
     setProcessing(true);
     try {
-      await acceptTripInvite(inv.id, inv.invite_token, inv.trip_id, currentUser.email);
+      await acceptTripInvite(inv.id, inv.invite_token);
       await notifyMembers(inv.trip_id, null, currentUser.email, currentUser.id);
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       navigate(createPageUrl(`Home?trip_id=${inv.trip_id}`));
