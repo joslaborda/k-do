@@ -174,7 +174,7 @@
     "delete": {
       "$or": [
         { "created_by": "{{user.email}}" },
-        { "$and": [ { "created_by": null }, { "data.saved_by": { "$in": ["{{user.email}}"] } } ] }
+        { "$and": [ { "created_by": null }, { "data.trip_members": { "$in": ["{{user.email}}"] } } ] }
       ]
     }
   }
