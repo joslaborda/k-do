@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
+import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
 
 const TYPE = {
@@ -179,7 +180,7 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
           {n.ref_title ? <span className="text-muted-foreground"> · {n.ref_title}</span> : ''}
           {showTrip ? <span className="text-muted-foreground"> · {n.trip_name}</span> : ''}
         </p>
-        {n.created_date && <p className="text-xs text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(n.created_date), { addSuffix: true, locale: es })}</p>}
+        {n.created_date && <p className="text-xs text-muted-foreground mt-0.5">{formatDistanceToNow(parseServerDate(n.created_date), { addSuffix: true, locale: es })}</p>}
       </div>
     </div>
   );
