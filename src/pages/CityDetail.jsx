@@ -613,7 +613,7 @@ export default function CityDetail() {
         )}
 
         {/* Unlinked documents section */}
-        <UnlinkedCityDocuments cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} />
+        <UnlinkedCityDocuments cityId={cityId} tripId={tripId} currentUserEmail={currentUser?.email} currentUserId={currentUser?.id} />
 
         {/* Spots section */}
         <SpotsSection

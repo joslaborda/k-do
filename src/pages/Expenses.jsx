@@ -638,7 +638,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">{expense.description}</p>
-                <p className="text-xs text-muted-foreground">{tc.label}{expense.date ? ' · ' + expense.date : ''}</p>
+                <p className="text-xs text-muted-foreground">{t(tc.label)}{expense.date ? ' · ' + expense.date : ''}</p>
               </div>
             </div>
             <button onClick={onClose} aria-label={t('common.close')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">

@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Car, CirclePlus, FileText, Hotel, Lock, Pencil, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
+import { Car, ChevronDown, ChevronUp, CirclePlus, FileText, Hotel, Lock, Pencil, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
 import { PlaneIcon, BusFront } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -105,7 +105,14 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
             className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
             <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-
+          {/* Sin este botón, `open` nunca pasaba a true — la tarjeta expandida
+              (visibilidad, notas, fechas, aerolínea, ciudad...) era código
+              muerto que el usuario no podía llegar a ver nunca. */}
+          <button onClick={() => setOpen(o => !o)}
+            aria-label={open ? t('common.collapse') : t('common.expand')}
+            className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-secondary/50 transition-colors">
+            {open ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+          </button>
         </div>
       </div>
 

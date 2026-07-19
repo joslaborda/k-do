@@ -649,7 +649,12 @@ export default function Restaurants() {
   const [stateFilter, setStateFilter] = useState('all');
   const [assignDateSpot, setAssignDateSpot] = useState(null); // spot to assign date after saving
   const [selectedCity, setSelectedCity] = useState('');
-  const [toast, setToast] = useState({ visible: false, spot: null });
+  // Renombrado de `toast` a `savedToast`: el nombre `toast` tapaba la función
+  // useToast() de más abajo — los onError de las mutaciones de Spot llamaban
+  // a este estado como si fuera función y crasheaban con "toast is not a
+  // function" en cada fallo de crear/editar/borrar un spot.
+  const { toast } = useToast();
+  const [savedToast, setSavedToast] = useState({ visible: false, spot: null });
   const [lastSavedId, setLastSavedId] = useState(null);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [mySpotSearch, setMySpotSearch] = useState('');
@@ -785,9 +790,9 @@ export default function Restaurants() {
   });
 
   const showToastFor = (spot, cityName) => {
-    setToast({ visible: true, spot, city: cityName || city });
+    setSavedToast({ visible: true, spot, city: cityName || city });
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast({ visible: false, spot: null }), 3000);
+    toastTimer.current = setTimeout(() => setSavedToast({ visible: false, spot: null }), 3000);
   };
 
   const saveOsmPlace = async place => {
@@ -885,7 +890,7 @@ export default function Restaurants() {
 
   const undoSave = async () => {
     if (lastSavedId) { await deleteMutation.mutateAsync(lastSavedId); setLastSavedId(null); }
-    setToast({ visible: false, spot: null });
+    setSavedToast({ visible: false, spot: null });
   };
 
   // Seed spots. spotsDB son ~112 KB de datos que solo hacen falta en esta pantalla;
@@ -1380,7 +1385,7 @@ export default function Restaurants() {
       )}
 
       {/* Toast */}
-      <Toast spot={toast.spot} city={toast.city} visible={toast.visible} onUndo={undoSave} />
+      <Toast spot={savedToast.spot} city={savedToast.city} visible={savedToast.visible} onUndo={undoSave} />
     </div>
   );
 }
