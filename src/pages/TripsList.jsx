@@ -1,4 +1,5 @@
 import { PlaneIcon } from '@/lib/icons';
+import Logo from '@/components/Logo';
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
@@ -219,7 +220,7 @@ export default function TripsList() {
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-medium text-foreground leading-none tracking-tight">K<span style={{color:'hsl(var(--primary))'}}>ō</span>do</h1>
+              <Logo className="h-6 w-auto text-foreground" style={{ display: 'block' }} />
               <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
               {firstName && (
                 <p className="text-sm text-muted-foreground mt-2">{getGreeting(t)}, {firstName}</p>
