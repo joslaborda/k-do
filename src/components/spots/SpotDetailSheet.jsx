@@ -26,13 +26,13 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   //
   // Caso especial: los spots guardados desde "Buscar" (resultados de OSM,
   // ver saveOsmPlace en Restaurants.jsx) se crean con created_by: null a
-  // propósito — no tienen autor, solo quien los guardó (saved_by). Con el
-  // criterio de arriba, created_by === currentUserEmail nunca era cierto
-  // para ellos (null !== email), así que NADIE podía borrarlos — ni
-  // siquiera quien los guardó. Se añade ese caso: si el spot no tiene autor
-  // y el usuario actual está en saved_by, puede borrarlo.
-  const canDelete = spot?.created_by === currentUserEmail
-    || (!spot?.created_by && Array.isArray(spot?.saved_by) && spot.saved_by.includes(currentUserEmail));
+  // propósito — no tienen autor. La primera versión de este arreglo exigía
+  // además estar en spot.saved_by, pero los spots guardados ANTES de que
+  // saved_by existiera en el schema no lo tienen relleno — para esos,
+  // seguía sin aparecer el botón aunque fueran del usuario. Un spot sin
+  // autor no tiene a nadie a quien pertenecerle más que al viaje: si el
+  // usuario actual puede verlo (es miembro del viaje), puede borrarlo.
+  const canDelete = spot?.created_by === currentUserEmail || !spot?.created_by;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId, spot?.created_by_user_id);
   const isReal = spot?.id && !String(spot?.id || '').startsWith('seed_');
   const { data: comments = [] } = useQuery({
