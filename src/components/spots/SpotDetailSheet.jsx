@@ -23,7 +23,16 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // Mismo criterio que SpotCard.jsx: solo quien creó el spot puede borrarlo.
   // Antes cualquier miembro del grupo veía el botón de borrar sin confirmación.
-  const canDelete = spot?.created_by === currentUserEmail;
+  //
+  // Caso especial: los spots guardados desde "Buscar" (resultados de OSM,
+  // ver saveOsmPlace en Restaurants.jsx) se crean con created_by: null a
+  // propósito — no tienen autor, solo quien los guardó (saved_by). Con el
+  // criterio de arriba, created_by === currentUserEmail nunca era cierto
+  // para ellos (null !== email), así que NADIE podía borrarlos — ni
+  // siquiera quien los guardó. Se añade ese caso: si el spot no tiene autor
+  // y el usuario actual está en saved_by, puede borrarlo.
+  const canDelete = spot?.created_by === currentUserEmail
+    || (!spot?.created_by && Array.isArray(spot?.saved_by) && spot.saved_by.includes(currentUserEmail));
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId, spot?.created_by_user_id);
   const isReal = spot?.id && !String(spot?.id || '').startsWith('seed_');
   const { data: comments = [] } = useQuery({
