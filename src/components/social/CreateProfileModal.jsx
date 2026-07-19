@@ -462,7 +462,7 @@ function SlideHoy() {
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
-export default function CreateProfileModal({ user, open }) {
+export default function CreateProfileModal({ user, open, onComplete }) {
   const { t } = useTranslation();
   // slide: -1=idioma, 0=perfil, 1=pasaporte, 2..5=features
   const [slide, setSlide] = useState(-1);
@@ -734,7 +734,7 @@ export default function CreateProfileModal({ user, open }) {
 
         {isLastSlide && (
           <button
-            onClick={() => {/* queryClient ya invalidó → TripsList se refresca */}}
+            onClick={() => onComplete?.()}
             className="w-full py-3.5 rounded-full bg-primary text-white text-sm font-bold transition-colors"
           >
             {t('common.start')}
