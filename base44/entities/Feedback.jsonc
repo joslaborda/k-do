@@ -1,0 +1,51 @@
+{
+  "name": "Feedback",
+  "type": "object",
+  "properties": {
+    "feedback_type": {
+      "type": "string",
+      "enum": [
+        "bug",
+        "suggestion",
+        "other"
+      ],
+      "description": "Categoría elegida por el usuario en el formulario de Ayuda y sugerencias"
+    },
+    "message": {
+      "type": "string",
+      "description": "Texto libre escrito por el usuario"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email de quien envía — copiado en el momento del envío para no depender de joins si el usuario borra la cuenta después"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nombre visible de quien envía, en el momento del envío"
+    },
+    "app_language": {
+      "type": "string",
+      "description": "Idioma activo en la app cuando se envió — útil para saber en qué idioma responder"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "read"
+      ],
+      "default": "new",
+      "description": "Se revisa manualmente desde el panel de datos de base44 — no hay bandeja dentro de la app"
+    }
+  },
+  "required": [
+    "feedback_type",
+    "message",
+    "user_email"
+  ],
+  "rls": {
+    "create": true,
+    "read": { "data.user_email": "{{user.email}}" },
+    "update": false,
+    "delete": false
+  }
+}
