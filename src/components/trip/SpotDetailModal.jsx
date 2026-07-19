@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { getTripDays, tripDayOptionValue } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
 
 const SPOT_ICONS = {
   food:     Utensils,
@@ -58,7 +58,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
       const own = allDays.filter(d => d.cityId === spot.city_id);
       return own.length > 0 ? own : allDays;
     }
-    const sameCity = allDays.filter(d => d.city === spotCityName);
+    const sameCity = allDays.filter(d => sameCityName(d.city, spotCityName));
     return sameCity.length > 0 ? sameCity : allDays;
   }, [tripCities, spot?.city_id, spot?.city_name]);
 
