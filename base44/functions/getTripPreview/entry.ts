@@ -44,8 +44,9 @@ Deno.serve(async (req) => {
 
     // Igual que en acceptTripInvite: el enlace está atado al email invitado,
     // así que un token válido reenviado a otra persona no le sirve para
-    // fisgonear el viaje.
-    if (invite.email && invite.email.toLowerCase() !== normalizedUserEmail) {
+    // fisgonear el viaje. Se exige SIEMPRE, incluso si invite.email viniera
+    // vacío (antes se saltaba la comprobación en ese caso).
+    if (!invite.email || invite.email.toLowerCase() !== normalizedUserEmail) {
       return Response.json({ error: "Esta invitación no es para tu cuenta" }, { status: 403 });
     }
 
