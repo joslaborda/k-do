@@ -1112,6 +1112,8 @@
       "goToTrip": "Ir al viaje →",
       "alreadyMemberTitle": "Ya eres miembro",
       "alreadyMemberBody1": "Ya formas parte de",
+      "declinedTitle": "Ya rechazaste esta invitación",
+      "declinedBody": "Si cambiaste de opinión, pide que te inviten de nuevo a",
       "mismatchTitle": "Esta invitación es para otra cuenta",
       "mismatch1": "La invitación se envió a",
       "mismatch2": ", pero has iniciado sesión como",
@@ -1123,6 +1125,7 @@
       "role": "Rol:",
       "createAccountHint": "Crea una cuenta con el email al que te enviaron la invitación para unirte al viaje.",
       "joinTrip": "Unirme al viaje",
+      "loginToAccept": "Iniciar sesión para unirme",
       "step1": "Un compañero te invita desde su viaje",
       "step2": "Recibes una notificación en el bell",
       "step3": "Aceptas y tienes acceso completo al viaje"

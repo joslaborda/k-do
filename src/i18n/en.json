@@ -1112,6 +1112,8 @@
       "goToTrip": "Go to trip →",
       "alreadyMemberTitle": "You're already a member",
       "alreadyMemberBody1": "You're already part of",
+      "declinedTitle": "You already declined this invitation",
+      "declinedBody": "If you changed your mind, ask to be invited again to",
       "mismatchTitle": "This invitation is for another account",
       "mismatch1": "The invitation was sent to",
       "mismatch2": ", but you signed in as",
@@ -1123,6 +1125,7 @@
       "role": "Role:",
       "createAccountHint": "Create an account with the email the invitation was sent to in order to join the trip.",
       "joinTrip": "Join the trip",
+      "loginToAccept": "Sign in to join",
       "step1": "A companion invites you from their trip",
       "step2": "You get a notification in the bell",
       "step3": "You accept and get full access to the trip"
