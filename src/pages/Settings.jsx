@@ -244,87 +244,6 @@ function DeleteAccountRow({ user, profile }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Reparación puntual de trip_members (TEMPORAL)
-//
-// Sección visible solo para José (ADMIN_EMAIL) para disparar la función
-// repairTripMembers desde la propia app, sin depender de un panel de "test"
-// de funciones en base44. Repara TODOS los viajes de una sola pasada:
-// re-escribe trip_members en cada registro de las entidades sincronizadas
-// para que coincida con trip.members actual — arregla los registros que se
-// quedaron con trip_members: [] por la condición de carrera ya corregida en
-// el código de creación (parecían "borrados" sin estarlo).
-//
-// Es seguro volver a pulsarlo más de una vez (idempotente). Quitar esta
-// sección cuando José confirme que los datos de todos los viajes afectados
-// han vuelto a aparecer — ya no hará falta.
-// ─────────────────────────────────────────────────────────────────────────────
-const ADMIN_EMAIL = 'jlabord@gmail.com';
-
-function RepairTripMembersRow({ user }) {
-  const [running, setRunning] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  if ((user?.email || '').toLowerCase() !== ADMIN_EMAIL) return null;
-
-  const handleRun = async () => {
-    setRunning(true);
-    setError('');
-    setResult(null);
-    setCopied(false);
-    try {
-      const res = await base44.functions.invoke('repairTripMembers', {});
-      const data = res?.data ?? res;
-      setResult(data);
-    } catch (e) {
-      setError(e?.message || 'Error ejecutando la función');
-    } finally {
-      setRunning(false);
-    }
-  };
-
-  const resultText = result ? JSON.stringify(result, null, 2) : '';
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(resultText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
-  };
-
-  return (
-    <div className="bg-card border border-border rounded-2xl overflow-hidden mt-3">
-      <div className="px-4 py-3.5 border-b border-border">
-        <p className="text-sm font-medium text-foreground">🛠 Reparar datos de viajes (temporal)</p>
-        <p className="text-xs text-muted-foreground mt-0.5">Re-sincroniza trip_members en todos los viajes. Solo tú ves este botón.</p>
-      </div>
-      <div className="px-4 py-3.5 space-y-3">
-        <button onClick={handleRun} disabled={running}
-          className="w-full py-2.5 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-40">
-          {running ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Ejecutar reparación'}
-        </button>
-        {error && <p className="text-xs text-red-500">{error}</p>}
-        {result && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-green-600 font-medium">Listo — resultado abajo:</p>
-              <button onClick={handleCopy} className="text-xs text-primary font-medium">
-                {copied ? 'Copiado ✓' : 'Copiar resultado'}
-              </button>
-            </div>
-            <pre className="text-[10px] leading-tight bg-secondary rounded-xl p-3 overflow-auto max-h-64 whitespace-pre-wrap break-all">
-              {resultText}
-            </pre>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Settings() {
@@ -669,7 +588,6 @@ export default function Settings() {
             right={<ChevronRight className="w-3 h-3 text-muted-foreground" />}
           />
         </div>
-        <RepairTripMembersRow user={user} />
 
       </div>
       {/* Guardar */}
