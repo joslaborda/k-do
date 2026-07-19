@@ -39,15 +39,29 @@ function TripInviteModal({ notif, onClose, onAccept }) {
     if (!notif?.trip_id) { setLoading(false); return; }
     (async () => {
       try {
-        const fetchedTrip = await base44.entities.Trip.get(notif.trip_id);
+        if (!currentUser?.email) { setLoading(false); return; }
+        // invites.js siempre guarda el email en minúsculas (normalizedEmail);
+        // si aquí se filtraba con currentUser.email tal cual, un email con
+        // mayúsculas nunca encontraba su propia invitación pendiente.
+        const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email.toLowerCase(), status: 'pending' });
+        const currentInvite = invs[0] || null;
+        setInvite(currentInvite);
+
+        // Trip.read ya no está abierto a cualquier usuario logueado (solo a
+        // miembros) — quien ve este modal todavía no lo es, así que hace
+        // falta pasar por getTripPreview con el token de SU invitación en
+        // vez de leer el viaje directo. Sin invitación pendiente ya no hay
+        // forma legítima de previsualizarlo aquí.
+        if (!currentInvite) { setLoading(false); return; }
+        const result = await base44.functions.invoke('getTripPreview', {
+          tripId: notif.trip_id,
+          token: currentInvite.invite_token,
+        });
+        const data = result?.data ?? result;
+        if (data?.error) { setLoading(false); return; }
+        const fetchedTrip = data.trip;
         setTripData(fetchedTrip);
-        if (currentUser?.email) {
-          // invites.js siempre guarda el email en minúsculas (normalizedEmail);
-          // si aquí se filtraba con currentUser.email tal cual, un email con
-          // mayúsculas nunca encontraba su propia invitación pendiente.
-          const invs = await base44.entities.TripInvite.filter({ trip_id: notif.trip_id, email: currentUser.email.toLowerCase(), status: 'pending' });
-          setInvite(invs[0] || null);
-        }
+
         const memberEmails = fetchedTrip.members || [];
         const users = await base44.entities.User.filter({ email: { $in: memberEmails } });
         const ids = users.map(u => u.id).filter(Boolean);
