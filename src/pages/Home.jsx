@@ -62,12 +62,19 @@ export default function Home() {
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('trip_id');
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('trip_id');
     if (!id || id === 'null' || id === 'default') {
       navigate(createPageUrl('TripsList'), { replace: true });
       return;
     }
     setTripId(id);
+    // Cities.jsx enlaza aquí con ?open_settings=true para "+ Ciudad" (añadir
+    // ciudad vive dentro del diálogo de ajustes del viaje, no tiene pantalla
+    // propia) — sin esto el enlace aterrizaba en Inicio sin abrir nada.
+    if (params.get('open_settings') === 'true') {
+      setSettingsOpen(true);
+    }
     window.scrollTo(0, 0);
   }, [navigate]);
 

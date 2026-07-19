@@ -731,7 +731,10 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
     return m;
   }, [itineraryDays, city.id]);
 
-  const transportIcon = useMemo(() =>
+  // Componente de icono, no un elemento — hay que renderizarlo como <TransportIcon />,
+  // nunca como {transportIcon}: React no admite una referencia a función como hijo
+  // (crashea la pantalla entera en cuanto hay un vuelo/tren/bus entre dos ciudades).
+  const TransportIcon = useMemo(() =>
     getTransportIcon(allDocs, city.start_date),
     [allDocs, city.start_date]
   );
@@ -797,10 +800,10 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
       )}
 
       {/* Conector transporte entre ciudades */}
-      {idx < total - 1 && transportIcon && (
+      {idx < total - 1 && TransportIcon && (
         <div className="flex items-center gap-3 px-2 py-3">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-xs text-muted-foreground font-medium">{transportIcon}</span>
+          <TransportIcon className="w-3.5 h-3.5 text-muted-foreground" />
           <div className="flex-1 h-px bg-border" />
         </div>
       )}
