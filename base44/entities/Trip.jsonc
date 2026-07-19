@@ -85,5 +85,11 @@
     "name",
     "destination",
     "start_date"
-  ]
+  ],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": { "data.members": { "$in": ["{{user.email}}"] } },
+    "delete": { "created_by": "{{user.email}}" }
+  }
 }
