@@ -158,8 +158,14 @@ export default function SpotsSection({ cityId, tripId, currentUserEmail, trip, d
     enabled: !!cityId && !!tripId,
   });
 
+  // Si `trip` no había cargado (conexión lenta/intermitente), antes se
+  // guardaba con trip_members:[] y el spot quedaba invisible para siempre,
+  // ni para quien lo creó. Se corta antes de guardar algo roto.
   const createMutation = useMutation({
-    mutationFn: data => base44.entities.Spot.create({ ...data, trip_members: trip?.members || [] }),
+    mutationFn: data => {
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.Spot.create({ ...data, trip_members: trip.members });
+    },
     // Restaurants.jsx (la vista de spots de todo el viaje) cachea bajo
     // ['spots', tripId], no ['spots', cityId] — un spot creado aquí, en la
     // vista de ciudad, no aparecía ahí hasta recargar la página entera.
