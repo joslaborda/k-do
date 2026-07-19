@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 
 export default
-function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
+function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembers }) {
   const { t, i18n } = useTranslation();
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -81,6 +81,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile }) {
       user_email: currentUserEmail,
       display_name: myProfile?.display_name || currentUserEmail,
       avatar_url: myProfile?.avatar_url || null,
+      trip_members: tripMembers || [],
       ...payload,
     }),
     onSuccess: () => {

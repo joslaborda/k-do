@@ -132,6 +132,7 @@ function SettingsDialog({
         country: normalizeCountry(cityDraft.country || ''),
         start_date: cityDraft.start_date || '',
         end_date: cityDraft.end_date || '',
+        trip_members: trip?.members || [],
       });
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
