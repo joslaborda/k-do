@@ -82,7 +82,11 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
       user_email: currentUserEmail,
       display_name: myProfile?.display_name || currentUserEmail,
       avatar_url: myProfile?.avatar_url || null,
-      trip_members: tripMembers || [],
+      // Si tripMembers (trip?.members del padre) no había cargado, antes se
+      // guardaba con trip_members:[] y el mensaje quedaba invisible para
+      // siempre, ni para quien lo mandó — como mínimo se incluye a quien
+      // escribe.
+      trip_members: tripMembers?.length ? tripMembers : [currentUserEmail],
       ...payload,
     }),
     onSuccess: () => {

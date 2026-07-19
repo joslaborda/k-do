@@ -126,13 +126,17 @@ function SettingsDialog({
     if (!cityDraft.name?.trim()) return;
     setCityLoading('new');
     try {
+      // Si `trip` no había cargado (conexión lenta/intermitente), antes se
+      // guardaba con trip_members:[] y la ciudad quedaba invisible para
+      // siempre, ni para quien la creó.
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
       await base44.entities.City.create({
         trip_id: tripId,
         name: cityDraft.name.trim(),
         country: normalizeCountry(cityDraft.country || ''),
         start_date: cityDraft.start_date || '',
         end_date: cityDraft.end_date || '',
-        trip_members: trip?.members || [],
+        trip_members: trip.members,
       });
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
