@@ -478,20 +478,33 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
 
-  // El spot ya tiene city_id fijo desde que se creó (la ciudad activa en ese
-  // momento). Cities.jsx solo lo muestra en un día si `assigned_date` Y
-  // `city_id` coinciden con ese día — si aquí se deja elegir una fecha de OTRA
-  // ciudad del viaje, el spot queda con una fecha que no cuadra con su city_id
-  // y desaparece de todas las vistas de itinerario sin aviso. Por eso los
-  // días que se ofrecen aquí se filtran a la ciudad del propio spot.
+  // Si el viaje visita la misma ciudad más de una vez (varios registros City
+  // con el mismo nombre, p. ej. Lima 3 veces en fechas distintas), agrupar
+  // por NOMBRE en vez de por el city_id exacto de la estancia en la que se
+  // creó el spot — si no, solo se podían elegir los días de la primera
+  // visita. Al confirmar (ver isAllowed/onAssign más abajo) se re-ancla el
+  // spot a la estancia que de verdad contiene la fecha elegida, para que no
+  // desaparezca de las vistas de itinerario (que exigen que assigned_date Y
+  // city_id coincidan).
   const dayOptions = useMemo(() => {
     const allDays = getTripDays(tripCities);
-    if (!spot?.city_id) return allDays;
-    const own = allDays.filter(d => d.cityId === spot.city_id);
-    return own.length > 0 ? own : allDays;
-  }, [tripCities, spot?.city_id]);
+    const spotCityName = spot?.city_name || tripCities.find(c => c.id === spot?.city_id)?.name;
+    if (!spotCityName) {
+      if (!spot?.city_id) return allDays;
+      const own = allDays.filter(d => d.cityId === spot.city_id);
+      return own.length > 0 ? own : allDays;
+    }
+    const sameCity = allDays.filter(d => d.city === spotCityName);
+    return sameCity.length > 0 ? sameCity : allDays;
+  }, [tripCities, spot?.city_id, spot?.city_name]);
 
   const tripDates = useMemo(() => new Set(dayOptions.map(d => d.date)), [dayOptions]);
+
+  const resolveCityIdForDate = (dateStr) => {
+    if (!dateStr) return null;
+    const c = tripCities.find(c => c.start_date && c.end_date && dateStr >= c.start_date && dateStr <= c.end_date);
+    return c?.id || null;
+  };
 
   const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
   const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
@@ -558,7 +571,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
           <button
             onClick={() => {
               if (selectedDate && isAllowed(selectedDate)) {
-                onAssign(selectedDate);
+                onAssign(selectedDate, resolveCityIdForDate(selectedDate));
               } else {
                 onSkip();
               }
@@ -1378,8 +1391,16 @@ export default function Restaurants() {
         <AssignDateModal
           spot={assignDateSpot}
           tripCities={tripCities}
-          onAssign={async (date) => {
-            await updateMutation.mutateAsync({ id: assignDateSpot.id, data: { assigned_date: date } });
+          onAssign={async (date, resolvedCityId) => {
+            const data = { assigned_date: date };
+            // Re-ancla el spot a la estancia correcta si la fecha elegida
+            // pertenece a otra visita a la misma ciudad — si no, se queda
+            // con el city_id de la estancia original y desaparece de las
+            // vistas de itinerario (que exigen que ambos coincidan).
+            if (resolvedCityId && resolvedCityId !== assignDateSpot.city_id) {
+              data.city_id = resolvedCityId;
+            }
+            await updateMutation.mutateAsync({ id: assignDateSpot.id, data });
             setAssignDateSpot(null);
           }}
           onSkip={() => setAssignDateSpot(null)}
