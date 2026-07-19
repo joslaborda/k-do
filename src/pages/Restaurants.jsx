@@ -16,7 +16,7 @@ import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays, tripDayOptionValue } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
 
 
 
@@ -494,7 +494,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
       const own = allDays.filter(d => d.cityId === spot.city_id);
       return own.length > 0 ? own : allDays;
     }
-    const sameCity = allDays.filter(d => d.city === spotCityName);
+    const sameCity = allDays.filter(d => sameCityName(d.city, spotCityName));
     return sameCity.length > 0 ? sameCity : allDays;
   }, [tripCities, spot?.city_id, spot?.city_name]);
 
