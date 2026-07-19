@@ -107,6 +107,11 @@
     "day_order": {
       "type": "number",
       "description": "Orden manual dentro de los items sin hora fija de un día (arrastrar para reordenar). Igual que Spot.day_order."
+    },
+    "trip_members": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copia de Trip.members en el momento de crear/sincronizar — usada por rls porque base44 no permite comprobar la pertenencia al viaje contra otra entidad. Se mantiene al día vía syncTripMembers() cada vez que cambia la membresía del viaje."
     }
   },
   "required": [
@@ -114,5 +119,23 @@
     "user_id",
     "name",
     "category"
-  ]
+  ],
+  "rls": {
+    "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "read": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "$and": [ { "data.visibility": "shared" }, { "data.trip_members": { "$in": ["{{user.email}}"] } } ] },
+        { "$and": [ { "data.visibility": "selected_users" }, { "data.shared_with": { "$in": ["{{user.email}}"] } } ] }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "$and": [ { "data.visibility": "shared" }, { "data.trip_members": { "$in": ["{{user.email}}"] } } ] },
+        { "$and": [ { "data.visibility": "selected_users" }, { "data.shared_with": { "$in": ["{{user.email}}"] } } ] }
+      ]
+    },
+    "delete": { "created_by": "{{user.email}}" }
+  }
 }

@@ -39,6 +39,11 @@
       "type": "boolean",
       "default": false,
       "description": "Marca el art\u00edculo como esencial (se resalta y se cuenta aparte)"
+    },
+    "trip_members": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copia de Trip.members en el momento de crear/sincronizar \u2014 usada por rls porque base44 no permite comprobar la pertenencia al viaje contra otra entidad. Se mantiene al d\u00eda v\u00eda syncTripMembers() cada vez que cambia la membres\u00eda del viaje."
     }
   },
   "required": [
@@ -46,5 +51,11 @@
     "user_id",
     "name",
     "category"
-  ]
+  ],
+  "rls": {
+    "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "read": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "update": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "delete": { "data.trip_members": { "$in": ["{{user.email}}"] } }
+  }
 }

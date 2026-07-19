@@ -16,10 +16,21 @@
     },
     "order": {
       "type": "number"
+    },
+    "trip_members": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copia de Trip.members en el momento de crear/sincronizar — usada por rls porque base44 no permite comprobar la pertenencia al viaje contra otra entidad. Se mantiene al día vía syncTripMembers() cada vez que cambia la membresía del viaje."
     }
   },
   "required": [
     "trip_id",
     "text"
-  ]
+  ],
+  "rls": {
+    "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "read": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "update": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "delete": { "data.trip_members": { "$in": ["{{user.email}}"] } }
+  }
 }

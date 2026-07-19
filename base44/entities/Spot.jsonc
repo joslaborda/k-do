@@ -133,11 +133,35 @@
         "saved_import"
       ],
       "description": "C\u00f3mo se a\u00f1adi\u00f3 el spot: manual, importado de b\u00fasqueda OSM, o importado de la wishlist personal"
+    },
+    "trip_members": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copia de Trip.members en el momento de crear/sincronizar \u2014 usada por rls porque base44 no permite comprobar la pertenencia al viaje contra otra entidad. Se mantiene al d\u00eda v\u00eda syncTripMembers() cada vez que cambia la membres\u00eda del viaje."
     }
   },
   "required": [
     "trip_id",
     "title",
     "type"
-  ]
+  ],
+  "rls": {
+    "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    "read": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "data.visibility": "public" },
+        { "$and": [ { "data.visibility": "trip_members" }, { "data.trip_members": { "$in": ["{{user.email}}"] } } ] },
+        { "$and": [ { "data.visibility": "selected_users" }, { "data.shared_with": { "$in": ["{{user.email}}"] } } ] }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "created_by": "{{user.email}}" },
+        { "$and": [ { "data.visibility": "trip_members" }, { "data.trip_members": { "$in": ["{{user.email}}"] } } ] },
+        { "$and": [ { "data.visibility": "selected_users" }, { "data.shared_with": { "$in": ["{{user.email}}"] } } ] }
+      ]
+    },
+    "delete": { "created_by": "{{user.email}}" }
+  }
 }
