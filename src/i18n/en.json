@@ -973,6 +973,7 @@
   },
   "cities": {
     "title": "Route",
+    "tripNotLoadedRetry": "The trip is still loading — wait a second and try again.",
     "addCity": "Add city",
     "noCity": "No cities",
     "nights": "{{count}} nights",

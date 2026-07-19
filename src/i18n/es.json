@@ -973,6 +973,7 @@
   },
   "cities": {
     "title": "Ruta",
+    "tripNotLoadedRetry": "El viaje todavía se está cargando — espera un segundo y vuelve a intentarlo.",
     "addCity": "Añadir ciudad",
     "noCity": "Sin ciudades",
     "nights": "{{count}} noches",
