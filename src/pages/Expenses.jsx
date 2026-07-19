@@ -1026,8 +1026,14 @@ export default function Expenses() {
     enabled: !!tripId, staleTime: 30000,
   });
 
+  // trip_members determina quién puede volver a leer este gasto (rls de
+  // Expense). Antes, si el usuario creaba un gasto justo cuando `trip`
+  // todavía no había cargado (conexión lenta/intermitente — muy real en
+  // gente viajando), se guardaba con trip_members:[] y el gasto quedaba
+  // invisible para siempre, incluso para quien lo creó — parecía "borrado"
+  // sin estarlo. Como mínimo se incluye siempre al propio creador.
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || [] }),
+    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || (currentUser?.email ? [currentUser.email] : []) }),
     onError: () => toast({ title: t('expenses.saveError'), description: t('common.tryAgain'), variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });

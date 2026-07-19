@@ -362,20 +362,27 @@ export default function CityDetail() {
     staleTime: 30000,
   });
 
+  // trip_members controla quién puede volver a leer este día (rls de
+  // ItineraryDay) — si `trip` no había cargado todavía al crear, se
+  // guardaba con trip_members:[] y el día quedaba invisible para siempre,
+  // ni para quien lo creó. Se corta antes de guardar un registro roto.
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ItineraryDay.create({
-      ...data,
-      city_id: cityId,
-      trip_id: tripId,
-      order: days.length,
-      trip_members: trip?.members || [],
-    }),
+    mutationFn: (data) => {
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.ItineraryDay.create({
+        ...data,
+        city_id: cityId,
+        trip_id: tripId,
+        order: days.length,
+        trip_members: trip.members,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['itineraryDays', cityId] });
       setDialogOpen(false);
       setFormData({ title: '', date: '', content: '' });
     },
-  
+
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 

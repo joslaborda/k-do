@@ -357,8 +357,14 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
     enabled: !!tripId, staleTime: 30000,
   });
 
+  // Si `tripMembers` (trip?.members del padre) no había cargado, antes se
+  // guardaba con trip_members:[] y el item de la maleta quedaba invisible
+  // para siempre, ni para quien lo creó. Se corta antes de guardar algo roto.
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId, trip_members: tripMembers || [] }),
+    mutationFn: d => {
+      if (!tripMembers?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.PackingItem.create({ ...d, trip_id: tripId, user_id: userId, trip_members: tripMembers });
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['packingItems', tripId] }),
   
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),

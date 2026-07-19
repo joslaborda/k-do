@@ -107,7 +107,10 @@ export default function Photos() {
             file_type: 'image',
             file_name: file.name,
             taken_at: takenAt || new Date().toISOString(),
-            trip_members: trip?.members || [],
+            // Si `trip` no había cargado, antes se guardaba trip_members:[] y
+            // la foto quedaba invisible para siempre (ni para quien la subió)
+            // — como mínimo se incluye a quien sube la foto.
+            trip_members: trip?.members || [user.email],
           });
           uploaded.push(file_url);
         } catch {

@@ -253,7 +253,13 @@ export default function Documents() {
     // Ticket compara contra esto (no puede comprobar la pertenencia al viaje
     // directamente, base44 no soporta condiciones cross-entity). Se mantiene
     // sincronizado por syncTripMembers() cada vez que cambia la membresía.
-    mutationFn: (data) => base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId, trip_members: trip?.members || [] }),
+    // Si `trip` todavía no había cargado (conexión lenta/intermitente) se
+    // guardaba antes con trip_members:[] — el documento quedaba invisible
+    // para siempre, ni para quien lo subió. Se corta antes de crear algo roto.
+    mutationFn: (data) => {
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.Ticket.create({ ...enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id), trip_id: tripId, user_id: userId, trip_members: trip.members });
+    },
     onSuccess: (newDoc, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       setAddOpen(false);

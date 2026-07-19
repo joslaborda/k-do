@@ -718,8 +718,14 @@ export default function Restaurants() {
   }, [importSavedParam, importableSpots.length]);
 
   // Mutations
+  // Si `trip` no había cargado (conexión lenta/intermitente), antes se
+  // guardaba con trip_members:[] y el spot quedaba invisible para siempre,
+  // ni para quien lo creó. Se corta antes de guardar algo roto.
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Spot.create({ ...d, trip_members: trip?.members || [] }),
+    mutationFn: d => {
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.Spot.create({ ...d, trip_members: trip.members });
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['spots', tripId] }),
 
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
