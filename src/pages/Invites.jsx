@@ -20,7 +20,7 @@ export default function Invites() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, navigateToLogin } = useAuth();
   const [processing, setProcessing] = useState(false);
 
   // ── Con token: aceptar desde email ─────────────────────────────────────────
@@ -159,11 +159,10 @@ export default function Invites() {
       );
     }
 
-    // Invitación ya aceptada — detectar si el usuario ya es miembro
-    const alreadyMember = invite._status !== 'pending' ||
-      (currentUser?.email && trip?.members?.includes(currentUser.email.toLowerCase()));
+    // Ya es miembro del viaje (aceptó esta invitación u otra, o ya estaba dentro).
+    const isMember = currentUser?.email && trip?.members?.includes(currentUser.email.toLowerCase());
 
-    if (alreadyMember && trip) {
+    if (isMember) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
@@ -176,6 +175,48 @@ export default function Invites() {
           <button onClick={() => navigate(createPageUrl('Home') + `?trip_id=${trip.id}`)}
             className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
             {t('invites.page.goToTrip')}
+          </button>
+        </div>
+      );
+    }
+
+    // Antes esto se trataba igual que "ya eres miembro" (cualquier status
+    // distinto de 'pending' caía en esa pantalla con botón "ir al viaje") —
+    // alguien que había RECHAZADO la invitación, o cuyo enlace ya no era
+    // válido por otro motivo, veía "ya eres miembro de X" sin serlo: la
+    // tarjeta del viaje se veía, pero ningún botón de aceptar/rechazar tenía
+    // sentido ni aparecía. Se distingue cada caso con su propio mensaje.
+    if (invite._status === 'declined') {
+      return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
+          <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
+            <X className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">{t('invites.page.declinedTitle')}</h2>
+          <p className="text-sm text-muted-foreground text-center">
+            {t('invites.page.declinedBody')} <span className="font-medium text-foreground">{trip.name}</span>.
+          </p>
+          <button onClick={() => navigate(createPageUrl('TripsList'))}
+            className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
+            {t('invites.page.goToTrips')}
+          </button>
+        </div>
+      );
+    }
+
+    if (invite._status !== 'pending') {
+      return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
+          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+            <X className="w-7 h-7 text-red-500" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">{t('invites.page.invalidTitle')}</h2>
+          <p className="text-sm text-muted-foreground text-center">
+            {t('invites.page.invalidBody')}
+          </p>
+          <button onClick={() => navigate(createPageUrl('TripsList'))}
+            className="h-11 px-8 rounded-full bg-primary text-white text-sm font-medium mt-2">
+            {t('invites.page.goToTrips')}
           </button>
         </div>
       );
@@ -251,16 +292,26 @@ export default function Invites() {
           )}
         </div>
 
-        {/* Botones */}
+        {/* Botones — sin sesión, el botón principal era "Unirme al viaje"
+            deshabilitado sin ninguna explicación visible de por qué ni forma
+            de arreglarlo: parecía que la invitación no existía. Ahora ese
+            mismo botón lleva directo al login/registro de Kōdo. */}
         <div className="px-5 pb-10 flex gap-3">
           <button onClick={handleDecline} disabled={processing}
             className="flex-1 h-12 rounded-full border border-border text-sm font-medium text-muted-foreground bg-card">
             {t('common.reject')}
           </button>
-          <button onClick={handleAccept} disabled={processing || !currentUser}
-            className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold disabled:opacity-50">
-            {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('invites.page.joinTrip')}
-          </button>
+          {currentUser ? (
+            <button onClick={handleAccept} disabled={processing}
+              className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold disabled:opacity-50">
+              {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : t('invites.page.joinTrip')}
+            </button>
+          ) : (
+            <button onClick={() => navigateToLogin()}
+              className="flex-1 h-12 rounded-full bg-primary text-white text-sm font-semibold">
+              {t('invites.page.loginToAccept')}
+            </button>
+          )}
         </div>
       </div>
     );
