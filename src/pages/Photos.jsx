@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
 import { checkUpload } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
@@ -349,7 +350,14 @@ export default function Photos() {
             </p>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>
               {currentPhoto.taken_at || currentPhoto.created_date
-                ? format(parseISO(currentPhoto.taken_at || currentPhoto.created_date), "d MMM yyyy · HH:mm", { locale: es })
+                ? format(
+                    // taken_at lo pone el cliente con toISOString() (trae Z);
+                    // created_date es el timestamp automático de base44, que
+                    // puede no traerlo — de ahí parseServerDate en ese caso.
+                    currentPhoto.taken_at ? parseISO(currentPhoto.taken_at) : parseServerDate(currentPhoto.created_date),
+                    "d MMM yyyy · HH:mm",
+                    { locale: es }
+                  )
                 : ''}
             </p>
             <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 4 }}>

@@ -12,6 +12,7 @@ import { toast } from '@/components/ui/use-toast';
 import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 import { daysUntil } from '@/lib/tripDays';
+import { parseServerDate } from '@/lib/parseServerDate';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -176,7 +177,7 @@ export default function Home() {
     return tripMessages.filter(m =>
       m.user_id !== currentUserId &&
       m.user_email !== currentUserEmail &&
-      new Date(m.created_date) > chatLastRead
+      parseServerDate(m.created_date) > chatLastRead
     ).length;
   }, [tripMessages, currentUserId, currentUserEmail, chatLastRead]);
 

@@ -44,6 +44,13 @@ export default function TripsList() {
   const [dialogOpen, setDialogOpen]           = useState(false);
   const [newTripPopup, setNewTripPopup]       = useState(null); // { trip, spotCount, country }
   const [showPast, setShowPast] = useState(false);
+  // CreateProfileModal crea el perfil e invalida la query de `myProfile` para
+  // pasar a las slides de "tour" (2-5) — pero esa misma invalidación hace que
+  // `needsOnboarding` (que depende de myProfile === null) pase a false casi
+  // al instante, desmontando el modal entero antes de que el usuario llegue
+  // a verlas. Este flag local separa "ya se completó el onboarding" de "ya
+  // existe el perfil en caché", para que el modal no desaparezca solo.
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const { user, isLoading: userLoading } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -203,7 +210,9 @@ export default function TripsList() {
 
   return (
     <div className="min-h-screen bg-background">
-      {needsOnboarding && <CreateProfileModal user={user} open={true} />}
+      {needsOnboarding && !onboardingDismissed && (
+        <CreateProfileModal user={user} open={true} onComplete={() => setOnboardingDismissed(true)} />
+      )}
 
       {/* ── Header ── */}
       <div className="bg-background border-b border-border sticky top-0 z-10">
