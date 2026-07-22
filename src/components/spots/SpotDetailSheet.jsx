@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { X } from 'lucide-react';
+import { X, MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
-import { TYPE_CONFIG } from './spotsHelpers';
+import { TYPE_CONFIG, getMapsUrl } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
@@ -148,6 +148,24 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+          {/* Dirección + Cómo llegar — antes este sheet no tenía ningún enlace
+              a Maps, a diferencia de SpotCard.jsx (misma info, otra vista) y
+              SpotDetailModal.jsx (Home/Ruta). Mismo getMapsUrl que ya usan. */}
+          {(spot.address || (spot.lat && spot.lng)) && (
+            <div className="flex items-center justify-between gap-3">
+              {spot.address ? (
+                <p className="text-xs text-muted-foreground flex items-start gap-1.5 flex-1 min-w-0">
+                  <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
+                  <span className="truncate">{spot.address}</span>
+                </p>
+              ) : <div className="flex-1" />}
+              <a href={getMapsUrl(spot)} target="_blank" rel="noopener noreferrer"
+                className="shrink-0 flex items-center gap-1.5 text-xs text-primary font-medium hover:text-primary/80 transition-colors">
+                <Navigation className="w-3.5 h-3.5" />{t('spots.sheet.directions')}
+              </a>
+            </div>
+          )}
+
           {/* Notes */}
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.sheet.myNote')}</p>

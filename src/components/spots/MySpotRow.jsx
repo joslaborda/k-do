@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Pencil } from 'lucide-react';
-import { TYPE_CONFIG } from './spotsHelpers';
+import { Pencil, Navigation } from 'lucide-react';
+import { TYPE_CONFIG, getMapsUrl } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
@@ -67,6 +67,12 @@ function MySpotRow({ spot, onTap, userId }) {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           {comments.length > 0 ? comments.length : 'Comentar'}
         </button>
+        {(spot.address || (spot.lat && spot.lng)) && (
+          <a href={getMapsUrl(spot)} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors p-1 -m-1 rounded-lg ml-auto">
+            <Navigation className="w-3.5 h-3.5" />{t('spots.sheet.directions')}
+          </a>
+        )}
       </div>
 
       {showComments && <InlineCommentsPopup spot={spot} userId={userId} onClose={() => setShowComments(false)} />}
