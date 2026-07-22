@@ -9,24 +9,13 @@ import { Search, MapPin, User, BookOpen, Loader2, ArrowRight, Utensils, Landmark
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import Avatar from '@/components/trip/Avatar';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 const SPOT_TYPE_ICON = {
   food: Utensils, sight: Landmark, activity: Zap,
   shopping: ShoppingBag, transport: Train, custom: MapPin,
 };
-
-function Avatar({ profile, size = 8 }) {
-  const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
-  if (profile?.avatar_url) {
-    return <img src={profile.avatar_url} className={`w-${size} h-${size} rounded-full object-cover flex-shrink-0`} alt={initials} />;
-  }
-  return (
-    <div className={`w-${size} h-${size} rounded-full bg-orange-100 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0`}>
-      {initials}
-    </div>
-  );
-}
 
 function SectionHeader({ icon: Icon, label, count }) {
   return (
@@ -203,7 +192,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                       onClick={() => goTo(`${createPageUrl('Profile')}?user_id=${profile.user_id}`)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
                     >
-                      <Avatar profile={profile} size={10} />
+                      <Avatar profile={profile} size={40} />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-foreground">{profile.display_name}</p>
                         <p className="text-xs text-muted-foreground">@{profile.username}</p>
