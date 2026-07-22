@@ -2,12 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-// Borrador estándar de Términos de Servicio. NO sustituye una revisión legal
-// real — antes de lanzar la app fuera de este entorno de pruebas, hay que
-// pedirle a un abogado que lo revise (jurisdicción, responsabilidad sobre
-// los datos de viaje, gastos compartidos entre usuarios, etc.). Placeholders
-// como [NOMBRE DE LA EMPRESA/PERSONA] y [EMAIL DE CONTACTO] hay que rellenarlos
-// antes de publicar.
+// Borrador estándar de Términos de Servicio, con contacto (hello@kodotravel.app)
+// y ley aplicable (España) ya rellenados. Sigue sin sustituir una revisión
+// legal real por un abogado antes de un lanzamiento serio — cubre lo básico
+// de un servicio en beta con gastos compartidos entre usuarios e información
+// de viaje no oficial, pero no ha sido validado profesionalmente.
 const CONTENT = {
   es: {
     title: 'Términos de servicio',
@@ -69,13 +68,13 @@ const CONTENT = {
       {
         h: '9. Ley aplicable',
         p: [
-          '[JURISDICCIÓN Y LEY APLICABLE — A RELLENAR CON ASESORÍA LEGAL]',
+          'Estos términos se rigen por la legislación española. Si resides en la Unión Europea, esto no afecta a los derechos de protección al consumidor que te correspondan por la normativa de tu país de residencia.',
         ],
       },
       {
         h: '10. Contacto',
         p: [
-          'Para cualquier duda sobre estos términos: [EMAIL DE CONTACTO].',
+          'Para cualquier duda sobre estos términos: hello@kodotravel.app.',
         ],
       },
     ],
@@ -140,13 +139,13 @@ const CONTENT = {
       {
         h: '9. Governing law',
         p: [
-          '[JURISDICTION AND GOVERNING LAW — TO BE COMPLETED WITH LEGAL ADVICE]',
+          'These terms are governed by Spanish law. If you live in the European Union, this does not affect any consumer-protection rights you have under the law of your country of residence.',
         ],
       },
       {
         h: '10. Contact',
         p: [
-          'For any questions about these terms: [CONTACT EMAIL].',
+          'For any questions about these terms: hello@kodotravel.app.',
         ],
       },
     ],

@@ -2,11 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-// Borrador estándar de Política de Privacidad alineado con RGPD. NO
-// sustituye una revisión legal real — antes de publicar hay que confirmar
-// con un abogado la base legal exacta de cada tratamiento, el responsable
-// del tratamiento, y si hace falta un DPO. Placeholders como
-// [NOMBRE DE LA EMPRESA/PERSONA] y [EMAIL DE CONTACTO] hay que rellenarlos.
+// Borrador estándar de Política de Privacidad alineado con RGPD, con
+// responsable y contacto ya rellenados (José Laborda Ubiria, persona física
+// — hello@kodotravel.app — proyecto individual, no una sociedad
+// constituida; el RGPD exige que el responsable sea una persona
+// identificable de verdad, no solo el nombre de la marca). Sigue sin
+// sustituir una revisión legal real por un abogado: si en algún momento se
+// constituye una empresa, se contratan proveedores nuevos, o se supera
+// cierto volumen de usuarios, hay que revisar si hace falta un DPO y si la
+// base legal de cada tratamiento sigue siendo la correcta.
 const CONTENT = {
   es: {
     title: 'Política de privacidad',
@@ -14,7 +18,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Responsable del tratamiento',
-        p: ['[NOMBRE DE LA EMPRESA/PERSONA RESPONSABLE], contacto: [EMAIL DE CONTACTO].'],
+        p: ['José Laborda Ubiria, como responsable de Kōdo. Contacto: hello@kodotravel.app.'],
       },
       {
         h: '2. Qué datos recogemos',
@@ -49,7 +53,7 @@ const CONTENT = {
         h: '6. Tus derechos',
         p: [
           'Tienes derecho a acceder, rectificar, y solicitar la supresión de tus datos, así como a la portabilidad, oposición y limitación del tratamiento, en los términos que marca el RGPD.',
-          'Puedes editar tus datos directamente en Ajustes, o borrar tu cuenta por completo desde Ajustes → Borrar cuenta. Para cualquier otra solicitud relacionada con tus datos: [EMAIL DE CONTACTO].',
+          'Puedes editar tus datos directamente en Ajustes, o borrar tu cuenta por completo desde Ajustes → Borrar cuenta. Para cualquier otra solicitud relacionada con tus datos: hello@kodotravel.app.',
         ],
       },
       {
@@ -72,7 +76,7 @@ const CONTENT = {
       },
       {
         h: '10. Contacto',
-        p: ['Para cualquier duda sobre privacidad: [EMAIL DE CONTACTO].'],
+        p: ['Para cualquier duda sobre privacidad: hello@kodotravel.app.'],
       },
     ],
   },
@@ -82,7 +86,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Data controller',
-        p: ['[COMPANY/PERSON NAME], contact: [CONTACT EMAIL].'],
+        p: ['José Laborda Ubiria, as the controller for Kōdo. Contact: hello@kodotravel.app.'],
       },
       {
         h: '2. What data we collect',
@@ -117,7 +121,7 @@ const CONTENT = {
         h: '6. Your rights',
         p: [
           'You have the right to access, rectify, and request deletion of your data, as well as portability, objection, and restriction of processing, under GDPR.',
-          'You can edit your data directly in Settings, or delete your account entirely from Settings → Delete account. For any other data-related request: [CONTACT EMAIL].',
+          'You can edit your data directly in Settings, or delete your account entirely from Settings → Delete account. For any other data-related request: hello@kodotravel.app.',
         ],
       },
       {
@@ -140,7 +144,7 @@ const CONTENT = {
       },
       {
         h: '10. Contact',
-        p: ['For any privacy questions: [CONTACT EMAIL].'],
+        p: ['For any privacy questions: hello@kodotravel.app.'],
       },
     ],
   },
