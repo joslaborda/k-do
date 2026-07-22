@@ -124,15 +124,20 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
 
       // Antes un cluster de varios spots se quedaba siendo SIEMPRE un solo
       // número, por mucho zoom que hicieras, y tocarlo mandaba a la lista en
-      // vez de mostrar algo en el mapa. Ahora, a partir de SPLIT_ZOOM, cada
-      // cluster de 2+ dibuja un pin por spot en su coordenada real; por
-      // debajo de ese zoom sigue siendo un solo número agregado. Se
-      // redibuja en cada 'zoomend', no solo al montar.
+      // vez de mostrar algo en el mapa. Luego, al arreglarlo con un
+      // setView(centroide, SPLIT_ZOOM) fijo, si los spots del cluster
+      // estaban repartidos más lejos entre sí de lo que ese zoom llega a
+      // mostrar, los pines quedaban fuera del encuadre — "explotaba a nada".
+      // Ahora, al tocar un cluster: (1) se marca como "expandido" (así se
+      // dibuja como pines individuales pase lo que pase con el zoom
+      // resultante) y (2) se hace fitBounds sobre las coordenadas REALES de
+      // sus spots, no un zoom fijo — así siempre quedan dentro del encuadre.
       let markers = [];
+      const expandedKeys = new Set();
       const drawMarkers = () => {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
-        const exploded = map.getZoom() >= SPLIT_ZOOM;
+        const zoomExploded = map.getZoom() >= SPLIT_ZOOM;
 
         clusters.forEach(c => {
           if (c.count === 1) {
@@ -146,7 +151,7 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
             return;
           }
 
-          if (exploded) {
+          if (zoomExploded || expandedKeys.has(c.key)) {
             c.spots.forEach(spot => {
               const marker = L.marker([spot.lat, spot.lng], { icon: singleIcon(spot) }).addTo(map);
               marker.on('click', (e) => {
@@ -165,7 +170,13 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
             // Evitar que el click del marker también dispare el click del
             // mapa (crearía un pin nuevo justo donde querías ver el cluster).
             if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
-            map.setView([c.lat, c.lng], SPLIT_ZOOM);
+            expandedKeys.add(c.key);
+            const bounds = L.latLngBounds(c.spots.map(s => [s.lat, s.lng]));
+            map.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
+            // fitBounds no siempre dispara 'zoomend' (si el zoom resultante
+            // es el mismo que ya había, solo dispara 'moveend') — se
+            // redibuja también aquí para no depender de eso.
+            drawMarkers();
           });
           markers.push(marker);
         });
