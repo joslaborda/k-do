@@ -2,25 +2,28 @@ import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { normalizeCountry } from '@/lib/countryConfig';
+import { normalizeEmail } from '@/lib/utils';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, Compass, DollarSign, MapPin, Users, X } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
+import Avatar from '@/components/trip/Avatar';
 
 const MAX_AVATARS = 4;
-const AVATAR_COLORS = [
-  'bg-orange-100 text-primary',
-  'bg-violet-100 text-violet-700',
-  'bg-blue-100 text-blue-700',
-  'bg-green-100 text-green-700',
-  'bg-pink-100 text-pink-700',
-];
 
-function TravelersSheet({ open, onClose, trip, profiles }) {
+// Antes esta pantalla tenía su propia lógica local de avatar/nombre —
+// comparación de email sin normalizeEmail() y, si no encontraba el perfil,
+// mostraba el email en crudo en vez del nombre. Es el mismo bug (y el mismo
+// fallback roto) que ya se eliminó de Avatar.jsx/InviteModal.jsx/
+// Expenses.jsx en la ronda anterior, solo que en un archivo que no se tocó
+// entonces — auditoría v2, punto 1.2. Se sustituye por el componente
+// compartido, que nunca cae al email.
+function TravelersSheet({ open, onClose, trip, profilesByEmail, currentUserEmail }) {
   const { t } = useTranslation();
   if (!open) return null;
-  const memberEmails = trip?.members || [];
+  const memberEmails = (trip?.members || []).map(normalizeEmail);
   const roles = trip?.roles || {};
+  const tripCreator = normalizeEmail(trip?.created_by);
   const dateRange = trip?.start_date && trip?.end_date
     ? `${format(parseISO(trip.start_date), 'dd MMM', { locale: es })} – ${format(parseISO(trip.end_date), 'dd MMM yyyy', { locale: es })}`
     : null;
@@ -52,22 +55,13 @@ function TravelersSheet({ open, onClose, trip, profiles }) {
         {/* List */}
         <div className="overflow-y-auto" style={{ maxHeight: '60vh' }}>
           {memberEmails.map((email, i) => {
-            const prof = profiles.find(p => p.email === email || p.user_email === email);
-            const name = prof?.display_name || prof?.username || email;
-            const initials = name.slice(0, 2).toUpperCase();
-            const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
-            const isAdmin = roles[email] === 'admin' || trip?.created_by === email;
-            const sub = prof?.username ? `@${prof.username}` : email;
+            const isAdmin = roles[email] === 'admin' || tripCreator === email;
+            const isMe = email === currentUserEmail;
 
             return (
               <div key={email} className={`flex items-center gap-3 px-5 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
-                {prof?.avatar_url
-                  ? <img src={prof.avatar_url} alt={name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
-                  : <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${color}`}>{initials}</div>
-                }
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{sub}</p>
+                  <Avatar email={email} profiles={profilesByEmail} size={40} showName isMe={isMe} />
                 </div>
                 {isAdmin && (
                   <span className="text-xs bg-orange-50 text-primary border border-orange-200 px-2 py-0.5 rounded-full flex-shrink-0">
@@ -89,6 +83,18 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
   const [showTravelers, setShowTravelers] = useState(false);
   const { t } = useTranslation();
   const allTripSpots = spots;
+  const meNorm = normalizeEmail(currentUserEmail);
+
+  // profiles llega como array — Avatar.jsx espera un mapa por email
+  // normalizado (mismo patrón que profilesByEmail en Expenses.jsx).
+  const profilesByEmail = useMemo(() => {
+    const map = {};
+    profiles.forEach(p => {
+      const key = normalizeEmail(p.email || p.user_email);
+      if (key) map[key] = p;
+    });
+    return map;
+  }, [profiles]);
 
   const isSettlement = (e) => e.is_settlement === true || (e.description || '').startsWith('Liquidación:');
   const realExpenses = expenses.filter(e => !isSettlement(e));
@@ -100,7 +106,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
   const avgPerDay   = totalDays ? totalSpent / totalDays : 0;
   const visitedSpots = allTripSpots.filter(s => !!s.assigned_date).length;
   const currency    = trip?.currency || 'EUR';
-  const memberEmails = trip?.members || [];
+  const memberEmails = (trip?.members || []).map(normalizeEmail);
   const memberCount = memberEmails.length;
 
   const allCountries = useMemo(() => {
@@ -134,15 +140,19 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
   const visibleMembers = memberEmails.slice(0, MAX_AVATARS);
   const overflow = memberCount - MAX_AVATARS;
 
+  // Mismo cálculo que Expenses.jsx (StatsTab.myByCategory) — amounts_by_user
+  // y split_with pueden venir sin normalizar, así que la clave/comparación
+  // se hace siempre contra el email normalizado, nunca contra el crudo.
   const myShare = realExpenses.reduce((s, e) => {
     const amt = parseFloat(e.amount_base || e.amount) || 0;
     if (!amt) return s;
-    if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+    const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
+    if (e.split_type === 'custom' && myShareKey) {
       const total = Object.values(e.amounts_by_user).reduce((t, v) => t + parseFloat(v || 0), 0);
-      return s + (total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0);
+      return s + (total > 0 ? (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt : 0);
     }
-    const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-    if (!parts.includes(currentUserEmail)) return s;
+    const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+    if (!parts.includes(meNorm)) return s;
     return s + amt / parts.length;
   }, 0);
 
@@ -166,8 +176,8 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
       <div className="grid grid-cols-2 gap-3">
         {[
           { label: t('home.finished.tripDays'), value: totalDays || '—', Icon: Calendar },
-          { label: 'Ciudades',      value: cities.length,    Icon: MapPin },
-          { label: 'Spots visitados', value: visitedSpots,  Icon: Compass },
+          { label: t('home.finished.cities'),      value: cities.length,    Icon: MapPin },
+          { label: t('home.finished.visitedSpots'), value: visitedSpots,  Icon: Compass },
         ].map(s => (
           <div key={s.label} className="bg-card rounded-2xl border border-border p-4" style={{ minHeight: 120 }}>
             <s.Icon className="w-4 h-4 text-primary mb-2" />
@@ -184,21 +194,11 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
         >
           <Users className="w-4 h-4 text-primary mb-2" />
           <div className="flex items-center">
-            {visibleMembers.map((email, i) => {
-              const prof = profiles.find(p => p.email === email || p.user_email === email);
-              const name = prof?.display_name || prof?.username || email;
-              const initials = name.slice(0, 2).toUpperCase();
-              const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
-              return prof?.avatar_url
-                ? <img key={email} src={prof.avatar_url} alt={name} title={name}
-                    className="w-9 h-9 rounded-full object-cover border-2 border-card flex-shrink-0"
-                    style={{ marginLeft: i > 0 ? -8 : 0 }} />
-                : <div key={email} title={name}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold border-2 border-card flex-shrink-0 ${color}`}
-                    style={{ marginLeft: i > 0 ? -8 : 0 }}>
-                    {initials}
-                  </div>;
-            })}
+            {visibleMembers.map((email, i) => (
+              <div key={email} className="border-2 border-card rounded-full flex-shrink-0" style={{ marginLeft: i > 0 ? -8 : 0 }}>
+                <Avatar email={email} profiles={profilesByEmail} size={36} />
+              </div>
+            ))}
             {overflow > 0 && (
               <div
                 className="w-9 h-9 rounded-full bg-secondary border-2 border-card flex items-center justify-center flex-shrink-0"
@@ -216,8 +216,8 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
           <p className="text-xs text-muted-foreground mb-0.5">{t('home.finished.yourPart')}</p>
           <p className="text-2xl font-medium text-foreground">{myShare.toFixed(0)} {currency}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Total grupo: <span className="font-medium text-foreground">{totalSpent.toFixed(0)} {currency}</span>
-            {avgPerDay > 0 && <>{' · '}{avgPerDay.toFixed(0)} {currency}/día</>}
+            {t('home.finished.groupTotal')}: <span className="font-medium text-foreground">{totalSpent.toFixed(0)} {currency}</span>
+            {avgPerDay > 0 && <>{' · '}{t('home.finished.perDay', { amount: avgPerDay.toFixed(0), currency })}</>}
           </p>
         </div>
       </div>
@@ -241,7 +241,8 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
         open={showTravelers}
         onClose={() => setShowTravelers(false)}
         trip={trip}
-        profiles={profiles}
+        profilesByEmail={profilesByEmail}
+        currentUserEmail={meNorm}
       />
     </div>
   );
