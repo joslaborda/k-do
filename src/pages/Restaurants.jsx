@@ -8,11 +8,12 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2 } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2, List, Map as MapIcon } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
 import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
+import SpotsMapView from '@/components/spots/SpotsMapView';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
@@ -30,6 +31,33 @@ const OSM_MAP = {
   sports_centre:'activity', cinema:'activity', theatre:'activity',
 };
 function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
+
+// ── Auto-orden por cercanía ──────────────────────────────────────────────────
+// Distancia aproximada en metros (Haversine) — de sobra para decidir "cuál de
+// los que ya hay ese día tengo más cerca", no para calcular una ruta óptima.
+function haversineMeters(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Dado un spot recién asignado a un día y los spots que YA estaban en ese
+// mismo día (ordenados), sugiere en qué índice insertarlo: justo después del
+// que tenga más cerca. Si no hay coordenadas de por medio, se va al final —
+// sigue siendo editable a mano arrastrando en la lista (DraggableSpotList).
+function suggestInsertIndex(newSpot, daySpotsSorted) {
+  const withCoords = daySpotsSorted.filter(s => s.lat && s.lng);
+  if (!withCoords.length || !newSpot.lat || !newSpot.lng) return daySpotsSorted.length;
+  let nearest = withCoords[0], nearestDist = Infinity;
+  withCoords.forEach(s => {
+    const d = haversineMeters(newSpot.lat, newSpot.lng, s.lat, s.lng);
+    if (d < nearestDist) { nearestDist = d; nearest = s; }
+  });
+  return daySpotsSorted.findIndex(s => s.id === nearest.id) + 1;
+}
 
 async function searchPlaces(query, city, country, signal) {
   const q = [query, city, country].filter(Boolean).join(', ');
@@ -271,7 +299,7 @@ function LeafletMap({ lat, lng, onMove }) {
 }
 
 // ── Create spot bottom sheet ──────────────────────────────────────────────────
-function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }) {
+function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, initialLat, initialLng }) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [title, setTitle] = useState('');
@@ -284,6 +312,18 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country }
   const [showMap, setShowMap] = useState(false);
   const [locating, setLocating] = useState(false);
   const [duplicate, setDuplicate] = useState(null); // spot that matches
+
+  // Al venir de un tap en el mapa grande de Spots (SpotsMapView), llega ya con
+  // coordenadas — se precarga el pin y se abre el mapa directamente en vez de
+  // arrancar en el placeholder "toca para añadir ubicación".
+  useEffect(() => {
+    if (open && initialLat && initialLng) {
+      setPinLat(initialLat);
+      setPinLng(initialLng);
+      setShowMap(true);
+      reverseGeocode(initialLat, initialLng).then(addr => { if (addr) setAddress(addr); });
+    }
+  }, [open, initialLat, initialLng]);
 
   // A: real-time duplicate check
   useEffect(() => {
@@ -658,6 +698,8 @@ export default function Restaurants() {
   const [nearbyFilter, setNearbyFilter] = useState([]);  // empty = all
   const [loadingNearby, setLoadingNearby] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [pinPrefill, setPinPrefill] = useState(null); // {lat,lng} — al tocar el mapa de Mis spots
+  const [mySpotsView, setMySpotsView] = useState('lista'); // 'lista' | 'mapa'
   const [savingId, setSavingId] = useState(null);
   const [stateFilter, setStateFilter] = useState('all');
   const [assignDateSpot, setAssignDateSpot] = useState(null); // spot to assign date after saving
@@ -864,6 +906,7 @@ export default function Restaurants() {
       }));
       setLastSavedId(created?.id);
       setShowCreate(false);
+      setPinPrefill(null);
       showToastFor({ title: form.title }, city);
       if (created?.id) setAssignDateSpot(created);
       notifyMembers('spot_added', '', form.title, { spotId: created?.id, spotDate: created?.assigned_date });
@@ -1328,7 +1371,37 @@ export default function Restaurants() {
               ))}
             </div>
 
-            {loadingSpots && spots.length === 0 ? (
+            {/* Toggle Lista / Mapa — solo tiene sentido si ya hay algo que ver */}
+            {!loadingSpots && spots.length > 0 && (
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-muted-foreground">
+                  {t('spots.map.countSummary', { count: spots.length, cities: new Set(spots.map(s => s.city_id || s.city_name).filter(Boolean)).size })}
+                </span>
+                <div className="inline-flex bg-secondary rounded-full p-1 gap-0.5">
+                  <button onClick={() => setMySpotsView('lista')}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
+                      mySpotsView === 'lista' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                    }`}>
+                    <List className="w-3.5 h-3.5" />{t('spots.map.listView')}
+                  </button>
+                  <button onClick={() => setMySpotsView('mapa')}
+                    className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
+                      mySpotsView === 'mapa' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                    }`}>
+                    <MapIcon className="w-3.5 h-3.5" />{t('spots.map.mapView')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!loadingSpots && spots.length > 0 && mySpotsView === 'mapa' ? (
+              <SpotsMapView
+                spots={filteredSpots.length ? filteredSpots : spots}
+                cities={tripCities}
+                onCreatePin={(lat, lng) => { setPinPrefill({ lat, lng }); setShowCreate(true); }}
+                onSelectCity={() => setMySpotsView('lista')}
+              />
+            ) : loadingSpots && spots.length === 0 ? (
               <div className="text-center py-12">
                 <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
               </div>
@@ -1386,12 +1459,14 @@ export default function Restaurants() {
       {/* Create sheet */}
       <CreateSpotSheet
         open={showCreate}
-        onClose={() => setShowCreate(false)}
+        onClose={() => { setShowCreate(false); setPinPrefill(null); }}
         onSave={saveManualSpot}
         saving={savingId === 'manual'}
         spots={spots}
         city={city}
         country={country}
+        initialLat={pinPrefill?.lat}
+        initialLng={pinPrefill?.lng}
       />
 
       {/* Spot detail sheet */}
@@ -1426,6 +1501,23 @@ export default function Restaurants() {
             }
             try {
               await updateMutation.mutateAsync({ id: assignDateSpot.id, data });
+
+              // Auto-orden: si el spot tiene coordenadas y ya hay otros spots
+              // ese mismo día en la misma ciudad, se inserta junto al que
+              // tenga más cerca en vez de dejarlo desordenado al final. El
+              // usuario puede arrastrar para corregirlo (DraggableSpotList).
+              const finalCityId = data.city_id || assignDateSpot.city_id;
+              const daySpots = spots
+                .filter(s => s.id !== assignDateSpot.id && s.assigned_date === date && s.city_id === finalCityId)
+                .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999));
+              if (daySpots.length > 0 && assignDateSpot.lat && assignDateSpot.lng) {
+                const insertIdx = suggestInsertIndex(assignDateSpot, daySpots);
+                const reordered = [...daySpots];
+                reordered.splice(insertIdx, 0, assignDateSpot);
+                await Promise.all(reordered.map((s, idx) => base44.entities.Spot.update(s.id, { day_order: idx })));
+                queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+                toast({ title: t('spots.autoOrder.title'), description: t('spots.autoOrder.body', { position: insertIdx + 1 }) });
+              }
             } catch (e) {
               // El spot pudo haber sido borrado con el "Deshacer" del toast
               // mientras este modal seguía abierto — no es un error real que

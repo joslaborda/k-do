@@ -207,6 +207,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   const [viewingDoc,  setViewingDoc]  = useState(null);   // doc object — view modal
   const [viewingFile, setViewingFile] = useState(null);   // file url — PDFViewer
   const [editingDoc,  setEditingDoc]  = useState(null);   // doc object — edit modal
+  const [deleteDoc,   setDeleteDoc]   = useState(null);   // doc object — delete confirm (paridad con Documents.jsx)
   const [titleVal,    setTitleVal]    = useState(day?.title || '');
   const [titleEditing, setTitleEditing] = useState(false);
   const [addingNote,  setAddingNote]  = useState(false);
@@ -285,6 +286,19 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       setEditingDoc(null);
     } finally { setSavingDoc(false); }
+  };
+
+  // Antes no existía — el DocumentForm de Ruta no pasaba onDelete, así que el
+  // botón eliminar (condicional a ese prop) nunca se renderizaba aquí, aunque
+  // en Documents.jsx sí (mismo DocumentForm, mismo Ticket.delete). Paridad 1:1
+  // con la confirmación de Documents.jsx.
+  const handleDocDelete = async () => {
+    if (!deleteDoc) return;
+    await base44.entities.Ticket.delete(deleteDoc.id);
+    queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+    queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+    setDeleteDoc(null);
+    setEditingDoc(null);
   };
 
   const handleDocCreate = async (data) => {
@@ -613,11 +627,32 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
                 tripCities={cities || []}
                 onSave={handleDocSave}
                 onCancel={() => setEditingDoc(null)}
+                onDelete={() => setDeleteDoc(editingDoc)}
                 saving={savingDoc}
               />
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* Doc delete confirmation — misma UI que Documents.jsx */}
+      {!!deleteDoc && (
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50" onClick={() => setDeleteDoc(null)}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-sm font-medium text-foreground">{t('documents.deleteConfirm')}</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{t('documents.deletePermanent', { name: deleteDoc?.name })}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
+              <button onClick={handleDocDelete} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
