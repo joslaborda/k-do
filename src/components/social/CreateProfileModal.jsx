@@ -6,6 +6,15 @@ import { normalizeUsername, validateUsername, checkUsernameAvailability } from '
 import { getCountryMeta, getCountryOptions, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+
+// Versión de Términos/Privacidad que se está pidiendo aceptar — si el
+// contenido legal cambia de forma relevante más adelante, subir este valor
+// para poder detectar (comparando contra profile.terms_version) qué
+// usuarios ya registrados aceptaron una versión antigua y pedirles
+// re-aceptación, en vez de asumir que un consentimiento viejo sigue siendo válido.
+const TERMS_VERSION = '2026-07-22';
 
 // ── País list ─────────────────────────────────────────────────────────────────
 const HISPANO_FIRST = ['España','México','Colombia','Argentina','Perú','Venezuela','Chile','Ecuador','Guatemala','Cuba','Bolivia','República Dominicana','Honduras','Paraguay','El Salvador','Nicaragua','Costa Rica','Panamá','Uruguay','Puerto Rico','Guinea Ecuatorial'];
@@ -474,6 +483,7 @@ export default function CreateProfileModal({ user, open, onComplete }) {
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null);
   const [usernameError, setUsernameError] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Step 2
   const [nationality, setNationality] = useState('España');
@@ -513,7 +523,7 @@ export default function CreateProfileModal({ user, open, onComplete }) {
     setSecondNationality(country.name);
   }, []);
 
-  const canStep1 = displayName.trim().length >= 2 && !validateUsername(username) && available === true;
+  const canStep1 = displayName.trim().length >= 2 && !validateUsername(username) && available === true && termsAccepted;
   const canStep2 = !!nationality && !!homeCountry;
 
   const handleSave = async () => {
@@ -536,6 +546,13 @@ export default function CreateProfileModal({ user, open, onComplete }) {
         nationality,
         second_nationality: secondNationality || null,
         language: getLanguage(),
+        // Consentimiento RGPD: sin esto, la cuenta se creaba sin ningún
+        // registro de que el usuario hubiese aceptado nada. canStep1 ya
+        // exige termsAccepted antes de poder llegar aquí (slide 0 → 1), pero
+        // se guarda igualmente la fecha/versión exacta por si hace falta
+        // demostrar consentimiento informado más adelante.
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: TERMS_VERSION,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
       setSlide(2); // go to features
@@ -632,6 +649,30 @@ export default function CreateProfileModal({ user, open, onComplete }) {
                   <p className="text-xs text-green-600 mt-0.5">{t('onboarding.slide0.usernameAvailable')}</p>
                 )}
               </div>
+
+              {/* Consentimiento RGPD: bloquea el registro hasta aceptar
+                  explícitamente — antes no existía ningún checkbox ni
+                  registro de consentimiento en todo el flujo de alta. */}
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={e => setTermsAccepted(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-border text-primary flex-shrink-0"
+                />
+                <span className="text-xs text-muted-foreground leading-relaxed">
+                  {t('onboarding.slide0.termsPrefix')}{' '}
+                  <Link to={createPageUrl('Terms')} target="_blank" rel="noopener noreferrer"
+                    className="text-primary font-medium underline" onClick={e => e.stopPropagation()}>
+                    {t('onboarding.slide0.termsLabel')}
+                  </Link>
+                  {' '}{t('onboarding.slide0.termsAnd')}{' '}
+                  <Link to={createPageUrl('Privacy')} target="_blank" rel="noopener noreferrer"
+                    className="text-primary font-medium underline" onClick={e => e.stopPropagation()}>
+                    {t('onboarding.slide0.privacyLabel')}
+                  </Link>
+                </span>
+              </label>
             </div>
           </div>
         )}
@@ -708,7 +749,11 @@ export default function CreateProfileModal({ user, open, onComplete }) {
               {t('common.next')}
             </button>
             {!canStep1 && (
-              <p className="text-xs text-muted-foreground text-center mt-2">{t('onboarding.slide0.fillAll')}</p>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                {displayName.trim().length >= 2 && !validateUsername(username) && available === true && !termsAccepted
+                  ? t('onboarding.slide0.termsRequired')
+                  : t('onboarding.slide0.fillAll')}
+              </p>
             )}
           </>
         )}
