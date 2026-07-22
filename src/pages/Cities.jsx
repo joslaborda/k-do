@@ -336,112 +336,155 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
   const dayDocs = [...docs].sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
 
-  // Build timeline. Los items sin hora (`noTime`) se pueden arrastrar para
-  // reordenar — antes ese arrastre solo cambiaba el estado local (`dragItems`
-  // más abajo) y nunca se guardaba: al recargar la página, o simplemente al
-  // añadir/borrar cualquier otro item del día, el orden manual desaparecía
-  // sin avisar. Ahora cada item lleva un `_order` persistido (day_order en
-  // Spot/Ticket, `order` dentro del objeto de nota en el JSON de `content`) y
-  // el drag lo escribe de verdad — ver persistNoTimeOrder más abajo.
-  const { withTime, noTime } = useMemo(() => {
-    const docItems  = dayDocs.map((d, i) => ({ ...d,  _kind: 'doc',  _time: d.time || null, _order: d.day_order ?? (1000 + i), _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
-    const spotItems = spots.map((s, i) => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _order: s.day_order ?? (2000 + i), _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
+  // Timeline unificado: docs, notas y spots se intercalan en una sola
+  // secuencia. Los que ya tienen una posición manual (_order explícito, no
+  // nulo) forman la columna vertebral del orden; el resto se coloca por hora
+  // si la tiene, o al final si no. En cuanto arrastras CUALQUIER cosa — doc,
+  // nota o spot —, todo el día pasa a tener posición explícita y ese orden
+  // manda de ahí en adelante: así cualquier item se puede colocar entre
+  // cualquier otro, tenga hora o no. Antes solo los items sin hora eran
+  // arrastrables, y solo entre ellos.
+  const timeline = useMemo(() => {
+    const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _order: d.day_order ?? null, _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
+    const spotItems = spots.map(s => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _order: s.day_order ?? null, _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
     const noteItems = notesList.filter(n => n.text?.trim()).map((n, i) => ({
-      id: 'note-' + i, _kind: 'note', _time: n.time || null, _order: n.order ?? (3000 + i), _title: n.text, _sub: null, _noteIdx: i,
+      id: 'note-' + i, _kind: 'note', _time: n.time || null, _order: n.order ?? null, _title: n.text, _sub: null, _noteIdx: i,
     }));
     const all = [...docItems, ...spotItems, ...noteItems];
-    return {
-      withTime: all.filter(i => i._time).sort((a, b) => a._time.localeCompare(b._time)),
-      noTime:   all.filter(i => !i._time).sort((a, b) => a._order - b._order),
-    };
+    const pinned = all.filter(i => i._order != null).sort((a, b) => a._order - b._order);
+    const unpinnedTimed = all.filter(i => i._order == null && i._time).sort((a, b) => a._time.localeCompare(b._time));
+    const unpinnedUntimed = all.filter(i => i._order == null && !i._time);
+
+    const merged = [];
+    let ui = 0;
+    for (const item of pinned) {
+      if (item._time) {
+        while (ui < unpinnedTimed.length && unpinnedTimed[ui]._time <= item._time) {
+          merged.push(unpinnedTimed[ui]);
+          ui++;
+        }
+      }
+      merged.push(item);
+    }
+    while (ui < unpinnedTimed.length) { merged.push(unpinnedTimed[ui]); ui++; }
+
+    return [...merged, ...unpinnedUntimed];
   }, [dayDocs, spots, notesList]);
 
-  // Persiste el nuevo orden tras un drag. `orderedItems` es la lista completa
-  // `noTime` ya reordenada.
-  const persistNoTimeOrder = async (orderedItems) => {
+  // Al soltar un arrastre, se reescribe TODO el orden del día de una vez —
+  // spots y docs vía day_order, notas vía el campo "order" dentro de su
+  // content — así el orden queda siempre denso (0..N-1) y consistente sin
+  // importar de qué tipo sea cada item.
+  const [draggingId, setDraggingId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
+  const touchDragId = useRef(null);
+
+  // Se puede recolocar cualquier cosa donde quieras, EXCEPTO invertir el
+  // orden entre dos items que ya tienen hora fija — un spot a las 14:00 no
+  // puede terminar antes que uno a las 11:00. Si el drop deja esa inversión,
+  // se rechaza entero (no se guarda nada, no cambia nada en pantalla) y se
+  // avisa con un toast en vez de reordenar silenciosamente algo sin sentido.
+  const findTimeClash = (orderedItems) => {
+    const timed = orderedItems.filter(i => i._time);
+    for (let k = 0; k < timed.length - 1; k++) {
+      if (timed[k]._time > timed[k + 1]._time) return [timed[k], timed[k + 1]];
+    }
+    return null;
+  };
+
+  const reorderTimeline = async (fromId, toId) => {
+    if (!fromId || !toId || fromId === toId) return;
+    const from = timeline.findIndex(i => i.id === fromId);
+    const to = timeline.findIndex(i => i.id === toId);
+    if (from === -1 || to === -1) return;
+    const reordered = [...timeline];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+
+    const clash = findTimeClash(reordered);
+    if (clash) {
+      const [a, b] = clash;
+      toast({
+        title: t('common.timeClashTitle'),
+        description: t('common.timeClashBody', { a: a._title, aTime: a._time, b: b._title, bTime: b._time }),
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const spotUpdates = [];
     const docUpdates = [];
     const newNotes = [...notesList];
-    orderedItems.forEach((item, idx) => {
-      if (item._kind === 'spot') spotUpdates.push(base44.entities.Spot.update(item.id, { day_order: idx }));
-      else if (item._kind === 'doc') docUpdates.push(base44.entities.Ticket.update(item.id, { day_order: idx }));
-      else if (item._kind === 'note' && newNotes[item._noteIdx]) newNotes[item._noteIdx] = { ...newNotes[item._noteIdx], order: idx };
+    let noteChanged = false;
+
+    reordered.forEach((item, idx) => {
+      if (item._kind === 'spot') { if (item.day_order !== idx) spotUpdates.push(base44.entities.Spot.update(item.id, { day_order: idx })); }
+      else if (item._kind === 'doc') { if (item.day_order !== idx) docUpdates.push(base44.entities.Ticket.update(item.id, { day_order: idx })); }
+      else if (item._kind === 'note' && newNotes[item._noteIdx] && newNotes[item._noteIdx].order !== idx) {
+        newNotes[item._noteIdx] = { ...newNotes[item._noteIdx], order: idx };
+        noteChanged = true;
+      }
     });
+
     try {
       await Promise.all([...spotUpdates, ...docUpdates]);
       if (docUpdates.length) queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       if (spotUpdates.length) queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-      if (newNotes.some((n, i) => n.order !== notesList[i]?.order)) await saveNotes(newNotes);
+      if (noteChanged) await saveNotes(newNotes);
     } catch {
       // Best-effort: si falla, el próximo refetch vuelve a traer el orden anterior.
       // No se bloquea la UI por esto — reordenar no es una acción destructiva.
     }
   };
 
-  // Draggable no-time items
-  const [dragItems, setDragItems]   = useState(noTime);
-  const [dragging,  setDragging]    = useState(null);
-  const [dragOver,  setDragOver]    = useState(null);
-  const touchRef = useRef(null);
-  useEffect(() => { setDragItems(noTime); }, [noTime.length, spots.length, notesList.length]);
-
-  const onDragStart = (e, i) => { setDragging(i); e.dataTransfer.effectAllowed = 'move'; };
-  const onDragOver  = (e, i) => { e.preventDefault(); setDragOver(i); };
-  const onDrop = (e, i) => {
-    e.preventDefault();
-    if (dragging === null || dragging === i) return;
-    const next = [...dragItems]; const [m] = next.splice(dragging, 1); next.splice(i, 0, m);
-    setDragItems(next); setDragging(null); setDragOver(null);
-    persistNoTimeOrder(next);
-  };
-  const onDragEnd = () => { setDragging(null); setDragOver(null); };
-  const onTouchStart = (e, i) => { touchRef.current = i; setDragging(i); };
+  const onDragStart = (e, id) => { e.stopPropagation(); setDraggingId(id); e.dataTransfer.effectAllowed = 'move'; };
+  const onDragOver  = (e, id) => { e.preventDefault(); setDragOverId(id); };
+  const onDrop = (e, id) => { e.preventDefault(); reorderTimeline(draggingId, id); setDraggingId(null); setDragOverId(null); };
+  const onDragEnd = () => { setDraggingId(null); setDragOverId(null); };
+  const onTouchStart = (e, id) => { touchDragId.current = id; setDraggingId(id); };
   const onTouchMove = (e) => {
-    if (touchRef.current === null) return; e.preventDefault();
-    const y = e.touches[0].clientY;
-    document.querySelectorAll('[data-notime-row]').forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (y >= r.top && y <= r.bottom) setDragOver(parseInt(el.dataset.notimeRow));
-    });
+    if (!touchDragId.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const row = el?.closest?.('[data-item-id]');
+    setDragOverId(row?.dataset?.itemId || null);
   };
   const onTouchEnd = () => {
-    if (touchRef.current !== null && dragOver !== null && touchRef.current !== dragOver) {
-      const next = [...dragItems]; const [m] = next.splice(touchRef.current, 1); next.splice(dragOver, 0, m);
-      setDragItems(next);
-      persistNoTimeOrder(next);
-    }
-    touchRef.current = null; setDragging(null); setDragOver(null);
+    if (touchDragId.current && dragOverId) reorderTimeline(touchDragId.current, dragOverId);
+    touchDragId.current = null;
+    setDraggingId(null);
+    setDragOverId(null);
   };
 
-  const timeline = [...withTime, ...dragItems];
   const bgClass = isToday_ ? 'bg-orange-50/50 dark:bg-orange-950/10' : 'bg-card';
   const borderLeft = isToday_ ? 'border-l-2 border-l-primary' : '';
 
-  const renderItem = (item, idx, isNoTime) => {
+  const renderItem = (item, idx) => {
     const DocIcon = item._kind === 'doc' ? (DOC_ICON_MAP[item.category || item.type || item.doc_type] || FileText) : null;
     const isLast = idx === timeline.length - 1;
+    const isDragging = draggingId === item.id;
+    const isDragOver  = dragOverId === item.id && draggingId !== item.id;
 
     return (
       <div key={item.id || idx}
-        data-notime-row={isNoTime ? idx - withTime.length : undefined}
-        draggable={isNoTime}
-        onDragStart={isNoTime ? e => onDragStart(e, idx - withTime.length) : undefined}
-        onDragOver={isNoTime ? e => onDragOver(e, idx - withTime.length) : undefined}
-        onDrop={isNoTime ? e => onDrop(e, idx - withTime.length) : undefined}
-        onDragEnd={isNoTime ? onDragEnd : undefined}
-        onTouchStart={isNoTime ? e => onTouchStart(e, idx - withTime.length) : undefined}
+        data-item-id={item.id}
+        draggable
+        onDragStart={e => onDragStart(e, item.id)}
+        onDragOver={e => onDragOver(e, item.id)}
+        onDrop={e => onDrop(e, item.id)}
+        onDragEnd={onDragEnd}
+        onTouchStart={e => onTouchStart(e, item.id)}
         className={`flex items-stretch border-t border-border transition-all select-none
-          ${isNoTime && dragging === idx - withTime.length ? 'opacity-40' : ''}
-          ${isNoTime && dragOver === idx - withTime.length && dragging !== idx - withTime.length ? 'bg-accent/20' : ''}
+          ${isDragging ? 'opacity-40' : ''}
+          ${isDragOver ? 'bg-accent/20' : ''}
         `}>
 
         {/* Time column */}
         <div className="w-12 shrink-0 flex flex-col items-center pt-3.5 pb-1 pl-4 gap-0">
           {item._time
             ? <span className="text-label2 font-medium text-primary leading-none whitespace-nowrap">{item._time}</span>
-            : isNoTime
-            ? <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 cursor-grab touch-none mt-0.5" />
-            : <div className="w-2 h-2 rounded-full bg-border mt-1" />}
+            : <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 cursor-grab touch-none mt-0.5" />}
           {!isLast && <div className="w-px flex-1 bg-border/50 mt-1.5" />}
         </div>
 
@@ -505,7 +548,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
       </div>
 
       {/* Timeline */}
-      {timeline.map((item, idx) => renderItem(item, idx, idx >= withTime.length))}
+      {timeline.map((item, idx) => renderItem(item, idx))}
 
       {/* Add actions */}
       <div className="flex border-t border-border">
@@ -774,9 +817,23 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
 }
 
 // ── City block ────────────────────────────────────────────────────────────────
-function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId }) {
+function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId, forceOpenCityId }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(isActive);
+  // Al venir de "Abrir <ciudad>" en Home (ver DayCard.jsx), llega el id
+  // exacto de ESTA estancia — si la misma ciudad aparece dos veces en el
+  // viaje (ida y vuelta a Lima, por ejemplo), cada una tiene su propio
+  // city.id, así que se despliega justo la que corresponde y no cualquiera
+  // con el mismo nombre.
+  const shouldForceOpen = !!forceOpenCityId && city.id === forceOpenCityId;
+  const [open, setOpen] = useState(isActive || shouldForceOpen);
+  const blockRef = useRef(null);
+
+  useEffect(() => {
+    if (shouldForceOpen && blockRef.current) {
+      blockRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldForceOpen]);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
@@ -806,7 +863,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
   );
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" ref={blockRef}>
       {/* Ciudad header — colapsable */}
       <button onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-1 py-2 text-left">
@@ -887,11 +944,17 @@ export default function Cities() {
 
   const [tripId, setTripId] = useState(null);
 
+  // Llega desde "Abrir <ciudad>" en Home (DayCard.jsx) — antes ese enlace
+  // llevaba a una página vieja (CityDetail) que ya no existe; ahora aterriza
+  // aquí mismo, en Ruta, con la ciudad concreta desplegada.
+  const focusCityId = new URLSearchParams(window.location.search).get('city_id');
+
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('trip_id');
     if (!id || id === 'null') { navigate(createPageUrl('TripsList'), { replace: true }); return; }
     setTripId(id);
-    window.scrollTo(0, 0);
+    if (!focusCityId) window.scrollTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const { data: trip } = useQuery({
@@ -1103,6 +1166,7 @@ export default function Cities() {
                   cities={cities}
                   profiles={profiles}
                   userId={userId}
+                  forceOpenCityId={focusCityId}
                 />
               );
             })}
