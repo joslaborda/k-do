@@ -272,7 +272,6 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
           <span className={`text-xs font-medium uppercase tracking-wider shrink-0 ${isToday_ ? 'text-primary' : 'text-muted-foreground'}`}>{label}</span>
           <span className="text-sm font-medium text-foreground truncate">{city?.name}</span>
           {dateStr && <span className="text-xs text-muted-foreground shrink-0">{format(parseISO(dateStr), 'dd MMM', { locale: es })}</span>}
-          {hasContent && <span className="text-xs text-muted-foreground shrink-0">· {timeline.length}</span>}
         </div>
         {isToday_ && weather && (
           <span className="inline-flex items-center gap-1 shrink-0 mr-1">{(() => { const I = WMO_ICON[weather.code] || Thermometer; return <I className="w-3.5 h-3.5 text-muted-foreground" />; })()}<span className="text-xs font-medium text-foreground">{weather.temp}°</span></span>

@@ -36,6 +36,15 @@ export default function TodayRouteMap({ hotelSpot, items = [], height = 150, onS
 
       const map = L.map(containerRef.current, { zoomControl: false, attributionControl: true, scrollWheelZoom: false });
       L.tileLayer(KODO_TILE_URL, { subdomains: KODO_TILE_SUBDOMAINS, attribution: KODO_TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
+      // El contenedor vive dentro de la card colapsable de Home — en el
+      // instante en que este efecto corre, el layout puede no estar del
+      // todo asentado (mismo frame que el toggle de "open"), así que
+      // Leaflet a veces calcula el tamaño del contenedor como 0 o stale y
+      // el fitBounds de más abajo termina centrando/zoomeando mal: el tile
+      // layer pinta "algo" pero los pines caen fuera del viewport visible
+      // (mapa "en blanco" con datos válidos). invalidateSize() fuerza a
+      // Leaflet a releer el tamaño real antes de calcular el encuadre.
+      map.invalidateSize();
 
       const points = [];
 
@@ -75,6 +84,21 @@ export default function TodayRouteMap({ hotelSpot, items = [], height = 150, onS
       } else {
         map.setView(points[0], 15);
       }
+
+      // Un invalidateSize() ya hecho antes de fitBounds no siempre basta si
+      // el navegador todavía no ha pintado el layout final del contenedor
+      // en ese mismo frame (p.ej. justo al desplegar la card). Se repite el
+      // encuadre en el siguiente frame, cuando el tamaño real es fiable al
+      // 100%, para que los pines no queden fuera del viewport.
+      requestAnimationFrame(() => {
+        if (cancelled || !mapRef.current) return;
+        mapRef.current.invalidateSize();
+        if (points.length > 1) {
+          mapRef.current.fitBounds(L.latLngBounds(points), { padding: [24, 24] });
+        } else {
+          mapRef.current.setView(points[0], 15);
+        }
+      });
 
       mapRef.current = map;
     });
