@@ -9,7 +9,10 @@ import {
 "@/components/ui/toast";
 
 export function Toaster() {
-  const { toasts } = useToast();
+  // Antes ToastClose no recibía ningún onClick — el botón se dibujaba pero
+  // tocarlo no hacía nada. `dismiss` sí existe en useToast(), solo faltaba
+  // pasárselo.
+  const { toasts, dismiss } = useToast();
 
   return (
     <ToastProvider>
@@ -23,11 +26,11 @@ export function Toaster() {
               }
             </div>
             {action}
-            <ToastClose />
+            <ToastClose onClick={() => dismiss(id)} />
           </Toast>);
 
       })}
-      
+
     </ToastProvider>);
 
 }

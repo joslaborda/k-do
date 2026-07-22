@@ -1,8 +1,18 @@
 // Inspired by react-hot-toast library
 import { useState, useEffect } from "react";
 
-const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000000;
+// Antes TOAST_LIMIT era 20 y TOAST_REMOVE_DELAY ~16 minutos — los toasts
+// básicamente no se cerraban solos nunca, se iban apilando, y el botón de
+// cerrar tampoco hacía nada (ver ToastClose en toast.jsx). Resultado: se
+// quedaban ahí tapando la pantalla hasta recargar. Ahora cada toast se
+// autocierra a los DEFAULT_TOAST_DURATION ms (ver toast() más abajo);
+// TOAST_REMOVE_DELAY es solo el tiempo que tarda en desmontarse del DOM una
+// vez ya está "cerrado" (para que la animación de salida no se corte), y
+// TOAST_LIMIT baja a 3 para que nunca se amontonen aunque algo dispare
+// varios seguidos.
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 300;
+const DEFAULT_TOAST_DURATION = 4500;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -110,7 +120,21 @@ function dispatch(action) {
   });
 }
 
-function toast({ ...props }) {
+function toast({ duration = DEFAULT_TOAST_DURATION, ...props }) {
+  // Si ya hay un toast idéntico (mismo título+descripción) abierto ahora
+  // mismo, no se apila otro encima — evita el caso típico de un doble tap
+  // disparando la misma acción dos veces y mostrando el mismo aviso repetido.
+  const dup = memoryState.toasts.find(
+    (t) => t.open && t.title === props.title && t.description === props.description
+  );
+  if (dup) {
+    return {
+      id: dup.id,
+      dismiss: () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: dup.id }),
+      update: (p) => dispatch({ type: actionTypes.UPDATE_TOAST, toast: { ...p, id: dup.id } }),
+    };
+  }
+
   const id = genId();
 
   const update = (props) =>
@@ -133,6 +157,13 @@ function toast({ ...props }) {
       },
     },
   });
+
+  // Autocierre — antes esto no existía y el toast se quedaba para siempre
+  // si el usuario no lograba tocar el botón de cerrar (que además estaba
+  // roto, ver toast.jsx/toaster.jsx).
+  if (duration > 0) {
+    setTimeout(dismiss, duration);
+  }
 
   return {
     id,
