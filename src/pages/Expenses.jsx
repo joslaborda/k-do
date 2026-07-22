@@ -218,6 +218,22 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
   const iOwe   = debts.filter(d => d.from === meNorm);
   const owesMe = debts.filter(d => d.to   === meNorm);
 
+  // settlingKey evita doble-submit: "Saldar" dispara createMutation.mutateAsync
+  // (handleSettle) sin ningún guard local — un doble tap creaba dos gastos de
+  // liquidación idénticos. Se deshabilita solo el botón de la deuda que se
+  // está saldando (no todos), identificada por from+to.
+  const [settlingKey, setSettlingKey] = useState(null);
+  const handleSettleClick = async (debt) => {
+    const key = `${debt.from}-${debt.to}`;
+    if (settlingKey) return;
+    setSettlingKey(key);
+    try {
+      await onSettle(debt);
+    } finally {
+      setSettlingKey(null);
+    }
+  };
+
   // Convert each debt to debtor's home_currency for display
   const [convertedDebts, setConvertedDebts] = useState({});
   useEffect(() => {
@@ -339,9 +355,10 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                     </p>
                   </div>
                   <button
-                    onClick={() => onSettle({ ...d, displayAmount: cv?.debtorAmount || d.amount, displayCurrency: cv?.debtorCurrency || baseCurrency })}
-                    className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0">
-                    Saldar
+                    onClick={() => handleSettleClick({ ...d, displayAmount: cv?.debtorAmount || d.amount, displayCurrency: cv?.debtorCurrency || baseCurrency })}
+                    disabled={!!settlingKey}
+                    className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0 disabled:opacity-50 disabled:pointer-events-none">
+                    {settlingKey === `${d.from}-${d.to}` ? t('common.loading') : 'Saldar'}
                   </button>
                 </div>
               );

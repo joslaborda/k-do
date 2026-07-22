@@ -439,7 +439,7 @@ export default function Documents() {
             <p className="text-xs text-muted-foreground mb-5 ml-11">{t('documents.deletePermanent', { name: deleteDoc?.name })}</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
-              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
+              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} disabled={deleteMutation.isPending} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-60 disabled:pointer-events-none">{t('common.delete')}</button>
             </div>
           </div>
         </div>

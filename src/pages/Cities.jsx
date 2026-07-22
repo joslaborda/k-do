@@ -229,6 +229,8 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   const [addingDoc,   setAddingDoc]   = useState(false);
   const [savingNewDoc, setSavingNewDoc] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [savingTitle, setSavingTitle] = useState(false);
+  const [deletingDoc, setDeletingDoc] = useState(false);
   const [order, setOrder]             = useState(null);   // manual drag order for no-time items
 
   // Notes
@@ -266,14 +268,20 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   };
 
   const saveTitle = async () => {
+    if (savingTitle) return;
     if (!day?.id && !trip?.members?.length) {
       toast({ title: t('common.error'), description: t('cities.tripNotLoadedRetry'), variant: 'destructive' });
       return;
     }
-    if (day?.id) await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
-    else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: titleVal, content: '', order: 0, trip_members: trip.members });
-    queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
-    setTitleEditing(false);
+    setSavingTitle(true);
+    try {
+      if (day?.id) await base44.entities.ItineraryDay.update(day.id, { title: titleVal });
+      else await base44.entities.ItineraryDay.create({ city_id: cityId, trip_id: tripId, date: dayDate, title: titleVal, content: '', order: 0, trip_members: trip.members });
+      queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+      setTitleEditing(false);
+    } finally {
+      setSavingTitle(false);
+    }
   };
 
   const handleSpotSave = async (spot, newNotes, newTime) => {
@@ -304,12 +312,17 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   // en Documents.jsx sí (mismo DocumentForm, mismo Ticket.delete). Paridad 1:1
   // con la confirmación de Documents.jsx.
   const handleDocDelete = async () => {
-    if (!deleteDoc) return;
+    if (!deleteDoc || deletingDoc) return;
+    setDeletingDoc(true);
+    try {
     await base44.entities.Ticket.delete(deleteDoc.id);
     queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
     queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
     setDeleteDoc(null);
     setEditingDoc(null);
+    } finally {
+      setDeletingDoc(false);
+    }
   };
 
   const handleDocCreate = async (data) => {
@@ -546,7 +559,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
               placeholder={t('cities.day.titlePlaceholder')} className="flex-1 h-9 text-sm bg-secondary border-border"
               autoFocus onKeyDown={e => { if (e.key === 'Enter') saveTitle(); if (e.key === 'Escape') setTitleEditing(false); }} />
             <button onClick={() => setTitleEditing(false)} className="text-muted-foreground p-1"><X className="w-4 h-4" /></button>
-            <button aria-label={t('common.save')} onClick={saveTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0"><Check className="w-3.5 h-3.5 text-white" /></button>
+            <button aria-label={t('common.save')} onClick={saveTitle} disabled={savingTitle} className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0 disabled:opacity-60 disabled:pointer-events-none"><Check className="w-3.5 h-3.5 text-white" /></button>
           </div>
         ) : (
           <button onClick={() => setTitleEditing(true)} className="w-full flex items-center gap-2 text-left group">
@@ -588,7 +601,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
             <span className="text-xs text-muted-foreground">{t('cities.day.hourOptional')}</span>
             <div className="ml-auto flex gap-2">
               <button onClick={() => setAddingNote(false)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
-              <button onClick={handleAddNote} disabled={!newNoteText.trim()}
+              <button onClick={handleAddNote} disabled={!newNoteText.trim() || savingNotes}
                 className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors">{t('common.save')}</button>
             </div>
           </div>
@@ -608,7 +621,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
             </button>
             <div className="ml-auto flex gap-2">
               <button onClick={() => setEditingNote(null)} className="text-xs text-muted-foreground px-4 py-2 rounded-full border border-border hover:bg-secondary/50 transition-colors">{t('common.cancel')}</button>
-              <button onClick={() => handleSaveNote(editingNote)} className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors">{t('common.save')}</button>
+              <button onClick={() => handleSaveNote(editingNote)} disabled={savingNotes} className="text-xs text-white bg-primary px-4 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none">{t('common.save')}</button>
             </div>
           </div>
         </div>
@@ -703,7 +716,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
             <p className="text-xs text-muted-foreground mb-5 ml-11">{t('documents.deletePermanent', { name: deleteDoc?.name })}</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
-              <button onClick={handleDocDelete} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
+              <button onClick={handleDocDelete} disabled={deletingDoc} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-60 disabled:pointer-events-none">{t('common.delete')}</button>
             </div>
           </div>
         </div>

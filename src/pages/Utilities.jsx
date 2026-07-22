@@ -551,8 +551,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                               className={`text-xs px-2 py-1 rounded-lg border transition-colors ${newEssential ? 'bg-orange-50 border-primary text-primary' : 'border-border text-muted-foreground'}`}>
                               {t('utilities.packing.essential')}
                             </button>
-                            <button onClick={commitAdd}
-                              className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                            <button onClick={commitAdd} disabled={createMutation.isPending}
+                              className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0 disabled:opacity-50 disabled:pointer-events-none">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             </button>
                           </div>

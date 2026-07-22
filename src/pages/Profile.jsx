@@ -56,6 +56,16 @@ function countryFlag(country) {
 function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisibility = false }) {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
+  const handleSaveClick = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await onSave(spot);
+    } finally {
+      setSaving(false);
+    }
+  };
   const SpotTypeIcon = SPOT_ICONS_MAP[spot.type] || MapPin;
   const coverImg = spot.image_url || (spot.city_name || spot.country
     ? getTripCoverImage(spot.city_name, spot.country)
@@ -87,8 +97,8 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
         </span>
       )}
       {onSave && !isSaved && (
-        <button onClick={() => onSave(spot)}
-          className="w-7 h-7 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 hover:bg-orange-100 transition-colors">
+        <button onClick={handleSaveClick} disabled={saving}
+          className="w-7 h-7 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:pointer-events-none">
           <Plus className="w-3.5 h-3.5 text-primary" />
         </button>
       )}

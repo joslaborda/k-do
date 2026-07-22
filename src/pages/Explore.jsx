@@ -95,9 +95,19 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
 
 function UserCard({ profile, currentUser, myFollows, onFollow }) {
   const { t } = useTranslation();
+  const [toggling, setToggling] = useState(false);
   const isOwn = currentUser?.id === profile.user_id;
   const followRecord = myFollows.find(f => f.followed_user_id === profile.user_id);
   const isFollowing = !!followRecord;
+  const handleFollowClick = async () => {
+    if (toggling) return;
+    setToggling(true);
+    try {
+      await onFollow(profile, followRecord);
+    } finally {
+      setToggling(false);
+    }
+  };
   return (
     <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
       <Avatar profile={profile} size={40}/>
@@ -109,7 +119,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
         {profile.home_country && <p className="text-xs text-muted-foreground">{profile.home_country}</p>}
       </div>
       {!isOwn && currentUser && (
-        <Button size="sm" onClick={() => onFollow(profile, followRecord)}
+        <Button size="sm" onClick={handleFollowClick} disabled={toggling}
           className={isFollowing ? 'border border-primary/30 text-primary bg-card hover:bg-secondary' : 'bg-primary hover:bg-primary/90 text-white'}>
           {isFollowing ? <><UserCheck className="w-3.5 h-3.5 mr-1"/>{t('explore.following')}</> : <><UserPlus className="w-3.5 h-3.5 mr-1"/>{t('explore.follow')}</>}
         </Button>
@@ -349,7 +359,11 @@ export default function Explore() {
   });
 
   const handleSaveSpot = async spot => { setSavingSpotId(spot.id); await saveSpotMutation.mutateAsync(spot); };
-  const handleFollow = (profile, followRecord) => followMutation.mutate({ profile, followRecord });
+  // mutateAsync (no mutate): UserCard espera esta promesa para mantener su
+  // botón deshabilitado mientras la mutación está en curso — con mutate()
+  // (fire-and-forget) el guard local se liberaba antes de que terminase la
+  // llamada real, dejando la ventana de doble-tap abierta igual.
+  const handleFollow = (profile, followRecord) => followMutation.mutateAsync({ profile, followRecord });
 
   const activeFilters = [spotSearch, spotCity, spotTag].filter(Boolean).length;
 
