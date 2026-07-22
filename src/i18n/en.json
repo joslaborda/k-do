@@ -13,6 +13,8 @@
     "search": "Search",
     "loading": "Loading...",
     "error": "Error",
+    "timeClashTitle": "Time clash",
+    "timeClashBody": "You can't place \"{{a}}\" ({{aTime}}) before \"{{b}}\" ({{bTime}}) — change one of their times if you want to reorder them.",
     "success": "Success",
     "confirm": "Confirm",
     "accept": "Accept",
@@ -542,7 +544,8 @@
       "departsInMinutes": "Departs in {{count}} min",
       "todayRoute": "Today's route",
       "hotelPlusStops": "Hotel + {{count}} stops",
-      "stopsCount": "{{count}} stops"
+      "stopsCount": "{{count}} stops",
+      "addHotel": "+ Add hotel"
     },
     "tomorrow": {
       "emptyTitle": "Nothing planned for tomorrow",
@@ -751,7 +754,8 @@
       "countSummary": "{{count}} spots · {{cities}} cities",
       "otherCity": "Other city",
       "noCoords": "None of your spots have a map location yet",
-      "tapHint": "Tap the map to drop a new pin"
+      "tapHint": "Tap the map to drop a new pin",
+      "noDate": "No date"
     },
     "autoOrder": {
       "title": "Suggested order",
@@ -835,6 +839,7 @@
       "fields": {
         "origin": "Origin",
         "destination": "Destination",
+        "location": "Airport / station",
         "airline": "Airline / Flight no.",
         "city": "City",
         "date": "Date *",
@@ -844,8 +849,10 @@
         "notes": "Notes",
         "noteTime": "Note time"
       },
+      "locationHint": "So it shows up on the day's mini-map",
       "ph": {
         "name": "e.g. Madrid-Tokyo flight",
+        "location": "Search e.g. \"Atocha\" or \"Heathrow\"",
         "notes": "Additional notes..."
       },
       "vis": {

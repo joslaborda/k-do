@@ -13,6 +13,8 @@
     "search": "Buscar",
     "loading": "Cargando...",
     "error": "Error",
+    "timeClashTitle": "Choque de horarios",
+    "timeClashBody": "No puedes poner \"{{a}}\" ({{aTime}}) antes de \"{{b}}\" ({{bTime}}) — cambia la hora de uno de los dos si quieres reordenarlos.",
     "success": "Éxito",
     "confirm": "Confirmar",
     "accept": "Aceptar",
@@ -542,7 +544,8 @@
       "departsInMinutes": "Sale en {{count}} min",
       "todayRoute": "Ruta de hoy",
       "hotelPlusStops": "Hotel + {{count}} paradas",
-      "stopsCount": "{{count}} paradas"
+      "stopsCount": "{{count}} paradas",
+      "addHotel": "+ Añadir hotel"
     },
     "tomorrow": {
       "emptyTitle": "Nada planificado para mañana",
@@ -751,7 +754,8 @@
       "countSummary": "{{count}} spots · {{cities}} ciudades",
       "otherCity": "Otra ciudad",
       "noCoords": "Ninguno de tus spots tiene ubicación en el mapa todavía",
-      "tapHint": "Toca el mapa para soltar un pin nuevo"
+      "tapHint": "Toca el mapa para soltar un pin nuevo",
+      "noDate": "Sin fecha"
     },
     "autoOrder": {
       "title": "Orden sugerido",
@@ -835,6 +839,7 @@
       "fields": {
         "origin": "Origen",
         "destination": "Destino",
+        "location": "Aeropuerto / estación",
         "airline": "Compañía / Nº vuelo",
         "city": "Ciudad",
         "date": "Fecha *",
@@ -844,8 +849,10 @@
         "notes": "Notas",
         "noteTime": "Hora de la nota"
       },
+      "locationHint": "Para que aparezca en el mini-mapa del día",
       "ph": {
         "name": "Ej. Vuelo Madrid-Tokyo",
+        "location": "Busca p. ej. \"Atocha\" o \"Barajas\"",
         "notes": "Notas adicionales..."
       },
       "vis": {
