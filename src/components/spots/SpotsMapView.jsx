@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { loadLeaflet, TYPE_CONFIG } from './spotsHelpers';
+import { KODO_TILE_URL, KODO_TILE_SUBDOMAINS, KODO_TILE_ATTRIBUTION, injectKodoMapStyles } from './mapTiles';
 import { sameCityName } from '@/lib/tripDays';
 
 // Mapa de "todo el viaje" para la tab Mis spots: agrupa por ciudad (no hay
@@ -43,6 +44,7 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
     if (!clusters.length) return undefined;
     let cancelled = false;
 
+    injectKodoMapStyles();
     loadLeaflet().then(L => {
       if (cancelled || !containerRef.current) return;
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
@@ -50,8 +52,8 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
       // zoomControl:true — mismo default que LeafletMap.jsx (el selector de
       // pin al crear spot). Antes lo llevaba a false sin querer y, sumado a
       // scrollWheelZoom:false, no había ninguna forma de hacer zoom out.
-      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: true });
+      L.tileLayer(KODO_TILE_URL, { subdomains: KODO_TILE_SUBDOMAINS, attribution: KODO_TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
 
       clusters.forEach(c => {
         // Un cluster de un solo spot no aporta nada mostrando "1" — se ve el
@@ -118,7 +120,7 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
 
   return (
     <div>
-      <div ref={containerRef} style={{ height, borderRadius: 16, overflow: 'hidden', cursor: 'crosshair' }} className="border border-border" />
+      <div ref={containerRef} style={{ height, borderRadius: 16, overflow: 'hidden', cursor: 'crosshair' }} className="border border-border kodo-map-warm" />
       <p className="text-xs text-muted-foreground mt-2 px-1">{t('spots.map.tapHint')}</p>
     </div>
   );
