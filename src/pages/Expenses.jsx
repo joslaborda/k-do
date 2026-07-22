@@ -1163,7 +1163,15 @@ export default function Expenses() {
           refExtra: { amount: debt.amount, currency: baseCurrency },
         }));
       } catch {}
-    } catch {}
+      // catch de la notificación (arriba): best-effort, igual que el resto
+      // de notify() en la app — no debe bloquear ni avisar si falla solo eso.
+    } catch {
+      // catch de la liquidación en sí (createMutation, arriba): esto SÍ hay
+      // que avisarlo. Antes se tragaba en silencio — handleSettleClick
+      // liberaba el botón igualmente y la deuda se quedaba sin saldar sin
+      // ninguna explicación visible.
+      toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });
+    }
   };
 
   return (

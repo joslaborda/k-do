@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { normalizeEmail } from '@/lib/utils';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeCountry } from '@/lib/countryConfig';
@@ -781,7 +782,12 @@ export default function Restaurants() {
   });
 
   const notifyMembers = (type, _unused, refTitle, refExtra) => {
-    const others = (trip?.members || []).filter(e => e !== currentUser?.email);
+    // Mismo bug que ya se arregló en Expenses.jsx: trip.members está
+    // normalizado en minúsculas pero currentUser?.email no — sin normalizar
+    // aquí, el propio autor de la acción podía acabar recibiendo su propia
+    // notificación (o excluirse mal a sí mismo) si el email de auth traía
+    // mayúsculas distintas.
+    const others = (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUser?.email));
     if (!others.length) return;
     resolveUserIds(others).then(resolved => {
       resolved.forEach(({ userId }) => notify({

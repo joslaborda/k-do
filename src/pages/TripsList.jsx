@@ -71,9 +71,16 @@ export default function TripsList() {
     queryKey: ['trips', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
+      // Antes cualquiera de los dos catch {} tragaba el error y dejaba esa
+      // mitad como [] silenciosamente — un fallo de red puntual hacía que el
+      // usuario viera "crea tu primer viaje" como si no tuviera ninguno, sin
+      // ningún aviso. Se avisa con un toast si alguna de las dos falla, pero
+      // se sigue devolviendo lo que sí se pudo cargar (mejor una lista
+      // parcial que una pantalla de error).
+      let hadError = false;
       // Fetch trips created by user
       let myTrips = [];
-      try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch {}
+      try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch { hadError = true; }
       // Fetch trips where user is a member — filtrado server-side con $elemMatch
       let memberTrips = [];
       try {
@@ -82,7 +89,10 @@ export default function TripsList() {
           '-created_date'
         );
         memberTrips = all.filter(tr => tr.created_by !== user.email);
-      } catch {}
+      } catch { hadError = true; }
+      if (hadError) {
+        toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });
+      }
       const seen = new Set(myTrips.map(tr => tr.id));
       return [...myTrips, ...memberTrips.filter(tr => !seen.has(tr.id))]
         .sort((a,b) => new Date(b.created_date||0) - new Date(a.created_date||0));

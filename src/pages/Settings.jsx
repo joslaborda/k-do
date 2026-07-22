@@ -12,6 +12,7 @@ import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, g
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 import FeedbackModal from '@/components/settings/FeedbackModal';
+import { toast } from '@/components/ui/use-toast';
 
 // ── Language Switcher ──────────────────────────────────────────────────────────
 function LanguageSwitcher() {
@@ -312,13 +313,22 @@ export default function Settings() {
     return () => clearTimeout(timer);
   }, [username, profile?.username, user?.id]);
 
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const handleAvatarUpload = async (file) => {
-    if (!file || !profile) return;
+    if (!file || !profile || uploadingAvatar) return;
+    setUploadingAvatar(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
-    } catch {}
+    } catch {
+      // Antes un fallo aquí (subida o guardado) no dejaba ningún rastro: sin
+      // toast, sin reset visible — pulsar "cambiar foto" y que fallara se
+      // veía exactamente igual que no haber pasado nada.
+      toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handleSave = async () => {
@@ -414,15 +424,19 @@ export default function Settings() {
                   : displayName[0]?.toUpperCase() || '?'
                 }
               </div>
-              <button onClick={() => avatarInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary border-2 border-white flex items-center justify-center">
-                <Camera className="w-2.5 h-2.5 text-white" />
+              <button onClick={() => avatarInputRef.current?.click()} disabled={uploadingAvatar}
+                className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary border-2 border-white flex items-center justify-center disabled:opacity-60">
+                {uploadingAvatar
+                  ? <Loader2 className="w-2.5 h-2.5 text-white animate-spin" />
+                  : <Camera className="w-2.5 h-2.5 text-white" />}
               </button>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground">{displayName}</p>
-              <button onClick={() => avatarInputRef.current?.click()}
-                className="text-xs text-primary font-medium">{t('settings.changePhoto')}</button>
+              <button onClick={() => avatarInputRef.current?.click()} disabled={uploadingAvatar}
+                className="text-xs text-primary font-medium disabled:opacity-60">
+                {uploadingAvatar ? t('common.loading') : t('settings.changePhoto')}
+              </button>
             </div>
             <input ref={avatarInputRef} type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />

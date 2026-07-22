@@ -13,6 +13,7 @@ import { PlaneIcon } from '@/lib/icons';
 import { useTripContext } from '@/hooks/useTripContext';
 import { daysUntil } from '@/lib/tripDays';
 import { parseServerDate } from '@/lib/parseServerDate';
+import { normalizeEmail } from '@/lib/utils';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -106,13 +107,19 @@ export default function Home() {
     onError: () => toast({ title: t('trip.deleteError'), description: t('common.tryAgain'), variant: 'destructive' }),
   });
 
-  const currentUserEmail = currentUser?.email;
+  // currentUser.email viene tal cual de base44.auth.me(), sin pasar por
+  // normalizeEmail() — mientras que trip.roles/trip.created_by SÍ se guardan
+  // siempre en minúsculas (TripsList.jsx). Sin normalizar aquí, el propio
+  // creador del viaje podía dejar de verse como admin (perdiendo acceso a
+  // Ajustes/borrar viaje) si su proveedor de auth devolvía el email con
+  // mayúsculas distintas a como quedó guardado — auditoría 1.1.
+  const currentUserEmail = normalizeEmail(currentUser?.email);
   const currentUserId = currentUser?.id;
   const roles = trip?.roles || {};
   // Antes `!trip` hacía fail-open a admin mientras el viaje no había cargado
   // (o si el backend devolvía vacío en vez de lanzar error). Con trip aún sin
   // cargar, nadie debe verse como admin.
-  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail);
+  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || normalizeEmail(trip?.created_by) === currentUserEmail);
 
   const { activeCity, activeMeta, countryRoute } = useTripContext(tripId);
 
@@ -126,7 +133,7 @@ export default function Home() {
       return tickets.filter(ticket => {
         const vis = ticket.visibility || 'personal';
         if (vis === 'shared') return true;
-        return ticket.created_by === currentUserEmail || ticket.user_id === currentUserId;
+        return normalizeEmail(ticket.created_by) === currentUserEmail || ticket.user_id === currentUserId;
       });
     },
     enabled: !!tripId && !!currentUserEmail,
@@ -176,7 +183,7 @@ export default function Home() {
   const unreadMessages = useMemo(() => {
     return tripMessages.filter(m =>
       m.user_id !== currentUserId &&
-      m.user_email !== currentUserEmail &&
+      normalizeEmail(m.user_email) !== currentUserEmail &&
       parseServerDate(m.created_date) > chatLastRead
     ).length;
   }, [tripMessages, currentUserId, currentUserEmail, chatLastRead]);

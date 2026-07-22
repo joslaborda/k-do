@@ -153,7 +153,11 @@ export default function Invites() {
     try {
       await declineTripInvite(inv.id, inv.invite_token);
       await refetchInvites();
-    } catch {}
+    } catch (e) {
+      // Antes catch {} mudo, inconsistente con handleDecline (arriba) que sí
+      // avisa de un fallo en la misma acción vía token.
+      toast({ title: t('common.error'), description: e.message || t('invites.page.rejectError'), variant: 'destructive' });
+    }
     setProcessing(false);
   };
 

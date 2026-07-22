@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { normalizeEmail } from '@/lib/utils';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, TrainFront, BusFront, Compass, Car, Ship, Shield, FileText, Loader2, Settings } from 'lucide-react';
@@ -992,9 +993,11 @@ export default function Cities() {
   // ciudades o las fechas" es justo esta pantalla (Ruta). El diálogo ya
   // existía (SettingsDialog, usado en Home.jsx) — aquí se reutiliza tal
   // cual, solo que se abre directamente sin saltar a Inicio primero.
-  const currentUserEmail = currentUser?.email;
+  // Ver Home.jsx: currentUser.email no está normalizado, pero
+  // trip.roles/trip.created_by sí (TripsList.jsx) — auditoría 1.1.
+  const currentUserEmail = normalizeEmail(currentUser?.email);
   const roles = trip?.roles || {};
-  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || trip?.created_by === currentUserEmail);
+  const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || normalizeEmail(trip?.created_by) === currentUserEmail);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
