@@ -7,6 +7,7 @@ import { checkUpload } from '@/lib/uploadLimits';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { normalizeEmail } from '@/lib/utils';
 
 const CATEGORIES = [
   { value: 'food',          label: 'Comida',      Icon: Utensils    },
@@ -40,7 +41,10 @@ export default function ExpenseForm({
   defaultCityId = '',
 }) {
   const { t } = useTranslation();
-  const getName = email => userMap[email] || email || email || '?';
+  // userMap está indexado por email normalizado (minúsculas) — nunca se
+  // muestra el email en crudo, aunque no se encuentre el perfil.
+  const getName = email => userMap[normalizeEmail(email)] || t('common.member');
+  const isCurrentUser = email => normalizeEmail(email) === normalizeEmail(currentUserEmail || members[0]);
   const profileMap = profilesByEmail || profiles || {};
 
   const orderedCurrencies = [...new Set([defaultCurrency, baseCurrency, ...availableCurrencies, ...COMMON_CURRENCIES])];
@@ -333,7 +337,7 @@ export default function ExpenseForm({
                     </div>;
               })()}
               <span className={`text-xs truncate font-medium ${form.paid_by === email ? 'text-primary' : 'text-muted-foreground'}`}>
-                {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
+                {isCurrentUser(email) ? t('common.you') : getName(email)}
               </span>
             </button>
           ))}
@@ -388,7 +392,7 @@ export default function ExpenseForm({
                     : <div style={{width:28,height:28,borderRadius:'50%',background:selected?'var(--kodo-bg-orange-mid)':'var(--kodo-progress-track)',color:selected?'hsl(var(--primary))':'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className={`text-xs font-medium truncate max-w-full ${selected ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
+                    {isCurrentUser(email) ? t('common.you') : getName(email)}
                   </span>
                   {shareStr && <span className="text-xs text-primary font-medium">{shareStr} {currency}</span>}
                 </button>
@@ -408,7 +412,7 @@ export default function ExpenseForm({
                     : <div style={{width:28,height:28,borderRadius:'50%',background:'var(--kodo-progress-track)',color:'var(--kodo-text-muted)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:500,flexShrink:0}}>
                         {getName(email).slice(0,2).toUpperCase()}</div>}
                   <span className="text-xs font-medium text-foreground flex-1 truncate">
-                    {email === (currentUserEmail || members[0]) ? t('common.you') : getName(email)}
+                    {isCurrentUser(email) ? t('common.you') : getName(email)}
                   </span>
                   <input
                     type="number" min="0" step="any" placeholder="0"
