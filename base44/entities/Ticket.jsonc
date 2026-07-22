@@ -106,7 +106,19 @@
     },
     "day_order": {
       "type": "number",
-      "description": "Orden manual dentro de los items sin hora fija de un día (arrastrar para reordenar). Igual que Spot.day_order."
+      "description": "Orden manual dentro de los items de un día (arrastrar para reordenar, docs/notas/spots entre sí). Igual que Spot.day_order."
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Nombre del aeropuerto/estación elegido en el buscador (solo vuelo/tren) — para mostrarlo en el mini-mapa del día."
+    },
+    "location_lat": {
+      "type": "number",
+      "description": "Latitud del aeropuerto/estación elegido en el buscador (solo vuelo/tren)."
+    },
+    "location_lng": {
+      "type": "number",
+      "description": "Longitud del aeropuerto/estación elegido en el buscador (solo vuelo/tren)."
     },
     "trip_members": {
       "type": "array",
