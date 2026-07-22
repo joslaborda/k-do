@@ -4,6 +4,16 @@
  * Soporta multi-divisa: todos los montos se normalizan a la moneda base del viaje
  */
 
+// UserProfile.email se guarda siempre en minúsculas, pero trip.members y los
+// emails guardados en cada Expense (paid_by/split_with/amounts_by_user)
+// pueden venir de antes de esa normalización, o de un miembro cuyo email de
+// auth tenía mayúsculas distintas. Sin normalizar aquí, la misma persona
+// podía acabar como DOS claves distintas en `balances` ("Maria@x.com" y
+// "maria@x.com") — cada una con su propio saldo — y getDebts() generaba una
+// deuda fantasma entre esa persona y sí misma, o simplemente números que no
+// cuadraban. Todo el cálculo trabaja siempre con el email en minúsculas.
+const norm = (email) => (email || '').trim().toLowerCase();
+
 /**
  * Calcula balances netos por usuario
  * @param {Array} expenses - gastos con amount_base (convertido a moneda base)
@@ -12,12 +22,17 @@
 export function calculateBalances(expenses, members) {
   if (!Array.isArray(expenses) || !Array.isArray(members)) return {};
   const balances = {};
-  members.forEach(email => { balances[email] = 0; });
+  members.forEach(email => { const e = norm(email); if (e) balances[e] = 0; });
 
   expenses.forEach(expense => {
     // Usar amount_base si existe (ya convertido), si no usar amount
     const amount = parseFloat(expense.amount_base || expense.amount) || 0;
-    const { paid_by, split_type, split_with, amounts_by_user } = expense;
+    const paid_by = norm(expense.paid_by);
+    const { split_type } = expense;
+    const split_with = (expense.split_with || []).map(norm);
+    const amounts_by_user = expense.amounts_by_user
+      ? Object.fromEntries(Object.entries(expense.amounts_by_user).map(([e, v]) => [norm(e), v]))
+      : null;
 
     if (!paid_by || !amount) return;
 
@@ -26,7 +41,7 @@ export function calculateBalances(expenses, members) {
 
     // Calcular parte de cada uno
     if (split_type === 'equal') {
-      const participants = split_with?.length > 0 ? split_with : [paid_by];
+      const participants = split_with.length > 0 ? split_with : [paid_by];
       const share = amount / participants.length;
       participants.forEach(email => {
         balances[email] = (balances[email] || 0) - share;
