@@ -29,6 +29,10 @@ const OSM_MAP = {
   shop:'shopping', mall:'shopping', market:'shopping',
   bus_station:'transport', train_station:'transport', subway_entrance:'transport',
   sports_centre:'activity', cinema:'activity', theatre:'activity',
+  // Antes ningún tag de alojamiento tenía mapeo, así que buscar un hotel de
+  // verdad en la tab "Buscar" (p. ej. "Marriott Lima") y guardarlo caía en
+  // 'sight' por defecto — se guardaba como "Cultura", no como "Hotel".
+  hotel:'hotel', hostel:'hotel', guest_house:'hotel', motel:'hotel', apartment:'hotel',
 };
 function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
 
