@@ -321,6 +321,40 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
   const [locating, setLocating] = useState(false);
   const [duplicate, setDuplicate] = useState(null); // spot that matches
 
+  // El campo de dirección era solo texto libre — no buscaba nada, así que
+  // escribir "Atocha" ahí no hacía nada salvo guardar la palabra "Atocha"
+  // como etiqueta, sin coordenadas. Ahora busca de verdad (mismo
+  // searchPlaces que ya usa la tab "Buscar" de esta página) y, al elegir un
+  // resultado, coloca el pin y revela el mapa — se puede seguir afinando
+  // arrastrando después. suppressNextSearchRef evita que un cambio de
+  // `address` que viene de reverseGeocode (arrastrar el pin / GPS) dispare
+  // una búsqueda hacia adelante sobre el texto que él mismo acaba de poner.
+  const [addressResults, setAddressResults] = useState([]);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const addressTimer = useRef(null);
+  const addressAbortRef = useRef(null);
+  const suppressNextSearchRef = useRef(false);
+
+  useEffect(() => {
+    if (suppressNextSearchRef.current) { suppressNextSearchRef.current = false; setAddressResults([]); return; }
+    if (!address.trim() || address.trim().length < 3) { setAddressResults([]); return; }
+    clearTimeout(addressTimer.current);
+    addressTimer.current = setTimeout(async () => {
+      if (addressAbortRef.current) addressAbortRef.current.abort();
+      addressAbortRef.current = new AbortController();
+      setAddressSearching(true);
+      try {
+        setAddressResults(await searchPlaces(address.trim(), city, country, addressAbortRef.current.signal));
+      } catch (e) {
+        if (e?.name !== 'AbortError') setAddressResults([]);
+      } finally {
+        setAddressSearching(false);
+      }
+    }, 600);
+    return () => clearTimeout(addressTimer.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, city, country]);
+
   // Al venir de un tap en el mapa grande de Spots (SpotsMapView), llega ya con
   // coordenadas — se precarga el pin y se abre el mapa directamente en vez de
   // arrancar en el placeholder "toca para añadir ubicación".
@@ -329,7 +363,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
       setPinLat(initialLat);
       setPinLng(initialLng);
       setShowMap(true);
-      reverseGeocode(initialLat, initialLng).then(addr => { if (addr) setAddress(addr); });
+      reverseGeocode(initialLat, initialLng).then(addr => { if (addr) { suppressNextSearchRef.current = true; setAddress(addr); } });
     }
   }, [open, initialLat, initialLng]);
 
@@ -350,7 +384,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
         const la = pos.coords.latitude, ln = pos.coords.longitude;
         setPinLat(la); setPinLng(ln);
         const addr = await reverseGeocode(la, ln);
-        if (addr) setAddress(addr);
+        if (addr) { suppressNextSearchRef.current = true; setAddress(addr); }
         setShowMap(true);
         setLocating(false);
       },
@@ -397,7 +431,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
             {/* Map placeholder / real map */}
             <div className="rounded-xl overflow-hidden border border-border mb-2" style={{ height: '180px', background: 'var(--kodo-bg-subtle)', position: 'relative' }}>
               {showMap
-                ? <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) setAddress(addr); }} />
+                ? <LeafletMap lat={defaultLat} lng={defaultLng} onMove={(la, ln, addr) => { setPinLat(la); setPinLng(ln); if (addr) { suppressNextSearchRef.current = true; setAddress(addr); } }} />
                 : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <MapPin className="w-8 h-8 text-muted-foreground/40" />
@@ -411,8 +445,30 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
               <span className="flex items-center gap-2"><Navigation className="w-4 h-4"/>{locating ? t('spots.create.locating') : t('spots.create.useMyLocationFull')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-            <Input value={address} onChange={e => setAddress(e.target.value)}
-              placeholder={t('spots.create.addressPlaceholder')} className="h-9 text-sm" />
+            <div className="relative">
+              <Input value={address} onChange={e => { suppressNextSearchRef.current = false; setAddress(e.target.value); }}
+                placeholder={t('spots.create.addressPlaceholder')} className="h-9 text-sm pr-8" />
+              {addressSearching && (
+                <Loader2 className="w-3.5 h-3.5 text-muted-foreground animate-spin absolute right-2.5 top-1/2 -translate-y-1/2" />
+              )}
+              {addressResults.length > 0 && (
+                <div className="absolute z-10 left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-56 overflow-y-auto">
+                  {addressResults.map(r => (
+                    <button key={r.id} type="button" onClick={() => {
+                      suppressNextSearchRef.current = true;
+                      setAddress(r.name + (r.address ? ', ' + r.address : ''));
+                      setPinLat(r.lat); setPinLng(r.lng);
+                      setShowMap(true);
+                      setAddressResults([]);
+                    }}
+                      className="w-full flex flex-col items-start px-3 py-2.5 text-left hover:bg-secondary/30 transition-colors border-b border-border last:border-0">
+                      <span className="text-sm font-medium text-foreground truncate w-full">{r.name}</span>
+                      {r.address && <span className="text-xs text-muted-foreground truncate w-full">{r.address}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Name + duplicate check */}
@@ -1431,7 +1487,7 @@ export default function Restaurants() {
                 spots={filteredSpots.length ? filteredSpots : spots}
                 cities={tripCities}
                 onCreatePin={(lat, lng) => { setPinPrefill({ lat, lng }); setShowCreate(true); }}
-                onSelectCity={() => setMySpotsView('lista')}
+                onSelectSpot={setSelectedSpot}
               />
             ) : loadingSpots && spots.length === 0 ? (
               <div className="text-center py-12">
