@@ -8,7 +8,7 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2, List, Map as MapIcon } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2, List, Map as MapIcon, Hotel } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
@@ -171,6 +171,7 @@ const TYPE_CONFIG = {
   activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
   shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
   transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
+  hotel:     { label:'Hotel',      Icon: Hotel,       color:'bg-indigo-100 text-indigo-700' },
   custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
@@ -299,11 +300,18 @@ function LeafletMap({ lat, lng, onMove }) {
 }
 
 // ── Create spot bottom sheet ──────────────────────────────────────────────────
-function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, initialLat, initialLng }) {
+function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, initialLat, initialLng, initialType }) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [title, setTitle] = useState('');
-  const [type, setType] = useState('food');
+  const [type, setType] = useState(initialType || 'food');
+
+  // Si se abre con un tipo forzado (p. ej. desde "+ Añadir hotel" en Home),
+  // preseleccionarlo cada vez que se abre — sin esto, cerrar y reabrir el
+  // sheet para otro spot se quedaba pegado en "hotel" del uso anterior.
+  useEffect(() => {
+    if (open) setType(initialType || 'food');
+  }, [open, initialType]);
   const [notes, setNotes] = useState('');
   const [address, setAddress] = useState('');
   const [isPublic, setIsPublic] = useState(true);
@@ -517,6 +525,11 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
 function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
+  // El botón de confirmar no se deshabilitaba mientras onAssign (async)
+  // seguía en curso — un doble tap (fácil en móvil) lo disparaba dos veces,
+  // y como reordena + muestra un toast de "orden sugerido", salían dos
+  // toasts idénticos apilados.
+  const [submitting, setSubmitting] = useState(false);
 
   // Si el viaje visita la misma ciudad más de una vez (varios registros City
   // con el mismo nombre, p. ej. Lima 3 veces en fechas distintas), agrupar
@@ -609,16 +622,20 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
             {t('spots.undo')}
           </button>
           <button
-            onClick={() => {
+            onClick={async () => {
+              if (submitting) return;
               if (selectedDate && isAllowed(selectedDate)) {
-                onAssign(selectedDate, resolveCityIdForDate(selectedDate));
+                setSubmitting(true);
+                try { await onAssign(selectedDate, resolveCityIdForDate(selectedDate)); }
+                finally { setSubmitting(false); }
               } else {
                 onSkip();
               }
             }}
-            className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold transition-colors"
+            disabled={submitting}
+            className={`flex-1 py-3 bg-primary text-white rounded-full text-sm font-semibold transition-colors ${submitting ? 'opacity-60 pointer-events-none' : ''}`}
           >
-            {selectedDate && isAllowed(selectedDate) ? t('spots.assign.confirm') : t('spots.assign.notNow')}
+            {submitting ? t('common.loading') : (selectedDate && isAllowed(selectedDate) ? t('spots.assign.confirm') : t('spots.assign.notNow'))}
           </button>
         </div>
       </div>
@@ -651,6 +668,10 @@ export default function Restaurants() {
   const urlParams = new URLSearchParams(window.location.search);
   const tripId = urlParams.get('trip_id');
   const importSavedParam = urlParams.get('import_saved') === '1';
+  // Enlace desde el mini-mapa de Home ("+ Añadir hotel") cuando el día no
+  // tiene ninguno guardado — mismo patrón que import_saved de arriba.
+  const openCreateParam = urlParams.get('open_create');
+  const cityIdFromParam = urlParams.get('city_id');
 
   useEffect(() => {
     if (!tripId || tripId === 'null') {
@@ -784,6 +805,17 @@ export default function Restaurants() {
       setTab('mis');
     }
   }, [importSavedParam, importableSpots.length]);
+
+  // Abrir directo el formulario de crear spot con type "hotel" — enlace desde
+  // "+ Añadir hotel" en el mini-mapa de Home cuando ese día aún no tiene uno.
+  useEffect(() => {
+    if (openCreateParam === 'hotel') {
+      if (cityIdFromParam) setSelectedCityId(cityIdFromParam);
+      setTab('mis');
+      setShowCreate(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openCreateParam, cityIdFromParam]);
 
   // Mutations
   // Si `trip` no había cargado (conexión lenta/intermitente), antes se
@@ -1467,6 +1499,7 @@ export default function Restaurants() {
         country={country}
         initialLat={pinPrefill?.lat}
         initialLng={pinPrefill?.lng}
+        initialType={openCreateParam === 'hotel' ? 'hotel' : undefined}
       />
 
       {/* Spot detail sheet */}
