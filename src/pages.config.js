@@ -49,7 +49,6 @@
  */
 import Documents from './pages/Documents';
 import Cities from './pages/Cities';
-import CityDetail from './pages/CityDetail';
 
 import Expenses from './pages/Expenses';
 import Home from './pages/Home';
@@ -68,7 +67,6 @@ import __Layout from './Layout.jsx';
 export const PAGES = {
     "Documents": Documents,
     "Cities": Cities,
-    "CityDetail": CityDetail,
 
     "Expenses": Expenses,
     "Home": Home,
