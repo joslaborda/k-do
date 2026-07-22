@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { loadLeaflet } from './spotsHelpers';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { loadLeaflet, TYPE_CONFIG } from './spotsHelpers';
+import { sameCityName } from '@/lib/tripDays';
 
 // Mapa de "todo el viaje" para la tab Mis spots: agrupa por ciudad (no hay
 // campo de coordenadas en City, así que el centro de cada cluster se calcula
@@ -18,19 +20,24 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
 
   const withCoords = spots.filter(s => s?.lat && s?.lng);
 
+  // Agrupar por NOMBRE de ciudad normalizado, no por city_id — un spot puede
+  // tener city_id de una estancia concreta (o ni eso, si es "sin_ciudad") y
+  // dos estancias distintas del mismo viaje pueden compartir nombre (p. ej.
+  // "Lima" ida y vuelta). Agrupar por id partía esos casos en dos clusters
+  // de 1 con el mismo nombre en vez de uno solo de 2 — mismo criterio que ya
+  // usa sameCityName() en SpotDetailModal/SpotDetailSheet para esto mismo.
   const clusters = Object.values(
     withCoords.reduce((acc, s) => {
-      const key = s.city_id || s.city_name || 'sin_ciudad';
-      if (!acc[key]) {
-        const cityMeta = cities.find(c => c.id === s.city_id);
-        acc[key] = { key, name: cityMeta?.name || s.city_name || t('spots.map.otherCity'), lat: 0, lng: 0, count: 0 };
-      }
+      const cityMeta = cities.find(c => c.id === s.city_id);
+      const name = cityMeta?.name || s.city_name || t('spots.map.otherCity');
+      const key = Object.keys(acc).find(k => sameCityName(k, name)) || name;
+      if (!acc[key]) acc[key] = { key, name, lat: 0, lng: 0, spots: [] };
       acc[key].lat += s.lat;
       acc[key].lng += s.lng;
-      acc[key].count += 1;
+      acc[key].spots.push(s);
       return acc;
     }, {})
-  ).map(c => ({ ...c, lat: c.lat / c.count, lng: c.lng / c.count }));
+  ).map(c => ({ ...c, lat: c.lat / c.spots.length, lng: c.lng / c.spots.length, count: c.spots.length }));
 
   useEffect(() => {
     if (!clusters.length) return undefined;
@@ -40,13 +47,29 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
       if (cancelled || !containerRef.current) return;
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
 
-      const map = L.map(containerRef.current, { zoomControl: false, attributionControl: false, scrollWheelZoom: false });
+      // zoomControl:true — mismo default que LeafletMap.jsx (el selector de
+      // pin al crear spot). Antes lo llevaba a false sin querer y, sumado a
+      // scrollWheelZoom:false, no había ninguna forma de hacer zoom out.
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
       clusters.forEach(c => {
-        const size = Math.min(32 + c.count * 2, 56);
+        // Un cluster de un solo spot no aporta nada mostrando "1" — se ve el
+        // icono real de su tipo (mismo TYPE_CONFIG que SpotCard/MySpotRow),
+        // así se sabe qué es sin tener que tocarlo. Con 2+ sí tiene sentido
+        // el número, ahí ya es "cuántos hay", no "qué es".
+        const single = c.count === 1 ? c.spots[0] : null;
+        const size = single ? 30 : Math.min(32 + c.count * 2, 56);
+        const inner = single
+          ? renderToStaticMarkup((() => {
+              const tc = TYPE_CONFIG[single.type] || TYPE_CONFIG.custom;
+              const Icon = tc.Icon;
+              return <Icon size={14} color="#fff" strokeWidth={2.5} />;
+            })())
+          : String(c.count);
+        const fontSize = single ? 0 : (size > 46 ? 15 : 13);
         const icon = L.divIcon({
-          html: '<div style="width:' + size + 'px;height:' + size + 'px;background:hsl(16 75% 45% / .92);color:#fff;border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + (size > 46 ? 15 : 13) + 'px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.3)">' + c.count + '</div>',
+          html: '<div style="width:' + size + 'px;height:' + size + 'px;background:hsl(16 75% 45% / .92);color:#fff;border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + fontSize + 'px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.3)">' + inner + '</div>',
           iconSize: [size, size], iconAnchor: [size / 2, size / 2], className: '',
         });
         const marker = L.marker([c.lat, c.lng], { icon }).addTo(map);
