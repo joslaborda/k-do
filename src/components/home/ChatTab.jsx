@@ -447,7 +447,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
                 {t('common.cancel')}
               </button>
               <button onClick={sendPoll}
-                disabled={!pollQuestion.trim() || pollOptions.filter(o=>o.trim()).length < 2}
+                disabled={!pollQuestion.trim() || pollOptions.filter(o=>o.trim()).length < 2 || sendMutation.isPending}
                 className="flex-[2] py-3 rounded-full bg-primary text-white text-sm font-medium disabled:opacity-40">
                 {t('chat.sendPoll')}
               </button>
