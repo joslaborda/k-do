@@ -198,31 +198,137 @@ function DeleteAccountRow({ user, profile }) {
     setDeleting(true);
     setError('');
     try {
-      // 1. Salir de todos los viajes donde el usuario es miembro.
+      // Derecho al olvido (RGPD art. 17): antes esto solo sacaba al usuario
+      // de trip.members y borraba su perfil y favoritos — pero su email
+      // seguía en crudo en cada Expense (paid_by/split_with/amounts_by_user),
+      // Spot (created_by + creator_username/creator_avatar, que son una
+      // COPIA guardada en el momento de crear, no un lookup en vivo al
+      // perfil) y TripMessage (user_email/display_name/avatar_url, también
+      // copiados). Borrar el perfil no limpiaba nada de eso.
+      //
+      // No todo se puede borrar sin más: un Expense compartido es cálculo de
+      // grupo — borrar uno que pagó esta persona rompería el balance de
+      // todos los demás. La solución estándar (la misma que usan apps de
+      // grupo como Slack o WhatsApp) es ANONIMIZAR la identidad en los
+      // registros compartidos en vez de borrarlos, y solo borrar del todo lo
+      // que es puramente suyo y no afecta a nadie más.
+      //
+      // anonEmail es estable por usuario: si la misma persona aparece como
+      // paid_by Y en split_with del mismo gasto, las dos referencias quedan
+      // con el mismo valor anonimizado — el cálculo de balances sigue
+      // cuadrando, solo que ya no apunta a su email real. userMap ya cae a
+      // t('common.member') cuando no encuentra perfil, así que se ve como
+      // "Miembro" en vez de mostrar nada raro.
+      const anonEmail = `deleted-${user.id}@kodo.invalid`;
+
+      // 1. Todavía como miembro del viaje (con permisos RLS intactos):
+      //    anonimizar su identidad en lo que se comparte con el grupo.
       const trips = await base44.entities.Trip.filter({ members: { $elemMatch: { $eq: user.email } } });
+
+      await Promise.all(trips.map(async trip => {
+        const tripId = trip.id;
+
+        // Gastos donde pagó o participó
+        const expenses = await base44.entities.Expense.filter({ trip_id: tripId });
+        await Promise.all(expenses.map(async e => {
+          const touchesUser = e.paid_by === user.email
+            || (e.split_with || []).includes(user.email)
+            || Object.keys(e.amounts_by_user || {}).includes(user.email);
+          if (!touchesUser) return;
+          const patch = {};
+          if (e.paid_by === user.email) patch.paid_by = anonEmail;
+          if ((e.split_with || []).includes(user.email)) {
+            patch.split_with = e.split_with.map(em => em === user.email ? anonEmail : em);
+          }
+          if (e.amounts_by_user && Object.keys(e.amounts_by_user).includes(user.email)) {
+            const { [user.email]: myAmt, ...rest } = e.amounts_by_user;
+            patch.amounts_by_user = { ...rest, [anonEmail]: myAmt };
+          }
+          await base44.entities.Expense.update(e.id, patch);
+        }));
+
+        // Spots: si son personales (solo él los veía) no le sirven a nadie
+        // más — se borran. Si son del grupo (trip_members/selected_users/
+        // public) se conservan pero se anonimiza quién los creó.
+        const spots = await base44.entities.Spot.filter({ trip_id: tripId, created_by: user.email });
+        await Promise.all(spots.map(async s => {
+          if (s.visibility === 'personal') {
+            await base44.entities.Spot.delete(s.id);
+          } else {
+            await base44.entities.Spot.update(s.id, {
+              created_by: anonEmail,
+              created_by_user_id: null,
+              creator_username: null,
+              creator_avatar: null,
+            });
+          }
+        }));
+
+        // Mensajes de chat: se conserva el contenido (contexto de la
+        // conversación para el resto del grupo) pero se anonimiza quién lo
+        // escribió — igual que "Usuario eliminado" en Slack/WhatsApp.
+        const messages = await base44.entities.TripMessage.filter({ trip_id: tripId, user_id: user.id });
+        await Promise.all(messages.map(m => base44.entities.TripMessage.update(m.id, {
+          user_email: anonEmail,
+          display_name: null,
+          avatar_url: null,
+        })));
+
+        // Documentos/tickets propios: si son personales se borran (nadie más
+        // los necesita); si están compartidos con el grupo se anonimiza el
+        // propietario en vez de borrar el archivo de otros.
+        const tickets = await base44.entities.Ticket.filter({ trip_id: tripId, user_id: user.id });
+        await Promise.all(tickets.map(async doc => {
+          if ((doc.visibility || 'personal') === 'personal') {
+            await base44.entities.Ticket.delete(doc.id);
+          } else {
+            await base44.entities.Ticket.update(doc.id, { user_id: null });
+          }
+        }));
+
+        // Maleta: es una checklist individual, no afecta a nadie más — se borra.
+        const packing = await base44.entities.PackingItem.filter({ trip_id: tripId, user_id: user.id });
+        await Promise.all(packing.map(p => base44.entities.PackingItem.delete(p.id)));
+      }));
+
+      // 2. Datos puramente suyos, sin relación con el grupo — se borran enteros.
+      const [saved, notifications, likes, comments] = await Promise.all([
+        base44.entities.SavedSpot.filter({ user_id: user.id }),
+        base44.entities.Notification.filter({ user_id: user.id }),
+        base44.entities.Like.filter({ user_id: user.id }),
+        base44.entities.SpotComment.filter({ user_id: user.id }),
+      ]);
+      await Promise.all([
+        ...saved.map(s => base44.entities.SavedSpot.delete(s.id)),
+        ...notifications.map(n => base44.entities.Notification.delete(n.id)),
+        ...likes.map(l => base44.entities.Like.delete(l.id)),
+        ...comments.map(c => base44.entities.SpotComment.delete(c.id)),
+      ]);
+
+      // 3. Ahora sí, salir de los viajes — esto revoca el acceso (RLS) a
+      //    todo lo anterior, por eso tiene que ir DESPUÉS de anonimizar/
+      //    borrar arriba y no antes.
       await Promise.all(trips.map(async trip => {
         const newMembers = (trip.members || []).filter(e => e !== user.email);
         const newRoles = { ...(trip.roles || {}) };
         delete newRoles[user.email];
         await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
-        // Revoca el acceso a los datos de cada viaje que abandona — si no, su
-        // email queda congelado en el trip_members de gastos/chat/documentos
-        // antiguos y conservaría acceso a ellos después de borrar la cuenta.
         await syncTripMembers(trip.id, newMembers);
       }));
 
-      // 2. Borrar favoritos guardados (privados, sin relación con viajes compartidos).
-      const saved = await base44.entities.SavedSpot.filter({ user_id: user.id });
-      await Promise.all(saved.map(s => base44.entities.SavedSpot.delete(s.id)));
-
-      // 3. Borrar el perfil.
+      // 4. Borrar el perfil.
       if (profile?.id) {
         await base44.entities.UserProfile.delete(profile.id);
       }
 
-      // 4. Cerrar sesión. base44 no expone borrado de la cuenta de auth desde
+      // 5. Cerrar sesión. base44 no expone borrado de la cuenta de auth desde
       // el cliente — lo que sí queda garantizado es que ya no aparece en
-      // ningún viaje ni tiene perfil en Kōdo.
+      // ningún viaje, no tiene perfil, y su identidad ya no está en claro en
+      // ningún registro al que otros miembros sigan teniendo acceso. Nota:
+      // base44 mantiene internamente un campo "created_by" de sistema en
+      // cada registro (metadato de auditoría de la plataforma, no editable
+      // desde el cliente) — eso queda fuera del alcance de lo que se puede
+      // borrar/anonimizar vía la API de entidades.
       base44.auth.logout();
     } catch (e) {
       setDeleting(false);
@@ -597,10 +703,15 @@ export default function Settings() {
           <SettingRow
             label={t('settings.feedback')}
             sublabel={t('settings.feedbackSub')}
-            isLast
             onClick={() => setFeedbackOpen(true)}
             right={<ChevronRight className="w-3 h-3 text-muted-foreground" />}
           />
+          <Link to={createPageUrl('Terms')} className="block">
+            <SettingRow label={t('settings.terms')} right={<ChevronRight className="w-3 h-3 text-muted-foreground" />} />
+          </Link>
+          <Link to={createPageUrl('Privacy')} className="block">
+            <SettingRow label={t('settings.privacyPolicy')} isLast right={<ChevronRight className="w-3 h-3 text-muted-foreground" />} />
+          </Link>
         </div>
 
       </div>
