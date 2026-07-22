@@ -5,37 +5,17 @@ import { base44 } from '@/api/base44Client';
 import { sendTripInvite } from '@/lib/invites';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-
-const AVATAR_COLORS = [
-  'bg-orange-100 text-primary',
-  'bg-violet-100 text-violet-700',
-  'bg-blue-100 text-blue-700',
-  'bg-green-100 text-green-700',
-  'bg-pink-100 text-pink-700',
-];
-
-function Avatar({ email, profile, size = 36, colorIndex = 0 }) {
-  const name = profile?.display_name || profile?.username || email || '?';
-  const initials = name.slice(0, 2).toUpperCase();
-  const color = AVATAR_COLORS[colorIndex % AVATAR_COLORS.length];
-  const sz = `${size}px`;
-  if (profile?.avatar_url) {
-    return <img src={profile.avatar_url} alt={name}
-      style={{ width: sz, height: sz, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
-  }
-  return (
-    <div className={`rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm ${color}`}
-      style={{ width: sz, height: sz }}>
-      {initials}
-    </div>
-  );
-}
+import Avatar from '@/components/trip/Avatar';
+import { normalizeEmail } from '@/lib/utils';
 
 function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) {
   const { t } = useTranslation();
   // status: 'member' | 'pending' | 'available'
-  const name = profile?.display_name || profile?.username || email;
-  const username = profile?.username ? `@${profile.username}` : email;
+  // display_name/username son obligatorios en UserProfile — si no aparecen
+  // ninguno, es que no llegó perfil (búsqueda por email suelto sin match),
+  // no que la persona no tenga nombre. Nunca se muestra el email en su lugar.
+  const name = profile?.display_name || profile?.username || t('common.member');
+  const username = profile?.username ? `@${profile.username}` : '';
   const isBusy = status !== 'available' || sending;
 
   return (
@@ -45,7 +25,7 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
       className={`w-full flex items-center gap-3 px-4 py-3 border-b border-border last:border-0 text-left transition-colors
         ${status === 'available' && !sending ? 'hover:bg-secondary/30 active:bg-secondary/50' : 'opacity-50 cursor-default'}`}
     >
-      <Avatar email={email} profile={profile} size={38} colorIndex={0} />
+      <Avatar email={email} profile={profile} size={38} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-medium text-foreground truncate">{name}</p>
@@ -55,7 +35,7 @@ function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) 
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground truncate">{username}</p>
+        {username && <p className="text-xs text-muted-foreground truncate">{username}</p>}
       </div>
       {status === 'member' && (
         <span className="text-xs bg-green-50 text-green-700 border border-green-200 rounded-full px-2 py-0.5 flex-shrink-0 flex items-center gap-1">
@@ -110,9 +90,11 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
       if (!currentUserEmail) return [];
       const allTrips = await base44.entities.Trip.filter({ created_by: currentUserEmail });
       const emails = new Map();
+      const normalizedCurrentMembers = members.map(normalizeEmail);
       allTrips.forEach(t => {
-        (t.members || []).forEach(e => {
-          if (e !== currentUserEmail && !members.includes(e)) {
+        (t.members || []).forEach(rawEmail => {
+          const e = normalizeEmail(rawEmail);
+          if (e && e !== normalizeEmail(currentUserEmail) && !normalizedCurrentMembers.includes(e)) {
             emails.set(e, (emails.get(e) || 0) + 1);
           }
         });
@@ -174,9 +156,14 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     }, 150); // más rápido porque es client-side
   }, [query, allProfiles, profiles]);
 
+  // members puede traer entradas antiguas sin normalizar (viajes creados
+  // antes de este fix) — se normalizan ambos lados de cada comparación, no
+  // solo el email entrante, para que también funcione con esos datos viejos.
+  const normalizedMembers = members.map(normalizeEmail);
   const getStatus = (email) => {
-    if (members.includes(email?.toLowerCase())) return 'member';
-    if (pendingInvites.some(i => i.email?.toLowerCase() === email?.toLowerCase())) return 'pending';
+    const e = normalizeEmail(email);
+    if (normalizedMembers.includes(e)) return 'member';
+    if (pendingInvites.some(i => normalizeEmail(i.email) === e)) return 'pending';
     return 'available';
   };
 
@@ -255,8 +242,8 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
   // arriba para la búsqueda) sí tiene a todos los usuarios de Kōdo, así que
   // se busca ahí primero.
   const coTravelerProfiles = coTravelerEmails.map(({ email, count }) => ({
-    profile: allProfiles.find(p => p.email === email || p.user_email === email)
-      || profiles.find(p => p.email === email || p.user_email === email),
+    profile: allProfiles.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email))
+      || profiles.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email)),
     email,
     count,
   })).filter(({ email }) => getStatus(email) !== 'member').slice(0, 5);
@@ -405,17 +392,15 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('invites.modal.onTrip')}</p>
                   <div className="bg-card rounded-2xl border border-border overflow-hidden">
                     {members.map((email, i) => {
-                      const prof = profiles.find(p => p.email === email || p.user_email === email);
-                      const name = prof?.display_name || prof?.username || email;
+                      const prof = profiles.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email));
+                      const name = prof?.display_name || prof?.username || t('common.member');
                       const isAdmin = roles[email] === 'admin' || trip?.created_by === email;
                       return (
                         <div key={email} className={`flex items-center gap-3 px-4 py-3 ${i > 0 || pendingInvites.length > 0 ? 'border-t border-border' : ''}`}>
-                          <Avatar email={email} profile={prof} size={36} colorIndex={i} />
+                          <Avatar email={email} profile={prof} size={36} />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground truncate">{name}</p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {prof?.username ? `@${prof.username}` : email}
-                            </p>
+                            {prof?.username && <p className="text-xs text-muted-foreground truncate">@{prof.username}</p>}
                           </div>
                           {isAdmin
                             ? <span className="text-xs bg-orange-50 text-primary border border-orange-200 rounded-full px-2 py-0.5 flex-shrink-0">{t('common.admin')}</span>

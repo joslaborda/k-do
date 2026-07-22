@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { UserPlus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { normalizeEmail } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 export default function MemberAvatarRow({
@@ -9,7 +10,12 @@ export default function MemberAvatarRow({
 }) {
   const { t } = useTranslation();
   const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
-  const memberEmails = (trip?.members || [trip?.created_by]).filter(Boolean);
+  // Normalizado ya en el origen: trip.members debería venir siempre en
+  // minúsculas (ver TripsList.jsx / acceptTripInvite), pero se normaliza
+  // aquí también por si acaso — es la clave que se usa para buscar el
+  // perfil, y un desajuste de mayúsculas es justo lo que hacía que el propio
+  // creador del viaje viera su email en crudo en vez de su nombre.
+  const memberEmails = [...new Set((trip?.members || [trip?.created_by]).filter(Boolean).map(normalizeEmail))];
 
   const { data: memberProfiles = [] } = useQuery({
     queryKey: ['memberProfiles', memberEmails.join(',')],
@@ -18,7 +24,7 @@ export default function MemberAvatarRow({
       // Intento directo por email (funciona si el usuario tiene email backfilled)
       const direct = await base44.entities.UserProfile.filter({ email: { $in: memberEmails } });
       // Emails que no encontramos por email directo
-      const foundEmails = new Set(direct.map(p => p.email).filter(Boolean));
+      const foundEmails = new Set(direct.map(p => normalizeEmail(p.email)).filter(Boolean));
       const missing = memberEmails.filter(e => !foundEmails.has(e));
       if (!missing.length) return direct;
       // Fallback para los que faltan: User → user_id → UserProfile
@@ -30,7 +36,7 @@ export default function MemberAvatarRow({
       // Enriquecer con user_email para poder lookupear
       const enriched = extra.map(p => ({
         ...p,
-        email: users.find(u => u.id === p.user_id)?.email || '',
+        email: normalizeEmail(users.find(u => u.id === p.user_id)?.email || ''),
       }));
       return [...direct, ...enriched];
     },
@@ -40,9 +46,9 @@ export default function MemberAvatarRow({
 
   const profileMap = useMemo(() => {
     const map = {};
-    memberProfiles.forEach(p => { if (p.email) map[p.email] = p; });
+    memberProfiles.forEach(p => { const e = normalizeEmail(p.email); if (e) map[e] = p; });
     (profiles || []).forEach(p => {
-      const e = p.email || p.user_email;
+      const e = normalizeEmail(p.email || p.user_email);
       if (e) map[e] = p;
     });
     return map;
@@ -52,9 +58,13 @@ export default function MemberAvatarRow({
     <div className="px-4 py-3 flex items-center gap-4 flex-wrap">
       {memberEmails.map((email, i) => {
         const profile = profileMap[email] || null;
-        const name = profile?.display_name || profile?.username || email;
-        const initials = name.slice(0,2).toUpperCase();
-        const isMe = email === currentUserEmail;
+        // Nunca el email en crudo como nombre visible — display_name y
+        // username son campos obligatorios de UserProfile, así que si no
+        // aparecen es que no se encontró el perfil (ver arriba), no que la
+        // persona no tenga nombre. En ese caso, un placeholder neutro.
+        const name = profile?.display_name || profile?.username || t('common.member');
+        const initials = (profile?.display_name || profile?.username || '?').slice(0, 2).toUpperCase();
+        const isMe = normalizeEmail(currentUserEmail) === email;
         return (
           <div key={email} className="flex flex-col items-center gap-1">
             {profile?.avatar_url
