@@ -63,6 +63,8 @@ import Invites from './pages/Invites';
 import Photos from './pages/Photos';
 import Explore from './pages/Explore';
 import TemplateDetail from './pages/TemplateDetail';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +85,8 @@ export const PAGES = {
     "Photos": Photos,
     "Explore": Explore,
     "TemplateDetail": TemplateDetail,
+    "Terms": Terms,
+    "Privacy": Privacy,
 }
 
 export const pagesConfig = {
