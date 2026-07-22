@@ -586,7 +586,10 @@
       "transport": "Transport",
       "hotel": "Hotel",
       "nightlife": "Bars & Nightlife",
-      "custom": "Other"
+      "custom": "Other",
+      "airport": "Airport",
+      "train": "Train station",
+      "bus": "Bus station"
     },
     "create": {
       "title": "Create spot",
