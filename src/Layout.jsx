@@ -30,7 +30,7 @@ const globalNavItems = [
 
 const pagesWithoutNav = ['MigrateData', 'TripsList', 'Explore', 'Profile', 'Settings', 'VerifyEmail', 'Invites'];
 const globalPages     = ['Explore'];
-const tripOnlyPages   = ['Home', 'Cities', 'CityDetail', 'Documents', 'Restaurants', 'Photos',
+const tripOnlyPages   = ['Home', 'Cities', 'Documents', 'Restaurants', 'Photos',
                          'Expenses', 'Utilities', 'Translator'];
 
 export default function Layout({ children, currentPageName }) {
@@ -48,7 +48,7 @@ export default function Layout({ children, currentPageName }) {
 
   // Active state — also highlight "Más" when a drawer page is active
   const isDrawerPageActive = drawerItems.some(d =>
-    currentPageName === d.page || (d.page === 'Cities' && currentPageName === 'CityDetail')
+    currentPageName === d.page
   );
 
   useEffect(() => {
@@ -111,8 +111,7 @@ export default function Layout({ children, currentPageName }) {
               </button>
             </div>
             {drawerItems.map((item) => {
-              const isActive = currentPageName === item.page ||
-                (item.page === 'Cities' && currentPageName === 'CityDetail');
+              const isActive = currentPageName === item.page;
               return (
                 <Link
                   key={item.page}
@@ -252,8 +251,7 @@ export default function Layout({ children, currentPageName }) {
           </Link>
           <div className="flex-1 flex flex-col items-center gap-1 w-full px-1.5">
             {(showTripNav ? mainNavItems : globalNavItems).map((item) => {
-              const isActive = currentPageName === item.page ||
-                (item.page === 'Cities' && currentPageName === 'CityDetail');
+              const isActive = currentPageName === item.page;
               const linkUrl = showTripNav ? tripUrl(item.page) : createPageUrl(item.page);
               return (
                 <Link
@@ -279,8 +277,7 @@ export default function Layout({ children, currentPageName }) {
               <>
                 <div className="w-8 h-px bg-border my-1" />
                 {drawerItems.map((item) => {
-                  const isActive = currentPageName === item.page ||
-                    (item.page === 'Cities' && currentPageName === 'CityDetail');
+                  const isActive = currentPageName === item.page;
                   return (
                     <Link
                       key={item.page}
