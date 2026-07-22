@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { loadLeaflet } from '@/components/spots/spotsHelpers';
+import { KODO_TILE_URL, KODO_TILE_SUBDOMAINS, KODO_TILE_ATTRIBUTION, injectKodoMapStyles } from '@/components/spots/mapTiles';
 
 // Mini-mapa de la ruta del día: hotel (si hay uno guardado como spot type
 // 'hotel' para esta ciudad) + los spots del día conectados en el orden de
@@ -21,12 +22,13 @@ export default function TodayRouteMap({ hotelSpot, spots = [], height = 150 }) {
     if (totalPoints === 0) return undefined;
     let cancelled = false;
 
+    injectKodoMapStyles();
     loadLeaflet().then(L => {
       if (cancelled || !containerRef.current) return;
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
 
-      const map = L.map(containerRef.current, { zoomControl: false, attributionControl: false, scrollWheelZoom: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      const map = L.map(containerRef.current, { zoomControl: false, attributionControl: true, scrollWheelZoom: false });
+      L.tileLayer(KODO_TILE_URL, { subdomains: KODO_TILE_SUBDOMAINS, attribution: KODO_TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
 
       const points = [];
 
@@ -67,5 +69,5 @@ export default function TodayRouteMap({ hotelSpot, spots = [], height = 150 }) {
 
   if (totalPoints === 0) return null;
 
-  return <div ref={containerRef} style={{ height, borderRadius: 12, overflow: 'hidden' }} />;
+  return <div ref={containerRef} className="kodo-map-warm" style={{ height, borderRadius: 12, overflow: 'hidden' }} />;
 }
