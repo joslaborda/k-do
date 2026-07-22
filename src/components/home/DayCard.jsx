@@ -1,17 +1,18 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, FileText, MapPin , CirclePlus, Thermometer, Route } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, FileText, MapPin , CirclePlus, Thermometer, Route, GripVertical } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import ItemDetailSheet from './ItemDetailSheet';
 import TodayRouteMap from './TodayRouteMap';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_ICON } from './constants';
 import { useTranslation } from 'react-i18next';
+import { toast } from '@/components/ui/use-toast';
 
 export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime, hotelSpot }) {
   const { t } = useTranslation();
@@ -61,28 +62,168 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
 
   const hasItinerary = itineraryDays?.some(d => d.city_id === city?.id);
 
+  // Mismo parseo que usa Cities.jsx para las notas de itinerario (raw JSON
+  // string en ItineraryDay.content -> [{text,time,order}]). Se usa tanto al
+  // construir el timeline como al borrar/reordenar.
+  const parseNotesContent = (raw) => {
+    if (!raw) return [];
+    try { const p = JSON.parse(raw); if (Array.isArray(p)) return p; } catch {}
+    return raw.trim() ? [{ text: raw, time: '' }] : [];
+  };
+
   const timeline = useMemo(() => {
-    const docItems  = docs.map(d  => ({ ...d, _kind: 'doc',  time: d.time || null, type: d.category || d.type || 'other' }));
-    const spotItems = spots.map(s => ({ ...s, _kind: 'spot', time: s.assigned_time || s.time || null }));
-    const parseNotes = (raw) => {
-      if (!raw) return [];
-      try { const p = JSON.parse(raw); if (Array.isArray(p)) return p; } catch {}
-      return raw.trim() ? [{ text: raw, time: '' }] : [];
-    };
+    const docItems = docs.map(d => ({
+      ...d, _kind: 'doc', time: d.time || null, type: d.category || d.type || 'other',
+      _order: d.day_order ?? null,
+    }));
     const dayNotes = (itineraryDays || [])
       .filter(d => d.city_id === city?.id && d.date === dateStr && d.content?.trim())
-      .flatMap(d => parseNotes(d.content).filter(n => n.text?.trim()).map((n, i) => ({
-        id: d.id + '-' + i, _kind: 'note',
+      .flatMap(d => parseNotesContent(d.content).filter(n => n.text?.trim()).map((n, i) => ({
+        id: d.id + '-' + i, _kind: 'note', _dayId: d.id, _noteIdx: i,
         title: n.text.length > 50 ? n.text.slice(0, 50) + '…' : n.text,
         content: n.text, time: n.time || null, type: 'note',
+        _order: n.order ?? null,
       })));
+    const spotItems = spots.map(s => ({ ...s, _kind: 'spot', time: s.assigned_time || s.time || null, _order: s.day_order ?? null }));
+
+    // Todo — docs, notas y spots — se puede arrastrar entre sí, tenga hora o
+    // no. En cuanto arrastras cualquier cosa, esa posición se guarda de
+    // verdad (day_order en Spot/Ticket, "order" dentro del objeto de nota) y
+    // pasa a mandar sobre la hora para ordenar: así un doc, una nota o un
+    // spot sin hora se puede colar justo entre otros dos que sí la tienen.
+    // Lo que aún no se ha tocado nunca se intercala por hora si la tiene, o
+    // va al final si no.
     const all = [...docItems, ...spotItems, ...dayNotes];
-    const withTime    = all.filter(i => i.time).sort((a, b) => a.time.localeCompare(b.time));
-    const withoutTime = all.filter(i => !i.time);
-    return [...withTime, ...withoutTime];
+    const pinned = all.filter(i => i._order != null).sort((a, b) => a._order - b._order);
+    const unpinnedTimed = all.filter(i => i._order == null && i.time).sort((a, b) => a.time.localeCompare(b.time));
+    const unpinnedUntimed = all.filter(i => i._order == null && !i.time);
+
+    const merged = [];
+    let ui = 0;
+    for (const item of pinned) {
+      if (item.time) {
+        while (ui < unpinnedTimed.length && unpinnedTimed[ui].time <= item.time) {
+          merged.push(unpinnedTimed[ui]);
+          ui++;
+        }
+      }
+      merged.push(item);
+    }
+    while (ui < unpinnedTimed.length) { merged.push(unpinnedTimed[ui]); ui++; }
+
+    return [...merged, ...unpinnedUntimed];
   }, [docs, spots, itineraryDays, city?.id, dateStr]);
 
   const hasContent = timeline.length > 0;
+
+  // El mini-mapa dibuja los spots y, ahora, también los documentos de
+  // transporte con una ubicación guardada (aeropuerto/estación buscados en
+  // DocumentForm) — en el mismo orden en que ya aparecen en el timeline de
+  // abajo, así el número del pin coincide con la posición de la fila.
+  const mapItems = timeline.filter(i =>
+    i._kind === 'spot' ? (i.lat && i.lng) : (i._kind === 'doc' && i.location_lat && i.location_lng)
+  );
+
+  // Al soltar un arrastre, se reescribe TODO el orden del día de una vez —
+  // spots y docs vía day_order, notas vía el campo "order" dentro de su
+  // ItineraryDay.content — así el orden queda siempre denso y consistente
+  // (0..N-1) sin importar de qué tipo sea cada item. El mapa de arriba, que
+  // numera los spots por day_order, queda sincronizado sin tocar nada más.
+  const [draggingId, setDraggingId] = useState(null);
+  const [dragOverId, setDragOverId] = useState(null);
+  const touchDragId = useRef(null);
+
+  // Se puede recolocar cualquier cosa donde quieras, EXCEPTO invertir el
+  // orden entre dos items que ya tienen hora fija — un spot a las 14:00 no
+  // puede terminar antes que uno a las 11:00. Si el drop deja esa inversión,
+  // se rechaza entero (no se guarda nada, no cambia nada en pantalla) y se
+  // avisa con un toast en vez de reordenar silenciosamente algo sin sentido.
+  const findTimeClash = (orderedItems) => {
+    const timed = orderedItems.filter(i => i.time);
+    for (let k = 0; k < timed.length - 1; k++) {
+      if (timed[k].time > timed[k + 1].time) return [timed[k], timed[k + 1]];
+    }
+    return null;
+  };
+
+  const reorderTimeline = async (fromId, toId) => {
+    if (!fromId || !toId || fromId === toId) return;
+    const seq = timeline;
+    const from = seq.findIndex(i => (i.id || '') === fromId);
+    const to = seq.findIndex(i => (i.id || '') === toId);
+    if (from === -1 || to === -1) return;
+    const reordered = [...seq];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+
+    const clash = findTimeClash(reordered);
+    if (clash) {
+      const [a, b] = clash;
+      toast({
+        title: t('common.timeClashTitle'),
+        description: t('common.timeClashBody', {
+          a: a.title || a.name || t('home.dayCard.noTitle'), aTime: a.time,
+          b: b.title || b.name || t('home.dayCard.noTitle'), bTime: b.time,
+        }),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const spotUpdates = [];
+    const docUpdates = [];
+    const notesByDay = {};
+
+    reordered.forEach((item, idx) => {
+      if (item._kind === 'spot') {
+        if (item.day_order !== idx) spotUpdates.push(base44.entities.Spot.update(item.id, { day_order: idx }));
+      } else if (item._kind === 'doc') {
+        if (item.day_order !== idx) docUpdates.push(base44.entities.Ticket.update(item.id, { day_order: idx }));
+      } else if (item._kind === 'note') {
+        if (!notesByDay[item._dayId]) {
+          const day = (itineraryDays || []).find(d => d.id === item._dayId);
+          notesByDay[item._dayId] = parseNotesContent(day?.content);
+        }
+        if (notesByDay[item._dayId][item._noteIdx]) {
+          notesByDay[item._dayId][item._noteIdx] = { ...notesByDay[item._dayId][item._noteIdx], order: idx };
+        }
+      }
+    });
+
+    try {
+      await Promise.all([
+        ...spotUpdates,
+        ...docUpdates,
+        ...Object.entries(notesByDay).map(([dayId, content]) =>
+          base44.entities.ItineraryDay.update(dayId, { content: JSON.stringify(content) })
+        ),
+      ]);
+      if (spotUpdates.length) queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      if (docUpdates.length) queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      if (Object.keys(notesByDay).length) queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+    } catch {
+      // Best-effort: reordenar no es destructivo, si falla el próximo
+      // refetch trae de vuelta el orden anterior sin bloquear la UI.
+    }
+  };
+
+  const handleTouchStart = (item) => (e) => {
+    touchDragId.current = item.id;
+    setDraggingId(item.id);
+  };
+  const handleTouchMove = (e) => {
+    if (!touchDragId.current) return;
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const row = el?.closest?.('[data-item-id]');
+    setDragOverId(row?.dataset?.itemId || null);
+  };
+  const handleTouchEnd = async () => {
+    if (touchDragId.current && dragOverId) await reorderTimeline(touchDragId.current, dragOverId);
+    touchDragId.current = null;
+    setDraggingId(null);
+    setDragOverId(null);
+  };
 
   const handleSaveTime = async (item, time) => {
     if (onUpdateItemTime) await onUpdateItemTime(item, time);
@@ -98,14 +239,6 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
     await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
     queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
     setSelected(null);
-  };
-
-  // Mismo parseo que usa Cities.jsx para las notas de itinerario (raw JSON
-  // string en ItineraryDay.content -> [{text,time}]).
-  const parseNotesContent = (raw) => {
-    if (!raw) return [];
-    try { const p = JSON.parse(raw); if (Array.isArray(p)) return p; } catch {}
-    return raw.trim() ? [{ text: raw, time: '' }] : [];
   };
 
   // Antes ItemDetailSheet no podía borrar nada — ni documento ni nota — a
@@ -164,17 +297,24 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
 
       {open && (
         <div>
-          {(hotelSpot?.lat && hotelSpot?.lng) || spots.some(s => s.lat && s.lng) ? (
+          {((hotelSpot?.lat && hotelSpot?.lng) || mapItems.length > 0 || !hotelSpot) ? (
             <div className="border-t border-border px-4 pt-3 pb-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-foreground flex items-center gap-1.5">
                   <Route className="w-3.5 h-3.5 text-primary" />{t('home.dayCard.todayRoute')}
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {hotelSpot ? t('home.dayCard.hotelPlusStops', { count: spots.length }) : t('home.dayCard.stopsCount', { count: spots.length })}
-                </span>
+                {hotelSpot ? (
+                  <span className="text-xs text-muted-foreground">{t('home.dayCard.hotelPlusStops', { count: mapItems.length })}</span>
+                ) : (
+                  <Link
+                    to={createPageUrl('Restaurants') + '?trip_id=' + tripId + '&open_create=hotel&city_id=' + (city?.id || '')}
+                    className="text-xs text-primary font-medium hover:text-primary/80 transition-colors"
+                  >
+                    {t('home.dayCard.addHotel')}
+                  </Link>
+                )}
               </div>
-              <TodayRouteMap hotelSpot={hotelSpot} spots={spots} />
+              <TodayRouteMap hotelSpot={hotelSpot} items={mapItems} onSelectSpot={setSelected} />
             </div>
           ) : null}
           {hasContent ? (
@@ -186,10 +326,28 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
               const spotColor = (!isDoc && !isNote) ? (SPOT_COLORS[item.type] || SPOT_COLORS.custom) : '';
               const isLast  = idx === timeline.length - 1;
               const hasTime = !!item.time;
+              // Todo — docs, notas y spots — se puede arrastrar entre sí,
+              // tenga hora o no: así cualquiera se puede colar entre otros
+              // dos que sí la tienen.
+              const isDragging = draggingId === item.id;
+              const isDragOver  = dragOverId === item.id && draggingId !== item.id;
 
               return (
                 <button key={item.id || idx} onClick={() => setSelected(item)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 border-t border-border transition-colors text-left ${
+                  data-item-id={item.id}
+                  draggable
+                  onDragStart={(e) => { e.stopPropagation(); setDraggingId(item.id); e.dataTransfer.effectAllowed = 'move'; }}
+                  onDragOver={(e) => { e.preventDefault(); setDragOverId(item.id); }}
+                  onDrop={(e) => { e.preventDefault(); reorderTimeline(draggingId, item.id); setDraggingId(null); setDragOverId(null); }}
+                  onDragEnd={() => { setDraggingId(null); setDragOverId(null); }}
+                  onTouchStart={handleTouchStart(item)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  className={`w-full flex items-center gap-2 px-4 py-3 border-t border-border transition-colors text-left ${
+                    isDragging ? 'opacity-40' : ''
+                  } ${
+                    isDragOver ? 'bg-primary/5 border-t-primary/40' : ''
+                  } ${
                     isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
@@ -197,12 +355,12 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                       const diffMin = Math.round((dep - now) / 60000);
                       if (diffMin <= 0 || diffMin > 240) return false;
                       return diffMin <= 60 ? 'bg-red-50 hover:bg-red-50' : 'bg-orange-50/60 hover:bg-orange-50/80';
-                    })() || 'hover:bg-secondary/20'
+                    })() || (isDragOver ? '' : 'hover:bg-secondary/20')
                   }`}>
-                  <div className="w-11 shrink-0 flex flex-col items-center self-stretch justify-start pt-0.5">
+                  <div className="w-9 shrink-0 flex flex-col items-center self-stretch justify-start pt-0.5">
                     {hasTime
                       ? <span className="text-label2 font-medium text-primary leading-none whitespace-nowrap">{item.time}</span>
-                      : <div className="w-2 h-2 rounded-full bg-border mt-1" />}
+                      : <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 cursor-grab active:cursor-grabbing mt-0.5" />}
                     {!isLast && <div className="w-px flex-1 bg-border/60 mt-1.5" />}
                   </div>
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isDoc ? 'bg-orange-50 dark:bg-orange-950/30' : isNote ? 'bg-secondary' : spotColor || 'bg-secondary'}`}>
@@ -244,7 +402,12 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
               <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
             </Link>
           )}
-          <Link to={createPageUrl('CityDetail') + '?id=' + city?.id + '&trip_id=' + tripId}
+          {/* Antes iba a CityDetail (página vieja, sin usar en ningún otro
+              flujo) — ahora abre Ruta con esta ciudad concreta desplegada
+              (ver forceOpenCityId en Cities.jsx). Si la ciudad se repite en
+              el viaje, city.id identifica justo esta estancia, no cualquiera
+              con el mismo nombre. */}
+          <Link to={createPageUrl('Cities') + '?trip_id=' + tripId + '&city_id=' + (city?.id || '')}
             className="flex items-center justify-between px-4 py-3 border-t border-border hover:bg-secondary/20 transition-colors">
             <span className="text-xs font-medium text-primary">{hasItinerary ? t('home.dayCard.viewItineraryOf', { city: city?.name }) : t('home.dayCard.openCity', { city: city?.name })}</span>
             <ArrowRight className="w-3.5 h-3.5 text-primary" />
