@@ -9,8 +9,6 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import Explore from './pages/Explore';
-import TemplateDetail from './pages/TemplateDetail';
 import TripsList from './pages/TripsList';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/i18n/index.js';
@@ -88,9 +86,6 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      {/* Explicit routes for Explore & TemplateDetail (not in pagesConfig) */}
-      <Route path="/Explore" element={<LayoutWrapper currentPageName="Explore"><Explore /></LayoutWrapper>} />
-      <Route path="/TemplateDetail" element={<LayoutWrapper currentPageName="TemplateDetail"><TemplateDetail /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
