@@ -5,14 +5,6 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { loadLeaflet, TYPE_CONFIG } from './spotsHelpers';
 import { KODO_TILE_URL, KODO_TILE_SUBDOMAINS, KODO_TILE_ATTRIBUTION, injectKodoMapStyles } from './mapTiles';
-import { sameCityName } from '@/lib/tripDays';
-
-// A partir de este zoom, un cluster de ciudad "explota" en un pin por cada
-// spot individual (en su propia coordenada) en vez de seguir mostrando un
-// solo número agregado — antes el número nunca se abría por mucho que
-// hicieras zoom, y tocarlo solo te mandaba de vuelta a la lista, que no es
-// lo que se espera de un mapa.
-const SPLIT_ZOOM = 15;
 
 // Antes cada día usaba uno de los 5 --chart-1..5, todos tonos naranja/marrón
 // muy parecidos entre sí ("los colores... no son suficientemente
@@ -37,17 +29,12 @@ const TUBE_COLORS = [
   '#000000', // Northern — negro
 ];
 
-// Mapa de "todo el viaje" para la tab Mis spots: agrupa por ciudad (no hay
-// campo de coordenadas en City, así que el centro de cada cluster se calcula
-// como el centroide de los spots de esa ciudad que sí tienen lat/lng — no
-// depende de ningún dato nuevo). Tocar el mapa fuera de un cluster dispara
-// onCreatePin(lat,lng) para soltar un pin nuevo ahí mismo.
-//
-// El selector de día (chips arriba del mapa) cambia el mapa entero a una
-// vista de un solo día — pines numerados y conectados con línea, en el
-// mismo orden del itinerario — igual criterio que TodayRouteMap en Home,
-// pero disponible para cualquier día del viaje, no solo hoy. "Todos" vuelve
-// a la vista agrupada por ciudad de siempre.
+// Mapa de "todo el viaje" para la tab Mis spots: "Todos" dibuja, a la vez,
+// la ruta conectada y numerada de CADA día (un color por día, estilo mapa
+// de metro) más los spots sin fecha como pines sueltos — antes "Todos" solo
+// agrupaba por ciudad y no se veía ninguna ruta hasta elegir un día suelto.
+// Elegir un chip de día aísla esa ruta sola. Tocar el mapa fuera de un pin
+// dispara onCreatePin(lat,lng) para soltar un pin nuevo ahí mismo.
 export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onSelectSpot, height = 260 }) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language === 'en' ? undefined : es;
@@ -63,44 +50,32 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
   const withCoords = spots.filter(s => s?.lat && s?.lng);
 
   const distinctDates = [...new Set(withCoords.map(s => s.assigned_date).filter(Boolean))].sort();
-  const hasUnscheduled = withCoords.some(s => !s.assigned_date);
   const dayColor = (date) => date ? TUBE_COLORS[distinctDates.indexOf(date) % TUBE_COLORS.length] : 'hsl(var(--muted-foreground) / .35)';
 
-  // Agrupar por NOMBRE de ciudad normalizado, no por city_id — un spot puede
-  // tener city_id de una estancia concreta (o ni eso, si es "sin_ciudad") y
-  // dos estancias distintas del mismo viaje pueden compartir nombre (p. ej.
-  // "Lima" ida y vuelta). Agrupar por id partía esos casos en dos clusters
-  // de 1 con el mismo nombre en vez de uno solo de 2 — mismo criterio que ya
-  // usa sameCityName() en SpotDetailModal/SpotDetailSheet para esto mismo.
-  const clusters = Object.values(
-    withCoords.reduce((acc, s) => {
-      const cityMeta = cities.find(c => c.id === s.city_id);
-      const name = cityMeta?.name || s.city_name || t('spots.map.otherCity');
-      const key = Object.keys(acc).find(k => sameCityName(k, name)) || name;
-      if (!acc[key]) acc[key] = { key, name, lat: 0, lng: 0, spots: [] };
-      acc[key].lat += s.lat;
-      acc[key].lng += s.lng;
-      acc[key].spots.push(s);
-      return acc;
-    }, {})
-  ).map(c => ({ ...c, lat: c.lat / c.spots.length, lng: c.lng / c.spots.length, count: c.spots.length }));
+  // Mismo orden que ya usa el timeline de Home/Ruta: day_order primero
+  // (posición explícita guardada al arrastrar), si no hay, por hora
+  // asignada, si tampoco hay, al final — así el numerito del pin coincide
+  // con el orden real del día.
+  const sortByDayOrder = (list) => [...list].sort((a, b) => {
+    if (a.day_order != null && b.day_order != null) return a.day_order - b.day_order;
+    if (a.day_order != null) return -1;
+    if (b.day_order != null) return 1;
+    const at = a.assigned_time || '99:99', bt = b.assigned_time || '99:99';
+    return at.localeCompare(bt);
+  });
 
-  // Spots del día seleccionado, en el mismo orden que ya usa el timeline de
-  // Home/Ruta: day_order primero (posición explícita guardada al arrastrar),
-  // si no hay, por hora asignada, si tampoco hay, se quedan al final — así
-  // el numerito del pin coincide con el orden real del día.
-  const dayRouteSpots = !selectedDate ? [] : withCoords
-    .filter(s => s.assigned_date === selectedDate)
-    .sort((a, b) => {
-      if (a.day_order != null && b.day_order != null) return a.day_order - b.day_order;
-      if (a.day_order != null) return -1;
-      if (b.day_order != null) return 1;
-      const at = a.assigned_time || '99:99', bt = b.assigned_time || '99:99';
-      return at.localeCompare(bt);
-    });
+  const dayRoutes = distinctDates.map(d => ({
+    date: d,
+    color: dayColor(d),
+    spots: sortByDayOrder(withCoords.filter(s => s.assigned_date === d)),
+  }));
+  const unscheduledSpots = withCoords.filter(s => !s.assigned_date);
+
+  const visibleRoutes = selectedDate ? dayRoutes.filter(r => r.date === selectedDate) : dayRoutes;
+  const visibleUnscheduled = selectedDate ? [] : unscheduledSpots;
 
   useEffect(() => {
-    if (!clusters.length) return undefined;
+    if (!withCoords.length) return undefined;
     let cancelled = false;
 
     injectKodoMapStyles();
@@ -113,10 +88,10 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
       // scrollWheelZoom:false, no había ninguna forma de hacer zoom out.
       const map = L.map(containerRef.current, { zoomControl: true, attributionControl: true });
       L.tileLayer(KODO_TILE_URL, { subdomains: KODO_TILE_SUBDOMAINS, attribution: KODO_TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
-      // Mismo fix que TodayRouteMap: el contenedor puede no tener su tamaño
-      // final asentado en el instante en que corre este efecto (cambio de
-      // tab, layout todavía animando) y un fitBounds contra un tamaño stale
-      // deja el mapa con pines fuera del viewport visible.
+      // El contenedor puede no tener su tamaño final asentado en el instante
+      // en que corre este efecto (cambio de tab, layout todavía animando) y
+      // un fitBounds contra un tamaño stale deja el mapa con pines fuera del
+      // viewport visible.
       map.invalidateSize();
 
       map.on('click', (e) => {
@@ -128,155 +103,58 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
         iconSize: [size, size], iconAnchor: [size / 2, size / 2], className: '',
       });
 
-      if (selectedDate) {
-        // Vista de un día: ruta conectada y numerada, sin clusters — igual
-        // que TodayRouteMap, pero para el día que se haya elegido.
-        const color = dayColor(selectedDate);
-        const points = dayRouteSpots.map(s => [s.lat, s.lng]);
-
-        dayRouteSpots.forEach((spot, i) => {
-          const marker = L.marker([spot.lat, spot.lng], { icon: numberedIcon(i + 1, color) }).addTo(map);
-          marker.on('click', (e) => {
-            if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
-            if (onSelectSpotRef.current) onSelectSpotRef.current(spot);
-          });
-        });
-
-        if (points.length > 1) {
-          L.polyline(points, { color, weight: 2.5, dashArray: '5,6', opacity: 0.85 }).addTo(map);
-          map.fitBounds(L.latLngBounds(points), { padding: [42, 42] });
-        } else if (points.length === 1) {
-          map.setView(points[0], 15);
-        }
-
-        requestAnimationFrame(() => {
-          if (cancelled || !mapRef.current) return;
-          mapRef.current.invalidateSize();
-          if (points.length > 1) mapRef.current.fitBounds(L.latLngBounds(points), { padding: [42, 42] });
-          else if (points.length === 1) mapRef.current.setView(points[0], 15);
-        });
-
-        mapRef.current = map;
-        return;
-      }
-
-      // Icono de un spot suelto — aro de color por día + icono real de su
-      // tipo. Se reutiliza tanto para clusters de un solo spot como para
-      // cada pin cuando un cluster de varios "explota" al hacer zoom.
-      const singleIcon = (spot, size = 30) => {
+      // Spot sin fecha — pin suelto con el icono real de su tipo, sin
+      // número ni línea (no pertenece a ninguna ruta de día todavía).
+      const plainIcon = (spot, size = 28) => {
         const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
         const Icon = tc.Icon;
-        const inner = renderToStaticMarkup(<Icon size={14} color="#fff" strokeWidth={2.5} />);
-        const ring = dayColor(spot.assigned_date || null);
+        const inner = renderToStaticMarkup(<Icon size={13} color="#fff" strokeWidth={2.5} />);
         return L.divIcon({
-          html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;padding:3px;background:' + ring + '">' +
+          html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;padding:3px;background:hsl(var(--muted-foreground) / .35)">' +
             '<div style="width:100%;height:100%;background:hsl(16 75% 45% / .92);color:#fff;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center">' + inner + '</div>' +
           '</div>',
           iconSize: [size, size], iconAnchor: [size / 2, size / 2], className: '',
         });
       };
 
-      // Icono del cluster agregado (2+ spots) — número + aro partido por día.
-      const clusterIcon = (c) => {
-        const size = Math.min(32 + c.count * 2, 56);
-        const fontSize = size > 46 ? 15 : 13;
-        const dayBuckets = [...distinctDates, null]
-          .map(d => ({ d, count: c.spots.filter(s => (s.assigned_date || null) === d).length }))
-          .filter(b => b.count > 0);
-        let ringBg = 'transparent';
-        if (dayBuckets.length === 1) {
-          ringBg = dayColor(dayBuckets[0].d);
-        } else if (dayBuckets.length > 1) {
-          let acc = 0;
-          const stops = dayBuckets.map(b => {
-            const pct = (b.count / c.count) * 100;
-            const seg = dayColor(b.d) + ' ' + acc + '% ' + (acc + pct) + '%';
-            acc += pct;
-            return seg;
-          });
-          ringBg = 'conic-gradient(' + stops.join(',') + ')';
-        }
-        const ringThickness = dayBuckets.length ? 3 : 0;
-        return L.divIcon({
-          html: '<div style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;padding:' + ringThickness + 'px;background:' + ringBg + '">' +
-            '<div style="width:100%;height:100%;background:hsl(16 75% 45% / .92);color:#fff;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + fontSize + 'px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.3)">' + c.count + '</div>' +
-          '</div>',
-          iconSize: [size, size], iconAnchor: [size / 2, size / 2], className: '',
-        });
-      };
+      const allPoints = [];
 
-      // Antes un cluster de varios spots se quedaba siendo SIEMPRE un solo
-      // número, por mucho zoom que hicieras, y tocarlo mandaba a la lista en
-      // vez de mostrar algo en el mapa. Luego, al arreglarlo con un
-      // setView(centroide, SPLIT_ZOOM) fijo, si los spots del cluster
-      // estaban repartidos más lejos entre sí de lo que ese zoom llega a
-      // mostrar, los pines quedaban fuera del encuadre — "explotaba a nada".
-      // Ahora, al tocar un cluster: (1) se marca como "expandido" (así se
-      // dibuja como pines individuales pase lo que pase con el zoom
-      // resultante) y (2) se hace fitBounds sobre las coordenadas REALES de
-      // sus spots, no un zoom fijo — así siempre quedan dentro del encuadre.
-      let markers = [];
-      const expandedKeys = new Set();
-      const drawMarkers = () => {
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
-        const zoomExploded = map.getZoom() >= SPLIT_ZOOM;
-
-        clusters.forEach(c => {
-          if (c.count === 1) {
-            const spot = c.spots[0];
-            const marker = L.marker([spot.lat, spot.lng], { icon: singleIcon(spot) }).addTo(map);
-            marker.on('click', (e) => {
-              if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
-              if (onSelectSpotRef.current) onSelectSpotRef.current(spot);
-            });
-            markers.push(marker);
-            return;
-          }
-
-          if (zoomExploded || expandedKeys.has(c.key)) {
-            c.spots.forEach(spot => {
-              const marker = L.marker([spot.lat, spot.lng], { icon: singleIcon(spot) }).addTo(map);
-              marker.on('click', (e) => {
-                if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
-                if (onSelectSpotRef.current) onSelectSpotRef.current(spot);
-              });
-              markers.push(marker);
-            });
-            return;
-          }
-
-          const icon = clusterIcon(c);
-          const marker = L.marker([c.lat, c.lng], { icon }).addTo(map);
-          marker.bindTooltip(c.name, { permanent: true, direction: 'bottom', offset: [0, icon.options.iconSize[0] / 2 + 3], className: 'kodo-city-cluster-label' });
+      visibleRoutes.forEach(route => {
+        const points = route.spots.map(s => [s.lat, s.lng]);
+        allPoints.push(...points);
+        route.spots.forEach((spot, i) => {
+          const marker = L.marker([spot.lat, spot.lng], { icon: numberedIcon(i + 1, route.color) }).addTo(map);
           marker.on('click', (e) => {
-            // Evitar que el click del marker también dispare el click del
-            // mapa (crearía un pin nuevo justo donde querías ver el cluster).
             if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
-            expandedKeys.add(c.key);
-            const bounds = L.latLngBounds(c.spots.map(s => [s.lat, s.lng]));
-            map.fitBounds(bounds, { padding: [60, 60], maxZoom: 18 });
-            // fitBounds no siempre dispara 'zoomend' (si el zoom resultante
-            // es el mismo que ya había, solo dispara 'moveend') — se
-            // redibuja también aquí para no depender de eso.
-            drawMarkers();
+            if (onSelectSpotRef.current) onSelectSpotRef.current(spot);
           });
-          markers.push(marker);
         });
+        if (points.length > 1) {
+          L.polyline(points, { color: route.color, weight: 2.5, dashArray: '5,6', opacity: 0.85 }).addTo(map);
+        }
+      });
+
+      visibleUnscheduled.forEach(spot => {
+        allPoints.push([spot.lat, spot.lng]);
+        const marker = L.marker([spot.lat, spot.lng], { icon: plainIcon(spot) }).addTo(map);
+        marker.on('click', (e) => {
+          if (e.originalEvent) L.DomEvent.stopPropagation(e.originalEvent);
+          if (onSelectSpotRef.current) onSelectSpotRef.current(spot);
+        });
+      });
+
+      const fitToPoints = () => {
+        if (!mapRef.current || allPoints.length === 0) return;
+        if (allPoints.length > 1) mapRef.current.fitBounds(L.latLngBounds(allPoints), { padding: [42, 42] });
+        else mapRef.current.setView(allPoints[0], 15);
       };
 
-      map.on('zoomend', drawMarkers);
-
-      map.fitBounds(L.latLngBounds(clusters.map(c => [c.lat, c.lng])), { padding: [42, 42] });
-      drawMarkers();
       mapRef.current = map;
-
-      if (!document.getElementById('kodo-cluster-label-style')) {
-        const style = document.createElement('style');
-        style.id = 'kodo-cluster-label-style';
-        style.textContent = '.kodo-city-cluster-label{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;font-weight:800;font-size:11px;color:hsl(var(--foreground));font-family:inherit;text-shadow:0 1px 2px rgba(255,255,255,.9),0 0 6px rgba(255,255,255,.9)}.kodo-city-cluster-label::before{display:none}';
-        document.head.appendChild(style);
-      }
+      fitToPoints();
+      // Mismo motivo que el invalidateSize() de arriba: si el layout no
+      // estaba del todo asentado en este frame, se repite el encuadre en el
+      // siguiente, cuando el tamaño del contenedor ya es fiable al 100%.
+      requestAnimationFrame(() => { if (!cancelled) { mapRef.current?.invalidateSize(); fitToPoints(); } });
     });
 
     return () => {
@@ -286,11 +164,10 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedDate,
-    clusters.map(c => c.key + ':' + c.spots.map(s => s.id + '@' + (s.assigned_date || '')).join('|')).join(','),
-    dayRouteSpots.map(s => s.id + '@' + (s.day_order ?? '') + '@' + (s.assigned_time || '')).join(','),
+    withCoords.map(s => s.id + '@' + (s.assigned_date || '') + '@' + (s.day_order ?? '') + '@' + (s.assigned_time || '')).join(','),
   ]);
 
-  if (!clusters.length) {
+  if (!withCoords.length) {
     return (
       <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl bg-card">
         <p className="text-sm text-muted-foreground">{t('spots.map.noCoords')}</p>
@@ -300,22 +177,24 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
 
   return (
     <div>
-      {/* Selector de día — antes la única forma de ver "los pins de un día"
-          era leer el aro de color de cada cluster, que con 5 tonos naranja
-          casi iguales no distinguía nada. Elegir un chip cambia el mapa
-          entero a la ruta conectada y numerada de ese día; "Todos" vuelve a
-          la vista agrupada por ciudad. */}
+      <div ref={containerRef} style={{ height, borderRadius: 16, overflow: 'hidden', cursor: 'crosshair' }} className="border border-border kodo-map-warm" />
+
+      {/* Selector de día debajo del mapa, igual que el resto de selectores
+          de chip de la app (sin scroll lateral, envuelve en varias líneas
+          si no caben). "Todos" ya no es la vista agrupada por ciudad de
+          antes — dibuja la ruta de cada día a la vez, una encima de otra,
+          cada una de su color. Un chip de día aísla esa ruta sola. */}
       {distinctDates.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-2 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex flex-wrap items-center gap-2 mt-2 px-1">
           <button onClick={() => setSelectedDate(null)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
               !selectedDate ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
             }`}>
             {t('spots.map.allDays')}
           </button>
           {distinctDates.map((d, i) => (
             <button key={d} onClick={() => setSelectedDate(d)}
-              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                 selectedDate === d ? 'text-white border-transparent' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
               }`}
               style={selectedDate === d ? { background: TUBE_COLORS[i % TUBE_COLORS.length] } : {}}>
@@ -326,13 +205,11 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
         </div>
       )}
 
-      <div ref={containerRef} style={{ height, borderRadius: 16, overflow: 'hidden', cursor: 'crosshair' }} className="border border-border kodo-map-warm" />
-
       {selectedDate ? (
         <p className="text-xs text-muted-foreground mt-2 px-1">{t('spots.map.dayRouteHint')}</p>
       ) : (
         <>
-          {hasUnscheduled && distinctDates.length > 0 && (
+          {unscheduledSpots.length > 0 && distinctDates.length > 0 && (
             <div className="flex items-center gap-1.5 mt-2 px-1 text-xs text-muted-foreground">
               <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-muted-foreground/35" />
               {t('spots.map.noDate')}
