@@ -61,7 +61,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
     }
 
-    const members: string[] = trip.members || [];
+    // trip.members puede traer entradas de antes de normalizar el email a
+    // minúsculas al crear/aceptar un viaje (ver TripsList.jsx/acceptTripInvite)
+    // — sin normalizar aquí también, "gestionar miembro" fallaba con "no es
+    // miembro" para cualquier entrada vieja con mayúsculas distintas, aunque
+    // esa persona sí apareciera en la lista.
+    const members: string[] = (trip.members || []).map((e: string) => (e || "").toLowerCase());
     const roles: Record<string, string> = trip.roles || {};
 
     // Solo un admin del viaje (o su creador) puede gestionar a otros miembros.
