@@ -18,6 +18,12 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
+// El LeafletMap de aquí abajo es una copia local independiente del
+// componente compartido (src/components/spots/LeafletMap.jsx) — no lo
+// importa, así que arreglar el tile compartido nunca cambió nada en este
+// selector de pin. Se reusa solo el estilo de tiles (CARTO Positron), no el
+// componente entero, para no tocar loadLeaflet/reverseGeocode locales.
+import { KODO_TILE_URL, KODO_TILE_SUBDOMAINS, KODO_TILE_ATTRIBUTION, injectKodoMapStyles } from '@/components/spots/mapTiles';
 
 
 
@@ -266,10 +272,11 @@ function LeafletMap({ lat, lng, onMove }) {
 
   useEffect(() => {
     let cancelled = false;
+    injectKodoMapStyles();
     loadLeaflet().then(L => {
       if (cancelled || !containerRef.current || leafletRef.current) return;
-      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false }).setView([lat, lng], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: true }).setView([lat, lng], 15);
+      L.tileLayer(KODO_TILE_URL, { subdomains: KODO_TILE_SUBDOMAINS, attribution: KODO_TILE_ATTRIBUTION, maxZoom: 19 }).addTo(map);
       const icon = L.divIcon({
         html: '<div style="width:28px;height:28px;background:hsl(var(--primary));border:3px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
         iconSize: [28, 28], iconAnchor: [14, 28], className: ''
@@ -300,7 +307,7 @@ function LeafletMap({ lat, lng, onMove }) {
     }
   }, [lat, lng]);
 
-  return <div ref={containerRef} style={{ height: '180px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
+  return <div ref={containerRef} className="kodo-map-warm" style={{ height: '180px', width: '100%', borderRadius: '12px', overflow: 'hidden', zIndex: 0 }}/>;
 }
 
 // ── Create spot bottom sheet ──────────────────────────────────────────────────
@@ -401,7 +408,10 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
     // B: block if exact duplicate
     if (duplicate) return;
     if (!title.trim()) return;
-    onSave({ title, type, notes, address, lat: pinLat, lng: pinLng, visibility: isPublic ? 'public' : 'trip_members' });
+    // Un hotel es solo tuyo/de tu viaje — no tiene sentido publicarlo en Kōdo
+    // Community, así que se guarda siempre trip_members, sin depender del
+    // toggle (que ni siquiera se muestra para type === 'hotel').
+    onSave({ title, type, notes, address, lat: pinLat, lng: pinLng, visibility: type === 'hotel' ? 'trip_members' : (isPublic ? 'public' : 'trip_members') });
     // reset
     setTitle(''); setType('food'); setNotes(''); setAddress('');
     setPinLat(null); setPinLng(null); setShowMap(false); setIsPublic(true);
@@ -464,6 +474,10 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
                       setPinLat(r.lat); setPinLng(r.lng);
                       setShowMap(true);
                       setAddressResults([]);
+                      // Elegir un resultado ya trae el nombre del sitio — si el
+                      // usuario todavía no ha escrito uno propio, autocompletarlo
+                      // en vez de dejarle escribir "Hotel Marriott Lima" dos veces.
+                      setTitle(prev => prev.trim() ? prev : r.name);
                     }}
                       className="w-full flex flex-col items-start px-3 py-2.5 text-left hover:bg-secondary/30 transition-colors border-b border-border last:border-0">
                       <span className="text-sm font-medium text-foreground truncate w-full">{r.name}</span>
@@ -522,23 +536,26 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
             />
           </div>
 
-          {/* Visibility toggle */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.visibility')}</p>
-            <div className="flex rounded-xl border border-border overflow-hidden">
-              <button onClick={() => setIsPublic(true)}
-                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
-                Kōdo Community
-              </button>
-              <button onClick={() => setIsPublic(false)}
-                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
-                {t('spots.create.tripOnly')}
-              </button>
+          {/* Visibility toggle — no aplica a hoteles: un hotel es solo para
+              tu viaje, no algo que tenga sentido publicar en Kōdo Community. */}
+          {type !== 'hotel' && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.visibility')}</p>
+              <div className="flex rounded-xl border border-border overflow-hidden">
+                <button onClick={() => setIsPublic(true)}
+                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
+                  Kōdo Community
+                </button>
+                <button onClick={() => setIsPublic(false)}
+                  className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
+                  {t('spots.create.tripOnly')}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5 px-1">
+                {isPublic ? t('spots.create.publicHint') : t('spots.create.privateHint')}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1.5 px-1">
-              {isPublic ? t('spots.create.publicHint') : t('spots.create.privateHint')}
-            </p>
-          </div>
+          )}
         </div>
 
         {/* Sticky footer buttons */}
