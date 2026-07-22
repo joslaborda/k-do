@@ -79,6 +79,14 @@
     "deleteError": "No se pudo eliminar",
     "you": "Tú"
   },
+  "notRegistered": {
+    "title": "Acceso restringido",
+    "body": "No estás registrado para usar esta aplicación. Contacta con el administrador para solicitar acceso.",
+    "helpTitle": "Si crees que es un error, puedes:",
+    "help1": "Comprobar que has iniciado sesión con la cuenta correcta",
+    "help2": "Contactar con el administrador para solicitar acceso",
+    "help3": "Cerrar sesión y volver a entrar"
+  },
   "language": {
     "select": "Elige tu idioma",
     "subtitle": "Puedes cambiarlo después en ajustes",
@@ -521,6 +529,7 @@
       "thanksForVisiting": "Gracias por visitar",
       "daysOfTrip": "Días de viaje",
       "visitedSpots": "Spots visitados",
+      "cities": "Ciudades",
       "travelers": "viajeros",
       "traveler": "viajero",
       "tripRoute": "Ruta del viaje",
@@ -770,7 +779,8 @@
     "modal": {
       "noTime": "Sin hora",
       "addTime": "Añadir hora",
-      "addNote": "Añadir nota..."
+      "addNote": "Añadir nota...",
+      "openInMaps": "Abrir en Maps"
     }
   },
   "documents": {

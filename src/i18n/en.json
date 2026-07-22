@@ -79,6 +79,14 @@
     "deleteError": "Couldn't delete",
     "you": "You"
   },
+  "notRegistered": {
+    "title": "Access restricted",
+    "body": "You are not registered to use this application. Contact the app administrator to request access.",
+    "helpTitle": "If you believe this is an error, you can:",
+    "help1": "Verify you are logged in with the correct account",
+    "help2": "Contact the app administrator for access",
+    "help3": "Try logging out and back in again"
+  },
   "language": {
     "select": "Choose your language",
     "subtitle": "You can change this later in settings",
@@ -521,6 +529,7 @@
       "thanksForVisiting": "Thanks for visiting",
       "daysOfTrip": "Days of trip",
       "visitedSpots": "Spots visited",
+      "cities": "Cities",
       "travelers": "travelers",
       "traveler": "traveler",
       "tripRoute": "Trip route",
@@ -770,7 +779,8 @@
     "modal": {
       "noTime": "No time",
       "addTime": "Add time",
-      "addNote": "Add note..."
+      "addNote": "Add note...",
+      "openInMaps": "Open in Maps"
     }
   },
   "documents": {
