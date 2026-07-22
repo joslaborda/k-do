@@ -13,8 +13,10 @@ import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig'
 import { getFxRate } from '@/lib/fxRates';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
+import { normalizeEmail } from '@/lib/utils';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import OTabBar from '@/components/trip/OTabBar';
+import Avatar from '@/components/trip/Avatar';
 import { format } from 'date-fns';
 
 
@@ -55,23 +57,6 @@ function fmtAmt(n, code) {
   return v.toLocaleString('es');
 }
 
-// ── Avatar ─────────────────────────────────────────────────────────────────────
-function Avatar({ email, profiles = [], size = 28 }) {
-  const profile = profiles[email] || null;  // profiles is profilesByEmail map
-  const name = profile?.display_name || profile?.username || email || '?';
-  const initials = name.slice(0, 2).toUpperCase();
-  if (profile?.avatar_url) {
-    return <img src={profile.avatar_url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
-  }
-  const COLORS = ['#fbd5c0', '#c5deff', '#c5efd4', '#e8d5fb', '#fde8b5'];
-  const TEXT = ['#b34a1a', '#1d4ed8', '#15803d', '#7e22ce', '#92400e'];
-  const idx = email?.charCodeAt(0) % 5 || 0;
-  return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: COLORS[idx], color: TEXT[idx], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.36, fontWeight: 500, flexShrink: 0 }}>
-      {initials}
-    </div>
-  );
-}
 
 // ── CurrencyBanner — shown when active city changes ───────────────────────────
 function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccept, onDismiss }) {
@@ -109,7 +94,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
   const { t } = useTranslation();
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
   const isSame = expense.currency === baseCurrency || !expense.currency;
-  const paidByName = userMap[expense.paid_by] || expense.paid_by || '?';
+  const paidByName = userMap[expense.paid_by] || t('common.member');
   const splitCount = expense.split_with?.length || 1;
 
   return (
@@ -342,7 +327,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                 <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
                   <Avatar email={d.to} profiles={profilesByEmail} size={32} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.to] || d.to}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.to] || t('common.member')}</p>
                     <p className="text-xs text-red-500 font-medium mt-0.5">
                       {t('expenses.balance.youOwe')} <DebtAmount idx={idx} d={d} from={true} />
                     </p>
@@ -370,7 +355,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                 <div key={i} className="flex items-center gap-3 px-4 py-3.5 border-b border-border last:border-0">
                   <Avatar email={d.from} profiles={profilesByEmail} size={32} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.from] || d.from}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{userMap[d.from] || t('common.member')}</p>
                     <p className="text-xs text-green-600 font-medium mt-0.5">
                       {t('expenses.balance.owesYou')} <DebtAmount idx={idx} d={d} from={false} />
                     </p>
@@ -392,7 +377,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
             {members.map((email) => {
               const bal = balances[email] || 0;
               const isMe = email === currentUserEmail;
-              const name = userMap[email] || email || '?';
+              const name = userMap[email] || t('common.member');
               const total = Math.max(...Object.values(balances).map(Math.abs), 0.01);
               const pct = Math.abs(bal) / total * 100;
               return (
@@ -662,7 +647,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
               <span className="text-xs text-muted-foreground">{t('expenses.paidBy')}</span>
               <div className="flex items-center gap-2">
                 <Avatar email={expense.paid_by} profiles={profilesByEmail} size={20} />
-                <span className="text-sm text-foreground">{userMap[expense.paid_by] || expense.paid_by}</span>
+                <span className="text-sm text-foreground">{userMap[expense.paid_by] || t('common.member')}</span>
               </div>
             </div>
             {/* {t('expenses.splitWith')} */}
@@ -770,7 +755,8 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
           <button
             form="expense-form"
             onClick={() => document.getElementById('expense-form-submit')?.click()}
-            className="py-3 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-colors" style={{flex:2}}>
+            disabled={saving}
+            className="py-3 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:pointer-events-none" style={{flex:2}}>
             {saving ? t('common.loading') : (editingExpense ? t('expenses.saveChanges') : t('expenses.saveExpense'))}
           </button>
         </div>
@@ -987,26 +973,38 @@ export default function Expenses() {
 
   const defaultCurrency = activeCurrencyOverride || activeLocalCurrency || baseCurrency;
 
-  // Perfiles de miembros: email→user_id→UserProfile (UserProfile no tiene campo email)
+  // Perfiles de miembros: email→user_id→UserProfile. Se normaliza el email
+  // antes de consultar y al indexar los resultados — UserProfile.email
+  // siempre se guarda en minúsculas (migración en App.jsx), pero
+  // trip.members puede traer el email tal cual vino del proveedor de auth.
+  // Sin normalizar, el propio creador del viaje (o cualquier miembro con
+  // mayúsculas distintas) nunca hacía match y su nombre se sustituía por el
+  // email en crudo en toda esta pantalla.
+  const normalizedMembers = useMemo(() => [...new Set(members.map(normalizeEmail))], [members]);
   const { data: memberProfiles = [] } = useQuery({
-    queryKey: ['memberProfiles', members.join(',')],
+    queryKey: ['memberProfiles', normalizedMembers.join(',')],
     queryFn: async () => {
-      if (!members.length) return [];
-      const users = await base44.entities.User.filter({ email: { $in: members } });
+      if (!normalizedMembers.length) return [];
+      const users = await base44.entities.User.filter({ email: { $in: normalizedMembers } });
       const ids = users.map(u => u.id).filter(Boolean);
       if (!ids.length) return [];
       const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
-      return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
+      return profs.map(p => ({ ...p, user_email: normalizeEmail(users.find(u => u.id === p.user_id)?.email || '') }));
     },
-    enabled: members.length > 0,
+    enabled: normalizedMembers.length > 0,
     staleTime: 120000,
   });
 
   const userMap = useMemo(() => {
     const m = {};
     members.forEach(email => {
-      const prof = memberProfiles.find(p => p.email === email || p.user_email === email);
-      m[email] = prof?.display_name || prof?.username || email;
+      const e = normalizeEmail(email);
+      const prof = memberProfiles.find(p => normalizeEmail(p.email) === e || p.user_email === e);
+      // Nunca el email en crudo: display_name/username son obligatorios en
+      // UserProfile, así que si no aparecen es que no se encontró el
+      // perfil — se deja sin entrada y cada sitio que lee userMap decide su
+      // propio texto de reserva (t('common.member')).
+      if (prof?.display_name || prof?.username) m[email] = prof.display_name || prof.username;
     });
     return m;
   }, [memberProfiles, members]);
@@ -1014,7 +1012,7 @@ export default function Expenses() {
   const profilesByEmail = useMemo(() => {
     const map = {};
     memberProfiles.forEach(p => {
-      const email = p.email || p.user_email;
+      const email = normalizeEmail(p.email || p.user_email);
       if (email) map[email] = p;
     });
     return map;
@@ -1092,7 +1090,7 @@ export default function Expenses() {
     const settleAmount   = debt.displayAmount   || debt.amount;
     try {
       await createMutation.mutateAsync({
-        description: `Liquidación: ${userMap[debt.from] || debt.from} → ${userMap[debt.to] || debt.to}`,
+        description: `Liquidación: ${userMap[debt.from] || t('common.member')} → ${userMap[debt.to] || t('common.member')}`,
         amount: settleAmount, currency: settleCurrency, amount_base: debt.amount,
         category: 'other', paid_by: debt.from, split_with: [debt.to],
         split_type: 'equal', date: format(new Date(), 'yyyy-MM-dd'),

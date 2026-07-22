@@ -14,6 +14,7 @@ import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import { useLike } from '@/hooks/useLike';
 import { useToast } from '@/components/ui/use-toast';
+import Avatar from '@/components/trip/Avatar';
 
 const SPOT_TYPE_ICON = { food: Utensils, sight: Landmark, activity: Zap, shopping: ShoppingBag, transport: Train, custom: MapPin };
 const TYPE_COLORS = {
@@ -21,13 +22,6 @@ const TYPE_COLORS = {
   activity:'bg-green-100 text-green-700', shopping:'bg-purple-100 text-purple-700',
   transport:'bg-secondary text-foreground', custom:'bg-yellow-100 text-yellow-700',
 };
-
-function Avatar({ profile, size }) {
-  const cls = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
-  const initials = profile?.display_name?.[0]?.toUpperCase() || '?';
-  if (profile?.avatar_url) return <img src={profile.avatar_url} className={cls + ' rounded-full object-cover flex-shrink-0'} alt={initials}/>;
-  return <div className={cls + ' rounded-full bg-orange-50 text-primary flex items-center justify-center font-bold flex-shrink-0'}>{initials}</div>;
-}
 
 function LikeButton({ targetId, targetType, userId, targetOwnerId }) {
   const { isLiked, count, toggle } = useLike({ targetId, targetType, userId, targetOwnerId });
@@ -52,7 +46,7 @@ function FeedSpotCard({ spot, profile, currentUser, onSave, saving }) {
       {spot.image_url && <div className="h-36 overflow-hidden"><img src={spot.image_url} alt={spot.title} className="w-full h-full object-cover"/></div>}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Avatar profile={profile} size="sm"/>
+          <Avatar profile={profile} size={32}/>
           <div className="flex-1 min-w-0">
             <Link to={createPageUrl('Profile') + '?user_id=' + spot.created_by_user_id}
               className="text-xs font-semibold text-foreground hover:text-primary truncate block">
@@ -106,7 +100,7 @@ function UserCard({ profile, currentUser, myFollows, onFollow }) {
   const isFollowing = !!followRecord;
   return (
     <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
-      <Avatar profile={profile}/>
+      <Avatar profile={profile} size={40}/>
       <div className="flex-1 min-w-0">
         <Link to={createPageUrl('Profile') + '?user_id=' + profile.user_id} className="font-semibold text-sm text-foreground hover:text-primary block truncate">
           {profile.display_name || t('explore.traveler')}

@@ -13,6 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CreateProfileModal from '@/components/social/CreateProfileModal';
 import { createPageUrl } from '@/utils';
 import { normalizeCountry } from '@/lib/countryConfig';
+import { normalizeEmail } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 function getGreeting(t) {
@@ -106,7 +107,13 @@ export default function TripsList() {
 
   const createMutation = useMutation({
     mutationFn: async ({ formData, stops, stopCountries = [], allocations }) => {
-      const email = user?.email;
+      // UserProfile.email siempre se guarda en minúsculas (migración en
+      // App.jsx), pero user.email viene tal cual del proveedor de auth — si
+      // aquí se guarda sin normalizar, el propio creador del viaje queda con
+      // una entrada en trip.members que nunca hace match con su UserProfile,
+      // y su avatar en el propio viaje que acaba de crear muestra el email en
+      // crudo en vez de su nombre.
+      const email = normalizeEmail(user?.email);
 
       // Auto-detect best base currency from creator's home_currency
       let baseCurrency = formData.currency || 'EUR';
