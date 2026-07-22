@@ -755,7 +755,9 @@
       "otherCity": "Otra ciudad",
       "noCoords": "Ninguno de tus spots tiene ubicación en el mapa todavía",
       "tapHint": "Toca el mapa para soltar un pin nuevo",
-      "noDate": "Sin fecha"
+      "noDate": "Sin fecha",
+      "allDays": "Todos los días",
+      "dayRouteHint": "Ruta de ese día, en el orden de tu itinerario"
     },
     "autoOrder": {
       "title": "Orden sugerido",

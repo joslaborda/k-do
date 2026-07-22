@@ -755,7 +755,9 @@
       "otherCity": "Other city",
       "noCoords": "None of your spots have a map location yet",
       "tapHint": "Tap the map to drop a new pin",
-      "noDate": "No date"
+      "noDate": "No date",
+      "allDays": "All days",
+      "dayRouteHint": "That day's route, in your itinerary order"
     },
     "autoOrder": {
       "title": "Suggested order",
