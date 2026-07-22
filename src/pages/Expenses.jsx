@@ -234,29 +234,47 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     }
   };
 
-  // Convert each debt to debtor's home_currency for display
+  // Convert each debt to debtor's home_currency for display.
+  // getFxRate ya cachea en localStorage/ExchangeRateCache (24h), pero antes
+  // se llamaba una vez POR DEUDA aunque varias compartieran la misma moneda
+  // (p. ej. 4 personas debiendo en USD contra una base en EUR disparaban 4
+  // llamadas idénticas en paralelo, cada una re-parseando el mismo JSON de
+  // localStorage). Ahora se calcula el conjunto de monedas únicas que hacen
+  // falta y se pide la tasa una sola vez por moneda, no por deuda.
   const [convertedDebts, setConvertedDebts] = useState({});
   useEffect(() => {
     if (!debts.length) return;
     const run = async () => {
+      const neededCurrencies = new Set();
+      debts.forEach(d => {
+        const debtorCurrency = profilesByEmail?.[d.from]?.home_currency || baseCurrency;
+        const creditorCurrency = profilesByEmail?.[d.to]?.home_currency || baseCurrency;
+        if (debtorCurrency !== baseCurrency) neededCurrencies.add(debtorCurrency);
+        if (creditorCurrency !== baseCurrency) neededCurrencies.add(creditorCurrency);
+      });
+
+      const rateEntries = await Promise.all(
+        [...neededCurrencies].map(async (currency) => {
+          try {
+            const fx = await getFxRate(baseCurrency, currency);
+            return [currency, fx.rate];
+          } catch {
+            return [currency, null];
+          }
+        })
+      );
+      const rateByCurrency = Object.fromEntries(rateEntries);
+
       const results = {};
-      await Promise.all(debts.map(async (d, i) => {
+      debts.forEach((d, i) => {
         const debtorCurrency  = profilesByEmail?.[d.from]?.home_currency || baseCurrency;
         const creditorCurrency = profilesByEmail?.[d.to]?.home_currency  || baseCurrency;
-        let debtorAmount = d.amount;
-        let creditorAmount = d.amount;
-        try {
-          if (debtorCurrency !== baseCurrency) {
-            const fx = await getFxRate(baseCurrency, debtorCurrency);
-            debtorAmount = parseFloat((d.amount * fx.rate).toFixed(2));
-          }
-          if (creditorCurrency !== baseCurrency) {
-            const fx = await getFxRate(baseCurrency, creditorCurrency);
-            creditorAmount = parseFloat((d.amount * fx.rate).toFixed(2));
-          }
-        } catch {}
+        const debtorRate = debtorCurrency !== baseCurrency ? rateByCurrency[debtorCurrency] : null;
+        const creditorRate = creditorCurrency !== baseCurrency ? rateByCurrency[creditorCurrency] : null;
+        const debtorAmount = debtorRate ? parseFloat((d.amount * debtorRate).toFixed(2)) : d.amount;
+        const creditorAmount = creditorRate ? parseFloat((d.amount * creditorRate).toFixed(2)) : d.amount;
         results[i] = { debtorAmount, debtorCurrency, creditorAmount, creditorCurrency };
-      }));
+      });
       setConvertedDebts(results);
     };
     run();
