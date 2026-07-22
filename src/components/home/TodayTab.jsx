@@ -54,6 +54,12 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
   const spotsForDate = (cityId, dateStr) =>
     allSpots.filter(s => s.city_id === cityId && s.assigned_date === dateStr)
       .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999));
+  // El "hotel" no es un campo propio del viaje/ciudad — se modela como un
+  // Spot type:'hotel' sin assigned_date, así vale para toda la estancia en
+  // esa ciudad en vez de tener que repetirlo cada día. Si el usuario nunca
+  // guardó uno, hotelForCity devuelve undefined y el mini-mapa simplemente no
+  // dibuja el pin del hotel (ver TodayRouteMap).
+  const hotelForCity = (cityId) => allSpots.find(s => s.city_id === cityId && s.type === 'hotel');
 
   const handleReorder = async (newOrder) => {
     await Promise.all(newOrder.map((spot, idx) =>
@@ -100,6 +106,7 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
           defaultOpen={true}
           onReorderSpots={handleReorder}
           onUpdateItemTime={handleUpdateItemTime}
+          hotelSpot={hotelForCity(todayCity.id)}
         />
       )}
 
@@ -115,6 +122,7 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
           defaultOpen={false}
           onReorderSpots={handleReorder}
           onUpdateItemTime={handleUpdateItemTime}
+          hotelSpot={hotelForCity(tomorrowCity.id)}
         />
       )}
 

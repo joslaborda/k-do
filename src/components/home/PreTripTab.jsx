@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, Check, Users } from 'lucide-react';
+import { Calendar, Check, Users, Landmark, ArrowRight } from 'lucide-react';
 
 import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
 import { daysUntil } from '@/lib/tripDays';
@@ -156,6 +156,31 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
     [allCountries, originCountry, myProfile?.second_nationality, i18n.language, db]
   );
 
+  // Una testeadora reportó que la info de embajada/apps útiles (vive en
+  // Utilities.jsx, tab "Emergencias") quedaba enterrada: desde Home había que
+  // entrar a "Maleta" y luego cambiar de pestaña a mano para encontrarla — nada
+  // en Home avisaba de que existía. Se replica aquí el mismo lazy-load que ya
+  // usa Utilities.jsx (emergencyDB pesa ~495 KB, solo se carga si hay destino)
+  // para mostrar un aviso directo con link a esa pestaña exacta.
+  const destCountry = allCountries[0];
+  const [emergencyPreview, setEmergencyPreview] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (!destCountry) { setEmergencyPreview(null); return; }
+    import('@/lib/emergencyDB').then(({ getHardcodedEmergencyInfo }) => {
+      if (cancelled) return;
+      setEmergencyPreview(getHardcodedEmergencyInfo(destCountry, originCountry, myProfile?.second_nationality || null));
+    }).catch(() => { if (!cancelled) setEmergencyPreview(null); });
+    return () => { cancelled = true; };
+  }, [destCountry, originCountry, myProfile?.second_nationality]);
+
+  // normalizeCountry() ya deja ambos nombres en la misma forma canónica en
+  // español, así que basta comparar en minúsculas (sin el strip de acentos
+  // NFD que usa Utilities.jsx, innecesario aquí porque ambos vienen limpios).
+  const isHomeCountry = destCountry && destCountry.trim().toLowerCase() === (originCountry || '').trim().toLowerCase();
+  const hasEmbassy = !isHomeCountry && !!emergencyPreview?.embassy;
+  const appsCount = emergencyPreview?.useful_apps?.length || 0;
+
   const toggleCheck = (id) => {
     const next = { ...checkedItems, [id]: !checkedItems[id] };
     setCheckedItems(next);
@@ -211,6 +236,27 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           </div>
         </Link>
       </div>
+
+      {/* Embajada + apps útiles — antes solo se veía entrando a Maleta y
+          cambiando de pestaña a mano a "Emergencias"; nada en Home avisaba de
+          que existía. Ahora es visible directamente, con link a esa pestaña. */}
+      {(hasEmbassy || appsCount > 0) && (
+        <Link to={createPageUrl('Utilities') + '?trip_id=' + tripId + '&tab=emergencias'}>
+          <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-primary/40 transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+              <Landmark className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{t('pretrip.embassyAppsTitle')}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {[hasEmbassy ? t('pretrip.emergency') : null, appsCount > 0 ? t('pretrip.embassyAppsCount', { count: appsCount }) : null]
+                  .filter(Boolean).join(' · ')}
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          </div>
+        </Link>
+      )}
 
       {displayReqs.length > 0 && (
         <div className="bg-card rounded-2xl border border-border overflow-hidden">

@@ -2,16 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, FileText, MapPin , CirclePlus, Thermometer } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, FileText, MapPin , CirclePlus, Thermometer, Route } from 'lucide-react';
 import PDFViewer from '@/components/PDFViewer';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import ItemDetailSheet from './ItemDetailSheet';
+import TodayRouteMap from './TodayRouteMap';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_ICON } from './constants';
 import { useTranslation } from 'react-i18next';
 
-export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime }) {
+export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime, hotelSpot }) {
   const { t } = useTranslation();
   // holidaysDB son ~120 KB: se cargan solo si hay ciudad y fecha.
   const [holidays, setHolidays] = useState([]);
@@ -87,6 +89,48 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
     setSelected(prev => prev ? { ...prev, time } : null);
   };
 
+  // Antes SpotDetailModal se abría aquí sin onRemove, así que "Quitar del día"
+  // no aparecía (a diferencia de Cities.jsx/Ruta, que sí lo pasa) — mismo modal,
+  // dos comportamientos distintos. Se desasigna el spot del día, no se borra
+  // la entidad (eso solo pasa desde Spots/Restaurants.jsx, que es la vista de
+  // gestión de spots).
+  const handleRemoveSpot = async (spot) => {
+    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
+    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+    setSelected(null);
+  };
+
+  // Mismo parseo que usa Cities.jsx para las notas de itinerario (raw JSON
+  // string en ItineraryDay.content -> [{text,time}]).
+  const parseNotesContent = (raw) => {
+    if (!raw) return [];
+    try { const p = JSON.parse(raw); if (Array.isArray(p)) return p; } catch {}
+    return raw.trim() ? [{ text: raw, time: '' }] : [];
+  };
+
+  // Antes ItemDetailSheet no podía borrar nada — ni documento ni nota — a
+  // diferencia de Documents.jsx (doc) y Cities.jsx/Ruta (nota). Las notas no
+  // son su propia entidad: viven serializadas dentro de ItineraryDay.content,
+  // así que borrar una nota es reescribir esa lista sin ella.
+  const handleDeleteItem = async (item) => {
+    if (item._kind === 'doc') {
+      await base44.entities.Ticket.delete(item.id);
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+    } else if (item._kind === 'note') {
+      const lastDash = item.id.lastIndexOf('-');
+      const dayId = item.id.slice(0, lastDash);
+      const idx = parseInt(item.id.slice(lastDash + 1), 10);
+      const day = (itineraryDays || []).find(d => d.id === dayId);
+      if (day) {
+        const clean = parseNotesContent(day.content).filter(n => n.text?.trim());
+        clean.splice(idx, 1);
+        await base44.entities.ItineraryDay.update(dayId, { content: JSON.stringify(clean) });
+        queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+      }
+    }
+    setSelected(null);
+  };
+
   return (
     <div className={`bg-card rounded-2xl border overflow-hidden ${isToday_ ? 'border-orange-200' : 'border-border'}`}>
       <button onClick={() => setOpen(o => !o)}
@@ -120,6 +164,19 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
 
       {open && (
         <div>
+          {(hotelSpot?.lat && hotelSpot?.lng) || spots.some(s => s.lat && s.lng) ? (
+            <div className="border-t border-border px-4 pt-3 pb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                  <Route className="w-3.5 h-3.5 text-primary" />{t('home.dayCard.todayRoute')}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {hotelSpot ? t('home.dayCard.hotelPlusStops', { count: spots.length }) : t('home.dayCard.stopsCount', { count: spots.length })}
+                </span>
+              </div>
+              <TodayRouteMap hotelSpot={hotelSpot} spots={spots} />
+            </div>
+          ) : null}
           {hasContent ? (
             timeline.map((item, idx) => {
               const isDoc   = item._kind === 'doc';
@@ -197,10 +254,10 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
 
       {viewFile && <PDFViewer fileUrl={viewFile} onClose={() => setViewFile(null)} />}
       {selected && selected._kind !== 'spot' && (
-        <ItemDetailSheet item={selected} onClose={() => setSelected(null)} onSaveTime={handleSaveTime} onOpenPdf={(url) => setViewFile(url)} />
+        <ItemDetailSheet item={selected} onClose={() => setSelected(null)} onSaveTime={handleSaveTime} onOpenPdf={(url) => setViewFile(url)} onDelete={handleDeleteItem} />
       )}
       {selected && selected._kind === 'spot' && (
-        <SpotDetailModal spot={selected} open={true} onClose={() => setSelected(null)} queryClient={queryClient} tripId={tripId} />
+        <SpotDetailModal spot={selected} open={true} onClose={() => setSelected(null)} onRemove={handleRemoveSpot} queryClient={queryClient} tripId={tripId} />
       )}
     </div>
   );
