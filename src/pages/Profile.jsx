@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useRef} from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { Check, CirclePlus, Compass, Landmark, Loader2, MapPin, Plus, Search, ShoppingBag, Ticket, Utensils, X } from 'lucide-react';
+import { Check, CirclePlus, Compass, Hotel, Landmark, Loader2, MapPin, Plus, Search, ShoppingBag, Ticket, TrainFront, BusFront, Utensils, X } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { getCountryMeta, normalizeCountry, getCountryLabel } from '@/lib/countryConfig';
@@ -19,6 +20,9 @@ const SPOT_ICONS_MAP = {
   food: Utensils, sight: Landmark, activity: Ticket,
   shopping: ShoppingBag, custom: CirclePlus, other: Compass,
   restaurant: Utensils, museum: Landmark,
+  // Antes hotel/aeropuerto/tren/bus caían en el fallback MapPin de más
+  // abajo — no un "+", pero tampoco su icono real.
+  hotel: Hotel, transport: Compass, airport: PlaneIcon, train: TrainFront, bus: BusFront,
 };
 const TYPE_LABEL  = { food:'spots.types.food', sight:'spots.types.sight', activity:'spots.types.activity', shopping:'spots.types.shopping', custom:'spots.types.custom' };
 const TYPE_FILTERS = [

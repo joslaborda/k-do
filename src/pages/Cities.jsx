@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, Car, Ship, Shield, FileText, Loader2, Settings } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, TrainFront, BusFront, Compass, Car, Ship, Shield, FileText, Loader2, Settings } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,10 @@ const DOC_ICON_MAP = {
   bus: Car, car: Car, ticket: Ticket, insurance: Shield, other: FileText,
 };
 const DOC_TRANSPORT = new Set(['flight','train','bus','boat','ferry']);
+// Antes 'hotel' y las variantes de transporte (aeropuerto/tren/bus) no
+// tenían entrada aquí — cualquier spot de ese tipo caía en el fallback
+// CirclePlus ("+") en vez de un icono real. Mismos iconos que ya usa
+// TYPE_CONFIG (spotsHelpers.jsx) y home/constants.jsx.
 const SPOT_ICONS = {
   food:     Utensils,
   sight:    Landmark,
@@ -36,12 +40,19 @@ const SPOT_ICONS = {
   custom:   CirclePlus,
   restaurant: Utensils,
   museum:   Landmark,
+  hotel:    Hotel,
+  transport: Compass,
+  airport:  PlaneIcon,
+  train:    TrainFront,
+  bus:      BusFront,
 };
 const SPOT_COLORS = {
   food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
   custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
+  hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
+  airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
 };
 
 function getTransportIcon(docs, cityStartDate) {

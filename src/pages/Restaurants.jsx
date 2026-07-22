@@ -33,12 +33,18 @@ const OSM_MAP = {
   museum:'sight', monument:'sight', attraction:'sight', viewpoint:'sight', temple:'sight',
   church:'sight', shrine:'sight', castle:'sight', gallery:'sight', park:'sight',
   shop:'shopping', mall:'shopping', market:'shopping',
-  bus_station:'transport', train_station:'transport', subway_entrance:'transport',
   sports_centre:'activity', cinema:'activity', theatre:'activity',
   // Antes ningún tag de alojamiento tenía mapeo, así que buscar un hotel de
   // verdad en la tab "Buscar" (p. ej. "Marriott Lima") y guardarlo caía en
   // 'sight' por defecto — se guardaba como "Cultura", no como "Hotel".
   hotel:'hotel', hostel:'hotel', guest_house:'hotel', motel:'hotel', apartment:'hotel',
+  // Antes bus/tren/aeropuerto caían todos en 'transport' (o ni eso: un
+  // aeropuerto no tenía tag y caía en 'sight') — un icono genérico o el "+"
+  // de custom en vez de avión/tren/bus reales (ver TYPE_CONFIG en
+  // spotsHelpers.jsx, que ahora tiene un tipo — e icono — para cada uno).
+  aerodrome:'airport', international_airport:'airport', airport:'airport',
+  train_station:'train', subway_entrance:'train', station:'train',
+  bus_station:'bus',
 };
 function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
 
@@ -514,7 +520,10 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.type')}</p>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(TYPE_CONFIG).filter(([k]) => k !== 'transport').map(([val, tc]) => (
+              {/* airport/train/bus solo salen de la búsqueda (osmToType) —
+                  no tiene sentido que el usuario elija manualmente "eres un
+                  aeropuerto", igual que ya pasaba con 'transport'. */}
+              {Object.entries(TYPE_CONFIG).filter(([k]) => !['transport', 'airport', 'train', 'bus'].includes(k)).map(([val, tc]) => (
                 <button key={val} onClick={() => setType(val)}
                   className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
                     type === val ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
