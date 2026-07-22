@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2 } from 'lucide-react';
+import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2, Search, X, MapPin, Loader2 } from 'lucide-react';
 import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
@@ -36,13 +36,34 @@ const VISIBILITY_OPTS = [
 ];
 
 const SHOW_FIELDS = {
-  flight:   ['name','origin','destination','airline','date','time','end_time','notes','note_time'],
+  flight:   ['name','origin','destination','location','airline','date','time','end_time','notes','note_time'],
   hotel:    ['name','city','date','time','end_date','notes','note_time'],
-  train:    ['name','origin','destination','date','time','end_time','notes','note_time'],
+  train:    ['name','origin','destination','location','date','time','end_time','notes','note_time'],
   event:    ['name','city','date','time','notes','note_time'],
   personal: ['name','date','end_date','notes','note_time'],
   other:    ['name','city','date','time','notes','note_time'],
 };
+
+// Buscador de ubicación (aeropuerto/estación) para vuelos y trenes — mismo
+// endpoint de geocoding (Nominatim) que ya usa el buscador de spots en
+// Restaurants.jsx, adaptado aquí sin depender de ese archivo. El resultado
+// elegido guarda lat/lng reales, que es justo lo que le faltaba a un
+// documento para poder aparecer en el mini-mapa del día (TodayRouteMap).
+async function searchLocation(query, signal) {
+  const params = new URLSearchParams({ q: query, format: 'json', limit: 6, addressdetails: 1, namedetails: 1 });
+  const res = await fetch('https://nominatim.openstreetmap.org/search?' + params, {
+    headers: { 'Accept-Language': 'es,en', 'User-Agent': 'KodoTravelApp/1.0' },
+    signal,
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.map(item => ({
+    id: item.place_id?.toString(),
+    name: item.namedetails?.name || item.display_name?.split(',')[0] || query,
+    address: item.display_name,
+    lat: parseFloat(item.lat), lng: parseFloat(item.lon),
+  }));
+}
 
 const FIELD_LABELS = {
   name: 'Nombre', origin: 'Origen', destination: 'Destino',
@@ -82,7 +103,38 @@ export default function DocumentForm({
     notes:       initialData?.notes       || '',
     file_url:    initialData?.file_url    || '',
     city_id:     initialData?.city_id     || '',
+    location_name: initialData?.location_name || '',
+    location_lat:  initialData?.location_lat  || '',
+    location_lng:  initialData?.location_lng  || '',
   });
+
+  // Buscador de aeropuerto/estación (solo vuelo/tren, ver SHOW_FIELDS). El
+  // texto de búsqueda es local hasta que se elige un resultado; lo elegido
+  // vive en fields.location_* (lo que de verdad se guarda).
+  const [locationQuery, setLocationQuery] = useState(initialData?.location_name || '');
+  const [locationResults, setLocationResults] = useState([]);
+  const [locationSearching, setLocationSearching] = useState(false);
+  const locationTimer = useRef(null);
+  const locationAbortRef = useRef(null);
+
+  useEffect(() => {
+    if (fields.location_lat) { setLocationResults([]); return; }
+    if (!locationQuery.trim() || locationQuery.trim().length < 2) { setLocationResults([]); return; }
+    clearTimeout(locationTimer.current);
+    locationTimer.current = setTimeout(async () => {
+      if (locationAbortRef.current) locationAbortRef.current.abort();
+      locationAbortRef.current = new AbortController();
+      setLocationSearching(true);
+      try {
+        setLocationResults(await searchLocation(locationQuery.trim(), locationAbortRef.current.signal));
+      } catch (e) {
+        if (e?.name !== 'AbortError') setLocationResults([]);
+      } finally {
+        setLocationSearching(false);
+      }
+    }, 700);
+    return () => clearTimeout(locationTimer.current);
+  }, [locationQuery, fields.location_lat]);
 
   // Build trip day options from tripCities prop
   const tripDayOptions = useMemo(() => {
@@ -174,6 +226,52 @@ export default function DocumentForm({
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('documents.form.fields.destination')}</p>
               <Input value={fields.destination} onChange={e => setField('destination', e.target.value)}
                 placeholder={FIELD_PLACEHOLDERS.destination} className="h-10 text-sm" />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Ubicación (aeropuerto/estación) — solo vuelo/tren. Da lat/lng reales
+          al documento, que antes no tenía ninguna, para que pueda aparecer
+          en el mini-mapa del día junto al hotel y los spots. */}
+      {hasField('location') && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+            {t('documents.form.fields.location')} <span className="font-normal normal-case tracking-normal text-muted-foreground">{t('documents.form.optional')}</span>
+          </p>
+          <p className="text-xs text-muted-foreground/70 mb-1.5">{t('documents.form.locationHint')}</p>
+          {fields.location_lat && fields.location_lng ? (
+            <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-2.5">
+              <MapPin className="w-4 h-4 text-primary shrink-0" />
+              <span className="flex-1 text-sm text-foreground truncate">{fields.location_name}</span>
+              <button type="button" onClick={() => { setFields(prev => ({ ...prev, location_name: '', location_lat: '', location_lng: '' })); setLocationQuery(''); }}
+                className="text-muted-foreground hover:text-red-500 transition-colors shrink-0">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2.5 focus-within:border-primary transition-colors">
+                <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+                <input value={locationQuery} onChange={e => setLocationQuery(e.target.value)}
+                  placeholder={t('documents.form.ph.location')} className="flex-1 text-sm outline-none bg-transparent text-foreground min-w-0" />
+                {locationSearching && <Loader2 className="w-3.5 h-3.5 text-muted-foreground animate-spin shrink-0" />}
+              </div>
+              {locationResults.length > 0 && (
+                <div className="absolute z-10 left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-56 overflow-y-auto">
+                  {locationResults.map(r => (
+                    <button key={r.id} type="button" onClick={() => {
+                      setFields(prev => ({ ...prev, location_name: r.name, location_lat: r.lat, location_lng: r.lng }));
+                      setLocationQuery(r.name);
+                      setLocationResults([]);
+                    }}
+                      className="w-full flex flex-col items-start px-3 py-2.5 text-left hover:bg-secondary/30 transition-colors border-b border-border last:border-0">
+                      <span className="text-sm font-medium text-foreground truncate w-full">{r.name}</span>
+                      {r.address && <span className="text-xs text-muted-foreground truncate w-full">{r.address}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
