@@ -1,4 +1,5 @@
-import { CirclePlus, Compass, Landmark, ShoppingBag, Ticket, Utensils } from 'lucide-react';
+import { CirclePlus, Compass, Landmark, ShoppingBag, Ticket, Utensils, Hotel, TrainFront, BusFront } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 // ── Maps URL helper ───────────────────────────────────────────────────────────
 export function getMapsUrl(spot) {
   if (spot.lat && spot.lng) return `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
@@ -14,7 +15,14 @@ export const OSM_MAP = {
   museum:'sight', monument:'sight', attraction:'sight', viewpoint:'sight', temple:'sight',
   church:'sight', shrine:'sight', castle:'sight', gallery:'sight', park:'sight',
   shop:'shopping', mall:'shopping', market:'shopping',
-  bus_station:'transport', train_station:'transport', subway_entrance:'transport',
+  hotel:'hotel', hostel:'hotel', guest_house:'hotel', motel:'hotel', apartment:'hotel',
+  // Antes bus/tren/aeropuerto caían todos en el mismo 'transport' genérico
+  // (o ni eso: un aeropuerto ni siquiera tenía tag y caía en 'sight' por
+  // defecto) — icono genérico o "+" en vez de avión/tren/bus. Ahora cada uno
+  // tiene su propio tipo con su propio icono (ver TYPE_CONFIG más abajo).
+  aerodrome:'airport', international_airport:'airport', airport:'airport',
+  train_station:'train', subway_entrance:'train', station:'train',
+  bus_station:'bus',
   sports_centre:'activity', cinema:'activity', theatre:'activity',
 };
 export function osmToType(type, cls) { return OSM_MAP[type] || OSM_MAP[cls] || 'sight'; }
@@ -122,6 +130,13 @@ export const TYPE_CONFIG = {
   activity:  { label:'Actividad',  tk:'spots.types.activity',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
   shopping:  { label:'Compras',    tk:'spots.types.shopping',  Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
   transport: { label:'Transporte', tk:'spots.types.transport', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
+  hotel:     { label:'Hotel',      tk:'spots.types.hotel',     Icon: Hotel,       color:'bg-indigo-100 text-indigo-700' },
+  // Antes 'transport' era el único cajón para bus/tren/aeropuerto — un solo
+  // icono de brújula genérico para los tres. Ahora cada uno tiene el suyo;
+  // 'transport' se queda como fallback para spots antiguos ya guardados así.
+  airport:   { label:'Aeropuerto', tk:'spots.types.airport',   Icon: PlaneIcon,   color:'bg-sky-100 text-sky-700' },
+  train:     { label:'Estación de tren', tk:'spots.types.train', Icon: TrainFront, color:'bg-emerald-100 text-emerald-700' },
+  bus:       { label:'Estación de autobús', tk:'spots.types.bus', Icon: BusFront, color:'bg-amber-100 text-amber-700' },
   custom:    { label:'Otro',       tk:'spots.types.custom',    Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 

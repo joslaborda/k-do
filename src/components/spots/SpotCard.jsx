@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
-import { MapPin, X, Camera, Navigation, Pencil, Utensils, Landmark, Zap, ShoppingBag, Train, Star, Hotel, Moon, ThumbsUp, ThumbsDown, Check, Trash2 } from 'lucide-react';
+import { MapPin, X, Camera, Navigation, Pencil, Utensils, Landmark, Zap, ShoppingBag, Train, TrainFront, BusFront, Star, Hotel, Moon, ThumbsUp, ThumbsDown, Check, Trash2 } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { useLike } from '@/hooks/useLike';
 import { getMapsUrl } from './spotsHelpers';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,12 @@ const TYPE_CONFIG = {
   transport: { tk: 'spots.types.transport',  Icon: Train,      color: 'bg-secondary text-foreground' },
   hotel:     { tk: 'spots.types.hotel',      Icon: Hotel,      color: 'bg-indigo-100 text-indigo-700' },
   nightlife: { tk: 'spots.types.nightlife',  Icon: Moon,       color: 'bg-indigo-100 text-indigo-700' },
+  // 'transport' se queda para spots antiguos ya guardados así — aeropuerto,
+  // tren y bus ahora tienen cada uno su propio icono en vez de compartir
+  // uno genérico (o el "+" de custom, si ni eso resolvía).
+  airport:   { tk: 'spots.types.airport',    Icon: PlaneIcon,  color: 'bg-sky-100 text-sky-700' },
+  train:     { tk: 'spots.types.train',      Icon: TrainFront, color: 'bg-emerald-100 text-emerald-700' },
+  bus:       { tk: 'spots.types.bus',        Icon: BusFront,   color: 'bg-amber-100 text-amber-700' },
   custom:    { tk: 'spots.types.custom',    Icon: Star,       color: 'bg-yellow-100 text-yellow-700' },
 };
 
