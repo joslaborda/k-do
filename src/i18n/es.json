@@ -645,6 +645,7 @@
     "inYourList": "Ya en tu lista",
     "addShort": "Añadir",
     "undo": "Deshacer",
+    "undoError": "No se pudo deshacer. El sitio sigue guardado, revísalo en tu lista.",
     "backHome": "Inicio",
     "intro": "Busca y guarda los sitios que quieres visitar: restaurantes, museos, parques... y asígnales día y hora para completar tu itinerario. Tu tab Hoy en Home los mostrará cuando toca.",
     "tabSearch": "Buscar",

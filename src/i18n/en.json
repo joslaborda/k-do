@@ -645,6 +645,7 @@
     "inYourList": "Already in your list",
     "addShort": "Add",
     "undo": "Undo",
+    "undoError": "Couldn't undo. The spot is still saved — check your list.",
     "backHome": "Home",
     "intro": "Search and save the places you want to visit: restaurants, museums, parks... and assign them a day and time to complete your itinerary. Your Today tab on Home will show them when it's time.",
     "tabSearch": "Search",
