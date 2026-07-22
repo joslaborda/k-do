@@ -1,5 +1,5 @@
 import { PlaneIcon, BusFront } from '@/lib/icons';
-import { AlertTriangle, Car, Cross, DollarSign, FileText, Hotel, Shield, TrainFront, Utensils, Wifi, CirclePlus, Landmark, ShoppingBag, Ticket, Sun, Cloud, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, CloudFog } from 'lucide-react';
+import { AlertTriangle, Car, Compass, Cross, DollarSign, FileText, Hotel, Shield, TrainFront, Utensils, Wifi, CirclePlus, Landmark, ShoppingBag, Ticket, Sun, Cloud, CloudDrizzle, CloudRain, CloudSnow, CloudLightning, CloudFog } from 'lucide-react';
 
 export const REQ_ICON_MAP = {
   visa:    (p) => <Shield size={14} {...p} />,
@@ -21,6 +21,11 @@ export const DOC_ICONS = {
   other: (p) => <FileText size={13} {...p} />,
 };
 
+// Antes 'hotel' y 'transport' (y sus variantes concretas aeropuerto/tren/bus)
+// no tenían entrada aquí, así que cualquier fila de un hotel o una estación
+// en el timeline de Home caía en el fallback CirclePlus — un "+" en vez de
+// un icono real. Mismos iconos que ya usa TYPE_CONFIG (spotsHelpers.jsx)
+// para que un mismo spot se vea igual en el mapa y en la fila.
 export const SPOT_ICONS = {
   food:       Utensils,
   sight:      Landmark,
@@ -29,6 +34,11 @@ export const SPOT_ICONS = {
   custom:     CirclePlus,
   restaurant: Utensils,
   museum:     Landmark,
+  hotel:      Hotel,
+  transport:  Compass,
+  airport:    PlaneIcon,
+  train:      TrainFront,
+  bus:        BusFront,
 };
 
 export const SPOT_COLORS = {
@@ -36,6 +46,8 @@ export const SPOT_COLORS = {
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
   custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
+  hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
+  airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
 };
 
 
