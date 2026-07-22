@@ -252,13 +252,13 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
           {onRemove && (
             <button onClick={() => onRemove(spot)}
               className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 transition-colors">
-              <Trash2 className="w-3.5 h-3.5" />Quitar del día
+              <Trash2 className="w-3.5 h-3.5" />{t('cities.day.removeFromDay')}
             </button>
           )}
           <div className="flex-1" />
           <a href={getMapsUrl(spot)} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1.5 py-2.5 px-4 rounded-full border border-border text-sm text-foreground hover:bg-secondary/50 transition-colors">
-            <Navigation className="w-4 h-4" />Abrir en Maps
+            <Navigation className="w-4 h-4" />{t('spots.modal.openInMaps')}
           </a>
         </div>
       </div>
