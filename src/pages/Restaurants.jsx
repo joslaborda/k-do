@@ -1649,9 +1649,18 @@ export default function Restaurants() {
           onSkip={() => setAssignDateSpot(null)}
           onUndo={async () => {
             if (assignDateSpot?.id) {
-              await deleteMutation.mutateAsync(assignDateSpot.id).catch(() => {});
-              if (lastSavedId === assignDateSpot.id) setLastSavedId(null);
-              setSavedToast(prev => (prev.spot && lastSavedId === assignDateSpot.id ? { visible: false, spot: null } : prev));
+              // Antes: .catch(() => {}) tragaba el error y el modal se cerraba
+              // igual, dando a entender que el spot se había borrado aunque
+              // siguiera existiendo (auditoría 1.4). Ahora se avisa con un
+              // toast si el borrado falla, en vez de fingir que "Deshacer"
+              // funcionó.
+              try {
+                await deleteMutation.mutateAsync(assignDateSpot.id);
+                if (lastSavedId === assignDateSpot.id) setLastSavedId(null);
+                setSavedToast(prev => (prev.spot && lastSavedId === assignDateSpot.id ? { visible: false, spot: null } : prev));
+              } catch {
+                toast({ title: t('common.error'), description: t('spots.undoError'), variant: 'destructive' });
+              }
             }
             setAssignDateSpot(null);
           }}
