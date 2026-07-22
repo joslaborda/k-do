@@ -595,7 +595,7 @@
       "useMyLocation": "Usar mi ubicación",
       "locating": "Localizando...",
       "useMyLocationFull": "Usar mi ubicación actual",
-      "addressPlaceholder": "o escribe la dirección...",
+      "addressPlaceholder": "o busca una dirección, p. ej. \"Atocha\"...",
       "name": "Nombre *",
       "namePlaceholder": "ej. Ichiran Ramen Shinjuku",
       "duplicateExists": "Ya existe este spot en {{city}}",
