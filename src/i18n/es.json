@@ -496,6 +496,9 @@
     "addItem": "Añadir item",
     "checked": "Hecho",
     "days": "{{count}} días para el viaje",
+    "embassyAppsTitle": "Consejos antes de viajar",
+    "embassyAppsCount": "{{count}} apps útiles",
+    "embassyAppsSeeMore": "Ver en Emergencias",
     "daysAgo": "Hace {{count}} días",
     "departed": "Salida hace {{count}} días",
     "verify": "Verificar"
@@ -536,7 +539,10 @@
       "openCity": "Abrir {{city}}",
       "departsInHoursMinutes": "Sale en {{hours}}h {{minutes}}min",
       "departsInHours": "Sale en {{hours}}h",
-      "departsInMinutes": "Sale en {{count}} min"
+      "departsInMinutes": "Sale en {{count}} min",
+      "todayRoute": "Ruta de hoy",
+      "hotelPlusStops": "Hotel + {{count}} paradas",
+      "stopsCount": "{{count}} paradas"
     },
     "tomorrow": {
       "emptyTitle": "Nada planificado para mañana",
@@ -736,7 +742,20 @@
       "deleteSpot": "Eliminar spot",
       "like": "Like",
       "comment": "Comentar",
-      "saveChanges": "Guardar cambios"
+      "saveChanges": "Guardar cambios",
+      "directions": "Cómo llegar"
+    },
+    "map": {
+      "listView": "Lista",
+      "mapView": "Mapa",
+      "countSummary": "{{count}} spots · {{cities}} ciudades",
+      "otherCity": "Otra ciudad",
+      "noCoords": "Ninguno de tus spots tiene ubicación en el mapa todavía",
+      "tapHint": "Toca el mapa para soltar un pin nuevo"
+    },
+    "autoOrder": {
+      "title": "Orden sugerido",
+      "body": "Colocado en la posición {{position}} del día — arrástralo en la lista si no encaja"
     },
     "modal": {
       "noTime": "Sin hora",
@@ -1167,7 +1186,8 @@
     "file": "Archivo",
     "noFile": "Sin archivo",
     "viewDocument": "Ver documento",
-    "viewOnMap": "Ver en mapa"
+    "viewOnMap": "Ver en mapa",
+    "deleteConfirm": "¿Eliminar esto? No se puede deshacer."
   },
   "membersPanel": {
     "travelersCount": "Viajeros ({{count}})",

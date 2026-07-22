@@ -496,6 +496,9 @@
     "addItem": "Add item",
     "checked": "Done",
     "days": "{{count}} days to trip",
+    "embassyAppsTitle": "Tips before you go",
+    "embassyAppsCount": "{{count}} useful apps",
+    "embassyAppsSeeMore": "See under Emergency",
     "daysAgo": "{{count}} days ago",
     "departed": "Departed {{count}} days ago",
     "verify": "Verify"
@@ -536,7 +539,10 @@
       "openCity": "Open {{city}}",
       "departsInHoursMinutes": "Departs in {{hours}}h {{minutes}}min",
       "departsInHours": "Departs in {{hours}}h",
-      "departsInMinutes": "Departs in {{count}} min"
+      "departsInMinutes": "Departs in {{count}} min",
+      "todayRoute": "Today's route",
+      "hotelPlusStops": "Hotel + {{count}} stops",
+      "stopsCount": "{{count}} stops"
     },
     "tomorrow": {
       "emptyTitle": "Nothing planned for tomorrow",
@@ -736,7 +742,20 @@
       "deleteSpot": "Delete spot",
       "like": "Like",
       "comment": "Comment",
-      "saveChanges": "Save changes"
+      "saveChanges": "Save changes",
+      "directions": "Directions"
+    },
+    "map": {
+      "listView": "List",
+      "mapView": "Map",
+      "countSummary": "{{count}} spots · {{cities}} cities",
+      "otherCity": "Other city",
+      "noCoords": "None of your spots have a map location yet",
+      "tapHint": "Tap the map to drop a new pin"
+    },
+    "autoOrder": {
+      "title": "Suggested order",
+      "body": "Placed at position {{position}} of the day — drag it in the list if it doesn't fit"
     },
     "modal": {
       "noTime": "No time",
@@ -1167,7 +1186,8 @@
     "file": "File",
     "noFile": "No file",
     "viewDocument": "View document",
-    "viewOnMap": "View on map"
+    "viewOnMap": "View on map",
+    "deleteConfirm": "Delete this? This can't be undone."
   },
   "membersPanel": {
     "travelersCount": "Travellers ({{count}})",
