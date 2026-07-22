@@ -94,7 +94,7 @@ function ExpenseRow({ expense, baseCurrency, userMap, onEdit, onDelete }) {
   const { t } = useTranslation();
   const tc = CAT_CONFIG[expense.category] || CAT_CONFIG.other;
   const isSame = expense.currency === baseCurrency || !expense.currency;
-  const paidByName = userMap[expense.paid_by] || t('common.member');
+  const paidByName = userMap[normalizeEmail(expense.paid_by)] || t('common.member');
   const splitCount = expense.split_with?.length || 1;
 
   return (
@@ -204,14 +204,19 @@ function GastosTab({ expenses, baseCurrency, userMap, onEdit, onDelete, onAdd, c
 // ── Tab: Balances ─────────────────────────────────────────────────────────────
 function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrency, profilesByEmail, onSettle }) {
   const { t } = useTranslation();
+  // calculateBalances/getDebts trabajan siempre en minúsculas (ver
+  // expenseBalances.js) — aquí también hay que normalizar antes de comparar
+  // contra balances/debts, o el propio currentUserEmail no haría match con
+  // su entrada normalizada y "myBalance"/"iOwe"/"owesMe" saldrían vacíos.
   const balances = useMemo(() => calculateBalances(expenses, members), [expenses, members]);
   const debts = useMemo(() => getDebts(balances), [balances]);
+  const meNorm = normalizeEmail(currentUserEmail);
 
-  const myBalance = balances[currentUserEmail] || 0;
+  const myBalance = balances[meNorm] || 0;
   const iSettled = Math.abs(myBalance) < 0.01;
 
-  const iOwe   = debts.filter(d => d.from === currentUserEmail);
-  const owesMe = debts.filter(d => d.to   === currentUserEmail);
+  const iOwe   = debts.filter(d => d.from === meNorm);
+  const owesMe = debts.filter(d => d.to   === meNorm);
 
   // Convert each debt to debtor's home_currency for display
   const [convertedDebts, setConvertedDebts] = useState({});
@@ -297,13 +302,14 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           realExpenses.forEach(e => {
             const amt = parseFloat(e.amount_base || e.amount) || 0;
             if (!amt) return;
-            if (e.paid_by === currentUserEmail) iPaid += amt;
-            if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+            if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
+            const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
+            if (e.split_type === 'custom' && myShareKey) {
               const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-              if (total > 0) myShare += (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt;
+              if (total > 0) myShare += (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt;
             } else {
-              const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-              if (parts.includes(currentUserEmail)) myShare += amt / parts.length;
+              const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+              if (parts.includes(meNorm)) myShare += amt / parts.length;
             }
           });
           return iPaid > 0 ? (
@@ -375,9 +381,9 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('expenses.balance.groupBalance')}</p>
           <div className="bg-card rounded-2xl border border-border overflow-hidden">
             {members.map((email) => {
-              const bal = balances[email] || 0;
-              const isMe = email === currentUserEmail;
-              const name = userMap[email] || t('common.member');
+              const bal = balances[normalizeEmail(email)] || 0;
+              const isMe = normalizeEmail(email) === meNorm;
+              const name = userMap[normalizeEmail(email)] || t('common.member');
               const total = Math.max(...Object.values(balances).map(Math.abs), 0.01);
               const pct = Math.abs(bal) / total * 100;
               return (
@@ -416,6 +422,11 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
 function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip }) {
   const { t } = useTranslation();
   const s = sym(baseCurrency);
+  // Mismo motivo que en BalancesTab: paid_by/split_with/amounts_by_user
+  // pueden traer el email con mayúsculas distintas a currentUserEmail — sin
+  // normalizar, "lo que pagué"/"mi parte" salía en 0 para cualquiera cuyo
+  // email no coincidiera carácter a carácter.
+  const meNorm = normalizeEmail(currentUserEmail);
 
   // Excluir liquidaciones — no son gastos reales, son transferencias contables
   // Usamos el patrón de descripción porque is_settlement puede no estar en el schema de base44
@@ -431,19 +442,20 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt) return;
       // Lo que pagué yo
-      if (e.paid_by === currentUserEmail) iPaid += amt;
+      if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
       // Mi parte según el split
-      if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+      const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
+      if (e.split_type === 'custom' && myShareKey) {
         const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        if (total > 0) myShare += (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt;
+        if (total > 0) myShare += (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt;
       } else {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        if (parts.includes(currentUserEmail)) myShare += amt / parts.length;
+        const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+        if (parts.includes(meNorm)) myShare += amt / parts.length;
       }
     });
     // mySpend = mi parte real del gasto (no lo que adelanté para otros)
     return myShare;
-  }, [realExpenses, currentUserEmail]);
+  }, [realExpenses, meNorm]);
 
   // Total real del grupo (sin liquidaciones)
   const totalGroup = useMemo(() =>
@@ -471,17 +483,18 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       const amt = parseFloat(e.amount_base || e.amount) || 0;
       if (!amt) return;
       let myShare = 0;
-      if (e.split_type === 'custom' && e.amounts_by_user?.[currentUserEmail]) {
+      const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
+      if (e.split_type === 'custom' && myShareKey) {
         const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        myShare = total > 0 ? (parseFloat(e.amounts_by_user[currentUserEmail]) / total) * amt : 0;
+        myShare = total > 0 ? (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt : 0;
       } else {
-        const parts = e.split_with?.length > 0 ? e.split_with : [e.paid_by];
-        if (parts.includes(currentUserEmail)) myShare = amt / parts.length;
+        const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+        if (parts.includes(meNorm)) myShare = amt / parts.length;
       }
       if (myShare > 0) acc[e.category || 'other'] = (acc[e.category || 'other'] || 0) + myShare;
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
-  }, [realExpenses, currentUserEmail]);
+  }, [realExpenses, meNorm]);
 
   const maxCat = myByCategory[0]?.[1] || 1;
 
@@ -647,7 +660,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
               <span className="text-xs text-muted-foreground">{t('expenses.paidBy')}</span>
               <div className="flex items-center gap-2">
                 <Avatar email={expense.paid_by} profiles={profilesByEmail} size={20} />
-                <span className="text-sm text-foreground">{userMap[expense.paid_by] || t('common.member')}</span>
+                <span className="text-sm text-foreground">{userMap[normalizeEmail(expense.paid_by)] || t('common.member')}</span>
               </div>
             </div>
             {/* {t('expenses.splitWith')} */}
@@ -995,16 +1008,21 @@ export default function Expenses() {
     staleTime: 120000,
   });
 
+  // Indexado por email normalizado (minúsculas) — igual que balances/debts
+  // (ver expenseBalances.js) y profilesByEmail, así toda lectura del gasto
+  // usa la misma clave sin importar con qué mayúsculas se guardó el email
+  // original en trip.members/paid_by/split_with.
   const userMap = useMemo(() => {
     const m = {};
     members.forEach(email => {
       const e = normalizeEmail(email);
+      if (!e) return;
       const prof = memberProfiles.find(p => normalizeEmail(p.email) === e || p.user_email === e);
       // Nunca el email en crudo: display_name/username son obligatorios en
       // UserProfile, así que si no aparecen es que no se encontró el
       // perfil — se deja sin entrada y cada sitio que lee userMap decide su
       // propio texto de reserva (t('common.member')).
-      if (prof?.display_name || prof?.username) m[email] = prof.display_name || prof.username;
+      if (prof?.display_name || prof?.username) m[e] = prof.display_name || prof.username;
     });
     return m;
   }, [memberProfiles, members]);
@@ -1039,7 +1057,7 @@ export default function Expenses() {
       // Las liquidaciones notifican solo al acreedor (en handleSettle), no a todo el grupo
       const isSettlement = d?.is_settlement === true || (d?.description || '').startsWith('Liquidación:');
       if (isSettlement) return;
-      const others = (trip?.members || []).filter(e => e !== currentUser?.email);
+      const others = (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUser?.email));
       if (others.length > 0) {
         resolveUserIds(others).then(resolved => {
           resolved.forEach(({ userId }) => notify({
