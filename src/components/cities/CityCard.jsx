@@ -447,7 +447,9 @@ export default function CityCard({ city, daysCount, tripId }) {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
       <div className="relative aspect-[16/10] overflow-hidden">
-        <Link to={createPageUrl(`CityDetail?id=${city.id}&trip_id=${tripId}`)}>
+        {/* Antes iba a CityDetail (página vieja) — ahora abre Ruta con esta
+            ciudad concreta desplegada (ver forceOpenCityId en Cities.jsx). */}
+        <Link to={createPageUrl(`Cities?trip_id=${tripId}&city_id=${city.id}`)}>
           <img
             src={imageUrl}
             alt={city.name}
