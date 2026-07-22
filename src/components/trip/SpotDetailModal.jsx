@@ -2,13 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
+import { MapPin, X, Navigation, Clock, Trash2, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Compass, TrainFront, BusFront } from 'lucide-react';
+import { PlaneIcon } from '@/lib/icons';
 import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
 
+// Antes 'hotel' y las variantes de transporte (aeropuerto/tren/bus) no
+// tenían entrada aquí — el modal de detalle (el mismo que abre tanto Home
+// como Ruta al tocar un pin/fila) mostraba CirclePlus ("+") para esos
+// spots. Mismos iconos que TYPE_CONFIG (spotsHelpers.jsx).
 const SPOT_ICONS = {
   food:     Utensils,
   sight:    Landmark,
@@ -17,14 +22,21 @@ const SPOT_ICONS = {
   custom:   CirclePlus,
   restaurant: Utensils,
   museum:   Landmark,
+  hotel:    Hotel,
+  transport: Compass,
+  airport:  PlaneIcon,
+  train:    TrainFront,
+  bus:      BusFront,
 };
 const SPOT_COLORS = {
   food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
   activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
   custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
   museum: 'bg-violet-50 text-violet-600',
+  hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
+  airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
 };
-const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo' };
+const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo', hotel:'Hotel', transport:'Transporte', airport:'Aeropuerto', train:'Estación de tren', bus:'Estación de autobús' };
 
 
 export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
