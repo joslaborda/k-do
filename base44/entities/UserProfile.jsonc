@@ -110,6 +110,15 @@
       "type": "boolean",
       "default": false,
       "description": "Visibilidad pública por defecto de spots nuevos"
+    },
+    "terms_accepted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha/hora en que aceptó los Términos de Servicio y la Política de Privacidad — obligatorio antes de completar el registro (RGPD, consentimiento informado)"
+    },
+    "terms_version": {
+      "type": "string",
+      "description": "Versión de los Términos/Privacidad aceptada, para saber si hay que pedir re-aceptación cuando cambien"
     }
   },
   "required": [
