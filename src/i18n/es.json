@@ -105,7 +105,12 @@
       "usernameHint": "Letras, números y _ · mín. 3 caracteres",
       "usernameTaken": "Este @usuario ya está en uso, prueba con otro",
       "usernameAvailable": "¡Disponible!",
-      "fillAll": "Rellena todos los campos para continuar"
+      "fillAll": "Rellena todos los campos para continuar",
+      "termsPrefix": "He leído y acepto los",
+      "termsLabel": "Términos de servicio",
+      "termsAnd": "y la",
+      "privacyLabel": "Política de privacidad",
+      "termsRequired": "Tienes que aceptar los Términos y la Política de Privacidad para continuar"
     },
     "slide1": {
       "title": "Cuéntanos un\npoco sobre ti",
@@ -940,6 +945,8 @@
     "help": "Ayuda",
     "feedback": "Ayuda y sugerencias",
     "feedbackSub": "Reporta un problema o cuéntanos una idea",
+    "terms": "Términos de servicio",
+    "privacyPolicy": "Política de privacidad",
     "version": "Versión",
     "heading": "Configuración",
     "backProfile": "Perfil",

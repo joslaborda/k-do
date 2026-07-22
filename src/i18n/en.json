@@ -105,7 +105,12 @@
       "usernameHint": "Letters, numbers and _ · min. 3 characters",
       "usernameTaken": "This @username is already taken, try another one",
       "usernameAvailable": "Available!",
-      "fillAll": "Fill in all fields to continue"
+      "fillAll": "Fill in all fields to continue",
+      "termsPrefix": "I have read and accept the",
+      "termsLabel": "Terms of Service",
+      "termsAnd": "and the",
+      "privacyLabel": "Privacy Policy",
+      "termsRequired": "You need to accept the Terms and Privacy Policy to continue"
     },
     "slide1": {
       "title": "Tell us a bit\nabout yourself",
@@ -940,6 +945,8 @@
     "help": "Help",
     "feedback": "Help & feedback",
     "feedbackSub": "Report a problem or share an idea",
+    "terms": "Terms of service",
+    "privacyPolicy": "Privacy policy",
     "version": "Version",
     "heading": "Settings",
     "backProfile": "Profile",
