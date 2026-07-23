@@ -1204,6 +1204,7 @@
     "tripInvite": "invited you to a trip",
     "spotAdded": "added a spot",
     "spotTimeChanged": "changed the time to {{time}}",
+    "docTimeChanged": "changed the time to {{time}}",
     "new": "new notification",
     "joinTrip": "Join trip",
     "inviteFrom": "Invitation from",

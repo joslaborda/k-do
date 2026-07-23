@@ -1204,6 +1204,7 @@
     "tripInvite": "te invitó a un viaje",
     "spotAdded": "añadió un spot",
     "spotTimeChanged": "cambió la hora a {{time}}",
+    "docTimeChanged": "cambió la hora a {{time}}",
     "new": "nueva notificación",
     "joinTrip": "Unirme al viaje",
     "inviteFrom": "Invitación de",
