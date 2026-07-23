@@ -12,6 +12,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import { getCountryLabel } from '@/lib/countryConfig';
+import { normalizeEmail } from '@/lib/utils';
 
 export default function Invites() {
   const { t, i18n } = useTranslation();
@@ -98,7 +99,10 @@ export default function Invites() {
       const myProfArr = await base44.entities.UserProfile.filter({ email: acceptingEmail });
       const myProf = myProfArr[0] || null;
       const tripData = await base44.entities.Trip.get(tripId);
-      const others = (tripData?.members || []).filter(e => e !== acceptingEmail);
+      // Sin normalizar, un email de sesión con distinto casing al de
+      // trip.members hacía que este filtro no excluyera a quien acaba de
+      // aceptar — podía llegar a notificarse a sí mismo de su propia unión.
+      const others = (tripData?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(acceptingEmail));
       const resolved = await resolveUserIds(others);
       resolved.forEach(({ userId }) =>
         notify({ userId, type: 'member_joined', actor: myProf, tripId, tripName: tripData?.name })
@@ -174,7 +178,7 @@ export default function Invites() {
     if (!invite || !trip) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
-          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
             <X className="w-7 h-7 text-red-500" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">{t('invites.page.invalidTitle')}</h2>
@@ -195,7 +199,7 @@ export default function Invites() {
     if (isMember) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
-          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-950/30 flex items-center justify-center">
             <Check className="w-7 h-7 text-green-600" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">{t('invites.page.alreadyMemberTitle')}</h2>
@@ -237,7 +241,7 @@ export default function Invites() {
     if (invite._status !== 'pending') {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
-          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
             <X className="w-7 h-7 text-red-500" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">{t('invites.page.invalidTitle')}</h2>
@@ -259,7 +263,7 @@ export default function Invites() {
     if (emailMismatch) {
       return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 gap-4">
-          <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-950/30 flex items-center justify-center">
             <Mail className="w-7 h-7 text-amber-600" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">{t('invites.page.mismatchTitle')}</h2>
@@ -279,7 +283,7 @@ export default function Invites() {
         {/* Header Kōdo */}
         <div className="px-5 pt-14 pb-6 border-b border-border bg-background">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center">
               <Mail className="w-4 h-4 text-primary" />
             </div>
             <p className="text-xs text-muted-foreground">{t('invites.page.youHaveInvite')}</p>
@@ -316,7 +320,7 @@ export default function Invites() {
           </div>
 
           {!currentUser && (
-            <div className="bg-orange-50 border border-primary/20 rounded-2xl px-4 py-3">
+            <div className="bg-orange-50 dark:bg-orange-950/30 border border-primary/20 rounded-2xl px-4 py-3">
               <p className="text-xs text-primary font-medium">{t('invites.page.createAccountHint')}</p>
             </div>
           )}
@@ -374,7 +378,7 @@ export default function Invites() {
           <div className="flex flex-col items-center justify-center text-center px-6" style={{minHeight: 'calc(100vh - 120px)'}}>
             {/* Icono con acento naranja */}
             <div className="relative mb-5">
-              <div className="w-20 h-20 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-2xl bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40 flex items-center justify-center">
                 <Mail className="w-9 h-9 text-primary" />
               </div>
             </div>
@@ -387,19 +391,19 @@ export default function Invites() {
             {/* Pasos — qué esperar */}
             <div className="w-full space-y-2 text-left">
               <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
-                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">1</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t('invites.page.step1')}</p>
               </div>
               <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
-                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">2</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t('invites.page.step2')}</p>
               </div>
               <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
-                <div className="w-7 h-7 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold text-primary">3</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{t('invites.page.step3')}</p>
@@ -412,7 +416,7 @@ export default function Invites() {
             return (
               <div key={inv.id} className="bg-card border border-border rounded-2xl p-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">

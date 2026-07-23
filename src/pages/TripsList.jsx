@@ -81,14 +81,19 @@ export default function TripsList() {
       // Fetch trips created by user
       let myTrips = [];
       try { myTrips = await base44.entities.Trip.filter({ created_by: user.email }); } catch { hadError = true; }
-      // Fetch trips where user is a member — filtrado server-side con $elemMatch
+      // Fetch trips where user is a member — filtrado server-side con $elemMatch.
+      // trip.members está guardado en minúsculas; user.email tal cual viene
+      // del proveedor de auth no siempre lo está — antes esto usaba el email
+      // en crudo, así que un invitado (no el creador) con un email de
+      // distinto casing simplemente no veía ese viaje en "Mis viajes".
+      const myEmailNorm = normalizeEmail(user.email);
       let memberTrips = [];
       try {
         const all = await base44.entities.Trip.filter(
-          { members: { $elemMatch: { $eq: user.email } } },
+          { members: { $elemMatch: { $eq: myEmailNorm } } },
           '-created_date'
         );
-        memberTrips = all.filter(tr => tr.created_by !== user.email);
+        memberTrips = all.filter(tr => normalizeEmail(tr.created_by) !== myEmailNorm);
       } catch { hadError = true; }
       if (hadError) {
         toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });

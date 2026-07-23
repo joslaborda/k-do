@@ -317,7 +317,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
         myBalance > 0 ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/40' :
         'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/40'
       }`}>
-        <p className={`text-xs font-medium mb-2 ${iSettled ? 'text-muted-foreground' : myBalance > 0 ? 'text-green-800' : 'text-red-800'}`}>
+        <p className={`text-xs font-medium mb-2 ${iSettled ? 'text-muted-foreground' : myBalance > 0 ? 'text-green-800 dark:text-green-400' : 'text-red-800 dark:text-red-400'}`}>
           {t('expenses.balance.yourBalance')}
         </p>
         <p className={`text-3xl font-medium ${iSettled ? 'text-foreground' : myBalance > 0 ? 'text-green-700' : 'text-red-600'}`}>
@@ -734,7 +734,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
             <button onClick={onClose} className="flex-1 py-2.5 border border-border rounded-xl text-sm text-muted-foreground">{t('common.close')}</button>
             <button onClick={() => { onClose(); onEdit(expense); }}
               className="flex-1 py-2.5 bg-primary text-white rounded-full text-sm font-medium">
-              Editar
+              {t('common.edit')}
             </button>
           </div>
         </div>

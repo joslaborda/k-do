@@ -51,8 +51,8 @@ const CAT_TABS = [
 ];
 const VIS = {
   personal:       { tk:'documents.visibility.personal', Icon: Lock,  cls:'bg-secondary text-muted-foreground' },
-  shared:         { tk:'documents.visibility.group',    Icon: Users, cls:'bg-green-100 text-green-700'       },
-  selected_users: { tk:'documents.visibility.selected', Icon: User,  cls:'bg-blue-100 text-blue-700'         },
+  shared:         { tk:'documents.visibility.group',    Icon: Users, cls:'bg-green-100 dark:bg-green-950/30 text-green-700 dark:text-green-400'       },
+  selected_users: { tk:'documents.visibility.selected', Icon: User,  cls:'bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400'         },
 };
 
 // ── Doc row ───────────────────────────────────────────────────────────────────
@@ -99,7 +99,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
         <div className="flex items-center gap-1.5 shrink-0">
           {hasFile && (
             <button onClick={() => onView(ticket.file_url)}
-              className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center hover:bg-orange-100 transition-colors">
+              className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/40 flex items-center justify-center hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -407,6 +407,7 @@ export default function Documents() {
           </DialogHeader>
           <div className="px-5 py-4 overflow-y-auto flex-1">
             <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
+              currentUserEmail={currentUserEmail}
               minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
               onSave={(d) => createMutation.mutate(d)} onCancel={() => setAddOpen(false)} saving={createMutation.isPending}
               onView={(url) => { setEditDoc(null); setTimeout(() => setViewFile(url), 150); }} />
@@ -423,6 +424,7 @@ export default function Documents() {
           {editDoc && (
             <div className="px-5 py-4 overflow-y-auto flex-1">
               <DocumentForm cities={cities} itineraryDays={itineraryDays} members={members} profiles={profilesByEmail} tripCities={cities}
+                currentUserEmail={currentUserEmail}
                 initialData={editDoc}
                 minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
                 onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
@@ -441,7 +443,7 @@ export default function Documents() {
           <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
               <p className="text-sm font-medium text-foreground">{t('documents.deleteConfirm')}</p>

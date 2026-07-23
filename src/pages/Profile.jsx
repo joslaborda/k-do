@@ -12,6 +12,7 @@ import TripCard from '@/components/trip/TripCard';
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
+import { normalizeEmail } from '@/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -90,7 +91,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
       {showVisibility && (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
           spot.visibility === 'public'
-            ? 'bg-orange-50 text-primary border border-orange-200'
+            ? 'bg-orange-50 dark:bg-orange-950/30 text-primary border border-orange-200 dark:border-orange-900/50'
             : 'bg-secondary text-muted-foreground border border-border'
         }`}>
           {spot.visibility === 'public' ? t('profile.public') : t('profile.private')}
@@ -98,12 +99,12 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
       )}
       {onSave && !isSaved && (
         <button onClick={handleSaveClick} disabled={saving}
-          className="w-7 h-7 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0 hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:pointer-events-none">
+          className="w-7 h-7 rounded-full bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/50 flex items-center justify-center flex-shrink-0 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors disabled:opacity-50 disabled:pointer-events-none">
           <Plus className="w-3.5 h-3.5 text-primary" />
         </button>
       )}
       {onSave && isSaved && (
-        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/50 flex-shrink-0">
           {t('profile.savedBadge')}
         </span>
       )}
@@ -340,10 +341,13 @@ export default function Profile() {
   const { data: myTrips = [] } = useQuery({
     queryKey: ['myTrips', user?.id, user?.email],
     queryFn: async () => {
+      // trip.members está en minúsculas; user.email tal cual viene del auth
+      // no siempre lo está — sin normalizar, un invitado (no creador) con
+      // email de distinto casing no aparecía en esta lista de viajes.
       const [created, asMember] = await Promise.all([
         base44.entities.Trip.filter({ created_by: user.email }),
         base44.entities.Trip.filter(
-          { members: { $elemMatch: { $eq: user.email } } },
+          { members: { $elemMatch: { $eq: normalizeEmail(user.email) } } },
           '-created_date'
         ),
       ]);

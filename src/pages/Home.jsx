@@ -340,7 +340,7 @@ export default function Home() {
           <TodayTab trip={trip} cities={sortedCities} tripId={tripId} profiles={profiles} onInvite={() => setInviteOpen(true)} currentUserEmail={currentUserEmail} />
         )}
         {tab === 'manana' && (
-          <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} />
+          <TomorrowTab trip={trip} cities={sortedCities} tripId={tripId} currentUserEmail={currentUserEmail} profiles={profiles} />
         )}
 
         {tab === 'resumen' && (

@@ -107,7 +107,7 @@ const PLUG_IMAGES = {
 };
 
 function PlugIcon({ type }) {
-  const colors = { A:'bg-blue-50 text-blue-700', B:'bg-blue-50 text-blue-700', C:'bg-green-50 text-green-700', F:'bg-green-50 text-green-700', E:'bg-green-50 text-green-700', G:'bg-purple-50 text-purple-700', I:'bg-amber-50 text-amber-700', default:'bg-secondary text-muted-foreground' };
+  const colors = { A:'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400', B:'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400', C:'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400', F:'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400', E:'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400', G:'bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400', I:'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400', default:'bg-secondary text-muted-foreground' };
   const cls = colors[type] || colors.default;
   return (
     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${cls} text-xs font-semibold`}>
@@ -170,11 +170,11 @@ function RequirementsTab({ reqs, country, homeCountry, meta, skipVaccines = [], 
 
   let visaColor, visaIcon;
   if (visaNeeded === false) {
-    visaColor = 'bg-green-50 border-green-200'; visaIcon = <ShieldCheck className="w-5 h-5 text-green-600" />;
+    visaColor = 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-900/40'; visaIcon = <ShieldCheck className="w-5 h-5 text-green-600" />;
   } else if (visaType === 'evisa' || visaType === 'voa' || visaType === 'eta' || visaType === 'esta' || visaType === 'nzeta') {
-    visaColor = 'bg-amber-50 border-amber-200'; visaIcon = <ShieldAlert className="w-5 h-5 text-amber-500" />;
+    visaColor = 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/40'; visaIcon = <ShieldAlert className="w-5 h-5 text-amber-500" />;
   } else {
-    visaColor = 'bg-red-50 border-red-200'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />;
+    visaColor = 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/40'; visaIcon = <ShieldX className="w-5 h-5 text-red-500" />;
   }
 
   // Filtrar COVID-19 (no es requisito de viaje) y vacunas de rutina pediátrica
@@ -519,7 +519,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                         <cat.Icon size={15} color="#888" />
                         <span className="text-sm font-medium text-foreground">{t(cat.tk)}</span>
                         {essentialCount > 0 && (
-                          <span className="text-xs font-medium text-primary bg-orange-50 px-1.5 py-0.5 rounded-full">
+                          <span className="text-xs font-medium text-primary bg-orange-50 dark:bg-orange-950/30 px-1.5 py-0.5 rounded-full">
                             {t('utilities.packing.essentialCount', { count: essentialCount })}
                           </span>
                         )}
@@ -722,10 +722,10 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta, activ
   // loading/data handled inline below
 
   const numbers = data ? [
-    data.police && { label:t('utilities.emerg.police'), number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50' },
-    data.ambulance && data.ambulance !== data.police && { label:t('utilities.emerg.ambulance'), number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50' },
-    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:t('utilities.emerg.fire'), number:data.fire, Icon: Flame, color: 'text-primary', bg: 'bg-orange-50' },
-    data.emergency_general && !data.police && { label:t('utilities.emerg.general'), number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50' },
+    data.police && { label:t('utilities.emerg.police'), number:data.police, Icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+    data.ambulance && data.ambulance !== data.police && { label:t('utilities.emerg.ambulance'), number:data.ambulance, Icon: Cross, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/30' },
+    data.fire && data.fire !== data.police && data.fire !== data.ambulance && { label:t('utilities.emerg.fire'), number:data.fire, Icon: Flame, color: 'text-primary', bg: 'bg-orange-50 dark:bg-orange-950/30' },
+    data.emergency_general && !data.police && { label:t('utilities.emerg.general'), number:data.emergency_general, Icon: ShieldAlert, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30' },
   ].filter(Boolean) : [];
 
   return (
@@ -865,7 +865,7 @@ function EmergencyContent({ country, homeCountry, secondNationality, meta, activ
             {(showAllConsulates ? consulates : consulates.slice(0, 3)).map((c, i) => {
               const isHere = activeCityName && (c.c || '').toLowerCase() === activeCityName.trim().toLowerCase();
               return (
-                <div key={`${c.c}-${i}`} className={`rounded-xl p-3 ${isHere ? 'bg-orange-50 border border-orange-100' : 'bg-secondary/40'}`}>
+                <div key={`${c.c}-${i}`} className={`rounded-xl p-3 ${isHere ? 'bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40' : 'bg-secondary/40'}`}>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-foreground">{c.c}</p>
                     {isHere && (

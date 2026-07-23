@@ -150,17 +150,25 @@ export default function Photos() {
   });
 
   const handleFiles = async (e) => {
-    const files = Array.from(e.target.files || []).slice(0, 10);
+    const allFiles = Array.from(e.target.files || []);
+    const files = allFiles.slice(0, 10);
     if (!files.length) return;
     e.target.value = '';
+    if (allFiles.length > 10) {
+      toast({ title: t('photos.tooManyFilesTitle'), description: t('photos.tooManyFilesDesc', { count: 10 }) });
+    }
     setUploading(true);
     uploadMutation.mutate(files);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).slice(0, 10);
+    const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    const files = allFiles.slice(0, 10);
     if (!files.length) return;
+    if (allFiles.length > 10) {
+      toast({ title: t('photos.tooManyFilesTitle'), description: t('photos.tooManyFilesDesc', { count: 10 }) });
+    }
     setUploading(true);
     uploadMutation.mutate(files);
   };
@@ -415,13 +423,3 @@ async function getExifDate(file) {
   return null;
 }
 
-async function downloadAll(photos) {
-  for (const photo of photos) {
-    const a = document.createElement('a');
-    a.href = photo.file_url;
-    a.download = photo.file_name || 'foto.jpg';
-    a.target = '_blank';
-    a.click();
-    await new Promise(r => setTimeout(r, 300));
-  }
-}

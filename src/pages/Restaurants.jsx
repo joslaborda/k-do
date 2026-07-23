@@ -182,14 +182,19 @@ async function loadLeaflet() {
 }
 
 // ── Type config ───────────────────────────────────────────────────────────────
+// labelKey (clave i18n, reutiliza spots.types.* que ya tenía el mismo texto)
+// en vez de label fijo en español — este mapa es un const de módulo, sin
+// acceso a t(), así que se traduce en el punto de uso. Colores con dark:
+// añadido — antes no tenían variante y quedaban demasiado claros en modo
+// oscuro (chips de tipo en CreateSpotSheet y PlaceResultCard).
 const TYPE_CONFIG = {
-  food:      { label:'Comer',      Icon: Utensils,    color:'bg-orange-100 text-primary' },
-  sight:     { label:'Cultura',    Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
-  activity:  { label:'Actividad',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
-  shopping:  { label:'Compras',    Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
-  transport: { label:'Transporte', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
-  hotel:     { label:'Hotel',      Icon: Hotel,       color:'bg-indigo-100 text-indigo-700' },
-  custom:    { label:'Otro',       Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
+  food:      { labelKey:'spots.types.food',      Icon: Utensils,    color:'bg-orange-100 dark:bg-orange-950/30 text-primary' },
+  sight:     { labelKey:'spots.types.sight',      Icon: Landmark,    color:'bg-violet-100 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400' },
+  activity:  { labelKey:'spots.types.activity',   Icon: Ticket,      color:'bg-green-100 dark:bg-green-950/30 text-green-600 dark:text-green-400' },
+  shopping:  { labelKey:'spots.types.shopping',   Icon: ShoppingBag, color:'bg-blue-100 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400' },
+  transport: { labelKey:'spots.types.transport',  Icon: Compass,     color:'bg-secondary text-muted-foreground' },
+  hotel:     { labelKey:'spots.types.hotel',      Icon: Hotel,       color:'bg-indigo-100 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400' },
+  custom:    { labelKey:'spots.types.custom',     Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 
 // ── Country-specific special tags ─────────────────────────────────────────────
@@ -529,7 +534,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
                   className={`text-sm px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
                     type === val ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
                   }`}>
-                  {tc.Icon && <tc.Icon size={13} />} {tc.label}
+                  {tc.Icon && <tc.Icon size={13} />} {t(tc.labelKey)}
                 </button>
               ))}
             </div>
@@ -589,12 +594,12 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
   const tc = TYPE_CONFIG[place.type] || TYPE_CONFIG.custom;
   return (
     <div className={`bg-card rounded-2xl border flex overflow-hidden transition-all ${isDuplicate ? 'border-amber-200 opacity-60' : 'border-border hover:shadow-sm'}`}>
-      <div className="w-12 bg-orange-50 flex items-center justify-center flex-shrink-0">
+      <div className="w-12 bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${tc.color}`}>{tc.Icon && <tc.Icon size={16} />}</div>
       </div>
       <div className="flex-1 min-w-0 p-3">
         <p className="font-semibold text-sm text-foreground leading-tight">{place.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{tc.label}{place.address ? ' · ' + place.address : ''}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{t(tc.labelKey)}{place.address ? ' · ' + place.address : ''}</p>
         {isDuplicate ? (
           <p className="text-xs text-amber-600 mt-1.5 font-medium">{t('spots.inYourList')}</p>
         ) : (
@@ -774,8 +779,13 @@ export default function Restaurants() {
     queryFn: async () => {
       const members = trip?.members || [];
       if (!members.length) return [];
+      // members ya está normalizado; p.email/p.user_email deberían estarlo
+      // también, pero un .includes() en crudo dependía de que ambos lados
+      // coincidieran exactamente — normalizar por seguridad evita que un
+      // perfil legacy con distinto casing se quede sin avatar/nombre aquí.
+      const membersNorm = members.map(normalizeEmail);
       const all = await base44.entities.UserProfile.list();
-      return all.filter(p => members.includes(p.email) || members.includes(p.user_email));
+      return all.filter(p => membersNorm.includes(normalizeEmail(p.email)) || membersNorm.includes(normalizeEmail(p.user_email)));
     },
     enabled: !!trip?.members?.length,
     staleTime: 60000,

@@ -213,7 +213,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
 }
 
 // ── Day expanded content ──────────────────────────────────────────────────────
-function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId }) {
+function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomorrow_, isEmpty, onReorderSpots, queryClient, trip, cities, itineraryDays, profiles, userId, currentUserEmail }) {
   const { t } = useTranslation();
   const [editingSpot, setEditingSpot] = useState(null);   // spot object — view+edit modal
   const [viewingDoc,  setViewingDoc]  = useState(null);   // doc object — view modal
@@ -655,6 +655,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
                 members={trip?.members || []}
                 profiles={profiles || []}
                 tripCities={cities || []}
+                currentUserEmail={currentUserEmail}
                 initialData={{ date: dayDate }}
                 minDate={trip?.start_date || undefined}
                 maxDate={trip?.end_date || undefined}
@@ -677,6 +678,9 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
           onRemove={handleSpotRemove}
           queryClient={queryClient}
           tripId={tripId}
+          trip={trip}
+          currentUserEmail={currentUserEmail}
+          profiles={profiles}
         />
       )}
 
@@ -706,6 +710,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
                 members={trip?.members || []}
                 profiles={profiles || []}
                 tripCities={cities || []}
+                currentUserEmail={currentUserEmail}
                 onSave={handleDocSave}
                 onCancel={() => setEditingDoc(null)}
                 onDelete={() => setDeleteDoc(editingDoc)}
@@ -740,7 +745,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 }
 
 // ── Day row ───────────────────────────────────────────────────────────────────
-function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen, trip, cities, itineraryDays, profiles, userId }) {
+function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isTomorrow_, queryClient, defaultOpen, trip, cities, itineraryDays, profiles, userId, currentUserEmail }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(defaultOpen);
 
@@ -847,6 +852,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
           itineraryDays={itineraryDays}
           profiles={profiles}
           userId={userId}
+          currentUserEmail={currentUserEmail}
         />
       )}
       </div>
@@ -855,7 +861,7 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
 }
 
 // ── City block ────────────────────────────────────────────────────────────────
-function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId, forceOpenCityId }) {
+function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId, isActive, isPast, queryClient, trip, cities, profiles, userId, forceOpenCityId, currentUserEmail }) {
   const { t } = useTranslation();
   // Al venir de "Abrir <ciudad>" en Home (ver DayCard.jsx), llega el id
   // exacto de ESTA estancia — si la misma ciudad aparece dos veces en el
@@ -955,6 +961,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
               itineraryDays={itineraryDays}
               profiles={profiles}
               userId={userId}
+              currentUserEmail={currentUserEmail}
             />
           ))}
         </div>
@@ -1179,6 +1186,7 @@ export default function Cities() {
                   itineraryDays={itineraryDays}
                   profiles={profiles}
                   userId={userId}
+                  currentUserEmail={currentUserEmail}
                 />
               ));
             })()}
@@ -1206,6 +1214,7 @@ export default function Cities() {
                   cities={cities}
                   profiles={profiles}
                   userId={userId}
+                  currentUserEmail={currentUserEmail}
                   forceOpenCityId={focusCityId}
                 />
               );
