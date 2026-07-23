@@ -358,7 +358,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
         {/* Input bar */}
         {/* Offline banner — reading works, sending doesn't */}
         {!navigator.onLine && (
-          <div className="flex items-center gap-2 mx-3 mb-2 bg-amber-50 border border-amber-200 rounded-2xl px-3 py-2.5">
+          <div className="flex items-center gap-2 mx-3 mb-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-2xl px-3 py-2.5">
             <WifiOff className="w-3.5 h-3.5 text-amber-800 flex-shrink-0" />
             <p className="text-xs text-amber-800 font-medium">{t('translator.offline')}</p>
           </div>

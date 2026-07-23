@@ -42,12 +42,12 @@ export const SPOT_ICONS = {
 };
 
 export const SPOT_COLORS = {
-  food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
-  activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
-  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
-  museum: 'bg-violet-50 text-violet-600',
-  hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
-  airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
+  food: 'bg-orange-50 dark:bg-orange-950/30 text-primary', sight: 'bg-violet-50 dark:bg-violet-950/30 text-violet-600',
+  activity: 'bg-green-50 dark:bg-green-950/30 text-green-600', shopping: 'bg-blue-50 dark:bg-blue-950/30 text-blue-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 dark:bg-orange-950/30 text-primary',
+  museum: 'bg-violet-50 dark:bg-violet-950/30 text-violet-600',
+  hotel: 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
+  airport: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700', train: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700', bus: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700',
 };
 
 

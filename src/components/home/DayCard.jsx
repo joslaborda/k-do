@@ -236,9 +236,14 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
   // la entidad (eso solo pasa desde Spots/Restaurants.jsx, que es la vista de
   // gestión de spots).
   const handleRemoveSpot = async (spot) => {
-    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
-    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-    setSelected(null);
+    try {
+      await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      setSelected(null);
+    } catch (e) {
+      // Antes sin try/catch: un fallo dejaba la ficha abierta sin decir nada.
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
   };
 
   // Antes ItemDetailSheet no podía borrar nada — ni documento ni nota — a
@@ -246,22 +251,26 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
   // son su propia entidad: viven serializadas dentro de ItineraryDay.content,
   // así que borrar una nota es reescribir esa lista sin ella.
   const handleDeleteItem = async (item) => {
-    if (item._kind === 'doc') {
-      await base44.entities.Ticket.delete(item.id);
-      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
-    } else if (item._kind === 'note') {
-      const lastDash = item.id.lastIndexOf('-');
-      const dayId = item.id.slice(0, lastDash);
-      const idx = parseInt(item.id.slice(lastDash + 1), 10);
-      const day = (itineraryDays || []).find(d => d.id === dayId);
-      if (day) {
-        const clean = parseNotesContent(day.content).filter(n => n.text?.trim());
-        clean.splice(idx, 1);
-        await base44.entities.ItineraryDay.update(dayId, { content: JSON.stringify(clean) });
-        queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+    try {
+      if (item._kind === 'doc') {
+        await base44.entities.Ticket.delete(item.id);
+        queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      } else if (item._kind === 'note') {
+        const lastDash = item.id.lastIndexOf('-');
+        const dayId = item.id.slice(0, lastDash);
+        const idx = parseInt(item.id.slice(lastDash + 1), 10);
+        const day = (itineraryDays || []).find(d => d.id === dayId);
+        if (day) {
+          const clean = parseNotesContent(day.content).filter(n => n.text?.trim());
+          clean.splice(idx, 1);
+          await base44.entities.ItineraryDay.update(dayId, { content: JSON.stringify(clean) });
+          queryClient.invalidateQueries({ queryKey: ['itineraryDays', tripId] });
+        }
       }
+      setSelected(null);
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
     }
-    setSelected(null);
   };
 
   return (

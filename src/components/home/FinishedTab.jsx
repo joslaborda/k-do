@@ -65,7 +65,7 @@ function TravelersSheet({ open, onClose, trip, profilesByEmail, currentUserEmail
                 </div>
                 {isAdmin && (
                   <span className="text-xs bg-orange-50 text-primary border border-orange-200 px-2 py-0.5 rounded-full flex-shrink-0">
-                    Admin
+                    {t('common.admin')}
                   </span>
                 )}
               </div>
@@ -81,7 +81,7 @@ function TravelersSheet({ open, onClose, trip, profilesByEmail, currentUserEmail
 
 export default function FinishedTab({ trip, cities, expenses, spots, tripId, currentUserEmail, profiles = [] }) {
   const [showTravelers, setShowTravelers] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const allTripSpots = spots;
   const meNorm = normalizeEmail(currentUserEmail);
 
@@ -132,8 +132,9 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
     const countries = [...allCountries];
     if (countries.length === 0) return trip?.destination || '';
     if (countries.length === 1) return countries[0];
-    if (countries.length === 2) return countries.join(' y ');
-    return countries.slice(0, -1).join(', ') + ' y ' + countries[countries.length - 1];
+    // Intl.ListFormat pone la conjunción correcta según idioma ("y" en
+    // español, "and" en inglés) en vez de la "y" fija que había antes.
+    return new Intl.ListFormat(i18n.language, { type: 'conjunction' }).format(countries);
   })();
 
   // Avatares con overflow
