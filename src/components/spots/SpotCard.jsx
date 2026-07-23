@@ -9,6 +9,7 @@ import { getMapsUrl } from './spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { checkUpload } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
+import { normalizeEmail } from '@/lib/utils';
 
 const TYPE_CONFIG = {
   food:      { tk: 'spots.types.food',      Icon: Utensils,   color: 'bg-orange-100 text-primary' },
@@ -315,7 +316,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
   });
 
   const tc = TYPE_CONFIG[spot.type] || TYPE_CONFIG.custom;
-  const canDelete = spot.created_by === currentUserEmail;
+  const canDelete = normalizeEmail(spot.created_by) === normalizeEmail(currentUserEmail);
 
   const updateMutation = useMutation({
     mutationFn: data => base44.entities.Spot.update(spot.id, data),
@@ -396,7 +397,7 @@ export default function SpotCard({ spot, days = [], currentUserEmail, cityId, tr
           {/* Maps */}
           <a href={getMapsUrl(spot)} target="_blank" rel="noopener noreferrer"
             className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors">
-            <Navigation className="w-3.5 h-3.5" />Maps
+            <Navigation className="w-3.5 h-3.5" />{t('spots.cardMaps')}
           </a>
 
           {/* Visited toggle */}

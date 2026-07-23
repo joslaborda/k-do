@@ -10,6 +10,7 @@ import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
+import { normalizeEmail } from '@/lib/utils';
 
 export default
 function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCities, userId, onNotify, currentUserEmail }) {
@@ -32,7 +33,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   // seguía sin aparecer el botón aunque fueran del usuario. Un spot sin
   // autor no tiene a nadie a quien pertenecerle más que al viaje: si el
   // usuario actual puede verlo (es miembro del viaje), puede borrarlo.
-  const canDelete = spot?.created_by === currentUserEmail || !spot?.created_by;
+  const canDelete = normalizeEmail(spot?.created_by) === normalizeEmail(currentUserEmail) || !spot?.created_by;
   const { isLiked, count: likeCount, toggle: toggleLike } = useLikeSimple(spot?.id, userId, spot?.created_by_user_id);
   const isReal = spot?.id && !String(spot?.id || '').startsWith('seed_');
   const { data: comments = [] } = useQuery({
