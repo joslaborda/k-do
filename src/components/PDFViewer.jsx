@@ -98,7 +98,13 @@ export default function PDFViewer({ fileUrl, onClose }) {
   if (!fileUrl) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'hsl(var(--background))' }}>
+    /* El contenido (barras negras translúcidas, texto blanco a varias
+       opacidades, sombra del canvas) está diseñado como un "lightbox" sobre
+       fondo oscuro fijo, no sobre el token de tema — antes usaba
+       hsl(var(--background)), que en modo claro es un fondo casi blanco, y
+       los textos blancos translúcidos (cargando/error/sin vista previa)
+       quedaban casi invisibles encima. */
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#141414' }}>
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ background: 'rgba(0,0,0,.5)' }}>

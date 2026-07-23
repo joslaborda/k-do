@@ -234,7 +234,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
               onClick={() => setSelectedDay(i)}
               className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-colors ${
                 isSelected
-                  ? 'bg-orange-50 border-primary'
+                  ? 'bg-orange-50 dark:bg-orange-950/30 border-primary'
                   : 'bg-secondary/40 border-transparent hover:border-border'
               }`}
             >
@@ -257,7 +257,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
       {sel && (
         <div className="px-3 py-3 border-b border-border bg-secondary/20">
           <p className="text-xs font-medium text-foreground mb-2.5">
-            {selIsToday ? t('cities.day.today') : fmtDay(sel.date)}, {fmtDate(sel.date)}
+            {selIsToday ? t('cities.day.today') : fmtDay(sel.date, i18n.language)}, {fmtDate(sel.date, i18n.language)}
             {sel.label ? ` · ${sel.label}` : ''}
           </p>
 
