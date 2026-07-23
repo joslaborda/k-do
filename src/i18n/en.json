@@ -88,6 +88,42 @@
     "help2": "Contact the app administrator for access",
     "help3": "Try logging out and back in again"
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "bodyPrefix": "The page",
+    "bodySuffix": "could not be found in this application.",
+    "adminNoteTitle": "Admin Note",
+    "adminNoteBody": "This could mean that the AI hasn't implemented this page yet. Ask it to implement it in the chat.",
+    "goHome": "Go Home"
+  },
+  "spotDetail": {
+    "types": {
+      "food": "Food",
+      "sight": "Attraction",
+      "activity": "Activity",
+      "shopping": "Shopping",
+      "custom": "Custom",
+      "restaurant": "Restaurant",
+      "museum": "Museum",
+      "hotel": "Hotel",
+      "transport": "Transport",
+      "airport": "Airport",
+      "train": "Train station",
+      "bus": "Bus station"
+    }
+  },
+  "darkMode": {
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "syncIndicator": {
+    "offline": "Offline mode",
+    "synced": "Synced data: {{count}} sections",
+    "syncing": "Syncing...",
+    "updatingData": "Updating data",
+    "synced2": "Synced",
+    "allUpToDate": "All data is up to date"
+  },
   "language": {
     "select": "Choose your language",
     "subtitle": "You can change this later in settings",
@@ -495,12 +531,15 @@
       "descRequiredDesc": "Add a description to the expense.",
       "payerRequired": "Payer required",
       "payerRequiredDesc": "Indicate who paid the expense.",
-      "pickSomeone": "Select at least one person"
+      "pickSomeone": "Select at least one person",
+      "soloHint": "This expense is just for you. It doesn't affect the group's balances."
     },
     "fx": {
       "unavailableTitle": "No exchange rate",
       "unavailableDesc": "Couldn't convert {{from}} → {{to}}. The amount is saved in {{from}} unconverted and won't add up in the balances.",
       "unavailableRetry": "Couldn't convert {{from}} → {{to}}. Check your connection.",
+      "approximateTitle": "Approximate exchange rate",
+      "approximateDesc": "We couldn't find the historical rate for that date, so today's rate was used as an approximation.",
       "notConverted": "Not converted"
     },
     "updateError": "Couldn't update the expense",
@@ -531,7 +570,18 @@
     "embassyAppsSeeMore": "See under Emergency",
     "daysAgo": "{{count}} days ago",
     "departed": "Departed {{count}} days ago",
-    "verify": "Verify"
+    "verify": "Verify",
+    "firstStop": "First stop",
+    "noneUploaded": "None uploaded",
+    "uploadedCount_one": "{{count}} uploaded",
+    "uploadedCount_other": "{{count}} uploaded",
+    "passportOf": "{{country}} passport",
+    "groupVisas": "Visas",
+    "groupPlug": "Plug",
+    "groupCurrency": "Currency",
+    "groupTips": "Tips",
+    "holidaysInTrip": "Holidays during your trip",
+    "travelers": "Travelers"
   },
   "home": {
     "tripSettings": "Settings",
@@ -1377,6 +1427,10 @@
     "min": "Low",
     "rain": "Rain",
     "hourly": "Hourly",
+    "uvLow": "Low",
+    "uvModerate": "Moderate",
+    "uvHigh": "High",
+    "uvVeryHigh": "Very high",
     "wmo": {
       "variable": "Variable",
       "clear": "Clear",

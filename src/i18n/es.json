@@ -88,6 +88,42 @@
     "help2": "Contactar con el administrador para solicitar acceso",
     "help3": "Cerrar sesión y volver a entrar"
   },
+  "notFound": {
+    "title": "Página no encontrada",
+    "bodyPrefix": "La página",
+    "bodySuffix": "no se encontró en esta aplicación.",
+    "adminNoteTitle": "Nota para administradores",
+    "adminNoteBody": "Puede que la IA todavía no haya implementado esta página. Pídeselo en el chat.",
+    "goHome": "Ir al inicio"
+  },
+  "spotDetail": {
+    "types": {
+      "food": "Comida",
+      "sight": "Atracción",
+      "activity": "Actividad",
+      "shopping": "Shopping",
+      "custom": "Personalizado",
+      "restaurant": "Restaurante",
+      "museum": "Museo",
+      "hotel": "Hotel",
+      "transport": "Transporte",
+      "airport": "Aeropuerto",
+      "train": "Estación de tren",
+      "bus": "Estación de autobús"
+    }
+  },
+  "darkMode": {
+    "switchToLight": "Cambiar a modo claro",
+    "switchToDark": "Cambiar a modo oscuro"
+  },
+  "syncIndicator": {
+    "offline": "Modo offline",
+    "synced": "Datos sincronizados: {{count}} secciones",
+    "syncing": "Sincronizando...",
+    "updatingData": "Actualizando datos",
+    "synced2": "Sincronizado",
+    "allUpToDate": "Todos los datos actualizados"
+  },
   "language": {
     "select": "Elige tu idioma",
     "subtitle": "Puedes cambiarlo después en ajustes",
@@ -495,12 +531,15 @@
       "descRequiredDesc": "Añade una descripción al gasto.",
       "payerRequired": "Pagador requerido",
       "payerRequiredDesc": "Indica quién pagó el gasto.",
-      "pickSomeone": "Selecciona al menos una persona"
+      "pickSomeone": "Selecciona al menos una persona",
+      "soloHint": "Este gasto es solo para ti. No afecta a los balances del grupo."
     },
     "fx": {
       "unavailableTitle": "Sin tipo de cambio",
       "unavailableDesc": "No se pudo convertir {{from}} → {{to}}. El importe se guarda en {{from}} sin convertir y no cuadrará en los balances.",
       "unavailableRetry": "No se pudo convertir {{from}} → {{to}}. Revisa tu conexión.",
+      "approximateTitle": "Tipo de cambio aproximado",
+      "approximateDesc": "No encontramos el tipo de cambio histórico de esa fecha, así que usamos el de hoy como aproximación.",
       "notConverted": "Sin convertir"
     },
     "updateError": "Error al actualizar el gasto",
@@ -531,7 +570,18 @@
     "embassyAppsSeeMore": "Ver en Emergencias",
     "daysAgo": "Hace {{count}} días",
     "departed": "Salida hace {{count}} días",
-    "verify": "Verificar"
+    "verify": "Verificar",
+    "firstStop": "Primera parada",
+    "noneUploaded": "Ninguno subido",
+    "uploadedCount_one": "{{count}} subido",
+    "uploadedCount_other": "{{count}} subidos",
+    "passportOf": "pasaporte de {{country}}",
+    "groupVisas": "Visados",
+    "groupPlug": "Enchufe",
+    "groupCurrency": "Divisa",
+    "groupTips": "Consejos",
+    "holidaysInTrip": "Festivos en tu viaje",
+    "travelers": "Viajeros"
   },
   "home": {
     "tripSettings": "Ajustes",
@@ -1377,6 +1427,10 @@
     "min": "Mínima",
     "rain": "Lluvia",
     "hourly": "Por hora",
+    "uvLow": "Bajo",
+    "uvModerate": "Moderado",
+    "uvHigh": "Alto",
+    "uvVeryHigh": "Muy alto",
     "wmo": {
       "variable": "Variable",
       "clear": "Despejado",
