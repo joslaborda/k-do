@@ -132,7 +132,7 @@ function ResultCard({ original, translated, fromLang, toLang, onClear, onSave })
             {onSave && (
               <button
                 onClick={onSave}
-                className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-full border border-orange-200 bg-orange-50 transition-colors ml-auto"
+                className="flex items-center gap-1.5 text-xs text-primary px-3 py-1.5 rounded-full border border-orange-200 dark:border-orange-900/40 bg-orange-50 dark:bg-orange-950/30 transition-colors ml-auto"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
                 {t('common.save')}
@@ -297,7 +297,7 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
           </>
         ) : (
           <>
-            <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                 <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
                 <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
@@ -311,9 +311,9 @@ function VozTab({ fromLang, toLang, onSaveToHistory }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2">
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-2xl px-4 py-3 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -394,9 +394,9 @@ function TextoTab({ fromLang, toLang, onSaveToHistory }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-2">
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-2xl px-4 py-3 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -578,18 +578,18 @@ function TranslatorContent({ tripId, inPage = false }) {
   return (
     <>
       {isSameLang && !dismissed && (
-        <div className={`${inPage ? 'mt-4' : 'mt-5'} bg-green-50 border border-green-200 rounded-2xl p-4`}>
+        <div className={`${inPage ? 'mt-4' : 'mt-5'} bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/40 rounded-2xl p-4`}>
           <div className="flex items-start gap-3">
-            
+
             <div className="flex-1">
-              <p className="text-sm font-medium text-green-900">{t('translator.sameLang.title')}</p>
-              <p className="text-sm text-green-700 mt-1 leading-relaxed">
+              <p className="text-sm font-medium text-green-900 dark:text-green-300">{t('translator.sameLang.title')}</p>
+              <p className="text-sm text-green-700 dark:text-green-400 mt-1 leading-relaxed">
                 {t('translator.sameLang.body', { flag: meta.flag, country: getCountryLabel(countryRaw, i18n.language), language: getLanguageLabel(meta.languageCode, i18n.language) })}
               </p>
             </div>
             <button
               onClick={() => setDismissed(true)}
-              className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 hover:bg-green-200 transition-colors"
+              className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0 hover:bg-green-200 dark:hover:bg-green-900/60 transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -679,9 +679,9 @@ export default function Translator() {
       <div className="max-w-3xl mx-auto px-5 pb-24">
         {/* Offline banner */}
         {!navigator.onLine && (
-          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4">
-            <WifiOff className="w-4 h-4 text-amber-800 flex-shrink-0" />
-            <p className="text-sm text-amber-800 font-medium">{t('translator.offline')}</p>
+          <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-2xl px-4 py-3 mb-4">
+            <WifiOff className="w-4 h-4 text-amber-800 dark:text-amber-400 flex-shrink-0" />
+            <p className="text-sm text-amber-800 dark:text-amber-400 font-medium">{t('translator.offline')}</p>
           </div>
         )}
         <TranslatorContent tripId={tripId} inPage={true} />

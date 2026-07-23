@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 import FeedbackModal from '@/components/settings/FeedbackModal';
 import { toast } from '@/components/ui/use-toast';
+import { normalizeEmail } from '@/lib/utils';
+import { checkUpload } from '@/lib/uploadLimits';
 
 // ── Language Switcher ──────────────────────────────────────────────────────────
 function LanguageSwitcher() {
@@ -220,10 +222,16 @@ function DeleteAccountRow({ user, profile }) {
       // t('common.member') cuando no encuentra perfil, así que se ve como
       // "Miembro" en vez de mostrar nada raro.
       const anonEmail = `deleted-${user.id}@kodo.invalid`;
+      // trip.members/paid_by/etc. están normalizados en minúsculas, pero
+      // user.email (tal cual viene del proveedor de auth) no siempre lo
+      // está — sin esto, un email con mayúsculas distintas hacía que este
+      // filtro no encontrara ningún viaje y el resto de la limpieza se
+      // saltara en silencio, aunque el perfil se borrara igualmente.
+      const myEmail = normalizeEmail(user.email);
 
       // 1. Todavía como miembro del viaje (con permisos RLS intactos):
       //    anonimizar su identidad en lo que se comparte con el grupo.
-      const trips = await base44.entities.Trip.filter({ members: { $elemMatch: { $eq: user.email } } });
+      const trips = await base44.entities.Trip.filter({ members: { $elemMatch: { $eq: myEmail } } });
 
       await Promise.all(trips.map(async trip => {
         const tripId = trip.id;
@@ -231,17 +239,18 @@ function DeleteAccountRow({ user, profile }) {
         // Gastos donde pagó o participó
         const expenses = await base44.entities.Expense.filter({ trip_id: tripId });
         await Promise.all(expenses.map(async e => {
-          const touchesUser = e.paid_by === user.email
-            || (e.split_with || []).includes(user.email)
-            || Object.keys(e.amounts_by_user || {}).includes(user.email);
+          const touchesUser = normalizeEmail(e.paid_by) === myEmail
+            || (e.split_with || []).some(em => normalizeEmail(em) === myEmail)
+            || Object.keys(e.amounts_by_user || {}).some(em => normalizeEmail(em) === myEmail);
           if (!touchesUser) return;
           const patch = {};
-          if (e.paid_by === user.email) patch.paid_by = anonEmail;
-          if ((e.split_with || []).includes(user.email)) {
-            patch.split_with = e.split_with.map(em => em === user.email ? anonEmail : em);
+          if (normalizeEmail(e.paid_by) === myEmail) patch.paid_by = anonEmail;
+          if ((e.split_with || []).some(em => normalizeEmail(em) === myEmail)) {
+            patch.split_with = e.split_with.map(em => normalizeEmail(em) === myEmail ? anonEmail : em);
           }
-          if (e.amounts_by_user && Object.keys(e.amounts_by_user).includes(user.email)) {
-            const { [user.email]: myAmt, ...rest } = e.amounts_by_user;
+          const amtKey = Object.keys(e.amounts_by_user || {}).find(em => normalizeEmail(em) === myEmail);
+          if (amtKey) {
+            const { [amtKey]: myAmt, ...rest } = e.amounts_by_user;
             patch.amounts_by_user = { ...rest, [anonEmail]: myAmt };
           }
           await base44.entities.Expense.update(e.id, patch);
@@ -250,7 +259,7 @@ function DeleteAccountRow({ user, profile }) {
         // Spots: si son personales (solo él los veía) no le sirven a nadie
         // más — se borran. Si son del grupo (trip_members/selected_users/
         // public) se conservan pero se anonimiza quién los creó.
-        const spots = await base44.entities.Spot.filter({ trip_id: tripId, created_by: user.email });
+        const spots = await base44.entities.Spot.filter({ trip_id: tripId, created_by: myEmail });
         await Promise.all(spots.map(async s => {
           if (s.visibility === 'personal') {
             await base44.entities.Spot.delete(s.id);
@@ -309,9 +318,10 @@ function DeleteAccountRow({ user, profile }) {
       //    todo lo anterior, por eso tiene que ir DESPUÉS de anonimizar/
       //    borrar arriba y no antes.
       await Promise.all(trips.map(async trip => {
-        const newMembers = (trip.members || []).filter(e => e !== user.email);
+        const newMembers = (trip.members || []).filter(e => normalizeEmail(e) !== myEmail);
         const newRoles = { ...(trip.roles || {}) };
-        delete newRoles[user.email];
+        const roleKey = Object.keys(newRoles).find(em => normalizeEmail(em) === myEmail);
+        if (roleKey) delete newRoles[roleKey];
         await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
         await syncTripMembers(trip.id, newMembers);
       }));
@@ -422,6 +432,19 @@ export default function Settings() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const handleAvatarUpload = async (file) => {
     if (!file || !profile || uploadingAvatar) return;
+    // Antes esto subía cualquier archivo sin comprobar tamaño/tipo — una
+    // foto de galería moderna (o un vídeo elegido por error) podía quedarse
+    // subiendo un buen rato sin que el límite declarado en uploadLimits.js
+    // se aplicara realmente aquí.
+    const chk = checkUpload(file);
+    if (!chk.ok) {
+      toast({
+        title: chk.reason === 'size' ? t('upload.tooLarge') : t('upload.notImage'),
+        description: chk.reason === 'size' ? t('upload.maxMb', { mb: chk.maxMb }) : undefined,
+        variant: 'destructive',
+      });
+      return;
+    }
     setUploadingAvatar(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });

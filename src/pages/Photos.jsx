@@ -14,6 +14,7 @@ import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
 import { checkUpload } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
+import { normalizeEmail } from '@/lib/utils';
 
 function groupByDate(photos) {
   const groups = {};
@@ -66,9 +67,13 @@ export default function Photos() {
   const notifyMembers = async (count) => {
     try {
       const members = trip?.members || [];
-      const others = members.filter(e => e !== user.email);
+      // trip.members está normalizado en minúsculas; user.email tal cual
+      // viene del proveedor de auth no siempre lo está — sin normalizar
+      // aquí, resolveUserIds() no encontraba coincidencia y la notificación
+      // de "foto añadida" simplemente no se creaba, sin ningún error.
+      const others = members.filter(e => normalizeEmail(e) !== normalizeEmail(user.email));
       if (!others.length) return;
-      const myProfArr = await base44.entities.UserProfile.filter({ email: user.email });
+      const myProfArr = await base44.entities.UserProfile.filter({ email: normalizeEmail(user.email) });
       const myProf = myProfArr[0] || null;
       const resolved = await resolveUserIds(others);
       resolved.forEach(({ userId }) => notify({
