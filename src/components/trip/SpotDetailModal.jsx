@@ -9,6 +9,8 @@ import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
+import { notify, resolveUserIds } from '@/lib/notifications';
+import { normalizeEmail } from '@/lib/utils';
 
 // Antes 'hotel' y las variantes de transporte (aeropuerto/tren/bus) no
 // tenían entrada aquí — el modal de detalle (el mismo que abre tanto Home
@@ -42,7 +44,7 @@ const SPOT_COLORS = {
 const TYPE_LABEL_KEYS = { food:'spotDetail.types.food', sight:'spotDetail.types.sight', activity:'spotDetail.types.activity', shopping:'spotDetail.types.shopping', custom:'spotDetail.types.custom', restaurant:'spotDetail.types.restaurant', museum:'spotDetail.types.museum', hotel:'spotDetail.types.hotel', transport:'spotDetail.types.transport', airport:'spotDetail.types.airport', train:'spotDetail.types.train', bus:'spotDetail.types.bus' };
 
 
-export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
+export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId, trip, currentUserEmail, profiles }) {
   const { t } = useTranslation();
   const [notes, setNotes]         = useState(spot?.notes || '');
   const [time, setTime]           = useState(spot?.assigned_time || '');
@@ -98,11 +100,31 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
   const IconComp = SPOT_ICONS[spot.type] || null;
   const typeLabel = (TYPE_LABEL_KEYS[spot.type] ? t(TYPE_LABEL_KEYS[spot.type]) : null) || spot.type || 'Spot';
 
+  // Este modal es el mismo que usan tanto Home (DayCard) como Ruta
+  // (Cities.jsx) para ver/editar un spot — antes solo el flujo de
+  // Restaurantes (SpotDetailSheet.jsx) avisaba a los demás miembros al
+  // cambiar la hora de un spot (incl. vuelos/trenes/bus, que son spots con
+  // type airport/train/bus). Como este modal es el punto de guardado común
+  // a las otras dos pantallas, centralizamos el aviso aquí para no
+  // duplicar la lógica de notifyMembers en cada página.
+  const notifyTimeChange = (newTime) => {
+    const others = (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+    if (!others.length) return;
+    const myProfile = (profiles || []).find(p => normalizeEmail(p.email) === normalizeEmail(currentUserEmail));
+    resolveUserIds(others).then(resolved => {
+      resolved.forEach(({ userId }) => notify({
+        userId, type: 'spot_time', actor: myProfile, tripId, tripName: trip?.name,
+        refTitle: spot.title, refExtra: { time: newTime },
+      }));
+    });
+  };
+
   // `overrides` permite guardar un valor recién elegido sin esperar al
   // siguiente render (setAssignedDate es async, así que llamar a handleSave()
   // justo después del onChange guardaría el valor VIEJO si no se pasa aquí).
   const handleSave = async (overrides = {}) => {
     const nextDate = 'assignedDate' in overrides ? overrides.assignedDate : assignedDate;
+    const timeChanged = (time || '') !== (spot.assigned_time || '');
     setSaving(true);
     try {
       const resolvedCityId = nextDate ? resolveCityIdForDate(nextDate) : null;
@@ -116,6 +138,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
       if (queryClient && tripId) {
         queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       }
+      if (timeChanged && time) notifyTimeChange(time);
       if (onSave) onSave(spot, notes, time);
       setEditingTime(false);
       setEditingNotes(false);

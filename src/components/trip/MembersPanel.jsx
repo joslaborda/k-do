@@ -17,8 +17,8 @@ export default function MembersPanel({
   const { t } = useTranslation();
 
   const roleConfig = {
-    admin: { label: t('membersPanel.roleAdmin'), icon: Crown, color: 'bg-amber-100 text-amber-700 border-amber-200' },
-    editor: { label: t('membersPanel.roleEditor'), icon: Pencil, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    admin: { label: t('membersPanel.roleAdmin'), icon: Crown, color: 'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50' },
+    editor: { label: t('membersPanel.roleEditor'), icon: Pencil, color: 'bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900/50' },
     viewer: { label: t('membersPanel.roleViewer'), icon: Eye, color: 'bg-secondary text-foreground border-border' },
   };
   const [inviteEmail, setInviteEmail] = useState('');
