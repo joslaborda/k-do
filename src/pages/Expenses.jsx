@@ -59,7 +59,7 @@ function fmtAmt(n, code) {
 
 
 // ── CurrencyBanner — shown when active city changes ───────────────────────────
-function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccept, onDismiss }) {
+function CurrencyBanner({ countryName, currencyCode, flag, onAccept, onDismiss }) {
   const { t } = useTranslation();
   return (
     <div style={{ background: 'var(--kodo-bg-orange)', border: '0.5px solid var(--kodo-border)', borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
@@ -71,7 +71,7 @@ function CurrencyBanner({ countryName, currencyCode, currencyName, flag, onAccep
             <button onClick={onDismiss} style={{ background: 'none', border: 'none', color: 'var(--kodo-border)', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: 0, marginTop: -2 }}>×</button>
           </div>
           <p style={{ fontSize: 12, color: 'hsl(var(--primary))', marginBottom: 10, lineHeight: 1.4 }}>
-            {t('expenses.localCurrencyPrompt', { currencyName, currencyCode })}
+            {t('expenses.localCurrencyPrompt', { currencyCode })}
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onAccept}
@@ -1010,7 +1010,16 @@ export default function Expenses() {
   const tripEnded     = trip?.end_date   ? new Date() >  new Date(trip.end_date   + 'T23:59:59') : false;
   const tripInProgress = tripStarted && !tripEnded;
 
+  // `activeCity?.id === prevCityId` espera a que el efecto de abajo haya
+  // sincronizado currencyBannerDismissed con lo guardado en localStorage
+  // para ESTA ciudad. Sin esto, cada vez que se remonta la página (volver
+  // a Gastos, recargar, etc.) con la caché de React Query ya poblada,
+  // currencyBannerDismissed arrancaba en `false` por un instante — el
+  // banner ya confirmado "parpadeaba" visible antes de que el efecto lo
+  // corrigiera, y el usuario lo veía reaparecer una y otra vez aunque lo
+  // hubiera confirmado.
   const showCurrencyBanner = !currencyBannerDismissed &&
+    activeCity?.id === prevCityId &&
     tripInProgress &&
     activeLocalCurrency && activeLocalCurrency !== baseCurrency;
 
@@ -1210,7 +1219,6 @@ export default function Expenses() {
           <CurrencyBanner
             countryName={activeCity?.country || activeCity?.name || ''}
             currencyCode={activeLocalCurrency}
-            currencyName={activeMeta?.languageLabel || activeLocalCurrency}
             flag={activeMeta?.flag || '🌍'}
             onAccept={() => {
               setActiveCurrencyOverride(activeLocalCurrency);
