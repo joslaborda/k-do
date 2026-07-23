@@ -6,7 +6,7 @@ import { base44 } from '@/api/base44Client';
 import DayCard from './DayCard';
 import { useTranslation } from 'react-i18next';
 
-export default function TomorrowTab({ trip, cities, tripId }) {
+export default function TomorrowTab({ trip, cities, tripId, currentUserEmail, profiles }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
@@ -73,6 +73,9 @@ export default function TomorrowTab({ trip, cities, tripId }) {
           ));
           queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
         }}
+        trip={trip}
+        currentUserEmail={currentUserEmail}
+        profiles={profiles}
       />
     </div>
   );

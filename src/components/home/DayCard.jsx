@@ -14,7 +14,7 @@ import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS, WMO_ICON } from './constants';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/use-toast';
 
-export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime, hotelSpot }) {
+export default function DayCard({ label, city, docs, spots, itineraryDays, tripId, defaultOpen, onReorderSpots, dateStr, onUpdateItemTime, hotelSpot, trip, currentUserEmail, profiles }) {
   const { t } = useTranslation();
   // holidaysDB son ~120 KB: se cargan solo si hay ciudad y fecha.
   const [holidays, setHolidays] = useState([]);
@@ -39,7 +39,14 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
     return () => clearInterval(id);
   }, []);
 
-  const isToday_ = defaultOpen;
+  // Antes esto era `= defaultOpen`, confundiendo "esta tarjeta arranca
+  // expandida" con "esta tarjeta es hoy de verdad". DayCard se reutiliza
+  // para la tarjeta del día siguiente (TomorrowTab la abre con
+  // defaultOpen={true}), así que con la versión antigua el clima y el
+  // aviso "sale en X minutos" de un vuelo de MAÑANA se calculaban como si
+  // fuera hoy — un vuelo a las 09:00 de mañana visto hoy a las 08:30 podía
+  // mostrar "sale en 30 minutos" con alarma roja.
+  const isToday_ = dateStr === format(new Date(), 'yyyy-MM-dd');
   const [weather, setWeather] = useState(null);
 
   useEffect(() => {
@@ -356,7 +363,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                   } ${
                     isDragOver ? 'bg-primary/5 border-t-primary/40' : ''
                   } ${
-                    isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
+                    isToday_ && isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
                       const dep = new Date(now); dep.setHours(h, m, 0, 0);
@@ -381,7 +388,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
                     {!isDoc && !isNote && item.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.notes}</p>}
                     {isNote && <p className="text-xs text-muted-foreground mt-0.5 truncate">{item.content}</p>}
                     {isDoc && !hasTime && <p className="text-xs text-muted-foreground mt-0.5">{t('home.dayCard.noTime')}</p>}
-                    {isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
+                    {isToday_ && isDoc && item.time && ['flight','train','bus'].includes(item.category || item.type) && (() => {
                       const now = new Date();
                       const [h, m] = item.time.split(':').map(Number);
                       const dep = new Date(now); dep.setHours(h, m, 0, 0);
@@ -428,7 +435,7 @@ export default function DayCard({ label, city, docs, spots, itineraryDays, tripI
         <ItemDetailSheet item={selected} onClose={() => setSelected(null)} onSaveTime={handleSaveTime} onOpenPdf={(url) => setViewFile(url)} onDelete={handleDeleteItem} />
       )}
       {selected && selected._kind === 'spot' && (
-        <SpotDetailModal spot={selected} open={true} onClose={() => setSelected(null)} onRemove={handleRemoveSpot} queryClient={queryClient} tripId={tripId} />
+        <SpotDetailModal spot={selected} open={true} onClose={() => setSelected(null)} onRemove={handleRemoveSpot} queryClient={queryClient} tripId={tripId} trip={trip} currentUserEmail={currentUserEmail} profiles={profiles} />
       )}
     </div>
   );

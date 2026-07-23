@@ -107,6 +107,9 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
           onReorderSpots={handleReorder}
           onUpdateItemTime={handleUpdateItemTime}
           hotelSpot={hotelForCity(todayCity.id)}
+          trip={trip}
+          currentUserEmail={currentUserEmail}
+          profiles={profiles}
         />
       )}
 
@@ -123,6 +126,9 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
           onReorderSpots={handleReorder}
           onUpdateItemTime={handleUpdateItemTime}
           hotelSpot={hotelForCity(tomorrowCity.id)}
+          trip={trip}
+          currentUserEmail={currentUserEmail}
+          profiles={profiles}
         />
       )}
 
