@@ -41,7 +41,15 @@ export default function TemplateCard({ template, currentUser }) {
   // Mutation para guardar/quitar
   const saveMutation = useMutation({
     mutationFn: async (save) => {
-      if (!myCollection) {
+      // No usar el `myCollection` de la caché de react-query aquí: es del
+      // momento del render, y si esta u otra TemplateCard de la misma
+      // colección guarda casi a la vez, la segunda escritura pisaba la
+      // primera (leía-modificaba-escribía sobre datos ya obsoletos). Se
+      // relee la colección justo antes de escribir para evitarlo.
+      const fresh = currentUser?.id
+        ? (await base44.entities.Collection.filter({ owner_user_id: currentUser.id, name: 'Guardados' }))[0] || null
+        : null;
+      if (!fresh) {
         const newCollection = await base44.entities.Collection.create({
           owner_user_id: currentUser.id,
           name: 'Guardados',
@@ -49,19 +57,14 @@ export default function TemplateCard({ template, currentUser }) {
         });
         return newCollection;
       } else {
-        const updated = { ...myCollection };
-        if (save) {
-          if (!updated.template_ids) updated.template_ids = [];
-          if (!updated.template_ids.includes(template.id)) {
-            updated.template_ids.push(template.id);
-          }
-        } else {
-          updated.template_ids = updated.template_ids.filter((id) => id !== template.id);
-        }
-        await base44.entities.Collection.update(myCollection.id, {
-          template_ids: updated.template_ids
+        const currentIds = fresh.template_ids || [];
+        const updatedIds = save
+          ? (currentIds.includes(template.id) ? currentIds : [...currentIds, template.id])
+          : currentIds.filter((id) => id !== template.id);
+        await base44.entities.Collection.update(fresh.id, {
+          template_ids: updatedIds
         });
-        return updated;
+        return { ...fresh, template_ids: updatedIds };
       }
     },
     onSuccess: () => {
@@ -171,7 +174,7 @@ export default function TemplateCard({ template, currentUser }) {
             <button
               onClick={(e) => { e.preventDefault(); toggleLike(); }}
               className={"inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors " +
-                (isLiked ? "bg-red-50 text-red-500 border border-red-200" : "bg-secondary text-muted-foreground0 border border-border hover:bg-red-50 hover:text-red-400")}
+                (isLiked ? "bg-red-50 text-red-500 border border-red-200" : "bg-secondary text-muted-foreground border border-border hover:bg-red-50 hover:text-red-400")}
             >
               <Heart className={"w-3.5 h-3.5 " + (isLiked ? "fill-current" : "")}/>
               {likeCount > 0 ? likeCount : ""}
