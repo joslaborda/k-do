@@ -507,7 +507,7 @@
     "saveChanges": "Guardar cambios",
     "saveExpense": "Guardar gasto",
     "paidByShort": "Pagó {{name}} · ÷ {{count}}",
-    "localCurrencyPrompt": "La moneda local es {{currencyName}} ({{currencyCode}}). ¿Registrar gastos en {{currencyCode}}?",
+    "localCurrencyPrompt": "La moneda local es {{currencyCode}}. ¿Registrar gastos en {{currencyCode}}?",
     "arrivedAt": "Has llegado a {{countryName}}",
     "useThisCurrency": "Sí, usar {{currencyCode}}",
     "keepBaseCurrency": "Mantener base",

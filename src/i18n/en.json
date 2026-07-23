@@ -507,7 +507,7 @@
     "saveChanges": "Save changes",
     "saveExpense": "Save expense",
     "paidByShort": "Paid by {{name}} · ÷ {{count}}",
-    "localCurrencyPrompt": "Local currency is {{currencyName}} ({{currencyCode}}). Record expenses in {{currencyCode}}?",
+    "localCurrencyPrompt": "Local currency is {{currencyCode}}. Record expenses in {{currencyCode}}?",
     "arrivedAt": "You've arrived in {{countryName}}",
     "useThisCurrency": "Yes, use {{currencyCode}}",
     "keepBaseCurrency": "Keep base currency",
