@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Calendar } from 'lucide-react';
+import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Calendar, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +23,7 @@ const TYPE = {
   member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/30', labelKey: 'notifications.memberJoined' },
   trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.tripInvite' },
   spot_added:      { Icon: Compass,   color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.spotAdded' },
+  spot_time:       { Icon: Clock,     color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.spotTimeChanged' },
 };
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', labelKey: 'notifications.new' };
 
@@ -140,7 +141,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         ) : tripData ? (
           <>
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
@@ -170,7 +171,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
                     {members.slice(0, 4).map(m => (
                       m.avatar
                         ? <img key={m.email} src={m.avatar} className="w-6 h-6 rounded-full object-cover border-2 border-card" alt={m.name} />
-                        : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 border-2 border-card flex items-center justify-center text-micro font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
+                        : <div key={m.email} className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-950/30 border-2 border-card flex items-center justify-center text-micro font-bold text-primary">{m.name.slice(0,2).toUpperCase()}</div>
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">{members.length} {members.length !== 1 ? translate('common.travelers') : translate('common.traveler')}</span>
@@ -201,6 +202,11 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
   const { Icon } = cfg;
   const name = n.actor_display_name || n.actor_username || t('notifications.someone');
   const showTrip = !currentTripId && n.trip_name;
+  // ref_extra viaja como JSON (ver lib/notifications.js); algunos labelKey
+  // (p.ej. spotTimeChanged) usan variables de interpolación de i18next que
+  // vienen de ahí. Para el resto de tipos, t() simplemente ignora las
+  // variables que no usa, así que es seguro pasarlo siempre.
+  const extra = (() => { try { return n.ref_extra ? JSON.parse(n.ref_extra) : {}; } catch { return {}; } })();
   return (
     <div onClick={() => { onRead(n.id); onNavigate(n); }}
       className={`flex items-start gap-3 px-4 py-3 border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary/30 transition-colors ${!n.read ? 'bg-primary/5' : ''}`}>
@@ -212,7 +218,7 @@ function NotifItem({ n, currentTripId, onRead, onNavigate }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground leading-snug">
-          <span className="font-semibold">{name}</span>{' '}{t(cfg.labelKey)}
+          <span className="font-semibold">{name}</span>{' '}{t(cfg.labelKey, extra)}
           {n.ref_title ? <span className="text-muted-foreground"> · {n.ref_title}</span> : ''}
           {showTrip ? <span className="text-muted-foreground"> · {n.trip_name}</span> : ''}
         </p>
@@ -293,7 +299,11 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       if (n.trip_id && userEmail) {
         try {
           const t = await base44.entities.Trip.get(n.trip_id);
-          if (t?.members?.includes(userEmail.toLowerCase())) {
+          // trip.members legacy puede tener casing inconsistente — un
+          // .includes() en crudo (aunque userEmail ya venga en minúsculas)
+          // podía fallar contra esas entradas antiguas y volver a mostrar
+          // el modal de "¿unirte al viaje?" a alguien que ya era miembro.
+          if (t?.members?.some(e => normalizeEmail(e) === normalizeEmail(userEmail))) {
             navigate(createPageUrl('Home') + `?trip_id=${n.trip_id}`);
             return;
           }
@@ -313,6 +323,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       case 'photo_added':     return navigate(createPageUrl('Photos') + trip);
       case 'member_joined':   return navigate(createPageUrl('Home') + trip + '&scroll=members');
       case 'spot_added':      return navigate(createPageUrl('Cities') + trip + (extra.spotDate ? `&date=${extra.spotDate}` : ''));
+      case 'spot_time':       return navigate(createPageUrl('Cities') + trip);
       default:                return navigate(createPageUrl('Home') + trip);
     }
   };
