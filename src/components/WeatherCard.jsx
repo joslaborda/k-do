@@ -200,7 +200,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
 
   // UV label — del día seleccionado, no del momento actual
   const uvLabel = sel?.uv != null
-    ? sel.uv <= 2 ? 'Bajo' : sel.uv <= 5 ? 'Moderado' : sel.uv <= 7 ? 'Alto' : 'Muy alto'
+    ? sel.uv <= 2 ? t('weather.uvLow') : sel.uv <= 5 ? t('weather.uvModerate') : sel.uv <= 7 ? t('weather.uvHigh') : t('weather.uvVeryHigh')
     : null;
 
   return (
@@ -257,7 +257,7 @@ export default function WeatherCard({ city, tripCountry, showCityName = false })
       {sel && (
         <div className="px-3 py-3 border-b border-border bg-secondary/20">
           <p className="text-xs font-medium text-foreground mb-2.5">
-            {selIsToday ? 'Hoy' : fmtDay(sel.date)}, {fmtDate(sel.date)}
+            {selIsToday ? t('cities.day.today') : fmtDay(sel.date)}, {fmtDate(sel.date)}
             {sel.label ? ` · ${sel.label}` : ''}
           </p>
 

@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw, CheckCircle, WifiOff, Cloud } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
+// Antes: montado activamente en Layout.jsx pero con todo el texto en
+// español fijo (a diferencia de su vecino OfflineIndicator.jsx, que sí
+// estaba traducido) — un usuario en inglés lo veía en español.
 export default function SyncIndicator() {
+  const { t } = useTranslation();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState(null);
@@ -62,10 +67,10 @@ export default function SyncIndicator() {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-foreground dark:text-white text-sm">
-                    Modo offline
+                    {t('syncIndicator.offline')}
                   </p>
                   <p className="text-xs text-foreground dark:text-muted-foreground mt-1">
-                    Datos sincronizados: {syncedEntities.length} secciones
+                    {t('syncIndicator.synced', { count: syncedEntities.length })}
                   </p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {syncedEntities.slice(0, 4).map((entity, idx) => (
@@ -91,10 +96,10 @@ export default function SyncIndicator() {
                 <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />
                 <div>
                   <p className="font-semibold text-foreground dark:text-white text-sm">
-                    Sincronizando...
+                    {t('syncIndicator.syncing')}
                   </p>
                   <p className="text-xs text-foreground dark:text-muted-foreground">
-                    Actualizando datos
+                    {t('syncIndicator.updatingData')}
                   </p>
                 </div>
               </div>
@@ -107,10 +112,10 @@ export default function SyncIndicator() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground dark:text-white text-sm">
-                    Sincronizado
+                    {t('syncIndicator.synced2')}
                   </p>
                   <p className="text-xs text-foreground dark:text-muted-foreground">
-                    Todos los datos actualizados
+                    {t('syncIndicator.allUpToDate')}
                   </p>
                 </div>
               </div>

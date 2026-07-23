@@ -1,17 +1,19 @@
 import { Moon, Sun } from 'lucide-react';
 import { useDarkMode } from '@/components/hooks/useDarkMode';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Kōdo DarkModeToggle — switch inline para Settings
  * Renderiza un toggle pill con Moon/Sun según el estado
  */
 export default function DarkModeToggle() {
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useDarkMode();
 
   return (
     <button
       onClick={() => setIsDark(!isDark)}
-      aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      aria-label={isDark ? t('darkMode.switchToLight') : t('darkMode.switchToDark')}
       style={{
         width: 52,
         height: 28,
