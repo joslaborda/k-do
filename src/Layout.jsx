@@ -208,7 +208,7 @@ export default function Layout({ children, currentPageName }) {
                     strokeWidth={1.75}
                   />
                   <span className="text-micro font-medium" style={{color: (drawerOpen||isDrawerPageActive) ? 'var(--kodo-text-active)' : 'var(--kodo-nav-inactive)'}}>
-                    Más
+                    {t('nav.more')}
                   </span>
                 </button>
               )}
@@ -245,7 +245,7 @@ export default function Layout({ children, currentPageName }) {
           <Link
             to={createPageUrl('TripsList')}
             className="text-2xl mb-8 hover:scale-110 transition-transform"
-            title="Mis viajes"
+            title={t('tripslist.myTrips')}
           >
             
           </Link>
