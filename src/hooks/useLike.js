@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useToast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 /**
  * useLike — hook reutilizable para dar/quitar like a un spot o template
@@ -10,6 +12,8 @@ import { base44 } from '@/api/base44Client';
  */
 export function useLike({ targetId, targetType, userId, targetOwnerId }) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t } = useTranslation();
   const qKey = ['likes', targetType, targetId];
 
   const { data: likes = [] } = useQuery({
@@ -37,6 +41,9 @@ export function useLike({ targetId, targetType, userId, targetOwnerId }) {
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qKey }),
+    // Antes sin onError: si fallaba (red, permisos), el corazón simplemente
+    // no cambiaba de estado y no había ningún aviso de por qué.
+    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   return { isLiked, count, toggle: () => { if (!mutation.isPending) mutation.mutate(); }, loading: mutation.isPending };
