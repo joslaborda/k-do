@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { parseServerDate } from '@/lib/parseServerDate';
+import { MAX_FILE_BYTES } from '@/lib/uploadLimits';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembers }) {
@@ -113,7 +114,10 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
 
   const handleUpload = async (file) => {
     if (!file) return;
-    if (file.size > 20 * 1024 * 1024) { toast({ title: t('chat.fileTooLarge'), description: t('chat.max20mb'), variant: 'destructive' }); return; }
+    // Antes 20*1024*1024 estaba repetido aquí como literal en vez de
+    // importar la constante compartida — si el límite cambiaba en
+    // uploadLimits.js, este archivo se desincronizaba en silencio.
+    if (file.size > MAX_FILE_BYTES) { toast({ title: t('chat.fileTooLarge'), description: t('chat.max20mb'), variant: 'destructive' }); return; }
     const isImage = file.type.startsWith('image/');
     const isAudio = file.type.startsWith('audio/');
     setUploading(true);

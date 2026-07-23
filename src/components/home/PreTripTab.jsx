@@ -210,7 +210,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           <p className="text-sm text-muted-foreground mt-1">{t('onboarding.s4.daysToTrip')}</p>
           {sortedCities.length > 0 && (
             <p className="text-xs text-primary mt-2">
-              Primera parada: {sortedCities[0].name}
+              {t('pretrip.firstStop')}: {sortedCities[0].name}
               {trip?.start_date && ` · ${format(parseISO(trip.start_date), 'dd MMM yyyy', { locale: es })}`}
             </p>
           )}
@@ -232,7 +232,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           <div className="bg-card rounded-2xl border border-border p-4 hover:border-primary/40 transition-colors">
             <p className="text-xs text-muted-foreground mb-1">{t('documents.title')}</p>
             <p className="text-2xl font-semibold text-foreground">{docsCount}</p>
-            <p className="text-xs text-muted-foreground mt-1">{docsCount === 0 ? 'Ninguno subido' : `${docsCount} subido${docsCount > 1 ? 's' : ''}`}</p>
+            <p className="text-xs text-muted-foreground mt-1">{docsCount === 0 ? t('pretrip.noneUploaded') : t('pretrip.uploadedCount', { count: docsCount })}</p>
           </div>
         </Link>
       </div>
@@ -243,7 +243,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
       {(hasEmbassy || appsCount > 0) && (
         <Link to={createPageUrl('Utilities') + '?trip_id=' + tripId + '&tab=emergencias'}>
           <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3 hover:border-primary/40 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center shrink-0">
               <Landmark className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
@@ -263,16 +263,16 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div>
               <p className="text-sm font-semibold text-foreground">{t('onboarding.s4.todo')}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">pasaporte de {originCountry}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t('pretrip.passportOf', { country: originCountry })}</p>
             </div>
           </div>
           {(() => {
             const GROUPS = [
-              { key: 'visa',    label: 'Visados', types: ['visa'] },
+              { key: 'visa',    label: t('pretrip.groupVisas'), types: ['visa'] },
               { key: 'vaccine', label: t('pretrip.vaccines'), types: ['vaccine'] },
-              { key: 'tech',    label: 'Enchufe', types: ['tech'] },
-              { key: 'money',   label: 'Divisa',  types: ['money'] },
-              { key: 'safety',  label: 'Consejos',types: ['safety', 'info'] },
+              { key: 'tech',    label: t('pretrip.groupPlug'), types: ['tech'] },
+              { key: 'money',   label: t('pretrip.groupCurrency'),  types: ['money'] },
+              { key: 'safety',  label: t('pretrip.groupTips'),types: ['safety', 'info'] },
             ];
             return GROUPS.map(group => {
               const items = displayReqs.filter(r => group.types.includes(r.type));
@@ -306,7 +306,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                             <p className="text-sm font-medium text-foreground leading-tight">{req.origin} → {req.country}</p>
                             {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                           </div>
-                          <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200">{t('pretrip.visaFree')}</span>
+                          <span className="text-xs bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full font-medium shrink-0 border border-green-200 dark:border-green-900/40">{t('pretrip.visaFree')}</span>
                         </div>
                       );
                     }
@@ -324,7 +324,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                             {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                           </div>
                           {!checkedItems[req.id] && (
-                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200">{t('common.required')}</span>
+                            <span className="text-xs bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 px-2 py-0.5 rounded-full font-medium shrink-0 border border-red-200 dark:border-red-900/40">{t('common.required')}</span>
                           )}
                         </button>
                       );
@@ -338,8 +338,8 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
                           {req.description && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{req.description}</p>}
                         </div>
                         {req.type === 'visa'
-                          ? <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">{t('pretrip.verify')}</span>
-                          : <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100">{t('common.recommended')}</span>
+                          ? <span className="text-xs bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100 dark:border-amber-900/40">{t('pretrip.verify')}</span>
+                          : <span className="text-xs bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium shrink-0 border border-amber-100 dark:border-amber-900/40">{t('common.recommended')}</span>
                         }
                       </div>
                     );
@@ -361,7 +361,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <p className="text-sm font-medium text-foreground flex items-center gap-2">
                 <span className="w-5 h-5 rounded-md bg-amber-100 dark:bg-amber-950/50 flex items-center justify-center"><Calendar size={11} className="text-amber-700" /></span>
-                Festivos en tu viaje
+                {t('pretrip.holidaysInTrip')}
               </p>
               <span className="text-xs font-medium text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full border border-amber-200/60 dark:border-amber-900/40">
                 {tripHolidays.length} día{tripHolidays.length > 1 ? 's' : ''}
@@ -394,7 +394,7 @@ export default function PreTripTab({ trip, cities, packingItems, documents, myPr
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Users className="w-4 h-4" />Viajeros
+            <Users className="w-4 h-4" />{t('pretrip.travelers')}
           </p>
         </div>
         <MemberAvatarRow trip={trip} profiles={profiles} onInvite={onInvite} currentUserEmail={currentUserEmail} />

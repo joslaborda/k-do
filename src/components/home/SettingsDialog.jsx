@@ -331,7 +331,7 @@ function SettingsDialog({
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" className="h-7 text-xs" onClick={closeCityEdit}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button size="sm" className="h-7 text-xs bg-primary hover:bg-primary/90 text-white"
                 onClick={saveNewCity}
@@ -383,7 +383,7 @@ function SettingsDialog({
         <DialogContent className="max-w-xs rounded-2xl p-5">
           <DialogHeader className="sr-only"><DialogTitle>{t('trip.dialog.deleteStopConfirm')}</DialogTitle></DialogHeader>
           <div className="flex items-start gap-3 mb-1">
-            <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
               <AlertTriangle className="w-4 h-4 text-red-500" />
             </div>
             <p className="text-sm font-medium text-foreground pt-1.5">{t('trip.dialog.deleteStopConfirm')}</p>
