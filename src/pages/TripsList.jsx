@@ -237,7 +237,10 @@ export default function TripsList() {
         <div className="max-w-3xl mx-auto px-5 pt-12 pb-4">
           <div className="flex items-start justify-between">
             <div>
-              <Logo className="h-6 w-auto text-foreground" style={{ display: 'block' }} />
+              <div className="flex items-center gap-2">
+                <Logo className="h-6 w-auto text-foreground" style={{ display: 'block' }} />
+                <span className="text-[10px] font-medium text-muted-foreground border border-border rounded-full px-2 py-0.5 leading-none">{t('common.beta')}</span>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">Travel your way</p>
               {firstName && (
                 <p className="text-sm text-muted-foreground mt-2">{getGreeting(t)}, {firstName}</p>

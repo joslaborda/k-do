@@ -84,7 +84,7 @@ function SpotRow({ spot, isSaved, onSave, onUnsave, showLikes = false, showVisib
         <p className="text-sm font-medium text-foreground truncate">{spot.title}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {spot.city_name || spot.city || ''}
-          {showLikes && spot.likes_count ? ` · ${spot.likes_count} likes` : ''}
+          {showLikes && spot.likes_count ? ` · ${t('profile.likesCount', { count: spot.likes_count })}` : ''}
         </p>
       </div>
       {showVisibility && (

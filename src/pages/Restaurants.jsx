@@ -1606,7 +1606,7 @@ export default function Restaurants() {
           tripId={tripId}
           tripCities={tripCities}
           userId={user?.id}
-          currentUserEmail={currentUser?.email}
+          currentUserEmail={normalizeEmail(currentUser?.email)}
         />
       )}
 

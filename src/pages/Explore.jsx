@@ -371,10 +371,10 @@ export default function Explore() {
     <div className="min-h-screen bg-background pb-24">
       <div className="bg-background pt-12 pb-6 px-6">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-white text-4xl font-bold mb-1">{t('explore.title')}</h1>
-          <p className="text-white/80 text-sm mb-4">{t('explore.subtitle')}</p>
+          <h1 className="text-foreground text-4xl font-bold mb-1">{t('explore.title')}</h1>
+          <p className="text-muted-foreground text-sm mb-4">{t('explore.subtitle')}</p>
           <button onClick={() => setSearchOpen(true)}
-            className="w-full flex items-center gap-3 bg-white/15 hover:bg-white/25 transition-colors rounded-xl px-4 py-3 text-white/80 text-sm border border-white/20">
+            className="w-full flex items-center gap-3 bg-secondary hover:bg-secondary/70 transition-colors rounded-xl px-4 py-3 text-muted-foreground text-sm border border-border">
             <Search className="w-4 h-4 flex-shrink-0"/>
             <span>{t('explore.searchCta')}</span>
           </button>

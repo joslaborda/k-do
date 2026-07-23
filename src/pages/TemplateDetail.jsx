@@ -24,6 +24,11 @@ export default function TripDetail() {
     window.scrollTo(0, 0);
   }, []);
 
+  // date-fns con locale según idioma activo — antes esta pantalla mostraba
+  // siempre nombres de mes en español aunque el usuario tuviera la app en
+  // inglés (mismo patrón dinámico que ya usa DocumentCard.jsx).
+  const dateLocale = i18n.language === 'en' ? undefined : es;
+
   const { cities: tripCities, activeCity, overrideCityId, setOverrideCityId, clearOverride } = useTripContext(tripId);
 
   const { data: trip, isLoading } = useQuery({
@@ -102,11 +107,11 @@ export default function TripDetail() {
               {trip.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
-                  {format(new Date(trip.start_date), 'dd MMM', { locale: es })}
-                  {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: es })}`}
+                  {format(new Date(trip.start_date), 'dd MMM', { locale: dateLocale })}
+                  {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: dateLocale })}`}
                 </span>
               )}
-              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{trip.members?.length || 1} viajero{(trip.members?.length || 1) > 1 ? 's' : ''}</span>
+              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{t('trip.travelersCount', { count: trip.members?.length || 1 })}</span>
             </div>
           </div>
         </div>

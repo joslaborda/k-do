@@ -17,6 +17,7 @@ import { enrichTicketDataWithAutoLinks, createBackfillMutation } from '@/lib/aut
 import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
+import { normalizeEmail } from '@/lib/utils';
 
 const DOC_ICONS = {
   flight:    PlaneIcon,
@@ -56,7 +57,10 @@ const VIS = {
 
 // ── Doc row ───────────────────────────────────────────────────────────────────
 function DocRow({ticket, onEdit, onDelete, onView }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // Locale dinámico según idioma activo — antes esta fila mostraba siempre
+  // nombres de mes en español aunque el usuario tuviera la app en inglés.
+  const dateLocale = i18n.language === 'en' ? undefined : es;
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const cat  = ticket.category || 'other';
@@ -77,7 +81,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
   const timeLabel = ticket.time
     ? (ticket.end_time ? `${ticket.time} → ${ticket.end_time}` : ticket.time)
     : cat === 'hotel' && ticket.date
-    ? t('documents.row.checkIn', { date: format(parseISO(ticket.date), 'dd MMM', { locale: es }) })
+    ? t('documents.row.checkIn', { date: format(parseISO(ticket.date), 'dd MMM', { locale: dateLocale }) })
     : ticket.note_time || null;
 
   return (
@@ -130,10 +134,10 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
               <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.route')}</span><span className="text-foreground">{ticket.origin} → {ticket.destination}</span></div>
             )}
             {ticket.date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.date')}</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: es })}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.date')}</span><span className="text-foreground">{format(parseISO(ticket.date), 'dd MMM yyyy', { locale: dateLocale })}</span></div>
             )}
             {ticket.end_date && (
-              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.end')}</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: es })}</span></div>
+              <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.row.end')}</span><span className="text-foreground">{format(parseISO(ticket.end_date), 'dd MMM yyyy', { locale: dateLocale })}</span></div>
             )}
             {ticket.airline && (
               <div className="flex gap-2 text-xs"><span className="text-muted-foreground w-12 shrink-0">{t('documents.types.flight')}</span><span className="text-foreground">{ticket.airline}</span></div>
@@ -179,12 +183,18 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Documents() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // Locale dinámico según idioma activo — igual que en DocRow más arriba.
+  const dateLocale = i18n.language === 'en' ? undefined : es;
   const { toast } = useToast();
   const tripId = new URLSearchParams(window.location.search).get('trip_id');
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
-  const currentUserEmail = currentUser?.email ?? '';
+  // normalizeEmail() en ambos lados de cualquier comparación de email — el
+  // creador de un documento compartido con "usuarios seleccionados" podía no
+  // ver su propio documento si su email de auth traía distinta capitalización
+  // que el guardado en ticket.created_by/shared_with.
+  const currentUserEmail = normalizeEmail(currentUser?.email) ?? '';
   const userId = currentUser?.id ?? '';
 
   const [catFilter, setCatFilter]   = useState('all');
@@ -267,8 +277,8 @@ export default function Documents() {
       if (data.visibility !== 'personal') {
         const sharedWith = data.visibility === 'selected_users'
           ? (data.shared_with || [])
-          : (trip?.members || []).filter(e => e !== currentUserEmail);
-        const targets = sharedWith.filter(e => e !== currentUserEmail);
+          : (trip?.members || []).filter(e => normalizeEmail(e) !== currentUserEmail);
+        const targets = sharedWith.filter(e => normalizeEmail(e) !== currentUserEmail);
         if (targets.length) {
           resolveUserIds(targets).then(resolved => {
             resolved.forEach(({ userId }) => notify({
@@ -303,11 +313,11 @@ export default function Documents() {
   // Filter
   const filtered = useMemo(() => tickets.filter(ticket => {
     const vis = ticket.visibility || 'personal';
-    const isOwner = ticket.created_by === currentUserEmail || ticket.user_id === userId;
+    const isOwner = normalizeEmail(ticket.created_by) === currentUserEmail || ticket.user_id === userId;
     // personal: only owner sees it
     if (vis === 'personal' && !isOwner) return false;
     // selected_users: owner or explicitly shared
-    if (vis === 'selected_users' && !isOwner && !(ticket.shared_with || []).includes(currentUserEmail)) return false;
+    if (vis === 'selected_users' && !isOwner && !(ticket.shared_with || []).some(e => normalizeEmail(e) === currentUserEmail)) return false;
     // shared: all trip members — no extra check needed
     if (catFilter !== 'all') {
       if (catFilter === 'other') return !['flight','hotel','train'].includes(ticket.category);
@@ -329,9 +339,9 @@ export default function Documents() {
       date, items,
       isToday: date === todayStr,
       label: date === '__none__' ? t('documents.group.noDate')
-        : date === todayStr    ? t('documents.group.today', { date: format(parseISO(date), 'dd MMM', { locale: es }) })
-        : date === tomorrowStr ? t('documents.group.tomorrow', { date: format(parseISO(date), 'dd MMM', { locale: es }) })
-        : format(parseISO(date), "dd MMM · eeee", { locale: es }),
+        : date === todayStr    ? t('documents.group.today', { date: format(parseISO(date), 'dd MMM', { locale: dateLocale }) })
+        : date === tomorrowStr ? t('documents.group.tomorrow', { date: format(parseISO(date), 'dd MMM', { locale: dateLocale }) })
+        : format(parseISO(date), "dd MMM · eeee", { locale: dateLocale }),
     }));
   }, [filtered]);
 
