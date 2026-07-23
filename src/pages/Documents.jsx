@@ -299,8 +299,36 @@ export default function Documents() {
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setEditDoc(null); },
-  
+    onSuccess: (_updatedDoc, { data, oldDoc }) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      setEditDoc(null);
+      // Antes editar la hora de un ticket (vuelo/tren/etc.) no avisaba a
+      // nadie — solo se notificaba al CREAR el documento. Mismo criterio de
+      // destinatarios que doc_added (respeta visibility), pero disparado
+      // solo si time/end_time cambiaron de verdad.
+      const timeChanged = (data.time || '') !== (oldDoc?.time || '') || (data.end_time || '') !== (oldDoc?.end_time || '');
+      if (timeChanged && (data.time || data.end_time) && data.visibility !== 'personal') {
+        const sharedWith = data.visibility === 'selected_users'
+          ? (data.shared_with || [])
+          : (trip?.members || []).filter(e => normalizeEmail(e) !== currentUserEmail);
+        const targets = sharedWith.filter(e => normalizeEmail(e) !== currentUserEmail);
+        if (targets.length) {
+          resolveUserIds(targets).then(resolved => {
+            resolved.forEach(({ userId }) => notify({
+              userId,
+              type: 'doc_time',
+              actor: profilesByEmail[currentUserEmail],
+              tripId,
+              tripName: trip?.name,
+              refId: oldDoc?.id,
+              refTitle: data.name || oldDoc?.name || t('documents.docFallback'),
+              refExtra: { time: data.time || null, endTime: data.end_time || null },
+            }));
+          });
+        }
+      }
+    },
+
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
   const deleteMutation = useMutation({
@@ -427,7 +455,7 @@ export default function Documents() {
                 currentUserEmail={currentUserEmail}
                 initialData={editDoc}
                 minDate={trip?.start_date || undefined} maxDate={trip?.end_date || undefined}
-                onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d })}
+                onSave={(d) => updateMutation.mutate({ id: editDoc.id, data: d, oldDoc: editDoc })}
                 onCancel={() => setEditDoc(null)}
                 onDelete={() => { setDeleteDoc(editDoc); setEditDoc(null); }}
                 saving={updateMutation.isPending}

@@ -5,6 +5,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { normalizeEmail } from '@/lib/utils';
+import { notify, resolveUserIds } from '@/lib/notifications';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, ChevronDown, ChevronUp, Plus, Pencil, Trash2, X, Check, GripVertical, MapPin, Map, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Hotel, Train, TrainFront, BusFront, Compass, Car, Ship, Shield, FileText, Loader2, Settings } from 'lucide-react';
@@ -309,13 +310,38 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
 
   const handleDocSave = async (data) => {
     setSavingDoc(true);
+    const oldDoc = editingDoc;
     try {
       const enriched = enrichTicketDataWithAutoLinks(data, itineraryDays || [], data.city_id);
-      await base44.entities.Ticket.update(editingDoc.id, enriched);
+      await base44.entities.Ticket.update(oldDoc.id, enriched);
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       setEditingDoc(null);
+      // Mismo hueco que se cerró en Documents.jsx: editar la hora de un
+      // ticket (vuelo/tren/etc.) desde Ruta tampoco avisaba a nadie.
+      const timeChanged = (data.time || '') !== (oldDoc?.time || '') || (data.end_time || '') !== (oldDoc?.end_time || '');
+      if (timeChanged && (data.time || data.end_time) && data.visibility !== 'personal') {
+        const sharedWith = data.visibility === 'selected_users'
+          ? (data.shared_with || [])
+          : (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+        const targets = sharedWith.filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+        if (targets.length) {
+          const myProfile = (profiles || []).find(p => normalizeEmail(p.email) === normalizeEmail(currentUserEmail));
+          resolveUserIds(targets).then(resolved => {
+            resolved.forEach(({ userId }) => notify({
+              userId,
+              type: 'doc_time',
+              actor: myProfile,
+              tripId,
+              tripName: trip?.name,
+              refId: oldDoc?.id,
+              refTitle: data.name || oldDoc?.name || t('documents.docFallback'),
+              refExtra: { time: data.time || null, endTime: data.end_time || null },
+            }));
+          });
+        }
+      }
     } catch (e) {
       toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
     } finally { setSavingDoc(false); }
