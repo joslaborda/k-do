@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 const TYPE = {
   doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   labelKey: 'notifications.docAdded' },
+  doc_time:        { Icon: Clock,     color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   labelKey: 'notifications.docTimeChanged' },
   expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50 dark:bg-green-950/30',  labelKey: 'notifications.expenseAdded' },
   expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50 dark:bg-green-950/30',  labelKey: 'notifications.expenseSettled' },
   photo_added:     { Icon: Camera,    color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.photoAdded' },
@@ -318,6 +319,7 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
     const trip = `?trip_id=${n.trip_id}`;
     switch (n.type) {
       case 'doc_added':       return navigate(createPageUrl('Documents') + trip + (n.ref_id ? `&doc_id=${n.ref_id}` : ''));
+      case 'doc_time':        return navigate(createPageUrl('Documents') + trip + (n.ref_id ? `&doc_id=${n.ref_id}` : ''));
       case 'expense_added':   return navigate(createPageUrl('Expenses') + trip);
       case 'expense_settled': return navigate(createPageUrl('Expenses') + trip + '&tab=balances');
       case 'photo_added':     return navigate(createPageUrl('Photos') + trip);
