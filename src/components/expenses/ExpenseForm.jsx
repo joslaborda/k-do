@@ -9,13 +9,15 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { normalizeEmail } from '@/lib/utils';
 
+// labelKey en vez de label fijo: CATEGORIES es un const de módulo (fuera del
+// componente), así que no tiene acceso a t() — se traduce en el punto de uso.
 const CATEGORIES = [
-  { value: 'food',          label: 'Comida',      Icon: Utensils    },
-  { value: 'transport',     label: 'Transporte',  Icon: BusFront         },
-  { value: 'accommodation', label: 'Alojamiento', Icon: Hotel       },
-  { value: 'activities',    label: 'Actividades', Icon: Ticket      },
-  { value: 'shopping',      label: 'Compras',     Icon: ShoppingBag },
-  { value: 'other',         label: 'Otro',        Icon: CirclePlus  },
+  { value: 'food',          labelKey: 'expenses.categories.food',          Icon: Utensils    },
+  { value: 'transport',     labelKey: 'expenses.categories.transport',     Icon: BusFront         },
+  { value: 'accommodation', labelKey: 'expenses.categories.accommodation', Icon: Hotel       },
+  { value: 'activities',    labelKey: 'expenses.categories.activities',    Icon: Ticket      },
+  { value: 'shopping',      labelKey: 'expenses.categories.shopping',      Icon: ShoppingBag },
+  { value: 'other',         labelKey: 'expenses.categories.other',         Icon: CirclePlus  },
 ];
 
 const COMMON_CURRENCIES = [
@@ -170,6 +172,11 @@ export default function ExpenseForm({
         // nadie se enterara; la rama manual de abajo sí lo avisaba.
         if (fxInfo.source === 'unavailable') {
           toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableDesc', { from: currency, to: baseCurrency }), variant: 'destructive' });
+        } else if (fxInfo.approximate) {
+          // Se pidió el tipo de cambio de una fecha concreta pero la fuente
+          // histórica falló y se usó el tipo de HOY como aproximación — sin
+          // este aviso, el usuario no tenía forma de saberlo.
+          toast({ title: t('expenses.fx.approximateTitle'), description: t('expenses.fx.approximateDesc') });
         }
       } else {
         try {
@@ -177,6 +184,8 @@ export default function ExpenseForm({
           amountBase = r.amountConverted; fxRate = r.rate; fxSource = r.source; fxTimestamp = r.fetchedAt;
           if (r.source === 'unavailable') {
             toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableDesc', { from: currency, to: baseCurrency }), variant: 'destructive' });
+          } else if (r.approximate) {
+            toast({ title: t('expenses.fx.approximateTitle'), description: t('expenses.fx.approximateDesc') });
           }
         } catch {
           toast({ title: t('expenses.fx.unavailableTitle'), description: t('expenses.fx.unavailableRetry', { from: currency, to: baseCurrency }), variant: 'destructive' });
@@ -313,7 +322,7 @@ export default function ExpenseForm({
               className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-colors ${
                 form.category === c.value ? 'bg-primary text-white border-primary' : 'bg-card text-muted-foreground border-border hover:border-primary/40'
               }`}>
-              <c.Icon size={13} />{c.label}
+              <c.Icon size={13} />{t(c.labelKey)}
             </button>
           ))}
         </div>
@@ -352,7 +361,7 @@ export default function ExpenseForm({
           {[
             { key: 'equal', label: t('expenses.splitType.equal') },
             { key: 'custom', label: t('expenses.splitType.custom') },
-            { key: 'solo', label: 'Solo yo' },
+            { key: 'solo', label: t('expenses.splitType.solo') },
           ].map(m => (
             <button key={m.key} type="button"
               onClick={() => {
@@ -444,7 +453,7 @@ export default function ExpenseForm({
 
         {form.split_type === 'solo' && (
           <p className="text-xs text-muted-foreground bg-secondary rounded-xl px-3 py-2">
-            Este gasto es solo para ti. No afecta a los balances del grupo.
+            {t('expenses.form.soloHint')}
           </p>
         )}
 
