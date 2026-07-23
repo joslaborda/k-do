@@ -19,7 +19,7 @@ const SPOT_TYPE_ICON = {
 
 function SectionHeader({ icon: Icon, label, count }) {
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border-b border-border">
+    <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-950/20 border-b border-border">
       <Icon className="w-4 h-4 text-primary" />
       <span className="text-xs font-semibold uppercase tracking-wide text-primary">{label}</span>
       {count !== undefined && (
@@ -155,7 +155,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                   <button
                     key={s}
                     onClick={() => setQuery(s)}
-                    className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-primary rounded-full text-sm transition-colors"
+                    className="px-3 py-1.5 bg-orange-50 dark:bg-orange-950/20 hover:bg-orange-100 dark:hover:bg-orange-950/40 text-primary rounded-full text-sm transition-colors"
                   >
                     {s}
                   </button>
@@ -190,7 +190,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                     <button
                       key={profile.id}
                       onClick={() => goTo(`${createPageUrl('Profile')}?user_id=${profile.user_id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
                     >
                       <Avatar profile={profile} size={40} />
                       <div className="flex-1 min-w-0">
@@ -211,9 +211,9 @@ export default function CommunitySearch({ open, onOpenChange }) {
                     <button
                       key={i}
                       onClick={() => goTo(`${createPageUrl('Explore')}?q=${encodeURIComponent(dest.name)}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
                     >
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center flex-shrink-0">
                         <MapPin className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
@@ -234,7 +234,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
                     <button
                       key={t.id}
                       onClick={() => goTo(`${createPageUrl('TemplateDetail')}?id=${t.id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
                     >
                       <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         {t.cover_image
@@ -264,9 +264,9 @@ export default function CommunitySearch({ open, onOpenChange }) {
                     <button
                       key={s.id}
                       onClick={() => s.creator_username && goTo(`${createPageUrl('Profile')}?user_id=${s.created_by_user_id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
                     >
-                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center flex-shrink-0">
                         {(() => { const I = SPOT_TYPE_ICON[s.type] || MapPin; return <I className="w-4 h-4 text-primary" />; })()}
                       </div>
                       <div className="flex-1 min-w-0">
