@@ -36,7 +36,10 @@ const SPOT_COLORS = {
   hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
   airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
 };
-const TYPE_LABELS = { food:'Comida', sight:'Atracción', activity:'Actividad', shopping:'Shopping', custom:'Personalizado', restaurant:'Restaurante', museum:'Museo', hotel:'Hotel', transport:'Transporte', airport:'Aeropuerto', train:'Estación de tren', bus:'Estación de autobús' };
+// Claves i18n en vez de texto fijo en español — este mapa se usaba tal cual
+// (TYPE_LABELS[spot.type]) sin pasar por t(), a diferencia del resto del
+// archivo, así que un usuario en inglés veía el tipo de spot en español.
+const TYPE_LABEL_KEYS = { food:'spotDetail.types.food', sight:'spotDetail.types.sight', activity:'spotDetail.types.activity', shopping:'spotDetail.types.shopping', custom:'spotDetail.types.custom', restaurant:'spotDetail.types.restaurant', museum:'spotDetail.types.museum', hotel:'spotDetail.types.hotel', transport:'spotDetail.types.transport', airport:'spotDetail.types.airport', train:'spotDetail.types.train', bus:'spotDetail.types.bus' };
 
 
 export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove, queryClient, tripId }) {
@@ -93,7 +96,7 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
   if (!open || !spot) return null;
 
   const IconComp = SPOT_ICONS[spot.type] || null;
-  const typeLabel = TYPE_LABELS[spot.type] || spot.type || 'Spot';
+  const typeLabel = (TYPE_LABEL_KEYS[spot.type] ? t(TYPE_LABEL_KEYS[spot.type]) : null) || spot.type || 'Spot';
 
   // `overrides` permite guardar un valor recién elegido sin esperar al
   // siguiente render (setAssignedDate es async, así que llamar a handleSave()

@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { sendTripInvite } from '@/lib/invites';
 import { removeTripMember, setTripMemberRole } from '@/lib/tripMembers';
 import { useTranslation } from 'react-i18next';
+import { normalizeEmail } from '@/lib/utils';
 
 export default function MembersPanel({
   trip, currentUserEmail, isAdmin, profiles = []
@@ -104,7 +105,11 @@ export default function MembersPanel({
           resolvedEmail = user.email;
         }
       }
-      if (members.includes(resolvedEmail)) {
+      // members está normalizado en minúsculas; sin normalizar resolvedEmail
+      // aquí, un mismo miembro con distinto casing pasaba este check de
+      // duplicado y podía re-invitarse.
+      resolvedEmail = normalizeEmail(resolvedEmail);
+      if (members.some(m => normalizeEmail(m) === resolvedEmail)) {
         toast({ title: t('membersPanel.alreadyMember'), description: t('membersPanel.alreadyMemberDesc') });
         setInviting(false);
         return;
@@ -116,7 +121,7 @@ export default function MembersPanel({
         tripName: trip.name,
         inviterEmail: currentUserEmail,
         inviterName: (() => {
-          const myProf = profiles.find(p => p.email === currentUserEmail || p.user_email === currentUserEmail);
+          const myProf = profiles.find(p => normalizeEmail(p.email) === normalizeEmail(currentUserEmail) || normalizeEmail(p.user_email) === normalizeEmail(currentUserEmail));
           return myProf?.display_name || myProf?.username || currentUserEmail;
         })(),
       });
@@ -169,8 +174,8 @@ export default function MembersPanel({
           const role = roles[email] || 'viewer';
           const config = roleConfig[role];
           const RoleIcon = config.icon;
-          const isCurrentUser = email === currentUserEmail;
-          const isCreator = trip?.created_by === email;
+          const isCurrentUser = normalizeEmail(email) === normalizeEmail(currentUserEmail);
+          const isCreator = normalizeEmail(trip?.created_by) === normalizeEmail(email);
           const prof = getProfile(email);
           const displayName = prof?.display_name || prof?.username || email || email;
           const initials = displayName.slice(0,2).toUpperCase();
