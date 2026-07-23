@@ -9,6 +9,7 @@ import { PlaneIcon } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
+import { useToast } from '@/components/ui/use-toast';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -85,6 +86,7 @@ const PERSONAL_CATEGORIES = ['personal'];
 export default function DocumentForm({
   initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [category, setCategory]     = useState(initialData?.category || 'flight');
   const [visibility, setVisibility] = useState(initialData?.visibility || 'shared');
   const [sharedWith, setSharedWith] = useState(initialData?.shared_with || []);
@@ -173,6 +175,9 @@ export default function DocumentForm({
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setField('file_url', file_url);
     } catch (err) {
+      // Antes un fallo aquí no dejaba ningún rastro: sin toast, el campo de
+      // archivo simplemente se quedaba vacío como si nada se hubiera intentado.
+      toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });
     }
     setFileUploading(false);
   };

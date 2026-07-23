@@ -14,16 +14,16 @@ const CATEGORY_FALLBACK = {
 
 const VISIBILITY_BADGE = {
   personal:       { tk: 'documents.visibility.personal', icon: EyeOff, cls: 'bg-secondary text-muted-foreground' },
-  shared:         { tk: 'documents.visibility.group',    icon: Eye,    cls: 'bg-green-50 text-green-600' },
-  selected_users: { tk: 'documents.visibility.selected', icon: Users,  cls: 'bg-blue-50 text-blue-500'  },
+  shared:         { tk: 'documents.visibility.group',    icon: Eye,    cls: 'bg-green-50 dark:bg-green-950/30 text-green-600' },
+  selected_users: { tk: 'documents.visibility.selected', icon: Users,  cls: 'bg-blue-50 dark:bg-blue-950/30 text-blue-500'  },
 };
 
 const ICON_BG = {
-  flight:   'bg-blue-50 text-blue-500',
-  train:    'bg-emerald-50 text-emerald-500',
-  hotel:    'bg-purple-50 text-purple-500',
-  event:    'bg-orange-50 text-primary',
-  personal: 'bg-amber-50 text-amber-500',
+  flight:   'bg-blue-50 dark:bg-blue-950/30 text-blue-500',
+  train:    'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500',
+  hotel:    'bg-purple-50 dark:bg-purple-950/30 text-purple-500',
+  event:    'bg-orange-50 dark:bg-orange-950/30 text-primary',
+  personal: 'bg-amber-50 dark:bg-amber-950/30 text-amber-500',
   other:    'bg-secondary text-muted-foreground',
 };
 
