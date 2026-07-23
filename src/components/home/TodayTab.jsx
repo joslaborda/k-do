@@ -8,6 +8,8 @@ import { ArrowRight } from 'lucide-react';
 import DayCard from './DayCard';
 import MemberAvatarRow from './MemberAvatarRow';
 import { useTranslation } from 'react-i18next';
+import { notify, resolveUserIds } from '@/lib/notifications';
+import { normalizeEmail } from '@/lib/utils';
 
 export default function TodayTab({ trip, cities, tripId, profiles, onInvite, currentUserEmail }) {
   const { t } = useTranslation();
@@ -75,8 +77,27 @@ export default function TodayTab({ trip, cities, tripId, profiles, onInvite, cur
 
   const handleUpdateItemTime = async (item, time) => {
     if (item._kind === 'doc') {
+      const oldTime = item.time || '';
       await base44.entities.Ticket.update(item.id, { time });
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      // Edición rápida de hora desde la fila del día (Hoy/Mañana) — mismo
+      // hueco que Documents.jsx y Cities.jsx: antes no avisaba a nadie.
+      if ((time || '') !== oldTime && time && item.visibility !== 'personal') {
+        const sharedWith = item.visibility === 'selected_users'
+          ? (item.shared_with || [])
+          : (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+        const targets = sharedWith.filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+        if (targets.length) {
+          const myProfile = (profiles || []).find(p => normalizeEmail(p.email) === normalizeEmail(currentUserEmail));
+          resolveUserIds(targets).then(resolved => {
+            resolved.forEach(({ userId }) => notify({
+              userId, type: 'doc_time', actor: myProfile, tripId, tripName: trip?.name,
+              refId: item.id, refTitle: item.name || t('documents.docFallback'),
+              refExtra: { time, endTime: item.end_time || null },
+            }));
+          });
+        }
+      }
     } else if (item._kind === 'spot') {
       await base44.entities.Spot.update(item.id, { assigned_time: time });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
