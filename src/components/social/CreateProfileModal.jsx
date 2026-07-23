@@ -101,7 +101,7 @@ function CountryPicker({ value, onChange, placeholder }) {
                 key={country.name}
                 type="button"
                 onClick={() => { onChange(country); setOpen(false); setSearch(''); }}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-secondary/60 ${value === country.name ? 'bg-orange-50 text-primary font-semibold' : 'text-foreground'}`}
+                className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors hover:bg-secondary/60 ${value === country.name ? 'bg-orange-50 dark:bg-orange-950/20 text-primary font-semibold' : 'text-foreground'}`}
               >
                 <span className="text-base flex-shrink-0">{country.flag}</span>
                 <span className="flex-1">{country.label}</span>
@@ -145,7 +145,7 @@ function SlideIdioma({ onSelect }) {
           onClick={() => setSelected('es')}
           className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all ${
             selected === 'es'
-              ? 'border-primary bg-orange-50'
+              ? 'border-primary bg-orange-50 dark:bg-orange-950/20'
               : 'border-border bg-card'
           }`}
         >
@@ -161,7 +161,7 @@ function SlideIdioma({ onSelect }) {
           onClick={() => setSelected('en')}
           className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all ${
             selected === 'en'
-              ? 'border-primary bg-orange-50'
+              ? 'border-primary bg-orange-50 dark:bg-orange-950/20'
               : 'border-border bg-card'
           }`}
         >
@@ -222,7 +222,7 @@ function SlideGrupo() {
             ))}
             <span className="text-xs text-muted-foreground ml-2">{t('onboarding.s3.travelers')}</span>
           </div>
-          <span className="text-xs bg-orange-50 text-primary border border-orange-200 px-2.5 py-1 rounded-full font-semibold">{t('onboarding.s3.invite')}</span>
+          <span className="text-xs bg-orange-50 dark:bg-orange-950/20 text-primary border border-orange-200 dark:border-orange-900/40 px-2.5 py-1 rounded-full font-semibold">{t('onboarding.s3.invite')}</span>
         </div>
 
         {/* Docs compartidos */}
