@@ -12,15 +12,17 @@ import { es } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
 import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
+import { normalizeEmail } from '@/lib/utils';
+import { useToast } from '@/components/ui/use-toast';
 
 const TYPE = {
-  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50',   labelKey: 'notifications.docAdded' },
-  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  labelKey: 'notifications.expenseAdded' },
-  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50',  labelKey: 'notifications.expenseSettled' },
-  photo_added:     { Icon: Camera,    color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.photoAdded' },
-  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50', labelKey: 'notifications.memberJoined' },
-  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.tripInvite' },
-  spot_added:      { Icon: Compass,   color: 'text-primary',    bg: 'bg-orange-50', labelKey: 'notifications.spotAdded' },
+  doc_added:       { Icon: FileText,  color: 'text-blue-500',   bg: 'bg-blue-50 dark:bg-blue-950/30',   labelKey: 'notifications.docAdded' },
+  expense_added:   { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50 dark:bg-green-950/30',  labelKey: 'notifications.expenseAdded' },
+  expense_settled: { Icon: Receipt,   color: 'text-green-600',  bg: 'bg-green-50 dark:bg-green-950/30',  labelKey: 'notifications.expenseSettled' },
+  photo_added:     { Icon: Camera,    color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.photoAdded' },
+  member_joined:   { Icon: UserPlus,  color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/30', labelKey: 'notifications.memberJoined' },
+  trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.tripInvite' },
+  spot_added:      { Icon: Compass,   color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.spotAdded' },
 };
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', labelKey: 'notifications.new' };
 
@@ -28,6 +30,7 @@ function TripInviteModal({ notif, onClose, onAccept }) {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const { t: translate } = useTranslation();
+  const { toast } = useToast();
   const [tripData, setTripData] = useState(null);
   const [invite, setInvite] = useState(null);
   const [members, setMembers] = useState([]);
@@ -87,7 +90,11 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         const myProfArr = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
         const myProf = myProfArr[0] || null;
         const latestTrip = await base44.entities.Trip.get(invite.trip_id);
-        const others = (latestTrip?.members || []).filter(e => e !== currentUser.email);
+        // normalizeEmail() en ambos lados — sin esto, si el email de sesión
+        // trae mayúsculas distintas a como está guardado en trip.members, el
+        // propio usuario que se acaba de unir se queda incluido en `others`
+        // y termina notificándose a sí mismo de su propia entrada al viaje.
+        const others = (latestTrip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUser.email));
         const resolved = await resolveUserIds(others);
         resolved.forEach(({ userId }) => notify({ userId, type: 'member_joined', actor: myProf, tripId: invite.trip_id, tripName: latestTrip?.name }));
       } catch {}
@@ -106,7 +113,12 @@ function TripInviteModal({ notif, onClose, onAccept }) {
       await declineTripInvite(invite.id, invite.invite_token);
       qc.invalidateQueries({ queryKey: ['myPendingInvites'] });
       onClose();
-    } catch {}
+    } catch (e) {
+      // Antes esto fallaba en silencio: el botón dejaba de girar y el
+      // usuario no tenía forma de saber si la invitación se había rechazado
+      // de verdad o no.
+      toast({ title: t('common.error'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
     setProcessing(false);
   };
 
