@@ -337,6 +337,13 @@
     "new": {
       "countryRequired": "País *",
       "typeCityName": "Escribe el nombre de la ciudad",
+      "useQuery": "Usar “{{q}}” →",
+      "destination": "Destino",
+      "destinations": "Destinos",
+      "totalLabel": "Total",
+      "nightsCount_one": "{{count}} noche",
+      "nightsCount_other": "{{count}} noches",
+      "endLabel": "Fin",
       "namePlaceholder": "ej. Mamma mía 2026",
       "tripName": "Nombre del viaje",
       "nameRequired": "El nombre es obligatorio",
@@ -456,6 +463,11 @@
     "byCategory": "Por categoría (mi parte)",
     "deleteExpense": "Eliminar gasto",
     "deleteConfirm": "¿Eliminar este gasto?",
+    "deletePermanent": "{{description}} — Se eliminará permanentemente.",
+    "fx": {
+      "updatedAt": "Tasas actualizadas a las {{time}}",
+      "source": "Fuente: Banco Central Europeo · Solo orientativo"
+    },
     "saveChanges": "Guardar cambios",
     "saveExpense": "Guardar gasto",
     "paidByShort": "Pagó {{name}} · ÷ {{count}}",
@@ -1308,6 +1320,8 @@
       "verifyConsulate": "Verificar con consulado",
       "intro1": "Requisitos para viajar a",
       "intro2": "con pasaporte de",
+      "needHomeCountry": "Añade tu nacionalidad en tu perfil para ver los requisitos de visado y vacunas",
+      "completeProfileCta": "Completar perfil",
       "visa": {
         "evisa": "Tramitar online antes de viajar",
         "voa": "Se obtiene a la llegada en el aeropuerto",

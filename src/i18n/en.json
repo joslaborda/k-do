@@ -337,6 +337,13 @@
     "new": {
       "countryRequired": "Country *",
       "typeCityName": "Type the city name",
+      "useQuery": "Use “{{q}}” →",
+      "destination": "Destination",
+      "destinations": "Destinations",
+      "totalLabel": "Total",
+      "nightsCount_one": "{{count}} night",
+      "nightsCount_other": "{{count}} nights",
+      "endLabel": "End",
       "namePlaceholder": "e.g. Mamma mia 2026",
       "tripName": "Trip name",
       "nameRequired": "The name is required",
@@ -456,6 +463,11 @@
     "byCategory": "By category (my share)",
     "deleteExpense": "Delete expense",
     "deleteConfirm": "Delete this expense?",
+    "deletePermanent": "{{description}} — This will be permanently deleted.",
+    "fx": {
+      "updatedAt": "Rates updated at {{time}}",
+      "source": "Source: European Central Bank · For reference only"
+    },
     "saveChanges": "Save changes",
     "saveExpense": "Save expense",
     "paidByShort": "Paid by {{name}} · ÷ {{count}}",
@@ -1308,6 +1320,8 @@
       "verifyConsulate": "Verify with consulate",
       "intro1": "Requirements to travel to",
       "intro2": "with a passport from",
+      "needHomeCountry": "Add your nationality in your profile to see visa and vaccine requirements",
+      "completeProfileCta": "Complete profile",
       "visa": {
         "evisa": "Apply online before travelling",
         "voa": "Obtained on arrival at the airport",
