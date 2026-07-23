@@ -39,7 +39,10 @@ function InlineCommentsPopup({ spot, userId, onClose }) {
   });
 
   const handleSubmit = () => {
-    if (!text.trim()) return;
+    // El botón de enviar sí comprobaba isPending, pero Enter en el textarea
+    // llamaba a handleSubmit() directamente sin pasar por esa guarda —
+    // pulsar Enter rápido podía crear comentarios duplicados.
+    if (!text.trim() || mutation.isPending) return;
     mutation.mutate();
   };
 

@@ -125,18 +125,18 @@ export async function loadLeaflet() {
 // ── Type config ───────────────────────────────────────────────────────────────
 
 export const TYPE_CONFIG = {
-  food:      { label:'Comer',      tk:'spots.types.food',      Icon: Utensils,    color:'bg-orange-100 text-primary' },
-  sight:     { label:'Cultura',    tk:'spots.types.sight',     Icon: Landmark,    color:'bg-violet-100 text-violet-600' },
-  activity:  { label:'Actividad',  tk:'spots.types.activity',  Icon: Ticket,      color:'bg-green-100 text-green-600' },
-  shopping:  { label:'Compras',    tk:'spots.types.shopping',  Icon: ShoppingBag, color:'bg-blue-100 text-blue-600' },
+  food:      { label:'Comer',      tk:'spots.types.food',      Icon: Utensils,    color:'bg-orange-100 dark:bg-orange-950/30 text-primary' },
+  sight:     { label:'Cultura',    tk:'spots.types.sight',     Icon: Landmark,    color:'bg-violet-100 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400' },
+  activity:  { label:'Actividad',  tk:'spots.types.activity',  Icon: Ticket,      color:'bg-green-100 dark:bg-green-950/30 text-green-600 dark:text-green-400' },
+  shopping:  { label:'Compras',    tk:'spots.types.shopping',  Icon: ShoppingBag, color:'bg-blue-100 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400' },
   transport: { label:'Transporte', tk:'spots.types.transport', Icon: Compass,     color:'bg-secondary text-muted-foreground' },
-  hotel:     { label:'Hotel',      tk:'spots.types.hotel',     Icon: Hotel,       color:'bg-indigo-100 text-indigo-700' },
+  hotel:     { label:'Hotel',      tk:'spots.types.hotel',     Icon: Hotel,       color:'bg-indigo-100 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400' },
   // Antes 'transport' era el único cajón para bus/tren/aeropuerto — un solo
   // icono de brújula genérico para los tres. Ahora cada uno tiene el suyo;
   // 'transport' se queda como fallback para spots antiguos ya guardados así.
-  airport:   { label:'Aeropuerto', tk:'spots.types.airport',   Icon: PlaneIcon,   color:'bg-sky-100 text-sky-700' },
-  train:     { label:'Estación de tren', tk:'spots.types.train', Icon: TrainFront, color:'bg-emerald-100 text-emerald-700' },
-  bus:       { label:'Estación de autobús', tk:'spots.types.bus', Icon: BusFront, color:'bg-amber-100 text-amber-700' },
+  airport:   { label:'Aeropuerto', tk:'spots.types.airport',   Icon: PlaneIcon,   color:'bg-sky-100 dark:bg-sky-950/30 text-sky-700 dark:text-sky-400' },
+  train:     { label:'Estación de tren', tk:'spots.types.train', Icon: TrainFront, color:'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400' },
+  bus:       { label:'Estación de autobús', tk:'spots.types.bus', Icon: BusFront, color:'bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400' },
   custom:    { label:'Otro',       tk:'spots.types.custom',    Icon: CirclePlus,  color:'bg-secondary text-muted-foreground' },
 };
 

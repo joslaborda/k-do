@@ -115,7 +115,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
         ...cityIdUpdate,
       });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-      if (timeChanged && assignedTime) onNotify?.('spot_time', `${spot.title}: hora cambiada a ${assignedTime}`, spot.title);
+      if (timeChanged && assignedTime) onNotify?.('spot_time', null, spot.title, { time: assignedTime });
       onClose();
     } catch (e) {
       toast({ title: t('common.saveError'), description: e.message, variant: 'destructive' });
