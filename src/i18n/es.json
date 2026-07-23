@@ -47,6 +47,7 @@
     "member": "Miembro",
     "members": "Miembros",
     "admin": "Admin",
+    "beta": "beta",
     "usernameErrors": {
       "empty": "El usuario no puede estar vacío",
       "tooShort": "Mínimo 3 caracteres",
@@ -322,6 +323,8 @@
       "endBeforeStart": "La fecha de fin no puede ser anterior a la de inicio"
     },
     "loadingTrip": "Cargando viaje...",
+    "travelersCount_one": "{{count}} viajero",
+    "travelersCount_other": "{{count}} viajeros",
     "nav": {
       "routeSub": "Ciudades e itinerario",
       "docs": "Docs",
@@ -658,6 +661,9 @@
     "saving": "Guardando...",
     "inYourList": "Ya en tu lista",
     "addShort": "Añadir",
+    "alreadySavedInTrip": "Ya guardado en tu viaje",
+    "saveToTrip": "Guardar en mi viaje",
+    "cardMaps": "Maps",
     "undo": "Deshacer",
     "undoError": "No se pudo deshacer. El sitio sigue guardado, revísalo en tu lista.",
     "backHome": "Inicio",
@@ -928,6 +934,8 @@
     "noTrips": "Sin viajes aún",
     "spotCount_one": "{{count}} spot",
     "spotCount_other": "{{count}} spots",
+    "likesCount_one": "{{count}} like",
+    "likesCount_other": "{{count}} likes",
     "savedBadge": "Guardado",
     "savedToast": "{{title}} guardado · Añadido a tu carpeta {{country}}",
     "noResultsFor": "Sin resultados para \"{{query}}\"",

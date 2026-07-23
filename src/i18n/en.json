@@ -47,6 +47,7 @@
     "member": "Member",
     "members": "Members",
     "admin": "Admin",
+    "beta": "beta",
     "usernameErrors": {
       "empty": "Username can't be empty",
       "tooShort": "Minimum 3 characters",
@@ -322,6 +323,8 @@
       "endBeforeStart": "The end date can't be before the start date"
     },
     "loadingTrip": "Loading trip...",
+    "travelersCount_one": "{{count}} traveler",
+    "travelersCount_other": "{{count}} travelers",
     "nav": {
       "routeSub": "Cities and itinerary",
       "docs": "Docs",
@@ -658,6 +661,9 @@
     "saving": "Saving...",
     "inYourList": "Already in your list",
     "addShort": "Add",
+    "alreadySavedInTrip": "Already saved to your trip",
+    "saveToTrip": "Save to my trip",
+    "cardMaps": "Maps",
     "undo": "Undo",
     "undoError": "Couldn't undo. The spot is still saved — check your list.",
     "backHome": "Home",
@@ -928,6 +934,8 @@
     "noTrips": "No trips yet",
     "spotCount_one": "{{count}} spot",
     "spotCount_other": "{{count}} spots",
+    "likesCount_one": "{{count}} like",
+    "likesCount_other": "{{count}} likes",
     "savedBadge": "Saved",
     "savedToast": "{{title}} saved · Added to your {{country}} folder",
     "noResultsFor": "No results for \"{{query}}\"",
