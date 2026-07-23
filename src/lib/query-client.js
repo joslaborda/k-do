@@ -30,7 +30,12 @@ persistQueryClient({
   // Don't persist mutation state — only query data
   dehydrateOptions: {
     shouldDehydrateQuery: (query) => {
-      // Persist all successful queries except auth-related ones
+      // Persist all successful queries. Auth itself isn't a react-query
+      // query in this app (see AuthContext.jsx), so there's no key to
+      // exclude here — the real safeguard against leaking one user's
+      // cached data (trips, expenses, messages...) into the next session
+      // on a shared device is clearing the whole cache on logout, done in
+      // AuthContext.logout().
       return query.state.status === 'success';
     },
   },

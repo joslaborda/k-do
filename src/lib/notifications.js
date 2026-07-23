@@ -1,4 +1,5 @@
 import { base44 } from '@/api/base44Client';
+import { normalizeEmail } from '@/lib/utils';
 
 /**
  * Crea una notificación. Silencioso si falla.
@@ -29,9 +30,15 @@ export async function notify({ userId, type, actor, tripId, tripName, refId, ref
 export async function resolveUserIds(emails) {
   if (!emails?.length) return [];
   try {
-    const users = await base44.entities.User.filter({ email: { $in: emails } });
-    return emails
-      .map(email => ({ email, userId: users.find(u => u.email === email)?.id }))
+    // Normalizado en ambos lados: otros llamantes (Photos.jsx, Invites.jsx)
+    // no siempre normalizan antes de pasar los emails aquí, y comparar en
+    // crudo hacía que la notificación simplemente no se creara — sin
+    // ningún error visible — si el casing no coincidía exactamente.
+    const normEmails = emails.map(normalizeEmail).filter(Boolean);
+    if (!normEmails.length) return [];
+    const users = await base44.entities.User.filter({ email: { $in: normEmails } });
+    return normEmails
+      .map(email => ({ email, userId: users.find(u => normalizeEmail(u.email) === email)?.id }))
       .filter(x => x.userId);
   } catch { return []; }
 }

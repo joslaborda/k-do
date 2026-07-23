@@ -4,6 +4,8 @@
  * Cubre: festivos fijos + móviles calculados por año
  */
 
+import { parseDateOnly } from '@/lib/tripContext';
+
 // ─── Utilidades ───────────────────────────────────────────────────────────────
 
 // Calcular Domingo de Pascua (algoritmo de Butcher/Meeus)
@@ -662,8 +664,15 @@ export function getHolidaysForDate(country, dateStr, cityName = '') {
 export function getHolidaysInRange(countries, startDate, endDate, cities = []) {
   if (!startDate || !endDate) return [];
   const result = [];
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  // new Date('YYYY-MM-DD') parsea como medianoche UTC, pero el bucle avanza
+  // y `fmt()` formatea en hora LOCAL — para usuarios en zonas horarias
+  // negativas (Colombia, México, que este archivo soporta explícitamente
+  // más abajo) todo el rango se desplazaba un día antes, perdiendo festivos
+  // del último día del viaje. parseDateOnly ya evita esta trampa en
+  // tripContext.js — se reutiliza aquí por el mismo motivo.
+  const start = parseDateOnly(startDate);
+  const end = parseDateOnly(endDate);
+  if (!start || !end) return [];
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = fmt(d);

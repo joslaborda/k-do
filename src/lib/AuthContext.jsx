@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -113,7 +114,13 @@ export const AuthProvider = ({ children }) => {
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
-    
+
+    // Sin esto, la caché de react-query (viajes, gastos, mensajes, fotos...)
+    // seguía en localStorage tras cerrar sesión y podía renderizarse
+    // brevemente para la siguiente persona que iniciara sesión en el mismo
+    // dispositivo, antes de que sus propias queries la sobrescribieran.
+    queryClientInstance.clear();
+
     if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect
       base44.auth.logout(window.location.href);

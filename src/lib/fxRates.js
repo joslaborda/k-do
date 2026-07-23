@@ -117,10 +117,18 @@ export async function getFxRate(from, to, dateStr = null) {
   }
 
   // 3. Entity cache
+  // OJO: a partir de aquí (3, 4a, 4b) solo hay tasas ACTUALES. Si se pidió
+  // dateStr y la histórica de arriba falló, lo que devolvemos aquí es el
+  // tipo de cambio de HOY, no el de esa fecha — antes se devolvía con un
+  // source normal (frankfurter/ECB, exchangerate-api...) indistinguible de
+  // una tasa histórica real, así que un gasto con fecha pasada podía
+  // calcularse con el tipo de cambio equivocado sin ningún aviso. Se marca
+  // approximate:true para que la UI pueda avisar.
+  const wantedHistorical = !!dateStr;
   const entityCached = await fromEntity(from, to);
   if (entityCached) {
     lsSet(from, to, entityCached.rate, entityCached.source);
-    return entityCached;
+    return { ...entityCached, approximate: wantedHistorical };
   }
 
   // 4a. ExchangeRate-API (primary, most reliable)
@@ -129,7 +137,7 @@ export async function getFxRate(from, to, dateStr = null) {
     const fetchedAt = new Date().toISOString();
     lsSet(from, to, result.rate, result.source);
     persistToEntity(from, to, result.rate, result.source);
-    return { ...result, fetchedAt };
+    return { ...result, fetchedAt, approximate: wantedHistorical };
   } catch {}
 
   // 4b. Frankfurter API fallback
@@ -138,7 +146,7 @@ export async function getFxRate(from, to, dateStr = null) {
     const fetchedAt = new Date().toISOString();
     lsSet(from, to, result.rate, result.source);
     persistToEntity(from, to, result.rate, result.source);
-    return { ...result, fetchedAt };
+    return { ...result, fetchedAt, approximate: wantedHistorical };
   } catch {}
 
   // 5. Last resort: 1:1 con aviso
@@ -157,5 +165,6 @@ export async function convertAmount(amount, from, to, dateStr = null) {
     rate: fx.rate,
     source: fx.source,
     fetchedAt: fx.fetchedAt,
+    approximate: !!fx.approximate,
   };
 }
