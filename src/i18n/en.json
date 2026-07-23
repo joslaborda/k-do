@@ -1203,6 +1203,7 @@
     "memberJoined": "joined the trip",
     "tripInvite": "invited you to a trip",
     "spotAdded": "added a spot",
+    "spotTimeChanged": "changed the time to {{time}}",
     "new": "new notification",
     "joinTrip": "Join trip",
     "inviteFrom": "Invitation from",
@@ -1492,7 +1493,9 @@
     "uploadFailedTitle_other": "{{count}} photos couldn't be uploaded",
     "uploadPartial": "{{ok}} uploaded, {{failed}} failed. Try again with the remaining ones.",
     "uploadRetry": "Check your connection and try again.",
-    "uploadErrorTitle": "Couldn't upload the photos"
+    "uploadErrorTitle": "Couldn't upload the photos",
+    "tooManyFilesTitle": "Only {{count}} photos will be uploaded",
+    "tooManyFilesDesc": "You selected more than {{count}} photos at once. The rest weren't uploaded; try again with the ones that are missing."
   },
   "translator": {
     "translate": "Translate",
@@ -1647,6 +1650,7 @@
   "nav": {
     "home": "Home",
     "translate": "Translate",
+    "more": "More",
     "moreTools": "More tools",
     "photosSub": "Trip photos",
     "docsSub": "Trip documents",

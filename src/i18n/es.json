@@ -1203,6 +1203,7 @@
     "memberJoined": "se unió al viaje",
     "tripInvite": "te invitó a un viaje",
     "spotAdded": "añadió un spot",
+    "spotTimeChanged": "cambió la hora a {{time}}",
     "new": "nueva notificación",
     "joinTrip": "Unirme al viaje",
     "inviteFrom": "Invitación de",
@@ -1492,7 +1493,9 @@
     "uploadFailedTitle_other": "{{count}} fotos no se pudieron subir",
     "uploadPartial": "Se subieron {{ok}} y fallaron {{failed}}. Inténtalo de nuevo con las que faltan.",
     "uploadRetry": "Comprueba tu conexión e inténtalo de nuevo.",
-    "uploadErrorTitle": "No se pudieron subir las fotos"
+    "uploadErrorTitle": "No se pudieron subir las fotos",
+    "tooManyFilesTitle": "Solo se subirán {{count}} fotos",
+    "tooManyFilesDesc": "Has seleccionado más de {{count}} fotos a la vez. El resto no se ha subido; vuelve a intentarlo con las que falten."
   },
   "translator": {
     "translate": "Traducir",
@@ -1647,6 +1650,7 @@
   "nav": {
     "home": "Inicio",
     "translate": "Traducir",
+    "more": "Más",
     "moreTools": "Más herramientas",
     "photosSub": "Fotos del viaje",
     "docsSub": "Documentos del viaje",
