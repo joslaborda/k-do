@@ -130,7 +130,7 @@ function SlideIdioma({ onSelect }) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4">
-      <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mb-6">
+      <div className="w-16 h-16 rounded-2xl bg-orange-100 dark:bg-orange-950/30 flex items-center justify-center mb-6">
         <Languages className="w-8 h-8 text-primary" strokeWidth={1.5} />
       </div>
       <h2 className="text-2xl font-black text-foreground text-center leading-tight mb-2">
@@ -632,7 +632,7 @@ export default function CreateProfileModal({ user, open, onComplete }) {
                     maxLength={30}
                     autoCapitalize="none"
                     autoCorrect="off"
-                    className={`w-full pl-8 pr-10 py-3 rounded-2xl border text-sm font-medium text-foreground outline-none transition-colors ${available === true ? 'border-primary bg-card' : available === false ? 'border-red-400 bg-red-50' : 'border-border bg-secondary/40'} focus:border-primary`}
+                    className={`w-full pl-8 pr-10 py-3 rounded-2xl border text-sm font-medium text-foreground outline-none transition-colors ${available === true ? 'border-primary bg-card' : available === false ? 'border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-950/30' : 'border-border bg-secondary/40'} focus:border-primary`}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2">
                     {checking && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
