@@ -117,7 +117,7 @@ function PlugIcon({ type }) {
   );
 }
 
-function RequirementsTab({ reqs, country, homeCountry, meta, skipVaccines = [] }) {
+function RequirementsTab({ reqs, country, homeCountry, meta, skipVaccines = [], profileLoading = false }) {
   const { t, i18n } = useTranslation();
   const [showAllVaccines, setShowAllVaccines] = useState(false);
 
@@ -125,6 +125,27 @@ function RequirementsTab({ reqs, country, homeCountry, meta, skipVaccines = [] }
     <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
       <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
       <p className="text-sm text-muted-foreground">{t('utilities.noDestination')}</p>
+    </div>
+  );
+
+  // Mientras se carga el perfil no se sabe todavía si hay nacionalidad — no
+  // mostrar nada basado en un país de referencia que aún no se conoce.
+  if (profileLoading) return (
+    <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
+      <Loader2 className="w-6 h-6 mx-auto animate-spin text-muted-foreground/50" />
+    </div>
+  );
+
+  // El registro exige nacionalidad, así que llegar aquí sin homeCountry es
+  // un caso raro (perfil legacy o dato borrado) — mejor pedir completarlo
+  // que mostrar requisitos de un país que nadie ha elegido.
+  if (!homeCountry) return (
+    <div className="bg-card rounded-2xl border border-border text-center py-12 px-6">
+      <Info className="w-8 h-8 mx-auto mb-3 text-muted-foreground/40" />
+      <p className="text-sm font-medium text-foreground mb-1">{t('utilities.reqs.needHomeCountry')}</p>
+      <Link to={createPageUrl('Settings')} className="inline-block mt-3 text-xs text-primary font-medium underline">
+        {t('utilities.reqs.completeProfileCta')}
+      </Link>
     </div>
   );
 
@@ -404,6 +425,10 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
   };
 
   const commitAdd = async () => {
+    // Guard aquí (no solo en el botón "+"): el atajo de Enter en el input
+    // no pasaba por el `disabled` del botón, así que un doble Enter rápido
+    // antes de que terminara la primera mutación creaba el ítem duplicado.
+    if (createMutation.isPending) return;
     if (!newName.trim()) { setAdding(null); return; }
     if (adding === 'souvenir') {
       await createMutation.mutateAsync({ name: newName.trim(), category: 'souvenir', packed: false, essential: false });
@@ -528,8 +553,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                               {item.name}
                             </p>
                             {!item.essential && (
-                              <button onClick={() => deleteMutation.mutate(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0">
+                              <button onClick={() => deleteMutation.mutate(item.id)} disabled={deleteMutation.isPending}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0 disabled:opacity-30">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
@@ -592,8 +617,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                 <p className={`flex-1 text-sm truncate ${item.packed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                   {item.name}
                 </p>
-                <button onClick={() => deleteMutation.mutate(item.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0">
+                <button onClick={() => deleteMutation.mutate(item.id)} disabled={deleteMutation.isPending}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive flex-shrink-0 disabled:opacity-30">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -609,8 +634,8 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                   placeholder={t('utilities.packing.souvPlaceholder')}
                   className="flex-1 text-sm outline-none bg-transparent text-foreground placeholder:text-muted-foreground"
                 />
-                <button onClick={commitAdd}
-                  className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <button onClick={commitAdd} disabled={createMutation.isPending}
+                  className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0 disabled:opacity-50 disabled:pointer-events-none">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </button>
               </div>
@@ -1031,7 +1056,7 @@ export default function Utilities() {
     enabled: !!tripId, staleTime: 60000,
   });
 
-  const { data: myProfile } = useQuery({
+  const { data: myProfile, isLoading: profileLoading } = useQuery({
     queryKey: ['myProfile', user?.id],
     queryFn: async () => { const r = await base44.entities.UserProfile.filter({ user_id: user.id }); return r[0] || null; },
     enabled: !!user?.id, staleTime: 300000,
@@ -1043,7 +1068,15 @@ export default function Utilities() {
     || tripCities[0];
   const country = activeCity?.country || trip?.country || '';
   const meta = country ? getCountryMeta(country) : {};
-  const homeCountry = myProfile?.nationality || myProfile?.home_country || myProfile?.country || 'España';
+  // El registro exige nacionalidad y país de residencia (CreateProfileModal,
+  // canStep2), así que en condiciones normales esto siempre debería venir
+  // relleno. Antes, mientras la query de perfil aún no había resuelto (o en
+  // el caso raro de que de verdad viniera vacío), caía a 'España' a pelo —
+  // un usuario angloparlante sin perfil veía requisitos de visado pensados
+  // para un pasaporte español, sin ningún aviso de que el dato era una
+  // suposición. Ahora se deja en null y RequirementsTab/EmergencyContent
+  // distinguen "cargando" de "falta el dato" en vez de inventarse un país.
+  const homeCountry = myProfile?.nationality || myProfile?.home_country || myProfile?.country || null;
   const secondNationality = myProfile?.second_nationality || null;
 
   // `new Date('2026-07-20')` se parsea como medianoche UTC, no local, y sin hora
@@ -1114,13 +1147,14 @@ export default function Utilities() {
             secondNationality={secondNationality}
             meta={meta}
             activeCityName={activeCity?.name || ''}
+            profileLoading={profileLoading}
           />
         )}
         {activeTab === 'maleta' && (
           <PackingTab tripId={tripId} country={country} tripInProgress={tripInProgress} userId={user?.id} tripMembers={trip?.members} externalOpen={packingSheetOpen} onExternalClose={() => setPackingSheetOpen(false)} />
         )}
         {activeTab === 'requisitos' && (
-          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} skipVaccines={skipVaccines} />
+          <RequirementsTab reqs={countryReqs} country={country} homeCountry={homeCountry} meta={meta} skipVaccines={skipVaccines} profileLoading={profileLoading} />
         )}
         {activeTab === 'tiempo' && (
           <div className="space-y-4">

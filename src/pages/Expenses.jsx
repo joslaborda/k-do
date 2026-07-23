@@ -31,9 +31,9 @@ const CAT_ICONS = {
   other:         MoreHorizontal,
 };
 const CAT_COLORS = {
-  food: 'bg-orange-100 text-primary', transport: 'bg-blue-100 text-blue-600',
-  accommodation: 'bg-purple-100 text-purple-600', activities: 'bg-pink-100 text-pink-600',
-  shopping: 'bg-emerald-100 text-emerald-600', drinks: 'bg-pink-100 text-pink-600', other: 'bg-secondary text-muted-foreground',
+  food: 'bg-orange-100 dark:bg-orange-950/30 text-primary', transport: 'bg-blue-100 dark:bg-blue-950/30 text-blue-600',
+  accommodation: 'bg-purple-100 dark:bg-purple-950/30 text-purple-600', activities: 'bg-pink-100 dark:bg-pink-950/30 text-pink-600',
+  shopping: 'bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600', drinks: 'bg-pink-100 dark:bg-pink-950/30 text-pink-600', other: 'bg-secondary text-muted-foreground',
 };
 const CAT_CONFIG = {
   food:          { label: 'expenses.categories.food'          },
@@ -314,8 +314,8 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       {/* Mi balance — card prominente */}
       <div className={`rounded-2xl border p-4 ${
         iSettled ? 'bg-card border-border' :
-        myBalance > 0 ? 'bg-green-50 border-green-200' :
-        'bg-red-50 border-red-200'
+        myBalance > 0 ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900/40' :
+        'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/40'
       }`}>
         <p className={`text-xs font-medium mb-2 ${iSettled ? 'text-muted-foreground' : myBalance > 0 ? 'text-green-800' : 'text-red-800'}`}>
           {t('expenses.balance.yourBalance')}
@@ -376,7 +376,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
                     onClick={() => handleSettleClick({ ...d, displayAmount: cv?.debtorAmount || d.amount, displayCurrency: cv?.debtorCurrency || baseCurrency })}
                     disabled={!!settlingKey}
                     className="text-sm bg-primary text-white px-4 py-2 rounded-full font-semibold flex-shrink-0 disabled:opacity-50 disabled:pointer-events-none">
-                    {settlingKey === `${d.from}-${d.to}` ? t('common.loading') : 'Saldar'}
+                    {settlingKey === `${d.from}-${d.to}` ? t('common.loading') : t('expenses.balance.settle')}
                   </button>
                 </div>
               );
@@ -443,7 +443,7 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       )}
 
       {iSettled && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
+        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/40 rounded-2xl p-4 text-center">
           <p className="text-sm font-medium text-green-700">{t('expenses.balance.everyoneSettled')}</p>
           <p className="text-xs text-green-600 mt-1">{t('expenses.balance.noDebts')}</p>
         </div>
@@ -744,12 +744,12 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
           <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
               <p className="text-sm font-medium text-foreground">{t('expenses.deleteConfirm')}</p>
             </div>
-            <p className="text-xs text-muted-foreground mb-5 ml-11">{expense.description} — Se eliminará permanentemente.</p>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{t('expenses.deletePermanent', { description: expense.description })}</p>
             <div className="flex gap-3">
               <button onClick={() => setConfirmDelete(false)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
               <button onClick={() => { setConfirmDelete(false); onDelete(expense); }} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">{t('common.delete')}</button>
@@ -889,7 +889,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
           </div>
         </div>
         {lastFetch && (
-          <p className="text-xs text-muted-foreground mt-2">Tasas actualizadas a las {lastFetch}</p>
+          <p className="text-xs text-muted-foreground mt-2">{t('expenses.fx.updatedAt', { time: lastFetch })}</p>
         )}
       </div>
 
@@ -906,7 +906,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
             const isActive = currency === activeCurrency;
             return (
               <div key={currency}
-                className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40' : ''}`}>
+                className={`flex items-center justify-between px-4 py-3.5 ${i > 0 ? 'border-t border-border' : ''} ${isActive ? 'bg-orange-50/40 dark:bg-orange-950/20' : ''}`}>
                 <div className="flex items-center gap-2.5">
                   <span className="text-sm font-medium text-muted-foreground">{getCountryMeta(currency)?.flag || currency}</span>
                   <div>
@@ -923,7 +923,7 @@ function ConversionTab({ cities, baseCurrency, activeCity, homeCurrency = 'EUR' 
       </div>
 
       <p className="text-xs text-muted-foreground text-center px-4">
-        Fuente: Banco Central Europeo · Solo orientativo
+        {t('expenses.fx.source')}
       </p>
     </div>
   );
@@ -944,7 +944,12 @@ export default function Expenses() {
     }
   }, [tripId, navigate]);
   const { user: currentUser } = useAuth();
-  const currentUserEmail = currentUser?.email ?? '';
+  // normalizeEmail() aquí — a diferencia de Home.jsx/Cities.jsx, este email
+  // se usa además como fallback al escribir trip_members (ver createMutation
+  // más abajo), que es justo el campo que las reglas RLS de base44 usan para
+  // decidir quién puede releer el gasto. Sin normalizar, un email con
+  // capitalización distinta podía dejar al propio creador sin acceso.
+  const currentUserEmail = normalizeEmail(currentUser?.email) ?? '';
   const queryClient = useQueryClient();
 
   const [tab, setTab] = useState('gastos');
@@ -1084,7 +1089,7 @@ export default function Expenses() {
   // invisible para siempre, incluso para quien lo creó — parecía "borrado"
   // sin estarlo. Como mínimo se incluye siempre al propio creador.
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || (currentUser?.email ? [currentUser.email] : []) }),
+    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || (currentUserEmail ? [currentUserEmail] : []) }),
     onError: () => toast({ title: t('expenses.saveError'), description: t('common.tryAgain'), variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });

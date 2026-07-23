@@ -48,12 +48,12 @@ const SPOT_ICONS = {
   bus:      BusFront,
 };
 const SPOT_COLORS = {
-  food: 'bg-orange-50 text-primary', sight: 'bg-violet-50 text-violet-600',
-  activity: 'bg-green-50 text-green-600', shopping: 'bg-blue-50 text-blue-600',
-  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 text-primary',
-  museum: 'bg-violet-50 text-violet-600',
-  hotel: 'bg-indigo-50 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
-  airport: 'bg-sky-50 text-sky-700', train: 'bg-emerald-50 text-emerald-700', bus: 'bg-amber-50 text-amber-700',
+  food: 'bg-orange-50 dark:bg-orange-950/30 text-primary', sight: 'bg-violet-50 dark:bg-violet-950/30 text-violet-600',
+  activity: 'bg-green-50 dark:bg-green-950/30 text-green-600', shopping: 'bg-blue-50 dark:bg-blue-950/30 text-blue-600',
+  custom: 'bg-secondary text-muted-foreground', restaurant: 'bg-orange-50 dark:bg-orange-950/30 text-primary',
+  museum: 'bg-violet-50 dark:bg-violet-950/30 text-violet-600',
+  hotel: 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700', transport: 'bg-secondary text-muted-foreground',
+  airport: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700', train: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700', bus: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700',
 };
 
 function getTransportIcon(docs, cityStartDate) {
@@ -127,7 +127,7 @@ function SpotEditModal({spot, open, onClose, onSave, onRemove }) {
 
 
 // ── Doc viewer modal ──────────────────────────────────────────────────────────
-const DOC_BG = { flight:'bg-blue-50', hotel:'bg-purple-50', train:'bg-green-50', bus:'bg-amber-50', car:'bg-orange-50', ticket:'bg-rose-50', insurance:'bg-teal-50', other:'bg-secondary' };
+const DOC_BG = { flight:'bg-blue-50 dark:bg-blue-950/30', hotel:'bg-purple-50 dark:bg-purple-950/30', train:'bg-green-50 dark:bg-green-950/30', bus:'bg-amber-50 dark:bg-amber-950/30', car:'bg-orange-50 dark:bg-orange-950/30', ticket:'bg-rose-50 dark:bg-rose-950/30', insurance:'bg-teal-50 dark:bg-teal-950/30', other:'bg-secondary' };
 
 function DocViewerModal({ doc, open, onClose, onEdit }) {
   const { t } = useTranslation();
@@ -157,7 +157,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
         {/* File preview / upload zone */}
         {doc?.file_url ? (
           <button onClick={openFile} className="mx-4 my-3 bg-secondary rounded-xl p-4 flex items-center gap-3 hover:bg-border/40 transition-colors text-left w-[calc(100%-2rem)]">
-            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/30 flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5 text-red-600" strokeWidth={1.5} />
             </div>
             <div className="flex-1 min-w-0">
@@ -286,14 +286,25 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   };
 
   const handleSpotSave = async (spot, newNotes, newTime) => {
-    await base44.entities.Spot.update(spot.id, { notes: newNotes, assigned_time: newTime || null });
-    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-    setEditingSpot(null);
+    try {
+      await base44.entities.Spot.update(spot.id, { notes: newNotes, assigned_time: newTime || null });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      setEditingSpot(null);
+    } catch (e) {
+      // Antes esto no tenía try/catch — un fallo dejaba el modal a medias
+      // (ni se cerraba ni avisaba de nada) sin que el usuario supiera si su
+      // cambio se había guardado o no.
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
   };
   const handleSpotRemove = async (spot) => {
-    await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
-    queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-    setEditingSpot(null);
+    try {
+      await base44.entities.Spot.update(spot.id, { assigned_date: null, day_order: null, assigned_time: null });
+      queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+      setEditingSpot(null);
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
+    }
   };
 
   const handleDocSave = async (data) => {
@@ -305,6 +316,8 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       setEditingDoc(null);
+    } catch (e) {
+      toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' });
     } finally { setSavingDoc(false); }
   };
 
@@ -709,7 +722,7 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
           <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
             <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-4 h-4 text-red-500" />
               </div>
               <p className="text-sm font-medium text-foreground">{t('documents.deleteConfirm')}</p>
@@ -760,14 +773,14 @@ function DayRow({ day, dateStr, allDocs, allSpots, tripId, cityId, isToday_, isT
   const label = isToday_ ? format(parseISO(dateStr), 'dd MMM', { locale: es }) : format(parseISO(dateStr), 'dd MMM', { locale: es });
 
   const rowBorder = isToday_ ? 'border-t-2 border-t-primary' : 'border-t border-t-border';
-  const rowBg = isToday_ ? 'bg-orange-50/70' : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
+  const rowBg = isToday_ ? 'bg-orange-50/70 dark:bg-orange-950/20' : open ? 'bg-secondary/20' : 'bg-card hover:bg-secondary/10';
 
   // Pills de contenido
   const notesCount = day?.notes?.length || 0;
   const pillItems = [
-    docs.length > 0 && { label: `${docs.length} doc${docs.length > 1 ? 's' : ''}`, cls: 'bg-orange-50 text-primary' },
-    spots.length > 0 && { label: `${spots.length} spot${spots.length > 1 ? 's' : ''}`, cls: 'bg-violet-50 text-violet-700' },
-    notesCount > 0 && { label: `${notesCount} nota${notesCount > 1 ? 's' : ''}`, cls: 'bg-green-50 text-green-700' },
+    docs.length > 0 && { label: `${docs.length} doc${docs.length > 1 ? 's' : ''}`, cls: 'bg-orange-50 dark:bg-orange-950/30 text-primary' },
+    spots.length > 0 && { label: `${spots.length} spot${spots.length > 1 ? 's' : ''}`, cls: 'bg-violet-50 dark:bg-violet-950/30 text-violet-700' },
+    notesCount > 0 && { label: `${notesCount} nota${notesCount > 1 ? 's' : ''}`, cls: 'bg-green-50 dark:bg-green-950/30 text-green-700' },
   ].filter(Boolean);
 
   return (
@@ -893,7 +906,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
       <button onClick={() => setOpen(o => !o)}
         className="w-full flex items-center gap-3 px-1 py-2 text-left">
         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-          isPast ? 'bg-green-100 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-orange-100 text-primary'
+          isPast ? 'bg-green-100 dark:bg-green-950/30 text-green-700' : isActive ? 'bg-primary text-white' : 'bg-orange-100 dark:bg-orange-950/30 text-primary'
         }`}>
           {isPast ? <Check size={10} className='text-green-700' /> : idx + 1}
         </div>
@@ -907,9 +920,9 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
               : t('cities.noDates')}
           </span>
         </div>
-        {isPast && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">{t('cities.block.visited')}</span>}
+        {isPast && <span className="text-xs bg-green-100 dark:bg-green-950/30 text-green-700 px-2 py-0.5 rounded-full shrink-0 font-semibold">{t('cities.block.visited')}</span>}
         {isActive && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full shrink-0 font-semibold">{t('cities.block.now')}</span>}
-        {!isActive && !isPast && <span className="text-xs bg-orange-100 text-primary px-2 py-0.5 rounded-full shrink-0 font-medium">{t('cities.block.next')}</span>}
+        {!isActive && !isPast && <span className="text-xs bg-orange-100 dark:bg-orange-950/30 text-primary px-2 py-0.5 rounded-full shrink-0 font-medium">{t('cities.block.next')}</span>}
         {open
           ? <ChevronUp className="w-4 h-4 shrink-0 text-muted-foreground" />
           : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
