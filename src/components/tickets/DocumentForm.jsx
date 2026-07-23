@@ -11,6 +11,7 @@ import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
 import { useToast } from '@/components/ui/use-toast';
 import { checkUpload } from '@/lib/uploadLimits';
+import { normalizeEmail } from '@/lib/utils';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -85,7 +86,7 @@ const FIELD_PLACEHOLDERS = {
 const PERSONAL_CATEGORIES = ['personal'];
 
 export default function DocumentForm({
-  initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView }) {
+  initialData, cities, itineraryDays, members, profiles, tripCities, minDate, maxDate, onSave, onCancel, onDelete, saving, onView, currentUserEmail }) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [category, setCategory]     = useState(initialData?.category || 'flight');
@@ -413,8 +414,13 @@ export default function DocumentForm({
               const name = profile?.display_name || profile?.username || email;
               const initials = (profile?.display_name?.[0] || profile?.username?.[0] || email?.[0] || '?').toUpperCase();
               const colors = ['bg-orange-100 text-primary','bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-green-100 text-green-700'];
-              const selected = sharedWith.includes(email) || i === 0;
-              const isYou = i === 0;
+              // Antes "quién eres tú / siempre incluido" se decidía por
+              // posición en el array (i === 0, que solo es el creador del
+              // viaje) — para cualquier otro miembro, la UI etiquetaba al
+              // creador como "Tú" y bloqueaba su casilla, mientras que la
+              // persona real que compartía el documento no quedaba marcada.
+              const isYou = currentUserEmail ? normalizeEmail(email) === normalizeEmail(currentUserEmail) : i === 0;
+              const selected = sharedWith.includes(email) || isYou;
 
               return (
                 <button key={email}
