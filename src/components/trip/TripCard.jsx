@@ -157,7 +157,7 @@ export default function TripCard({ trip, cities = [] }) {
           <p className="text-sm font-medium text-foreground truncate mb-1">{trip.name}</p>
           {subtitle && <p className="text-xs text-muted-foreground truncate mb-1">{subtitle}</p>}
           <p className="text-xs text-muted-foreground">
-            {dateRange || 'Sin fechas'}{trip.members?.length > 0 ? ` · ${trip.members.length}` : ''}
+            {dateRange || t('trip.noDates')}{trip.members?.length > 0 ? ` · ${trip.members.length}` : ''}
           </p>
         </div>
         {status && (

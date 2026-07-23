@@ -239,7 +239,7 @@ function CityField({ country, value, onChange, placeholder }) {
           <p className="text-sm text-muted-foreground">{t('trip.new.typeCityName')}</p>
           <button onMouseDown={() => { onChange(q); setOpen(false); }}
             className="mt-1.5 text-sm text-primary font-medium">
-            Usar &ldquo;{q}&rdquo; →
+            {t('trip.new.useQuery', { q })}
           </button>
         </div>
       )}
@@ -474,7 +474,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-foreground">
-                Destino{mode === 'multi' ? 's' : ''} <span className="text-primary">*</span>
+                {mode === 'multi' ? t('trip.new.destinations') : t('trip.new.destination')} <span className="text-primary">*</span>
               </label>
               <div className="flex items-center gap-2">
                 {mode === 'multi' && formData.start_date && (
@@ -582,8 +582,8 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                   <p className="text-xs text-destructive font-medium flex items-center gap-1"><AlertTriangle size={12} />{nightsError}</p>
                 ) : totalNightsEntered > 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Total: <span className="font-medium text-foreground">{totalNightsEntered} noches</span>
-                    {' '}· Fin: <span className="font-medium text-primary">{addDays(formData.start_date, totalNightsEntered - 1)}</span>
+                    {t('trip.new.totalLabel')}: <span className="font-medium text-foreground">{t('trip.new.nightsCount', { count: totalNightsEntered })}</span>
+                    {' '}· {t('trip.new.endLabel')}: <span className="font-medium text-primary">{addDays(formData.start_date, totalNightsEntered - 1)}</span>
                   </p>
                 )}
               </div>
