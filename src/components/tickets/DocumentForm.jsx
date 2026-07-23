@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
 import { useToast } from '@/components/ui/use-toast';
+import { checkUpload } from '@/lib/uploadLimits';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -170,6 +171,16 @@ export default function DocumentForm({
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Este campo admite tickets/documentos (a menudo PDFs), no solo fotos —
+    // por eso images:false, para no rechazar un PDF por "no ser imagen" y
+    // usar el límite de tamaño de documentos (20 MB) en vez del de fotos.
+    // Antes no había ningún límite aquí: un archivo enorme desde la galería
+    // se quedaba subiendo sin que el usuario supiera por qué.
+    const chk = checkUpload(file, { images: false });
+    if (!chk.ok) {
+      toast({ title: t('upload.tooLarge'), description: t('upload.maxMb', { mb: chk.maxMb }), variant: 'destructive' });
+      return;
+    }
     setFileUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
