@@ -57,7 +57,24 @@
   "rls": {
     "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
     "read": { "data.trip_members": { "$in": ["{{user.email}}"] } },
-    "update": { "data.trip_members": { "$in": ["{{user.email}}"] } },
-    "delete": { "data.trip_members": { "$in": ["{{user.email}}"] } }
+    // Antes update/delete solo exigían pertenecer al viaje, igual que read —
+    // el botón de borrar en la interfaz sí comprobaba "isMine" (user_id ===
+    // user.id, ver Photos.jsx/ChatTab.jsx) pero era solo una comprobación de
+    // UI: cualquier miembro podía borrar o editar la foto/mensaje de OTRO
+    // miembro directamente por SDK/consola. Se añade la misma condición de
+    // autoría que ya usa SpotComment.jsonc, además de seguir exigiendo
+    // pertenecer al viaje.
+    "update": {
+      "$and": [
+        { "data.trip_members": { "$in": ["{{user.email}}"] } },
+        { "data.user_id": "{{user.id}}" }
+      ]
+    },
+    "delete": {
+      "$and": [
+        { "data.trip_members": { "$in": ["{{user.email}}"] } },
+        { "data.user_id": "{{user.id}}" }
+      ]
+    }
   }
 }

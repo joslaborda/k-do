@@ -40,12 +40,16 @@
         { "data.invited_by": "{{user.email}}" }
       ]
     },
-    "update": {
-      "$or": [
-        { "data.email": "{{user.email}}" },
-        { "data.invited_by": "{{user.email}}" }
-      ]
-    },
+    // Antes esto permitía a quien fuera el "email" o "invited_by" de UNA
+    // invitación propia reescribir CUALQUIER campo de esa fila, incluidos
+    // trip_id y role — y como acceptTripInvite confía en esos dos campos,
+    // eso permitía autoasignarse admin de un viaje ajeno con solo conocer su
+    // id. Este motor de reglas no puede restringir qué campos se cambian
+    // dentro de un update, así que se cierra del todo: aceptar/rechazar/
+    // cancelar una invitación corre en el backend (acceptTripInvite,
+    // respondToTripInvite) con asServiceRole, tocando solo status y
+    // responded_date.
+    "update": false,
     "delete": false
   }
 }

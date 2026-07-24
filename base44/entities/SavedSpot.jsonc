@@ -18,13 +18,20 @@
     },
     "type": {
       "type": "string",
+      // Mismo motivo que Spot.jsonc: se guarda una copia del type al añadir
+      // un spot ajeno a la wishlist (ver Profile.jsx), así que necesita
+      // aceptar los mismos valores que Spot.type.
       "enum": [
         "food",
         "sight",
         "activity",
         "shopping",
         "transport",
-        "custom"
+        "custom",
+        "hotel",
+        "airport",
+        "train",
+        "bus"
       ],
       "description": "Tipo de lugar"
     },

@@ -19,6 +19,7 @@
       "enum": [
         "flight",
         "train",
+        "bus",
         "hotel",
         "event",
         "personal",
