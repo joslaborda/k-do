@@ -1494,7 +1494,9 @@
     "uploadRetry": "Comprueba tu conexión e inténtalo de nuevo.",
     "uploadErrorTitle": "No se pudieron subir las fotos",
     "tooManyFilesTitle": "Solo se subirán {{count}} fotos",
-    "tooManyFilesDesc": "Has seleccionado más de {{count}} fotos a la vez. El resto no se ha subido; vuelve a intentarlo con las que falten."
+    "tooManyFilesDesc": "Has seleccionado más de {{count}} fotos a la vez. El resto no se ha subido; vuelve a intentarlo con las que falten.",
+    "deleteConfirm": "¿Borrar esta foto?",
+    "deletePermanent": "Se eliminará para todo el viaje. Esta acción no se puede deshacer."
   },
   "translator": {
     "translate": "Traducir",

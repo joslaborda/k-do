@@ -1494,7 +1494,9 @@
     "uploadRetry": "Check your connection and try again.",
     "uploadErrorTitle": "Couldn't upload the photos",
     "tooManyFilesTitle": "Only {{count}} photos will be uploaded",
-    "tooManyFilesDesc": "You selected more than {{count}} photos at once. The rest weren't uploaded; try again with the ones that are missing."
+    "tooManyFilesDesc": "You selected more than {{count}} photos at once. The rest weren't uploaded; try again with the ones that are missing.",
+    "deleteConfirm": "Delete this photo?",
+    "deletePermanent": "This will remove it for the whole trip. This action can't be undone."
   },
   "translator": {
     "translate": "Translate",
