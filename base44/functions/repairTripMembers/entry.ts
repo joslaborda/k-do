@@ -30,9 +30,12 @@ import { createClientFromRequest } from "npm:@base44/sdk";
  * se deja una pequeña pausa entre entidades para no ir a ráfaga.
  */
 
+// 'Restaurant' se quitó: la entidad no tiene ninguna pantalla que cree
+// registros (Restaurants.jsx trabaja sobre Spot), así que sincronizarla aquí
+// era una llamada que siempre iba a 0 resultados sobre una entidad eliminada.
 const SYNCED_ENTITIES = [
   "City", "Expense", "Ticket", "TripMessage", "DiaryEntry",
-  "PackingItem", "Spot", "ItineraryDay", "TodoItem", "UsefulInfo", "Restaurant",
+  "PackingItem", "Spot", "ItineraryDay", "TodoItem", "UsefulInfo",
 ];
 
 function sleep(ms: number) {
