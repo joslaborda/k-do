@@ -1,22 +1,28 @@
 import { BusFront } from '@/lib/icons';
 import { useState, useRef, useEffect } from 'react';
-import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus } from 'lucide-react';
+import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus, Wine } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
 import { checkUpload } from '@/lib/uploadLimits';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { normalizeEmail } from '@/lib/utils';
+import { normalizeEmail, normalizeAmountInput } from '@/lib/utils';
 
 // labelKey en vez de label fijo: CATEGORIES es un const de módulo (fuera del
 // componente), así que no tiene acceso a t() — se traduce en el punto de uso.
+// "drinks" ya tenía icono/color/traducción listos en Expenses.jsx (CAT_ICONS,
+// CAT_COLORS, CAT_CONFIG, usados para pintar gastos ya guardados con esa
+// categoría) pero nunca apareció aquí, en el selector real donde se elige la
+// categoría al crear/editar un gasto — así que nadie podía crear uno nuevo
+// como "Bebidas" desde la UI.
 const CATEGORIES = [
   { value: 'food',          labelKey: 'expenses.categories.food',          Icon: Utensils    },
   { value: 'transport',     labelKey: 'expenses.categories.transport',     Icon: BusFront         },
   { value: 'accommodation', labelKey: 'expenses.categories.accommodation', Icon: Hotel       },
   { value: 'activities',    labelKey: 'expenses.categories.activities',    Icon: Ticket      },
   { value: 'shopping',      labelKey: 'expenses.categories.shopping',      Icon: ShoppingBag },
+  { value: 'drinks',        labelKey: 'expenses.categories.drinks',        Icon: Wine        },
   { value: 'other',         labelKey: 'expenses.categories.other',         Icon: CirclePlus  },
 ];
 
@@ -41,6 +47,8 @@ export default function ExpenseForm({
   profilesByEmail,
   cities = [],
   defaultCityId = '',
+  minDate = '',
+  maxDate = '',
 }) {
   const { t } = useTranslation();
   // userMap está indexado por email normalizado (minúsculas) — nunca se
@@ -138,18 +146,28 @@ export default function ExpenseForm({
 
   const customTotal = Object.values(form.amounts_by_user || {}).reduce((s, v) => s + (parseFloat(v) || 0), 0);
   const customCuadra = Math.abs(parseFloat(form.amount || 0) - customTotal) < 0.01;
+  // Defensa adicional al guard del input: si algún importe individual del
+  // reparto personalizado es negativo, la suma total puede seguir "cuadrando"
+  // (p.ej. 150 + (-50) + 0 = 100) pero invierte a quién se le debita/acredita
+  // cada parte — sin este check se podía guardar un gasto que dejaba a un
+  // miembro debiendo más que el importe entero del gasto.
+  const customHasNegative = Object.values(form.amounts_by_user || {}).some(v => parseFloat(v) < 0);
 
   const canSave = form.description.trim() && form.amount && parseFloat(form.amount) > 0 && !saving && (
     form.split_type === 'solo' ||
     (form.split_type === 'equal' && form.split_with.length > 0) ||
     // En custom hay que asignar el importe completo: si no cuadra, el reparto se
     // haría por ratios y las cantidades escritas se escalarían sin avisar.
-    (form.split_type === 'custom' && customTotal > 0 && customCuadra)
+    (form.split_type === 'custom' && customTotal > 0 && customCuadra && !customHasNegative)
   );
 
   const handleSave = async () => {
     if (!form.amount || parseFloat(form.amount) <= 0) {
       toast({ title: t('expenses.form.amountRequired'), description: t('expenses.form.amountRequiredDesc'), variant: 'destructive' });
+      return;
+    }
+    if (form.split_type === 'custom' && customHasNegative) {
+      toast({ title: t('expenses.form.amountRequired'), description: t('expenses.form.negativeSplitDesc'), variant: 'destructive' });
       return;
     }
     if (!form.description.trim()) {
@@ -210,7 +228,10 @@ export default function ExpenseForm({
           placeholder="0"
           value={form.amount}
           onChange={e => {
-            const val = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+            // normalizeAmountInput detecta si la coma o el punto es el
+            // separador decimal real en vez de asumir siempre que la coma lo
+            // es — "1.234,56" ya no se guarda como 1.234 (ver utils.js).
+            const val = normalizeAmountInput(e.target.value);
             set('amount', val);
           }}
           autoFocus
@@ -291,7 +312,14 @@ export default function ExpenseForm({
       <div className={cities.length > 0 ? 'grid grid-cols-2 gap-3' : ''}>
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('common.date')}</p>
+          {/* Sin min/max, la fecha del gasto no tenía ninguna relación con las
+              fechas del viaje — a diferencia de DocumentForm.jsx (vuelos,
+              hoteles...), que sí acota el selector nativo al rango del viaje.
+              Igual que allí, es solo una guía en el <input type="date">, no un
+              bloqueo duro: un gasto justo antes/después del viaje sigue siendo
+              válido (p. ej. algo comprado con antelación). */}
           <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
+            min={minDate || undefined} max={maxDate || undefined}
             className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card text-foreground" />
         </div>
         {cities.length > 0 && (
@@ -426,7 +454,15 @@ export default function ExpenseForm({
                   <input
                     type="number" min="0" step="any" placeholder="0"
                     value={form.amounts_by_user?.[email] || ''}
-                    onChange={e => set('amounts_by_user', { ...form.amounts_by_user, [email]: e.target.value })}
+                    onChange={e => {
+                      // min="0" no se aplica solo (este input no vive dentro
+                      // de un <form>), así que sin este guard se podía escribir
+                      // un importe negativo aquí: la suma seguía "cuadrando"
+                      // con el total del gasto pero invertía quién debe a
+                      // quién (ver customHasNegative en canSave/handleSave).
+                      const raw = e.target.value.replace(/^-+/, '');
+                      set('amounts_by_user', { ...form.amounts_by_user, [email]: raw });
+                    }}
                     className="w-20 text-right text-sm border border-border rounded-lg px-2 py-1 outline-none focus:border-primary bg-secondary"
                   />
                   <span className="text-xs text-muted-foreground">{currency}</span>
