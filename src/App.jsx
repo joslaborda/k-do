@@ -102,6 +102,24 @@ function App() {
     }
   }, []);
 
+  // El modo oscuro (useDarkMode, en components/hooks/useDarkMode.jsx) solo
+  // aplica la clase "dark" al <html> mientras <DarkModeToggle> está montado,
+  // y ese componente solo vive dentro de Settings.jsx. Resultado: activar
+  // "Modo oscuro" ahí lo mostraba oscuro SOLO en esa pantalla — en cualquier
+  // otra página (Home, Ruta, Gastos...) o tras recargar, la preferencia
+  // guardada en localStorage nunca se leía, así que todo volvía a claro.
+  // Aplicamos la preferencia guardada aquí, en el nodo raíz siempre montado,
+  // para que se respete en toda la app desde el primer render.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('darkMode');
+      const isDark = stored ? JSON.parse(stored) : false;
+      window.document.documentElement.classList.toggle('dark', !!isDark);
+    } catch {
+      // localStorage inaccesible (modo privado, etc.) — se queda en claro.
+    }
+  }, []);
+
   if (!i18nReady) return null;
 
   return (
