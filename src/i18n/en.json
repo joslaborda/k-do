@@ -528,7 +528,8 @@
       "payerRequired": "Payer required",
       "payerRequiredDesc": "Indicate who paid the expense.",
       "pickSomeone": "Select at least one person",
-      "soloHint": "This expense is just for you. It doesn't affect the group's balances."
+      "soloHint": "This expense is just for you. It doesn't affect the group's balances.",
+      "negativeSplitDesc": "No split amount can be negative."
     },
     "fx": {
       "updatedAt": "Rates updated at {{time}}",
@@ -538,7 +539,9 @@
       "unavailableRetry": "Couldn't convert {{from}} → {{to}}. Check your connection.",
       "approximateTitle": "Approximate exchange rate",
       "approximateDesc": "We couldn't find the historical rate for that date, so today's rate was used as an approximation.",
-      "notConverted": "Not converted"
+      "notConverted": "Not converted",
+      "pendingAggregate_one": "{{count}} unconverted expense isn't correctly included in this total.",
+      "pendingAggregate_other": "{{count}} unconverted expenses aren't correctly included in this total."
     },
     "updateError": "Couldn't update the expense",
     "deleteError": "Couldn't delete the expense"
@@ -923,6 +926,8 @@
       "fileTypes": "PDF, JPG, PNG...",
       "deleteDoc": "Delete document",
       "saving": "Saving...",
+      "endBeforeStart": "Incorrect end date",
+      "endBeforeStartDesc": "The end date can't be earlier than the start date.",
       "fields": {
         "origin": "Origin",
         "destination": "Destination",

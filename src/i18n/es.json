@@ -528,7 +528,8 @@
       "payerRequired": "Pagador requerido",
       "payerRequiredDesc": "Indica quién pagó el gasto.",
       "pickSomeone": "Selecciona al menos una persona",
-      "soloHint": "Este gasto es solo para ti. No afecta a los balances del grupo."
+      "soloHint": "Este gasto es solo para ti. No afecta a los balances del grupo.",
+      "negativeSplitDesc": "Ningún importe del reparto puede ser negativo."
     },
     "fx": {
       "updatedAt": "Tasas actualizadas a las {{time}}",
@@ -538,7 +539,9 @@
       "unavailableRetry": "No se pudo convertir {{from}} → {{to}}. Revisa tu conexión.",
       "approximateTitle": "Tipo de cambio aproximado",
       "approximateDesc": "No encontramos el tipo de cambio histórico de esa fecha, así que usamos el de hoy como aproximación.",
-      "notConverted": "Sin convertir"
+      "notConverted": "Sin convertir",
+      "pendingAggregate_one": "{{count}} gasto sin convertir no está incluido correctamente en este total.",
+      "pendingAggregate_other": "{{count}} gastos sin convertir no están incluidos correctamente en este total."
     },
     "updateError": "Error al actualizar el gasto",
     "deleteError": "Error al eliminar el gasto"
@@ -923,6 +926,8 @@
       "fileTypes": "PDF, JPG, PNG...",
       "deleteDoc": "Eliminar documento",
       "saving": "Guardando...",
+      "endBeforeStart": "Fecha de fin incorrecta",
+      "endBeforeStartDesc": "La fecha de fin no puede ser anterior a la de inicio.",
       "fields": {
         "origin": "Origen",
         "destination": "Destino",
