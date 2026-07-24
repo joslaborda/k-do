@@ -31,6 +31,15 @@ const AuthenticatedApp = () => {
     }
   }, [isLoadingAuth, authError]);
 
+  // Efecto secundario (navegar fuera de la app) movido a un useEffect en vez
+  // de dispararse directamente en el cuerpo del render (ver el `if` de abajo
+  // que comprueba authError.type === 'auth_required').
+  useEffect(() => {
+    if (authError?.type === 'auth_required') {
+      navigateToLogin();
+    }
+  }, [authError, navigateToLogin]);
+
   // Migración silenciosa: mantener UserProfile.email en minúsculas y al día.
   useEffect(() => {
     if (!authUser?.id || !authUser?.email) return;
@@ -61,7 +70,11 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      navigateToLogin();
+      // navigateToLogin() se dispara en el useEffect de arriba, no aquí:
+      // llamarlo directamente en el cuerpo del render es un efecto
+      // secundario durante el render (anti-patrón en React) que podía
+      // dispararse más de una vez en renders intermedios antes de que el
+      // navegador abandonara la página.
       return null;
     }
   }
