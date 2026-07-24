@@ -40,6 +40,12 @@ function AddPackingSheet({ open, onClose, defaultCategory = 'personal', onSave, 
   }, [open, defaultCategory]);
 
   const handleSave = () => {
+    // Igual que en commitAdd: el atajo de Enter y un doble-click rápido
+    // pueden disparar dos llamadas a handleSave antes de que React vuelva
+    // a renderizar el botón con disabled=true (la prop `saving` tarda un
+    // ciclo en propagarse), creando un artículo duplicado. Guardamos aquí
+    // también, no solo en el `disabled` del botón.
+    if (saving) return;
     if (!name.trim()) return;
     onSave({ name: name.trim(), category, essential, packed: false });
   };
@@ -440,7 +446,14 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
     setAdding(null);
   };
 
-  const toggleCollapsed = (key) => setCollapsed(p => ({ ...p, [key]: !p[key] }));
+  // Recibe el estado "actual visible" (ya resuelto con el fallback a
+  // `allDone`, ver `isCollapsed` más abajo) en vez de leer `p[key]`
+  // directamente: como el valor por defecto de una categoría viene de
+  // `allDone` y no existe aún en `collapsed`, el primer clic tras un
+  // auto-colapso (p.ej. al marcar el último artículo como listo) invertía
+  // `undefined` → `true`, que es el mismo valor que ya se estaba mostrando,
+  // así que el clic no hacía nada.
+  const toggleCollapsed = (key, current) => setCollapsed(p => ({ ...p, [key]: !current }));
 
   // Inner tab bar (Maleta / Souvenirs) — Ō style
   const innerTabs = [
@@ -513,7 +526,7 @@ function PackingTab({ tripId, country, tripInProgress, userId, tripMembers, exte
                 return (
                   <div key={cat.value} className="bg-card rounded-2xl border border-border overflow-hidden">
                     {/* Category header */}
-                    <button onClick={() => toggleCollapsed(cat.value)}
+                    <button onClick={() => toggleCollapsed(cat.value, isCollapsed)}
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/20 transition-colors">
                       <div className="flex items-center gap-2">
                         <cat.Icon size={15} color="#888" />
