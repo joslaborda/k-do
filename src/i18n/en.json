@@ -500,10 +500,6 @@
     "deleteExpense": "Delete expense",
     "deleteConfirm": "Delete this expense?",
     "deletePermanent": "{{description}} — This will be permanently deleted.",
-    "fx": {
-      "updatedAt": "Rates updated at {{time}}",
-      "source": "Source: European Central Bank · For reference only"
-    },
     "saveChanges": "Save changes",
     "saveExpense": "Save expense",
     "paidByShort": "Paid by {{name}} · ÷ {{count}}",
@@ -535,6 +531,8 @@
       "soloHint": "This expense is just for you. It doesn't affect the group's balances."
     },
     "fx": {
+      "updatedAt": "Rates updated at {{time}}",
+      "source": "Source: European Central Bank · For reference only",
       "unavailableTitle": "No exchange rate",
       "unavailableDesc": "Couldn't convert {{from}} → {{to}}. The amount is saved in {{from}} unconverted and won't add up in the balances.",
       "unavailableRetry": "Couldn't convert {{from}} → {{to}}. Check your connection.",

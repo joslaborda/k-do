@@ -500,10 +500,6 @@
     "deleteExpense": "Eliminar gasto",
     "deleteConfirm": "¿Eliminar este gasto?",
     "deletePermanent": "{{description}} — Se eliminará permanentemente.",
-    "fx": {
-      "updatedAt": "Tasas actualizadas a las {{time}}",
-      "source": "Fuente: Banco Central Europeo · Solo orientativo"
-    },
     "saveChanges": "Guardar cambios",
     "saveExpense": "Guardar gasto",
     "paidByShort": "Pagó {{name}} · ÷ {{count}}",
@@ -535,6 +531,8 @@
       "soloHint": "Este gasto es solo para ti. No afecta a los balances del grupo."
     },
     "fx": {
+      "updatedAt": "Tasas actualizadas a las {{time}}",
+      "source": "Fuente: Banco Central Europeo · Solo orientativo",
       "unavailableTitle": "Sin tipo de cambio",
       "unavailableDesc": "No se pudo convertir {{from}} → {{to}}. El importe se guarda en {{from}} sin convertir y no cuadrará en los balances.",
       "unavailableRetry": "No se pudo convertir {{from}} → {{to}}. Revisa tu conexión.",
