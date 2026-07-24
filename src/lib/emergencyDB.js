@@ -1430,7 +1430,10 @@ const EMERGENCY_DB = {
   },
 
   'Perú': {
-    embassy_GB: { address: 'Torre Parque Mar (22Nd Floor) Avenida José Larco 1301 Miraflores Embassy Opening Hours: 08:00 - 13:00 And 14:00 - 16:30 (Monday To Thursday) 08:00 - 13:00 (Friday) Lima Peru', phone: '+51 1 617 3000', web: 'https://embassies.net/united-kingdom-in-peru/lima' },
+    // Dato original venía del scraper con el horario de apertura pegado
+    // dentro del campo "address" (p.ej. "...Embassy Opening Hours: 08:00 -
+    // 13:00 And 14:00...") — se recorta a solo la dirección real.
+    embassy_GB: { address: 'Torre Parque Mar (22º piso), Avenida José Larco 1301, Miraflores, Lima, Peru', phone: '+51 1 617 3000', web: 'https://embassies.net/united-kingdom-in-peru/lima' },
     embassy_NI: { address: 'Calle Paúl De Beaudiez 471, San Isidro 15076, Peru', phone: '+51 1 2645577', web: 'https://embassies.net/nicaragua-in-peru/lima' },
     embassy_SV: { address: 'Av. Javier Prado Oeste No. 2108 San Isidro Lima 27 Peru', phone: '+51 1 440-3500', web: 'https://embassies.net/el-salvador-in-peru/lima' },
     embassy_PA: { address: 'Calle Roma 397, Lima 27, Peru', phone: '+51 441-2616', web: 'https://embassies.net/panama-in-peru/lima' },
