@@ -196,8 +196,20 @@ export default function DocumentForm({
 
   const handleSave = () => {
     if (!fields.name.trim()) return;
+    // location_lat/location_lng se inicializan como '' cuando no se ha
+    // buscado un aeropuerto/estación (el campo es opcional). El backend
+    // valida estos campos como número y rechaza la petición entera si
+    // llega un string vacío ("Input should be a valid number"), lo que
+    // bloqueaba silenciosamente la creación/edición de CUALQUIER documento
+    // sin ubicación buscada. Los omitimos del payload si no son números.
+    const { location_lat, location_lng, ...rest } = fields;
+    const payload = { ...rest };
+    if (typeof location_lat === 'number' || (location_lat && !isNaN(Number(location_lat)))) {
+      payload.location_lat = location_lat;
+      payload.location_lng = location_lng;
+    }
     onSave({
-      ...fields,
+      ...payload,
       category,
       visibility,
       shared_with: visibility === 'selected_users' ? sharedWith : [],
