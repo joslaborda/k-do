@@ -187,6 +187,13 @@ function PasswordSection({ user }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function DeleteAccountRow({ user, profile }) {
   const { t } = useTranslation();
+  // Antes esta fila llamaba a base44.auth.logout() directo, que solo borra
+  // el token y redirige — no limpia la caché de react-query en localStorage
+  // (viajes, gastos, mensajes...). En un dispositivo compartido, esos datos
+  // podían seguir visibles brevemente para la siguiente persona que
+  // iniciara sesión. logout() del contexto sí limpia esa caché antes de
+  // redirigir (ver AuthContext.jsx).
+  const { logout } = useAuth();
   const [confirm, setConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -339,7 +346,7 @@ function DeleteAccountRow({ user, profile }) {
       // cada registro (metadato de auditoría de la plataforma, no editable
       // desde el cliente) — eso queda fuera del alcance de lo que se puede
       // borrar/anonimizar vía la API de entidades.
-      base44.auth.logout();
+      logout();
     } catch (e) {
       setDeleting(false);
       setError(e?.message || t('common.tryAgain'));
@@ -370,7 +377,7 @@ export default function Settings() {
     const m = getCountryMeta(o.value) || {};
     return { name: o.value, label: o.label, flag: m.flag || '🌍', currency: m.currency || 'USD' };
   }), [i18n.language]);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const queryClient = useQueryClient();
 
   const [displayName, setDisplayName] = useState('');
@@ -712,7 +719,7 @@ export default function Settings() {
           />
           <PasswordSection user={user} />
           <div className="border-t border-border">
-            <button onClick={() => base44.auth.logout()}
+            <button onClick={() => logout()}
               className="w-full text-left px-4 py-3.5 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors border-b border-border">
               {t('settings.logout')}
             </button>

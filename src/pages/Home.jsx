@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -60,11 +60,21 @@ export default function Home() {
     if (key === 'chat') setChatLastRead(new Date());
   };
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
+  // Antes este efecto solo dependía de [navigate], así que leía
+  // window.location.search UNA VEZ al montar — el resto de pantallas
+  // (Documentos, Restaurantes, Gastos, Fotos, Traductor, Utilidades) usan
+  // useSearchParams(), que sí recalcula en cada render. Con navegación
+  // normal (Mis viajes → Inicio) no se notaba porque el componente se
+  // remonta, pero es fragilidad ante cualquier cambio futuro (enlaces
+  // directos, selector rápido de viaje) que cambie el trip_id sin desmontar
+  // Home. Añadir location.search como dependencia hace que se recalcule
+  // cada vez que cambia la URL, igual que el resto de la app.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const id = params.get('trip_id');
     if (!id || id === 'null' || id === 'default') {
       navigate(createPageUrl('TripsList'), { replace: true });
@@ -78,7 +88,7 @@ export default function Home() {
       setSettingsOpen(true);
     }
     window.scrollTo(0, 0);
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ['trip', tripId],

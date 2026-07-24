@@ -51,11 +51,13 @@ export default function TripDetail() {
     enabled: !!tripId,
   });
 
-  const { data: cities = [] } = useQuery({
-    queryKey: ['cities', tripId],
-    queryFn: () => base44.entities.City.filter({ trip_id: tripId }),
-    enabled: !!tripId,
-  });
+  // Antes había aquí una segunda query con la MISMA clave ['cities', tripId]
+  // que ya usa useTripContext (línea de arriba), pero pidiendo las ciudades
+  // sin orden (`City.filter({ trip_id })` vs. `City.filter({...}, 'order')`
+  // en useTripContext.js). Dos queries con la misma clave y distinto
+  // resultado pueden pisarse entre sí en la caché compartida de react-query
+  // — y esta ni siquiera se usaba (el render de abajo ya usa `tripCities`
+  // de useTripContext). Eliminada por completo: no hacía falta.
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses', tripId],
@@ -107,8 +109,13 @@ export default function TripDetail() {
               {trip.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
-                  {format(new Date(trip.start_date), 'dd MMM', { locale: dateLocale })}
-                  {trip.end_date && ` - ${format(new Date(trip.end_date), 'dd MMM yyyy', { locale: dateLocale })}`}
+                  {/* +'T00:00:00' evita que new Date('2026-08-14') se lea en
+                      UTC — sin esto, alguien en un huso horario americano
+                      (México, Perú, Argentina...) veía un día menos del
+                      real en la ficha de una plantilla publicada. Mismo
+                      patrón ya usado en Home.jsx/Expenses.jsx/Utilities.jsx. */}
+                  {format(new Date(trip.start_date + 'T00:00:00'), 'dd MMM', { locale: dateLocale })}
+                  {trip.end_date && ` - ${format(new Date(trip.end_date + 'T00:00:00'), 'dd MMM yyyy', { locale: dateLocale })}`}
                 </span>
               )}
               <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{t('trip.travelersCount', { count: trip.members?.length || 1 })}</span>

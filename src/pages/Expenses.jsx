@@ -309,8 +309,27 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     );
   };
 
+  // Gastos cuya conversión a la moneda base falló (fx_source === 'unavailable'):
+  // calculateBalances los suma igualmente usando el monto original como si ya
+  // estuviera en baseCurrency (ver expenseBalances.js), así que si hay varios
+  // el balance mostrado puede estar mezclando monedas sin avisar. Antes solo
+  // se marcaba fila por fila en GastosTab (ExpenseRow) — aquí, donde se toman
+  // decisiones de "quién le debe a quién", no había ningún aviso.
+  const unavailableFxCount = useMemo(
+    () => expenses.filter(e => e.fx_source === 'unavailable').length,
+    [expenses]
+  );
+
   return (
     <div className="space-y-4">
+      {unavailableFxCount > 0 && (
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            {t('expenses.fx.pendingAggregate', { count: unavailableFxCount })}
+          </p>
+        </div>
+      )}
       {/* Mi balance — card prominente */}
       <div className={`rounded-2xl border p-4 ${
         iSettled ? 'bg-card border-border' :
@@ -762,7 +781,7 @@ function ExpenseDetailSheet({ expense, baseCurrency, userMap, profilesByEmail, o
 }
 
 // ── Expense add/edit sheet ────────────────────────────────────────────────────
-function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail, cities, defaultCityId }) {
+function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency, baseCurrency, availableCurrencies, userMap, onSave, saving, currentUserEmail, profilesByEmail, cities, defaultCityId, minDate, maxDate }) {
   const { t } = useTranslation();
   if (!open) return null;
   return (
@@ -792,6 +811,8 @@ function ExpenseSheet({ open, onClose, editingExpense, members, defaultCurrency,
             profilesByEmail={profilesByEmail}
             cities={cities}
             defaultCityId={defaultCityId}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         </div>
         {/* Buttons — outside scroll, always visible */}
@@ -985,9 +1006,14 @@ export default function Expenses() {
 
   const { cities, activeCity } = useTripContext(tripId);
 
-  // Fetch user profile to get home currency as fallback
+  // Fetch user profile to get home currency as fallback.
+  // Clave unificada a ['myProfile', id] — antes esta pantalla usaba una clave
+  // propia ('myProfile_exp') que compartía el mismo dato pero nunca se
+  // invalidaba cuando Settings.jsx cambiaba la moneda de referencia (que
+  // invalida ['myProfile', id]). Resultado: Gastos podía seguir mostrando la
+  // moneda anterior varios minutos tras cambiarla en Ajustes.
   const { data: myProfile_ } = useQuery({
-    queryKey: ['myProfile_exp', currentUser?.id],
+    queryKey: ['myProfile', currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return null;
       const r = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
@@ -1307,6 +1333,8 @@ export default function Expenses() {
         profilesByEmail={profilesByEmail}
         cities={cities}
         defaultCityId={activeCity?.id}
+        minDate={trip?.start_date || undefined}
+        maxDate={trip?.end_date || undefined}
       />
     </div>
   );

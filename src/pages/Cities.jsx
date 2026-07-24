@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -1009,6 +1009,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
 export default function Cities() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const userId = currentUser?.id ?? '';
@@ -1018,15 +1019,19 @@ export default function Cities() {
   // Llega desde "Abrir <ciudad>" en Home (DayCard.jsx) — antes ese enlace
   // llevaba a una página vieja (CityDetail) que ya no existe; ahora aterriza
   // aquí mismo, en Ruta, con la ciudad concreta desplegada.
-  const focusCityId = new URLSearchParams(window.location.search).get('city_id');
+  const focusCityId = new URLSearchParams(location.search).get('city_id');
 
+  // Antes dependía solo de [navigate] (con exhaustive-deps deshabilitado a
+  // propósito), leyendo window.location.search una sola vez al montar — a
+  // diferencia de Documentos/Restaurantes/Gastos/Fotos/Traductor/Utilidades,
+  // que usan useSearchParams() y sí recalculan en cada render. Con
+  // location.search como dependencia real ya no hace falta el eslint-disable.
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('trip_id');
+    const id = new URLSearchParams(location.search).get('trip_id');
     if (!id || id === 'null') { navigate(createPageUrl('TripsList'), { replace: true }); return; }
     setTripId(id);
     if (!focusCityId) window.scrollTo(0, 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const { data: trip } = useQuery({
     queryKey: ['trip', tripId],

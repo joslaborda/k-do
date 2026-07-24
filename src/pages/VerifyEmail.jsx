@@ -3,9 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Loader2, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function VerifyEmail() {
   const { t } = useTranslation();
+  // logout() del contexto limpia la caché de react-query antes de redirigir;
+  // base44.auth.logout() directo solo borra el token (ver AuthContext.jsx).
+  const { logout } = useAuth();
   const [checking, setChecking] = useState(false);
   const [msg, setMsg] = useState('');
 
@@ -47,7 +51,7 @@ export default function VerifyEmail() {
           {checking ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('verifyEmail.checking')}</> : t('verifyEmail.alreadyVerified')}
         </Button>
         <button
-          onClick={() => base44.auth.logout()}
+          onClick={() => logout()}
           className="mt-4 text-xs text-muted-foreground hover:underline block mx-auto"
         >
           {t('verifyEmail.logout')}

@@ -254,7 +254,14 @@ export default function Documents() {
     const updates = createBackfillMutation(tickets, itineraryDays, cities).filter(u => Object.keys(u.updates).length > 0);
     if (updates.length) {
       Promise.all(updates.map(({ ticketId, updates }) => base44.entities.Ticket.update(ticketId, updates)))
-        .then(() => queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }));
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+          // Home/Ruta (Cities.jsx, TodayTab.jsx, TomorrowTab.jsx, TripAlerts.jsx)
+          // cachean los mismos documentos bajo la clave 'allDocs', no 'tickets'.
+          // Sin esto, un documento subido/editado/borrado aquí no se reflejaba
+          // ahí hasta que esa otra caché caducara por sí sola.
+          queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+        });
     }
   }, [tripId, tickets.length, itineraryDays.length]);
 
@@ -272,6 +279,7 @@ export default function Documents() {
     },
     onSuccess: (newDoc, data) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       setAddOpen(false);
       // Notify members about new doc
       if (data.visibility !== 'personal') {
@@ -301,6 +309,7 @@ export default function Documents() {
     mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, enrichTicketDataWithAutoLinks(data, itineraryDays, data.city_id)),
     onSuccess: (_updatedDoc, { data, oldDoc }) => {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       setEditDoc(null);
       // Antes editar la hora de un ticket (vuelo/tren/etc.) no avisaba a
       // nadie — solo se notificaba al CREAR el documento. Mismo criterio de
@@ -333,7 +342,11 @@ export default function Documents() {
   });
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Ticket.delete(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tickets', tripId] }); setDeleteDoc(null); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
+      queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
+      setDeleteDoc(null);
+    },
   
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });

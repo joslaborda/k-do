@@ -18,7 +18,7 @@ import SpotsMapView from '@/components/spots/SpotsMapView';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 // El LeafletMap de aquí abajo es una copia local independiente del
 // componente compartido (src/components/spots/LeafletMap.jsx) — no lo
 // importa, así que arreglar el tile compartido nunca cambió nada en este
@@ -617,6 +617,10 @@ function PlaceResultCard({ place, onSave, saving, isDuplicate }) {
 function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState('');
+  // Ciudad explícitamente elegida en el <select> — ver comentario junto al
+  // botón "Confirmar" sobre por qué re-derivar la ciudad solo a partir de la
+  // fecha es ambiguo en un día de tránsito entre dos ciudades distintas.
+  const [selectedCityId, setSelectedCityId] = useState(null);
   // El botón de confirmar no se deshabilitaba mientras onAssign (async)
   // seguía en curso — un doble tap (fácil en móvil) lo disparaba dos veces,
   // y como reordena + muestra un toast de "orden sugerido", salían dos
@@ -644,12 +648,6 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   }, [tripCities, spot?.city_id, spot?.city_name]);
 
   const tripDates = useMemo(() => new Set(dayOptions.map(d => d.date)), [dayOptions]);
-
-  const resolveCityIdForDate = (dateStr) => {
-    if (!dateStr) return null;
-    const c = tripCities.find(c => c.start_date && c.end_date && dateStr >= c.start_date && dateStr <= c.end_date);
-    return c?.id || null;
-  };
 
   const minDate = tripCities.map(c => c.start_date).filter(Boolean).sort()[0] || '';
   const maxDate = tripCities.map(c => c.end_date).filter(Boolean).sort().reverse()[0] || '';
@@ -684,13 +682,20 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
           <p className="text-sm font-semibold text-foreground mb-2">{t('spots.assign.whenVisit')}</p>
           {tripDates.size > 0 ? (
             <select
-              value={selectedDate}
-              onChange={e => setSelectedDate(e.target.value)}
+              // value combina fecha+ciudad (tripDayOptionValue) — con solo
+              // la fecha, un día de tránsito entre dos ciudades (misma
+              // fecha, dos City) no se puede distinguir cuál se eligió.
+              value={selectedDate ? tripDayOptionValue({ date: selectedDate, cityId: selectedCityId }) : ''}
+              onChange={e => {
+                const { date, cityId } = parseTripDayOptionValue(e.target.value);
+                setSelectedDate(date);
+                setSelectedCityId(cityId);
+              }}
               className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
             >
               <option value="">{t('spots.assign.unassigned')}</option>
               {dayOptions.map(d => (
-                <option key={tripDayOptionValue(d)} value={d.date}>{d.date} · {d.city}</option>
+                <option key={tripDayOptionValue(d)} value={tripDayOptionValue(d)}>{d.date} · {d.city}</option>
               ))}
             </select>
           ) : (
@@ -718,7 +723,13 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
               if (submitting) return;
               if (selectedDate && isAllowed(selectedDate)) {
                 setSubmitting(true);
-                try { await onAssign(selectedDate, resolveCityIdForDate(selectedDate)); }
+                // selectedCityId es la ciudad que el usuario eligió
+                // EXPLÍCITAMENTE en el <select> de arriba — no se
+                // re-deriva de la fecha (resolveCityIdForDate), que en un
+                // día de tránsito entre dos ciudades podía devolver la
+                // ciudad equivocada aunque el usuario hubiera elegido
+                // explícitamente la otra.
+                try { await onAssign(selectedDate, selectedCityId); }
                 finally { setSubmitting(false); }
               } else {
                 onSkip();
