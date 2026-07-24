@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
-import { queryClientInstance } from '@/lib/query-client';
+import { queryClientInstance, clearPersistedQueryCache, AUTH_EXPIRED_EVENT } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -16,6 +16,29 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAppState();
+  }, []);
+
+  // Antes la sesión solo se comprobaba una vez al cargar la app — sin esto,
+  // si el token caducaba mientras la app seguía abierta (habitual en un
+  // viaje largo, horas con la app abierta y conexión intermitente), las
+  // peticiones empezaban a fallar con 401/403 pero el estado interno seguía
+  // marcando al usuario como conectado: las pantallas se quedaban vacías o
+  // rotas sin ningún aviso ni redirección al login. query-client.js dispara
+  // este evento desde su QueryCache/MutationCache en cuanto detecta un
+  // 401/403 en cualquier petición.
+  useEffect(() => {
+    const onAuthExpired = () => {
+      setUser(null);
+      setIsAuthenticated(false);
+      queryClientInstance.clear();
+      clearPersistedQueryCache();
+      // Reutiliza el mismo gate que ya existe en App.jsx (AuthenticatedApp)
+      // para authError.type === 'auth_required': ese render llama a
+      // navigateToLogin() automáticamente.
+      setAuthError({ type: 'auth_required', message: 'Session expired' });
+    };
+    window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
   }, []);
 
   const checkAppState = async () => {
@@ -120,6 +143,11 @@ export const AuthProvider = ({ children }) => {
     // brevemente para la siguiente persona que iniciara sesión en el mismo
     // dispositivo, antes de que sus propias queries la sobrescribieran.
     queryClientInstance.clear();
+    // El guardado a localStorage del persister está throttled (hasta 2s) —
+    // sin este borrado síncrono, la redirección de abajo podía ganarle la
+    // carrera al guardado diferido y dejar la caché anterior intacta en
+    // disco pese a haber "cerrado sesión".
+    clearPersistedQueryCache();
 
     if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect

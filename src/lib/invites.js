@@ -157,17 +157,24 @@ export async function acceptTripInvite(inviteId, inviteToken) {
   return data.trip;
 }
 
+// Igual que acceptTripInvite: TripInvite.update está cerrado del todo en el
+// rls (ver base44/entities/TripInvite.jsonc — permitir cualquier update a
+// quien coincidiera en email/invited_by dejaba reescribir trip_id/role de la
+// invitación, no solo el status). Rechazar corre en el backend, con
+// asServiceRole, tocando solo status/responded_date.
 export async function declineTripInvite(inviteId, inviteToken) {
   const invite = await base44.entities.TripInvite.get(inviteId);
+  if (!invite) throw new Error('Invitación inválida o expirada');
 
-  if (!invite || invite.invite_token !== inviteToken || invite.status !== 'pending') {
-    throw new Error('Invitación inválida o expirada');
+  let result;
+  try {
+    result = await base44.functions.invoke('respondToTripInvite', { inviteId, inviteToken, action: 'decline' });
+  } catch (e) {
+    const serverError = e?.response?.data?.error || e?.data?.error;
+    throw new Error(serverError || e?.message || 'No se pudo rechazar la invitación.');
   }
-
-  await base44.entities.TripInvite.update(inviteId, {
-    status: 'declined',
-    responded_date: new Date().toISOString()
-  });
+  const data = result?.data ?? result;
+  if (data?.error) throw new Error(data.error);
 
   return invite;
 }

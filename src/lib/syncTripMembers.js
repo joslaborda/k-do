@@ -10,9 +10,13 @@ import { base44 } from '@/api/base44Client';
  * el historial del viaje (gastos, chat, documentos, itinerario anteriores a su
  * entrada), o alguien expulsado conserva acceso a esos datos para siempre.
  */
+// 'Restaurant' se quitó de esta lista: la entidad Restaurant.jsonc no tenía
+// ninguna pantalla que creara registros (Restaurants.jsx trabaja sobre Spot),
+// así que sincronizar trip_members ahí era una llamada que siempre iba a 0
+// resultados — ver kodo_changelog.md, sección "entidades huérfanas".
 const SYNCED_ENTITIES = [
   'City', 'Expense', 'Ticket', 'TripMessage', 'DiaryEntry',
-  'PackingItem', 'Spot', 'ItineraryDay', 'TodoItem', 'UsefulInfo', 'Restaurant',
+  'PackingItem', 'Spot', 'ItineraryDay', 'TodoItem', 'UsefulInfo',
 ];
 
 /**

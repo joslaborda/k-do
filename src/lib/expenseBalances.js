@@ -41,18 +41,29 @@ export function calculateBalances(expenses, members) {
 
     // Calcular parte de cada uno
     if (split_type === 'equal') {
-      const participants = split_with.length > 0 ? split_with : [paid_by];
+      // Deduplicar: si trip.members llegó a tener a la misma persona dos
+      // veces con distinta capitalización (bug histórico ya corregido en el
+      // origen, pero pueden quedar viajes con el dato así), sin este Set un
+      // gasto "a partes iguales entre todos" la debitaba el doble.
+      const participants = [...new Set(split_with.length > 0 ? split_with : [paid_by])];
       const share = amount / participants.length;
       participants.forEach(email => {
         balances[email] = (balances[email] || 0) - share;
       });
     } else if (split_type === 'custom' && amounts_by_user) {
-      // amounts_by_user en moneda original — usar ratios para calcular en base
-      const totalCustom = Object.values(amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-      const participants = Object.keys(amounts_by_user);
+      // amounts_by_user en moneda original — usar ratios para calcular en base.
+      // Los importes negativos se tratan como 0: ya se bloquean en el
+      // formulario, pero si llega un gasto con un valor negativo por
+      // cualquier otra vía (import, edición directa por API), sin este guard
+      // podían invertir a quién se debita/acredita cada parte.
+      const safeAmounts = Object.fromEntries(
+        Object.entries(amounts_by_user).map(([e, v]) => [e, Math.max(0, parseFloat(v) || 0)])
+      );
+      const totalCustom = Object.values(safeAmounts).reduce((s, v) => s + v, 0);
+      const participants = Object.keys(safeAmounts);
       if (totalCustom > 0) {
-        Object.entries(amounts_by_user).forEach(([email, val]) => {
-          const ratio = parseFloat(val) / totalCustom;
+        Object.entries(safeAmounts).forEach(([email, val]) => {
+          const ratio = val / totalCustom;
           balances[email] = (balances[email] || 0) - (amount * ratio);
         });
       } else if (participants.length > 0) {
@@ -71,6 +82,18 @@ export function calculateBalances(expenses, members) {
       // Gasto personal: solo afecta al pagador, neto 0 para el grupo
       // El pagador adelanta y se lo descuenta a sí mismo → no crea deuda entre miembros
       balances[paid_by] = (balances[paid_by] || 0) - amount;
+    } else {
+      // split_type desconocido, vacío, o "custom" sin amounts_by_user: sin
+      // esta rama el pagador se acreditaba el importe completo (línea de
+      // arriba) y nadie quedaba debitado, rompiendo la invariante "suma de
+      // balances = 0" y generando una deuda fantasma. Se reparte a partes
+      // iguales entre split_with (o solo el pagador si no hay nadie más),
+      // igual que el resto de ramas de "dato inesperado" de esta función.
+      const participants = [...new Set(split_with.length > 0 ? split_with : [paid_by])];
+      const share = amount / participants.length;
+      participants.forEach(email => {
+        balances[email] = (balances[email] || 0) - share;
+      });
     }
   });
 
