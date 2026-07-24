@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
 import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2, Search, X, MapPin, Loader2 } from 'lucide-react';
-import { PlaneIcon } from '@/lib/icons';
+import { PlaneIcon, BusFront } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
@@ -17,6 +17,11 @@ import { normalizeEmail } from '@/lib/utils';
 export const CATEGORY_CONFIG = {
   flight:   { icon: PlaneIcon, label: 'Vuelo',    labelKey: 'documents.types.flight',    color: 'bg-blue-50 dark:bg-blue-950/30'   },
   train:    { icon: Train,     label: 'Tren',     labelKey: 'documents.types.train',     color: 'bg-green-50 dark:bg-green-950/30'  },
+  // "bus" ya tenía icono y traducción listos en otros sitios (Documents.jsx:
+  // DOC_ICONS/ICON_BG; InicioTab.jsx: DOC_ICON/TRANSPORT_TYPES) pero nunca
+  // fue una categoría elegible aquí ni en el enum de Ticket.jsonc — así que
+  // nadie podía llegar a crear un documento con category:'bus' desde la UI.
+  bus:      { icon: BusFront,  label: 'Bus',      labelKey: 'documents.types.bus',       color: 'bg-amber-50 dark:bg-amber-950/30'  },
   hotel:    { icon: Hotel,     label: 'Hotel',    labelKey: 'documents.types.hotel',     color: 'bg-purple-50 dark:bg-purple-950/30' },
   event:    { icon: Ticket,    label: 'Evento',   labelKey: 'documents.types.ticket',    color: 'bg-orange-50 dark:bg-orange-950/30' },
   personal: { icon: Shield,    label: 'Seguro',   labelKey: 'documents.types.insurance', color: 'bg-amber-50 dark:bg-amber-950/30'  },
@@ -27,6 +32,7 @@ const CATEGORIES = [
   { key: 'flight',   Icon: PlaneIcon,  labelKey: 'documents.types.flight'   },
   { key: 'hotel',    Icon: Hotel,      labelKey: 'documents.types.hotel'    },
   { key: 'train',    Icon: Train,      labelKey: 'documents.types.train'    },
+  { key: 'bus',      Icon: BusFront,   labelKey: 'documents.types.bus'      },
   { key: 'event',    Icon: Ticket,     labelKey: 'documents.types.ticket'   },
   { key: 'personal', Icon: Shield,     labelKey: 'documents.types.insurance' },
   { key: 'other',    Icon: CirclePlus, labelKey: 'documents.types.other'    },
@@ -42,6 +48,7 @@ const SHOW_FIELDS = {
   flight:   ['name','origin','destination','location','airline','date','time','end_time','notes','note_time'],
   hotel:    ['name','city','date','time','end_date','notes','note_time'],
   train:    ['name','origin','destination','location','date','time','end_time','notes','note_time'],
+  bus:      ['name','origin','destination','location','date','time','end_time','notes','note_time'],
   event:    ['name','city','date','time','notes','note_time'],
   personal: ['name','date','end_date','notes','note_time'],
   other:    ['name','city','date','time','notes','note_time'],
@@ -196,6 +203,15 @@ export default function DocumentForm({
 
   const handleSave = () => {
     if (!fields.name.trim()) return;
+    // Nada validaba que la fecha de fin (checkout de hotel, fin de seguro...)
+    // fuera posterior a la de inicio — igual que el bug ya corregido en
+    // NewTripModal.jsx (viaje con end_date < start_date). Aquí se podía
+    // guardar p. ej. un hotel con checkout antes del checkin sin ningún aviso,
+    // rompiendo el orden de las tarjetas en el calendario/Documents.jsx.
+    if (fields.end_date && fields.date && fields.end_date < fields.date) {
+      toast({ title: t('documents.form.endBeforeStart'), description: t('documents.form.endBeforeStartDesc'), variant: 'destructive' });
+      return;
+    }
     // location_lat/location_lng se inicializan como '' cuando no se ha
     // buscado un aeropuerto/estación (el campo es opcional). El backend
     // valida estos campos como número y rechaza la petición entera si
