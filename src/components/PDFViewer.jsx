@@ -28,6 +28,15 @@ export default function PDFViewer({ fileUrl, onClose }) {
   // Load PDF
   useEffect(() => {
     if (!fileUrl || !isPDF) { setLoading(false); return; }
+    // `cancelled` evita dos problemas: (1) si `fileUrl` cambia mientras la
+    // carga anterior seguía en vuelo (o el componente se desmonta), sin esto
+    // llegaban a fijarse pdfDoc/pageCount de un documento que ya no es el
+    // actual; (2) da el punto donde destruir el pdfDoc previo — antes nunca
+    // se llamaba a `pdf.destroy()`, así que cada documento abierto (y cada
+    // vez que Documents.jsx cambiaba de fileUrl) dejaba su worker de pdf.js
+    // y los buffers de página vivos en memoria para siempre.
+    let cancelled = false;
+    let localPdf = null;
     const load = async () => {
       try {
         setLoading(true); setError(null);
@@ -41,12 +50,20 @@ export default function PDFViewer({ fileUrl, onClose }) {
         }
         lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const pdf = await lib.getDocument(fileUrl).promise;
+        if (cancelled) { pdf.destroy(); return; }
+        localPdf = pdf;
         setPdfDoc(pdf);
         setPageCount(pdf.numPages);
         setLoading(false);
-      } catch { setError(t('pdfViewer.loadError')); setLoading(false); }
+      } catch {
+        if (!cancelled) { setError(t('pdfViewer.loadError')); setLoading(false); }
+      }
     };
     load();
+    return () => {
+      cancelled = true;
+      if (localPdf) localPdf.destroy();
+    };
   }, [fileUrl, isPDF]);
 
   // Render a page into its canvas
