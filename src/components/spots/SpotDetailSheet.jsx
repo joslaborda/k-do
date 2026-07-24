@@ -9,7 +9,7 @@ import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
-import { getTripDays, tripDayOptionValue, sameCityName } from '@/lib/tripDays';
+import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 import { normalizeEmail } from '@/lib/utils';
 
 export default
@@ -18,6 +18,11 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const queryClient = useQueryClient();
   const [notes, setNotes] = useState(spot?.notes || '');
   const [assignedDate, setAssignedDate] = useState(spot?.assigned_date || '');
+  // Ciudad explícitamente elegida en el <select> (por su cityId real), no
+  // solo la fecha — ver comentario en tripDayOptions/handleSave más abajo
+  // sobre por qué re-derivar la ciudad SOLO a partir de la fecha es ambiguo
+  // en un día de tránsito entre dos ciudades distintas.
+  const [assignedCityId, setAssignedCityId] = useState(spot?.city_id || null);
   const [assignedTime, setAssignedTime] = useState(spot?.assigned_time || '');
   const [saving, setSaving] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -71,17 +76,6 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
     return sameCity.length > 0 ? sameCity : allDays;
   }, [tripCities, spot?.city_id, spot?.city_name]);
 
-  // Dado un date 'yyyy-MM-dd', encuentra qué estancia (City) lo contiene —
-  // para re-anclar el spot a la estancia correcta si se le asigna una fecha
-  // de una visita distinta a la misma ciudad.
-  const resolveCityIdForDate = (dateStr) => {
-    if (!dateStr) return null;
-    const city = (tripCities || []).find(c =>
-      c.start_date && c.end_date && dateStr >= c.start_date && dateStr <= c.end_date
-    );
-    return city?.id || null;
-  };
-
   const hasTripDays = tripDayOptions.length > 0;
 
   useEffect(() => {
@@ -89,6 +83,7 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
       setNotes(spot.notes || '');
       setAssignedDate(spot.assigned_date || '');
       setAssignedTime(spot.assigned_time || '');
+      setAssignedCityId(spot.city_id || null);
     }
   }, [spot?.id]);
 
@@ -99,13 +94,14 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
   const handleSave = async () => {
     setSaving(true);
     const timeChanged = assignedTime !== (spot?.assigned_time || '');
-    // Si la fecha elegida cae en OTRA estancia de la misma ciudad (visita
-    // repetida), re-anclar el spot a esa estancia — si no, se quedaría con
-    // la fecha nueva pero el city_id de la estancia anterior, y las vistas
-    // de itinerario (que exigen que ambos coincidan) dejarían de mostrarlo.
-    const resolvedCityId = assignedDate ? resolveCityIdForDate(assignedDate) : null;
-    const cityIdUpdate = resolvedCityId && resolvedCityId !== spot?.city_id
-      ? { city_id: resolvedCityId }
+    // Se usa el cityId que el usuario eligió EXPLÍCITAMENTE en el <select>
+    // (assignedCityId, ver el onChange de arriba), no un resolveCityIdForDate
+    // recalculado solo a partir de la fecha: en un día de tránsito entre dos
+    // ciudades (p. ej. Madrid termina el 5 ago el mismo día que Zaragoza
+    // empieza), ese recálculo podía devolver la ciudad equivocada aunque el
+    // usuario hubiera elegido explícitamente "Zaragoza" en el desplegable.
+    const cityIdUpdate = assignedCityId && assignedCityId !== spot?.city_id
+      ? { city_id: assignedCityId }
       : {};
     try {
       await base44.entities.Spot.update(spot.id, {
@@ -184,13 +180,21 @@ function SpotDetailSheet({ spot, open, onClose, onSave, onDelete, tripId, tripCi
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">{t('spots.sheet.day')}</p>
               {hasTripDays ? (
                 <select
-                  value={assignedDate}
-                  onChange={e => setAssignedDate(e.target.value)}
+                  // value combina fecha+ciudad (tripDayOptionValue), no solo
+                  // la fecha — con solo la fecha, un día de tránsito entre
+                  // dos ciudades distintas (misma fecha, dos City) no se
+                  // puede distinguir cuál eligió el usuario en el <select>.
+                  value={assignedDate ? tripDayOptionValue({ date: assignedDate, cityId: assignedCityId }) : ''}
+                  onChange={e => {
+                    const { date, cityId } = parseTripDayOptionValue(e.target.value);
+                    setAssignedDate(date);
+                    setAssignedCityId(cityId);
+                  }}
                   className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
                 >
                   <option value="">{t('spots.sheet.unassigned')}</option>
                   {tripDayOptions.map(d => (
-                    <option key={tripDayOptionValue(d)} value={d.date}>{d.date} · {d.city}</option>
+                    <option key={tripDayOptionValue(d)} value={tripDayOptionValue(d)}>{d.date} · {d.city}</option>
                   ))}
                 </select>
               ) : (

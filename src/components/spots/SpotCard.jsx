@@ -35,7 +35,12 @@ async function uploadPhoto(file) {
   const chk = checkUpload(file);
   if (!chk.ok) return { error: chk.reason, maxMb: chk.maxMb };
   try {
-    const { file_url } = await base44.storage.uploadFile(file);
+    // base44.storage no existe en el SDK instalado (@base44/sdk) — la subida
+    // de archivos vive en base44.integrations.Core.UploadFile, que es lo que
+    // usan los otros 5 puntos de subida de la app (documentos, gastos,
+    // perfil, chat, galería). Con el método viejo esto fallaba el 100% de
+    // las veces al adjuntar una foto a una valoración o comentario de spot.
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
     return { url: file_url };
   } catch {
     return { error: 'failed' };
