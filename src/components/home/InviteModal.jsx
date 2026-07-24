@@ -204,10 +204,18 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
   const handleCancelInvite = async (inv) => {
     setCancelling(inv.id);
     try {
-      await base44.entities.TripInvite.update(inv.id, { status: 'cancelled' });
+      // TripInvite.update está cerrado del todo en el rls (permitir cualquier
+      // update a quien coincidiera en email/invited_by dejaba reescribir
+      // trip_id/role de la invitación, no solo el status) — cancelar corre
+      // ahora en el backend, con asServiceRole, validando que quien cancela
+      // es quien la envió.
+      const result = await base44.functions.invoke('respondToTripInvite', { inviteId: inv.id, action: 'cancel' });
+      const data = result?.data ?? result;
+      if (data?.error) throw new Error(data.error);
       queryClient.invalidateQueries({ queryKey: ['tripPendingInvites', tripId] });
     } catch (e) {
-      setError(e?.message || t('invites.modal.cancelError'));
+      const serverError = e?.response?.data?.error || e?.data?.error;
+      setError(serverError || e?.message || t('invites.modal.cancelError'));
     }
     setCancelling(null);
   };

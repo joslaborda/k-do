@@ -26,8 +26,13 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
     const docDate = d.date || d.valid_from || d.start_date;
     return docDate === todayStr;
   }).sort((a, b) => {
-    const aT = TRANSPORT_TYPES.indexOf(a.type);
-    const bT = TRANSPORT_TYPES.indexOf(b.type);
+    // Ticket.jsonc guarda el tipo de documento en `category` (ver
+    // DocumentForm.jsx), no en `type` — con `.type` (undefined en todo
+    // documento real) este ordenado por transporte primero nunca funcionaba,
+    // y las dos comparaciones de abajo (icono y etiqueta "Vuelo/Tren/...")
+    // caían siempre al fallback "documento".
+    const aT = TRANSPORT_TYPES.indexOf(a.category);
+    const bT = TRANSPORT_TYPES.indexOf(b.category);
     if (aT !== bT) return (aT === -1 ? 99 : aT) - (bT === -1 ? 99 : bT);
     return (a.time || '').localeCompare(b.time || '');
   });
@@ -84,15 +89,15 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
         <div className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              {TRANSPORT_TYPES.includes(firstDoc.type)
-                ? (firstDoc.type === 'flight' ? t('home.inicio.firstFlight') : firstDoc.type === 'train' ? t('home.inicio.firstTrain') : t('home.inicio.firstTransport'))
+              {TRANSPORT_TYPES.includes(firstDoc.category)
+                ? (firstDoc.category === 'flight' ? t('home.inicio.firstFlight') : firstDoc.category === 'train' ? t('home.inicio.firstTrain') : t('home.inicio.firstTransport'))
                 : t('home.inicio.firstDocument')}
             </p>
             {countdown && <span className="text-xs font-medium text-primary">{t('home.inicio.departsIn', { countdown })}</span>}
           </div>
           <div className="flex items-center gap-3 px-4 py-3">
             <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-xl flex-shrink-0">
-              {(() => { const I = DOC_ICON[firstDoc.type] || DOC_ICON.other; return <I className="text-primary" />; })()}
+              {(() => { const I = DOC_ICON[firstDoc.category] || DOC_ICON.other; return <I className="text-primary" />; })()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{firstDoc.title || firstDoc.name}</p>
