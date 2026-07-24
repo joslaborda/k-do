@@ -1100,6 +1100,16 @@ export default function Cities() {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const tomorrowStr = format(new Date(Date.now() + 86400000), 'yyyy-MM-dd');
 
+  // El día en que una ciudad termina y la siguiente empieza (end_date de A ==
+  // start_date de B) caía dentro del rango de AMBAS — cada bloque calculaba
+  // isActive por su cuenta, así que las dos se pintaban "Ahora" a la vez.
+  // Igual que ya hace getActiveCity() (lib/tripContext.js) para el resto de
+  // la app, solo la PRIMERA ciudad en orden cronológico que cubre hoy cuenta
+  // como activa; el resto se compara contra ese único id.
+  const activeCityId = sortedCities.find(c =>
+    c.start_date && c.end_date && todayStr >= c.start_date && todayStr <= c.end_date
+  )?.id || null;
+
   // Progress
   const tripStart = trip?.start_date;
   const tripEnd = trip?.end_date;
@@ -1222,7 +1232,7 @@ export default function Cities() {
           <div className="flex flex-col gap-0">
             {sortedCities.map((city, idx) => {
               const isPast = city.end_date && todayStr > city.end_date;
-              const isActive = city.start_date && city.end_date && todayStr >= city.start_date && todayStr <= city.end_date;
+              const isActive = city.id === activeCityId;
               return (
                 <CityBlock
                   key={city.id}
