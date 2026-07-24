@@ -24,9 +24,12 @@ import { createClientFromRequest } from "npm:@base44/sdk";
  * invitación ajena mandando otro email en el body.
  */
 
+// 'Restaurant' se quitó: la entidad no tiene ninguna pantalla que cree
+// registros (Restaurants.jsx trabaja sobre Spot), así que sincronizarla aquí
+// era una llamada que siempre iba a 0 resultados sobre una entidad eliminada.
 const SYNCED_ENTITIES = [
   "City", "Expense", "Ticket", "TripMessage", "DiaryEntry",
-  "PackingItem", "Spot", "ItineraryDay", "TodoItem", "UsefulInfo", "Restaurant",
+  "PackingItem", "Spot", "ItineraryDay", "TodoItem", "UsefulInfo",
 ];
 
 const ROLE_HIERARCHY: Record<string, number> = { admin: 3, editor: 2, viewer: 1 };
