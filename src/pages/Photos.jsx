@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus, Loader2 } from 'lucide-react';
+import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus, Loader2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';
@@ -41,6 +41,7 @@ export default function Photos() {
   const [lbIdx, setLbIdx] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
+  const [deletePhoto, setDeletePhoto] = useState(null);
 
   const { data: messages = [], isLoading: loadingPhotos } = useQuery({
     queryKey: ['tripMessages', tripId],
@@ -63,6 +64,28 @@ export default function Photos() {
     });
 
   const groups = groupByDate(photos);
+
+  // Solo quien subió la foto puede borrarla (misma lógica que "isMine" en
+  // ChatTab.jsx). Comparamos user_id y, si falta, el email normalizado.
+  const isMine = (photo) =>
+    !!photo && !!user && (
+      photo.user_id === user.id ||
+      normalizeEmail(photo.user_email) === normalizeEmail(user.email)
+    );
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.TripMessage.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+      setDeletePhoto(null);
+      // Si se borró desde el visor a pantalla completa, ciérralo — el índice
+      // ya no es válido una vez que `photos` pierde un elemento.
+      setLbIdx(null);
+    },
+    onError: () => {
+      toast({ title: t('common.saveError'), description: t('common.tryAgain'), variant: 'destructive' });
+    },
+  });
 
   const notifyMembers = async (count) => {
     try {
@@ -295,6 +318,15 @@ export default function Photos() {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
+                    {isMine(photo) && (
+                      <button
+                        onClick={e => { e.stopPropagation(); setDeletePhoto(photo); }}
+                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                        aria-label={t('common.delete')}
+                      >
+                        <Trash2 className="w-3 h-3 text-white" />
+                      </button>
+                    )}
                     <div className="absolute bottom-0 left-0 right-0 px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.5))' }}>
                       <p className="text-micro text-white/90 truncate">{photo.display_name || photo.user_email}</p>
@@ -323,6 +355,15 @@ export default function Photos() {
             >
               <Download size={18} />
             </a>
+            {isMine(currentPhoto) && (
+              <button
+                onClick={e => { e.stopPropagation(); setDeletePhoto(currentPhoto); }}
+                aria-label={t('common.delete')}
+                style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
             <button
               onClick={() => setLbIdx(null)}
               style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -379,6 +420,33 @@ export default function Photos() {
             <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 4 }}>
               {lbIdx + 1} / {photos.length}
             </p>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete confirmation — mismo patrón que Documents.jsx */}
+      {!!deletePhoto && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/50" onClick={() => setDeletePhoto(null)}>
+          <div className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8" onClick={e => e.stopPropagation()}>
+            <div className="w-9 h-1 bg-border rounded-full mx-auto mb-5" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-sm font-medium text-foreground">{t('photos.deleteConfirm')}</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-5 ml-11">{t('photos.deletePermanent')}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeletePhoto(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
+              <button
+                onClick={() => deleteMutation.mutate(deletePhoto.id)}
+                disabled={deleteMutation.isPending}
+                className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-60 disabled:pointer-events-none"
+              >
+                {t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>,
         document.body
