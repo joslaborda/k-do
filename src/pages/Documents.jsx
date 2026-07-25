@@ -18,6 +18,7 @@ import OTabBar from '@/components/trip/OTabBar';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 const DOC_ICONS = {
   flight:    PlaneIcon,
@@ -232,7 +233,9 @@ export default function Documents() {
       const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
       const ids = users.map(u => u.id).filter(Boolean);
       if (!ids.length) return [];
-      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      // UserProfile.read cerrado en el rls — se lee vía función backend con
+      // userIds ya conocidos (miembros del viaje) — ver src/lib/userProfiles.js.
+      const profs = await searchUserProfiles({ userIds: ids });
       return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
     },
     enabled: tripMembers.length > 0,

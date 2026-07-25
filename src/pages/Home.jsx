@@ -14,6 +14,7 @@ import { useTripContext } from '@/hooks/useTripContext';
 import { daysUntil } from '@/lib/tripDays';
 import { parseServerDate } from '@/lib/parseServerDate';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
@@ -160,7 +161,12 @@ export default function Home() {
       const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
       const ids = users.map(u => u.id).filter(Boolean);
       if (!ids.length) return [];
-      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      // UserProfile.read se cerró en el rls (exponía email/nationality de
+      // todo el mundo) — se lee vía función backend en vez de .filter()
+      // directo. Se pasan userIds (ya conocidos: son miembros de este
+      // viaje), así que la respuesta sí incluye email — ver
+      // src/lib/userProfiles.js.
+      const profs = await searchUserProfiles({ userIds: ids });
       // Enriquecer cada perfil con el email del usuario para poder buscarlo luego
       return profs.map(p => {
         const u = users.find(u => u.id === p.user_id);

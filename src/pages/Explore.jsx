@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Heart, Bookmark, Users, Compass, Globe, UserPlus, UserCheck, X, Star, Utensils, Landmark, Zap, ShoppingBag, Train, Sparkles, Map } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -253,9 +254,14 @@ export default function Explore() {
     staleTime: 10 * 60 * 1000,
   });
 
+  // UserProfile.read se cerró en el rls (exponía email/nationality de todo
+  // el mundo) — este es el caso real de "descubrimiento abierto" (explorar
+  // comunidad), así que se lee vía función backend sin email ni nationality
+  // — solo los campos que esta pantalla ya pintaba (username, display_name,
+  // avatar, home_country) — ver src/lib/userProfiles.js.
   const { data: allProfiles = [] } = useQuery({
     queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
+    queryFn: () => searchUserProfiles({}),
     staleTime: 10 * 60 * 1000,
   });
 

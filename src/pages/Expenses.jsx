@@ -14,6 +14,7 @@ import { getFxRate } from '@/lib/fxRates';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
 import { normalizeEmail, isZeroDecimalCurrency } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import OTabBar from '@/components/trip/OTabBar';
 import Avatar from '@/components/trip/Avatar';
@@ -1120,7 +1121,9 @@ export default function Expenses() {
       const users = await base44.entities.User.filter({ email: { $in: normalizedMembers } });
       const ids = users.map(u => u.id).filter(Boolean);
       if (!ids.length) return [];
-      const profs = await base44.entities.UserProfile.filter({ user_id: { $in: ids } });
+      // UserProfile.read cerrado en el rls — se lee vía función backend con
+      // userIds ya conocidos (miembros del viaje) — ver src/lib/userProfiles.js.
+      const profs = await searchUserProfiles({ userIds: ids });
       return profs.map(p => ({ ...p, user_email: normalizeEmail(users.find(u => u.id === p.user_id)?.email || '') }));
     },
     enabled: normalizedMembers.length > 0,

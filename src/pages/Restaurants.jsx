@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { normalizeEmail } from '@/lib/utils';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -795,8 +796,12 @@ export default function Restaurants() {
       // coincidieran exactamente — normalizar por seguridad evita que un
       // perfil legacy con distinto casing se quede sin avatar/nombre aquí.
       const membersNorm = members.map(normalizeEmail);
-      const all = await base44.entities.UserProfile.list();
-      return all.filter(p => membersNorm.includes(normalizeEmail(p.email)) || membersNorm.includes(normalizeEmail(p.user_email)));
+      // UserProfile.read se cerró en el rls (exponía email/nationality de
+      // todo el mundo) — antes esto traía TODOS los perfiles de la app para
+      // filtrar por miembros en el cliente; ahora se pide directo por los
+      // emails ya conocidos (trip.members), que además es más preciso y más
+      // rápido — ver src/lib/userProfiles.js.
+      return searchUserProfiles({ emails: membersNorm });
     },
     enabled: !!trip?.members?.length,
     staleTime: 60000,

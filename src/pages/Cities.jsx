@@ -5,6 +5,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { format, differenceInDays, parseISO, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -1102,9 +1103,16 @@ export default function Cities() {
     enabled: !!tripId, staleTime: 60000,
   });
 
+  // UserProfile.read se cerró en el rls (exponía email/nationality de todo
+  // el mundo) — antes esto traía TODOS los perfiles de la app; ahora se pide
+  // por los emails ya conocidos (trip.members) — ver src/lib/userProfiles.js.
+  // Cambia el queryKey de 'allProfiles' a uno scoped al viaje porque ya no
+  // son "todos los perfiles", para no compartir caché con pantallas que sí
+  // siguen pidiendo el listado completo (Explore, CommunitySearch).
   const { data: profiles = [] } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
+    queryKey: ['tripProfiles', tripId, (trip?.members || []).join(',')],
+    queryFn: () => searchUserProfiles({ emails: trip?.members || [] }),
+    enabled: !!trip?.members?.length,
     staleTime: 5 * 60 * 1000,
   });
 
