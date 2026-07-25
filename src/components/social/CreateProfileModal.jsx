@@ -532,7 +532,7 @@ export default function CreateProfileModal({ user, open, onComplete }) {
     try {
       const ok = await checkUsernameAvailability(username, user?.id);
       if (!ok) { setError(t('onboarding.slide0.usernameTaken')); setSaving(false); setAvailable(false); return; }
-      await base44.entities.UserProfile.create({
+      const created = await base44.entities.UserProfile.create({
         user_id: user.id,
         // invites.js/NotificationBell/Invites.jsx comparan y filtran email en
         // minúsculas; si aquí se guarda tal cual venga de base44.auth, un
@@ -554,6 +554,26 @@ export default function CreateProfileModal({ user, open, onComplete }) {
         terms_accepted_at: new Date().toISOString(),
         terms_version: TERMS_VERSION,
       });
+      // El check de arriba (y el del debounce mientras se escribe) es
+      // "comprobar y luego crear" sin ninguna transacción — sin una
+      // restricción de unicidad a nivel de esquema, dos personas pidiendo el
+      // mismo username casi a la vez podían pasar ambas el check y crear dos
+      // UserProfile con el mismo username_normalized, rompiendo la asunción
+      // de unicidad que usa el resto de la app (MembersPanel/InviteModal
+      // buscan por username_normalized y asumen que el primer resultado es
+      // el correcto). Tras crear, se relee por username_normalized: si
+      // aparece OTRO perfil además del propio, es que se perdió la carrera —
+      // se borra el que se acaba de crear aquí y se pide reintentar con otro
+      // username, en vez de dejar el duplicado en la base de datos.
+      const afterCreate = await base44.entities.UserProfile.filter({ username_normalized: username });
+      const dupes = afterCreate.filter(p => p.id !== created.id && p.user_id !== user.id);
+      if (dupes.length > 0) {
+        await base44.entities.UserProfile.delete(created.id).catch(() => {});
+        setError(t('onboarding.slide0.usernameTaken'));
+        setAvailable(false);
+        setSaving(false);
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
       setSlide(2); // go to features
     } catch {
