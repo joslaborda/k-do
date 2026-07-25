@@ -36,6 +36,107 @@ const SYNCED_ENTITIES = [
 
 const VALID_ROLES = ["admin", "editor", "viewer"];
 
+// Extraído del cuerpo de Deno.serve para poder recalcularse en cada intento
+// del bucle de reintento (ver comentario junto al bucle, más abajo) sin
+// duplicar la lógica de negocio.
+async function computeNewMembersAndRoles(
+  service: any,
+  tripId: string,
+  action: string,
+  role: string | undefined,
+  targetEmail: string,
+  members: string[],
+  roles: Record<string, string>
+): Promise<{ newMembers: string[]; newRoles: Record<string, string>; errorResponse?: Response }> {
+  if (action === "remove") {
+    // Deuda huérfana: si a quien se expulsa le deben dinero o debe dinero
+    // (balance neto != 0), Expense.jsonc solo permite editar/borrar gastos
+    // a miembros actuales del viaje — al quitarlo de trip.members pierde
+    // acceso a esos gastos (RLS) y su saldo queda congelado para siempre:
+    // nadie puede saldarlo ni corregirlo, y calculateBalances() lo seguiría
+    // arrastrando en el resto del grupo sin que él lo vea. Se replica aquí
+    // el mismo cálculo de balances que expenseBalances.js (algoritmo
+    // idéntico) solo para este miembro, y se bloquea la expulsión si su
+    // saldo no está saldado — igual que hacen apps de gastos compartidos
+    // (p. ej. Splitwise) al intentar salir de un grupo con balance abierto.
+    let targetBalance = 0;
+    try {
+      const expenses = await service.entities.Expense.filter({ trip_id: tripId });
+      for (const expense of expenses) {
+        const amount = parseFloat(expense.amount_base || expense.amount) || 0;
+        const paidBy = (expense.paid_by || "").trim().toLowerCase();
+        if (!paidBy || !amount) continue;
+        if (paidBy === targetEmail) targetBalance += amount;
+
+        const splitType = expense.split_type;
+        if (splitType === "solo") {
+          if (paidBy === targetEmail) targetBalance -= amount;
+        } else if (splitType === "custom" && expense.amounts_by_user) {
+          const safeAmounts = Object.fromEntries(
+            Object.entries(expense.amounts_by_user).map(([e, v]: [string, any]) => [
+              (e || "").trim().toLowerCase(),
+              Math.max(0, parseFloat(v) || 0),
+            ])
+          );
+          const totalCustom = Object.values(safeAmounts).reduce((s: number, v: any) => s + v, 0);
+          if (totalCustom > 0 && safeAmounts[targetEmail] != null) {
+            targetBalance -= amount * (safeAmounts[targetEmail] / totalCustom);
+          } else if (totalCustom === 0 && Object.keys(safeAmounts).includes(targetEmail)) {
+            targetBalance -= amount / Object.keys(safeAmounts).length;
+          }
+        } else {
+          const splitWith = (expense.split_with || []).map((e: string) => (e || "").trim().toLowerCase());
+          const participants = [...new Set(splitWith.length > 0 ? splitWith : [paidBy])];
+          if (participants.includes(targetEmail)) {
+            targetBalance -= amount / participants.length;
+          }
+        }
+      }
+    } catch (e) {
+      // Si falla la lectura de gastos, no bloqueamos la expulsión por un
+      // error de infraestructura — solo cuando SÍ pudimos calcular un saldo
+      // real y no está saldado.
+      targetBalance = 0;
+    }
+
+    if (Math.abs(targetBalance) > 0.01) {
+      return {
+        newMembers: members,
+        newRoles: roles,
+        errorResponse: Response.json(
+          {
+            error:
+              "Esta persona tiene un saldo pendiente en los gastos del viaje. Salda su balance antes de expulsarla.",
+            code: "target_has_balance",
+            balance: parseFloat(targetBalance.toFixed(2)),
+          },
+          { status: 400 }
+        ),
+      };
+    }
+
+    const newMembers = members.filter((e) => e !== targetEmail);
+    const newRoles = { ...roles };
+    delete newRoles[targetEmail];
+    return { newMembers, newRoles };
+  } else {
+    // No se puede dejar el viaje sin ningún admin.
+    const adminCount = Object.values(roles).filter((r) => r === "admin").length;
+    if (roles[targetEmail] === "admin" && adminCount <= 1 && role !== "admin") {
+      return {
+        newMembers: members,
+        newRoles: roles,
+        errorResponse: Response.json(
+          { error: "El viaje necesita al menos un admin.", code: "last_admin" },
+          { status: 400 }
+        ),
+      };
+    }
+    const newRoles = { ...roles, [targetEmail]: role as string };
+    return { newMembers: members, newRoles };
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -43,10 +144,10 @@ Deno.serve(async (req) => {
     if (!user?.email) {
       return Response.json({ error: "No autenticado" }, { status: 401 });
     }
-    const actingEmail = user.email.toLowerCase();
+    const actingEmail = user.email.trim().toLowerCase();
 
     const { tripId, targetEmail: rawTargetEmail, action, role } = await req.json();
-    const targetEmail = (rawTargetEmail || "").toLowerCase();
+    const targetEmail = (rawTargetEmail || "").trim().toLowerCase();
 
     if (!tripId || !targetEmail || !action) {
       return Response.json({ error: "Faltan datos" }, { status: 400 });
@@ -59,131 +160,91 @@ Deno.serve(async (req) => {
     }
 
     const service = base44.asServiceRole;
-    const trip = await service.entities.Trip.get(tripId);
-    if (!trip) {
-      return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
-    }
 
-    // trip.members puede traer entradas de antes de normalizar el email a
-    // minúsculas al crear/aceptar un viaje (ver TripsList.jsx/acceptTripInvite)
-    // — sin normalizar aquí también, "gestionar miembro" fallaba con "no es
-    // miembro" para cualquier entrada vieja con mayúsculas distintas, aunque
-    // esa persona sí apareciera en la lista.
-    const members: string[] = (trip.members || []).map((e: string) => (e || "").toLowerCase());
-    const roles: Record<string, string> = trip.roles || {};
+    // Expulsar/cambiar rol es leer→modificar→escribir sobre trip.members/
+    // roles (un array y un objeto completos, no un campo suelto) — igual que
+    // acceptTripInvite.ts, que ya documenta y resuelve este mismo problema
+    // ahí. Antes esta función leía el Trip UNA vez al principio y escribía
+    // UNA vez al final, sin ninguna protección: si dos admins gestionaban
+    // miembros del mismo viaje casi a la vez (o incluso un reintento de red
+    // del mismo admin), el segundo Trip.update podía pisar al primero con
+    // datos ya obsoletos — un miembro expulsado "revivía" en trip.members, o
+    // un cambio de rol se perdía, sin ningún error visible. Se relee el Trip
+    // en cada intento y se relee de nuevo tras escribir para confirmar que
+    // el cambio se aplicó sobre el estado más reciente, reintentando hasta
+    // 4 veces si no.
+    let updatedTrip: any = null;
+    let newMembers: string[] = [];
+    let newRoles: Record<string, string> = {};
 
-    // Solo un admin del viaje (o su creador) puede gestionar a otros miembros.
-    const actingIsAdmin = roles[actingEmail] === "admin" || trip.created_by === actingEmail;
-    if (!actingIsAdmin) {
-      return Response.json(
-        { error: "No tienes permiso para gestionar miembros de este viaje.", code: "not_admin" },
-        { status: 403 }
-      );
-    }
-
-    if (!members.includes(targetEmail)) {
-      return Response.json({ error: "Esa persona no es miembro del viaje." }, { status: 400 });
-    }
-
-    // Gestionar la propia membresía (salir, etc.) no pasa por aquí — es el
-    // flujo de "salir del viaje" ya existente en Settings.jsx.
-    if (targetEmail === actingEmail) {
-      return Response.json(
-        { error: "No puedes gestionarte a ti mismo desde aquí.", code: "self_target" },
-        { status: 400 }
-      );
-    }
-
-    // El creador del viaje no se puede expulsar ni degradar.
-    if (trip.created_by === targetEmail) {
-      return Response.json(
-        { error: "No se puede modificar al creador del viaje.", code: "target_is_creator" },
-        { status: 400 }
-      );
-    }
-
-    let newMembers = members;
-    let newRoles = roles;
-
-    if (action === "remove") {
-      // Deuda huérfana: si a quien se expulsa le deben dinero o debe dinero
-      // (balance neto != 0), Expense.jsonc solo permite editar/borrar gastos
-      // a miembros actuales del viaje — al quitarlo de trip.members pierde
-      // acceso a esos gastos (RLS) y su saldo queda congelado para siempre:
-      // nadie puede saldarlo ni corregirlo, y calculateBalances() lo seguiría
-      // arrastrando en el resto del grupo sin que él lo vea. Se replica aquí
-      // el mismo cálculo de balances que expenseBalances.js (algoritmo
-      // idéntico) solo para este miembro, y se bloquea la expulsión si su
-      // saldo no está saldado — igual que hacen apps de gastos compartidos
-      // (p. ej. Splitwise) al intentar salir de un grupo con balance abierto.
-      let targetBalance = 0;
-      try {
-        const expenses = await service.entities.Expense.filter({ trip_id: tripId });
-        for (const expense of expenses) {
-          const amount = parseFloat(expense.amount_base || expense.amount) || 0;
-          const paidBy = (expense.paid_by || "").toLowerCase();
-          if (!paidBy || !amount) continue;
-          if (paidBy === targetEmail) targetBalance += amount;
-
-          const splitType = expense.split_type;
-          if (splitType === "solo") {
-            if (paidBy === targetEmail) targetBalance -= amount;
-          } else if (splitType === "custom" && expense.amounts_by_user) {
-            const safeAmounts = Object.fromEntries(
-              Object.entries(expense.amounts_by_user).map(([e, v]: [string, any]) => [
-                e.toLowerCase(),
-                Math.max(0, parseFloat(v) || 0),
-              ])
-            );
-            const totalCustom = Object.values(safeAmounts).reduce((s: number, v: any) => s + v, 0);
-            if (totalCustom > 0 && safeAmounts[targetEmail] != null) {
-              targetBalance -= amount * (safeAmounts[targetEmail] / totalCustom);
-            } else if (totalCustom === 0 && Object.keys(safeAmounts).includes(targetEmail)) {
-              targetBalance -= amount / Object.keys(safeAmounts).length;
-            }
-          } else {
-            const splitWith = (expense.split_with || []).map((e: string) => (e || "").toLowerCase());
-            const participants = [...new Set(splitWith.length > 0 ? splitWith : [paidBy])];
-            if (participants.includes(targetEmail)) {
-              targetBalance -= amount / participants.length;
-            }
-          }
-        }
-      } catch (e) {
-        // Si falla la lectura de gastos, no bloqueamos la expulsión por un
-        // error de infraestructura — solo cuando SÍ pudimos calcular un saldo
-        // real y no está saldado.
-        targetBalance = 0;
+    for (let intento = 0; intento < 4 && !updatedTrip; intento++) {
+      const trip = await service.entities.Trip.get(tripId);
+      if (!trip) {
+        return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
       }
 
-      if (Math.abs(targetBalance) > 0.01) {
+      // trip.members puede traer entradas de antes de normalizar el email a
+      // minúsculas al crear/aceptar un viaje (ver TripsList.jsx/acceptTripInvite)
+      // — sin normalizar aquí también, "gestionar miembro" fallaba con "no es
+      // miembro" para cualquier entrada vieja con mayúsculas distintas, aunque
+      // esa persona sí apareciera en la lista.
+      const members: string[] = (trip.members || []).map((e: string) => (e || "").trim().toLowerCase());
+      const roles: Record<string, string> = trip.roles || {};
+
+      // Solo un admin del viaje (o su creador) puede gestionar a otros miembros.
+      const actingIsAdmin = roles[actingEmail] === "admin" || trip.created_by === actingEmail;
+      if (!actingIsAdmin) {
         return Response.json(
-          {
-            error:
-              "Esta persona tiene un saldo pendiente en los gastos del viaje. Salda su balance antes de expulsarla.",
-            code: "target_has_balance",
-            balance: parseFloat(targetBalance.toFixed(2)),
-          },
+          { error: "No tienes permiso para gestionar miembros de este viaje.", code: "not_admin" },
+          { status: 403 }
+        );
+      }
+
+      if (!members.includes(targetEmail)) {
+        return Response.json({ error: "Esa persona no es miembro del viaje." }, { status: 400 });
+      }
+
+      // Gestionar la propia membresía (salir, etc.) no pasa por aquí — es el
+      // flujo de "salir del viaje" ya existente en Settings.jsx.
+      if (targetEmail === actingEmail) {
+        return Response.json(
+          { error: "No puedes gestionarte a ti mismo desde aquí.", code: "self_target" },
           { status: 400 }
         );
       }
 
-      newMembers = members.filter((e) => e !== targetEmail);
-      newRoles = { ...roles };
-      delete newRoles[targetEmail];
-    } else {
-      // No se puede dejar el viaje sin ningún admin.
-      const adminCount = Object.values(roles).filter((r) => r === "admin").length;
-      if (roles[targetEmail] === "admin" && adminCount <= 1 && role !== "admin") {
+      // El creador del viaje no se puede expulsar ni degradar.
+      if (trip.created_by === targetEmail) {
         return Response.json(
-          { error: "El viaje necesita al menos un admin.", code: "last_admin" },
+          { error: "No se puede modificar al creador del viaje.", code: "target_is_creator" },
           { status: 400 }
         );
       }
-      newRoles = { ...roles, [targetEmail]: role };
+
+      const result = await computeNewMembersAndRoles(service, tripId, action, role, targetEmail, members, roles);
+      if (result.errorResponse) return result.errorResponse;
+      newMembers = result.newMembers;
+      newRoles = result.newRoles;
+
+      await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+
+      const check = await service.entities.Trip.get(tripId);
+      const membersMatch = JSON.stringify((check.members || []).slice().sort()) === JSON.stringify(newMembers.slice().sort());
+      const rolesMatch = JSON.stringify(check.roles || {}) === JSON.stringify(newRoles);
+      if (membersMatch && rolesMatch) {
+        updatedTrip = check;
+        break;
+      }
+
+      await new Promise((r) => setTimeout(r, 120 * (intento + 1)));
     }
 
-    const updatedTrip = await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+    if (!updatedTrip) {
+      return Response.json(
+        { error: "No se pudo actualizar el viaje. Vuelve a intentarlo en unos segundos.", code: "conflict" },
+        { status: 409 }
+      );
+    }
 
     // Si se expulsó a alguien, revocar su acceso a los datos ya existentes
     // del viaje — si no, su email queda congelado en el trip_members de cada
