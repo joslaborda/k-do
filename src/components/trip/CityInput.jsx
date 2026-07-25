@@ -16,12 +16,14 @@ export default function CityInput({ country, value, onChange, placeholder = 'Eli
   // Load cities whenever country changes, clear previous list
   useEffect(() => {
     if (!country) { setCities([]); return; }
+    let cancelled = false;
     setCities([]);
     setLoading(true);
     getTopCities(country)
-      .then((c) => setCities(c))
-      .catch(() => setCities([]))
-      .finally(() => setLoading(false));
+      .then((c) => { if (!cancelled) setCities(c); })
+      .catch(() => { if (!cancelled) setCities([]); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [country]);
 
   // Close dropdown when clicking outside
