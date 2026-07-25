@@ -65,6 +65,7 @@ Deno.serve(async (req) => {
     if (!user?.email) {
       return Response.json({ error: "No autenticado" }, { status: 401 });
     }
+    const actingEmail = user.email.toLowerCase();
 
     let tripId: string | undefined;
     try {
@@ -75,6 +76,37 @@ Deno.serve(async (req) => {
     }
 
     const service = base44.asServiceRole;
+
+    // Antes, esta función solo exigía tener sesión iniciada en Kōdo — nada
+    // más. Sin tripId recorría con asServiceRole TODOS los viajes de la
+    // plataforma y devolvía en la respuesta el nombre y la lista completa de
+    // miembros de cada uno: cualquier usuario recién registrado podía
+    // enumerar todos los viajes ajenos con una sola llamada, además de forzar
+    // una reescritura masiva de trip_members sin ser dueño de nada. Se cierra
+    // en dos niveles: reparar TODOS los viajes exige rol de admin de la
+    // plataforma (user.role, igual que ya usa PageNotFound.jsx); reparar UN
+    // viaje concreto exige ser miembro (o el creador) de ese viaje.
+    if (!tripId) {
+      if (user.role !== "admin") {
+        return Response.json(
+          { error: "Reparar todos los viajes requiere permisos de administrador." },
+          { status: 403 }
+        );
+      }
+    } else {
+      const targetTrip = await service.entities.Trip.get(tripId).catch(() => null);
+      if (!targetTrip) {
+        return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
+      }
+      const members = (targetTrip.members || []).map((e: string) => (e || "").toLowerCase());
+      const isMember = members.includes(actingEmail) || (targetTrip.created_by || "").toLowerCase() === actingEmail;
+      if (!isMember && user.role !== "admin") {
+        return Response.json(
+          { error: "No tienes permiso para reparar este viaje." },
+          { status: 403 }
+        );
+      }
+    }
 
     const trips = tripId
       ? [await service.entities.Trip.get(tripId)].filter(Boolean)
