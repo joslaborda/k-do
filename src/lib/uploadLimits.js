@@ -49,3 +49,42 @@ export function checkUpload(file, { images = true } = {}) {
   }
   return { ok: true };
 }
+
+/**
+ * HEIC/HEIF → JPEG antes de subir.
+ *
+ * Por qué: los iPhone guardan las fotos de la cámara en HEIC por defecto.
+ * `checkUpload` ya dejaba pasar ese archivo (está en IMAGE_EXTENSIONS), y se
+ * subía tal cual — pero ningún navegador salvo Safari sabe pintar un
+ * `<img src="foto.heic">`, así que la foto quedaba con el icono de imagen
+ * rota para TODO el viaje, no solo para quien la subió. Se detecta aquí y se
+ * convierte a JPEG en el propio navegador antes de que el archivo llegue a
+ * `UploadFile`, así lo que se guarda y lo que ve el resto del grupo es un
+ * JPEG normal.
+ */
+const HEIC_EXT_RE = /\.hei[cf]$/i;
+
+export function isHeic(file) {
+  const type = (file?.type || '').toLowerCase();
+  if (type === 'image/heic' || type === 'image/heif') return true;
+  // Varios navegadores/iOS dejan `file.type` vacío para HEIC — sin MIME type
+  // fiable, se mira la extensión (mismo criterio que ya usa checkUpload).
+  if (!type) return HEIC_EXT_RE.test(file?.name || '');
+  return false;
+}
+
+export async function convertHeicIfNeeded(file) {
+  if (!isHeic(file)) return file;
+  try {
+    const heic2any = (await import('heic2any')).default;
+    const result = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+    const blob = Array.isArray(result) ? result[0] : result;
+    const newName = (file.name || 'photo').replace(HEIC_EXT_RE, '') + '.jpg';
+    return new File([blob], newName, { type: 'image/jpeg' });
+  } catch {
+    // Si la conversión falla (librería no carga, archivo dañado...) se sube
+    // el archivo original en vez de bloquear la subida entera — peor es nada:
+    // el usuario verá la imagen rota como antes, pero no pierde la subida.
+    return file;
+  }
+}
