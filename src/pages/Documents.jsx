@@ -230,13 +230,22 @@ export default function Documents() {
     queryKey: ['memberProfiles', tripMembers.join(',')],
     queryFn: async () => {
       if (!tripMembers.length) return [];
-      const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
-      const ids = users.map(u => u.id).filter(Boolean);
-      if (!ids.length) return [];
-      // UserProfile.read cerrado en el rls — se lee vía función backend con
-      // userIds ya conocidos (miembros del viaje) — ver src/lib/userProfiles.js.
-      const profs = await searchUserProfiles({ userIds: ids });
-      return profs.map(p => ({ ...p, user_email: users.find(u => u.id === p.user_id)?.email || '' }));
+      // Antes: base44.entities.User.filter({email:{$in:tripMembers}}) para
+      // sacar el user_id y de ahí pedir el perfil. Esa llamada devuelve
+      // SIEMPRE 403 para cualquier usuario que no sea colaborador del
+      // proyecto en Base44 ("Only collaborators can view the list of
+      // users") — mismo hallazgo que en resolveUserIds (src/lib/
+      // notifications.js). Al no tener try/catch, la query quedaba en
+      // estado de error para siempre y memberProfiles se quedaba vacío —
+      // en el selector de "Elegir quién lo ve" del formulario de documento
+      // esto hacía que se mostraran los nombres tal cual venían de una
+      // caché vieja de React Query en localStorage (de una sesión anterior
+      // en el mismo navegador) en vez de los del viaje actual: se veía a
+      // los dos miembros con el mismo nombre porque ambos "profile" caían
+      // en el mismo dato cacheado y obsoleto. searchUserProfiles ya acepta
+      // emails directamente (ya los tenemos en trip.members) — no hace
+      // falta pasar primero por User.filter.
+      return searchUserProfiles({ emails: tripMembers });
     },
     enabled: tripMembers.length > 0,
     staleTime: 5 * 60 * 1000,

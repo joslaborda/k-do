@@ -1118,13 +1118,15 @@ export default function Expenses() {
     queryKey: ['memberProfiles', normalizedMembers.join(',')],
     queryFn: async () => {
       if (!normalizedMembers.length) return [];
-      const users = await base44.entities.User.filter({ email: { $in: normalizedMembers } });
-      const ids = users.map(u => u.id).filter(Boolean);
-      if (!ids.length) return [];
-      // UserProfile.read cerrado en el rls — se lee vía función backend con
-      // userIds ya conocidos (miembros del viaje) — ver src/lib/userProfiles.js.
-      const profs = await searchUserProfiles({ userIds: ids });
-      return profs.map(p => ({ ...p, user_email: normalizeEmail(users.find(u => u.id === p.user_id)?.email || '') }));
+      // Antes: base44.entities.User.filter({email:{$in:...}}) para sacar el
+      // user_id antes de poder pedir el perfil — esa llamada da SIEMPRE 403
+      // para cualquier usuario no colaborador del proyecto en Base44 ("Only
+      // collaborators can view the list of users"), así que esta query
+      // fallaba en silencio y todos los nombres de esta pantalla (gastos,
+      // balances, quién debe a quién) caían al email en crudo — mismo
+      // hallazgo que en notifications.js, Home.jsx y Documents.jsx.
+      // searchUserProfiles ya acepta emails directamente.
+      return searchUserProfiles({ emails: normalizedMembers });
     },
     enabled: normalizedMembers.length > 0,
     staleTime: 120000,

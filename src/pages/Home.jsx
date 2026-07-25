@@ -157,21 +157,15 @@ export default function Home() {
     queryKey: ['profilesHome', tripMembers.join(',')],
     queryFn: async () => {
       if (!tripMembers.length) return [];
-      // UserProfile solo tiene user_id — hay que resolver email→user_id primero
-      const users = await base44.entities.User.filter({ email: { $in: tripMembers } });
-      const ids = users.map(u => u.id).filter(Boolean);
-      if (!ids.length) return [];
-      // UserProfile.read se cerró en el rls (exponía email/nationality de
-      // todo el mundo) — se lee vía función backend en vez de .filter()
-      // directo. Se pasan userIds (ya conocidos: son miembros de este
-      // viaje), así que la respuesta sí incluye email — ver
-      // src/lib/userProfiles.js.
-      const profs = await searchUserProfiles({ userIds: ids });
-      // Enriquecer cada perfil con el email del usuario para poder buscarlo luego
-      return profs.map(p => {
-        const u = users.find(u => u.id === p.user_id);
-        return { ...p, user_email: u?.email || p.user_email || '' };
-      });
+      // Antes se resolvía email→user_id con base44.entities.User.filter()
+      // antes de poder pedir el perfil — esa llamada da SIEMPRE 403 para
+      // cualquier usuario no colaborador del proyecto en Base44 ("Only
+      // collaborators can view the list of users"), así que esta query
+      // fallaba en silencio y `profiles` se quedaba vacío para cualquier
+      // usuario normal (mismo hallazgo que en notifications.js y
+      // Documents.jsx). searchUserProfiles ya acepta emails directamente
+      // (ya los tenemos en trip.members) — no hace falta pasar por User.filter.
+      return searchUserProfiles({ emails: tripMembers });
     },
     enabled: tripMembers.length > 0,
     staleTime: 5 * 60 * 1000,
