@@ -353,6 +353,7 @@
       "adding": "Adding...",
       "addStop": "Add stop",
       "deleteTrip": "Delete trip",
+      "adminOnlyEdit": "Only the trip admin can edit the name and dates.",
       "deleteStopConfirm": "Delete this stop?",
       "deleteStopWarning": "{{city}} and its itinerary days will be deleted. This action cannot be undone.",
       "deleteStopError": "Couldn't delete the stop",

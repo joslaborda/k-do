@@ -353,6 +353,7 @@
       "adding": "Añadiendo...",
       "addStop": "Añadir parada",
       "deleteTrip": "Eliminar viaje",
+      "adminOnlyEdit": "Solo el admin del viaje puede editar el nombre y las fechas.",
       "deleteStopConfirm": "¿Eliminar esta parada?",
       "deleteStopWarning": "Se eliminará {{city}} y los días de su itinerario. Esta acción no se puede deshacer.",
       "deleteStopError": "No se pudo eliminar la parada",
