@@ -916,6 +916,30 @@ export default function Restaurants() {
     return userSavedSpots.filter(s => normalizeCountry(s.country || '') === tripCountry);
   }, [userSavedSpots, country, trip?.country]);
 
+  // Agrupa los spots importables por la ciudad del VIAJE a la que
+  // corresponden (comparando nombre normalizado), no por la ciudad
+  // "activa" del momento. Antes, importar un spot guardado de p.ej. Cusco
+  // en un viaje Lima+Cusco lo colgaba siempre bajo la ciudad activa (Lima si
+  // el viaje aún no había empezado) sin importar de qué ciudad era — el
+  // filtro de arriba solo comprueba el país. Los que no coinciden con
+  // ninguna ciudad del viaje (guardados de otra ciudad del mismo país que no
+  // está en este itinerario) se agrupan aparte y cuelgan de la ciudad activa
+  // como ya hacía antes, en vez de quedar sin ciudad — un Spot sin city_id
+  // no está probado en el resto de la app (Ruta, día a día, etc).
+  const normCityName = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+  const importGroups = useMemo(() => {
+    const groups = tripCities.map(c => ({ city: c, spots: [] }));
+    const other = [];
+    importableSpots.forEach(s => {
+      const match = tripCities.find(c => normCityName(c.name) === normCityName(s.city_name));
+      if (match) groups.find(g => g.city.id === match.id).spots.push(s);
+      else other.push(s);
+    });
+    const nonEmpty = groups.filter(g => g.spots.length > 0);
+    if (other.length) nonEmpty.push({ city: null, spots: other });
+    return nonEmpty;
+  }, [importableSpots, tripCities]);
+
   // Activar panel de importación si viene desde el popup de creación de viaje
   useEffect(() => {
     if (importSavedParam && importableSpots.length > 0) {
@@ -1063,15 +1087,19 @@ export default function Restaurants() {
     } finally { setSavingId(null); }
   };
 
-  // Importar un spot de la wishlist personal al viaje actual
-  const importSavedSpot = async (savedSpot) => {
+  // Importar un spot de la wishlist personal al viaje actual.
+  // targetCity: la ciudad del VIAJE a la que corresponde este spot guardado
+  // (resuelta en importGroups comparando nombres) — si no hay ninguna ciudad
+  // del viaje que coincida (guardado de una ciudad que no está en este
+  // itinerario), cae a la ciudad activa como hacía siempre antes.
+  const importSavedSpot = async (savedSpot, targetCity) => {
     const dup = spots.find(s => s.title?.toLowerCase().trim() === savedSpot.title?.toLowerCase().trim());
     if (dup) return;
     setSavingId('import_' + savedSpot.id);
     try {
       const created = await createMutation.mutateAsync({
-        trip_id: tripId, city_id: effectiveCityId || undefined,
-        city_name: effectiveCityName, country: normalizeCountry(country),
+        trip_id: tripId, city_id: targetCity?.id || effectiveCityId || undefined,
+        city_name: targetCity?.name || effectiveCityName, country: normalizeCountry(country),
         title: savedSpot.title, type: savedSpot.type || 'custom',
         address: savedSpot.address || '', lat: savedSpot.lat, lng: savedSpot.lng,
         notes: savedSpot.notes || '', image_url: savedSpot.image_url || null,
@@ -1080,9 +1108,27 @@ export default function Restaurants() {
         source: 'saved_import',
       });
       setLastSavedId(created?.id);
-      showToastFor({ title: savedSpot.title }, city);
+      showToastFor({ title: savedSpot.title }, targetCity?.name || city);
     } finally {
       setSavingId(null);
+    }
+  };
+
+  // Importar todos los spots pendientes de un grupo (ciudad) de una vez —
+  // secuencial para no disparar N mutaciones concurrentes ni pisar el
+  // indicador savingId de cada botón individual.
+  const [importingGroup, setImportingGroup] = useState(null);
+  const importGroup = async (group) => {
+    const targetCity = group.city;
+    const pending = group.spots.filter(s => !spots.some(sp => sp.title?.toLowerCase().trim() === s.title?.toLowerCase().trim()));
+    if (!pending.length) return;
+    setImportingGroup(targetCity?.id || 'other');
+    try {
+      for (const savedSpot of pending) {
+        await importSavedSpot(savedSpot, targetCity);
+      }
+    } finally {
+      setImportingGroup(null);
     }
   };
 
@@ -1463,30 +1509,53 @@ export default function Restaurants() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                {importableSpots.map((savedSpot, i) => {
-                  const alreadyInTrip = spots.some(s => s.title?.toLowerCase().trim() === savedSpot.title?.toLowerCase().trim());
-                  const isSaving = savingId === 'import_' + savedSpot.id;
-                  const SpotIcon = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag }[savedSpot.type] || CirclePlus;
+                {importGroups.map((group, gi) => {
+                  const groupKey = group.city?.id || 'other';
+                  const pendingInGroup = group.spots.filter(s => !spots.some(sp => sp.title?.toLowerCase().trim() === s.title?.toLowerCase().trim()));
+                  const isImportingGroup = importingGroup === groupKey;
                   return (
-                    <div key={savedSpot.id} className={`flex items-center gap-3 px-4 py-3 ${i > 0 ? 'border-t border-orange-200 dark:border-primary/20' : ''}`}>
-                      <div className="w-8 h-8 rounded-xl bg-orange-100 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
-                        <SpotIcon size={14} className="text-primary" />
+                    <div key={groupKey} className={gi > 0 ? 'border-t border-orange-200 dark:border-primary/20' : ''}>
+                      <div className="flex items-center justify-between px-4 py-2 bg-orange-100/50 dark:bg-primary/15">
+                        <p className="text-xs font-semibold text-primary uppercase tracking-wide">
+                          {group.city ? group.city.name : t('spots.importOtherCities')}
+                        </p>
+                        {pendingInGroup.length > 1 && (
+                          <button
+                            onClick={() => importGroup(group)}
+                            disabled={isImportingGroup}
+                            className="text-xs font-medium text-primary hover:underline disabled:opacity-50"
+                          >
+                            {isImportingGroup ? '...' : t('spots.importAllShort', { count: pendingInGroup.length })}
+                          </button>
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{savedSpot.title}</p>
-                        {savedSpot.city_name && <p className="text-xs text-muted-foreground">{savedSpot.city_name}</p>}
-                      </div>
-                      {alreadyInTrip ? (
-                        <span className="text-xs text-muted-foreground px-2 py-1 bg-secondary rounded-full flex-shrink-0">{t('spots.alreadyAdded')}</span>
-                      ) : (
-                        <button
-                          onClick={() => importSavedSpot(savedSpot)}
-                          disabled={isSaving}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full flex-shrink-0 disabled:opacity-50"
-                        >
-                          {isSaving ? '...' : <><Plus className="w-3 h-3" />{t('spots.addShort')}</>}
-                        </button>
-                      )}
+                      {group.spots.map(savedSpot => {
+                        const alreadyInTrip = spots.some(s => s.title?.toLowerCase().trim() === savedSpot.title?.toLowerCase().trim());
+                        const isSaving = savingId === 'import_' + savedSpot.id;
+                        const SpotIcon = { food: Utensils, sight: Landmark, activity: Ticket, shopping: ShoppingBag }[savedSpot.type] || CirclePlus;
+                        return (
+                          <div key={savedSpot.id} className="flex items-center gap-3 px-4 py-3 border-t border-orange-200 dark:border-primary/20">
+                            <div className="w-8 h-8 rounded-xl bg-orange-100 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
+                              <SpotIcon size={14} className="text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{savedSpot.title}</p>
+                              {!group.city && savedSpot.city_name && <p className="text-xs text-muted-foreground">{savedSpot.city_name}</p>}
+                            </div>
+                            {alreadyInTrip ? (
+                              <span className="text-xs text-muted-foreground px-2 py-1 bg-secondary rounded-full flex-shrink-0">{t('spots.alreadyAdded')}</span>
+                            ) : (
+                              <button
+                                onClick={() => importSavedSpot(savedSpot, group.city)}
+                                disabled={isSaving || isImportingGroup}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-full flex-shrink-0 disabled:opacity-50"
+                              >
+                                {isSaving ? '...' : <><Plus className="w-3 h-3" />{t('spots.addShort')}</>}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}

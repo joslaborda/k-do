@@ -393,19 +393,15 @@ export default function Explore() {
             <TabsTrigger value="explorar" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Globe className="w-4 h-4 mr-1"/>{t('explore.tabs.explore')}
             </TabsTrigger>
-            <TabsTrigger value="siguiendo" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Heart className="w-4 h-4 mr-1"/>{t('explore.tabs.following')}
-              {(siguiendoSpots.length + siguiendoTemplates.length) > 0 && (
-                <Badge variant="secondary" className="ml-1">{siguiendoSpots.length + siguiendoTemplates.length}</Badge>
-              )}
-            </TabsTrigger>
-            {/* Pestaña "Personas" (seguir/dejar de seguir) ocultada a petición de
-                José: la funcionalidad de Follow está conectada y funciona (probado
-                con una cuenta real), pero no hay ningún sitio de la app que
-                muestre seguidores/seguidos ni haga nada visible con esa relación
-                todavía — hasta que se lance "Kodo Social" distrae más que aporta.
-                Reversible: basta con descomentar este TabsTrigger y el
-                TabsContent value="personas" de más abajo. */}
+            {/* Pestañas "Siguiendo" y "Personas" ocultadas a petición de José:
+                la funcionalidad de Follow está conectada y funciona (probado con
+                una cuenta real), pero no hay ningún sitio de la app que muestre
+                seguidores/seguidos ni haga nada visible con esa relación todavía
+                — sin "Personas" (de donde salía el único botón de Seguir),
+                "Siguiendo" quedaría siempre vacía, así que se oculta también.
+                Hasta que se lance "Kodo Social" distrae más que aporta.
+                Reversible: basta con descomentar este TabsTrigger, el de
+                "personas" y sus TabsContent de más abajo. */}
             <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Star className="w-4 h-4 mr-1"/>{t('explore.tabs.top')}
             </TabsTrigger>
