@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { normalizeEmail } from '@/lib/utils';
 import { searchUserProfiles } from '@/lib/userProfiles';
+import { resolveDocViewUrl } from '@/lib/privateFiles';
 
 const DOC_ICONS = {
   flight:    PlaneIcon,
@@ -70,7 +71,16 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
   const bg   = DOC_BG[cat]   || 'bg-secondary';
   const vis  = VIS[ticket.visibility || 'personal'];
   const todayDoc = ticket.date && isToday(parseISO(ticket.date));
-  const hasFile  = !!ticket.file_url;
+  // file_uri: documentos subidos a storage privado tras el fix de
+  // seguridad — no tienen file_url pero sí llevan archivo adjunto.
+  const hasFile  = !!(ticket.file_url || ticket.file_uri);
+  // Resuelve la URL de visualización en el momento del clic — para
+  // file_uri (storage privado) pide una URL firmada nueva cada vez en vez
+  // de guardar/reusar una que podría haber caducado. Ver src/lib/privateFiles.js.
+  const handleView = async () => {
+    const url = await resolveDocViewUrl(ticket);
+    if (url) onView(url);
+  };
 
   const displayName = ticket.name || (ticket.origin && ticket.destination
     ? `${ticket.origin} → ${ticket.destination}`
@@ -92,14 +102,14 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${iconCls}`}>
           <IconComp size={16} className="flex-shrink-0" />
         </div>
-        <button onClick={() => hasFile && onView(ticket.file_url)} className="flex-1 min-w-0 text-left">
+        <button onClick={() => hasFile && handleView()} className="flex-1 min-w-0 text-left">
           <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{displayName}</p>
           {routeLabel && <p className="text-xs text-muted-foreground mt-0.5">{routeLabel}</p>}
           {timeLabel && <p className="text-xs text-primary font-semibold mt-0.5">{timeLabel}</p>}
         </button>
         <div className="flex items-center gap-1.5 shrink-0">
           {hasFile && (
-            <button onClick={() => onView(ticket.file_url)}
+            <button onClick={handleView}
               className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/40 flex items-center justify-center hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -152,7 +162,7 @@ function DocRow({ticket, onEdit, onDelete, onView }) {
 
             {/* File */}
             {hasFile && (
-              <button onClick={() => onView(ticket.file_url)}
+              <button onClick={handleView}
                 className="w-full flex items-center gap-3 px-3 py-2 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors text-left mt-1">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>

@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { toast } from '@/components/ui/use-toast';
 import DocumentForm from '@/components/tickets/DocumentForm';
 import PDFViewer from '@/components/PDFViewer';
+import { resolveDocViewUrl } from '@/lib/privateFiles';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import SettingsDialog from '@/components/home/SettingsDialog';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
@@ -143,8 +144,18 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
   const DocIcon = DOC_ICON_MAP[type] || FileText;
   const bgColor = DOC_BG[type] || 'bg-secondary';
 
-  const openFile = () => {
-    if (doc?.file_url) window.open(doc.file_url, '_blank');
+  // Resuelve la URL en el momento de abrir — para documentos con file_uri
+  // (storage privado) pide una URL firmada nueva cada vez en vez de reusar
+  // una que podría haber caducado. Ver src/lib/privateFiles.js. La pestaña
+  // se abre en blanco de forma SÍNCRONA (dentro del propio click) y se le
+  // asigna la URL después de resolverla — abrirla ya tras el await podía
+  // hacer que el navegador la tratase como pop-up no solicitado y la bloqueara.
+  const openFile = async () => {
+    if (!doc?.file_url && !doc?.file_uri) return;
+    const win = window.open('', '_blank');
+    const url = await resolveDocViewUrl(doc);
+    if (url && win) win.location.href = url;
+    else if (win) win.close();
   };
 
   return (
@@ -163,7 +174,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
         </div>
 
         {/* File preview / upload zone */}
-        {doc?.file_url ? (
+        {(doc?.file_url || doc?.file_uri) ? (
           <button onClick={openFile} className="mx-4 my-3 bg-secondary rounded-xl p-4 flex items-center gap-3 hover:bg-border/40 transition-colors text-left w-[calc(100%-2rem)]">
             <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/30 flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5 text-red-600" strokeWidth={1.5} />
@@ -203,7 +214,7 @@ function DocViewerModal({ doc, open, onClose, onEdit }) {
         <div className="px-4 py-3 border-t border-border flex justify-between items-center">
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={onClose}>{t('cities.doc.close')}</Button>
-            {doc?.file_url && (
+            {(doc?.file_url || doc?.file_uri) && (
               <Button size="sm" className="bg-primary hover:bg-primary/90 text-white" onClick={openFile}>
                 {t('cities.doc.open')}
               </Button>
