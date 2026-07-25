@@ -5,6 +5,7 @@ import { es } from 'date-fns/locale';
 import PDFViewer from '@/components/PDFViewer';
 import { CATEGORY_CONFIG } from './DocumentForm';
 import { useTranslation } from 'react-i18next';
+import { resolveDocViewUrl } from '@/lib/privateFiles';
 
 // Categories not in CATEGORY_CONFIG (legacy data) → fallback mapping
 const CATEGORY_FALLBACK = {
@@ -30,6 +31,14 @@ const ICON_BG = {
 export default function DocumentCard({ ticket, onEdit, onDelete, compact = false, cityName = '', dayTitle = '' }) {
   const { t, i18n } = useTranslation();
   const [viewingPDF, setViewingPDF] = useState(null);
+  // Resuelve la URL de visualización en el momento del clic — para
+  // documentos con file_uri (storage privado) pide una URL firmada nueva
+  // cada vez en vez de reusar una que podría haber caducado. Ver
+  // src/lib/privateFiles.js.
+  const handleView = async () => {
+    const url = await resolveDocViewUrl(ticket);
+    if (url) setViewingPDF(url);
+  };
 
   // Resolve category — legacy values fall back gracefully
   const resolvedCat = CATEGORY_CONFIG[ticket.category]
@@ -72,9 +81,9 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
               {contextCity ? ` · ${contextCity}` : ''}
             </p>
           </div>
-          {ticket.file_url && (
+          {(ticket.file_url || ticket.file_uri) && (
             <button
-              onClick={() => setViewingPDF(ticket.file_url)}
+              onClick={handleView}
               className="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary text-white text-xs font-semibold transition-all flex-shrink-0"
             >
               {t('documents.card.view')}
@@ -161,9 +170,9 @@ export default function DocumentCard({ ticket, onEdit, onDelete, compact = false
 
         {/* CTA — vertically centered */}
         <div className="flex-shrink-0 flex items-center self-center">
-          {ticket.file_url ? (
+          {(ticket.file_url || ticket.file_uri) ? (
             <button
-              onClick={() => setViewingPDF(ticket.file_url)}
+              onClick={handleView}
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all whitespace-nowrap"
             >
               <FileText className="w-4 h-4" />

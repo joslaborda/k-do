@@ -12,6 +12,7 @@ import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/
 import { useToast } from '@/components/ui/use-toast';
 import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 import { normalizeEmail } from '@/lib/utils';
+import { uploadDocFile, resolveDocViewUrl } from '@/lib/privateFiles';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
 export const CATEGORY_CONFIG = {
@@ -113,6 +114,13 @@ export default function DocumentForm({
     note_time:   initialData?.note_time   || '',
     notes:       initialData?.notes       || '',
     file_url:    initialData?.file_url    || '',
+    // file_uri: referencia a storage PRIVADO (ver handleFileUpload) — lo que
+    // de verdad se guarda para archivos nuevos. file_url en documentos
+    // nuevos solo sirve como vista previa temporal dentro de este formulario
+    // (URL firmada, caduca) — nunca se persiste tal cual, ver handleSave.
+    // Los documentos antiguos (subidos antes de este fix) solo tienen
+    // file_url público y siguen funcionando igual que siempre.
+    file_uri:    initialData?.file_uri    || '',
     city_id:     initialData?.city_id     || '',
     arrival_city_id: initialData?.arrival_city_id || '',
     location_name: initialData?.location_name || '',
@@ -128,6 +136,22 @@ export default function DocumentForm({
   const [locationSearching, setLocationSearching] = useState(false);
   const locationTimer = useRef(null);
   const locationAbortRef = useRef(null);
+
+  // Al editar un documento que ya tiene file_uri (subido a storage privado),
+  // fields.file_url arranca vacío a propósito (no se persiste la firma
+  // temporal, ver handleSave) — sin esto, la sección de "archivo adjunto"
+  // de más abajo pensaría que el documento no tiene ningún archivo y
+  // mostraría el botón de subir uno nuevo en vez de la vista previa del que
+  // ya existe. Se pide una URL firmada fresca solo para previsualizar aquí.
+  useEffect(() => {
+    if (!initialData?.file_uri || fields.file_url) return;
+    let cancelled = false;
+    resolveDocViewUrl(initialData).then(url => {
+      if (!cancelled && url) setField('file_url', url);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData?.file_uri]);
 
   useEffect(() => {
     if (fields.location_lat) { setLocationResults([]); return; }
@@ -195,8 +219,15 @@ export default function DocumentForm({
       // Este campo admite PDFs además de fotos (p.ej. una foto del pasaporte
       // tomada con el móvil), por eso también puede llegar un HEIC aquí.
       const uploadFile = await convertHeicIfNeeded(file);
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
-      setField('file_url', file_url);
+      // UploadPrivateFile (no UploadFile): documentos como pasaporte/seguro
+      // no deben quedar en storage público solo porque alguien conozca la
+      // URL — ver src/lib/privateFiles.js para el hallazgo completo.
+      // file_uri es lo permanente (se guarda en el Ticket); previewUrl es
+      // una URL firmada de corta duración solo para la vista previa de aquí
+      // abajo mientras se edita este formulario — nunca se persiste.
+      const { file_uri, previewUrl } = await uploadDocFile(uploadFile);
+      setField('file_uri', file_uri);
+      setField('file_url', previewUrl);
     } catch (err) {
       // Antes un fallo aquí no dejaba ningún rastro: sin toast, el campo de
       // archivo simplemente se quedaba vacío como si nada se hubiera intentado.
@@ -227,6 +258,14 @@ export default function DocumentForm({
     if (typeof location_lat === 'number' || (location_lat && !isNaN(Number(location_lat)))) {
       payload.location_lat = location_lat;
       payload.location_lng = location_lng;
+    }
+    // Si hay file_uri (archivo subido a storage privado tras este fix),
+    // fields.file_url en este punto es solo la URL firmada de vista previa
+    // de este formulario (caduca en 1h) — no tiene sentido persistirla como
+    // si fuera permanente. Se guarda vacía; resolveDocViewUrl() siempre
+    // pedirá una firma nueva a partir de file_uri para ver el documento.
+    if (payload.file_uri) {
+      payload.file_url = '';
     }
     onSave({
       ...payload,
@@ -520,7 +559,7 @@ export default function DocumentForm({
                 className="text-sm text-foreground flex-1 truncate text-left hover:text-primary transition-colors">
                 {t('documents.form.fileAttached')}
               </button>
-              <button onClick={() => setField('file_url', '')}
+              <button onClick={() => { setField('file_url', ''); setField('file_uri', ''); }}
                 className="text-xs text-muted-foreground hover:text-red-500 transition-colors ml-2">
                 {t('documents.form.removeFile')}
               </button>
