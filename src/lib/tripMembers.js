@@ -38,3 +38,24 @@ export async function removeTripMember(tripId, targetEmail) {
 export async function setTripMemberRole(tripId, targetEmail, role) {
   return callManageTripMember({ tripId, targetEmail, action: 'setRole', role });
 }
+
+/**
+ * Sale del viaje (siempre uno mismo, nunca otra persona) — corre en el
+ * backend (base44/functions/leaveTrip) por el mismo motivo que
+ * callManageTripMember de arriba: el rls de Trip.update ahora exige ser
+ * admin, así que quitarse a uno mismo de members/roles ya no se puede hacer
+ * con Trip.update() directo desde aquí. Usado por el flujo de borrar cuenta
+ * en Settings.jsx.
+ */
+export async function leaveTrip(tripId) {
+  let result;
+  try {
+    result = await base44.functions.invoke('leaveTrip', { tripId });
+  } catch (e) {
+    const serverError = e?.response?.data?.error || e?.data?.error;
+    throw new Error(serverError || e?.message || 'No se pudo salir del viaje.');
+  }
+  const data = result?.data ?? result;
+  if (data?.error) throw new Error(data.error);
+  return data.trip;
+}
