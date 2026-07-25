@@ -108,6 +108,20 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     staleTime: 300000,
   });
 
+  // Perfiles de los co-travelers, buscados por email ya conocido (vienen de
+  // tus propios viajes creados, ver query de arriba) — NO se puede usar
+  // `allProfiles` (más abajo) para esto: ese es el modo "descubrimiento
+  // abierto" de searchUserProfiles y nunca incluye email a propósito (para
+  // no exponerlo a quien no lo conocía ya), así que matchear por p.email
+  // contra esa lista siempre fallaría.
+  const coTravelerEmailList = coTravelerEmails.map(c => c.email);
+  const { data: coTravelerProfilesRaw = [] } = useQuery({
+    queryKey: ['coTravelerProfiles', coTravelerEmailList.join(',')],
+    queryFn: () => searchUserProfiles({ emails: coTravelerEmailList }),
+    enabled: coTravelerEmailList.length > 0,
+    staleTime: 300000,
+  });
+
   // Focus input on open
   useEffect(() => {
     if (open) {
@@ -256,7 +270,7 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
   // arriba para la búsqueda) sí tiene a todos los usuarios de Kōdo, así que
   // se busca ahí primero.
   const coTravelerProfiles = coTravelerEmails.map(({ email, count }) => ({
-    profile: allProfiles.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email))
+    profile: coTravelerProfilesRaw.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email))
       || profiles.find(p => normalizeEmail(p.email) === normalizeEmail(email) || normalizeEmail(p.user_email) === normalizeEmail(email)),
     email,
     count,
