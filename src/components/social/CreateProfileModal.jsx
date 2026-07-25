@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, CheckCircle2, XCircle, Check, Languages, Plane, Hotel, Shield, Utensils, Ticket, MapPin, Palette, CloudSun } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { getCountryMeta, getCountryOptions, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
@@ -565,7 +566,11 @@ export default function CreateProfileModal({ user, open, onComplete }) {
       // aparece OTRO perfil además del propio, es que se perdió la carrera —
       // se borra el que se acaba de crear aquí y se pide reintentar con otro
       // username, en vez de dejar el duplicado en la base de datos.
-      const afterCreate = await base44.entities.UserProfile.filter({ username_normalized: username });
+      // UserProfile.read se cerró en el rls a "solo tu propio perfil" — un
+      // .filter() directo aquí ya nunca vería el duplicado de otra persona
+      // (justo lo que este chequeo necesita detectar), así que se relee vía
+      // función backend igual que el resto de búsquedas por username.
+      const afterCreate = await searchUserProfiles({ usernameQuery: username, exact: true });
       const dupes = afterCreate.filter(p => p.id !== created.id && p.user_id !== user.id);
       if (dupes.length > 0) {
         await base44.entities.UserProfile.delete(created.id).catch(() => {});

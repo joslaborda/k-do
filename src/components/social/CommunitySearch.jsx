@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/trip/Avatar';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 const SPOT_TYPE_ICON = {
@@ -55,9 +56,11 @@ export default function CommunitySearch({ open, onOpenChange }) {
     staleTime: 10 * 60 * 1000,
   });
 
+  // UserProfile.read se cerró en el rls — descubrimiento abierto, se lee sin
+  // email/nationality — ver src/lib/userProfiles.js.
   const { data: allProfiles = [], isLoading: loadingProfiles } = useQuery({
     queryKey: ['allProfiles'],
-    queryFn: () => base44.entities.UserProfile.list(),
+    queryFn: () => searchUserProfiles({}),
     enabled: open,
     staleTime: 10 * 60 * 1000,
   });
