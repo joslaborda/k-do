@@ -11,6 +11,20 @@
   },
   "required": ["base", "quote", "rate"],
   "rls": {
+    // Riesgo aceptado, documentado (no se cierra del todo en esta ronda):
+    // a diferencia de CountryInfo.jsonc, aquí el cliente SÍ necesita escribir
+    // de verdad — src/lib/fxRates.js hace create/update directos tras
+    // consultar Frankfurter/LLM, porque es una caché compartida entre todos
+    // los usuarios (no hay una función backend que la alimente). El motor de
+    // rls de base44 no permite validar el VALOR de "rate" (solo puede
+    // comparar campos contra el usuario), así que cualquier usuario
+    // autenticado podría en teoría escribir una tasa de cambio falsa y
+    // afectar los cálculos de gasto de otros usuarios hasta que expire
+    // (valid_until, 24h) o se sobreescriba con un valor correcto. Impacto
+    // limitado (autocorrige en <24h, no toca datos de otros usuarios, solo
+    // una cifra de conversión) frente al coste de mover esta escritura a una
+    // función backend con asServiceRole — se deja documentado como pendiente
+    // si en el futuro se quiere cerrar del todo.
     "create": true,
     "read": true,
     "update": true,

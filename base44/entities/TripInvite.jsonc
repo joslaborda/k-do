@@ -34,6 +34,16 @@
   ],
   "rls": {
     "create": false,
+    // Nota pendiente de verificación en vivo (no corregible solo con código):
+    // data.email/data.invited_by siempre se guardan en minúsculas
+    // (createTripInvite normaliza con .trim().toLowerCase()), pero no está
+    // confirmado si el motor de rls de base44 normaliza también el valor de
+    // {{user.email}} antes de comparar. Si un proveedor de login (p. ej.
+    // Google) devolviera el email de sesión con mayúsculas, esta comparación
+    // podría no coincidir nunca y la persona invitada no vería su propia
+    // invitación al leerla desde el cliente. Requiere una prueba en vivo con
+    // una cuenta cuyo email de sesión tenga mayúsculas para confirmar o
+    // descartar esto.
     "read": {
       "$or": [
         { "data.email": "{{user.email}}" },

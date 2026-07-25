@@ -30,7 +30,10 @@
     "target_type"
   ],
   "rls": {
-    "create": true,
+    // Mismo patrón que ya se corrigió en Follow.jsonc: create:true sin
+    // exigir autoría dejaba que cualquiera diera like en nombre de otro
+    // user_id (spam/manipulación de contadores de "me gusta").
+    "create": { "data.user_id": "{{user.id}}" },
     "read": true,
     "update": { "data.user_id": "{{user.id}}" },
     "delete": { "data.user_id": "{{user.id}}" }

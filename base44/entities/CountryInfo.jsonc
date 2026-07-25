@@ -24,5 +24,20 @@
   },
   "required": [
     "country_label"
-  ]
+  ],
+  "rls": {
+    // Caché compartida de info de emergencias/embajadas por país — de solo
+    // lectura desde el cliente (confirmado: src/ solo hace .filter(), nunca
+    // .create()/.update()). Sin este bloque no había ninguna restricción:
+    // cualquier usuario autenticado podía crear/editar/borrar estas filas y
+    // alterar los datos de emergencia mostrados a TODOS los usuarios de un
+    // país — vector de vandalismo con impacto real (números de emergencia
+    // falsos), no solo de datos. Cerrado del todo desde el cliente; si en el
+    // futuro hace falta regenerarlas, debe hacerse con asServiceRole desde
+    // una función backend, no desde aquí.
+    "create": false,
+    "read": true,
+    "update": false,
+    "delete": false
+  }
 }

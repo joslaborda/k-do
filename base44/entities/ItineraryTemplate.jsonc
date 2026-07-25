@@ -72,5 +72,16 @@
   "required": [
     "title",
     "created_by_user_id"
-  ]
+  ],
+  "rls": {
+    "create": { "data.created_by_user_id": "{{user.id}}" },
+    "read": {
+      "$or": [
+        { "data.created_by_user_id": "{{user.id}}" },
+        { "data.visibility": { "$in": ["public", "unlisted"] } }
+      ]
+    },
+    "update": { "data.created_by_user_id": "{{user.id}}" },
+    "delete": { "data.created_by_user_id": "{{user.id}}" }
+  }
 }

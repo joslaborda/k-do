@@ -55,7 +55,19 @@
     "content"
   ],
   "rls": {
-    "create": { "data.trip_members": { "$in": ["{{user.email}}"] } },
+    // El fix de update/delete (ver comentario abajo) cerró la suplantación
+    // al editar/borrar, pero create se quedó solo con la comprobación de
+    // pertenencia al viaje, sin exigir data.user_id === {{user.id}} — y
+    // ChatTab.jsx decide "es mío" y qué nombre/avatar mostrar leyendo esos
+    // mismos campos del mensaje (no un created_by de sistema), así que
+    // cualquier miembro podía crear un TripMessage con la identidad de OTRO
+    // miembro y se mostraría como si lo hubiera escrito esa persona.
+    "create": {
+      "$and": [
+        { "data.trip_members": { "$in": ["{{user.email}}"] } },
+        { "data.user_id": "{{user.id}}" }
+      ]
+    },
     "read": { "data.trip_members": { "$in": ["{{user.email}}"] } },
     // Antes update/delete solo exigían pertenecer al viaje, igual que read —
     // el botón de borrar en la interfaz sí comprobaba "isMine" (user_id ===
