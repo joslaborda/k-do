@@ -77,8 +77,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: "No eres miembro de este viaje" }, { status: 403 });
     }
 
-    const recipients = await service.entities.User.filter({ id: userId });
-    const recipientUser = recipients[0];
+    // Un userId con formato inválido hace que el propio SDK lance una
+    // excepción al consultar (en vez de devolver una lista vacía) — se
+    // captura aparte para devolver un 404 limpio en vez de un 500 con el
+    // mensaje interno del SDK.
+    let recipientUser: any = null;
+    try {
+      const recipients = await service.entities.User.filter({ id: userId });
+      recipientUser = recipients[0] || null;
+    } catch {
+      recipientUser = null;
+    }
     if (!recipientUser?.email) {
       return Response.json({ error: "Destinatario no encontrado" }, { status: 404 });
     }
