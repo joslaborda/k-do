@@ -79,13 +79,20 @@ async function persistToEntity(from, to, rate, source) {
 }
 
 async function fromEntity(from, to) {
+  // Leer directo desde el cliente (ExchangeRateCache.read abierto en el rls)
+  // es exactamente lo que el panel de seguridad de Base44 marca CRÍTICO:
+  // "los usuarios públicos pueden acceder a todos los registros". Se
+  // pensó (ronda 3) que no era grave por no ser información sensible, pero
+  // el panel evalúa acceso público sin restricción, no el contenido — así
+  // que, igual que con la escritura, la lectura se movió a una función
+  // backend (getCachedFxRate) que exige sesión real. El rls de la entidad
+  // ya no permite ningún acceso directo desde el cliente (create/read/
+  // update/delete todos en false).
   try {
-    const rows = await base44.entities.ExchangeRateCache.filter({ base: from, quote: to });
-    if (rows.length > 0) {
-      const row = rows[0];
-      if (row.valid_until && new Date(row.valid_until) > new Date()) {
-        return { rate: row.rate, source: row.source, fetchedAt: row.fetched_at };
-      }
+    const res = await base44.functions.invoke('getCachedFxRate', { base: from, quote: to });
+    const data = res?.data ?? res;
+    if (data?.found) {
+      return { rate: data.rate, source: data.source, fetchedAt: data.fetched_at };
     }
   } catch {}
   return null;
