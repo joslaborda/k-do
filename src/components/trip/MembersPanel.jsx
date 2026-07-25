@@ -104,18 +104,24 @@ export default function MembersPanel({
           return;
         }
         const profile = found[0];
-        // Resolver email: primero desde el campo email del perfil (backfilled), luego via User.filter
+        // Resolver email: primero desde el campo email del perfil
+        // (backfilled). Si no, antes se intentaba con
+        // base44.entities.User.filter({id:...}) desde el cliente — esa
+        // llamada da SIEMPRE 403 para cualquier usuario no colaborador del
+        // proyecto en Base44, así que este fallback nunca resolvía nada en
+        // la práctica para un usuario normal. searchUserProfiles ya hace
+        // este mismo fallback en el backend con permisos de servicio.
         if (profile.email) {
           resolvedEmail = profile.email;
         } else {
-          const users = await base44.entities.User.filter({ id: profile.user_id });
-          const user = users[0];
-          if (!user?.email) {
+          const resolved = await searchUserProfiles({ userIds: [profile.user_id] });
+          const foundEmail = resolved[0]?.email;
+          if (!foundEmail) {
             toast({ title: t('common.error'), description: t('membersPanel.resolveEmailError') });
             setInviting(false);
             return;
           }
-          resolvedEmail = user.email;
+          resolvedEmail = foundEmail;
         }
       }
       // members está normalizado en minúsculas; sin normalizar resolvedEmail
