@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { parseServerDate } from '@/lib/parseServerDate';
-import { MAX_FILE_BYTES } from '@/lib/uploadLimits';
+import { MAX_FILE_BYTES, convertHeicIfNeeded } from '@/lib/uploadLimits';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembers }) {
@@ -118,7 +118,8 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
     setUploading(true);
     setAttachOpen(false);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const uploadFile = isImage ? await convertHeicIfNeeded(file) : file;
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
       sendMutation.mutate({
         content: isImage || isAudio ? '' : file.name,
         file_url,
