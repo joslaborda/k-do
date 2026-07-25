@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/trip/Avatar';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 function ResultRow({ profile, email, triplesCount, status, onInvite, sending }) {
   const { t } = useTranslation();
@@ -116,10 +117,15 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     }
   }, [open]);
 
-  // Precargar todos los perfiles al abrir el modal — búsqueda client-side inmediata
+  // Precargar todos los perfiles al abrir el modal — búsqueda client-side inmediata.
+  // UserProfile.read se cerró en el rls (exponía email/nationality de todo
+  // el mundo) — se lee vía función backend, modo "descubrimiento abierto" (sin
+  // filtros = todos los perfiles con solo campos públicos, nunca email). El
+  // email de a quién se invita se resuelve aparte en handleInvite() vía el
+  // fallback que ya existía (User.filter por profile.user_id) — ver abajo.
   const { data: allProfiles = [] } = useQuery({
     queryKey: ['allUserProfiles'],
-    queryFn: () => base44.entities.UserProfile.filter({}),
+    queryFn: () => searchUserProfiles({}),
     enabled: open,
     staleTime: 120000, // 2 min cache
   });

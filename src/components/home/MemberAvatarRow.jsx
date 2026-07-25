@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { UserPlus } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { useTranslation } from 'react-i18next';
 
 export default function MemberAvatarRow({
@@ -21,24 +21,14 @@ export default function MemberAvatarRow({
     queryKey: ['memberProfiles', memberEmails.join(',')],
     queryFn: async () => {
       if (!memberEmails.length) return [];
-      // Intento directo por email (funciona si el usuario tiene email backfilled)
-      const direct = await base44.entities.UserProfile.filter({ email: { $in: memberEmails } });
-      // Emails que no encontramos por email directo
-      const foundEmails = new Set(direct.map(p => normalizeEmail(p.email)).filter(Boolean));
-      const missing = memberEmails.filter(e => !foundEmails.has(e));
-      if (!missing.length) return direct;
-      // Fallback para los que faltan: User → user_id → UserProfile
-      const users = await base44.entities.User.filter({ email: { $in: missing } });
-      const ids = users.map(u => u.id).filter(Boolean);
-      const extra = ids.length
-        ? await base44.entities.UserProfile.filter({ user_id: { $in: ids } })
-        : [];
-      // Enriquecer con user_email para poder lookupear
-      const enriched = extra.map(p => ({
-        ...p,
-        email: normalizeEmail(users.find(u => u.id === p.user_id)?.email || ''),
-      }));
-      return [...direct, ...enriched];
+      // UserProfile.read se cerró en el rls (exponía email/nationality de
+      // todo el mundo) — se lee vía función backend en vez de .filter()
+      // directo. Se pasan emails ya conocidos (son miembros de este viaje),
+      // así que la respuesta sí incluye email — ver src/lib/userProfiles.js.
+      // El propio backend ya resuelve internamente el fallback email→User→
+      // user_id para perfiles sin email backfilled, así que el fallback en
+      // dos pasos que había aquí ya no hace falta.
+      return searchUserProfiles({ emails: memberEmails });
     },
     enabled: memberEmails.length > 0,
     staleTime: 10 * 60 * 1000,
