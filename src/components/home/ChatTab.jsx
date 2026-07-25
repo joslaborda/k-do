@@ -63,27 +63,17 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
 
   const votePoll = async (msg, optionIdx) => {
     try {
-      // Antes se leía msg.file_name directo de la caché de la query (hasta
-      // 8s de desfase por el refetchInterval de arriba) y se reescribía el
-      // JSON completo de opciones de vuelta. Si dos personas votaban casi a
-      // la vez, el segundo "update" pisaba entero el resultado del primero
-      // — un voto desaparecía sin ningún aviso, sin fusionarse. Se relee el
-      // mensaje justo antes de escribir para aplicar el voto sobre la
-      // versión más reciente del backend, no sobre la que había en caché.
-      // No elimina la carrera del todo (seguiría cabiendo un choque exacto
-      // entre el get() y el update()), pero la reduce de ~8s a una sola
-      // ida y vuelta — una solución completa necesitaría un endpoint propio
-      // que aplique el voto de forma atómica en el servidor.
-      const fresh = await base44.entities.TripMessage.get(msg.id);
-      const pollData = JSON.parse(fresh?.file_name || msg.file_name || '{}');
-      if (!pollData.options) return;
-      pollData.options = pollData.options.map((opt, i) => ({
-        ...opt,
-        votes: i === optionIdx
-          ? [...new Set([...(opt.votes || []), currentUserEmail])]
-          : (opt.votes || []).filter(v => v !== currentUserEmail)
-      }));
-      await base44.entities.TripMessage.update(msg.id, { file_name: JSON.stringify(pollData) });
+      // Votar ya no escribe TripMessage.update directo desde el cliente:
+      // el rls de esa entidad exige ser el AUTOR del mensaje para poder
+      // actualizarlo (fix de ronda 2, para impedir editar/borrar mensajes
+      // ajenos), lo que sin querer también bloqueaba votar en la encuesta de
+      // cualquiera que no fuera quien la creó. La función backend votePoll
+      // valida membresía del viaje, aplica el voto de forma atómica con
+      // reintento, y solo toca la entrada de quien vota — ver
+      // base44/functions/votePoll/entry.ts.
+      const result = await base44.functions.invoke('votePoll', { messageId: msg.id, optionIdx });
+      const data = result?.data ?? result;
+      if (data?.error) throw new Error(data.error);
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
     } catch {
       toast({ title: t('common.error'), description: t('common.tryAgain'), variant: 'destructive' });

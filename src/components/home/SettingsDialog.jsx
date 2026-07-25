@@ -15,6 +15,19 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
 
+// Solo se validaba end_date >= start_date de CADA ciudad por separado — nada
+// impedía que el start_date de una ciudad fuera muy anterior al end_date de
+// otra ya guardada, más allá del día de tránsito esperado. Cities.jsx genera
+// entradas de "día" por cada fecha dentro del rango de cada ciudad, así que
+// dos ciudades solapadas por varios días producían días duplicados bajo dos
+// bloques de ciudad distintos y descuadraban el progreso del viaje. Se
+// permite tocar exactamente un día (el de tránsito, end === start de la
+// siguiente) pero no más.
+function datesOverlap(aStart, aEnd, bStart, bEnd) {
+  if (!aStart || !aEnd || !bStart || !bEnd) return false;
+  return aStart < bEnd && bStart < aEnd;
+}
+
 export default
 function SettingsDialog({
   open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, profiles = [], currentUserEmail = ''
@@ -105,6 +118,10 @@ function SettingsDialog({
       toast({ title: t('trip.dialog.endBeforeStart'), variant: 'destructive' });
       return;
     }
+    if ((cities || []).some(c => c.id !== cityId && datesOverlap(cityDraft.start_date, cityDraft.end_date, c.start_date, c.end_date))) {
+      toast({ title: t('trip.dialog.datesOverlap'), variant: 'destructive' });
+      return;
+    }
     setCityLoading(cityId);
     try {
       await base44.entities.City.update(cityId, {
@@ -153,6 +170,10 @@ function SettingsDialog({
     if (!cityDraft.name?.trim()) return;
     if (cityDraft.start_date && cityDraft.end_date && cityDraft.end_date < cityDraft.start_date) {
       toast({ title: t('trip.dialog.endBeforeStart'), variant: 'destructive' });
+      return;
+    }
+    if ((cities || []).some(c => datesOverlap(cityDraft.start_date, cityDraft.end_date, c.start_date, c.end_date))) {
+      toast({ title: t('trip.dialog.datesOverlap'), variant: 'destructive' });
       return;
     }
     setCityLoading('new');

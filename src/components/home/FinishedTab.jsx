@@ -102,7 +102,7 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
   const totalDays = (trip?.start_date && trip?.end_date)
     ? differenceInDays(parseISO(trip.end_date), parseISO(trip.start_date)) + 1
     : null;
-  const totalSpent  = realExpenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0);
+  const totalSpent  = realExpenses.reduce((s, e) => s + Math.max(0, parseFloat(e.amount_base || e.amount) || 0), 0);
   const avgPerDay   = totalDays ? totalSpent / totalDays : 0;
   const visitedSpots = allTripSpots.filter(s => !!s.assigned_date).length;
   const currency    = trip?.currency || 'EUR';
@@ -145,14 +145,19 @@ export default function FinishedTab({ trip, cities, expenses, spots, tripId, cur
   // y split_with pueden venir sin normalizar, así que la clave/comparación
   // se hace siempre contra el email normalizado, nunca contra el crudo.
   const myShare = realExpenses.reduce((s, e) => {
-    const amt = parseFloat(e.amount_base || e.amount) || 0;
+    // Mismos dos guards que ya tienen BalancesTab/StatsTab en Expenses.jsx:
+    // Math.max(0, ...) contra importes negativos (amount y cada entrada de
+    // amounts_by_user) y un Set contra emails duplicados en split_with. Esta
+    // pantalla de resumen de fin de viaje reimplementaba el cálculo sin
+    // ninguno de los dos, reintroduciendo ambos bugs aquí.
+    const amt = Math.max(0, parseFloat(e.amount_base || e.amount) || 0);
     if (!amt) return s;
     const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
     if (e.split_type === 'custom' && myShareKey) {
-      const total = Object.values(e.amounts_by_user).reduce((t, v) => t + parseFloat(v || 0), 0);
-      return s + (total > 0 ? (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt : 0);
+      const total = Object.values(e.amounts_by_user).reduce((t, v) => t + Math.max(0, parseFloat(v) || 0), 0);
+      return s + (total > 0 ? (Math.max(0, parseFloat(e.amounts_by_user[myShareKey]) || 0) / total) * amt : 0);
     }
-    const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+    const parts = [...new Set((e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail))];
     if (!parts.includes(meNorm)) return s;
     return s + amt / parts.length;
   }, 0);
