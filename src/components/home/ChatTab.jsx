@@ -91,19 +91,24 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
   };
 
   const sendMutation = useMutation({
-    mutationFn: (payload) => base44.entities.TripMessage.create({
-      trip_id: tripId,
-      user_id: currentUserId,
-      user_email: currentUserEmail,
-      display_name: myProfile?.display_name || currentUserEmail,
-      avatar_url: myProfile?.avatar_url || null,
-      // Si tripMembers (trip?.members del padre) no había cargado, antes se
-      // guardaba con trip_members:[] y el mensaje quedaba invisible para
-      // siempre, ni para quien lo mandó — como mínimo se incluye a quien
-      // escribe.
-      trip_members: tripMembers?.length ? tripMembers : [currentUserEmail],
-      ...payload,
-    }),
+    // Antes, si tripMembers (trip?.members del padre) no había cargado
+    // todavía, se guardaba con trip_members: [currentUserEmail] — el
+    // mensaje quedaba invisible para el RESTO del grupo (falla su propia
+    // rls de TripMessage), así que solo quien lo mandó lo veía en su chat.
+    // Igual que Documents.jsx/Utilities.jsx con sus propios registros, se
+    // corta antes de crear algo que el grupo no podría ver.
+    mutationFn: (payload) => {
+      if (!tripMembers?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.TripMessage.create({
+        trip_id: tripId,
+        user_id: currentUserId,
+        user_email: currentUserEmail,
+        display_name: myProfile?.display_name || currentUserEmail,
+        avatar_url: myProfile?.avatar_url || null,
+        trip_members: tripMembers,
+        ...payload,
+      });
+    },
     onSuccess: () => {
       setMessage('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
