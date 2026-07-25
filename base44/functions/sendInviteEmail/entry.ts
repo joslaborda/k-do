@@ -30,6 +30,17 @@ import { createClientFromRequest } from "npm:@base44/sdk";
  * correo arbitrario sin autenticar.
  */
 
+// Dominio real de la app — se usa para RECONSTRUIR el link del botón/texto
+// del email server-side, en vez de confiar en la URL completa que manda el
+// cliente. Antes se validaba el token contra una TripInvite real, pero el
+// dominio de `inviteUrl` no se comprobaba: alguien podía llamar a esta
+// función directamente (no por la UI) con un token real pero un dominio
+// ajeno (ej. "https://dominio-malicioso.com/phish?token=<token real>"), y el
+// email oficial de Kōdo (remitente verificado, pasa SPF/DKIM) llegaba con un
+// botón/enlace apuntando a un sitio de phishing. Configurable por si cambia
+// el dominio; con fallback al dominio de producción conocido.
+const APP_ORIGIN = (Deno.env.get("KODO_APP_URL") || "https://kodotravel.app").replace(/\/$/, "");
+
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 // Por defecto usa el remitente de pruebas de Resend — solo entrega al email
 // con el que se creó la cuenta de Resend. Para invitar a cualquier persona
@@ -174,6 +185,13 @@ Deno.serve(async (req) => {
       );
     }
 
+    // El link que se manda en el email SIEMPRE se reconstruye aquí, con el
+    // dominio real de la app y el token ya validado — se ignora el resto de
+    // `inviteUrl` que mandó el cliente (dominio, query params extra, etc.).
+    // Así, aunque alguien llame a esta función con un `inviteUrl` apuntando a
+    // otro sitio, el email que sale de verdad siempre enlaza a kodotravel.app.
+    const safeInviteUrl = `${APP_ORIGIN}/Invites?token=${encodeURIComponent(tokenFromUrl)}`;
+
     const lang = rawLang === "en" ? "en" : "es";
     const s = STRINGS[lang];
 
@@ -242,12 +260,12 @@ Deno.serve(async (req) => {
 ${infoBox}
 
 <tr><td style="padding:0 32px 8px;text-align:center;">
-<a href="${inviteUrl}" style="display:inline-block;background-color:#c2410c;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:13px 40px;border-radius:24px;">${s.button}</a>
+<a href="${safeInviteUrl}" style="display:inline-block;background-color:#c2410c;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;text-decoration:none;padding:13px 40px;border-radius:24px;">${s.button}</a>
 </td></tr>
 
 <tr><td style="padding:16px 32px 0;text-align:center;">
 <p class="kodo-muted" style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#9a9490;">${s.linkHint}</p>
-<p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#c2410c;word-break:break-all;">${inviteUrl}</p>
+<p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#c2410c;word-break:break-all;">${safeInviteUrl}</p>
 </td></tr>
 
 <tr><td style="padding:16px 32px 26px;border-top:1px solid #f0ede8;">
