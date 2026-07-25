@@ -63,7 +63,7 @@ async function computeNewMembersAndRoles(
     try {
       const expenses = await service.entities.Expense.filter({ trip_id: tripId });
       for (const expense of expenses) {
-        const amount = parseFloat(expense.amount_base || expense.amount) || 0;
+        const amount = Math.max(0, parseFloat(expense.amount_base || expense.amount) || 0);
         const paidBy = (expense.paid_by || "").trim().toLowerCase();
         if (!paidBy || !amount) continue;
         if (paidBy === targetEmail) targetBalance += amount;
@@ -189,7 +189,18 @@ Deno.serve(async (req) => {
       // miembro" para cualquier entrada vieja con mayúsculas distintas, aunque
       // esa persona sí apareciera en la lista.
       const members: string[] = (trip.members || []).map((e: string) => (e || "").trim().toLowerCase());
-      const roles: Record<string, string> = trip.roles || {};
+      // roles se normaliza igual que members y por el mismo motivo — antes
+      // solo se normalizaban las claves de members, no las de roles. Una
+      // clave con distinto casing en roles hacía fallar "actingIsAdmin" con
+      // un 403 falso para un admin real, podía dejar sin detectar que el
+      // target era el último admin, y al escribir newRoles con el email ya
+      // normalizado podía quedar duplicado junto a la clave vieja.
+      const rawRoles: Record<string, string> = trip.roles || {};
+      const roles: Record<string, string> = {};
+      for (const [rawEmail, r] of Object.entries(rawRoles)) {
+        const key = (rawEmail || "").trim().toLowerCase();
+        if (key) roles[key] = r;
+      }
 
       // Solo un admin del viaje (o su creador) puede gestionar a otros miembros.
       const actingIsAdmin = roles[actingEmail] === "admin" || trip.created_by === actingEmail;
@@ -201,6 +212,24 @@ Deno.serve(async (req) => {
       }
 
       if (!members.includes(targetEmail)) {
+        // Si estamos en un reintento (intento > 0) y la acción es "remove",
+        // esto no es un error real: significa que la expulsión SÍ se aplicó
+        // en el intento anterior, pero la relectura de verificación de ESE
+        // intento llegó "stale" (todavía con el miembro puesto) y el bucle
+        // reintentó — al releer aquí de nuevo, ahora sí refleja la
+        // expulsión ya hecha. Antes esto se trataba como "esa persona no es
+        // miembro" y se devolvía un 400 ANTES de llegar al bloque de
+        // sincronización de trip_members más abajo — el Trip.update sí se
+        // había aplicado, pero la persona expulsada conservaba acceso de
+        // lectura (via rls) a todo el contenido del viaje porque nunca se
+        // limpiaba su entrada en City/Expense/Ticket/etc., y el admin veía
+        // un error pese a que la expulsión sí había funcionado.
+        if (action === "remove" && intento > 0) {
+          newMembers = members;
+          newRoles = roles;
+          updatedTrip = trip;
+          break;
+        }
         return Response.json({ error: "Esa persona no es miembro del viaje." }, { status: 400 });
       }
 
