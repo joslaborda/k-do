@@ -52,6 +52,11 @@
       "type": "object",
       "description": "Roles de los miembros: { email: 'admin' | 'editor' | 'viewer' }"
     },
+    "admins": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Copia (emails) de quién tiene role 'admin' en `roles` — existe solo para que el rls de abajo pueda usar un $in de array (igual que en el resto del proyecto) en vez de necesitar comparar una clave dinámica dentro de `roles`, que el motor de rls no admite. Se mantiene al día en Trip.create (TripsList.jsx), y en el backend (manageTripMember, acceptTripInvite, leaveTrip) cada vez que `roles` cambia — nunca se edita a mano desde ningún otro sitio."
+    },
     "ai_preferences": {
       "type": "object",
       "description": "Preferencias de la IA: { pace, places, restaurants, experiences, avoid }",
@@ -89,7 +94,25 @@
   "rls": {
     "create": true,
     "read": { "data.members": { "$in": ["{{user.email}}"] } },
-    "update": { "data.members": { "$in": ["{{user.email}}"] } },
+    // HALLAZGO DE ESTA AUDITORÍA (probado en vivo con 2 cuentas): esto antes
+    // era { "data.members": { "$in": ["{{user.email}}"] } } — cualquier
+    // miembro ACTUAL del viaje, sin importar su role, podía llamar a
+    // Trip.update() directo (sin pasar por manageTripMember) y mandar
+    // members/roles a su gusto: auto-ascenderse a admin, expulsar a otro
+    // miembro (incluido el admin) o quitarle su rol — el rls solo comprobaba
+    // "eres miembro ahora", nunca "qué estás intentando cambiar". Ya existía
+    // el comentario en acceptTripInvite.ts diciendo que el rls de Trip debía
+    // poder "cerrarse del todo" una vez esa función existiera — pero nunca
+    // se aplicó aquí. Ahora exige ser admin (vía el array `admins`, ver su
+    // propio comentario arriba) para cualquier update directo. Como
+    // consecuencia asumida y decidida con el usuario: renombrar el viaje o
+    // cambiar sus fechas pasa a ser solo-admin (antes cualquier miembro podía
+    // — ver SettingsDialog.jsx, ahora gateado en la UI también). Añadir
+    // ciudades/paradas NO se ve afectado (vive en la entidad City, no aquí).
+    // Unirse a un viaje (members) y salir de él (leaveTrip, borrar cuenta)
+    // siguen funcionando porque corren con asServiceRole en el backend, que
+    // no pasa por este rls.
+    "update": { "data.admins": { "$in": ["{{user.email}}"] } },
     "delete": { "created_by": "{{user.email}}" }
   }
 }
