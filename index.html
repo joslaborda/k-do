@@ -1,7 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      lang="es" porque DEFAULT_LANGUAGE en src/i18n/index.js es 'es' — antes
+      estaba fijo en "en" aunque la app arranca (y la mayoría de usuarios ven)
+      en español, y nunca se actualizaba al cambiar de idioma en Ajustes.
+      Google Translate (y el auto-traductor del navegador) usan este atributo
+      para decidir de qué idioma traducir: con el valor equivocado, creían que
+      el contenido era inglés y "traducían" texto que ya estaba en español,
+      produciendo resultados sin sentido en apps de una sola página como esta
+      (el contenido cambia dinámicamente vía JS, así que Google Translate
+      además puede confundirse por sí solo con las re-renderizaciones de
+      React). Ver src/i18n/index.js: ahora se mantiene sincronizado con el
+      idioma activo real. La meta "google" / "notranslate" de abajo evita que
+      Google intente traducir la app entera: ya tiene su propio sistema de
+      i18n completo (es/en), así que la traducción del navegador es
+      redundante y, como se vio, puede corromper texto ya traducido.
+    -->
+    <meta name="google" content="notranslate" />
     <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="manifest" href="/manifest.json" />
