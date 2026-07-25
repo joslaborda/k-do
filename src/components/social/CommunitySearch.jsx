@@ -31,6 +31,13 @@ function SectionHeader({ icon: Icon, label, count }) {
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
+// José (2026-07-25): el buscador global de Explore solo debe buscar spots.
+// Antes también resolvía @usuarios (te llevaba al perfil de alguien),
+// itinerarios públicos y destinos derivados de esos itinerarios — todo eso
+// es descubrimiento social/de comunidad, que se pospone a Kodo Social igual
+// que la pestaña Personas y las plantillas. Reversible: allTemplates/
+// allProfiles y las secciones de usuarios/itinerarios/destinos de más abajo
+// están comentadas, no borradas.
 export default function CommunitySearch({ open, onOpenChange }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
@@ -42,12 +49,12 @@ export default function CommunitySearch({ open, onOpenChange }) {
   }, [open]);
 
   // ── Datos base (se cargan una sola vez al abrir) ──────────────────────────
-  const { data: allTemplates = [], isLoading: loadingTemplates } = useQuery({
-    queryKey: ['templatesPublic'],
-    queryFn: () => base44.entities.ItineraryTemplate.filter({ visibility: 'public' }, '-created_date'),
-    enabled: open,
-    staleTime: 10 * 60 * 1000,
-  });
+  // const { data: allTemplates = [], isLoading: loadingTemplates } = useQuery({
+  //   queryKey: ['templatesPublic'],
+  //   queryFn: () => base44.entities.ItineraryTemplate.filter({ visibility: 'public' }, '-created_date'),
+  //   enabled: open,
+  //   staleTime: 10 * 60 * 1000,
+  // });
 
   const { data: allSpots = [], isLoading: loadingSpots } = useQuery({
     queryKey: ['spotsPublic'],
@@ -58,66 +65,33 @@ export default function CommunitySearch({ open, onOpenChange }) {
 
   // UserProfile.read se cerró en el rls — descubrimiento abierto, se lee sin
   // email/nationality — ver src/lib/userProfiles.js.
-  const { data: allProfiles = [], isLoading: loadingProfiles } = useQuery({
-    queryKey: ['allProfiles'],
-    queryFn: () => searchUserProfiles({}),
-    enabled: open,
-    staleTime: 10 * 60 * 1000,
-  });
+  // const { data: allProfiles = [], isLoading: loadingProfiles } = useQuery({
+  //   queryKey: ['allProfiles'],
+  //   queryFn: () => searchUserProfiles({}),
+  //   enabled: open,
+  //   staleTime: 10 * 60 * 1000,
+  // });
 
-  const isLoading = loadingTemplates || loadingSpots || loadingProfiles;
+  const isLoading = loadingSpots;
 
   // ── Filtrado ──────────────────────────────────────────────────────────────
-  const q = query.trim().toLowerCase();
-  const isUserSearch = q.startsWith('@');
-  const searchTerm = isUserSearch ? q.slice(1) : q;
+  const searchTerm = query.trim().toLowerCase();
 
   const results = useMemo(() => {
     if (!searchTerm || searchTerm.length < 2) return null;
 
-    // Usuarios
-    const users = allProfiles.filter(p =>
-      p.user_id !== currentUser?.id && (
-        p.username?.toLowerCase().includes(searchTerm) ||
-        p.display_name?.toLowerCase().includes(searchTerm)
-      )
-    ).slice(0, 4);
-
-    // Itinerarios
-    const templates = isUserSearch ? [] : allTemplates.filter(t =>
-      t.title?.toLowerCase().includes(searchTerm) ||
-      t.summary?.toLowerCase().includes(searchTerm) ||
-      t.countries?.some(c => c.toLowerCase().includes(searchTerm)) ||
-      t.cities?.some(c => c.toLowerCase().includes(searchTerm)) ||
-      t.tags?.some(tag => tag.toLowerCase().includes(searchTerm)) ||
-      t.creator_username?.toLowerCase().includes(searchTerm)
-    ).slice(0, 4);
-
-    // Spots públicos
-    const spots = isUserSearch ? [] : allSpots.filter(s =>
+    // Spots públicos — único tipo de resultado mientras el resto sea social/Kodo Social
+    const spots = allSpots.filter(s =>
       s.title?.toLowerCase().includes(searchTerm) ||
       s.city_name?.toLowerCase().includes(searchTerm) ||
       s.country?.toLowerCase().includes(searchTerm) ||
       s.notes?.toLowerCase().includes(searchTerm)
     ).slice(0, 4);
 
-    // Destinos únicos (ciudades y países de templates)
-    const destSet = new Set();
-    allTemplates.forEach(t => {
-      t.countries?.forEach(c => { if (c.toLowerCase().includes(searchTerm)) destSet.add({ type: 'country', name: c }); });
-      t.cities?.forEach(c => { if (c.toLowerCase().includes(searchTerm)) destSet.add({ type: 'city', name: c }); });
-    });
-    const destinations = Array.from(destSet).slice(0, 3);
+    return { spots };
+  }, [searchTerm, allSpots]);
 
-    return { users, templates, spots, destinations };
-  }, [searchTerm, isUserSearch, allTemplates, allSpots, allProfiles, currentUser]);
-
-  const hasResults = results && (
-    results.users.length > 0 ||
-    results.templates.length > 0 ||
-    results.spots.length > 0 ||
-    results.destinations.length > 0
-  );
+  const hasResults = results && results.spots.length > 0;
 
   // ── Navegación al hacer clic ──────────────────────────────────────────────
   const goTo = (url) => {
@@ -154,7 +128,7 @@ export default function CommunitySearch({ open, onOpenChange }) {
               <p className="font-medium">{t('explore.search.title')}</p>
               <p className="text-sm mt-1 opacity-70">{t('explore.search.subtitle')}</p>
               <div className="flex flex-wrap gap-2 justify-center mt-4">
-                {['Japón', 'Lisboa', '@viajero', 'ramen'].map(s => (
+                {['Japón', 'Lisboa', 'ramen'].map(s => (
                   <button
                     key={s}
                     onClick={() => setQuery(s)}
@@ -185,79 +159,9 @@ export default function CommunitySearch({ open, onOpenChange }) {
           {/* Resultados */}
           {!isLoading && hasResults && (
             <div>
-              {/* Usuarios */}
-              {results.users.length > 0 && (
-                <div>
-                  <SectionHeader icon={User} label={t('explore.search.users')} count={results.users.length} />
-                  {results.users.map(profile => (
-                    <button
-                      key={profile.id}
-                      onClick={() => goTo(`${createPageUrl('Profile')}?user_id=${profile.user_id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
-                    >
-                      <Avatar profile={profile} size={40} />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-foreground">{profile.display_name}</p>
-                        <p className="text-xs text-muted-foreground">@{profile.username}</p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Destinos */}
-              {results.destinations.length > 0 && (
-                <div>
-                  <SectionHeader icon={MapPin} label={t('explore.search.destinations')} count={results.destinations.length} />
-                  {results.destinations.map((dest, i) => (
-                    <button
-                      key={i}
-                      onClick={() => goTo(`${createPageUrl('Explore')}?q=${encodeURIComponent(dest.name)}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm text-foreground">{dest.name}</p>
-                        <p className="text-xs text-muted-foreground">{dest.type === 'country' ? t('common.country') : t('common.city')}</p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Itinerarios */}
-              {results.templates.length > 0 && (
-                <div>
-                  <SectionHeader icon={BookOpen} label={t('explore.search.itineraries')} count={results.templates.length} />
-                  {results.templates.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => goTo(`${createPageUrl('TemplateDetail')}?id=${t.id}`)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                        {t.cover_image
-                          ? <img src={t.cover_image} className="w-full h-full object-cover" alt={t.title} />
-                          : <div className="w-full h-full flex items-center justify-center"><Map className="w-4 h-4 text-muted-foreground" /></div>
-                        }
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm text-foreground line-clamp-1">{t.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {t.duration_days && `${t.duration_days}d · `}
-                          {t.countries?.[0]}
-                          {t.is_premium && <span className="ml-1 text-amber-600 font-medium">✦ Premium</span>}
-                        </p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  ))}
-                </div>
-              )}
+              {/* Usuarios, destinos e itinerarios: descubrimiento social/Kodo
+                  Social, ocultos por ahora junto con Personas/Seguir y
+                  Plantillas (ver comentario junto a las queries de arriba). */}
 
               {/* Spots */}
               {results.spots.length > 0 && (
