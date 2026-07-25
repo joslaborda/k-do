@@ -85,8 +85,14 @@ Deno.serve(async (req) => {
       status: "pending",
     });
 
-    const inviteToken =
-      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    // Math.random() no es un PRNG criptográficamente seguro (su estado es
+    // recuperable a partir de suficientes salidas observadas) — débil para un
+    // valor que se trata como secreto (viaja en la URL del email y es lo que
+    // demuestra que la invitación es legítima junto al email). El impacto ya
+    // estaba mitigado porque además hace falta que el email de sesión
+    // coincida, pero crypto.randomUUID() cierra esta debilidad de defensa en
+    // profundidad sin coste.
+    const inviteToken = crypto.randomUUID().replace(/-/g, '');
 
     let invite;
     if (existing.length > 0) {
