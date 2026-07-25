@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useMemo, useCallback, useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { getActiveCity } from '@/lib/tripContext';
@@ -12,12 +12,20 @@ export function useTripContext(tripId) {
     return localStorage.getItem(storageKey) || null;
   });
 
-  // Keep in sync if tripId changes
-  useEffect(() => {
-    if (!storageKey) return;
-    const saved = localStorage.getItem(storageKey);
+  // Resincronizar cuando cambia storageKey (cambio de viaje activo). Antes
+  // esto vivía en un useEffect, que corre DESPUÉS del primer render con el
+  // nuevo storageKey — durante ese frame, activeCity (más abajo) se
+  // calculaba todavía con el overrideCityId del viaje anterior, casi nunca
+  // válido para el nuevo viaje. "Ajustar estado durante el render" (patrón
+  // documentado de React: comparar contra un ref y llamar al setter en el
+  // cuerpo del componente, no en un efecto) lo aplica de forma síncrona
+  // antes de pintar, sin ese frame de por medio.
+  const prevStorageKeyRef = useRef(storageKey);
+  if (prevStorageKeyRef.current !== storageKey) {
+    prevStorageKeyRef.current = storageKey;
+    const saved = storageKey ? localStorage.getItem(storageKey) : null;
     setOverrideCityIdState(saved || null);
-  }, [storageKey]);
+  }
 
   const setOverrideCityId = useCallback((cityId) => {
     setOverrideCityIdState(cityId);
