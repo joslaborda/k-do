@@ -7,7 +7,7 @@ import { PlaneIcon } from '@/lib/icons';
 import { useLike } from '@/hooks/useLike';
 import { getMapsUrl } from './spotsHelpers';
 import { useTranslation } from 'react-i18next';
-import { checkUpload } from '@/lib/uploadLimits';
+import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
 import { normalizeEmail } from '@/lib/utils';
 
@@ -40,7 +40,8 @@ async function uploadPhoto(file) {
     // usan los otros 5 puntos de subida de la app (documentos, gastos,
     // perfil, chat, galería). Con el método viejo esto fallaba el 100% de
     // las veces al adjuntar una foto a una valoración o comentario de spot.
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const uploadFile = await convertHeicIfNeeded(file);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
     return { url: file_url };
   } catch {
     return { error: 'failed' };
