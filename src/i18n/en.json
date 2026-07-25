@@ -356,7 +356,8 @@
       "deleteStopConfirm": "Delete this stop?",
       "deleteStopWarning": "{{city}} and its itinerary days will be deleted. This action cannot be undone.",
       "deleteStopError": "Couldn't delete the stop",
-      "endBeforeStart": "The end date can't be before the start date"
+      "endBeforeStart": "The end date can't be before the start date",
+      "datesOverlap": "These dates overlap with another stop on the trip"
     },
     "loadingTrip": "Loading trip...",
     "travelersCount_one": "{{count}} traveler",
@@ -915,6 +916,7 @@
       "name": "Name *",
       "optional": "— optional",
       "selectDay": "Select day",
+      "selectCity": "Not specified",
       "visibility": "Visibility",
       "alwaysIncluded": "Always included",
       "file": "Attached file",
@@ -934,6 +936,7 @@
         "location": "Airport / station",
         "airline": "Airline / Flight no.",
         "city": "City",
+        "arrivalCity": "Arrival city",
         "date": "Date *",
         "time": "Departure time",
         "endTime": "Arrival time",

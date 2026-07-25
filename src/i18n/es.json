@@ -356,7 +356,8 @@
       "deleteStopConfirm": "¿Eliminar esta parada?",
       "deleteStopWarning": "Se eliminará {{city}} y los días de su itinerario. Esta acción no se puede deshacer.",
       "deleteStopError": "No se pudo eliminar la parada",
-      "endBeforeStart": "La fecha de fin no puede ser anterior a la de inicio"
+      "endBeforeStart": "La fecha de fin no puede ser anterior a la de inicio",
+      "datesOverlap": "Estas fechas se solapan con otra parada del viaje"
     },
     "loadingTrip": "Cargando viaje...",
     "travelersCount_one": "{{count}} viajero",
@@ -915,6 +916,7 @@
       "name": "Nombre *",
       "optional": "— opcional",
       "selectDay": "Seleccionar día",
+      "selectCity": "Sin especificar",
       "visibility": "Visibilidad",
       "alwaysIncluded": "Siempre incluido",
       "file": "Archivo adjunto",
@@ -934,6 +936,7 @@
         "location": "Aeropuerto / estación",
         "airline": "Compañía / Nº vuelo",
         "city": "Ciudad",
+        "arrivalCity": "Ciudad de llegada",
         "date": "Fecha *",
         "time": "Hora salida",
         "endTime": "Hora llegada",
