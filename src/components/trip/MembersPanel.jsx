@@ -54,7 +54,16 @@ export default function MembersPanel({
   const updateTripMutation = useMutation({
     mutationFn: ({ email, role }) => setTripMemberRole(trip.id, email, role),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['trip', trip.id] }),
-    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.roleChangeError'), variant: 'destructive' }),
+    // También se invalida en error: si el backend YA aplicó el cambio pero
+    // responde con error (p. ej. el caso de "ya se había hecho" que
+    // manageTripMember ahora resuelve, o cualquier 5xx transitorio tras un
+    // Trip.update que sí se guardó), sin esto la UI se quedaba con datos
+    // obsoletos y el admin no tenía forma de saber que en realidad sí
+    // funcionó.
+    onError: (e) => {
+      queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
+      toast({ title: t('common.error'), description: e?.message || t('membersPanel.roleChangeError'), variant: 'destructive' });
+    },
   });
 
   // Expulsar miembro: MembersPanel existía en el proyecto pero no estaba
@@ -68,7 +77,10 @@ export default function MembersPanel({
       queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
       setMemberToRemove(null);
     },
-    onError: (e) => toast({ title: t('common.error'), description: e?.message || t('membersPanel.removeError'), variant: 'destructive' }),
+    onError: (e) => {
+      queryClient.invalidateQueries({ queryKey: ['trip', trip.id] });
+      toast({ title: t('common.error'), description: e?.message || t('membersPanel.removeError'), variant: 'destructive' });
+    },
   });
 
   const handleInvite = async () => {

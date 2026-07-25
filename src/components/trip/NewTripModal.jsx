@@ -548,8 +548,18 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 pl-1 flex-wrap">
+                          {/* El min del start_date de una parada N>0 solo miraba
+                              formData.start_date (el inicio del viaje entero),
+                              no el end_date de la parada N-1 — así que nada
+                              impedía elegir un start_date muy anterior al fin
+                              de la parada previa, solapando varios días entre
+                              dos paradas consecutivas. Igual que en
+                              SettingsDialog.jsx, se acota al end_date de la
+                              parada anterior (o al inicio del viaje si es la
+                              primera). */}
                           <input type="date" value={stop.manual.start_date}
-                            min={formData.start_date || undefined} max={formData.end_date || undefined}
+                            min={(idx > 0 ? stops[idx - 1]?.manual?.end_date : null) || formData.start_date || undefined}
+                            max={formData.end_date || undefined}
                             onChange={e => updateStopManual(idx, { start_date: e.target.value })}
                             className="w-36 h-8 border border-border rounded-lg px-2 text-xs outline-none focus:border-primary bg-secondary"
                           />
