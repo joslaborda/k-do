@@ -1,5 +1,6 @@
 import { base44 } from '@/api/base44Client';
 import { notify } from '@/lib/notifications';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { getLanguage } from '@/i18n/index.js';
 
 // Ya no se usa para crear invitaciones (eso ahora genera su propio token
@@ -106,7 +107,10 @@ Si aún no tienes cuenta en Kōdo, el mismo enlace te lleva a crearla con este e
   // Si el usuario ya existe en Kōdo, crear notificación in-app
   // Usamos UserProfile.filter por email para no necesitar User.list() (que puede estar restringido)
   try {
-    const profiles = await base44.entities.UserProfile.filter({ email: normalizedEmail });
+    // UserProfile.read se cerró en el rls — se lee vía función backend con
+    // un email ya conocido (el que se está invitando), así que la respuesta
+    // sí incluye user_id — ver src/lib/userProfiles.js.
+    const profiles = await searchUserProfiles({ emails: [normalizedEmail] });
     if (profiles.length > 0 && profiles[0].user_id) {
       await notify({
         userId: profiles[0].user_id,

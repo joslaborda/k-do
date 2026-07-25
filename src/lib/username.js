@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 const USERNAME_REGEX = /^[a-z][a-z0-9_]{2,29}$/;
 
@@ -24,7 +24,9 @@ export function validateUsername(username) {
 
 /** Comprueba si el username_normalized está disponible (excluye al propio userId) */
 export async function checkUsernameAvailability(usernameNormalized, currentUserId) {
-  const existing = await base44.entities.UserProfile.filter({ username_normalized: usernameNormalized });
+  // UserProfile.read se cerró en el rls — se comprueba vía función backend
+  // (modo exacto, búsqueda abierta, nunca devuelve email de nadie).
+  const existing = await searchUserProfiles({ usernameQuery: usernameNormalized, exact: true });
   const others = existing.filter(p => p.user_id !== currentUserId);
   return others.length === 0;
 }
