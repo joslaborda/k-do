@@ -114,6 +114,7 @@ export default function DocumentForm({
     notes:       initialData?.notes       || '',
     file_url:    initialData?.file_url    || '',
     city_id:     initialData?.city_id     || '',
+    arrival_city_id: initialData?.arrival_city_id || '',
     location_name: initialData?.location_name || '',
     location_lat:  initialData?.location_lat  || '',
     location_lng:  initialData?.location_lng  || '',
@@ -371,6 +372,31 @@ export default function DocumentForm({
               <Input type="time" value={fields.time} onChange={e => setField('time', e.target.value)} className="h-10 text-sm" />
             </div>
           )}
+        </div>
+      )}
+
+      {/* Ciudad de llegada — solo vuelo/tren en viajes multi-ciudad. El campo
+          arrival_city_id existía en el esquema y Cities.jsx ya lo usaba para
+          decidir bajo qué ciudad mostrar un documento en un día de tránsito
+          (origen vs. destino), pero ningún formulario lo escribía nunca —
+          siempre quedaba null, así que ese documento solo aparecía bajo la
+          ciudad de origen elegida arriba, nunca bajo la de llegada. Opcional:
+          si no se elige, se mantiene el comportamiento anterior (solo city_id). */}
+      {(category === 'flight' || category === 'train') && (cities || []).length > 1 && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+            {t('documents.form.fields.arrivalCity')} <span className="font-normal normal-case tracking-normal text-muted-foreground">{t('documents.form.optional')}</span>
+          </p>
+          <select
+            value={fields.arrival_city_id}
+            onChange={e => setField('arrival_city_id', e.target.value)}
+            className="w-full h-10 border border-border rounded-md px-3 text-sm outline-none focus:border-primary bg-input"
+          >
+            <option value="">{t('documents.form.selectCity')}</option>
+            {cities.filter(c => c.id !== fields.city_id).map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
         </div>
       )}
 
