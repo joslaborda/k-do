@@ -191,13 +191,16 @@ export default function InviteModal({ open, onClose, trip, tripId, queryClient, 
     let email = resolvedEmail;
     // Perfiles antiguos (o creados sin backfill) pueden no tener `email`
     // guardado — antes esto cortaba aquí en silencio: el botón parecía
-    // activo pero pulsarlo no hacía nada, ni error ni invitación. Se intenta
-    // resolver vía User.filter, igual que ya hace MembersPanel.jsx.
+    // activo pero pulsarlo no hacía nada, ni error ni invitación. Se
+    // intentaba resolver vía base44.entities.User.filter({id:...}) desde el
+    // cliente — esa llamada da SIEMPRE 403 para cualquier usuario no
+    // colaborador del proyecto en Base44, así que este caso nunca se
+    // resolvía en la práctica. searchUserProfiles ya resuelve este mismo
+    // fallback en el backend (con permisos de servicio) — ver
+    // base44/functions/searchUserProfiles/entry.ts.
     if (!email && profile?.user_id) {
-      try {
-        const users = await base44.entities.User.filter({ id: profile.user_id });
-        email = users[0]?.email || '';
-      } catch { /* se cae al error de abajo */ }
+      const resolved = await searchUserProfiles({ userIds: [profile.user_id] });
+      email = resolved[0]?.email || '';
     }
     if (!email) { setError(t('invites.modal.resolveEmailError')); return; }
     setSending(true); setError('');
