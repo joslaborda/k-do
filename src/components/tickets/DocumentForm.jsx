@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
 import { useToast } from '@/components/ui/use-toast';
-import { checkUpload } from '@/lib/uploadLimits';
+import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 import { normalizeEmail } from '@/lib/utils';
 
 // ── Exported config (used by DocumentCard, Calendar) ─────────────────────────
@@ -192,7 +192,10 @@ export default function DocumentForm({
     }
     setFileUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      // Este campo admite PDFs además de fotos (p.ej. una foto del pasaporte
+      // tomada con el móvil), por eso también puede llegar un HEIC aquí.
+      const uploadFile = await convertHeicIfNeeded(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
       setField('file_url', file_url);
     } catch (err) {
       // Antes un fallo aquí no dejaba ningún rastro: sin toast, el campo de
