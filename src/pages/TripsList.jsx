@@ -225,6 +225,20 @@ export default function TripsList() {
   const needsOnboarding = user?.is_verified === true && !profileLoading && myProfile === null;
   const firstName = myProfile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || '';
 
+  // `onboardingDismissed` (arriba) solo evita que el modal reaparezca DESPUÉS
+  // de onComplete — pero `needsOnboarding` se calcula a partir de
+  // `myProfile === null`, y CreateProfileModal crea el perfil a mitad del
+  // tour (slide 1→2, antes de las 4 slides de "Grupo/Preparativos/Gastos/
+  // Hoy"). En cuanto se crea, needsOnboarding pasa a false y `needsOnboarding
+  // && !onboardingDismissed` ya da false aunque onboardingDismissed siga
+  // siendo false — el modal se desmontaba solo y esas 4 slides no las veía
+  // nadie. Este "latch" separa "hizo falta enseñar el onboarding alguna vez
+  // en esta sesión" de "myProfile sigue siendo null ahora mismo", así el
+  // modal no desaparece hasta que el propio usuario llega al final (onComplete).
+  const onboardingStartedRef = useRef(false);
+  if (needsOnboarding) onboardingStartedRef.current = true;
+  const showOnboarding = onboardingStartedRef.current && !onboardingDismissed;
+
   // Loading
   if (isLoading || isLoadingAuth) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -241,7 +255,7 @@ export default function TripsList() {
 
   return (
     <div className="min-h-screen bg-background">
-      {needsOnboarding && !onboardingDismissed && (
+      {showOnboarding && (
         <CreateProfileModal user={user} open={true} onComplete={() => setOnboardingDismissed(true)} />
       )}
 
