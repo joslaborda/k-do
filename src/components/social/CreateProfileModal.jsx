@@ -531,6 +531,27 @@ export default function CreateProfileModal({ user, open, onComplete }) {
     setSaving(true);
     setError('');
     try {
+      // Guarda de idempotencia: este modal se abre cuando `myProfile` (en
+      // TripsList.jsx) todavía es null, pero esa comprobación vive en una
+      // query de React Query que puede ejecutarse antes de que el perfil
+      // recién creado se haya propagado, o quedar abierta en una pestaña ya
+      // vieja. Sin este chequeo, un segundo envío de este formulario para un
+      // user_id que YA tiene perfil crea una fila UserProfile duplicada (con
+      // el mismo user_id/email pero username distinto) — es exactamente lo
+      // que encontramos al re-onboardear la cuenta de QA en esta sesión:
+      // dos perfiles para el mismo user_id, y cualquier UI que liste
+      // "miembros por email" (selector de "quién ve este documento",
+      // MembersPanel, etc.) los mostraba como dos personas distintas.
+      // Se busca por user_id vía función backend (no rls-restringido) y, si
+      // ya existe un perfil, no se crea uno nuevo: se reutiliza el existente
+      // y se continúa el flujo como si se acabara de crear.
+      const existing = await searchUserProfiles({ userIds: [user.id] });
+      if (existing.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ['myProfile', user.id] });
+        setSlide(2); // go to features
+        setSaving(false);
+        return;
+      }
       const ok = await checkUsernameAvailability(username, user?.id);
       if (!ok) { setError(t('onboarding.slide0.usernameTaken')); setSaving(false); setAvailable(false); return; }
       const created = await base44.entities.UserProfile.create({
