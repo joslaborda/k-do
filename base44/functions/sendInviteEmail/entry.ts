@@ -135,6 +135,45 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Faltan datos del email (to / inviteUrl)" }, { status: 400 });
     }
 
+    // Antes esta función solo exigía sesión iniciada — no comprobaba que
+    // hubiera una invitación real detrás de `to`/`inviteUrl`. Cualquier
+    // usuario autenticado de Kōdo podía invocarla con una URL y un
+    // destinatario arbitrarios, y el sistema mandaba un email con la marca
+    // oficial (dominio verificado en Resend) a esa dirección — un vector de
+    // phishing/spam barato que se aprovecha de la reputación del remitente.
+    // Se exige que exista un TripInvite pendiente real, creado por
+    // createTripInvite, cuyo invite_token coincida con el de inviteUrl y
+    // cuyo email/invited_by coincidan con `to`/quien llama — así no se puede
+    // mandar el email "oficial" de Kōdo a nadie que no tenga ya una
+    // invitación de verdad esperándolo.
+    const normalizedTo = String(to).trim().toLowerCase();
+    const normalizedActingEmail = user.email.toLowerCase();
+    let tokenFromUrl = "";
+    try {
+      tokenFromUrl = new URL(inviteUrl).searchParams.get("token") || "";
+    } catch {
+      tokenFromUrl = "";
+    }
+    if (!tokenFromUrl) {
+      return Response.json({ error: "inviteUrl inválida" }, { status: 400 });
+    }
+
+    const service = base44.asServiceRole;
+    const matches = await service.entities.TripInvite.filter({ invite_token: tokenFromUrl });
+    const realInvite = matches?.[0];
+    const inviteValid =
+      realInvite &&
+      realInvite.status === "pending" &&
+      (realInvite.email || "").toLowerCase() === normalizedTo &&
+      (realInvite.invited_by || "").toLowerCase() === normalizedActingEmail;
+
+    if (!inviteValid) {
+      return Response.json(
+        { error: "No hay una invitación pendiente real para ese destinatario." },
+        { status: 403 }
+      );
+    }
+
     const lang = rawLang === "en" ? "en" : "es";
     const s = STRINGS[lang];
 
