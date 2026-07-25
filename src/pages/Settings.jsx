@@ -8,6 +8,7 @@ import { Loader2, Camera, ChevronRight } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { syncTripMembers } from '@/lib/syncTripMembers';
+import { leaveTrip } from '@/lib/tripMembers';
 import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
@@ -324,13 +325,15 @@ function DeleteAccountRow({ user, profile }) {
       // 3. Ahora sí, salir de los viajes — esto revoca el acceso (RLS) a
       //    todo lo anterior, por eso tiene que ir DESPUÉS de anonimizar/
       //    borrar arriba y no antes.
+      // Este auditoría cerró Trip.update a "solo admin" (ver el comentario
+      // largo en base44/entities/Trip.jsonc: cualquier miembro podía tocar
+      // members/roles a su gusto). Salir de un viaje al borrar la cuenta
+      // pasa ahora por leaveTrip (backend, permisos de servicio) en vez de
+      // Trip.update() directo — que ya no funcionaría aquí para nadie que no
+      // sea admin del viaje.
       await Promise.all(trips.map(async trip => {
-        const newMembers = (trip.members || []).filter(e => normalizeEmail(e) !== myEmail);
-        const newRoles = { ...(trip.roles || {}) };
-        const roleKey = Object.keys(newRoles).find(em => normalizeEmail(em) === myEmail);
-        if (roleKey) delete newRoles[roleKey];
-        await base44.entities.Trip.update(trip.id, { members: newMembers, roles: newRoles });
-        await syncTripMembers(trip.id, newMembers);
+        const updated = await leaveTrip(trip.id);
+        await syncTripMembers(trip.id, updated?.members || []);
       }));
 
       // 4. Borrar el perfil.

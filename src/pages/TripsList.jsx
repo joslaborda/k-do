@@ -154,6 +154,11 @@ export default function TripsList() {
         base_currency: baseCurrency,
         members: email ? [email] : [],
         roles: email ? { [email]: 'admin' } : {},
+        // admins mantiene una copia en array de quién tiene role 'admin' en
+        // `roles` — el rls de Trip.update ahora exige estar en este array
+        // (ver el comentario en Trip.jsonc), así que tiene que fijarse aquí
+        // desde el primer momento, igual que roles.
+        admins: email ? [email] : [],
       });
       for (let i = 0; i < stops.length; i++) {
         const dates = allocations[i] || { start_date: formData.start_date, end_date: formData.end_date };
