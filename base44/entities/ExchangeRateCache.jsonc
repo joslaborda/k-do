@@ -11,23 +11,21 @@
   },
   "required": ["base", "quote", "rate"],
   "rls": {
-    // Riesgo aceptado, documentado (no se cierra del todo en esta ronda):
-    // a diferencia de CountryInfo.jsonc, aquí el cliente SÍ necesita escribir
-    // de verdad — src/lib/fxRates.js hace create/update directos tras
-    // consultar Frankfurter/LLM, porque es una caché compartida entre todos
-    // los usuarios (no hay una función backend que la alimente). El motor de
-    // rls de base44 no permite validar el VALOR de "rate" (solo puede
-    // comparar campos contra el usuario), así que cualquier usuario
-    // autenticado podría en teoría escribir una tasa de cambio falsa y
-    // afectar los cálculos de gasto de otros usuarios hasta que expire
-    // (valid_until, 24h) o se sobreescriba con un valor correcto. Impacto
-    // limitado (autocorrige en <24h, no toca datos de otros usuarios, solo
-    // una cifra de conversión) frente al coste de mover esta escritura a una
-    // función backend con asServiceRole — se deja documentado como pendiente
-    // si en el futuro se quiere cerrar del todo.
-    "create": true,
+    // El panel de seguridad de Base44 marcó como CRÍTICO ("usuarios públicos
+    // pueden acceder a todos los registros") tener create/update abiertos sin
+    // restricción — antes se había dejado así a propósito porque el cliente
+    // necesitaba escribir en esta caché compartida y el motor de rls no
+    // puede validar el VALOR de "rate" ni expresar "cualquier autenticado,
+    // pero no público". Ahora la escritura se movió a la función backend
+    // cacheFxRate (exige sesión real, valida rate/base/quote, limpia
+    // duplicados) — ver base44/functions/cacheFxRate/entry.ts y
+    // src/lib/fxRates.js. Create/update quedan cerrados del todo desde el
+    // cliente; read sigue abierto porque src/lib/fxRates.js lee la caché
+    // directo con .filter() y es información no sensible (tipos de cambio
+    // públicos, no ligados a ningún usuario).
+    "create": false,
     "read": true,
-    "update": true,
+    "update": false,
     "delete": false
   }
 }

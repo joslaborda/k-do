@@ -43,7 +43,15 @@
     "user_email"
   ],
   "rls": {
-    "create": true,
+    // create exigía solo sesión iniciada, no que user_email coincidiera con
+    // quien llama — cualquier usuario podía mandar feedback con el
+    // user_email/user_name de otra persona en el body, atribuyéndole quejas
+    // o "bugs" falsos de cara al equipo de soporte (que lee esto desde el
+    // panel de datos de base44, no hay bandeja dentro de la app). Impacto
+    // bajo porque read ya exigía autoría (nadie más podía LEER el mensaje
+    // ajeno), pero se cierra igual la creación, mismo patrón que
+    // Like/SpotComment.
+    "create": { "data.user_email": "{{user.email}}" },
     "read": { "data.user_email": "{{user.email}}" },
     "update": false,
     "delete": false
