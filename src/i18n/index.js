@@ -40,6 +40,30 @@ i18n
     },
   });
 
+// index.html traía <html lang="en"> fijo desde siempre, sin importar el
+// idioma real que i18next estuviera sirviendo (por defecto 'es' para casi
+// todo el mundo). El navegador y Google Translate usan ese atributo para
+// decidir de qué idioma traducir — con el valor equivocado, "traducían"
+// texto que ya estaba en español, produciendo resultados sin sentido (p.ej.
+// "Guardados" convertido en texto random) en vez de simplemente no traducir
+// nada, que es lo correcto ya que la app tiene su propio i18n completo.
+// Se mantiene sincronizado en dos momentos: al resolver el idioma inicial
+// (evento 'languageChanged' de i18next, que se dispara también en el
+// arranque) y cada vez que cambia explícitamente vía setLanguage().
+i18n.on('languageChanged', (lng) => {
+  try {
+    document.documentElement.lang = lng;
+  } catch {}
+});
+// El evento de arriba puede no cubrir la resolución inicial si i18next la
+// resuelve de forma síncrona durante el propio .init() (antes de que el
+// listener quede registrado, ya que se pasa un "lng" explícito arriba en vez
+// de depender solo de LanguageDetector) — se fija el valor actual ya mismo
+// como red de seguridad.
+try {
+  document.documentElement.lang = i18n.language || DEFAULT_LANGUAGE;
+} catch {}
+
 export const setLanguage = (lang) => {
   if (!SUPPORTED_LANGUAGES.includes(lang)) return;
   i18n.changeLanguage(lang);
