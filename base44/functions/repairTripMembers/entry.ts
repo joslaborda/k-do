@@ -123,6 +123,27 @@ Deno.serve(async (req) => {
       const members: string[] = trip.members || [];
       const tripReport: any = { tripId: trip.id, tripName: trip.name, members, entities: {} };
 
+      // Repara también trip.admins — campo nuevo de esta auditoría (ver
+      // Trip.jsonc) del que depende el rls de Trip.update. Cualquier viaje
+      // creado/migrado ANTES de que este campo existiera en el esquema
+      // publicado se quedó con admins vacío, lo que bloquea a su propio
+      // admin real de volver a tocar el viaje (probado en vivo: 403 al
+      // intentar renombrar "test peru" tras publicar, con roles ya
+      // correcto pero admins todavía vacío). Se recalcula aquí a partir de
+      // roles y se escribe con permisos de servicio, que sí puede aunque el
+      // rls de Trip.update ya esté cerrado.
+      const roles: Record<string, string> = trip.roles || {};
+      const correctAdmins = Object.keys(roles).filter((k) => roles[k] === "admin");
+      const currentAdmins = Array.isArray(trip.admins) ? trip.admins.slice().sort() : [];
+      if (JSON.stringify(correctAdmins.slice().sort()) !== JSON.stringify(currentAdmins)) {
+        try {
+          await withRetry(() => service.entities.Trip.update(trip.id, { admins: correctAdmins }));
+          tripReport.adminsFixed = correctAdmins;
+        } catch (e) {
+          tripReport.adminsFixError = (e as Error).message;
+        }
+      }
+
       for (const entityName of SYNCED_ENTITIES) {
         try {
           const records = await withRetry(() => service.entities[entityName].filter({ trip_id: trip.id }));
