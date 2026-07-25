@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2, Camera, Upload, X, Utensils, Hotel, Ticket, ShoppingBag, CirclePlus, Wine } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { convertAmount } from '@/lib/fxRates';
-import { checkUpload } from '@/lib/uploadLimits';
+import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
@@ -135,7 +135,8 @@ export default function ExpenseForm({
     }
     setUploadingReceipt(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const uploadFile = await convertHeicIfNeeded(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
       setReceipts(p => [...p, file_url]);
     } catch (e) {
       // Antes era try/finally sin catch: si fallaba, el error se perdía y el
