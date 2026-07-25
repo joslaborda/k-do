@@ -10,6 +10,7 @@ import { sendTripInvite } from '@/lib/invites';
 import { removeTripMember, setTripMemberRole } from '@/lib/tripMembers';
 import { useTranslation } from 'react-i18next';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 export default function MembersPanel({
   trip, currentUserEmail, isAdmin, profiles = []
@@ -92,11 +93,11 @@ export default function MembersPanel({
       // If not an email, search by username
       if (!raw.includes('@')) {
         const query = raw.startsWith('@') ? raw.slice(1) : raw;
-        // Buscar por username_normalized primero, luego por username exacto
-        let found = await base44.entities.UserProfile.filter({ username_normalized: query.toLowerCase() });
-        if (!found.length) {
-          found = await base44.entities.UserProfile.filter({ username: query });
-        }
+        // Buscar por username_normalized primero, luego por username exacto.
+        // UserProfile.read se cerró en el rls — se busca vía función backend
+        // (búsqueda por username es "descubrimiento abierto": nunca devuelve
+        // email, el fallback de abajo ya resuelve el email vía User.filter).
+        let found = await searchUserProfiles({ usernameQuery: query, exact: true });
         if (!found.length) {
           toast({ title: t('membersPanel.userNotFound'), description: t('membersPanel.userNotFoundDesc', { query }) });
           setInviting(false);

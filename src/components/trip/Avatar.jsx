@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 
 /**
  * Avatar compartido — foto de perfil si hay, si no iniciales. Con
@@ -32,14 +32,12 @@ export default function Avatar({
     queryKey: ['profileByEmail', normEmail],
     queryFn: async () => {
       if (!normEmail) return [];
-      // Intento directo por email (funciona si el usuario tiene email backfilled)
-      const direct = await base44.entities.UserProfile.filter({ email: normEmail });
-      if (direct.length > 0) return direct;
-      // Fallback: resolver via User → user_id
-      const users = await base44.entities.User.filter({ email: { $in: [normEmail] } });
-      if (!users.length) return [];
-      const profs = await base44.entities.UserProfile.filter({ user_id: users[0].id });
-      return profs;
+      // UserProfile.read cerrado en el rls — se lee vía función backend con
+      // un email ya conocido (lo pasa quien use este componente), así que la
+      // respuesta sí incluye email. El fallback para perfiles sin email
+      // backfilled ya lo resuelve el propio backend — ver
+      // base44/functions/searchUserProfiles/entry.ts.
+      return searchUserProfiles({ emails: [normEmail] });
     },
     staleTime: 5 * 60 * 1000,
     enabled: !skipQueries && !!normEmail,
