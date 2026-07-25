@@ -13,7 +13,7 @@ import { getCountryMeta, computeAvailableCurrencies } from '@/lib/countryConfig'
 import { getFxRate } from '@/lib/fxRates';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { calculateBalances, getDebts } from '@/lib/expenseBalances';
-import { normalizeEmail } from '@/lib/utils';
+import { normalizeEmail, isZeroDecimalCurrency } from '@/lib/utils';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import OTabBar from '@/components/trip/OTabBar';
 import Avatar from '@/components/trip/Avatar';
@@ -47,12 +47,12 @@ const CAT_CONFIG = {
 
 // ── Currency symbol helper ─────────────────────────────────────────────────────
 function sym(code) {
-  const MAP = { EUR:'€', USD:'$', GBP:'£', JPY:'¥', KRW:'₩', CNY:'¥', THB:'฿', VND:'₫', INR:'₹', MXN:'$', COP:'$' };
+  const MAP = { EUR:'€', USD:'$', GBP:'£', JPY:'¥', KRW:'₩', CNY:'¥', THB:'฿', VND:'₫', INR:'₹', MXN:'$', COP:'$', CLP:'$' };
   return MAP[code] || code;
 }
 
 function fmtAmt(n, code) {
-  const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(code);
+  const isZeroDecimal = isZeroDecimalCurrency(code);
   const v = isZeroDecimal ? Math.round(n) : parseFloat(n.toFixed(2));
   return v.toLocaleString('es');
 }
@@ -352,8 +352,15 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
           const realExpenses = expenses.filter(e => !isSettlement(e));
           let iPaid = 0;
           let myShare = 0;
+          // Math.max(0, ...) en los 6 usos de amount_base/amount de este archivo:
+          // el hardening contra negativos que ya tenía amounts_by_user (reparto
+          // personalizado) no cubría el campo que usan TODOS los split_type,
+          // incluido "equal" — Expense.jsonc no impone un mínimo y su rls de
+          // update deja a cualquier miembro reescribir el monto de un gasto
+          // ajeno, así que un valor negativo colado por API/devtools invertía
+          // quién debe a quién en balances y estadísticas.
           realExpenses.forEach(e => {
-            const amt = parseFloat(e.amount_base || e.amount) || 0;
+            const amt = Math.max(0, parseFloat(e.amount_base || e.amount) || 0);
             if (!amt) return;
             if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
             const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
@@ -506,7 +513,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
     let iPaid = 0;
     let myShare = 0;
     realExpenses.forEach(e => {
-      const amt = parseFloat(e.amount_base || e.amount) || 0;
+      const amt = Math.max(0, parseFloat(e.amount_base || e.amount) || 0);
       if (!amt) return;
       // Lo que pagué yo
       if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
@@ -532,7 +539,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
 
   // Total real del grupo (sin liquidaciones)
   const totalGroup = useMemo(() =>
-    realExpenses.reduce((s, e) => s + (parseFloat(e.amount_base || e.amount) || 0), 0),
+    realExpenses.reduce((s, e) => s + (Math.max(0, parseFloat(e.amount_base || e.amount) || 0)), 0),
   [realExpenses]);
 
   // Días: usar fechas reales del viaje si están disponibles
@@ -553,7 +560,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
   const myByCategory = useMemo(() => {
     const acc = {};
     realExpenses.forEach(e => {
-      const amt = parseFloat(e.amount_base || e.amount) || 0;
+      const amt = Math.max(0, parseFloat(e.amount_base || e.amount) || 0);
       if (!amt) return;
       let myShare = 0;
       const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
@@ -579,7 +586,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
     const acc = {};
     realExpenses.forEach(e => {
       const cat = e.category || 'other';
-      acc[cat] = (acc[cat] || 0) + (parseFloat(e.amount_base || e.amount) || 0);
+      acc[cat] = (acc[cat] || 0) + (Math.max(0, parseFloat(e.amount_base || e.amount) || 0));
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
   }, [realExpenses]);
@@ -589,7 +596,7 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
     const acc = {};
     realExpenses.forEach(e => {
       const city = e.city_name || t('expenses.noCity');
-      acc[city] = (acc[city] || 0) + (parseFloat(e.amount_base || e.amount) || 0);
+      acc[city] = (acc[city] || 0) + (Math.max(0, parseFloat(e.amount_base || e.amount) || 0));
     });
     return Object.entries(acc).sort((a, b) => b[1] - a[1]);
   }, [realExpenses]);

@@ -193,7 +193,15 @@ export default function Photos() {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    // Antes se filtraba por f.type.startsWith('image/') ANTES de llegar a
+    // checkUpload, que ya tiene su propio fallback por extensión para
+    // cuando file.type viene vacío (típico de HEIC en iOS, ver
+    // uploadLimits.js). Un HEIC arrastrado y soltado desaparecía en
+    // silencio, sin ningún toast — mientras que el mismo archivo elegido con
+    // el selector (handleFiles, sin este filtro) sí se subía. checkUpload ya
+    // es la única fuente de verdad en el bucle de subida; se deja que decida
+    // él, igual que en handleFiles.
+    const allFiles = Array.from(e.dataTransfer.files);
     const files = allFiles.slice(0, 10);
     if (!files.length) return;
     if (allFiles.length > 10) {

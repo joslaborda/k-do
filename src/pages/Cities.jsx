@@ -417,9 +417,20 @@ function DayContent({day, dayDate, docs, spots, tripId, cityId, isToday_, isTomo
   const timeline = useMemo(() => {
     const docItems  = dayDocs.map(d  => ({ ...d,  _kind: 'doc',  _time: d.time || null, _order: d.day_order ?? null, _title: d.name || d.title || t('cities.day.docFallback'), _sub: d.origin && d.destination ? `${d.origin} → ${d.destination}` : null }));
     const spotItems = spots.map(s => ({ ...s,  _kind: 'spot', _time: s.assigned_time || null, _order: s.day_order ?? null, _title: s.title || t('cities.day.spotFallback'), _sub: s.notes || null }));
-    const noteItems = notesList.filter(n => n.text?.trim()).map((n, i) => ({
-      id: 'note-' + i, _kind: 'note', _time: n.time || null, _order: n.order ?? null, _title: n.text, _sub: null, _noteIdx: i,
-    }));
+    // _noteIdx debe ser la posición REAL en notesList, no en la lista ya
+    // filtrada por texto no vacío — antes se calculaba después del filter()
+    // (map(..., i) sobre el resultado filtrado), así que si una nota tenía
+    // texto vacío momentáneamente (p. ej. mientras se edita y se borra todo
+    // el texto antes de guardar) intercalada entre otras, todas las notas
+    // posteriores quedaban con el índice desplazado — editingNote/
+    // handleDeleteNote usan este índice directo contra notesList[idx], así
+    // que se podía editar o borrar la nota equivocada.
+    const noteItems = notesList
+      .map((n, i) => ({ ...n, _origIdx: i }))
+      .filter(n => n.text?.trim())
+      .map((n) => ({
+        id: 'note-' + n._origIdx, _kind: 'note', _time: n.time || null, _order: n.order ?? null, _title: n.text, _sub: null, _noteIdx: n._origIdx,
+      }));
     const all = [...docItems, ...spotItems, ...noteItems];
     const pinned = all.filter(i => i._order != null).sort((a, b) => a._order - b._order);
     const unpinnedTimed = all.filter(i => i._order == null && i._time).sort((a, b) => a._time.localeCompare(b._time));

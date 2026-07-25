@@ -53,7 +53,14 @@ export default function TripsList() {
   // a verlas. Este flag local separa "ya se completó el onboarding" de "ya
   // existe el perfil en caché", para que el modal no desaparezca solo.
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
-  const { user, isLoading: userLoading } = useAuth();
+  // AuthContext nunca expuso una clave "isLoading" (solo isLoadingAuth /
+  // isLoadingPublicSettings) — desestructurarla así dejaba userLoading
+  // siempre en undefined, así que el gate de carga de abajo (isLoading ||
+  // userLoading) no bloqueaba nada realmente ligado al estado de auth: podía
+  // parpadear el estado vacío ("crea tu primer viaje") en cada arranque
+  // aunque el usuario sí tuviera viajes, hasta que la sesión terminaba de
+  // resolverse.
+  const { user, isLoadingAuth } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -102,6 +109,7 @@ export default function TripsList() {
       return [...myTrips, ...memberTrips.filter(tr => !seen.has(tr.id))]
         .sort((a,b) => new Date(b.created_date||0) - new Date(a.created_date||0));
     },
+    enabled: !!user?.id,
     staleTime: 30000,
   });
 
@@ -218,7 +226,7 @@ export default function TripsList() {
   const firstName = myProfile?.display_name?.split(' ')[0] || user?.full_name?.split(' ')[0] || '';
 
   // Loading
-  if (isLoading || userLoading) return (
+  if (isLoading || isLoadingAuth) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin mx-auto mb-4" />
