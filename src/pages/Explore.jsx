@@ -399,9 +399,13 @@ export default function Explore() {
                 <Badge variant="secondary" className="ml-1">{siguiendoSpots.length + siguiendoTemplates.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="personas" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
-              <Users className="w-4 h-4 mr-1"/>{t('explore.tabs.people')}
-            </TabsTrigger>
+            {/* Pestaña "Personas" (seguir/dejar de seguir) ocultada a petición de
+                José: la funcionalidad de Follow está conectada y funciona (probado
+                con una cuenta real), pero no hay ningún sitio de la app que
+                muestre seguidores/seguidos ni haga nada visible con esa relación
+                todavía — hasta que se lance "Kodo Social" distrae más que aporta.
+                Reversible: basta con descomentar este TabsTrigger y el
+                TabsContent value="personas" de más abajo. */}
             <TabsTrigger value="top" className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Star className="w-4 h-4 mr-1"/>{t('explore.tabs.top')}
             </TabsTrigger>
@@ -518,7 +522,7 @@ export default function Explore() {
             )}
           </TabsContent>
 
-          {/* ── PERSONAS ──────────────────────────────────────────────────── */}
+          {/* ── PERSONAS (oculta, ver comentario junto al TabsTrigger de arriba) ──
           <TabsContent value="personas">
             <div className="relative mb-5">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"/>
@@ -537,6 +541,7 @@ export default function Explore() {
               </div>
             )}
           </TabsContent>
+          */}
 
           <TabsContent value="top">
             <TopSpotsTab publicSpots={publicSpots} profileMap={profileMap} currentUser={currentUser} onSave={handleSaveSpot} savingSpotId={savingSpotId}/>
