@@ -92,7 +92,12 @@ Deno.serve(async (req) => {
       const newMembers = members.filter((m) => norm(m) !== targetNorm);
       const newRoles = { ...roles };
       delete newRoles[targetKey];
-      const updated = await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+      // admins tiene que recalcularse aquí igual que roles — el rls de
+      // Trip.update ahora exige estar en `admins` (ver Trip.jsonc), así que
+      // si esto se queda desincronizado de `roles` un admin real podría
+      // perder la capacidad de volver a tocar el viaje más adelante.
+      const newAdmins = Object.keys(newRoles).filter((k) => newRoles[k] === "admin");
+      const updated = await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles, admins: newAdmins });
       return Response.json({ trip: updated });
     }
 
@@ -104,7 +109,8 @@ Deno.serve(async (req) => {
       );
     }
     const newRoles = { ...roles, [targetKey]: role };
-    const updated = await service.entities.Trip.update(tripId, { roles: newRoles });
+    const newAdmins = Object.keys(newRoles).filter((k) => newRoles[k] === "admin");
+    const updated = await service.entities.Trip.update(tripId, { roles: newRoles, admins: newAdmins });
     return Response.json({ trip: updated });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
