@@ -105,7 +105,7 @@ export default function InicioTab({ trip, cities, documents, packingItems, profi
             </div>
             {firstDoc.time && <p className="text-base font-semibold text-foreground flex-shrink-0">{firstDoc.time}</p>}
           </div>
-          {firstDoc.file_url && (
+          {(firstDoc.file_url || firstDoc.file_uri) && (
             <div className="px-4 pb-3">
               <Link to={createPageUrl('Documents') + '?trip_id=' + tripId}
                 className="block w-full py-2.5 bg-primary text-white text-sm font-medium text-center rounded-full">

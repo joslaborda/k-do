@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Clock, ArrowRight, CirclePlus, Trash2 } from 'lucide-react';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS } from './constants';
 import { useTranslation } from 'react-i18next';
+import { resolveDocViewUrl } from '@/lib/privateFiles';
 
 export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf, onDelete }) {
   const { t } = useTranslation();
@@ -34,6 +35,15 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf, 
   const handleDelete = async () => {
     setDeleting(true);
     try { await onDelete(item); } finally { setDeleting(false); }
+  };
+
+  // Resuelve la URL en el momento de abrir — para documentos con file_uri
+  // (storage privado) pide una URL firmada nueva cada vez en vez de una que
+  // podría haber caducado. Ver src/lib/privateFiles.js.
+  const handleOpenPdf = async () => {
+    const url = await resolveDocViewUrl(item);
+    onClose();
+    if (url) setTimeout(() => onOpenPdf(url), 50);
   };
 
   return (
@@ -102,7 +112,7 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf, 
                 <p className="text-xs text-muted-foreground mb-1">{t('itemDetail.type')}</p>
                 <p className="text-sm font-medium text-foreground capitalize">{item.type}</p>
               </div>
-              {!item.file_url && (
+              {!item.file_url && !item.file_uri && (
                 <div className="bg-secondary rounded-xl p-3 flex-1">
                   <p className="text-xs text-muted-foreground mb-1">{t('itemDetail.file')}</p>
                   <p className="text-sm text-muted-foreground">{t('itemDetail.noFile')}</p>
@@ -131,8 +141,8 @@ export default function ItemDetailSheet({ item, onClose, onSaveTime, onOpenPdf, 
               <Trash2 className="w-3.5 h-3.5" />{t('common.delete')}
             </button>
           )}
-          {isDoc && item.file_url && (
-            <button onClick={() => { onClose(); setTimeout(() => onOpenPdf(item.file_url), 50); }}
+          {isDoc && (item.file_url || item.file_uri) && (
+            <button onClick={handleOpenPdf}
               className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium">
               {t('itemDetail.viewDocument')}
             </button>
