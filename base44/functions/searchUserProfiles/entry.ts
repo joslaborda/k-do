@@ -63,7 +63,26 @@ Deno.serve(async (req) => {
     if (Array.isArray(userIds) && userIds.length > 0) {
       const ids = userIds.filter((x: unknown) => typeof x === "string").slice(0, MAX_IDS);
       const rows = ids.length ? await service.entities.UserProfile.filter({ user_id: { $in: ids } }) : [];
-      return Response.json({ profiles: rows.map((p: any) => ({ ...safeProfile(p), email: p.email || null })) });
+      // Perfiles antiguos (creados antes del backfill de email) tienen
+      // user_id pero no email guardado en UserProfile — mismo caso que en
+      // el modo `emails` de abajo. InviteModal.jsx y MembersPanel.jsx
+      // resolvían esto llamando ellos mismos a base44.entities.User.filter
+      // ({id: ...}) desde el cliente — esa llamada da SIEMPRE 403 para
+      // cualquier usuario no colaborador del proyecto en Base44 ("Only
+      // collaborators can view the list of users"), así que el email nunca
+      // llegaba a resolverse para esos perfiles viejos (el botón de invitar
+      // parecía activo pero no hacía nada). Se resuelve aquí, con
+      // asServiceRole (que sí puede leer User sin esa restricción), en vez
+      // de en el cliente.
+      const missingIds = rows.filter((p: any) => !p.email).map((p: any) => p.user_id).filter(Boolean);
+      let emailById: Record<string, string> = {};
+      if (missingIds.length) {
+        const users = await service.entities.User.filter({ id: { $in: missingIds } });
+        emailById = Object.fromEntries(users.map((u: any) => [u.id, (u.email || "").toLowerCase()]));
+      }
+      return Response.json({
+        profiles: rows.map((p: any) => ({ ...safeProfile(p), email: p.email || emailById[p.user_id] || null })),
+      });
     }
 
     if (Array.isArray(emails) && emails.length > 0) {
