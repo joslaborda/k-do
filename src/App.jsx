@@ -10,7 +10,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import TripsList from './pages/TripsList';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import i18n from '@/i18n/index.js';
 
 const { Pages, Layout } = pagesConfig;
@@ -19,7 +19,8 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
+  const { t } = useTranslation();
   const [authUser, setAuthUser] = useState(null);
   const [userLoaded, setUserLoaded] = useState(false);
 
@@ -76,6 +77,28 @@ const AuthenticatedApp = () => {
       // dispararse más de una vez en renders intermedios antes de que el
       // navegador abandonara la página.
       return null;
+    } else {
+      // Antes, cualquier authError.type no contemplado explícitamente arriba
+      // (p. ej. 'unknown', o el nuevo 'network_error' que ahora fija
+      // checkUserAuth ante un fallo sin conexión) no tenía ningún return: el
+      // flujo seguía hacia abajo y terminaba renderizando <Routes> como si
+      // todo estuviera bien, con el usuario sin autenticar del todo — justo
+      // el síntoma de "pantallas vacías o rotas sin aviso" que motivó los
+      // fixes de auth de rondas anteriores, reaparecido para este camino.
+      return (
+        <div className="fixed inset-0 flex items-center justify-center p-6">
+          <div className="max-w-sm w-full text-center">
+            <p className="text-foreground font-medium mb-2">{t('common.error')}</p>
+            <p className="text-muted-foreground text-sm mb-6">{authError.message || t('common.tryAgain')}</p>
+            <button
+              onClick={() => checkAppState()}
+              className="px-5 py-2.5 rounded-full bg-primary text-white text-sm font-medium"
+            >
+              {t('common.tryAgain')}
+            </button>
+          </div>
+        </div>
+      );
     }
   }
 
