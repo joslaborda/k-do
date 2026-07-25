@@ -1,6 +1,19 @@
 import { createClientFromRequest } from "npm:@base44/sdk";
 
 /**
+ * SIN USO — ninguna pantalla de la app llama a esta función (grep de
+ * "migrateTripMembers" en src/ no da ningún resultado). Por el nombre y por
+ * el contenido, parece un borrador/reescritura de manageTripMember que
+ * nunca se llegó a conectar desde el cliente. Esta auditoría encontró que
+ * ESTA versión (con protección al creador, comprobación de saldo pendiente y
+ * sincronización de trip_members al expulsar) era más completa y correcta
+ * que la que la app SÍ usa — esa lógica ya se ha llevado a
+ * base44/functions/manageTripMember/entry.ts, que es la que de verdad
+ * ejecuta la app. Se deja este archivo tal cual (no se borra, por si acaso
+ * se invoca a mano fuera de la app) pero no debería usarse ni mantenerse en
+ * paralelo — cualquier cambio futuro a la gestión de miembros va en
+ * manageTripMember, no aquí.
+ *
  * manageTripMember — cambia el rol de un miembro o lo expulsa del viaje.
  *
  * Por qué en el backend: el rls de Trip.update solo puede cerrarse a "eres
