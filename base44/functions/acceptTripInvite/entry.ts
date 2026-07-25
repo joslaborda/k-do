@@ -101,8 +101,13 @@ Deno.serve(async (req) => {
 
       const newMembers = members.includes(normalizedUserEmail) ? members : [...members, normalizedUserEmail];
       const newRoles = { ...roles, [normalizedUserEmail]: finalRole };
+      // admins en array, en sync con roles — ver el comentario en
+      // Trip.jsonc: el rls de Trip.update ahora exige estar en `admins`, así
+      // que una invitación aceptada con role "admin" tiene que reflejarse
+      // aquí también, o esa persona no podría luego gestionar el viaje.
+      const newAdmins = Object.keys(newRoles).filter((k) => newRoles[k] === "admin");
 
-      await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles });
+      await service.entities.Trip.update(tripId, { members: newMembers, roles: newRoles, admins: newAdmins });
 
       const check = await service.entities.Trip.get(tripId);
       if ((check.members || []).includes(normalizedUserEmail)) {
