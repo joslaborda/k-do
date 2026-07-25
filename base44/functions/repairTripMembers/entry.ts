@@ -65,7 +65,12 @@ Deno.serve(async (req) => {
     if (!user?.email) {
       return Response.json({ error: "No autenticado" }, { status: 401 });
     }
-    const actingEmail = user.email.toLowerCase();
+    // .trim() además de .toLowerCase() — migrateTripMembers.ts ya normaliza
+    // así (fix de ronda 2/3); aquí solo se quitaban mayúsculas, no espacios.
+    // Un email con espacios accidentales podía pasar el check de membresía
+    // en una función pero fallar en la otra, con un 403 inconsistente según
+    // cuál se llamara.
+    const actingEmail = user.email.trim().toLowerCase();
 
     let tripId: string | undefined;
     try {
@@ -98,8 +103,8 @@ Deno.serve(async (req) => {
       if (!targetTrip) {
         return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
       }
-      const members = (targetTrip.members || []).map((e: string) => (e || "").toLowerCase());
-      const isMember = members.includes(actingEmail) || (targetTrip.created_by || "").toLowerCase() === actingEmail;
+      const members = (targetTrip.members || []).map((e: string) => (e || "").trim().toLowerCase());
+      const isMember = members.includes(actingEmail) || (targetTrip.created_by || "").trim().toLowerCase() === actingEmail;
       if (!isMember && user.role !== "admin") {
         return Response.json(
           { error: "No tienes permiso para reparar este viaje." },
