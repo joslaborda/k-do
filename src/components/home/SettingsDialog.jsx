@@ -207,16 +207,26 @@ function SettingsDialog({
           <DialogTitle className="text-foreground text-base font-semibold">{t('trip.settings')}</DialogTitle>
         </DialogHeader>
 
-        {/* Nombre */}
+        {/* Nombre — esta auditoría cerró Trip.update a "solo admin" (ver el
+            comentario largo en base44/entities/Trip.jsonc: antes cualquier
+            miembro podía tocar members/roles vía este mismo update, no solo
+            el nombre/fechas). Antes de eso, cualquier miembro podía renombrar
+            el viaje o cambiar sus fechas; ahora eso pasa a ser solo-admin
+            también en la UI, para no dejar a un editor/viewer con campos
+            editables que el backend va a rechazar en silencio. */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground mb-1">{t('trip.tripName')}</p>
-            <Input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="h-8 text-sm font-medium border-0 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-              placeholder={t('trip.tripName')}
-            />
+            {isAdmin ? (
+              <Input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="h-8 text-sm font-medium border-0 p-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                placeholder={t('trip.tripName')}
+              />
+            ) : (
+              <p className="text-sm font-medium text-foreground">{name}</p>
+            )}
           </div>
         </div>
 
@@ -224,30 +234,42 @@ function SettingsDialog({
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
           <div className="flex-1 min-w-0">
             <p className="text-xs text-muted-foreground mb-1.5">{t('trip.dialog.tripDates')}</p>
-            <div className="flex items-center gap-2">
-              <Input
-                type="date"
-                value={startDate}
-                max={endDate || undefined}
-                onChange={e => setStartDate(e.target.value)}
-                className="h-8 text-sm flex-1"
-              />
-              <span className="text-muted-foreground text-sm">→</span>
-              <Input
-                type="date"
-                value={endDate}
-                min={startDate || undefined}
-                onChange={e => setEndDate(e.target.value)}
-                className="h-8 text-sm flex-1"
-              />
-              {totalDays && (
-                <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0">
-                  {totalDays}d
-                </span>
-              )}
-            </div>
+            {isAdmin ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={startDate}
+                  max={endDate || undefined}
+                  onChange={e => setStartDate(e.target.value)}
+                  className="h-8 text-sm flex-1"
+                />
+                <span className="text-muted-foreground text-sm">→</span>
+                <Input
+                  type="date"
+                  value={endDate}
+                  min={startDate || undefined}
+                  onChange={e => setEndDate(e.target.value)}
+                  className="h-8 text-sm flex-1"
+                />
+                {totalDays && (
+                  <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium shrink-0">
+                    {totalDays}d
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-foreground">
+                {startDate || '—'} → {endDate || '—'}
+                {totalDays && <span className="text-xs bg-accent text-primary px-2 py-1 rounded-full font-medium ml-2">{totalDays}d</span>}
+              </p>
+            )}
           </div>
         </div>
+        {!isAdmin && (
+          <div className="px-5 py-2 border-b border-border bg-secondary/30">
+            <p className="text-xs text-muted-foreground">{t('trip.dialog.adminOnlyEdit')}</p>
+          </div>
+        )}
 
         {/* Paradas */}
         <div className="bg-secondary/50 px-5 py-2 border-b border-border">
@@ -389,11 +411,13 @@ function SettingsDialog({
           )}
           <div className="flex gap-2 ml-auto">
             <Button variant="outline" size="sm" onClick={onClose}>{t('common.cancel')}</Button>
-            <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
-              onClick={handleSaveTrip}
-              disabled={!name.trim() || saving}>
-              {saving ? t('trip.dialog.saving') : t('common.save')}
-            </Button>
+            {isAdmin && (
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-white"
+                onClick={handleSaveTrip}
+                disabled={!name.trim() || saving}>
+                {saving ? t('trip.dialog.saving') : t('common.save')}
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
