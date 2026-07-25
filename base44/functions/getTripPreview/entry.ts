@@ -50,6 +50,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Esta invitación no es para tu cuenta" }, { status: 403 });
     }
 
+    // A diferencia de acceptTripInvite/respondToTripInvite, esto no exigía
+    // status === "pending" — una invitación ya rechazada, cancelada o
+    // aceptada hace tiempo seguía sirviendo para siempre como llave de vista
+    // previa del viaje (nombre, destino, fechas, lista de miembros
+    // actualizada), reenviando el mismo link/token antiguo. Si ya se aceptó,
+    // quien la aceptó ya es miembro y tiene Trip.read normal — no necesita
+    // este endpoint.
+    if (invite.status !== "pending") {
+      return Response.json({ error: "Esta invitación ya no está disponible" }, { status: 403 });
+    }
+
     const trip = await service.entities.Trip.get(tripId);
     if (!trip) {
       return Response.json({ error: "Viaje no encontrado" }, { status: 404 });
