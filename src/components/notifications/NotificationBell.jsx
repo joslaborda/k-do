@@ -13,6 +13,7 @@ import { createPageUrl } from '@/utils';
 import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
 import { normalizeEmail } from '@/lib/utils';
+import { searchUserProfiles } from '@/lib/userProfiles';
 import { useToast } from '@/components/ui/use-toast';
 
 const TYPE = {
@@ -68,14 +69,12 @@ function TripInviteModal({ notif, onClose, onAccept }) {
         setTripData(fetchedTrip);
 
         const memberEmails = fetchedTrip.members || [];
-        const users = await base44.entities.User.filter({ email: { $in: memberEmails } });
-        const ids = users.map(u => u.id).filter(Boolean);
-        const profiles = ids.length
-          ? await base44.entities.UserProfile.filter({ user_id: { $in: ids } })
-          : [];
+        // UserProfile.read cerrado en el rls — se lee vía función backend
+        // con emails ya conocidos (miembros del viaje, vía getTripPreview) —
+        // ver src/lib/userProfiles.js.
+        const profiles = await searchUserProfiles({ emails: memberEmails });
         setMembers(memberEmails.map(email => {
-          const u = users.find(x => x.email === email);
-          const p = profiles.find(x => x.user_id === u?.id);
+          const p = profiles.find(x => normalizeEmail(x.email) === normalizeEmail(email));
           return { email, name: p?.display_name || p?.username || email, avatar: p?.avatar_url };
         }));
       } catch {}
