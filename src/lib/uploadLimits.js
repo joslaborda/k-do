@@ -76,7 +76,13 @@ export function isHeic(file) {
 export async function convertHeicIfNeeded(file) {
   if (!isHeic(file)) return file;
   try {
-    const heic2any = (await import('heic2any')).default;
+    // Se carga desde CDN en vez de instalarla como dependencia npm: Base44 no
+    // instala paquetes nuevos añadidos a package.json al publicar (el primer
+    // intento, con "heic2any" como import normal, rompió el build con
+    // "Failed to resolve import"). `@vite-ignore` evita que Vite intente
+    // resolver esta URL en tiempo de compilación — se resuelve en el
+    // navegador, en tiempo de ejecución, como cualquier import() dinámico.
+    const heic2any = (await import(/* @vite-ignore */ 'https://esm.sh/heic2any@0.0.4')).default;
     const result = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
     const blob = Array.isArray(result) ? result[0] : result;
     const newName = (file.name || 'photo').replace(HEIC_EXT_RE, '') + '.jpg';
