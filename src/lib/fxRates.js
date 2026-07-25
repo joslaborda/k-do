@@ -66,15 +66,15 @@ async function fromHistoricalFrankfurter(from, to, dateStr) {
 }
 
 async function persistToEntity(from, to, rate, source) {
+  // Escribir directo desde el cliente (create/update abiertos en el rls de
+  // ExchangeRateCache) lo marcó CRÍTICO el propio panel de seguridad de
+  // Base44: cualquiera, sin sesión, podía escribir una tasa de cambio falsa.
+  // El motor de rls no puede expresar "cualquier usuario autenticado, pero
+  // no público" como predicado, así que la escritura se movió a la función
+  // backend cacheFxRate (exige sesión, valida el valor, y de paso limpia
+  // duplicados). El rls de la entidad ya no permite create/update directos.
   try {
-    const now = new Date().toISOString();
-    const valid_until = new Date(Date.now() + CACHE_TTL_MS).toISOString();
-    const rows = await base44.entities.ExchangeRateCache.filter({ base: from, quote: to });
-    if (rows.length > 0) {
-      await base44.entities.ExchangeRateCache.update(rows[0].id, { rate, source, fetched_at: now, valid_until });
-    } else {
-      await base44.entities.ExchangeRateCache.create({ base: from, quote: to, rate, source, fetched_at: now, valid_until });
-    }
+    await base44.functions.invoke('cacheFxRate', { base: from, quote: to, rate, source });
   } catch {}
 }
 

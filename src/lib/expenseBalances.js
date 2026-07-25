@@ -25,8 +25,14 @@ export function calculateBalances(expenses, members) {
   members.forEach(email => { const e = norm(email); if (e) balances[e] = 0; });
 
   expenses.forEach(expense => {
-    // Usar amount_base si existe (ya convertido), si no usar amount
-    const amount = parseFloat(expense.amount_base || expense.amount) || 0;
+    // Usar amount_base si existe (ya convertido), si no usar amount. El
+    // hardening contra negativos que ya tenía amounts_by_user (custom split)
+    // faltaba aquí, en el campo que usan TODOS los split_type (incluido
+    // "equal", el más común) — Expense.jsonc no impone un mínimo y su rls de
+    // update permite a cualquier miembro reescribir el monto de un gasto
+    // ajeno, así que un valor negativo colado por API/devtools invertía
+    // quién paga y quién debe. Math.max(0, ...) igual que amounts_by_user.
+    const amount = Math.max(0, parseFloat(expense.amount_base || expense.amount) || 0);
     const paid_by = norm(expense.paid_by);
     const { split_type } = expense;
     const split_with = (expense.split_with || []).map(norm);
@@ -151,5 +157,5 @@ export function getDebts(balances) {
  */
 export function getTotalInBase(expenses) {
   if (!Array.isArray(expenses)) return 0;
-  return expenses.reduce((sum, e) => sum + parseFloat(e.amount_base || e.amount || 0), 0);
+  return expenses.reduce((sum, e) => sum + Math.max(0, parseFloat(e.amount_base || e.amount) || 0), 0);
 }

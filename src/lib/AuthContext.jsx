@@ -146,6 +146,18 @@ export const AuthProvider = ({ children }) => {
           type: 'auth_required',
           message: 'Authentication required'
         });
+      } else {
+        // Antes, un fallo SIN status 401/403 (típico de estar sin conexión —
+        // muy plausible viajando, justo el escenario que motivó el fix de
+        // arriba) no fijaba ningún authError: el estado quedaba idéntico al
+        // de "sesión cerrada normal" (isAuthenticated: false, user: null,
+        // authError: null), así que App.jsx renderizaba como si el usuario
+        // simplemente no hubiera iniciado sesión, en vez de avisar de un
+        // problema de red y ofrecer reintentar.
+        setAuthError({
+          type: 'network_error',
+          message: error.message || 'Network error'
+        });
       }
     }
   };

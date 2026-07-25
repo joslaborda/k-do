@@ -18,6 +18,19 @@ export const isIframe = window.self !== window.top;
 // cualquier comparación o lookup de email debe pasar por aquí primero.
 export const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 
+// Monedas ISO 4217 sin decimales (0 dígitos tras la coma/punto). Antes cada
+// sitio que necesitaba saber esto (Expenses.jsx, ExpenseForm.jsx x2)
+// hardcodeaba su propia lista corta ['JPY','KRW','VND','IDR'] — incompleta y
+// desalineada con las monedas que la propia app soporta explícitamente (CLP,
+// COP están en el enum de Expense.jsonc y en countryConfig.js). Un gasto en
+// CLP/COP podía mostrarse con "céntimos" que no existen tras una conversión.
+// Lista según ISO 4217 (monedas con "minor unit" 0).
+export const ZERO_DECIMAL_CURRENCIES = new Set([
+  'BIF', 'CLP', 'DJF', 'GNF', 'ISK', 'JPY', 'KMF', 'KRW', 'PYG',
+  'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF', 'IDR',
+]);
+export const isZeroDecimalCurrency = (code) => ZERO_DECIMAL_CURRENCIES.has(code);
+
 // Convierte un importe escrito a mano (que puede venir en formato "1.234,56"
 // o "1,234.56" o "1234.56") a un string parseable por parseFloat/Number.
 // Antes se hacía con un simple `.replace(',', '.')`, que con "1.234,56"
