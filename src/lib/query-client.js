@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
 import { persistQueryClient } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { base44 } from '@/api/base44Client';
 
 // Nombre del evento global que se dispara cuando cualquier query/mutation
 // falla con 401/403 (token caducado a mitad de sesión — habitual en un viaje
@@ -17,10 +18,32 @@ function isAuthError(error) {
   return status === 401 || status === 403;
 }
 
+// Evita confundir "tu sesión ya no vale" con "esta fila concreta no te es
+// accesible por RLS" — ambos casos llegan como 401/403 en este backend (p.
+// ej. si expulsan a alguien de un viaje mientras tiene la pantalla abierta,
+// su siguiente Trip.get(tripId) falla con 403 por rls, no porque su token
+// haya caducado). Antes, CUALQUIER 401/403 de CUALQUIER query/mutation
+// disparaba un logout completo — regresión real: perder acceso a un solo
+// recurso ya no debería cerrar toda la sesión. Al ver un 401/403, se
+// reconfirma en tiempo real con auth.me(): si la sesión sigue siendo válida,
+// era un rechazo de ESTE recurso concreto y no se dispara el evento (la
+// pantalla/mutation que falló ya muestra su propio error); solo si auth.me()
+// también falla se considera la sesión realmente caducada.
+let expiryCheckInFlight = null;
 function handleQueryError(error) {
-  if (isAuthError(error)) {
-    window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
-  }
+  if (!isAuthError(error)) return;
+  if (expiryCheckInFlight) return; // ya hay una comprobación en curso
+  expiryCheckInFlight = base44.auth.me()
+    .then(() => {
+      // La sesión sigue siendo válida — el 401/403 era de este recurso
+      // concreto (rls, permisos de la acción...), no de la sesión.
+    })
+    .catch(() => {
+      window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
+    })
+    .finally(() => {
+      expiryCheckInFlight = null;
+    });
 }
 
 export const queryClientInstance = new QueryClient({

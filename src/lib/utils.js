@@ -57,9 +57,18 @@ export function normalizeAmountInput(raw) {
   if (hasDot) {
     const parts = s.split('.');
     if (parts.length > 2) {
-      // Varios puntos: todos menos el último son separadores de miles.
+      // Varios puntos: antes se asumía SIEMPRE que el último grupo era el
+      // decimal ("1.234.567" -> "1234.567", en vez de 1234567) — el mismo
+      // bug ×1000 que este parseo existe para evitar, pero solo se
+      // comprobaba la longitud del último grupo en la rama de un único
+      // punto. Aquí aplicamos la misma regla: último grupo de 2 dígitos o
+      // menos = decimal ("1.234.567,89" ya se filtra antes por tener coma;
+      // esto cubre "1.234.567" sin coma, típico de CLP/COP/VND/IDR), si no,
+      // todos los grupos son miles.
       const last = parts.pop();
-      return parts.join('') + '.' + last;
+      if (last.length <= 2) return parts.join('') + '.' + last;
+      parts.push(last);
+      return parts.join(''); // todos los grupos son separadores de miles
     }
     if (parts.length === 2 && parts[1].length > 2) {
       return parts.join(''); // "1.234" -> miles, sin parte decimal

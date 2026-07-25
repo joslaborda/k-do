@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
@@ -76,6 +76,12 @@ export const AuthProvider = ({ children }) => {
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
           const reason = appError.data.extra_data.reason;
           if (reason === 'auth_required') {
+            // Mismo motivo que en checkUserAuth: este catch también es un
+            // camino real de "token caducado" (falla ya en la comprobación
+            // de public-settings, antes incluso de llegar a auth.me()) y
+            // antes no limpiaba la caché de React Query.
+            queryClientInstance.clear();
+            clearPersistedQueryCache();
             setAuthError({
               type: 'auth_required',
               message: 'Authentication required'
@@ -123,9 +129,19 @@ export const AuthProvider = ({ children }) => {
       console.error('User auth check failed:', error);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
-      
+
       // If user auth fails, it might be an expired token
       if (error.status === 401 || error.status === 403) {
+        // Antes solo se marcaba authError aquí — a diferencia de logout() y
+        // del listener de AUTH_EXPIRED_EVENT, no se limpiaba la caché de
+        // React Query ni la copia en localStorage. Este es justo el camino
+        // más común de "token ya caducado" (se comprueba en cada carga de la
+        // app, p. ej. al reabrirla tras horas de viaje sin usarla) — sin
+        // limpiar aquí, un dispositivo compartido podía mostrar brevemente
+        // la caché de la persona anterior al siguiente login, el mismo
+        // problema que este fix decía haber cerrado en logout().
+        queryClientInstance.clear();
+        clearPersistedQueryCache();
         setAuthError({
           type: 'auth_required',
           message: 'Authentication required'
@@ -134,7 +150,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (shouldRedirect = true) => {
+  const logout = useCallback((shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
 
@@ -156,11 +172,17 @@ export const AuthProvider = ({ children }) => {
       // Just remove the token without redirect
       base44.auth.logout();
     }
-  };
+  }, []);
 
-  const navigateToLogin = () => {
+  // useCallback: sin esto, navigateToLogin era una función nueva en cada
+  // render de AuthProvider. App.jsx la usa como dependencia de un useEffect
+  // que llama a redirectToLogin() — con una referencia inestable, cualquier
+  // re-render del provider mientras authError.type siguiera siendo
+  // 'auth_required' podía re-disparar la redirección, el mismo antipatrón
+  // de "efecto que se repite en renders intermedios" que ese fix corregía.
+  const navigateToLogin = useCallback(() => {
     base44.auth.redirectToLogin();
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ 
