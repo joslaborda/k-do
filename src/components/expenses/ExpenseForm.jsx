@@ -7,7 +7,7 @@ import { checkUpload } from '@/lib/uploadLimits';
 import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { normalizeEmail, normalizeAmountInput } from '@/lib/utils';
+import { normalizeEmail, normalizeAmountInput, isZeroDecimalCurrency } from '@/lib/utils';
 
 // labelKey en vez de label fijo: CATEGORIES es un const de módulo (fuera del
 // componente), así que no tiene acceso a t() — se traduce en el punto de uso.
@@ -117,7 +117,7 @@ export default function ExpenseForm({
 
   const equalShare = () => {
     if (!form.amount || form.split_with.length === 0) return null;
-    const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(currency);
+    const isZeroDecimal = isZeroDecimalCurrency(currency);
     const share = parseFloat(form.amount) / form.split_with.length;
     return isZeroDecimal ? Math.round(share).toLocaleString('es') : share.toFixed(2);
   };
@@ -210,8 +210,18 @@ export default function ExpenseForm({
         }
       }
     }
+    // split_with para "solo" se fijaba solo en el momento de pulsar ese modo
+    // (el botón hace set('split_with', [form.paid_by || members[0]])) — si
+    // después se cambiaba quién pagó sin volver a tocar el modo, split_with
+    // quedaba apuntando a la persona anterior. No afecta el balance (solo
+    // debita al pagador, calculateBalances ignora split_with en este modo),
+    // pero sí la visualización: el detalle del gasto mostraba el avatar
+    // equivocado en "Compartido con". Se fuerza aquí, al guardar, en vez de
+    // confiar en el estado acumulado.
     const splitWith = form.split_type === 'custom'
       ? Object.entries(form.amounts_by_user||{}).filter(([,v]) => parseFloat(v) > 0).map(([e]) => e)
+      : form.split_type === 'solo'
+      ? [form.paid_by]
       : form.split_with;
     onSave({ ...form, split_with: splitWith, currency, amount_base: amountBase, fx_rate_to_base: fxRate, fx_source: fxSource, fx_timestamp: fxTimestamp, receipt_photos: receipts });
   };
@@ -416,7 +426,7 @@ export default function ExpenseForm({
               const selected = form.split_with.includes(email);
               const share = selected && form.split_with.length > 0 && form.amount
                 ? (parseFloat(form.amount) / form.split_with.length) : null;
-              const isZeroDecimal = ['JPY','KRW','VND','IDR'].includes(currency);
+              const isZeroDecimal = isZeroDecimalCurrency(currency);
               const shareStr = share ? (isZeroDecimal ? Math.round(share).toLocaleString('es') : share.toFixed(2)) : null;
               const sp = profileMap?.[email];
               return (
