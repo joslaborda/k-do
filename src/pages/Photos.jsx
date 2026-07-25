@@ -12,7 +12,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { parseServerDate } from '@/lib/parseServerDate';
 import { useTranslation } from 'react-i18next';
-import { checkUpload } from '@/lib/uploadLimits';
+import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 import { useToast } from '@/components/ui/use-toast';
 import { normalizeEmail } from '@/lib/utils';
 
@@ -132,8 +132,11 @@ export default function Photos() {
         try {
           const chk = checkUpload(file);
           if (!chk.ok) { failed.push(file.name); setUploadProgress({ current: i + 1, total: files.length }); continue; }
+          // EXIF se lee del archivo original (antes de convertir HEIC), la
+          // conversión a JPEG no conserva esos metadatos.
           const takenAt = await getExifDate(file);
-          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+          const uploadFile = await convertHeicIfNeeded(file);
+          const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
           await base44.entities.TripMessage.create({
             trip_id: tripId,
             user_id: user.id,

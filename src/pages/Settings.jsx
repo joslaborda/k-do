@@ -14,7 +14,7 @@ import { setLanguage, getLanguage } from '@/i18n/index.js';
 import FeedbackModal from '@/components/settings/FeedbackModal';
 import { toast } from '@/components/ui/use-toast';
 import { normalizeEmail } from '@/lib/utils';
-import { checkUpload } from '@/lib/uploadLimits';
+import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
 
 // ── Language Switcher ──────────────────────────────────────────────────────────
 function LanguageSwitcher() {
@@ -454,7 +454,8 @@ export default function Settings() {
     }
     setUploadingAvatar(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const uploadFile = await convertHeicIfNeeded(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: uploadFile });
       await base44.entities.UserProfile.update(profile.id, { avatar_url: file_url });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
     } catch {
