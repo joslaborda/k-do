@@ -57,14 +57,20 @@ const SPOT_COLORS = {
   airport: 'bg-sky-50 dark:bg-sky-950/30 text-sky-700', train: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700', bus: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700',
 };
 
+// Ticket.jsonc guarda el tipo de documento en `category` (ver DocumentForm.jsx
+// y el mismo bug ya corregido 3 veces en InicioTab.jsx), no en `type` — con
+// `.type` (siempre undefined en un documento real) DOC_TRANSPORT.has() nunca
+// encontraba nada, así que el icono de avión/tren/bus entre dos ciudades en
+// la vista Ruta no aparecía jamás. `doc_type` es un campo distinto (tipo de
+// documento personal: pasaporte, DNI...) y se deja fuera a propósito.
 function getTransportIcon(docs, cityStartDate) {
   if (!docs || !cityStartDate) return null;
   const doc = docs.find(d => {
     const docDate = d.date || d.valid_from || d.start_date;
-    return docDate === cityStartDate && DOC_TRANSPORT.has(d.type || d.doc_type);
+    return docDate === cityStartDate && DOC_TRANSPORT.has(d.category || d.type);
   });
   if (!doc) return null;
-  const t = doc.type || doc.doc_type;
+  const t = doc.category || doc.type;
   const M = { flight: PlaneIcon, train: Train, bus: Car }; const I = M[t] || Ship; return I;
 }
 

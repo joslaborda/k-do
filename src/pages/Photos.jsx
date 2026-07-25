@@ -116,6 +116,16 @@ export default function Photos() {
       // bucle abortaba en la primera excepción y las ya subidas ni se mostraban.
       const uploaded = [];
       const failed = [];
+      // Si `trip` no ha cargado todavía, antes se guardaba trip_members con
+      // solo quien sube la foto — el resto del grupo no podía leer ese
+      // TripMessage (falla su propia rls) y la foto quedaba invisible para
+      // ellos aunque el que la subió sí la viera. Se corta ANTES de subir
+      // los archivos (no solo antes de crear el TripMessage) para no gastar
+      // subidas que de todas formas habría que rehacer.
+      if (!trip?.members?.length) {
+        setUploadProgress({ current: files.length, total: files.length });
+        return { uploaded, failed: files.map(f => f.name) };
+      }
       setUploadProgress({ current: 0, total: files.length });
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -135,10 +145,7 @@ export default function Photos() {
             file_type: 'image',
             file_name: file.name,
             taken_at: takenAt || new Date().toISOString(),
-            // Si `trip` no había cargado, antes se guardaba trip_members:[] y
-            // la foto quedaba invisible para siempre (ni para quien la subió)
-            // — como mínimo se incluye a quien sube la foto.
-            trip_members: trip?.members || [user.email],
+            trip_members: trip.members,
           });
           uploaded.push(file_url);
         } catch {

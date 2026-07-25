@@ -358,10 +358,23 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
             if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
             const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
             if (e.split_type === 'custom' && myShareKey) {
-              const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-              if (total > 0) myShare += (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt;
+              // Mismo hardening que calculateBalances() en expenseBalances.js:
+              // sin Math.max(0,...), un importe negativo colado por API/edición
+              // directa podía inflar o invertir "mi parte" aquí aunque el
+              // balance real (que sí usa expenseBalances.js) ya estuviera
+              // saneado — las dos cifras dejaban de cuadrar en la misma
+              // pantalla.
+              const safeAmounts = Object.fromEntries(
+                Object.entries(e.amounts_by_user).map(([k, v]) => [k, Math.max(0, parseFloat(v) || 0)])
+              );
+              const total = Object.values(safeAmounts).reduce((s, v) => s + v, 0);
+              if (total > 0) myShare += (safeAmounts[myShareKey] / total) * amt;
             } else {
-              const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+              // Igual que calculateBalances(): deduplicar con Set — un viaje
+              // con datos legado (mismo email repetido con distinta
+              // capitalización en trip.members/split_with) inflaba
+              // parts.length y subestimaba "mi parte".
+              const parts = [...new Set((e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail))];
               if (parts.includes(meNorm)) myShare += amt / parts.length;
             }
           });
@@ -497,13 +510,19 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       if (!amt) return;
       // Lo que pagué yo
       if (normalizeEmail(e.paid_by) === meNorm) iPaid += amt;
-      // Mi parte según el split
+      // Mi parte según el split — mismo hardening que calculateBalances() en
+      // expenseBalances.js (Math.max(0,...) sobre importes negativos, Set
+      // dedup en split_with) para que esta cifra no se desincronice de "Tu
+      // balance" en la pestaña Balances ante los mismos datos borde.
       const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
       if (e.split_type === 'custom' && myShareKey) {
-        const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        if (total > 0) myShare += (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt;
+        const safeAmounts = Object.fromEntries(
+          Object.entries(e.amounts_by_user).map(([k, v]) => [k, Math.max(0, parseFloat(v) || 0)])
+        );
+        const total = Object.values(safeAmounts).reduce((s, v) => s + v, 0);
+        if (total > 0) myShare += (safeAmounts[myShareKey] / total) * amt;
       } else {
-        const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+        const parts = [...new Set((e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail))];
         if (parts.includes(meNorm)) myShare += amt / parts.length;
       }
     });
@@ -539,10 +558,13 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
       let myShare = 0;
       const myShareKey = Object.keys(e.amounts_by_user || {}).find(k => normalizeEmail(k) === meNorm);
       if (e.split_type === 'custom' && myShareKey) {
-        const total = Object.values(e.amounts_by_user).reduce((s, v) => s + parseFloat(v || 0), 0);
-        myShare = total > 0 ? (parseFloat(e.amounts_by_user[myShareKey]) / total) * amt : 0;
+        const safeAmounts = Object.fromEntries(
+          Object.entries(e.amounts_by_user).map(([k, v]) => [k, Math.max(0, parseFloat(v) || 0)])
+        );
+        const total = Object.values(safeAmounts).reduce((s, v) => s + v, 0);
+        myShare = total > 0 ? (safeAmounts[myShareKey] / total) * amt : 0;
       } else {
-        const parts = (e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail);
+        const parts = [...new Set((e.split_with?.length > 0 ? e.split_with : [e.paid_by]).map(normalizeEmail))];
         if (parts.includes(meNorm)) myShare = amt / parts.length;
       }
       if (myShare > 0) acc[e.category || 'other'] = (acc[e.category || 'other'] || 0) + myShare;
@@ -582,8 +604,23 @@ function StatsTab({ expenses, baseCurrency, currentUserEmail, cities = [], trip 
     );
   }
 
+  // Mismo aviso que ya tiene BalancesTab: si hay gastos con conversión a la
+  // moneda base fallida, estos totales (mySpend, myByCategory, groupByCategory,
+  // byCity — todos usan amount_base) pueden estar mezclando monedas sin
+  // convertir, igual que el balance de la otra pestaña. Antes solo se avisaba
+  // ahí, no aquí, aunque el riesgo es idéntico.
+  const unavailableFxCount = expenses.filter(e => e.fx_source === 'unavailable').length;
+
   return (
     <div className="space-y-4">
+      {unavailableFxCount > 0 && (
+        <div className="rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            {t('expenses.fx.pendingAggregate', { count: unavailableFxCount })}
+          </p>
+        </div>
+      )}
       {/* {t('expenses.myExpense')} — PRIMERO */}
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('expenses.myExpense')}</p>
       <div className="grid grid-cols-2 gap-3">
@@ -1120,12 +1157,19 @@ export default function Expenses() {
   // trip_members determina quién puede volver a leer este gasto (rls de
   // Expense). Antes, si el usuario creaba un gasto justo cuando `trip`
   // todavía no había cargado (conexión lenta/intermitente — muy real en
-  // gente viajando), se guardaba con trip_members:[] y el gasto quedaba
-  // invisible para siempre, incluso para quien lo creó — parecía "borrado"
-  // sin estarlo. Como mínimo se incluye siempre al propio creador.
+  // gente viajando), se guardaba con trip_members: [currentUserEmail] —
+  // el gasto quedaba invisible para el RESTO del grupo (falla su propia
+  // rls), así que sus balances lo omitían mientras el creador sí lo veía
+  // en el suyo: cifras que no cuadran entre miembros, sin ningún aviso.
+  // Documents.jsx/Utilities.jsx ya cortan este mismo caso bloqueando la
+  // creación en vez de degradar la visibilidad en silencio — aquí se aplica
+  // el mismo guard, consistente con el resto de la app.
   const createMutation = useMutation({
-    mutationFn: d => base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip?.members || (currentUserEmail ? [currentUserEmail] : []) }),
-    onError: () => toast({ title: t('expenses.saveError'), description: t('common.tryAgain'), variant: 'destructive' }),
+    mutationFn: d => {
+      if (!trip?.members?.length) throw new Error(t('cities.tripNotLoadedRetry'));
+      return base44.entities.Expense.create({ ...d, trip_id: tripId, amount: parseFloat(d.amount), trip_members: trip.members });
+    },
+    onError: (error) => toast({ title: t('expenses.saveError'), description: error?.message || t('common.tryAgain'), variant: 'destructive' }),
     onSuccess: async (_, d) => {
       queryClient.invalidateQueries({ queryKey: ['expenses', tripId] });
       setSheetOpen(false); setEditingExpense(null);
