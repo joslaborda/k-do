@@ -29,7 +29,11 @@
     },
     "file_url": {
       "type": "string",
-      "description": "URL del archivo subido"
+      "description": "URL pública del archivo — solo documentos subidos ANTES del fix de almacenamiento privado (ver file_uri). Los nuevos se guardan con file_url vacío."
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "Referencia a storage PRIVADO del archivo subido (UploadPrivateFile). Para verlo hay que pedir una URL firmada y temporal (CreateFileSignedUrl) — ver src/lib/privateFiles.js. Antes se usaba file_url (público): cualquiera con la URL podía ver el archivo sin pasar por la app, sin importar la visibilidad elegida (Solo yo, Elegir...)."
     },
     "date": {
       "type": "string",
