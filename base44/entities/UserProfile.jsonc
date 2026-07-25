@@ -128,25 +128,27 @@
     "display_name"
   ],
   "rls": {
-    // Riesgo aceptado, DOCUMENTADO PERO NO RESUELTO en esta ronda — necesita
-    // una decisión de producto, no solo un fix de código: read:true es
-    // necesario para el buscador de usuarios (InviteModal.jsx, username,
-    // avatar), pero esta entidad mezcla campos públicos (username,
-    // display_name, avatar_url, bio) con datos sensibles (email,
-    // nationality, second_nationality — doble nacionalidad puede ser
-    // información delicada). El motor de rls de base44 no proyecta campos
-    // (es todo o nada), así que cualquier usuario logueado puede volcar
-    // email + nacionalidad(es) de TODOS los demás con una sola llamada al
-    // SDK, no solo lo que muestra la UI. Cerrarlo del todo requiere separar
-    // esto en dos entidades — un UserProfile público (read:true) y un
-    // UserSettings privado (read solo para el propio dueño) — lo que implica
-    // migrar los datos ya guardados y tocar cada sitio que hoy lee
-    // profile.email/nationality/etc. de esta única entidad. Es un cambio de
-    // esquema con migración de datos en vivo, fuera de lo que se puede
-    // aplicar solo con un diff de código — requiere luz verde explícita
-    // antes de tocarlo.
+    // Antes read:true sin restricción — cualquier usuario logueado podía
+    // volcar TODOS los campos de TODOS los perfiles con una sola llamada al
+    // SDK (email, nationality, second_nationality incluidos), no solo lo que
+    // mostraba la UI. En vez de partir la entidad en dos (público/privado,
+    // lo que exigiría migrar los datos ya guardados), se cerró read a "solo
+    // tu propio perfil" y se movieron todas las lecturas de OTROS perfiles a
+    // la función backend searchUserProfiles, que solo devuelve los campos
+    // que alguna pantalla de la app realmente pinta de otra persona
+    // (username, display_name, avatar_url, cover_image_url, bio, website,
+    // instagram, travel_style, home_country) — nunca nationality,
+    // second_nationality, home_currency, language, notif_*, terms_*,
+    // spots_public_default, que son ajustes de cuenta y solo se leen del
+    // propio perfil en cualquier pantalla existente (confirmado revisando
+    // cada sitio que consultaba UserProfile antes de este fix). El email SÍ
+    // se devuelve cuando quien llama ya lo conocía de antemano (búsqueda por
+    // email/userIds ya conocidos, p.ej. trip.members) — no divulga nada
+    // nuevo — pero nunca en los modos de descubrimiento abierto (buscar por
+    // username, listar todos). Ver base44/functions/searchUserProfiles/entry.ts
+    // y src/lib/userProfiles.js.
     "create": { "data.user_id": "{{user.id}}" },
-    "read": true,
+    "read": { "data.user_id": "{{user.id}}" },
     "update": { "data.user_id": "{{user.id}}" },
     "delete": { "data.user_id": "{{user.id}}" }
   }

@@ -16,25 +16,16 @@
   },
   "required": ["user_id", "type"],
   "rls": {
-    // Riesgo aceptado, documentado (no se cierra del todo en esta ronda): a
-    // diferencia de Like/SpotComment/TripMessage (donde "create" se cerró
-    // exigiendo data.user_id === {{user.id}}), aquí esa misma regla rompería
-    // la función normal de una notificación — se crea SIEMPRE con el
-    // user_id del DESTINATARIO, no de quien la genera (11 sitios en src/
-    // llaman a notify() para avisar a otro miembro de un like, comentario,
-    // invitación, etc.), así que no hay ningún campo de esta entidad que el
-    // rls pueda comparar de forma útil contra {{user.id}}/{{user.email}} de
-    // quien llama. Cualquier usuario autenticado puede en teoría crear una
-    // notificación falsa (actor/tipo/texto arbitrarios) dirigida a cualquier
-    // otro usuario — vector de spam/ingeniería social, pero sin acceso a
-    // datos ajenos (read/update/delete siguen exigiendo ser el destinatario)
-    // y sin que ningún flujo sensible (aceptar invitación, etc.) confíe en
-    // el contenido de una notificación para autorizar nada. Cerrarlo del
-    // todo requeriría mover la creación de notificaciones a las funciones
-    // backend que ya validan la acción real de origen (p. ej. emitir
-    // "member_joined" desde acceptTripInvite con asServiceRole) — refactor
-    // de los 11 sitios que llaman notify(), no se ha hecho aquí.
-    "create": true,
+    // Antes "create": true sin restricción — el rls no puede expresar "solo
+    // si quien llama y el destinatario son miembros del mismo viaje" (una
+    // notificación se crea con el user_id del DESTINATARIO, no de quien la
+    // genera, y esa validación requiere leer Trip/TripInvite, algo que el
+    // motor de rls no puede hacer). Se cerró moviendo la creación a la
+    // función backend createNotification, que sí valida esa relación con
+    // asServiceRole y deriva el "actor" del perfil real de quien llama (ver
+    // base44/functions/createNotification/entry.ts y src/lib/notifications.js).
+    // read/update/delete siguen igual que antes: solo el destinatario.
+    "create": false,
     "read": { "data.user_id": "{{user.id}}" },
     "update": { "data.user_id": "{{user.id}}" },
     "delete": { "data.user_id": "{{user.id}}" }
