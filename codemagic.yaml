@@ -8,7 +8,6 @@ workflows:
   kodo-android:
     name: Kōdo — Android
     max_build_duration: 30
-    instance_type: linux_x2
     environment:
       groups:
         - kodo_env # VITE_BASE44_APP_ID, VITE_BASE44_APP_BASE_URL, VITE_ONESIGNAL_APP_ID
