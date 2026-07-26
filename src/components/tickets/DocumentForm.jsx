@@ -1,13 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Check } from 'lucide-react';
-import { Hotel, Train, Car, Ticket, Shield, CirclePlus, Trash2, Search, X, MapPin, Loader2 } from 'lucide-react';
+import { Hotel, Train, Ticket, Shield, CirclePlus, Trash2, Search, X, MapPin, Loader2 } from 'lucide-react';
 import { PlaneIcon, BusFront } from '@/lib/icons';
 import { useTranslation } from 'react-i18next';
-import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue } from '@/lib/tripDays';
 import { useToast } from '@/components/ui/use-toast';
 import { checkUpload, convertHeicIfNeeded } from '@/lib/uploadLimits';
@@ -150,7 +148,7 @@ export default function DocumentForm({
       if (!cancelled && url) setField('file_url', url);
     });
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [initialData?.file_uri]);
 
   useEffect(() => {
