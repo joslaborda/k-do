@@ -281,6 +281,22 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
     run();
   }, [debts.map(d => `${d.from}-${d.to}-${d.amount}`).join(','), profilesByEmail, baseCurrency]);
 
+  // Gastos cuya conversión a la moneda base falló (fx_source === 'unavailable'):
+  // calculateBalances los suma igualmente usando el monto original como si ya
+  // estuviera en baseCurrency (ver expenseBalances.js), así que si hay varios
+  // el balance mostrado puede estar mezclando monedas sin avisar. Antes solo
+  // se marcaba fila por fila en GastosTab (ExpenseRow) — aquí, donde se toman
+  // decisiones de "quién le debe a quién", no había ningún aviso.
+  // Este hook tiene que ir ANTES del early return de abajo (expenses.length
+  // === 0): moverlo después violaba las Rules of Hooks — con la lista vacía
+  // en el primer render y expenses llegando después vía react-query, el
+  // número de hooks cambiaba entre renders y React podía romper el
+  // componente entero (u otros hooks empezaban a leer el state equivocado).
+  const unavailableFxCount = useMemo(
+    () => expenses.filter(e => e.fx_source === 'unavailable').length,
+    [expenses]
+  );
+
   if (expenses.length === 0) {
     return (
       <div className="bg-card rounded-2xl border border-border text-center py-16">
@@ -309,17 +325,6 @@ function BalancesTab({ expenses, members, currentUserEmail, userMap, baseCurrenc
       </>
     );
   };
-
-  // Gastos cuya conversión a la moneda base falló (fx_source === 'unavailable'):
-  // calculateBalances los suma igualmente usando el monto original como si ya
-  // estuviera en baseCurrency (ver expenseBalances.js), así que si hay varios
-  // el balance mostrado puede estar mezclando monedas sin avisar. Antes solo
-  // se marcaba fila por fila en GastosTab (ExpenseRow) — aquí, donde se toman
-  // decisiones de "quién le debe a quién", no había ningún aviso.
-  const unavailableFxCount = useMemo(
-    () => expenses.filter(e => e.fx_source === 'unavailable').length,
-    [expenses]
-  );
 
   return (
     <div className="space-y-4">

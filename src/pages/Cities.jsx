@@ -931,7 +931,7 @@ function CityBlock({ city, idx, total, allDocs, allSpots, itineraryDays, tripId,
     if (shouldForceOpen && blockRef.current) {
       blockRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [shouldForceOpen]);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');

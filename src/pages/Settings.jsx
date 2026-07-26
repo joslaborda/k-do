@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { syncTripMembers } from '@/lib/syncTripMembers';
 import { leaveTrip } from '@/lib/tripMembers';
-import { getCountryMeta, getCountryOptions, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
+import { getCountryMeta, getCountryLabel, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 import FeedbackModal from '@/components/settings/FeedbackModal';

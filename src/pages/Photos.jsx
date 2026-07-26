@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripContext } from '@/hooks/useTripContext';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Download, X, ArrowRight, Camera, Upload, ArrowLeft, Plus, Loader2, Trash2 } from 'lucide-react';
+import { Download, X, ArrowRight, Camera, Plus, Loader2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, parseISO } from 'date-fns';

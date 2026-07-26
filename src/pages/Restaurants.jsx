@@ -1,5 +1,5 @@
 import { createPageUrl } from '@/utils';
-import { useState, useEffect, useRef, useMemo, useCallback} from 'react';
+import { useState, useEffect, useRef, useMemo} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -10,7 +10,7 @@ import { searchUserProfiles } from '@/lib/userProfiles';
 import { normalizeCountry } from '@/lib/countryConfig';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Plus, X, Navigation, MapPin, ArrowRight, Pencil, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2, List, Map as MapIcon, Hotel } from 'lucide-react';
+import { Search, Plus, X, Navigation, MapPin, ArrowRight, Utensils, Landmark, Ticket, ShoppingBag, CirclePlus, Compass, Moon, AlertTriangle, Loader2, Check, CheckCircle2, List, Map as MapIcon, Hotel } from 'lucide-react';
 import OTabBar from '@/components/trip/OTabBar';
 import { Link, useNavigate } from 'react-router-dom';
 import MySpotRow from '@/components/spots/MySpotRow';
@@ -18,7 +18,6 @@ import SpotDetailSheet from '@/components/spots/SpotDetailSheet';
 import SpotsMapView from '@/components/spots/SpotsMapView';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/ui/use-toast';
-import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 // El LeafletMap de aquí abajo es una copia local independiente del
 // componente compartido (src/components/spots/LeafletMap.jsx) — no lo
@@ -376,7 +375,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
       }
     }, 600);
     return () => clearTimeout(addressTimer.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [address, city, country]);
 
   // Al venir de un tap en el mapa grande de Spots (SpotsMapView), llega ya con
@@ -956,7 +955,7 @@ export default function Restaurants() {
       setTab('mis');
       setShowCreate(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [openCreateParam, cityIdFromParam]);
 
   // Mutations

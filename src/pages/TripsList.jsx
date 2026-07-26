@@ -1,11 +1,11 @@
 import { PlaneIcon } from '@/lib/icons';
 import Logo from '@/components/Logo';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Archive, Calendar, Map, Plus, X as XIcon } from 'lucide-react';
+import { Archive, Map, Plus } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TripCard, { HeroTripCard, getTripStatus } from '@/components/trip/TripCard';
 import NewTripModal from '@/components/trip/NewTripModal';

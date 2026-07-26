@@ -5,7 +5,7 @@ import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { format, differenceInDays, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, MapPin, Settings } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
@@ -110,7 +110,7 @@ export default function Home() {
     else next = 'hoy';
     tabRef.current = next;
     setTab(next);
-  }, [trip?.start_date, trip?.end_date]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [trip?.start_date, trip?.end_date]);  
 
   const deleteMutation = useMutation({
     mutationFn: () => base44.entities.Trip.delete(tripId),
