@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { RefreshCw, CheckCircle, WifiOff, Cloud } from 'lucide-react';
+import { RefreshCw, CheckCircle, WifiOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
