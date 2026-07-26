@@ -1,7 +1,17 @@
-import { Capacitor } from '@capacitor/core';
-
 /**
  * pushNotifications — puente entre la sesión de Kōdo y OneSignal.
+ *
+ * Por qué NO se importa el paquete "@capacitor/core": Base44 sirve esta
+ * misma base de código como PWA en su propio editor/hosting, y su entorno
+ * de build no tiene instalado ese paquete (no lo gestiona él) — un
+ * `import { Capacitor } from '@capacitor/core'` aquí rompía la carga de
+ * TODA la app dentro de Base44 con "Failed to resolve import", no solo el
+ * push. Capacitor, cuando la app corre de verdad dentro del shell nativo,
+ * inyecta él solo un objeto global `window.Capacitor` — se puede detectar
+ * la plataforma nativa leyendo esa variable global sin importar el paquete
+ * en absoluto. Fuera del shell nativo (web/PWA en Base44, o el propio
+ * navegador de escritorio), `window.Capacitor` no existe y todo esto queda
+ * en no-op, que es justo el comportamiento que queremos.
  *
  * Por qué External ID en vez de guardar el player_id en UserProfile:
  * OneSignal permite asociar cada instalación de la app a un "external_id"
@@ -12,20 +22,18 @@ import { Capacitor } from '@capacitor/core';
  * tiene varios dispositivos (OneSignal reparte a todos los que tenga
  * asociados a ese external_id). Ver base44/functions/createNotification/entry.ts,
  * que es quien realmente dispara el envío.
- *
- * No-op total en web: esta misma base de código se sirve tal cual como PWA
- * en el navegador (ver App.jsx) y el plugin de OneSignal solo existe en el
- * shell nativo de Capacitor — sin el guard de Capacitor.isNativePlatform(),
- * cualquier llamada aquí rompería la versión web con un TypeError sobre
- * window.plugins.OneSignal, que no existe fuera de iOS/Android.
  */
 
 const ONESIGNAL_APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID;
 
 let deviceReady = false;
 
+function isNativePlatform() {
+  return typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
+}
+
 function whenNativeReady(callback) {
-  if (!Capacitor.isNativePlatform()) return;
+  if (!isNativePlatform()) return;
   if (deviceReady) {
     callback();
     return;
