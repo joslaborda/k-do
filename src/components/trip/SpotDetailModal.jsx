@@ -7,7 +7,6 @@ import { PlaneIcon } from '@/lib/icons';
 import { Textarea } from '@/components/ui/textarea';
 import { getMapsUrl } from '@/components/spots/spotsHelpers';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeEmail } from '@/lib/utils';
