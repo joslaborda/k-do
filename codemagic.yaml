@@ -1,0 +1,81 @@
+workflows:
+  # ── Android ────────────────────────────────────────────────────────────
+  # Genera un .aab firmado listo para subir a Play Console (track interno).
+  # Antes del primer build hay que subir el keystore de firma en Codemagic
+  # (Teams > Code signing identities > Android) y crear el grupo de
+  # variables "kodo_env" (ver más abajo) con las mismas claves que tu
+  # .env.local.
+  kodo-android:
+    name: Kōdo — Android
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      groups:
+        - kodo_env # VITE_BASE44_APP_ID, VITE_BASE44_APP_BASE_URL, VITE_ONESIGNAL_APP_ID
+      android_signing:
+        - kodo_keystore # nombre que le des al keystore al subirlo en Codemagic
+      node: latest
+    scripts:
+      - name: Instalar dependencias
+        script: npm install
+      - name: Build del frontend (Vite)
+        script: npm run build
+      - name: Sincronizar Capacitor (copia dist/ al proyecto Android)
+        script: npx cap sync android
+      - name: Build del .aab firmado
+        script: |
+          cd android
+          ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - jlabord@gmail.com
+
+  # ── iOS ────────────────────────────────────────────────────────────────
+  # Necesita, ya configurados en Codemagic (Teams > Code signing identities
+  # > iOS), un certificado de distribución y un perfil de aprovisionamiento
+  # asociados a tu cuenta de Apple Developer — no se puede completar este
+  # workflow hasta tener esa cuenta dada de alta (ver LEEME_CAPACITOR_PUSH.md).
+  kodo-ios:
+    name: Kōdo — iOS
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      groups:
+        - kodo_env
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.kodotravel.app
+      node: latest
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Instalar dependencias
+        script: npm install
+      - name: Build del frontend (Vite)
+        script: npm run build
+      - name: Sincronizar Capacitor (copia dist/ al proyecto iOS)
+        script: npx cap sync ios
+      - name: Instalar CocoaPods
+        script: |
+          cd ios/App
+          pod install
+      - name: Ajustar firma automática con los perfiles de Codemagic
+        script: |
+          xcode-project use-profiles
+      - name: Build del .ipa firmado
+        script: |
+          xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      email:
+        recipients:
+          - jlabord@gmail.com
+      app_store_connect:
+        auth: integration # configurar la integración con App Store Connect en Codemagic
+        submit_to_testflight: true

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kōdo</string>
+    <string name="title_activity_main">Kōdo</string>
+    <string name="package_name">com.kodotravel.app</string>
+    <string name="custom_url_scheme">com.kodotravel.app</string>
+</resources>
