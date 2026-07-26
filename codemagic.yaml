@@ -14,6 +14,9 @@ workflows:
       android_signing:
         - kodo_keystore # nombre que le des al keystore al subirlo en Codemagic
       node: latest
+      java: 21 # Capacitor 8 / AGP necesitan Java 21 para compilar — sin esto
+               # falla con "invalid source release: 21" (la máquina usa un
+               # Java más antiguo por defecto)
     scripts:
       - name: Instalar dependencias
         script: npm install
