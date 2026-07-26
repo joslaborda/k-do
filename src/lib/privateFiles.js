@@ -26,6 +26,26 @@ import { base44 } from '@/api/base44Client';
 const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 /**
+ * `file_url` es texto libre editable por cualquier miembro del viaje (campo
+ * legado, ver arriba) — sin esta validación, alguien podía guardar
+ * 'javascript:alert(document.cookie)' como file_url de un Ticket, y en
+ * cuanto otro miembro abriera ese documento (Cities.jsx le asigna la URL
+ * directa a window.location.href, DocumentCard.jsx la pasa al visor de PDF)
+ * ese código se ejecutaba en su sesión — XSS con acceso a la cuenta de la
+ * víctima. Se valida aquí, en el único sitio del que salen todas las URLs
+ * de visualización, en vez de en cada uno de los sitios que las consumen.
+ */
+function isSafeFileUrl(url) {
+  if (typeof url !== 'string' || !url) return false;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Sube un archivo de documento a storage privado.
  * Devuelve { file_uri, previewUrl } — file_uri es lo que hay que guardar en
  * el Ticket; previewUrl es una URL firmada de corta duración, solo para
@@ -54,11 +74,12 @@ export async function resolveDocViewUrl(ticket) {
         file_uri: ticket.file_uri,
         expires_in: SIGNED_URL_TTL_SECONDS,
       });
-      if (signed_url) return signed_url;
+      if (signed_url && isSafeFileUrl(signed_url)) return signed_url;
     } catch {
       // Si falla la firma (red, etc.), probamos con el file_url legado si
       // existiera antes de rendirnos — mejor que dejar el botón sin hacer nada.
     }
   }
-  return ticket?.file_url || '';
+  const legacyUrl = ticket?.file_url || '';
+  return isSafeFileUrl(legacyUrl) ? legacyUrl : '';
 }
