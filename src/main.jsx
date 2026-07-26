@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom/client'
 import App from '@/App.jsx'
 import '@/index.css'
 import '@/i18n/index.js' // Initialize i18n before anything renders
+import { initPushNotifications } from '@/lib/pushNotifications'
+
+// No-op en web (PWA en navegador) — solo pide permiso y arranca OneSignal
+// dentro del shell nativo de Capacitor. Ver src/lib/pushNotifications.js.
+initPushNotifications()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <App />
