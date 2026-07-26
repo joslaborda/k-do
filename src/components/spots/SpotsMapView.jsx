@@ -161,7 +161,7 @@ export default function SpotsMapView({ spots = [], cities = [], onCreatePin, onS
       cancelled = true;
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [
     selectedDate,
     withCoords.map(s => s.id + '@' + (s.assigned_date || '') + '@' + (s.day_order ?? '') + '@' + (s.assigned_time || '')).join(','),

@@ -8,7 +8,6 @@ import { TYPE_CONFIG, getMapsUrl } from './spotsHelpers';
 import useLikeSimple from './useLikeSimple';
 import InlineCommentsPopup from './InlineCommentsPopup';
 import { useTranslation } from 'react-i18next';
-import { format, parseISO, addDays } from 'date-fns';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 import { normalizeEmail } from '@/lib/utils';
 
