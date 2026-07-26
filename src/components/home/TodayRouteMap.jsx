@@ -107,7 +107,7 @@ export default function TodayRouteMap({ hotelSpot, items = [], height = 150, onS
       cancelled = true;
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [hotelSpot?.id, hotelSpot?.lat, hotelSpot?.lng, routeItems.map(i => i.id + ':' + (i._kind === 'doc' ? i.location_lat + ':' + i.location_lng : i.lat + ':' + i.lng)).join(',')]);
 
   if (totalPoints === 0) return null;

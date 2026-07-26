@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight } from 'lucide-react';
 import DayCard from './DayCard';
 import MemberAvatarRow from './MemberAvatarRow';
 import { useTranslation } from 'react-i18next';

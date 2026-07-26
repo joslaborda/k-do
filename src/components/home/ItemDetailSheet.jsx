@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Clock, ArrowRight, CirclePlus, Trash2 } from 'lucide-react';
+import { X, Clock, CirclePlus, Trash2 } from 'lucide-react';
 import { DOC_ICONS, SPOT_ICONS, SPOT_COLORS } from './constants';
 import { useTranslation } from 'react-i18next';
 import { resolveDocViewUrl } from '@/lib/privateFiles';
