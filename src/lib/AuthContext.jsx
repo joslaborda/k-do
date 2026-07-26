@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { queryClientInstance, clearPersistedQueryCache, AUTH_EXPIRED_EVENT } from '@/lib/query-client';
+import { syncPushIdentity, clearPushIdentity } from '@/lib/pushNotifications';
 
 const AuthContext = createContext();
 
@@ -125,6 +126,11 @@ export const AuthProvider = ({ children }) => {
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
+      // No-op fuera de la app nativa (Capacitor) — ver pushNotifications.js.
+      // Asocia este dispositivo al usuario en OneSignal para que
+      // createNotification (backend) pueda enviarle push dirigidos por
+      // external_id sin que tengamos que guardar ningún token aquí.
+      syncPushIdentity(currentUser.id);
     } catch (error) {
       console.error('User auth check failed:', error);
       setIsLoadingAuth(false);
@@ -165,6 +171,10 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback((shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
+    // Desvincula el dispositivo en OneSignal — ver comentario en
+    // pushNotifications.js sobre dispositivos compartidos entre miembros
+    // del mismo viaje.
+    clearPushIdentity();
 
     // Sin esto, la caché de react-query (viajes, gastos, mensajes, fotos...)
     // seguía en localStorage tras cerrar sesión y podía renderizarse
