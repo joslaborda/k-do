@@ -76,6 +76,10 @@ workflows:
       email:
         recipients:
           - jlabord@gmail.com
-      app_store_connect:
-        auth: integration # configurar la integración con App Store Connect en Codemagic
-        submit_to_testflight: true
+      # Cuando tengas cuenta de Apple Developer y hayas conectado la
+      # integración con App Store Connect (Teams > Integrations > App Store
+      # Connect en Codemagic, le pones un nombre, ej. "kodo_asc"), descomenta
+      # esto y pon ese mismo nombre en "auth":
+      # app_store_connect:
+      #   auth: kodo_asc
+      #   submit_to_testflight: true
