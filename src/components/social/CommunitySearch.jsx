@@ -5,12 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, User, BookOpen, Loader2, ArrowRight, Utensils, Landmark, Zap, ShoppingBag, Train, Map } from 'lucide-react';
+import { Search, MapPin, Loader2, ArrowRight, Utensils, Landmark, Zap, ShoppingBag, Train } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useTranslation } from 'react-i18next';
-import Avatar from '@/components/trip/Avatar';
-import { searchUserProfiles } from '@/lib/userProfiles';
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 const SPOT_TYPE_ICON = {

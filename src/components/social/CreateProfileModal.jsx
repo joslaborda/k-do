@@ -4,7 +4,7 @@ import { Loader2, CheckCircle2, XCircle, Check, Languages, Plane, Hotel, Shield,
 import { useQueryClient } from '@tanstack/react-query';
 import { normalizeUsername, validateUsername, checkUsernameAvailability } from '@/lib/username';
 import { searchUserProfiles } from '@/lib/userProfiles';
-import { getCountryMeta, getCountryOptions, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
+import { getCountryMeta, normalizeCountry, getOriginCountryOptions } from '@/lib/countryConfig';
 import { useTranslation } from 'react-i18next';
 import { setLanguage, getLanguage } from '@/i18n/index.js';
 import { Link } from 'react-router-dom';
