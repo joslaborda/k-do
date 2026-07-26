@@ -26,6 +26,16 @@ import { createClientFromRequest } from "npm:@base44/sdk";
  * lo manda el cliente — se deriva aquí del propio perfil de quien llama, así
  * nadie puede hacerse pasar por otra persona en el remitente de una
  * notificación.
+ *
+ * Push (OneSignal): este es el único sitio donde se crean las 9
+ * notificaciones de la app (ver arriba), así que es también el sitio
+ * correcto para disparar el push — no hace falta un segundo mecanismo de
+ * triggers en ningún otro lado. Se manda por external_id (ver
+ * src/lib/pushNotifications.js — OneSignal.login(user.id) en el cliente),
+ * nunca guardamos token de dispositivo en nuestras propias entidades. Un
+ * fallo mandando el push NUNCA debe tumbar la request: la notificación
+ * in-app (Notification.create, arriba) es la fuente de verdad y ya se creó
+ * correctamente cuando se intenta el push.
  */
 
 const ALLOWED_TYPES = new Set([
@@ -39,6 +49,56 @@ const ALLOWED_TYPES = new Set([
   "spot_time",
   "spot_added",
 ]);
+
+// Mismo texto que src/i18n/es.json (notifications.*) — duplicado aquí a
+// propósito: este function corre en el backend (Deno), sin acceso a
+// i18next ni al bundle del frontend. Si cambia la redacción en es.json,
+// hay que replicarla aquí a mano. Sin i18n de verdad en el push todavía
+// (la app solo tiene es/en) — placeholder aceptado hasta que haga falta.
+const PUSH_TEXT: Record<string, string> = {
+  doc_time: "cambió la hora de un documento",
+  doc_added: "subió un documento",
+  expense_added: "añadió un gasto",
+  expense_settled: "liquidó tu deuda",
+  photo_added: "subió fotos",
+  trip_invite: "te invitó a un viaje",
+  member_joined: "se unió al viaje",
+  spot_time: "cambió la hora de un spot",
+  spot_added: "añadió un spot",
+};
+
+// Mismos secretos que RESEND_API_KEY (ver sendInviteEmail/entry.ts) — se
+// configuran en Base44 > Secretos del proyecto, nunca en el código.
+const ONESIGNAL_APP_ID = Deno.env.get("ONESIGNAL_APP_ID");
+const ONESIGNAL_REST_API_KEY = Deno.env.get("ONESIGNAL_REST_API_KEY");
+
+/**
+ * Envía el push. Silencioso ante cualquier fallo (secretos sin configurar,
+ * OneSignal caído, destinatario sin la app instalada — todo son casos
+ * normales, no errores que deban propagarse).
+ */
+async function sendPush(recipientUserId: string, title: string, body: string, data: Record<string, unknown>) {
+  if (!ONESIGNAL_APP_ID || !ONESIGNAL_REST_API_KEY) return;
+  try {
+    await fetch("https://api.onesignal.com/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Key ${ONESIGNAL_REST_API_KEY}`,
+      },
+      body: JSON.stringify({
+        app_id: ONESIGNAL_APP_ID,
+        target_channel: "push",
+        include_aliases: { external_id: [recipientUserId] },
+        headings: { es: title, en: title },
+        contents: { es: body, en: body },
+        data,
+      }),
+    });
+  } catch {
+    // best-effort — ver comentario de la función.
+  }
+}
 
 function norm(s: unknown): string {
   return typeof s === "string" ? s.trim().toLowerCase() : "";
@@ -148,6 +208,28 @@ Deno.serve(async (req) => {
       ref_title: typeof refTitle === "string" ? refTitle.slice(0, 300) : null,
       ref_extra: safeRefExtra,
     });
+
+    // Respeta los toggles de Settings.jsx (notif_invites / notif_expenses)
+    // — hasta ahora esos campos se guardaban pero nada los leía (la
+    // notificación in-app de arriba nunca los consultó). Para el resto de
+    // tipos (doc_*, photo_added, member_joined, spot_*) no hay toggle en la
+    // UI todavía, así que se manda por defecto, igual que la in-app.
+    let recipientProfile: any = null;
+    try {
+      const recipientProfiles = await service.entities.UserProfile.filter({ user_id: recipientUser.id });
+      recipientProfile = recipientProfiles[0] || null;
+    } catch {
+      recipientProfile = null;
+    }
+    const pushAllowed =
+      type === "trip_invite" ? recipientProfile?.notif_invites !== false :
+      (type === "expense_added" || type === "expense_settled") ? recipientProfile?.notif_expenses !== false :
+      true;
+
+    if (pushAllowed) {
+      const pushBody = `${actor_display_name} ${PUSH_TEXT[type] || "tiene novedades para ti"}`;
+      await sendPush(recipientUser.id, trip.name || "Kōdo", pushBody, { tripId, type, refId: refId || null });
+    }
 
     return Response.json({ ok: true });
   } catch (error) {
