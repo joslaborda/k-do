@@ -109,14 +109,10 @@ workflows:
         script: npm run build
       - name: Sincronizar Capacitor (copia dist/ al proyecto iOS)
         script: npx cap sync ios
-      - name: Instalar CocoaPods
+- name: Build para simulador (sin firma, solo valida que compila)
         script: |
           cd ios/App
-          pod install
-      - name: Build para simulador (sin firma, solo valida que compila)
-        script: |
-          cd ios/App
-          xcodebuild build -workspace App.xcworkspace -scheme App -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+          xcodebuild build -project App.xcodeproj -scheme App -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
     artifacts:
       - /tmp/xcodebuild_logs/*.log
     publishing:
