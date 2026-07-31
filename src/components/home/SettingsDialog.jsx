@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { notify, resolveUserIds } from '@/lib/notifications';
+import { normalizeEmail } from '@/lib/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronDown, Trash2 } from 'lucide-react';
@@ -84,6 +86,24 @@ function SettingsDialog({
         start_date: startDate,
         end_date: endDate,
       });
+            // Avisa al resto de miembros si el nombre o las fechas cambian de
+            // verdad -- antes esto era un cambio silencioso, nadie se enteraba
+            // hasta que se volvia a abrir Ajustes.
+            const tripChanged = (trip?.name || '') !== name.trim() || (trip?.start_date || '') !== startDate || (trip?.end_date || '') !== endDate;
+            if (tripChanged) {
+                      const targets = (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+                      if (targets.length) {
+                                  resolveUserIds(targets).then(resolved => {
+                                                resolved.forEach(({ userId }) => notify({
+                                                                userId,
+                                                                type: 'trip_updated',
+                                                                tripId,
+                                                                tripName: name.trim(),
+                                                                refExtra: { startDate, endDate },
+                                                }));
+                                  });
+                      }
+            }
       onSaved();
       onClose();
     } catch (e) {
@@ -130,6 +150,29 @@ function SettingsDialog({
         start_date: cityDraft.start_date || '',
         end_date: cityDraft.end_date || '',
       });
+            // Avisa a los demas miembros si el pais o las fechas de la parada
+            // cambian de verdad -- esto es un cambio de destino del viaje.
+            const oldCity = (cities || []).find(c => c.id === cityId);
+            const cityChanged = oldCity && (
+                      normalizeCountry(oldCity.country || '') !== normalizeCountry(cityDraft.country || '') ||
+                      (oldCity.start_date || '') !== (cityDraft.start_date || '') ||
+                      (oldCity.end_date || '') !== (cityDraft.end_date || '')
+                    );
+            if (cityChanged) {
+                      const targets = (trip?.members || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+                      if (targets.length) {
+                                  resolveUserIds(targets).then(resolved => {
+                                                resolved.forEach(({ userId }) => notify({
+                                                                userId,
+                                                                type: 'trip_updated',
+                                                                tripId,
+                                                                tripName: trip?.name,
+                                                                refTitle: cityDraft.name.trim(),
+                                                                refExtra: { city: cityDraft.name.trim(), country: cityDraft.country || '' },
+                                                }));
+                                  });
+                      }
+            }
       queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
       closeCityEdit();
     } catch (e) {
