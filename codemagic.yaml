@@ -87,3 +87,39 @@ workflows:
       # app_store_connect:
       #   auth: kodo_asc
       #   submit_to_testflight: true
+
+  # --- iOS test build (simulador, sin firma) ------------------------------
+  # No necesita cuenta de Apple Developer ni certificados: compila para el
+  # simulador de iOS solo para validar que el proyecto Capacitor/CocoaPods
+  # compila sin errores, antes de tener la cuenta de pago activa.
+  kodo-ios-simulator:
+    name: Kodo - iOS (test simulador, sin firma)
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      groups:
+        - kodo_env
+      node: latest
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Instalar dependencias
+        script: npm install
+      - name: Build del frontend (Vite)
+        script: npm run build
+      - name: Sincronizar Capacitor (copia dist/ al proyecto iOS)
+        script: npx cap sync ios
+      - name: Instalar CocoaPods
+        script: |
+          cd ios/App
+          pod install
+      - name: Build para simulador (sin firma, solo valida que compila)
+        script: |
+          cd ios/App
+          xcodebuild build -workspace App.xcworkspace -scheme App -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      email:
+        recipients:
+          - jlabord@gmail.com
