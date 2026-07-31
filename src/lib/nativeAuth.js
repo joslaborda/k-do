@@ -36,7 +36,14 @@ export function relayNativeLoginIfNeeded() {
     if (typeof window === 'undefined') return false;
     const params = new URLSearchParams(window.location.search);
     if (params.get('native_login') !== '1') return false;
-    const token = params.get('access_token');
+        // El SDK de base44 (app-params.js, importado arriba en este mismo
+      // fichero) ya ha leido access_token de la URL y lo ha borrado con
+      // removeFromUrl:true nada mas cargarse -- import { appParams } se
+      // ejecuta antes de que esta funcion llegue a correr, asi que para
+      // entonces ya no esta en location.search. base44 lo deja guardado en
+      // localStorage['base44_access_token'] justo antes de borrarlo de la
+      // URL, asi que lo leemos de ahi en vez de la URL.
+      const token = localStorage.getItem('base44_access_token');
     if (!token) return false;
     window.location.href = `${CALLBACK_URL}?access_token=${encodeURIComponent(token)}`;
     return true;
