@@ -47,6 +47,8 @@ workflows:
     name: Kōdo — iOS
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic
     environment:
       groups:
         - kodo_env
@@ -80,9 +82,9 @@ workflows:
       # integración con App Store Connect (Teams > Integrations > App Store
       # Connect en Codemagic, le pones un nombre, ej. "kodo_asc"), descomenta
       # esto y pon ese mismo nombre en "auth":
-      # app_store_connect:
-      #   auth: kodo_asc
-      #   submit_to_testflight: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
 
   # --- iOS test build (simulador, sin firma) ------------------------------
   # No necesita cuenta de Apple Developer ni certificados: compila para el
