@@ -68,6 +68,11 @@ workflows:
       - name: Ajustar firma automática con los perfiles de Codemagic
         script: |
           xcode-project use-profiles
+      - name: Incrementar número de build
+        script: |
+          cd ios/App
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number 6796791081 --platform=IOS)
+          agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
       - name: Build del .ipa firmado
         script: |
           xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
