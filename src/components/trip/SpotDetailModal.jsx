@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { getTripDays, tripDayOptionValue, parseTripDayOptionValue, sameCityName } from '@/lib/tripDays';
 import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeEmail } from '@/lib/utils';
+import { scheduleSpotReminder, cancelSpotReminder } from '@/lib/localReminders';
 
 // Antes 'hotel' y las variantes de transporte (aeropuerto/tren/bus) no
 // tenían entrada aquí — el modal de detalle (el mismo que abre tanto Home
@@ -143,6 +144,8 @@ export default function SpotDetailModal({ spot, open, onClose, onSave, onRemove,
         queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
       }
       if (timeChanged && time) notifyTimeChange(time);
+      cancelSpotReminder(spot.id);
+      scheduleSpotReminder({ id: spot.id, title: spot.title, assigned_date: nextDate || null, assigned_time: time || null });
       if (onSave) onSave(spot, notes, time);
       setEditingTime(false);
       setEditingNotes(false);
