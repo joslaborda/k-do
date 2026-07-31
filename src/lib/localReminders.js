@@ -9,10 +9,10 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 // durante el propio viaje. No-op fuera de la app nativa (Capacitor).
 
 const MINUTES_BEFORE = {
-  flight: 120,
-  train: 60,
-  bus: 60,
-  default: 60,
+  flight: 240,
+  train: 240,
+  bus: 240,
+  default: 120,
 };
 
 let permissionChecked = false;
