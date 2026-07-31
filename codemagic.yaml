@@ -109,7 +109,7 @@ workflows:
         script: npm run build
       - name: Sincronizar Capacitor (copia dist/ al proyecto iOS)
         script: npx cap sync ios
-- name: Build para simulador (sin firma, solo valida que compila)
+      - name: Build para simulador (sin firma, solo valida que compila)
         script: |
           cd ios/App
           xcodebuild build -project App.xcodeproj -scheme App -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
