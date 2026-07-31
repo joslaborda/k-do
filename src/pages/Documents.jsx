@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notify, resolveUserIds } from '@/lib/notifications';
+import { scheduleTicketReminder, cancelTicketReminder } from '@/lib/localReminders';
 import { Car, ChevronDown, ChevronUp, CirclePlus, FileText, Hotel, Lock, Pencil, Plus, Shield, Ticket, Train, Trash2, User, Users } from 'lucide-react';
 import { PlaneIcon, BusFront } from '@/lib/icons';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -302,6 +303,7 @@ export default function Documents() {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       setAddOpen(false);
+      scheduleTicketReminder({ ...data, id: newDoc?.id });
       // Notify members about new doc
       if (data.visibility !== 'personal') {
         const sharedWith = data.visibility === 'selected_users'
@@ -332,6 +334,8 @@ export default function Documents() {
       queryClient.invalidateQueries({ queryKey: ['tickets', tripId] });
       queryClient.invalidateQueries({ queryKey: ['allDocs', tripId] });
       setEditDoc(null);
+      cancelTicketReminder(oldDoc?.id);
+      scheduleTicketReminder({ ...data, id: oldDoc?.id });
       // Antes editar la hora de un ticket (vuelo/tren/etc.) no avisaba a
       // nadie — solo se notificaba al CREAR el documento. Mismo criterio de
       // destinatarios que doc_added (respeta visibility), pero disparado
@@ -513,7 +517,7 @@ export default function Documents() {
             <p className="text-xs text-muted-foreground mb-5 ml-11">{t('documents.deletePermanent', { name: deleteDoc?.name })}</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteDoc(null)} className="flex-1 py-3 border border-border rounded-full text-sm text-muted-foreground">{t('common.cancel')}</button>
-              <button onClick={() => deleteMutation.mutate(deleteDoc.id)} disabled={deleteMutation.isPending} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-60 disabled:pointer-events-none">{t('common.delete')}</button>
+              <button onClick={() => deleteMutation.mutate(deleteDoc.id, { onSuccess: () => cancelTicketReminder(deleteDoc.id) })} disabled={deleteMutation.isPending} className="flex-1 py-3 bg-primary text-white rounded-full text-sm font-medium disabled:opacity-60 disabled:pointer-events-none">{t('common.delete')}</button>
             </div>
           </div>
         </div>
