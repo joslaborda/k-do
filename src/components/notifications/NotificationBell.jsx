@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { acceptTripInvite, declineTripInvite } from '@/lib/invites';
 import { notify, resolveUserIds } from '@/lib/notifications';
-import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Calendar, Clock } from 'lucide-react';
+import { Bell, X, Mail, FileText, Receipt, Camera, UserPlus, Compass, MapPin, Calendar, Clock, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -26,6 +26,8 @@ const TYPE = {
   trip_invite:     { Icon: Mail,      color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.tripInvite' },
   spot_added:      { Icon: Compass,   color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.spotAdded' },
   spot_time:       { Icon: Clock,     color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.spotTimeChanged' },
+    chat_message:    { Icon: MessageCircle, color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/30', labelKey: 'notifications.chatMessage' },
+    trip_updated:    { Icon: MapPin,        color: 'text-primary',    bg: 'bg-orange-50 dark:bg-orange-950/30', labelKey: 'notifications.tripUpdated' },
 };
 const FALLBACK = { Icon: Bell, color: 'text-muted-foreground', bg: 'bg-secondary', labelKey: 'notifications.new' };
 
@@ -325,6 +327,8 @@ export default function NotificationBell({ userId, userEmail, currentTripId }) {
       case 'member_joined':   return navigate(createPageUrl('Home') + trip + '&scroll=members');
       case 'spot_added':      return navigate(createPageUrl('Cities') + trip + (extra.spotDate ? `&date=${extra.spotDate}` : ''));
       case 'spot_time':       return navigate(createPageUrl('Cities') + trip);
+      case 'chat_message':   return navigate(createPageUrl('Home') + trip + '&tab=chat');
+      case 'trip_updated':   return navigate(createPageUrl('Home') + trip);
       default:                return navigate(createPageUrl('Home') + trip);
     }
   };
