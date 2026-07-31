@@ -12,89 +12,124 @@ export function isNative() {
 export async function openNativeLogin() {
     if (!isNative()) return;
     // from_url debe ser https del propio dominio: base44 ignora en silencio
-  // un from_url con esquema personalizado y deja al usuario logueado
-  // dentro del propio navegador in-app en vez de devolver el control a la
-  // app nativa. Volvemos a nuestra propia app y dejamos que
-  // relayNativeLoginIfNeeded() (mas abajo) detecte el token guardado por
-  // el SDK de base44 y salte al esquema personalizado desde JS.
-  const returnUrl = `${appParams.appBaseUrl}/`;
+// un from_url con esquema personalizado y deja al usuario logueado
+// dentro del propio navegador in-app en vez de devolver el control a la
+// app nativa. Volvemos a nuestra propia app y dejamos que
+// relayNativeLoginIfNeeded() (mas abajo) detecte el token guardado por
+// el SDK de base44 y salte al esquema personalizado desde JS.
+const returnUrl = `${appParams.appBaseUrl}/`;
     const loginUrl = `${appParams.appBaseUrl}/login?from_url=${encodeURIComponent(returnUrl)}`;
     try {
-          await Browser.open({ url: loginUrl });
+        await Browser.open({ url: loginUrl });
     } catch {}
+}
+
+function buildCallbackUrl(token) {
+    return `${CALLBACK_URL}?access_token=${encodeURIComponent(token)}`;
+}
+
+// Pantalla real con boton que el usuario toca para volver a la app.
+//
+// Build #8 (localStorage) y build #9 (sin marcador, salto automatico via
+// location.href / click() sintetico) se probaron en dispositivo real y el
+// resultado fue identico en los dos: la app se queda funcionando dentro del
+// navegador in-app en vez de devolver el control a la app nativa. Un salto
+// disparado por codigo (sin que el usuario haya tocado nada) es lo unico
+// que cambiaba entre intentos, y en los dos casos fallo igual -- eso apunta
+// a que iOS/Safari puede estar bloqueando el salto a un esquema
+// personalizado (com.kodotravel.app://...) precisamente por no venir de un
+// toque real del usuario (comportamiento conocido de Safari/
+// SFSafariViewController para evitar redirecciones-spam). Por eso ahora,
+// ademas de intentarlo automaticamente por si acaso, mostramos una pantalla
+// con un boton real: si el usuario lo toca y SI vuelve a la app, confirma
+// que el problema era la falta de gesto real. Si tampoco funciona tocandolo,
+// el problema esta en otro sitio (registro del esquema, listener nativo...).
+function showReturnToAppScreen(token, onFallback) {
+    const callbackUrl = buildCallbackUrl(token);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#faf7f2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center;';
+
+const title = document.createElement('div');
+    title.textContent = 'kōdo';
+    title.style.cssText = 'font-size:30px;font-weight:600;color:#181818;letter-spacing:-0.02em;';
+
+const msg = document.createElement('div');
+    msg.textContent = 'Sesión iniciada. Toca el botón para volver a la app.';
+    msg.style.cssText = 'font-size:15px;color:#555;max-width:280px;';
+
+const btn = document.createElement('button');
+    btn.textContent = 'Volver a la app';
+    btn.style.cssText = 'background:#c1541f;color:#fff;border:none;border-radius:999px;padding:14px 30px;font-size:16px;font-weight:600;';
+
+const debug = document.createElement('div');
+    debug.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;font-size:10px;color:#999;word-break:break-all;';
+    debug.textContent = `debug: token=${token.slice(0, 10)}… native=${isNative()}`;
+
+let finished = false;
+    const finish = () => {
+        if (finished) return;
+        finished = true;
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        if (onFallback) onFallback();
+    };
+
+btn.onclick = () => {
+    window.location.href = callbackUrl;
+    setTimeout(finish, 1500);
+};
+
+overlay.appendChild(title);
+    overlay.appendChild(msg);
+    overlay.appendChild(btn);
+    overlay.appendChild(debug);
+    document.body.appendChild(overlay);
+
+// Red de seguridad: si el usuario no toca nada, montamos la app igual
+// pasados unos segundos en vez de dejarla bloqueada para siempre.
+setTimeout(finish, 15000);
 }
 
 // Se llama al arrancar la app (main.jsx), antes de montar React.
 //
-// Version anterior: solo se intentaba el salto al esquema personalizado si
-// la URL de vuelta traia ?native_login=1 (marcador que anadiamos nosotros al
-// from_url). Probado en build #7 y #8 en dispositivo real: la app se
-// quedaba mostrando la web completa y funcional (login correcto, viajes
-// visibles) dentro del navegador in-app -- eso solo puede pasar si esta
-// funcion devolvia false y dejaba que main.jsx montara React con
-// normalidad, lo que confirma que base44 NO conserva parametros de query
-// personalizados al redirigir de vuelta tras el login (se queda solo con
-// su propio access_token).
-//
-// Por eso ahora no dependemos de ningun marcador que tenga que sobrevivir
-// el redirect de base44: si no estamos en la app nativa real (isNative()
-// false, que es el caso tanto para el navegador in-app como para un
-// navegador de verdad) y hay un access_token recien guardado por el SDK de
-// base44 (app-params.js, importado arriba) en localStorage, asumimos que
-// estamos en el navegador in-app tras un login y saltamos al esquema
-// personalizado (com.kodotravel.app://auth-callback) -- iOS lo reconoce
-// (registrado en Info.plist) y le pasa el control a la app nativa, que lo
-// recoge en listenForLoginCallback.
-//
-// Por si el salto al esquema no lo recoge nadie (p.ej. porque esto se ha
-// cargado en un navegador de verdad, no en el navegador in-app), onFallback
-// se llama pasado un instante para montar la app igualmente -- sin esto nos
-// arriesgamos a dejar una pantalla en blanco para siempre, peor que el bug
-// que intentamos arreglar.
+// Historial de intentos en dispositivo real, todos con el mismo sintoma
+// final (la app se queda funcionando dentro del navegador in-app):
+//  - build #7/#8: dependian de que sobreviviera un marcador propio
+//    (?native_login=1) en el redirect de base44 -- no sobrevive.
+//  - build #9: salto automatico (location.href y luego click() sintetico en
+//    un <a>) nada mas detectar el token en localStorage, sin depender de
+//    ningun marcador -- tampoco funciono.
+// La automatizacion total (sin ningun toque del usuario) es el factor comun
+// a los tres intentos fallidos, asi que esta version anade una pantalla con
+// un boton real (ver showReturnToAppScreen) ademas del intento automatico.
 export function relayNativeLoginIfNeeded(onFallback) {
-      if (typeof window === 'undefined') return false;
-      if (isNative()) return false;
-      const token = localStorage.getItem('base44_access_token');
-      if (!token) return false;
-      // Evita reintentar el salto en bucle si esta pagina se recarga dentro
-    // del navegador in-app con el mismo token (p.ej. tras un salto fallido).
-    const attemptedKey = 'kodo_native_relay_attempted_token';
-      if (localStorage.getItem(attemptedKey) === token) return false;
-      localStorage.setItem(attemptedKey, token);
-      const callbackUrl = `${CALLBACK_URL}?access_token=${encodeURIComponent(token)}`;
-      try {
-                // Un enlace real + click() es mas fiable que window.location.href
-          // para que Safari/SFSafariViewController reconozca el esquema
-          // personalizado y le pase el control a la app nativa.
-          const a = document.createElement('a');
-                a.href = callbackUrl;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-      } catch {
-                window.location.href = callbackUrl;
-      }
-      if (onFallback) {
-                setTimeout(onFallback, 1200);
-      }
-      return true;
+    if (typeof window === 'undefined') return false;
+    if (isNative()) return false;
+    const token = localStorage.getItem('base44_access_token');
+    if (!token) return false;
+    // Intento automatico primero, por si en este dispositivo/version de iOS
+// si funciona sin toque -- si no funciona, el usuario vera la pantalla
+// con el boton igualmente.
+try {
+    window.location.href = buildCallbackUrl(token);
+} catch {}
+    showReturnToAppScreen(token, onFallback);
+    return true;
 }
 
 export function listenForLoginCallback(onToken) {
     if (!isNative()) return () => {};
     const handlePromise = App.addListener('appUrlOpen', ({ url }) => {
-          if (!url || !url.startsWith(CALLBACK_URL)) return;
-          try {
-                  const parsed = new URL(url);
-                  const token = parsed.searchParams.get('access_token');
-                  if (token) {
-                            Browser.close().catch(() => {});
-                            onToken(token);
-                  }
-          } catch {}
+        if (!url || !url.startsWith(CALLBACK_URL)) return;
+        try {
+            const parsed = new URL(url);
+            const token = parsed.searchParams.get('access_token');
+            if (token) {
+                Browser.close().catch(() => {});
+                onToken(token);
+            }
+        } catch {}
     });
     return () => {
-          handlePromise.then(handle => handle.remove()).catch(() => {});
+        handlePromise.then(handle => handle.remove()).catch(() => {});
     };
 }
