@@ -9,6 +9,8 @@ import { toast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { parseServerDate } from '@/lib/parseServerDate';
 import { MAX_FILE_BYTES, convertHeicIfNeeded } from '@/lib/uploadLimits';
+import { notify, resolveUserIds } from '@/lib/notifications';
+import { normalizeEmail } from '@/lib/utils';
 
 export default
 function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembers }) {
@@ -99,9 +101,23 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
         ...payload,
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, payload) => {
       setMessage('');
       queryClient.invalidateQueries({ queryKey: ['tripMessages', tripId] });
+              // Avisa al resto de miembros del viaje de un mensaje nuevo en
+              // el chat del grupo -- antes esto no generaba ninguna notificacion.
+              const targets = (tripMembers || []).filter(e => normalizeEmail(e) !== normalizeEmail(currentUserEmail));
+              if (targets.length) {
+                          const preview = payload.content?.trim() || t('notifications.chatAttachmentFallback');
+                          resolveUserIds(targets).then(resolved => {
+                                        resolved.forEach(({ userId }) => notify({
+                                                        userId,
+                                                        type: 'chat_message',
+                                                        tripId,
+                                                        refTitle: preview,
+                                        }));
+                          });
+              }
     },
   
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
