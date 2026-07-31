@@ -1192,7 +1192,8 @@
       "delete": "Delete"
     },
     "modal": {
-Add en i18n keys for chat_message/trip_updated notifications      "cityPlaceholder": "e.g. Tokyo",
+      "cityStop": "City / Stop",
+            "cityPlaceholder": "e.g. Tokyo",
       "accommodation": "Accommodation",
       "accommodationPlaceholder": "e.g. APA Hotel Pride Kokkaigijidomae, Tokyo",
       "coverImage": "Cover image (URL)",
