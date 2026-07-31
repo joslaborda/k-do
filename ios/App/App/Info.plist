@@ -6,6 +6,8 @@
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Kōdo no utiliza tu ubicación. Este permiso es requerido por una dependencia (OneSignal) aunque la funcionalidad no está activa en la app.</string>
 	<key>CFBundleDisplayName</key>
         <string>Kōdo</string>
 	<key>CFBundleExecutable</key>
