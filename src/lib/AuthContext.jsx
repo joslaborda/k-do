@@ -4,6 +4,7 @@ import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { queryClientInstance, clearPersistedQueryCache, AUTH_EXPIRED_EVENT } from '@/lib/query-client';
 import { syncPushIdentity, clearPushIdentity } from '@/lib/pushNotifications';
+import { isNative, openNativeLogin, listenForLoginCallback } from '@/lib/nativeAuth';
 
 const AuthContext = createContext();
 
@@ -17,6 +18,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAppState();
+  }, []);
+
+  // Recibe la vuelta del login nativo (ver src/lib/nativeAuth.js): al llegar
+  // el access_token via appUrlOpen, lo guardamos y volvemos a comprobar el
+  // estado de auth para que se comporte igual que una carga inicial con token.
+  useEffect(() => {
+      return listenForLoginCallback((token) => {
+            appParams.token = token;
+            base44.auth.setToken(token);
+            checkAppState();
+      });
   }, []);
 
   // Antes la sesión solo se comprobaba una vez al cargar la app — sin esto,
@@ -204,8 +216,12 @@ export const AuthProvider = ({ children }) => {
   // 'auth_required' podía re-disparar la redirección, el mismo antipatrón
   // de "efecto que se repite en renders intermedios" que ese fix corregía.
   const navigateToLogin = useCallback(() => {
-    base44.auth.redirectToLogin();
-  }, []);
+if (isNative()) {
+        openNativeLogin();
+} else {
+        base44.auth.redirectToLogin();
+}
+}, []);
 
   return (
     <AuthContext.Provider value={{ 
