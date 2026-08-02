@@ -209,22 +209,18 @@ Deno.serve(async (req) => {
       ref_extra: safeRefExtra,
     });
 
-    // Respeta los toggles de Settings.jsx (notif_invites / notif_expenses)
-    // — hasta ahora esos campos se guardaban pero nada los leía (la
-    // notificación in-app de arriba nunca los consultó). Para el resto de
-    // tipos (doc_*, photo_added, member_joined, spot_*) no hay toggle en la
-    // UI todavía, así que se manda por defecto, igual que la in-app.
+      // Respeta el interruptor único de Settings.jsx (notif_enabled).
+    // Antes había toggles separados por tipo (notif_invites / notif_expenses);
+    // ahora un solo campo gatea el push de los 9 tipos de notificación.
+    // Las notificaciones in-app se siguen creando siempre; esto solo afecta al push.
     let recipientProfile: any = null;
     try {
-      const recipientProfiles = await service.entities.UserProfile.filter({ user_id: recipientUser.id });
-      recipientProfile = recipientProfiles[0] || null;
+        const recipientProfiles = await service.entities.UserProfile.filter({ user_id: recipientUser.id });
+        recipientProfile = recipientProfiles[0] || null;
     } catch {
-      recipientProfile = null;
+        recipientProfile = null;
     }
-    const pushAllowed =
-      type === "trip_invite" ? recipientProfile?.notif_invites !== false :
-      (type === "expense_added" || type === "expense_settled") ? recipientProfile?.notif_expenses !== false :
-      true;
+    const pushAllowed = recipientProfile?.notif_enabled !== false;
 
     if (pushAllowed) {
       const pushBody = `${actor_display_name} ${PUSH_TEXT[type] || "tiene novedades para ti"}`;
