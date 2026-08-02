@@ -1196,7 +1196,7 @@
     },
     "modal": {
       "cityStop": "City / Stop",
-            "cityPlaceholder": "e.g. Tokyo",
+      "cityPlaceholder": "e.g. Tokyo",
       "accommodation": "Accommodation",
       "accommodationPlaceholder": "e.g. APA Hotel Pride Kokkaigijidomae, Tokyo",
       "coverImage": "Cover image (URL)",
@@ -1218,9 +1218,9 @@
     "spotAdded": "added a spot",
     "spotTimeChanged": "changed the time to {{time}}",
     "docTimeChanged": "changed the time to {{time}}",
-          "chatMessage": "sent a message in the chat",
-          "tripUpdated": "updated the trip dates or destination",
-          "chatAttachmentFallback": "an attachment",
+    "chatMessage": "sent a message in the chat",
+    "tripUpdated": "updated the trip dates or destination",
+    "chatAttachmentFallback": "an attachment",
     "new": "new notification",
     "joinTrip": "Join trip",
     "inviteFrom": "Invitation from",
@@ -1681,5 +1681,51 @@
     "maxMb": "The maximum is {{mb}} MB",
     "notImage": "Only images are allowed",
     "failed": "Couldn't upload the file"
+  },
+  "auth": {
+    "tagline": "Travel your way",
+    "tabs": {
+      "login": "Log in",
+      "register": "Sign up"
+    },
+    "fields": {
+      "email": "Email",
+      "emailPlaceholder": "name@email.com",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "otpCode": "Verification code"
+    },
+    "buttons": {
+      "login": "Log in",
+      "register": "Sign up",
+      "google": "Continue with Google",
+      "forgotPassword": "Forgot it?",
+      "verify": "Verify",
+      "resendOtp": "Resend code",
+      "sendResetLink": "Send link",
+      "backToLogin": "Back to log in",
+      "or": "or"
+    },
+    "otp": {
+      "title": "Verify your email",
+      "sent": "We sent a code to {{email}}.",
+      "resent": "Code resent."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "body": "We'll send you a link to reset your password.",
+      "sent": "If an account exists with that email, we've sent a password reset link."
+    },
+    "errors": {
+      "missingFields": "Fill in all fields.",
+      "missingEmail": "Enter your email.",
+      "missingOtp": "Enter the code.",
+      "passwordMismatch": "Passwords don't match.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "loginFailed": "Incorrect email or password.",
+      "registerFailed": "Couldn't create the account. Try again.",
+      "otpFailed": "Incorrect or expired code.",
+      "forgotFailed": "Couldn't send the email. Try again."
+    }
   }
 }

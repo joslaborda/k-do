@@ -1218,9 +1218,9 @@
     "spotAdded": "añadió un spot",
     "spotTimeChanged": "cambió la hora a {{time}}",
     "docTimeChanged": "cambió la hora a {{time}}",
-          "chatMessage": "envió un mensaje al chat",
-          "tripUpdated": "actualizó las fechas o el destino del viaje",
-          "chatAttachmentFallback": "un archivo adjunto",
+    "chatMessage": "envió un mensaje al chat",
+    "tripUpdated": "actualizó las fechas o el destino del viaje",
+    "chatAttachmentFallback": "un archivo adjunto",
     "new": "nueva notificación",
     "joinTrip": "Unirme al viaje",
     "inviteFrom": "Invitación de",
@@ -1681,5 +1681,51 @@
     "maxMb": "El máximo son {{mb}} MB",
     "notImage": "Solo se admiten imágenes",
     "failed": "No se pudo subir el archivo"
+  },
+  "auth": {
+    "tagline": "Travel your way",
+    "tabs": {
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta"
+    },
+    "fields": {
+      "email": "Email",
+      "emailPlaceholder": "nombre@email.com",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "otpCode": "Código de verificación"
+    },
+    "buttons": {
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "google": "Continuar con Google",
+      "forgotPassword": "¿La olvidaste?",
+      "verify": "Verificar",
+      "resendOtp": "Reenviar código",
+      "sendResetLink": "Enviar enlace",
+      "backToLogin": "Volver a iniciar sesión",
+      "or": "o"
+    },
+    "otp": {
+      "title": "Verifica tu email",
+      "sent": "Te hemos enviado un código a {{email}}.",
+      "resent": "Código reenviado."
+    },
+    "forgot": {
+      "title": "Recuperar contraseña",
+      "body": "Te enviaremos un enlace para restablecer tu contraseña.",
+      "sent": "Si existe una cuenta con ese email, te hemos enviado un enlace para restablecer la contraseña."
+    },
+    "errors": {
+      "missingFields": "Rellena todos los campos.",
+      "missingEmail": "Introduce tu email.",
+      "missingOtp": "Introduce el código.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "loginFailed": "Email o contraseña incorrectos.",
+      "registerFailed": "No se pudo crear la cuenta. Inténtalo de nuevo.",
+      "otpFailed": "Código incorrecto o caducado.",
+      "forgotFailed": "No se pudo enviar el email. Inténtalo de nuevo."
+    }
   }
 }
