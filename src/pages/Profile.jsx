@@ -320,9 +320,12 @@ export default function Profile() {
     queryKey: ['mySpots', user?.email],
     queryFn: async () => {
       const all = await base44.entities.Spot.filter({ created_by: user.email });
-      // Only count truly user-created spots (not saved from OSM/community search)
-      // A spot is "created" if it has no osm_id and was explicitly added by the user
-      return all.filter(s => s.source === 'manual' || (!s.osm_id && !s.source));
+      // Solo cuenta spots creados explícitamente vía el formulario "Crear spot"
+      // (source === 'manual'). Antes se admitía también cualquier spot sin
+      // osm_id/source como fallback "manual por defecto" — eso colaba en
+      // "Creados" los spots asignados desde OSM y los importados desde otros
+      // viajes, que nunca llegaron a tener ese metadata rellenado.
+      return all.filter(s => s.source === 'manual');
     },
     enabled: !!user?.email,
     staleTime: 60000,
