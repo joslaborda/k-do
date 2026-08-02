@@ -41,9 +41,7 @@ function buildCallbackUrl(token) {
 // toque real del usuario (comportamiento conocido de Safari/
 // SFSafariViewController para evitar redirecciones-spam). Por eso ahora,
 // ademas de intentarlo automaticamente por si acaso, mostramos una pantalla
-// con un boton real: si el usuario lo toca y SI vuelve a la app, confirma
-// que el problema era la falta de gesto real. Si tampoco funciona tocandolo,
-// el problema esta en otro sitio (registro del esquema, listener nativo...).
+// con un boton real (ver showReturnToAppScreen) ademas del intento automatico.
 function showReturnToAppScreen(token, onFallback) {
     const callbackUrl = buildCallbackUrl(token);
     const overlay = document.createElement('div');
@@ -104,6 +102,20 @@ setTimeout(finish, 15000);
 export function relayNativeLoginIfNeeded(onFallback) {
     if (typeof window === 'undefined') return false;
     if (isNative()) return false;
+    // El editor/vista previa de base44 carga la app dentro de un <iframe>
+    // (id="preview-iframe"). El flujo de "toca para volver a la app" solo
+    // tiene sentido cuando estamos en la pestaña de nivel superior tras
+    // volver del navegador in-app de Capacitor -- un iframe nunca es ese
+    // caso. Sin este guard, si quedaba un base44_access_token viejo en el
+    // localStorage de ese origen (p. ej. por haber iniciado sesion alli
+    // alguna vez durante pruebas), cada vez que se abria la vista previa
+    // dentro del editor se montaba la pantalla de "Volver a la app" a
+    // pantalla completa y se retrasaba el montaje de React hasta 15s -- y
+    // como esa pantalla vive DENTRO del iframe, el editor de base44 (que
+    // espera una señal de "listo" del iframe) se quedaba mostrando
+    // "Cargando tu app..." indefinidamente por fuera, sin que el usuario
+    // viera boton alguno que tocar.
+    if (window.self !== window.top) return false;
     const token = localStorage.getItem('base44_access_token');
     if (!token) return false;
     // Intento automatico primero, por si en este dispositivo/version de iOS
