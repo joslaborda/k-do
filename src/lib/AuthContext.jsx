@@ -210,6 +210,14 @@ export const AuthProvider = ({ children }) => {
       // muestre LoginScreen.
       window.localStorage.removeItem('base44_access_token');
       window.localStorage.removeItem('token');
+      // Sin esto, la app se queda con la ruleta de carga para siempre tras el
+      // logout nativo: al no navegar (ver arriba), AuthenticatedApp (App.jsx)
+      // seguía montando <Routes> con el usuario ya en null, y cualquier
+      // pantalla con una query gateada por user?.id (enabled: !!user?.id) se
+      // quedaba pendiente sin resolver jamas. Fijar authError a 'auth_required'
+      // reutiliza el mismo gate que ya usa AUTH_EXPIRED_EVENT para montar
+      // LoginScreen en vez de las rutas autenticadas.
+      setAuthError({ type: 'auth_required', message: 'Logged out' });
     } else if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect
       base44.auth.logout(window.location.href);
