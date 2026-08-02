@@ -395,8 +395,7 @@ export default function Settings() {
   const [secondNationality, setSecondNationality] = useState('');
   const [secondNatQuery, setSecondNatQuery] = useState('');
   const [showSecondNatList, setShowSecondNatList] = useState(false);
-  const [notifInvites,  setNotifInvites]  = useState(true);
-  const [notifExpenses, setNotifExpenses] = useState(true);
+const [notifEnabled, setNotifEnabled] = useState(true);
   const [spotsPublic,   setSpotsPublic]   = useState(false);
 
   const avatarInputRef = useRef(null);
@@ -419,8 +418,7 @@ export default function Settings() {
       setHomeCountry(profile.home_country || 'España');
       setSecondNationality(profile.second_nationality || '');
       setHomeCurrency(profile.home_currency || 'EUR');
-      setNotifInvites(profile.notif_invites !== false);
-      setNotifExpenses(profile.notif_expenses !== false);
+setNotifEnabled(profile.notif_enabled !== false);
       setSpotsPublic(profile.spots_public_default === true);
     }
   }, [profile]);
@@ -505,8 +503,7 @@ export default function Settings() {
         home_country: homeCountry,
         second_nationality: secondNationality || null,
         home_currency: homeCurrency,
-        notif_invites: notifInvites,
-        notif_expenses: notifExpenses,
+notif_enabled: notifEnabled,
         spots_public_default: spotsPublic,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
@@ -684,16 +681,12 @@ export default function Settings() {
         {/* ── NOTIFICACIONES ── */}
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-1">{t('settings.notifications')}</p>
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <SettingRow
-            label={t('settings.notifInvites')}
-            right={<Toggle value={notifInvites} onChange={setNotifInvites} />}
-          />
-          <SettingRow
-            label={t('settings.notifExpenses')}
-            sublabel={t('settings.notifExpensesSub')}
-            right={<Toggle value={notifExpenses} onChange={setNotifExpenses} />}
-            isLast
-          />
+<SettingRow
+  label={t('settings.notifEnabled')}
+  sublabel={t('settings.notifEnabledSub')}
+  right={<Toggle value={notifEnabled} onChange={setNotifEnabled} />}
+  isLast
+  />
         </div>
 
         {/* ── PRIVACIDAD ── */}
