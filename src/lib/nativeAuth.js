@@ -24,6 +24,28 @@ const returnUrl = `${appParams.appBaseUrl}/`;
     } catch {}
 }
 
+// Construye a mano la URL de login social que el SDK de base44 generaría
+// con auth.loginWithProvider(provider, fromUrl) (ver auth.js del SDK,
+// metodo loginWithProvider) en vez de dejar que el SDK navegue el solo
+// (hace window.location.href, que dentro de un WebView de Capacitor
+// simplemente cargaria el flujo de OAuth de Google DENTRO de la propia
+// app -- Google bloquea el login OAuth embebido en WebViews por politica,
+// asi que en nativo hace falta abrirlo en un navegador in-app real, exacto
+// igual que ya hacemos para el login por email/password en
+// openNativeLogin() de arriba). El resultado final (redirect de vuelta a
+// fromUrl con ?access_token=... en la query) es identico al flujo de
+// email/password, asi que reutiliza el mismo relay
+// (relayNativeLoginIfNeeded / listenForLoginCallback) sin ningun cambio.
+export async function openProviderLogin(provider = 'google') {
+    if (!isNative()) return;
+    const returnUrl = `${appParams.appBaseUrl}/`;
+    const providerPath = provider === 'google' ? '' : `/${provider}`;
+    const loginUrl = `${appParams.appBaseUrl}/api/apps/auth${providerPath}/login?app_id=${appParams.appId}&from_url=${encodeURIComponent(returnUrl)}`;
+    try {
+        await Browser.open({ url: loginUrl });
+    } catch {}
+}
+
 function buildCallbackUrl(token) {
     return `${CALLBACK_URL}?access_token=${encodeURIComponent(token)}`;
 }
