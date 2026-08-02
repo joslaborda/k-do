@@ -22,6 +22,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+                        <!-- Esquema personalizado para el relay del login nativo -- ver
+                             src/lib/nativeAuth.js. Sin esto, al volver del navegador in-app
+                             tras el login, Android no tiene ningun manejador registrado
+                             para com.kodotravel.app://auth-callback y la app nunca
+                             recupera el control (mismo bug que tuvimos en iOS antes de
+                             registrarlo en Info.plist). -->
+                        <intent-filter>
+                                            <action android:name="android.intent.action.VIEW" />
+                                            <category android:name="android.intent.category.DEFAULT" />
+                                            <category android:name="android.intent.category.BROWSABLE" />
+                                            <data android:scheme="com.kodotravel.app" />
+                        </intent-filter>
+
         </activity>
 
         <provider
