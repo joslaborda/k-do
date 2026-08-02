@@ -3,6 +3,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import { leaveTrip } from '@/lib/tripMembers';
 import { useAuth } from '@/lib/AuthContext';
 import { normalizeEmail } from '@/lib/utils';
 import { searchUserProfiles } from '@/lib/userProfiles';
@@ -22,6 +23,7 @@ import { resolveDocViewUrl } from '@/lib/privateFiles';
 import SpotDetailModal from '@/components/trip/SpotDetailModal';
 import SettingsDialog from '@/components/home/SettingsDialog';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
+import LeaveTripModal from '@/components/trip/LeaveTripModal';
 import { enrichTicketDataWithAutoLinks } from '@/lib/autoLinkTickets';
 import { daysUntil } from '@/lib/tripDays';
 import { useTranslation } from 'react-i18next';
@@ -1080,11 +1082,22 @@ export default function Cities() {
   const isAdmin = !!trip && (roles[currentUserEmail] === 'admin' || normalizeEmail(trip?.created_by) === currentUserEmail);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
 
   const deleteTripMutation = useMutation({
     mutationFn: () => base44.entities.Trip.delete(tripId),
     onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
     onError: () => toast({ title: t('trip.deleteError'), description: t('common.tryAgain'), variant: 'destructive' }),
+  });
+
+  // Mismo fix que en Home.jsx: exponer leaveTrip() (ya implementado en el
+  // backend) para que un miembro no-admin pueda abandonar el viaje desde
+  // Ajustes, aquí también, ya que Cities.jsx renderiza su propia instancia
+  // de SettingsDialog.
+  const leaveMutation = useMutation({
+    mutationFn: () => leaveTrip(tripId),
+    onSuccess: () => { setLeaveOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
+    onError: (e) => toast({ title: t('trip.leaveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   // OJO: esta query comparte queryKey ['cities', tripId] con Home.jsx y
@@ -1310,6 +1323,7 @@ export default function Cities() {
         profiles={profiles}
         currentUserEmail={currentUserEmail}
         onDelete={() => { setSettingsOpen(false); setDeleteOpen(true); }}
+        onLeave={() => { setSettingsOpen(false); setLeaveOpen(true); }}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
           queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
@@ -1320,6 +1334,12 @@ export default function Cities() {
         tripName={trip?.name || ''}
         onConfirm={() => deleteTripMutation.mutate()}
         isPending={deleteTripMutation.isPending}
+      />
+      <LeaveTripModal
+        open={leaveOpen} onOpenChange={setLeaveOpen}
+        tripName={trip?.name || ''}
+        onConfirm={() => leaveMutation.mutate()}
+        isPending={leaveMutation.isPending}
       />
     </div>
   );

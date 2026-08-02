@@ -5,6 +5,7 @@ import { createPageUrl } from '@/utils';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { leaveTrip } from '@/lib/tripMembers';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Calendar, MapPin, Settings } from 'lucide-react';
@@ -17,6 +18,7 @@ import { normalizeEmail } from '@/lib/utils';
 import { searchUserProfiles } from '@/lib/userProfiles';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import DeleteTripModal from '@/components/trip/DeleteTripModal';
+import LeaveTripModal from '@/components/trip/LeaveTripModal';
 import TripAlerts from '@/components/trip/TripAlerts';
 import OTabBar from '@/components/trip/OTabBar';
 import PreTripTab from '@/components/home/PreTripTab';
@@ -45,6 +47,7 @@ export default function Home() {
   const { t } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [tripId, setTripId] = useState(null);
   const [tab, setTab] = useState(() => 'inicio');
   const tabRef = useRef('inicio');
@@ -116,6 +119,17 @@ export default function Home() {
     mutationFn: () => base44.entities.Trip.delete(tripId),
     onSuccess: () => { setDeleteOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
     onError: () => toast({ title: t('trip.deleteError'), description: t('common.tryAgain'), variant: 'destructive' }),
+  });
+
+  // Solo el admin podía quitar a otros miembros (y ni siquiera podía
+  // quitarse a sí mismo) — un miembro normal que quisiera dejar el viaje no
+  // tenía ninguna forma de hacerlo salvo pedirle al admin que lo expulsara.
+  // leaveTrip() ya existía en el backend (base44/functions/leaveTrip), solo
+  // faltaba esta mutación para exponerlo desde Ajustes.
+  const leaveMutation = useMutation({
+    mutationFn: () => leaveTrip(tripId),
+    onSuccess: () => { setLeaveOpen(false); navigate(createPageUrl('TripsList'), { replace: true }); },
+    onError: (e) => toast({ title: t('trip.leaveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
   // currentUser.email viene tal cual de base44.auth.me(), sin pasar por
@@ -379,6 +393,7 @@ export default function Home() {
         profiles={profiles}
         currentUserEmail={currentUserEmail}
         onDelete={() => { setSettingsOpen(false); setDeleteOpen(true); }}
+        onLeave={() => { setSettingsOpen(false); setLeaveOpen(true); }}
         onSaved={() => {
           queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
           queryClient.invalidateQueries({ queryKey: ['cities', tripId] });
@@ -390,6 +405,13 @@ export default function Home() {
         tripName={trip?.name || ''}
         onConfirm={() => deleteMutation.mutate()}
         isPending={deleteMutation.isPending}
+      />
+
+      <LeaveTripModal
+        open={leaveOpen} onOpenChange={setLeaveOpen}
+        tripName={trip?.name || ''}
+        onConfirm={() => leaveMutation.mutate()}
+        isPending={leaveMutation.isPending}
       />
 
       <InviteModal
