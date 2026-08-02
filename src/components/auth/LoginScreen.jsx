@@ -25,7 +25,7 @@ function GoogleIcon() {
 // suele adjuntar { status, data: { message } }) sin reventar si el shape es
 // distinto (p. ej. un error de red plano de axios/fetch).
 function extractErrorMessage(err, fallback) {
-  return err?.data?.message || err?.message || fallback;
+    return fallback || err?.data?.message || err?.message || 'Error';
 }
 
 /**
