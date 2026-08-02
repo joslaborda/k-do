@@ -5,7 +5,7 @@ import { notify, resolveUserIds } from '@/lib/notifications';
 import { normalizeEmail } from '@/lib/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronDown, Trash2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -32,7 +32,7 @@ function datesOverlap(aStart, aEnd, bStart, bEnd) {
 
 export default
 function SettingsDialog({
-  open, onClose, trip, cities, tripId, isAdmin, onDelete, onSaved, profiles = [], currentUserEmail = ''
+  open, onClose, trip, cities, tripId, isAdmin, onDelete, onLeave, onSaved, profiles = [], currentUserEmail = ''
 }) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
@@ -450,6 +450,17 @@ function SettingsDialog({
             <button onClick={onDelete}
               className="text-sm text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
               <Trash2 className="w-4 h-4" />{t('trip.dialog.deleteTrip')}
+            </button>
+          )}
+          {/* Sin esto, un miembro no-admin no tenía forma de abandonar el
+              viaje: solo el admin puede expulsar a otros, y el admin no
+              puede expulsarse a sí mismo. leaveTrip() ya existía en el
+              backend (base44/functions/leaveTrip) y en tripMembers.js, solo
+              faltaba exponerlo aquí. */}
+          {!isAdmin && (
+            <button onClick={onLeave}
+              className="text-sm text-red-500 flex items-center gap-1.5 hover:text-red-700 transition-colors">
+              <LogOut className="w-4 h-4" />{t('trip.dialog.leaveTrip')}
             </button>
           )}
           <div className="flex gap-2 ml-auto">
