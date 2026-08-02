@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import LoginScreen from '@/components/auth/LoginScreen';
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import TripsList from './pages/TripsList';
@@ -19,7 +20,7 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, checkAppState } = useAuth();
   const { t } = useTranslation();
   const [authUser, setAuthUser] = useState(null);
   const [userLoaded, setUserLoaded] = useState(false);
@@ -31,15 +32,6 @@ const AuthenticatedApp = () => {
       setUserLoaded(true);
     }
   }, [isLoadingAuth, authError]);
-
-  // Efecto secundario (navegar fuera de la app) movido a un useEffect en vez
-  // de dispararse directamente en el cuerpo del render (ver el `if` de abajo
-  // que comprueba authError.type === 'auth_required').
-  useEffect(() => {
-    if (authError?.type === 'auth_required') {
-      navigateToLogin();
-    }
-  }, [authError, navigateToLogin]);
 
   // Migración silenciosa: mantener UserProfile.email en minúsculas y al día.
   useEffect(() => {
@@ -71,12 +63,18 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // navigateToLogin() se dispara en el useEffect de arriba, no aquí:
-      // llamarlo directamente en el cuerpo del render es un efecto
-      // secundario durante el render (anti-patrón en React) que podía
-      // dispararse más de una vez en renders intermedios antes de que el
-      // navegador abandonara la página.
-      return null;
+      // Antes esto llamaba a navigateToLogin() (via un useEffect) para SACAR
+      // al usuario de la app hacia la pantalla /login hospedada por base44
+      // (flujo "Pública, inicio de sesión requerido" -- ahora marcado como
+      // obsoleto en el propio panel de base44). Con el flujo nuevo ("Pública,
+      // sin inicio de sesión") la app siempre carga y es el propio código
+      // quien decide cuándo mostrar login -- así que ahora montamos nuestra
+      // propia pantalla (ver src/components/auth/LoginScreen.jsx) en vez de
+      // navegar a ningún sitio. checkAppState() (ya expuesto por
+      // useAuth()) es lo que hace que, tras un login/registro con éxito, la
+      // app vuelva a comprobar el estado de auth y monte el resto con
+      // normalidad.
+      return <LoginScreen onSuccess={checkAppState} />;
     } else {
       // Antes, cualquier authError.type no contemplado explícitamente arriba
       // (p. ej. 'unknown', o el nuevo 'network_error' que ahora fija
