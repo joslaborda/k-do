@@ -48,6 +48,8 @@ const ALLOWED_TYPES = new Set([
   "member_joined",
   "spot_time",
   "spot_added",
+    "chat_message",
+    "trip_updated",
 ]);
 
 // Mismo texto que src/i18n/es.json (notifications.*) — duplicado aquí a
@@ -65,6 +67,8 @@ const PUSH_TEXT: Record<string, string> = {
   member_joined: "se unió al viaje",
   spot_time: "cambió la hora de un spot",
   spot_added: "añadió un spot",
+    chat_message: "envió un mensaje al chat",
+    trip_updated: "actualizó las fechas o el destino del viaje",
 };
 
 // Mismos secretos que RESEND_API_KEY (ver sendInviteEmail/entry.ts) — se
