@@ -28,14 +28,25 @@ function buildRequirements(countries, originCountry, secondNationality = null, l
     const destMeta = getCountryMeta(country);
 
     // ── Visa ──────────────────────────────────────────────────────────────
-    const visaInfo = getVisaInfo(destISO, originISO);
-    const secondary = secondISO ? getVisaInfo(destISO, secondISO) : null;
-    const best = (secondary && secondary.needed === false) ? secondary : visaInfo;
+    // Antes esto llamaba getVisaInfo() dos veces por separado (una por
+    // pasaporte) y se quedaba con el resultado del segundo pasaporte en
+    // cuanto needed===false, sin usar el `note` que ya devuelve
+    // getVisaInfo() explicando qué pasa con el OTRO pasaporte. Resultado:
+    // con dos nacionalidades (p. ej. España + Reino Unido yendo a Londres)
+    // la tarjeta pasaba a describir "Tu país." sin más contexto, mientras
+    // el tip estático de packingDB.js seguía diciendo "ETA en gov.uk"
+    // como "Recomendado" — dos avisos contradictorios para el mismo
+    // requisito. getVisaInfo() ya hace bien la comparación de los dos
+    // pasaportes (incluye desempate por días) si se le pasa el tercer
+    // argumento, así que basta con delegarle todo el trabajo aquí.
+    const best = getVisaInfo(destISO, originISO, secondISO);
+    const description = [best?.notes || best?.info, best?.note].filter(Boolean).join(' — ')
+      || countryData.visa?.info || '';
     requirements.push({
       id: `visa-${country}`, type: 'visa', country,
       origin: originCountry,
       title: `${getCountryLabel(originCountry, lang)} → ${getCountryLabel(country, lang)}`,
-      description: best?.notes || best?.info || countryData.visa?.info || '',
+      description,
       level: best?.needed === true ? 'required' : (best?.needed === false ? 'ok' : 'info'),
     });
 
