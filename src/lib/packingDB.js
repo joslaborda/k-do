@@ -540,7 +540,13 @@ export const COUNTRY_REQUIREMENTS = {
     adapter: { needed: true, type: 'Tipo G', info: 'Voltaje: 230V/50Hz' },
     vaccines: [],
     currency: { info: 'Libra (GBP). Tarjeta ampliamente aceptada.' },
-    tips: ['ETA en gov.uk.', 'Circulación por la izquierda.', 'Oyster Card para Londres.'],
+    // 'ETA en gov.uk.' se quitó de aquí: era un tip genérico ajeno al
+    // pasaporte del usuario, mostrado como 'Recomendado' incluso cuando la
+    // ETA es en realidad obligatoria (o directamente no aplica si el
+    // usuario tiene pasaporte UK/IE) — la tarjeta de visado ya lo cubre
+    // bien usando getVisaInfo() con ambas nacionalidades. Dejarlo aquí
+    // producía un segundo aviso contradictorio (ver PreTripTab.jsx).
+    tips: ['Circulación por la izquierda.', 'Oyster Card para Londres.'],
     emergency: '999 · 112'
   },
 
