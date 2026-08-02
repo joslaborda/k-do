@@ -626,6 +626,9 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
   // y como reordena + muestra un toast de "orden sugerido", salían dos
   // toasts idénticos apilados.
   const [submitting, setSubmitting] = useState(false);
+    // Hora opcional en el mismo paso que el día — antes solo se podía
+    // asignar día aquí y la hora aparte, más tarde, desde el detalle del spot.
+    const [selectedTime, setSelectedTime] = useState('');
 
   // Si el viaje visita la misma ciudad más de una vez (varios registros City
   // con el mismo nombre, p. ej. Lima 3 veces en fechas distintas), agrupar
@@ -708,6 +711,14 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
               className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
             />
           )}
+          {/* Hora opcional en el mismo paso que el día */}
+                    <p className="text-sm font-semibold text-foreground mt-4 mb-2">{t('spots.assignTime')}</p>
+          <input
+            type="time"
+            value={selectedTime}
+            onChange={e => setSelectedTime(e.target.value)}
+            className="w-full h-11 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-secondary"
+          />
         </div>
 
         {/* Buttons — always visible */}
@@ -729,7 +740,7 @@ function AssignDateModal({ spot, tripCities = [], onAssign, onSkip, onUndo }) {
                 // día de tránsito entre dos ciudades podía devolver la
                 // ciudad equivocada aunque el usuario hubiera elegido
                 // explícitamente la otra.
-                try { await onAssign(selectedDate, selectedCityId); }
+                try { await onAssign(selectedDate, selectedCityId, selectedTime); }
                 finally { setSubmitting(false); }
               } else {
                 onSkip();
@@ -1709,8 +1720,8 @@ export default function Restaurants() {
         <AssignDateModal
           spot={assignDateSpot}
           tripCities={tripCities}
-          onAssign={async (date, resolvedCityId) => {
-            const data = { assigned_date: date };
+          onAssign={async (date, resolvedCityId, time) => {
+            const data = { assigned_date: date, assigned_time: time || null };
             // Re-ancla el spot a la estancia correcta si la fecha elegida
             // pertenece a otra visita a la misma ciudad — si no, se queda
             // con el city_id de la estancia original y desaparece de las
