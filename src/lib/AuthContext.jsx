@@ -200,7 +200,17 @@ export const AuthProvider = ({ children }) => {
     // disco pese a haber "cerrado sesión".
     clearPersistedQueryCache();
 
-    if (shouldRedirect) {
+    if (isNative()) {
+      // En nativo, base44.auth.logout() siempre navega (window.location.href =
+      // .../auth/logout?from_url=...), lo que en el WebView de Capacitor dispara
+      // el interstitial "Open this page in Kodo?" de iOS y deja la app colgada.
+      // Como ya no dependemos de las paginas hospedadas de base44 para el login
+      // (LoginScreen.jsx lo gestiona todo), en nativo basta con borrar el token
+      // localmente -- sin navegacion -- y dejar que el cambio de estado de React
+      // muestre LoginScreen.
+      window.localStorage.removeItem('base44_access_token');
+      window.localStorage.removeItem('token');
+    } else if (shouldRedirect) {
       // Use the SDK's logout method which handles token cleanup and redirect
       base44.auth.logout(window.location.href);
     } else {
