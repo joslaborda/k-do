@@ -397,7 +397,6 @@ export default function Settings() {
   const [showSecondNatList, setShowSecondNatList] = useState(false);
   const [notifInvites,  setNotifInvites]  = useState(true);
   const [notifExpenses, setNotifExpenses] = useState(true);
-  const [notifComments, setNotifComments] = useState(false);
   const [spotsPublic,   setSpotsPublic]   = useState(false);
 
   const avatarInputRef = useRef(null);
@@ -422,7 +421,6 @@ export default function Settings() {
       setHomeCurrency(profile.home_currency || 'EUR');
       setNotifInvites(profile.notif_invites !== false);
       setNotifExpenses(profile.notif_expenses !== false);
-      setNotifComments(profile.notif_comments === true);
       setSpotsPublic(profile.spots_public_default === true);
     }
   }, [profile]);
@@ -509,7 +507,6 @@ export default function Settings() {
         home_currency: homeCurrency,
         notif_invites: notifInvites,
         notif_expenses: notifExpenses,
-        notif_comments: notifComments,
         spots_public_default: spotsPublic,
       });
       queryClient.invalidateQueries({ queryKey: ['myProfile', user?.id] });
@@ -695,10 +692,6 @@ export default function Settings() {
             label={t('settings.notifExpenses')}
             sublabel={t('settings.notifExpensesSub')}
             right={<Toggle value={notifExpenses} onChange={setNotifExpenses} />}
-          />
-          <SettingRow
-            label={t('settings.notifComments')}
-            right={<Toggle value={notifComments} onChange={setNotifComments} />}
             isLast
           />
         </div>
