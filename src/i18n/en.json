@@ -304,6 +304,7 @@
     "delete": "Delete trip",
     "deleteConfirm": "Delete this trip?",
     "deleteWarning": "This action cannot be undone. All trip data will be deleted.",
+    "leaveWarning": "Are you sure you want to leave \"{{tripName}}\"? You'll only be able to rejoin if someone invites you again.",
     "settings": "Trip settings",
     "members": "Members",
     "inviteToTrip": "Invite to trip",
@@ -353,6 +354,8 @@
       "adding": "Adding...",
       "addStop": "Add stop",
       "deleteTrip": "Delete trip",
+      "leaveTrip": "Leave trip",
+      "leaving": "Leaving...",
       "adminOnlyEdit": "Only the trip admin can edit the name and dates.",
       "deleteStopConfirm": "Delete this stop?",
       "deleteStopWarning": "{{city}} and its itinerary days will be deleted. This action cannot be undone.",
@@ -411,7 +414,8 @@
     "sectionsAria": "Trip sections",
     "settingsAria": "Trip settings",
     "startsToday": "Starts today!",
-    "deleteError": "Couldn't delete the trip"
+    "deleteError": "Couldn't delete the trip",
+    "leaveError": "Couldn't leave the trip"
   },
   "expenses": {
     "title": "Expenses",

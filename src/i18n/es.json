@@ -304,6 +304,7 @@
     "delete": "Eliminar viaje",
     "deleteConfirm": "¿Eliminar este viaje?",
     "deleteWarning": "Esta acción no se puede deshacer. Se eliminarán todos los datos del viaje.",
+    "leaveWarning": "¿Seguro que quieres salir de \"{{tripName}}\"? Podrás volver a unirte solo si alguien te invita de nuevo.",
     "settings": "Ajustes del viaje",
     "members": "Miembros",
     "inviteToTrip": "Invitar al viaje",
@@ -353,6 +354,8 @@
       "adding": "Añadiendo...",
       "addStop": "Añadir parada",
       "deleteTrip": "Eliminar viaje",
+      "leaveTrip": "Salir del viaje",
+      "leaving": "Saliendo...",
       "adminOnlyEdit": "Solo el admin del viaje puede editar el nombre y las fechas.",
       "deleteStopConfirm": "¿Eliminar esta parada?",
       "deleteStopWarning": "Se eliminará {{city}} y los días de su itinerario. Esta acción no se puede deshacer.",
@@ -411,7 +414,8 @@
     "sectionsAria": "Secciones del viaje",
     "settingsAria": "Configuración del viaje",
     "startsToday": "¡Hoy empieza!",
-    "deleteError": "Error al eliminar el viaje"
+    "deleteError": "Error al eliminar el viaje",
+    "leaveError": "No se pudo salir del viaje"
   },
   "expenses": {
     "title": "Gastos",
