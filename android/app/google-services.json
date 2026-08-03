@@ -1,0 +1,29 @@
+{
+    "project_info": {
+          "project_number": "416405430934",
+          "project_id": "kodo-travel-app",
+          "storage_bucket": "kodo-travel-app.firebasestorage.app"
+    },
+    "client": [
+          {
+                  "client_info": {
+                            "mobilesdk_app_id": "1:416405430934:android:af81e0a9896a4acaf258b7",
+                            "android_client_info": {
+                                        "package_name": "com.kodotravel.app"
+                            }
+                  },
+                  "oauth_client": [],
+                  "api_key": [
+                            {
+                                        "current_key": "AIzaSyAhud0U_nhb9YS6x0CX6XPlNK9t9Pfv-l8"
+                            }
+                  ],
+                  "services": {
+                            "appinvite_service": {
+                                        "other_platform_oauth_client": []
+                            }
+                  }
+          }
+    ],
+    "configuration_version": "1"
+}
