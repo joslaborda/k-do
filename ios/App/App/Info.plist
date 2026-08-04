@@ -7,7 +7,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.kodotravel.app</string>
+				<string>com.kaikodo.app</string>
 			</array>
 		</dict>
 	</array>
@@ -16,9 +16,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Kōdo no utiliza tu ubicación. Este permiso es requerido por una dependencia (OneSignal) aunque la funcionalidad no está activa en la app.</string>
+		<string>Kaikōdo no utiliza tu ubicación. Este permiso es requerido por una dependencia (OneSignal) aunque la funcionalidad no está activa en la app.</string>
 	<key>CFBundleDisplayName</key>
-        <string>Kōdo</string>
+        <string>Kaikōdo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
