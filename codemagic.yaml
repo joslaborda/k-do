@@ -6,7 +6,7 @@ workflows:
   # variables "kodo_env" (ver más abajo) con las mismas claves que tu
   # .env.local.
   kodo-android:
-    name: Kōdo — Android
+    name: Kaikōdo — Android
     max_build_duration: 30
     environment:
       groups:
@@ -44,7 +44,7 @@ workflows:
   # asociados a tu cuenta de Apple Developer — no se puede completar este
   # workflow hasta tener esa cuenta dada de alta (ver LEEME_CAPACITOR_PUSH.md).
   kodo-ios:
-    name: Kōdo — iOS
+    name: Kaikōdo — iOS
     max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
@@ -54,7 +54,7 @@ workflows:
         - kodo_env
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.kodotravel.app
+        bundle_identifier: com.kaikodo.app
       node: latest
       xcode: latest
       cocoapods: default
