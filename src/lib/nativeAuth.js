@@ -3,7 +3,7 @@ import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { appParams } from '@/lib/app-params';
 
-const CALLBACK_URL = 'com.kodotravel.app://auth-callback';
+const CALLBACK_URL = 'com.kaikodo.app://auth-callback';
 
 export function isNative() {
     return Capacitor.isNativePlatform();
@@ -59,7 +59,7 @@ function buildCallbackUrl(token) {
 // disparado por codigo (sin que el usuario haya tocado nada) es lo unico
 // que cambiaba entre intentos, y en los dos casos fallo igual -- eso apunta
 // a que iOS/Safari puede estar bloqueando el salto a un esquema
-// personalizado (com.kodotravel.app://...) precisamente por no venir de un
+// personalizado (com.kaikodo.app://...) precisamente por no venir de un
 // toque real del usuario (comportamiento conocido de Safari/
 // SFSafariViewController para evitar redirecciones-spam). Por eso ahora,
 // ademas de intentarlo automaticamente por si acaso, mostramos una pantalla
