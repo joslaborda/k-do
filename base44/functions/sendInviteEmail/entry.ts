@@ -36,18 +36,18 @@ import { createClientFromRequest } from "npm:@base44/sdk";
 // dominio de `inviteUrl` no se comprobaba: alguien podía llamar a esta
 // función directamente (no por la UI) con un token real pero un dominio
 // ajeno (ej. "https://dominio-malicioso.com/phish?token=<token real>"), y el
-// email oficial de Kōdo (remitente verificado, pasa SPF/DKIM) llegaba con un
+// email oficial de Kaikōdo (remitente verificado, pasa SPF/DKIM) llegaba con un
 // botón/enlace apuntando a un sitio de phishing. Configurable por si cambia
 // el dominio; con fallback al dominio de producción conocido.
-const APP_ORIGIN = (Deno.env.get("KODO_APP_URL") || "https://kodotravel.app").replace(/\/$/, "");
+const APP_ORIGIN = (Deno.env.get("KODO_APP_URL") || "https://kaikodo.app").replace(/\/$/, "");
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 // Por defecto usa el remitente de pruebas de Resend — solo entrega al email
 // con el que se creó la cuenta de Resend. Para invitar a cualquier persona
 // real hace falta un dominio propio verificado en Resend y fijar
-// RESEND_FROM_ADDRESS (p. ej. "Kōdo <invites@mail.kodotravel.app>") en
+// RESEND_FROM_ADDRESS (p. ej. "Kaikōdo <invites@mail.kaikodo.app>") en
 // Secretos.
-const FROM_ADDRESS = Deno.env.get("RESEND_FROM_ADDRESS") || "Kōdo <onboarding@resend.dev>";
+const FROM_ADDRESS = Deno.env.get("RESEND_FROM_ADDRESS") || "Kaikōdo <onboarding@resend.dev>";
 
 // Logo real (el SVG de marca que dio José) convertido a PNG e incrustado
 // como data URI — así no depende de subir el archivo a ningún sitio. Se usa
@@ -78,21 +78,21 @@ const STRINGS: Record<string, Record<string, string>> = {
     invitedBy: "te invita a un viaje",
     button: "Ver invitación",
     linkHint: "¿El botón no funciona? Copia este enlace:",
-    noAccount: "¿Aún no tienes cuenta en Kōdo? El mismo enlace te lleva a crearla — la invitación aparecerá automáticamente en cuanto entres.",
+    noAccount: "¿Aún no tienes cuenta en Kaikōdo? El mismo enlace te lleva a crearla — la invitación aparecerá automáticamente en cuanto entres.",
     destinationLabel: "Destino",
     datesLabel: "Fechas",
     subjectVerb: "te invita a",
-    inKodo: "en Kōdo",
+    inKodo: "en Kaikōdo",
   },
   en: {
     invitedBy: "invited you on a trip",
     button: "View invitation",
     linkHint: "Button not working? Copy this link:",
-    noAccount: "No account on Kōdo yet? The same link takes you to create one — the invitation will show up as soon as you sign in.",
+    noAccount: "No account on Kaikōdo yet? The same link takes you to create one — the invitation will show up as soon as you sign in.",
     destinationLabel: "Destination",
     datesLabel: "Dates",
     subjectVerb: "invited you to",
-    inKodo: "on Kōdo",
+    inKodo: "on Kaikōdo",
   },
 };
 
@@ -148,14 +148,14 @@ Deno.serve(async (req) => {
 
     // Antes esta función solo exigía sesión iniciada — no comprobaba que
     // hubiera una invitación real detrás de `to`/`inviteUrl`. Cualquier
-    // usuario autenticado de Kōdo podía invocarla con una URL y un
+    // usuario autenticado de Kaikōdo podía invocarla con una URL y un
     // destinatario arbitrarios, y el sistema mandaba un email con la marca
     // oficial (dominio verificado en Resend) a esa dirección — un vector de
     // phishing/spam barato que se aprovecha de la reputación del remitente.
     // Se exige que exista un TripInvite pendiente real, creado por
     // createTripInvite, cuyo invite_token coincida con el de inviteUrl y
     // cuyo email/invited_by coincidan con `to`/quien llama — así no se puede
-    // mandar el email "oficial" de Kōdo a nadie que no tenga ya una
+    // mandar el email "oficial" de Kaikōdo a nadie que no tenga ya una
     // invitación de verdad esperándolo.
     const normalizedTo = String(to).trim().toLowerCase();
     const normalizedActingEmail = user.email.toLowerCase();
@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
     // dominio real de la app y el token ya validado — se ignora el resto de
     // `inviteUrl` que mandó el cliente (dominio, query params extra, etc.).
     // Así, aunque alguien llame a esta función con un `inviteUrl` apuntando a
-    // otro sitio, el email que sale de verdad siempre enlaza a kodotravel.app.
+    // otro sitio, el email que sale de verdad siempre enlaza a kaikodo.app.
     const safeInviteUrl = `${APP_ORIGIN}/Invites?token=${encodeURIComponent(tokenFromUrl)}`;
 
     const lang = rawLang === "en" ? "en" : "es";
@@ -249,7 +249,7 @@ Deno.serve(async (req) => {
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" bgcolor="#ffffff" class="kodo-card" style="max-width:480px;width:100%;background-color:#ffffff;border:1px solid #e8e3dc;border-radius:12px;">
 
 <tr><td style="padding:26px 32px;text-align:center;border-bottom:1px solid #f0ede8;">
-<img src="${LOGO_DATA_URI}" width="120" alt="Kōdo" style="display:inline-block;height:auto;max-width:120px;border:0;outline:none;" />
+<img src="${LOGO_DATA_URI}" width="120" alt="Kaikōdo" style="display:inline-block;height:auto;max-width:120px;border:0;outline:none;" />
 </td></tr>
 
 <tr><td style="padding:28px 32px 8px;text-align:center;">
