@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-// Borrador estándar de Términos de Servicio, con contacto (hello@kodotravel.app)
+// Borrador estándar de Términos de Servicio, con contacto (hello@kaikodo.app)
 // y ley aplicable (España) ya rellenados. Sigue sin sustituir una revisión
 // legal real por un abogado antes de un lanzamiento serio — cubre lo básico
 // de un servicio en beta con gastos compartidos entre usuarios e información
@@ -74,7 +74,7 @@ const CONTENT = {
       {
         h: '10. Contacto',
         p: [
-          'Para cualquier duda sobre estos términos: hello@kodotravel.app.',
+          'Para cualquier duda sobre estos términos: hello@kaikodo.app.',
         ],
       },
     ],
@@ -145,7 +145,7 @@ const CONTENT = {
       {
         h: '10. Contact',
         p: [
-          'For any questions about these terms: hello@kodotravel.app.',
+          'For any questions about these terms: hello@kaikodo.app.',
         ],
       },
     ],

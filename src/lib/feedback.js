@@ -2,10 +2,10 @@ import { base44 } from '@/api/base44Client';
 import { getLanguage } from '@/i18n/index.js';
 
 // Dirección donde José recibe el aviso de cada envío — buzón real
-// (hello@kodotravel.app) creado aparte para esto, no relacionado con el
+// (hello@kaikodo.app) creado aparte para esto, no relacionado con el
 // remitente de las invitaciones (RESEND_FROM_ADDRESS), que es solo de
 // salida y no admite respuestas.
-const FEEDBACK_INBOX = 'hello@kodotravel.app';
+const FEEDBACK_INBOX = 'hello@kaikodo.app';
 
 const TYPE_LABEL = {
   bug: 'Bug',

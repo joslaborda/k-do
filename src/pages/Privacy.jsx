@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 // Borrador estándar de Política de Privacidad alineado con RGPD, con
 // responsable y contacto ya rellenados (José Laborda Ubiria, persona física
-// — hello@kodotravel.app — proyecto individual, no una sociedad
+// — hello@kaikodo.app — proyecto individual, no una sociedad
 // constituida; el RGPD exige que el responsable sea una persona
 // identificable de verdad, no solo el nombre de la marca). Sigue sin
 // sustituir una revisión legal real por un abogado: si en algún momento se
@@ -18,7 +18,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Responsable del tratamiento',
-        p: ['José Laborda Ubiria, como responsable de Kōdo. Contacto: hello@kodotravel.app.'],
+        p: ['José Laborda Ubiria, como responsable de Kōdo. Contacto: hello@kaikodo.app.'],
       },
       {
         h: '2. Qué datos recogemos',
@@ -53,7 +53,7 @@ const CONTENT = {
         h: '6. Tus derechos',
         p: [
           'Tienes derecho a acceder, rectificar, y solicitar la supresión de tus datos, así como a la portabilidad, oposición y limitación del tratamiento, en los términos que marca el RGPD.',
-          'Puedes editar tus datos directamente en Ajustes, o borrar tu cuenta por completo desde Ajustes → Borrar cuenta. Para cualquier otra solicitud relacionada con tus datos: hello@kodotravel.app.',
+          'Puedes editar tus datos directamente en Ajustes, o borrar tu cuenta por completo desde Ajustes → Borrar cuenta. Para cualquier otra solicitud relacionada con tus datos: hello@kaikodo.app.',
         ],
       },
       {
@@ -76,7 +76,7 @@ const CONTENT = {
       },
       {
         h: '10. Contacto',
-        p: ['Para cualquier duda sobre privacidad: hello@kodotravel.app.'],
+        p: ['Para cualquier duda sobre privacidad: hello@kaikodo.app.'],
       },
     ],
   },
@@ -86,7 +86,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Data controller',
-        p: ['José Laborda Ubiria, as the controller for Kōdo. Contact: hello@kodotravel.app.'],
+        p: ['José Laborda Ubiria, as the controller for Kōdo. Contact: hello@kaikodo.app.'],
       },
       {
         h: '2. What data we collect',
@@ -121,7 +121,7 @@ const CONTENT = {
         h: '6. Your rights',
         p: [
           'You have the right to access, rectify, and request deletion of your data, as well as portability, objection, and restriction of processing, under GDPR.',
-          'You can edit your data directly in Settings, or delete your account entirely from Settings → Delete account. For any other data-related request: hello@kodotravel.app.',
+          'You can edit your data directly in Settings, or delete your account entirely from Settings → Delete account. For any other data-related request: hello@kaikodo.app.',
         ],
       },
       {
@@ -144,7 +144,7 @@ const CONTENT = {
       },
       {
         h: '10. Contact',
-        p: ['For any privacy questions: hello@kodotravel.app.'],
+        p: ['For any privacy questions: hello@kaikodo.app.'],
       },
     ],
   },
