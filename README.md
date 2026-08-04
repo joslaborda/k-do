@@ -1,8 +1,8 @@
-**Welcome to your Base44 project** 
+**Kaikōdo — Travel your way.**
 
 **About**
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+Kaikōdo is a travel organization app. View and Edit your app on [Base44.com](http://Base44.com)
 
 This project contains everything you need to run your app locally.
 

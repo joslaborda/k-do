@@ -1,5 +1,6 @@
 {
-  "name": "base44-app",
+  "name": "kaikodo",
+  "description": "Kaikōdo — Travel your way.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

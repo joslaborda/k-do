@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.kodotravel.app',
-  appName: 'Kōdo',
+  appName: 'Kaikōdo',
   webDir: 'dist',
   plugins: {
     PushNotifications: {

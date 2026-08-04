@@ -1,5 +1,5 @@
 /**
- * Logo — wordmark oficial de Kōdo (SVG proporcionado por José).
+ * Logo — wordmark oficial de Kaikōdo (SVG proporcionado por José).
  *
  * Se inserta como SVG inline (mismo patrón que lib/PlaneIcon.jsx) en vez de
  * como archivo estático, para no depender de una carpeta /public y poder
@@ -20,7 +20,7 @@ export default function Logo({ className = '', style = {} }) {
       style={style}
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="Kōdo"
+      aria-label="Kaikōdo"
     >
       <path
         fill="currentColor"

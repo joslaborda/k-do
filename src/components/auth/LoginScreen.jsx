@@ -29,7 +29,7 @@ function extractErrorMessage(err, fallback) {
 }
 
 /**
- * LoginScreen — pantalla de login/registro propia de kōdo, construida
+ * LoginScreen — pantalla de login/registro propia de Kaikōdo, construida
  * directamente sobre el SDK de base44 (auth.loginViaEmailPassword,
  * auth.register + auth.verifyOtp, auth.resetPasswordRequest,
  * auth.loginWithProvider) en vez de depender de la pantalla /login
