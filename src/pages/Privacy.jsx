@@ -18,7 +18,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Responsable del tratamiento',
-        p: ['José Laborda Ubiria, como responsable de Kōdo. Contacto: hello@kaikodo.app.'],
+        p: ['José Laborda Ubiria, como responsable de Kaikōdo. Contacto: hello@kaikodo.app.'],
       },
       {
         h: '2. Qué datos recogemos',
@@ -59,13 +59,13 @@ const CONTENT = {
       {
         h: '7. Seguridad',
         p: [
-          'Aplicamos medidas técnicas razonables para proteger tus datos, pero ningún sistema es infalible al 100%. Kōdo está en versión beta — recomendamos no subir documentación especialmente sensible salvo la necesaria para planificar tu viaje.',
+          'Aplicamos medidas técnicas razonables para proteger tus datos, pero ningún sistema es infalible al 100%. Kaikōdo está en versión beta — recomendamos no subir documentación especialmente sensible salvo la necesaria para planificar tu viaje.',
         ],
       },
       {
         h: '8. Menores de edad',
         p: [
-          'Kōdo no está dirigido a menores de 16 años. Si crees que un menor ha creado una cuenta sin el consentimiento de sus padres o tutores, contacta con nosotros para eliminarla.',
+          'Kaikōdo no está dirigido a menores de 16 años. Si crees que un menor ha creado una cuenta sin el consentimiento de sus padres o tutores, contacta con nosotros para eliminarla.',
         ],
       },
       {
@@ -86,7 +86,7 @@ const CONTENT = {
     sections: [
       {
         h: '1. Data controller',
-        p: ['José Laborda Ubiria, as the controller for Kōdo. Contact: hello@kaikodo.app.'],
+        p: ['José Laborda Ubiria, as the controller for Kaikōdo. Contact: hello@kaikodo.app.'],
       },
       {
         h: '2. What data we collect',
@@ -127,13 +127,13 @@ const CONTENT = {
       {
         h: '7. Security',
         p: [
-          'We apply reasonable technical measures to protect your data, but no system is 100% foolproof. Kōdo is in beta — we recommend not uploading especially sensitive documentation beyond what is needed to plan your trip.',
+          'We apply reasonable technical measures to protect your data, but no system is 100% foolproof. Kaikōdo is in beta — we recommend not uploading especially sensitive documentation beyond what is needed to plan your trip.',
         ],
       },
       {
         h: '8. Minors',
         p: [
-          'Kōdo is not intended for anyone under 16. If you believe a minor has created an account without parental or guardian consent, contact us to have it removed.',
+          'Kaikōdo is not intended for anyone under 16. If you believe a minor has created an account without parental or guardian consent, contact us to have it removed.',
         ],
       },
       {

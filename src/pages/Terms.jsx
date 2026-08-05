@@ -15,14 +15,14 @@ const CONTENT = {
       {
         h: '1. Aceptación de los términos',
         p: [
-          'Al crear una cuenta y usar Kōdo aceptas estos Términos de Servicio y la Política de Privacidad. Si no estás de acuerdo, no debes usar la aplicación.',
+          'Al crear una cuenta y usar Kaikōdo aceptas estos Términos de Servicio y la Política de Privacidad. Si no estás de acuerdo, no debes usar la aplicación.',
         ],
       },
       {
-        h: '2. Qué es Kōdo',
+        h: '2. Qué es Kaikōdo',
         p: [
-          'Kōdo es una aplicación para planificar viajes en grupo: itinerarios, documentos de viaje, gastos compartidos entre los miembros de un viaje, y una capa social de recomendaciones (spots) entre usuarios.',
-          'Kōdo está actualmente en versión beta. Esto significa que puede contener errores, cambiar de funcionamiento sin previo aviso, o sufrir interrupciones. Se ofrece "tal cual", sin garantías de disponibilidad, precisión o continuidad del servicio.',
+          'Kaikōdo es una aplicación para planificar viajes en grupo: itinerarios, documentos de viaje, gastos compartidos entre los miembros de un viaje, y una capa social de recomendaciones (spots) entre usuarios.',
+          'Kaikōdo está actualmente en versión beta. Esto significa que puede contener errores, cambiar de funcionamiento sin previo aviso, o sufrir interrupciones. Se ofrece "tal cual", sin garantías de disponibilidad, precisión o continuidad del servicio.',
         ],
       },
       {
@@ -35,28 +35,28 @@ const CONTENT = {
       {
         h: '4. Contenido que subes',
         p: [
-          'Todo lo que subas a Kōdo (recomendaciones de sitios, fotos, documentos, mensajes, comentarios) sigue siendo tuyo. Al subirlo, nos das permiso para almacenarlo y mostrarlo dentro de la app a las personas con las que lo compartes (miembros del viaje, o públicamente si así lo eliges).',
+          'Todo lo que subas a Kaikōdo (recomendaciones de sitios, fotos, documentos, mensajes, comentarios) sigue siendo tuyo. Al subirlo, nos das permiso para almacenarlo y mostrarlo dentro de la app a las personas con las que lo compartes (miembros del viaje, o públicamente si así lo eliges).',
           'Eres responsable de no subir contenido ilegal, que infrinja derechos de terceros, o documentos de otras personas sin su consentimiento.',
         ],
       },
       {
         h: '5. Gastos compartidos',
         p: [
-          'La función de gastos de Kōdo es una calculadora de reparto entre los miembros de un viaje: registra quién pagó qué y calcula quién debe a quién. Kōdo no procesa pagos ni transferencias de dinero — el pago real entre personas ocurre fuera de la app, por el medio que elijáis.',
+          'La función de gastos de Kaikōdo es una calculadora de reparto entre los miembros de un viaje: registra quién pagó qué y calcula quién debe a quién. Kaikōdo no procesa pagos ni transferencias de dinero — el pago real entre personas ocurre fuera de la app, por el medio que elijáis.',
           'No nos hacemos responsables de que los pagos acordados entre miembros del viaje se lleguen a realizar.',
         ],
       },
       {
         h: '6. Información de requisitos de viaje',
         p: [
-          'La información sobre visados, vacunas, embajadas y requisitos de entrada que muestra Kōdo es orientativa y puede estar desactualizada o ser incorrecta. No sustituye la información oficial de la embajada, consulado o autoridad migratoria del país de destino.',
-          'Eres responsable de verificar los requisitos de entrada de cada país directamente en la fuente oficial antes de viajar. Kōdo no se hace responsable de decisiones de viaje tomadas basándose únicamente en esta información.',
+          'La información sobre visados, vacunas, embajadas y requisitos de entrada que muestra Kaikōdo es orientativa y puede estar desactualizada o ser incorrecta. No sustituye la información oficial de la embajada, consulado o autoridad migratoria del país de destino.',
+          'Eres responsable de verificar los requisitos de entrada de cada país directamente en la fuente oficial antes de viajar. Kaikōdo no se hace responsable de decisiones de viaje tomadas basándose únicamente en esta información.',
         ],
       },
       {
         h: '7. Limitación de responsabilidad',
         p: [
-          'En la medida permitida por la ley, Kōdo se ofrece sin garantías de ningún tipo. No somos responsables de pérdidas indirectas, pérdida de datos, ni de las consecuencias de decisiones de viaje tomadas usando la app.',
+          'En la medida permitida por la ley, Kaikōdo se ofrece sin garantías de ningún tipo. No somos responsables de pérdidas indirectas, pérdida de datos, ni de las consecuencias de decisiones de viaje tomadas usando la app.',
         ],
       },
       {
@@ -86,14 +86,14 @@ const CONTENT = {
       {
         h: '1. Acceptance of terms',
         p: [
-          'By creating an account and using Kōdo, you accept these Terms of Service and the Privacy Policy. If you do not agree, you must not use the app.',
+          'By creating an account and using Kaikōdo, you accept these Terms of Service and the Privacy Policy. If you do not agree, you must not use the app.',
         ],
       },
       {
-        h: '2. What Kōdo is',
+        h: '2. What Kaikōdo is',
         p: [
-          'Kōdo is a group trip-planning app: itineraries, travel documents, expenses shared between trip members, and a social layer of place recommendations between users.',
-          'Kōdo is currently in beta. This means it may contain bugs, change behavior without notice, or experience downtime. It is provided "as is", without guarantees of availability, accuracy, or continuity of service.',
+          'Kaikōdo is a group trip-planning app: itineraries, travel documents, expenses shared between trip members, and a social layer of place recommendations between users.',
+          'Kaikōdo is currently in beta. This means it may contain bugs, change behavior without notice, or experience downtime. It is provided "as is", without guarantees of availability, accuracy, or continuity of service.',
         ],
       },
       {
@@ -106,28 +106,28 @@ const CONTENT = {
       {
         h: '4. Content you upload',
         p: [
-          'Anything you upload to Kōdo (place recommendations, photos, documents, messages, comments) remains yours. By uploading it, you grant us permission to store it and display it within the app to the people you share it with (trip members, or publicly if you choose to).',
+          'Anything you upload to Kaikōdo (place recommendations, photos, documents, messages, comments) remains yours. By uploading it, you grant us permission to store it and display it within the app to the people you share it with (trip members, or publicly if you choose to).',
           'You are responsible for not uploading illegal content, content that infringes on others\' rights, or other people\'s documents without their consent.',
         ],
       },
       {
         h: '5. Shared expenses',
         p: [
-          'Kōdo\'s expense feature is a split calculator between trip members: it records who paid for what and calculates who owes whom. Kōdo does not process payments or money transfers — actual payment between people happens outside the app, by whatever means you choose.',
+          'Kaikōdo\'s expense feature is a split calculator between trip members: it records who paid for what and calculates who owes whom. Kaikōdo does not process payments or money transfers — actual payment between people happens outside the app, by whatever means you choose.',
           'We are not responsible for whether payments agreed between trip members actually take place.',
         ],
       },
       {
         h: '6. Travel requirement information',
         p: [
-          'Information about visas, vaccines, embassies, and entry requirements shown in Kōdo is for guidance only and may be outdated or incorrect. It does not replace official information from the embassy, consulate, or immigration authority of the destination country.',
-          'You are responsible for verifying entry requirements for each country directly with the official source before traveling. Kōdo is not responsible for travel decisions made based solely on this information.',
+          'Information about visas, vaccines, embassies, and entry requirements shown in Kaikōdo is for guidance only and may be outdated or incorrect. It does not replace official information from the embassy, consulate, or immigration authority of the destination country.',
+          'You are responsible for verifying entry requirements for each country directly with the official source before traveling. Kaikōdo is not responsible for travel decisions made based solely on this information.',
         ],
       },
       {
         h: '7. Limitation of liability',
         p: [
-          'To the extent permitted by law, Kōdo is provided without warranties of any kind. We are not liable for indirect losses, data loss, or the consequences of travel decisions made using the app.',
+          'To the extent permitted by law, Kaikōdo is provided without warranties of any kind. We are not liable for indirect losses, data loss, or the consequences of travel decisions made using the app.',
         ],
       },
       {

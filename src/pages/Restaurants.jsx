@@ -420,7 +420,7 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
     // B: block if exact duplicate
     if (duplicate) return;
     if (!title.trim()) return;
-    // Un hotel es solo tuyo/de tu viaje — no tiene sentido publicarlo en Kōdo
+    // Un hotel es solo tuyo/de tu viaje — no tiene sentido publicarlo en Kaikōdo
     // Community, así que se guarda siempre trip_members, sin depender del
     // toggle (que ni siquiera se muestra para type === 'hotel').
     onSave({ title, type, notes, address, lat: pinLat, lng: pinLng, visibility: type === 'hotel' ? 'trip_members' : (isPublic ? 'public' : 'trip_members') });
@@ -552,14 +552,14 @@ function CreateSpotSheet({ open, onClose, onSave, saving, spots, city, country, 
           </div>
 
           {/* Visibility toggle — no aplica a hoteles: un hotel es solo para
-              tu viaje, no algo que tenga sentido publicar en Kōdo Community. */}
+              tu viaje, no algo que tenga sentido publicar en Kaikōdo Community. */}
           {type !== 'hotel' && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{t('spots.create.visibility')}</p>
               <div className="flex rounded-xl border border-border overflow-hidden">
                 <button onClick={() => setIsPublic(true)}
                   className={`flex-1 py-2.5 text-sm font-medium transition-colors ${isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
-                  Kōdo Community
+                  Kaikōdo Community
                 </button>
                 <button onClick={() => setIsPublic(false)}
                   className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!isPublic ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:bg-secondary/50'}`}>
