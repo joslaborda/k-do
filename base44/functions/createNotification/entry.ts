@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
 
     if (pushAllowed) {
       const pushBody = `${actor_display_name} ${PUSH_TEXT[type] || "tiene novedades para ti"}`;
-      await sendPush(recipientUser.id, trip.name || "Kōdo", pushBody, { tripId, type, refId: refId || null });
+      await sendPush(recipientUser.id, trip.name || "Kaikōdo", pushBody, { tripId, type, refId: refId || null });
     }
 
     return Response.json({ ok: true });
