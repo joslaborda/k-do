@@ -71,7 +71,7 @@ workflows:
       - name: Incrementar número de build
         script: |
           cd ios/App
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number 6796791081 --platform=IOS)
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number 6798173537 --platform=IOS)
           agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
       - name: Build del .ipa firmado
         script: |
@@ -96,7 +96,7 @@ workflows:
   # simulador de iOS solo para validar que el proyecto Capacitor/CocoaPods
   # compila sin errores, antes de tener la cuenta de pago activa.
   kodo-ios-simulator:
-    name: Kodo - iOS (test simulador, sin firma)
+    name: Kaikōdo - iOS (test simulador, sin firma)
     max_build_duration: 30
     instance_type: mac_mini_m2
     environment:
