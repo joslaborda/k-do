@@ -43,7 +43,7 @@ export async function sendFeedback({ feedbackType, message, userEmail, userName 
   try {
     await base44.integrations.Core.SendEmail({
       to: FEEDBACK_INBOX,
-      subject: `[Kōdo] ${TYPE_LABEL[feedbackType] || 'Feedback'} de ${userName || userEmail || 'usuario'}`,
+      subject: `[Kaikōdo] ${TYPE_LABEL[feedbackType] || 'Feedback'} de ${userName || userEmail || 'usuario'}`,
       body: `Tipo: ${TYPE_LABEL[feedbackType] || feedbackType}
 De: ${userName || '(sin nombre)'} <${userEmail || 'sin email'}>
 Idioma app: ${getLanguage()}

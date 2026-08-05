@@ -70,7 +70,7 @@ function showReturnToAppScreen(token, onFallback) {
     overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#faf7f2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center;';
 
 const title = document.createElement('div');
-    title.textContent = 'kōdo';
+    title.textContent = 'kaikōdo';
     title.style.cssText = 'font-size:30px;font-weight:600;color:#181818;letter-spacing:-0.02em;';
 
 const msg = document.createElement('div');

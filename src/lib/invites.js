@@ -83,10 +83,10 @@ export async function sendTripInvite({ tripId, email, role, tripName, inviterEma
     try {
       await base44.integrations.Core.SendEmail({
         to: normalizedEmail,
-        subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kōdo ✈️`,
+        subject: `${inviterName || inviterEmail} te invita a "${tripName}" en Kaikōdo ✈️`,
         body: `Hola,
 
-${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kōdo.
+${inviterName || inviterEmail} te ha invitado a unirte al viaje "${tripName}" en Kaikōdo.
 
 Para aceptar la invitación, abre este enlace:
 
@@ -94,7 +94,7 @@ ${inviteUrl}
 
 Si el enlace no se abre solo al tocarlo, cópialo y pégalo en el navegador.
 
-Si aún no tienes cuenta en Kōdo, el mismo enlace te lleva a crearla con este email (${normalizedEmail}) — la invitación aparecerá automáticamente en cuanto entres.
+Si aún no tienes cuenta en Kaikōdo, el mismo enlace te lleva a crearla con este email (${normalizedEmail}) — la invitación aparecerá automáticamente en cuanto entres.
 
 ¡Buen viaje! 🧳`
       });
@@ -104,7 +104,7 @@ Si aún no tienes cuenta en Kōdo, el mismo enlace te lleva a crearla con este e
     }
   }
 
-  // Si el usuario ya existe en Kōdo, crear notificación in-app
+  // Si el usuario ya existe en Kaikōdo, crear notificación in-app
   // Usamos UserProfile.filter por email para no necesitar User.list() (que puede estar restringido)
   try {
     // UserProfile.read se cerró en el rls — se lee vía función backend con
