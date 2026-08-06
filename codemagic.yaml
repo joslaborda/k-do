@@ -11,6 +11,7 @@ workflows:
     environment:
       groups:
         - kodo_env # VITE_BASE44_APP_ID, VITE_BASE44_APP_BASE_URL, VITE_ONESIGNAL_APP_ID
+        - google_play # GCLOUD_SERVICE_ACCOUNT_CREDENTIALS (JSON de la service account)
       android_signing:
         - kodo_keystore # nombre que le des al keystore al subirlo en Codemagic
       node: latest
@@ -37,6 +38,10 @@ workflows:
       email:
         recipients:
           - jlabord@gmail.com
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: false
 
   # ── iOS ────────────────────────────────────────────────────────────────
   # Necesita, ya configurados en Codemagic (Teams > Code signing identities
