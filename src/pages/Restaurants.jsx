@@ -1731,23 +1731,6 @@ export default function Restaurants() {
             }
             try {
               await updateMutation.mutateAsync({ id: assignDateSpot.id, data });
-
-              // Auto-orden: si el spot tiene coordenadas y ya hay otros spots
-              // ese mismo día en la misma ciudad, se inserta junto al que
-              // tenga más cerca en vez de dejarlo desordenado al final. El
-              // usuario puede arrastrar para corregirlo (DraggableSpotList).
-              const finalCityId = data.city_id || assignDateSpot.city_id;
-              const daySpots = spots
-                .filter(s => s.id !== assignDateSpot.id && s.assigned_date === date && s.city_id === finalCityId)
-                .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999));
-              if (daySpots.length > 0 && assignDateSpot.lat && assignDateSpot.lng) {
-                const insertIdx = suggestInsertIndex(assignDateSpot, daySpots);
-                const reordered = [...daySpots];
-                reordered.splice(insertIdx, 0, assignDateSpot);
-                await Promise.all(reordered.map((s, idx) => base44.entities.Spot.update(s.id, { day_order: idx })));
-                queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
-                toast({ title: t('spots.autoOrder.title'), description: t('spots.autoOrder.body', { position: insertIdx + 1 }) });
-              }
             } catch (e) {
               // El spot pudo haber sido borrado con el "Deshacer" del toast
               // mientras este modal seguía abierto — no es un error real que
@@ -1755,7 +1738,41 @@ export default function Restaurants() {
               const notFound = /not found/i.test(String(e?.message || ''));
               if (!notFound) throw e;
             }
+
+            // El guardado esencial (fecha/hora) ya está hecho — cerramos el
+            // modal aquí. Antes el auto-orden de abajo corría DENTRO del
+            // mismo await que el botón "Confirmar" esperaba: con mala
+            // conexión, los Spot.update en Promise.all podían tardar mucho o
+            // quedarse colgados sin resolver ni rechazar nunca, y el botón se
+            // quedaba en "Cargando..." para siempre aunque el spot ya
+            // estuviera guardado (auditoría: José, 2026-08-06). Ahora el
+            // auto-orden es best-effort en segundo plano y no puede volver a
+            // bloquear el botón.
             setAssignDateSpot(null);
+
+            (async () => {
+              try {
+                // Auto-orden: si el spot tiene coordenadas y ya hay otros spots
+                // ese mismo día en la misma ciudad, se inserta junto al que
+                // tenga más cerca en vez de dejarlo desordenado al final. El
+                // usuario puede arrastrar para corregirlo (DraggableSpotList).
+                const finalCityId = data.city_id || assignDateSpot.city_id;
+                const daySpots = spots
+                  .filter(s => s.id !== assignDateSpot.id && s.assigned_date === date && s.city_id === finalCityId)
+                  .sort((a, b) => (a.day_order ?? 999) - (b.day_order ?? 999));
+                if (daySpots.length > 0 && assignDateSpot.lat && assignDateSpot.lng) {
+                  const insertIdx = suggestInsertIndex(assignDateSpot, daySpots);
+                  const reordered = [...daySpots];
+                  reordered.splice(insertIdx, 0, assignDateSpot);
+                  await Promise.all(reordered.map((s, idx) => base44.entities.Spot.update(s.id, { day_order: idx })));
+                  queryClient.invalidateQueries({ queryKey: ['spots', tripId] });
+                  toast({ title: t('spots.autoOrder.title'), description: t('spots.autoOrder.body', { position: insertIdx + 1 }) });
+                }
+              } catch {
+                // Best-effort: el spot ya quedó guardado con su fecha/hora,
+                // así que un fallo aquí no debe interrumpir al usuario.
+              }
+            })();
           }}
           onSkip={() => setAssignDateSpot(null)}
           onUndo={async () => {
