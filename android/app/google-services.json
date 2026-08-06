@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "416405430934",
-    "project_id": "kodo-travel-app",
-    "storage_bucket": "kodo-travel-app.firebasestorage.app"
+    "project_number": "19138303048",
+    "project_id": "kaikodo-app",
+    "storage_bucket": "kaikodo-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:416405430934:android:f5c602ea0937c768f258b7",
+        "mobilesdk_app_id": "1:19138303048:android:40d36dbfd375c29fc0347d",
         "android_client_info": {
           "package_name": "com.kaikodo.app"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAhud0U_nhb9YS6x0CX6XPlNK9t9Pfv-l8"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:416405430934:android:af81e0a9896a4acaf258b7",
-        "android_client_info": {
-          "package_name": "com.kodotravel.app"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAhud0U_nhb9YS6x0CX6XPlNK9t9Pfv-l8"
+          "current_key": "AIzaSyBCbXJZ6CqZBwumAz7UcnM0Wxj5x6-cxYE"
         }
       ],
       "services": {
