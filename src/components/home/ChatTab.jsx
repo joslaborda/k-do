@@ -49,8 +49,22 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
     const lastMsg = messages[messages.length - 1];
     const isMine = lastMsg && (lastMsg.user_id === currentUserId || lastMsg.user_email === currentUserEmail);
     if (isFirstLoad.current || (isMine && messages.length > lastMsgCount.current)) {
-      container.scrollTop = container.scrollHeight;
+      // Antes solo se hacía `container.scrollTop = container.scrollHeight`
+      // una vez, en el mismo tick que este efecto. Al entrar a la pestaña
+      // Chat (p. ej. desde una notificación) el contenedor a veces no tiene
+      // todavía su scrollHeight final en ese instante — la animación de
+      // entrada del tab (kodo-slide-right/left en Home.jsx) y el layout de
+      // los mensajes recién montados pueden tardar un frame más — así que
+      // el scroll se quedaba a medias o directamente arriba. Se repite en
+      // el siguiente frame (y con un pequeño margen extra) para asegurarse
+      // de que llega al fondo de verdad.
+      const scrollToBottom = () => { container.scrollTop = container.scrollHeight; };
+      scrollToBottom();
+      requestAnimationFrame(scrollToBottom);
+      const timeoutId = setTimeout(scrollToBottom, 150);
       isFirstLoad.current = false;
+      lastMsgCount.current = messages.length;
+      return () => clearTimeout(timeoutId);
     }
     lastMsgCount.current = messages.length;
   }, [messages]);
@@ -119,7 +133,7 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
                           });
               }
     },
-  
+
     onError: (e) => toast({ title: t('common.saveError'), description: e?.message || t('common.tryAgain'), variant: 'destructive' }),
   });
 
@@ -489,5 +503,3 @@ function ChatTab({ tripId, currentUserEmail, currentUserId, myProfile, tripMembe
     </>
   );
 }
-
-
