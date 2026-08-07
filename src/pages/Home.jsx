@@ -42,6 +42,16 @@ if (typeof document !== 'undefined' && !document.getElementById('kodo-tab-slide-
   document.head.appendChild(st);
 }
 
+// Clave de localStorage para el "último visto" del chat, por viaje — antes
+// chatLastRead se inicializaba a `new Date()` (el instante en que se monta
+// Home), así que cualquier mensaje llegado mientras la app estaba cerrada
+// quedaba "leído" de oficio en cuanto abrías la app: nunca se contaba como
+// no leído y la pestaña Chat jamás mostraba la burbuja de aviso, aunque
+// OTabBar sí sabe pintarla (badge > 0). Persistiendo el timestamp real de
+// la última vez que el usuario abrió el chat (por viaje) se puede saber de
+// verdad si hay mensajes nuevos desde entonces.
+const chatReadStorageKey = (tripId) => `kaikodo_chat_last_read_${tripId}`;
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const { t } = useTranslation();
@@ -54,14 +64,32 @@ export default function Home() {
   const [tabDir, setTabDir] = useState(1);
   const [urgentCount, setUrgentCount] = useState(0);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [chatLastRead, setChatLastRead] = useState(new Date());
+  const [chatLastRead, setChatLastReadState] = useState(() => new Date(0));
+  // Se consulta desde dos sitios (el deep-link de ?tab=... y el efecto de
+  // "tab inteligente" según fecha del viaje): sin esta ref, cuando llegas
+  // desde una notificación de chat con ?tab=chat, el efecto de tab
+  // inteligente se dispara justo después al cargar el viaje y pisa el tab
+  // que acabamos de fijar, devolviéndote a Pre-viaje/Hoy sin que llegues a
+  // ver el chat.
+  const deepLinkTabRef = useRef(null);
+
+  // Marca el chat como visto AHORA y lo persiste para este viaje — se llama
+  // tanto al cambiar de pestaña a mano como al entrar directo desde una
+  // notificación de chat.
+  const markChatRead = (tid) => {
+    const now = new Date();
+    setChatLastReadState(now);
+    if (tid) {
+      try { localStorage.setItem(chatReadStorageKey(tid), now.toISOString()); } catch {}
+    }
+  };
 
   const handleTabChange = (key) => {
     const tabOrder = ['previaje','inicio','hoy','manana','resumen','chat'];
     setTabDir(tabOrder.indexOf(key) >= tabOrder.indexOf(tabRef.current) ? 1 : -1);
     tabRef.current = key;
     setTab(key);
-    if (key === 'chat') setChatLastRead(new Date());
+    if (key === 'chat') markChatRead(tripId);
   };
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,8 +119,31 @@ export default function Home() {
     if (params.get('open_settings') === 'true') {
       setSettingsOpen(true);
     }
+    // Deep link a una pestaña concreta (usado por NotificationBell, p. ej.
+    // ?tab=chat al tocar una notificación de mensaje). Se aplica ya mismo —
+    // el efecto de "tab inteligente" de abajo respeta este valor la primera
+    // vez que se dispare tras esto, ver deepLinkTabRef.
+    const wantedTab = params.get('tab');
+    if (wantedTab) {
+      deepLinkTabRef.current = wantedTab;
+      tabRef.current = wantedTab;
+      setTab(wantedTab);
+      if (wantedTab === 'chat') markChatRead(id);
+    }
     window.scrollTo(0, 0);
   }, [navigate, location.search]);
+
+  // Carga el "último leído" del chat persistido para este viaje concreto —
+  // solo al cambiar de viaje, no en cada render.
+  useEffect(() => {
+    if (!tripId) return;
+    try {
+      const stored = localStorage.getItem(chatReadStorageKey(tripId));
+      setChatLastReadState(stored ? new Date(stored) : new Date(0));
+    } catch {
+      setChatLastReadState(new Date(0));
+    }
+  }, [tripId]);
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ['trip', tripId],
@@ -104,6 +155,13 @@ export default function Home() {
   // Tab inicial inteligente según estado del viaje
   useEffect(() => {
     if (!trip?.start_date) return;
+    // Si acabamos de llegar con un deep link explícito (p. ej. desde una
+    // notificación de chat con ?tab=chat), se respeta esa pestaña una única
+    // vez en vez de pisarla con el cálculo automático de abajo.
+    if (deepLinkTabRef.current) {
+      deepLinkTabRef.current = null;
+      return;
+    }
     const today = new Date(); today.setHours(0,0,0,0);
     const start = new Date(trip.start_date + 'T00:00:00');
     const end = trip.end_date ? new Date(trip.end_date + 'T00:00:00') : null;
@@ -113,7 +171,7 @@ export default function Home() {
     else next = 'hoy';
     tabRef.current = next;
     setTab(next);
-  }, [trip?.start_date, trip?.end_date]);  
+  }, [trip?.start_date, trip?.end_date]);
 
   const deleteMutation = useMutation({
     mutationFn: () => base44.entities.Trip.delete(tripId),
@@ -123,7 +181,7 @@ export default function Home() {
 
   // Solo el admin podía quitar a otros miembros (y ni siquiera podía
   // quitarse a sí mismo) — un miembro normal que quisiera dejar el viaje no
-  // tenía ninguna forma de hacerlo salvo pedirle al admin que lo expulsara.
+  // tenía ninguna forma de hacerlo salvo pedirle al admin que lo expulasara.
   // leaveTrip() ya existía en el backend (base44/functions/leaveTrip), solo
   // faltaba esta mutación para exponerlo desde Ajustes.
   const leaveMutation = useMutation({
