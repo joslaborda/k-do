@@ -45,6 +45,21 @@
 * evento ya se disparó antes de que este módulo se cargara. Se añaden logs
 * con el prefijo [push] para poder diagnosticar esto en el futuro sin
 * depender de conectar el dispositivo por USB.
+*
+* Fix (ago 2026) — badge del icono "pegado" en Android:
+* Android (y algunos launchers vía ShortcutBadger, que es lo que usa el SDK
+* de OneSignal por debajo) calculan el número del badge del icono a partir
+* de las notificaciones del sistema que siguen entregadas en la bandeja —
+* NO a partir de nada de lo que pase dentro de la app. Marcar un mensaje
+* como leído en el chat, o simplemente ver que ya no hay nada pendiente en
+* la propia app, no cancela esas notificaciones del sistema: si llegaron 3
+* pushes y el usuario abrió la app tocando el icono (no una notificación
+* concreta), las 3 siguen "vivas" en la bandeja y el badge se queda clavado
+* en 3 para siempre, aunque dentro de la app no quede rastro de ellas.
+* clearDeliveredNotifications() cancela todas las notificaciones de
+* OneSignal ya entregadas (y con ello el badge) — se llama una vez al
+* arrancar la app y cada vez que vuelve a primer plano (ver main.jsx),
+* imitando el comportamiento habitual de apps como WhatsApp o Gmail.
 */
 
 const ONESIGNAL_APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID;
@@ -55,11 +70,11 @@ const READY_POLL_TIMEOUT_MS = 8000;
 let nativeReadyPromise = null;
 
 function isNativePlatform() {
-  return typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
+    return typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
 }
 
 function getOneSignal() {
-  return typeof window !== 'undefined' ? window.plugins?.OneSignal : null;
+    return typeof window !== 'undefined' ? window.plugins?.OneSignal : null;
 }
 
 /**
@@ -74,41 +89,41 @@ function getOneSignal() {
 * un aviso en consola cuando esto pase.
 */
 function whenNativeReady() {
-  if (!isNativePlatform()) return Promise.resolve(false);
-  if (nativeReadyPromise) return nativeReadyPromise;
+    if (!isNativePlatform()) return Promise.resolve(false);
+    if (nativeReadyPromise) return nativeReadyPromise;
 
   nativeReadyPromise = new Promise((resolve) => {
-    if (getOneSignal()) {
-      console.log('[push] OneSignal ya disponible de forma síncrona');
-      resolve(true);
-      return;
-    }
+        if (getOneSignal()) {
+                console.log('[push] OneSignal ya disponible de forma síncrona');
+                resolve(true);
+                return;
+        }
 
-    let settled = false;
-    const finish = (ok, reason) => {
-      if (settled) return;
-      settled = true;
-      clearInterval(pollId);
-      clearTimeout(timeoutId);
-      console.log(`[push] whenNativeReady resuelto vía "${reason}" (plugin ${ok ? 'sí' : 'no'} disponible)`);
-      resolve(ok);
-    };
+                                       let settled = false;
+        const finish = (ok, reason) => {
+                if (settled) return;
+                settled = true;
+                clearInterval(pollId);
+                clearTimeout(timeoutId);
+                console.log(`[push] whenNativeReady resuelto vía "${reason}" (plugin ${ok ? 'sí' : 'no'} disponible)`);
+                resolve(ok);
+        };
 
-    document.addEventListener(
-      'deviceready',
-      () => finish(!!getOneSignal(), 'deviceready'),
-      { once: true }
-    );
+                                       document.addEventListener(
+                                               'deviceready',
+                                               () => finish(!!getOneSignal(), 'deviceready'),
+                                         { once: true }
+                                             );
 
-    // Respaldo: por si 'deviceready' ya se disparó antes de que este
-    // módulo llegara a registrar el listener de arriba.
-    const pollId = setInterval(() => {
-      if (getOneSignal()) finish(true, 'polling');
-    }, READY_POLL_INTERVAL_MS);
+                                       // Respaldo: por si 'deviceready' ya se disparó antes de que este
+                                       // módulo llegara a registrar el listener de arriba.
+                                       const pollId = setInterval(() => {
+                                               if (getOneSignal()) finish(true, 'polling');
+                                       }, READY_POLL_INTERVAL_MS);
 
-    const timeoutId = setTimeout(() => {
-      finish(!!getOneSignal(), 'timeout');
-    }, READY_POLL_TIMEOUT_MS);
+                                       const timeoutId = setTimeout(() => {
+                                               finish(!!getOneSignal(), 'timeout');
+                                       }, READY_POLL_TIMEOUT_MS);
   });
 
   return nativeReadyPromise;
@@ -121,21 +136,21 @@ function whenNativeReady() {
 * abrir un viaje) para no generar el prompt en un momento raro.
 */
 export function initPushNotifications() {
-  if (!isNativePlatform()) return;
-  if (!ONESIGNAL_APP_ID) {
-    console.warn('[push] VITE_ONESIGNAL_APP_ID no está definido, no se inicializa OneSignal');
-    return;
-  }
-  whenNativeReady().then((available) => {
-    const OneSignal = getOneSignal();
-    if (!available || !OneSignal) {
-      console.warn('[push] OneSignal no disponible tras esperar al bridge nativo — el plugin no se cargó');
-      return;
+    if (!isNativePlatform()) return;
+    if (!ONESIGNAL_APP_ID) {
+          console.warn('[push] VITE_ONESIGNAL_APP_ID no está definido, no se inicializa OneSignal');
+          return;
     }
-    console.log('[push] Inicializando OneSignal…');
-    OneSignal.initialize(ONESIGNAL_APP_ID);
-    OneSignal.Notifications.requestPermission(true);
-  });
+    whenNativeReady().then((available) => {
+          const OneSignal = getOneSignal();
+          if (!available || !OneSignal) {
+                  console.warn('[push] OneSignal no disponible tras esperar al bridge nativo — el plugin no se cargó');
+                  return;
+          }
+          console.log('[push] Inicializando OneSignal…');
+          OneSignal.initialize(ONESIGNAL_APP_ID);
+          OneSignal.Notifications.requestPermission(true);
+    });
 }
 
 /**
@@ -143,14 +158,14 @@ export function initPushNotifications() {
 * cada login exitoso (ver AuthContext.jsx / checkUserAuth).
 */
 export function syncPushIdentity(userId) {
-  if (!userId) return;
-  whenNativeReady().then((available) => {
-    if (!available) {
-      console.warn('[push] No se puede vincular external_id — OneSignal no disponible');
-      return;
-    }
-    getOneSignal()?.login(String(userId));
-  });
+    if (!userId) return;
+    whenNativeReady().then((available) => {
+          if (!available) {
+                  console.warn('[push] No se puede vincular external_id — OneSignal no disponible');
+                  return;
+          }
+          getOneSignal()?.login(String(userId));
+    });
 }
 
 /**
@@ -160,8 +175,22 @@ export function syncPushIdentity(userId) {
 * teléfono seguiría recibiendo los push del usuario anterior.
 */
 export function clearPushIdentity() {
-  whenNativeReady().then((available) => {
-    if (!available) return;
-    getOneSignal()?.logout();
-  });
+    whenNativeReady().then((available) => {
+          if (!available) return;
+          getOneSignal()?.logout();
+    });
+}
+
+/**
+* Cancela todas las notificaciones de OneSignal ya entregadas al sistema y,
+* con ello, resetea el badge del icono de la app. Se llama al arrancar la
+* app y cada vez que vuelve a primer plano (ver main.jsx) — así el badge
+* nunca se queda "pegado" con un número que ya no corresponde a nada
+* pendiente dentro de la app.
+*/
+export function clearDeliveredNotifications() {
+    whenNativeReady().then((available) => {
+          if (!available) return;
+          getOneSignal()?.Notifications?.clearAll?.();
+    });
 }
