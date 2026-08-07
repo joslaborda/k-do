@@ -20,19 +20,28 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, checkAppState } = useAuth();
-  const { t } = useTranslation();
-  const [authUser, setAuthUser] = useState(null);
-  const [userLoaded, setUserLoaded] = useState(false);
-
-  useEffect(() => {
-    if (!isLoadingAuth && !authError) {
-      base44.auth.me().then((u) => { setAuthUser(u); setUserLoaded(true); }).catch(() => setUserLoaded(true));
-    } else if (!isLoadingAuth) {
-      setUserLoaded(true);
-    }
-  }, [isLoadingAuth, authError]);
-
+  // Fix (ago 2026) -- "tras registrarme/entrar la app se queda colgada,
+    // hay que cerrar y volver a abrirla": este componente llevaba su PROPIA
+    // copia del usuario (authUser/userLoaded) en vez de usar directamente
+    // `user` de useAuth(), reobteniéndola con su propio base44.auth.me() en
+    // un useEffect aparte. Tras un login/registro, checkAppState() (llamado
+    // como onSuccess de LoginScreen) dispara varias veces seguidas el mismo
+    // ciclo isLoadingAuth/authError mientras resuelve -- y cada vez, este
+    // efecto lanzaba OTRA llamada a auth.me() en paralelo (hasta 3-4 por un
+    // solo login), aparte de la que ya hace checkUserAuth() en AuthContext.
+    // Peor aún: `userLoaded` se ponía a true la PRIMERA vez (como visitante
+    // anónimo, antes de loguearse) y nunca se reseteaba a false en el
+    // siguiente login -- así que en cuanto isLoadingAuth/isLoadingPublicSettings
+    // volvían a false tras el login, la puerta de carga se abría usando el
+    // `authUser` todavía viejo (null) mientras alguna de esas llamadas
+    // redundantes seguía en vuelo, en vez de esperar a los datos nuevos. En
+    // un móvil con red de viaje (lenta o con el backend de Render en frío)
+    // esto se sentía como que la app se quedaba colgada -- solo un cierre y
+    // reapertura completo (que reinicia todo este estado desde cero, con una
+    // sola llamada) lo desatascaba. Al usar `user` de useAuth() directamente
+    // no hay ninguna copia ni llamada duplicada que pueda ir por detrás.
+  const { user: authUser, isLoadingAuth, isLoadingPublicSettings, authError, checkAppState } = useAuth();
+    const { t } = useTranslation();
   // Migración silenciosa: mantener UserProfile.email en minúsculas y al día.
   useEffect(() => {
     if (!authUser?.id || !authUser?.email) return;
@@ -51,7 +60,7 @@ const AuthenticatedApp = () => {
     }).catch(() => {});
   }, [authUser?.id, authUser?.email]);
 
-  if (isLoadingPublicSettings || isLoadingAuth || !userLoaded) {
+    if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin"></div>
