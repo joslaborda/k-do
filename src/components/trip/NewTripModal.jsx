@@ -267,6 +267,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
   const startDateRef = useRef(null);
   const firstCountryRef = useRef(null);
   const nightsErrorRef = useRef(null);
+    const endDateRef = useRef(null);
 
   const validStops = stops.filter(s => s.city.trim());
   const totalNightsEntered = stops.reduce((sum, s) => sum + (parseInt(s.nights) || 0), 0);
@@ -344,7 +345,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
 
     // Scroll to first error
     if (!formData.name.trim()) { nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); nameRef.current?.focus(); return; }
-    if (!formData.start_date) { startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); startDateRef.current?.focus(); return; }
+    if (!formData.start_date) { startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); startDateRef.current?.focus(); return; }    if (formData.end_date && formData.end_date < formData.start_date) { endDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); endDateRef.current?.focus(); return; }
     if (!stops[0]?.country?.trim()) { firstCountryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstCountryRef.current?.focus(); return; }
     if (validStops.length === 0) return;
     // El error de noches (suma de noches por parada no cuadra con los días del
@@ -399,6 +400,7 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
   const missingName = attempted && !formData.name.trim();
   const missingStart = attempted && !formData.start_date;
   const missingCountry = attempted && !stops[0]?.country?.trim();
+  const invalidEndDate = attempted && formData.end_date && formData.end_date < formData.start_date;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -461,12 +463,14 @@ export default function NewTripModal({ open, onOpenChange, onSubmit, isPending }
                 {t('trip.dialog.endDate')} <span className="text-muted-foreground font-normal text-xs">{t('trip.new.orByNights')}</span>
               </label>
               <input
+                ref={endDateRef}
                 type="date"
                 value={formData.end_date}
                 min={formData.start_date || undefined}
                 onChange={e => setFormData(p => ({ ...p, end_date: e.target.value }))}
-                className="w-full h-10 border border-border rounded-xl px-3 text-sm outline-none focus:border-primary bg-card"
+                className={`w-full h-10 border rounded-xl px-3 text-sm outline-none transition-colors ${invalidEndDate ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-border bg-card focus:border-primary'}`}
               />
+              {invalidEndDate && <p className="text-xs text-red-500">{t('trip.dialog.endBeforeStart')}</p>}
             </div>
           </div>
 
