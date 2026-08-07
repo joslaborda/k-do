@@ -52,3 +52,36 @@ const getAppParams = () => {
 export const appParams = {
 	...getAppParams()
 }
+// Fix (ago 2026) — login por email/contraseña en web dejaba fuera al
+// usuario aunque el login funcionara perfectamente en el servidor (visible
+// en los Registros de base44 como "app.auth.login" con éxito, auth_method:
+// "password"): appParams.token se calculaba UNA sola vez al cargar este
+// módulo, así que para un visitante anónimo quedaba en null para siempre en
+// memoria. base44.auth.loginViaEmailPassword() (LoginScreen.jsx) sí guarda
+// el token nuevo en localStorage bajo la misma clave "base44_access_token"
+// (ver saveAccessToken en @base44/sdk), pero sin recargar la página nada
+// releía ese localStorage — checkAppState() (AuthContext.jsx) seguía viendo
+// appParams.token === null y con el "if (appParams.token)" mandaba otra vez
+// a LoginScreen, como si el login nunca hubiera pasado. El flujo nativo
+// (nativeAuth.js) no tenía este problema porque hace `appParams.token =
+// token` a mano tras el callback — aquí convertimos "token" en un getter/
+// setter que lee y escribe siempre el localStorage real, así cualquier
+// login (web o nativo, actual o futuro) queda reflejado al instante sin
+// depender de que cada sitio de la app recuerde sincronizarlo a mano.
+Object.defineProperty(appParams, 'token', {
+		get() {
+					if (isNode) return null;
+					return storage.getItem('base44_access_token');
+		},
+		set(value) {
+					if (isNode) return;
+					if (value) {
+									storage.setItem('base44_access_token', value);
+									storage.setItem('token', value);
+					} else {
+									storage.removeItem('base44_access_token');
+					}
+		},
+		enumerable: true,
+		configurable: true,
+});
